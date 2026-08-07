@@ -1,14 +1,20 @@
-﻿import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import './styles.css';
 
-export default function M056Page(){
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  useEffect(()=>{ setLoading(true); fetch(/api/v1/).then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
-  return (<div className='module-M056 p-4'>
-    <h1>M056 Module</h1>
-    {loading? <div>Loading…</div> : (
-      <ul>{items.map(it => <li key={it.id}>{JSON.stringify(it.data)}</li>)}</ul>
-    )}
-  </div>);
+// Real implementation lives in FPODashboardPage's Inventory tab, not here.
+export default function M056Page() {
+  return (
+    <div className='module-M056 p-4'>
+      <h1>FPO Inventory (M056)</h1>
+      <p>Domain: FPO — Status: HIDDEN</p>
+      <p className="text-sm text-gray-600 mt-2">
+        This capability is implemented at <code>pages/FPODashboardPage.jsx</code>
+        {' '}("Inventory" tab), not here.
+      </p>
+      <Link to="/fpo-dashboard" className="text-blue-600 underline">
+        Go to the FPO Dashboard →
+      </Link>
+    </div>
+  );
 }

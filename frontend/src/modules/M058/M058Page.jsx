@@ -1,14 +1,20 @@
-﻿import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import './styles.css';
 
-export default function M058Page(){
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  useEffect(()=>{ setLoading(true); fetch(/api/v1/).then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
-  return (<div className='module-M058 p-4'>
-    <h1>M058 Module</h1>
-    {loading? <div>Loading…</div> : (
-      <ul>{items.map(it => <li key={it.id}>{JSON.stringify(it.data)}</li>)}</ul>
-    )}
-  </div>);
+// Real implementation lives in FPODashboardPage's Collective Orders tab, not here.
+export default function M058Page() {
+  return (
+    <div className='module-M058 p-4'>
+      <h1>FPO Sales (M058)</h1>
+      <p>Domain: FPO — Status: HIDDEN</p>
+      <p className="text-sm text-gray-600 mt-2">
+        This capability is implemented at <code>pages/FPODashboardPage.jsx</code>
+        {' '}("Collective Orders" tab), not here.
+      </p>
+      <Link to="/fpo-dashboard" className="text-blue-600 underline">
+        Go to the FPO Dashboard →
+      </Link>
+    </div>
+  );
 }

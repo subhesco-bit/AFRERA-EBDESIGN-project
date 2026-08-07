@@ -1,6 +1,8 @@
 ﻿# M034 - Parcel Mapping (frontend)
 
 Domain: Land
-Status: PARTIAL
+Status: HIDDEN — implemented at `frontend/src/pages/FarmerFieldPage.jsx`
 
-This folder contains frontend scaffolding (React). Add pages and components here.
+This module's UI is not built here. Parcel/field mapping ("My Fields") is
+implemented in `FarmerFieldPage.jsx`, mounted at `/farmerfield`. This stub
+(`M034Page.jsx`) redirects to it rather than duplicating the implementation.
