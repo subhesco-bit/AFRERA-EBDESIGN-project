@@ -1,0 +1,1 @@
+﻿# M144 - M144 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M144_generated.sql\n

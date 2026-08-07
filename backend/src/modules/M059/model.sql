@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for FPO Compliance (M059)
+-- Define tables and indexes here

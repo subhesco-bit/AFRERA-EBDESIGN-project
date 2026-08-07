@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Feature Flag Management (M007)
+-- Define tables and indexes here

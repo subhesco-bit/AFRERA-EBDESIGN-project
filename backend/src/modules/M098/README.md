@@ -1,0 +1,1 @@
+﻿# M098 - M098 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M098_generated.sql\n

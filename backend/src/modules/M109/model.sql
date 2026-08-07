@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Spare Parts Management (M109)
+-- Define tables and indexes here

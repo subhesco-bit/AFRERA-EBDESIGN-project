@@ -1,0 +1,211 @@
+# ============================================================================
+# SUPERSEDED - THIS FILE NEVER RUNS AND NEVER HAS.
+#
+# GitHub Actions only discovers workflows in .github/workflows/ at the
+# REPOSITORY ROOT. This file sits at backend/.github/workflows/, so it has
+# never been executed a single time.
+#
+# Replaced 2026-08-03 by /.github/workflows/ci.yml, which also fixes:
+#   * missing postgres/redis/mongo service containers (tests need them)
+#   * deploy jobs referencing k8s/*.yaml manifests that do not exist here
+#   * `npm run lint` with no ESLint config present
+#   * paths assuming repo root == backend/ (this is a monorepo)
+#
+# Kept for reference only. Delete once /.github/workflows/ci.yml is confirmed
+# green on a real push.
+# ============================================================================
+
+name: AFRERA Backend CI/CD Pipeline (SUPERSEDED - DOES NOT RUN)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: afrera-backend
+
+jobs:
+  # Lint and Test
+  test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          PG_HOST: localhost
+          PG_DATABASE: test_db
+          PG_USER: test
+          PG_PASSWORD: test
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+  # Build Docker Image
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sem,pattern={{version}}
+            type=sem,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Deploy to Development
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: development
+      url: https://dev-api.afrera.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.DEV_KUBECONFIG }}
+      
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
+        with:
+          manifests: |
+            k8s/namespace.yaml
+            k8s/configmap.yaml
+            k8s/deployment.yaml
+            k8s/service.yaml
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:develop
+      
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/afrera-backend -n afrera-dev --timeout=5m
+
+  # Deploy to Production
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://api.afrera.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.PROD_KUBECONFIG }}
+      
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
+        with:
+          manifests: |
+            k8s/namespace.yaml
+            k8s/configmap.yaml
+            k8s/deployment.yaml
+            k8s/service.yaml
+            k8s/ingress.yaml
+          images: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+      
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/afrera-backend -n afrera-prod --timeout=5m
+      
+      - name: Run smoke tests
+        run: |
+          curl -f https://api.afrera.com/health || exit 1
+
+  # Security Scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'

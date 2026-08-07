@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: afrera-postgres
+    environment:
+      POSTGRES_USER: afrera
+      POSTGRES_PASSWORD: afrera_password
+      POSTGRES_DB: afrera_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "afrera"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - afrera-network
+
+  # MongoDB
+  mongodb:
+    image: mongo:7
+    container_name: afrera-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: afrera
+      MONGO_INITDB_ROOT_PASSWORD: afrera_password
+      MONGO_INITDB_DATABASE: afrera_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - afrera-network
+
+  # Redis Cache
+  redis:
+    image: redis:7
+    container_name: afrera-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - afrera-network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: afrera-backend
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DATABASE: afrera_db
+      PG_USER: afrera
+      PG_PASSWORD: afrera_password
+      MONGO_URI: mongodb://afrera:afrera_password@mongodb:27017/afrera_mongo?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: your-super-secret-key-change-in-production
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      FRONTEND_URL: http://localhost:3000
+      LOG_LEVEL: debug
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    networks:
+      - afrera-network
+    restart: unless-stopped
+
+  # RabbitMQ Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: afrera-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: afrera
+      RABBITMQ_DEFAULT_PASS: afrera_password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - afrera-network
+
+  # Elasticsearch
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: afrera-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - afrera-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  rabbitmq_data:
+  elasticsearch_data:
+
+networks:
+  afrera-network:
+    driver: bridge

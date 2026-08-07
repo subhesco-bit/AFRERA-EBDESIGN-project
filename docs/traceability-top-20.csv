@@ -1,0 +1,21 @@
+screen,frontend_route,backend_api,db_tables,events
+Auth - Login,/login,/api/v1/auth/login,users;sessions,auth.login
+Farmer Dashboard,/,/api/v1/farmers/:id/summary,farmers;orders;inventory,dashboard.view
+Farmer Sell Flow,/sell,/api/v1/marketplace/products,products;orders,product.create
+Marketplace Listing,/marketplace,/api/v1/marketplace/products,products,search.query
+Product Detail,/products/:id,/api/v1/marketplace/products/{id},products,product.view
+Pre-order Subscription,/preorder,/api/v1/marketplace/subscriptions,orders;subscriptions,subscription.create
+Order Checkout,/checkout,/api/v1/orders,orders,payment.initiated
+Logistics Tracking,/logistics,/api/v1/logistics/track,orders;logistics,tracking.update
+Inventory Overview,/inventory,/api/v1/erp/inventory,inventory,inventory.view
+Analytics Dashboard,/analytics,/api/v1/analytics/summary,analytics,analytics.view
+Module Hub,/modules,/api/v1/modules,module_catalog,module.list
+Forms Management,/forms,/api/v1/forms,forms,form.submit
+Decision Support,/decision-support,/api/v1/decision-support/recommendations,decision_logs,decision.request
+Contract Farming Onboard,/contracts,/api/v1/contracts,contracts,contract.create
+Price Projection,/price-projection,/api/v1/revenue/price,price_forecasts,price.forecast
+Cost Breakdown,/costs,/api/v1/costs/product,product_costs,cost.calculate
+Recipe Page,/recipes,/api/v1/recipes,recipes,recipe.view
+NE Products,/ne-products,/api/v1/ne/products,products,ne.product.view
+Offline Sync Status,/sync,/api/v1/sync/status,offline_changes,sync.status
+Settings,/settings,/api/v1/users/{id}/settings,users,settings.update

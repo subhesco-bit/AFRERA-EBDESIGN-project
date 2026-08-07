@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Fertilizer Inventory (M112)
+-- Define tables and indexes here

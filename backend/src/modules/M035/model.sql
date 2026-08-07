@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for GIS Land Mapping (M035)
+-- Define tables and indexes here

@@ -1,0 +1,180 @@
+{
+  "users": [
+    {
+      "id": "user-1785831364622",
+      "email": "lab-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$vBPY64XggAA1TnwFRXuRSeTR3OuTR..KcV.aqa6k7ki9ONs6I7n0i",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-04T08:16:04.623Z"
+    },
+    {
+      "id": "user-1785831377608",
+      "email": "iot-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$yy6DHiSmpUjUFyXbnVZQ4.7AGvPVkXYq.CvMX80j0N1iXzFEScOIC",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-04T08:16:17.608Z"
+    },
+    {
+      "id": "user-1785831381405",
+      "email": "arvr-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$.f.8OXT88KjuarKka6qXIeegqp80gjFS7Dt91sooLn8yh.PlKQW0i",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-04T08:16:21.405Z"
+    },
+    {
+      "id": "user-1785831384416",
+      "email": "chat-test@example.com",
+      "phone": "",
+      "role": "consumer",
+      "status": "active",
+      "password_hash": "$2a$12$zDRWBdVDuewAmK7EWXtPVuV3mVCyK3t0tZHDu/F5bmU3weQxHmxcm",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-04T08:16:24.416Z"
+    },
+    {
+      "id": "user-1785831387689",
+      "email": "gi-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$OBqbLNRR5UfOyjNde1okpeZ3Qlz5b.bhloTW9aZYbUACYXb2z.R0y",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-04T08:16:27.689Z"
+    },
+    {
+      "id": "user-1785920248905",
+      "email": "food-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$FMUbjh6oFwEwaao34Umnq.lIssO4vdyPbiZGNWjWmiKO04lhJp9d.",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T08:57:28.906Z"
+    },
+    {
+      "id": "user-1785920250476",
+      "email": "health-test@example.com",
+      "phone": "",
+      "role": "consumer",
+      "status": "active",
+      "password_hash": "$2a$12$U5dFY70Mnggi2xAm0.lzX./FBPiw7vv0cmnmUtKjnHew931XWNCsi",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T08:57:30.476Z"
+    },
+    {
+      "id": "user-1785920251444",
+      "email": "nutrition-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$NGwEv/Ciz0wsPlAOnZxqxepJ612FvfMMkFT6f/aNy1g563SLojaT6",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T08:57:31.444Z"
+    },
+    {
+      "id": "user-1785920252489",
+      "email": "voice-test@example.com",
+      "phone": "",
+      "role": "consumer",
+      "status": "active",
+      "password_hash": "$2a$12$ZUY9NWYP.Kr18AgMqcXzBOeZZ6OQu7877NMIWLuLyxFaPd0dfvkeW",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T08:57:32.489Z"
+    },
+    {
+      "id": "user-1785920254041",
+      "email": "organic-test@example.com",
+      "phone": "",
+      "role": "farmer",
+      "status": "active",
+      "password_hash": "$2a$12$9SuUYc1cOS9aVsdQMYtTze03qiYej3VrQMZP8WaMRFdD.cDaE9X6W",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T08:57:34.041Z"
+    },
+    {
+      "id": "user-1785920255576",
+      "email": "test@example.com",
+      "phone": "",
+      "role": "consumer",
+      "status": "active",
+      "password_hash": "$2a$12$itMeTTB7uEy3rjkGGOWw5.WNB2dmjysi1h5tdVHrvORmj3RAjovau",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T08:57:35.576Z"
+    },
+    {
+      "id": "user-1785920535162",
+      "email": "blockchain-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$56QWGBUQxZCR5SfwIqzHS.0kL5C0PKU7Zng4MAcpff9hIyTgOp70q",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T09:02:15.162Z"
+    },
+    {
+      "id": "user-1785920536222",
+      "email": "pa-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$WVOpIEuXh8UpEU8QLpbCiuAs.pZ/r5AMWTHGv.wssTDoGIyal0NPW",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T09:02:16.222Z"
+    },
+    {
+      "id": "user-1785920538114",
+      "email": "value-test@example.com",
+      "phone": "",
+      "role": "consumer",
+      "status": "active",
+      "password_hash": "$2a$12$pTN4ijPfwAlAllTF/qT17ufEnywpOAR2JjpVB0p3GX46t22rkST2G",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T09:02:18.114Z"
+    },
+    {
+      "id": "user-1785920539764",
+      "email": "kg-test@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$pflngzOtg2XJCld/.XusOO.wjINvcJ2IDZvZjyXM7aBDLWtsYcGxS",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T09:02:19.764Z"
+    },
+    {
+      "id": "user-1785935259431",
+      "email": "gi-test2@example.com",
+      "phone": "",
+      "role": "admin",
+      "status": "active",
+      "password_hash": "$2a$12$4oeIVrwhRhldiA.Sqz5EpekC/OOYDXZtu4P/kdydRTqp.4H/OkQ3K",
+      "first_name": "",
+      "last_name": "",
+      "created_at": "2026-08-05T13:07:39.431Z"
+    }
+  ]
+}

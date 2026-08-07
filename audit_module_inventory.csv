@@ -1,0 +1,19 @@
+path,module,notes,status
+backend/src/services/energy/EnergyCostCalculator.js,Energy (RECIE),Core calculator & forecasting,implemented (verify tests)
+backend/src/routes/energyRoutes.js,Energy (RECIE),API routes for RECIE,endpoints present
+backend/src/services/food/FoodIntelligenceEngine.js,Food,Batch & traceability engine,implemented (verify tests)
+backend/src/routes/foodRoutes.js,Food,Food API routes,endpoints present
+backend/src/services/erp/CostControlModule.js,ERP,Cost control & ABC engine,implemented (verify tests)
+backend/src/routes/erpRoutes.js,ERP,ERP API routes,endpoints present
+backend/src/platforms/platformDetector.js,Platform,Platform detection & capability matrix,implemented
+backend/src/websocket/socketServer.js,Realtime,Websocket server/push,implemented (verify)
+backend/src/utils/logger.js,Utils,Logging utilities,implemented
+backend/src/database/migrations/1000_energy_food_erp_modules.sql,Database,Migrations for core modules,implemented (run migrations)
+docs/EVGA_PHASE13_REVERIFIED_2026-08-03.md,EVGA Docs,EVGA Phase 13 evidence & CAP list,documented (CAPs need mapping)
+EVGA_PHASE13_REVERIFIED_2026-08-03.md,EVGA Docs,Root-level EVGA doc,documented
+IMPLEMENTATION_SUMMARY_2026-08-05.md,Implementation Summary,Phase 1 summary and next steps,documented
+backend/src/cache/redis.js,Cache,Redis cache integration,implemented (lint suggestions present)
+backend/src/routes/vendorRoutes.js,Integrations,Vendor integrations routes,partial (check TODOs)
+backend/src/monitoring/performance.js,Monitoring,Performance metrics & hooks,partial
+
+# Note: This CSV is an initial snapshot created by automated scan. Further rows will be added after deeper parsing of TODO/FIXME markers and EVGA CAP mapping.

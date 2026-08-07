@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Platform Configuration (M002)
+-- Define tables and indexes here

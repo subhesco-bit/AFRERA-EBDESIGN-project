@@ -1,0 +1,68 @@
+openapi: 3.0.0
+info:
+  title: AFRERA Marketplace API (stub)
+  version: 1.0.0
+servers:
+  - url: /api/v1/marketplace
+paths:
+  /products:
+    get:
+      summary: List products
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create product (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreate'
+      responses:
+        '201':
+          description: Created
+  /products/{id}:
+    get:
+      summary: Get product
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        seller_id:
+          type: string
+    ProductCreate:
+      type: object
+      required: [title, price, seller_id]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        seller_id:
+          type: string

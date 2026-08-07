@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Fish Health Management (M136)
+-- Define tables and indexes here

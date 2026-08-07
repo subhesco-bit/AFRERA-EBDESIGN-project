@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Floriculture Management (M143)
+-- Define tables and indexes here

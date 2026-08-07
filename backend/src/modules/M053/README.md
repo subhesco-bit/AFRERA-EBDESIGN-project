@@ -1,0 +1,1 @@
+﻿# M053 - M053 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M053_generated.sql\n

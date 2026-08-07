@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Equipment Rental (M104)
+-- Define tables and indexes here

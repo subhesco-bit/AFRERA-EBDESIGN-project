@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Harvest Planning (M069)
+-- Define tables and indexes here

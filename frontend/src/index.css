@@ -1,0 +1,281 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142 76% 36%;
+    --radius: 0.5rem;
+
+    /* -------------------------------------------------------------------
+     * AFRERA domain tokens
+     *
+     * The shadcn primitives above describe a generic app (primary, muted,
+     * destructive). They cannot express what this platform actually shows:
+     * whether a lot is perishable, whether a cold chain held, whether a
+     * product carries GI protection, how urgent an incident is.
+     *
+     * Encoding those as domain tokens means "perishable" looks the same on
+     * every screen, and changing it changes it everywhere — rather than 45
+     * components each picking their own orange.
+     * ----------------------------------------------------------------- */
+
+    /* Brand accent (was hardcoded #f97316 in a utility class) */
+    --brand-accent: 25 95% 53%;
+    --brand-accent-foreground: 0 0% 100%;
+
+    /* Handling engines — mirrors backend handling_engines (migration 992) */
+    --perishable: 142 70% 40%;          /* live, clock running */
+    --perishable-foreground: 0 0% 100%;
+    --ambient: 217 33% 45%;             /* stable, cost-optimised */
+    --ambient-foreground: 0 0% 100%;
+
+    /* Cold chain state */
+    --coldchain-ok: 199 89% 48%;
+    --coldchain-warn: 38 92% 50%;
+    --coldchain-breach: 0 84% 60%;
+
+    /* Provenance / trust */
+    --gi-verified: 271 60% 50%;         /* GI-registered origin */
+    --organic-certified: 88 55% 40%;
+    --unverified: 215 16% 55%;          /* honest neutral, never green */
+
+    /* Severity — mirrors backend SEVERITY enum + emergency severity ladder.
+       Kept distinguishable in greyscale and for red-green colour blindness:
+       lightness descends monotonically, so severity survives desaturation. */
+    --sev-info: 199 89% 48%;
+    --sev-notice: 173 58% 39%;
+    --sev-warning: 38 92% 50%;
+    --sev-critical: 15 85% 47%;
+    --sev-emergency: 0 72% 41%;
+
+    /* Decision provenance — mirrors the MCDA data-quality weighting.
+       A figure derived from assumed data must never look as solid as a
+       measured one. */
+    --data-real: 142 70% 40%;
+    --data-estimated: 38 92% 50%;
+    --data-assumed: 215 16% 55%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142 76% 36%;
+
+    /* Dark-mode domain tokens: lightened so contrast against the dark
+       surface stays legible. Hues are held constant — a perishable badge
+       must read as the same category in either theme. */
+    --brand-accent: 25 95% 60%;
+    --brand-accent-foreground: 0 0% 10%;
+    --perishable: 142 60% 55%;
+    --perishable-foreground: 0 0% 10%;
+    --ambient: 217 33% 62%;
+    --ambient-foreground: 0 0% 10%;
+    --coldchain-ok: 199 80% 62%;
+    --coldchain-warn: 38 85% 62%;
+    --coldchain-breach: 0 75% 65%;
+    --gi-verified: 271 55% 65%;
+    --organic-certified: 88 45% 55%;
+    --unverified: 215 16% 62%;
+    --sev-info: 199 80% 62%;
+    --sev-notice: 173 50% 55%;
+    --sev-warning: 38 85% 62%;
+    --sev-critical: 15 80% 62%;
+    --sev-emergency: 0 70% 60%;
+    --data-real: 142 60% 55%;
+    --data-estimated: 38 85% 62%;
+    --data-assumed: 215 16% 62%;
+  }
+
+  /* -----------------------------------------------------------------------
+   * ACCESSIBILITY MODES — recovered from v42 A11Y {simple, kiosk, voice, sms}
+   *
+   * These are not cosmetic preferences. A farmer on a feature phone reaches
+   * the platform by SMS or not at all; a shared village kiosk needs a
+   * different session model than a personal phone. Applied as a class on
+   * <html> by AccessibilityProvider.
+   * --------------------------------------------------------------------- */
+
+  /* Simple: larger type, calmer surfaces, fewer competing signals. */
+  .a11y-simple {
+    font-size: 118%;
+    --radius: 0.75rem;
+  }
+  .a11y-simple button,
+  .a11y-simple a[role='button'],
+  .a11y-simple input,
+  .a11y-simple select {
+    min-height: 3rem;
+  }
+  /* Decorative motion removed — it competes for attention it hasn't earned. */
+  .a11y-simple .animate-fadeIn,
+  .a11y-simple .animate-slideUp {
+    animation: none;
+  }
+
+  /* Kiosk: shared terminal. Bigger targets for standing use at arm's length. */
+  .a11y-kiosk {
+    font-size: 132%;
+  }
+  .a11y-kiosk button,
+  .a11y-kiosk a[role='button'] {
+    min-height: 3.5rem;
+    min-width: 3.5rem;
+  }
+
+  /* Voice-assisted: strong focus ring, because the caret is the user's
+     position in the document when they cannot see it. */
+  .a11y-voice :focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  /* Respect the OS-level reduced-motion setting regardless of mode. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded-md;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* ---------------------------------------------------------------------------
+ * AFRERA brand utilities
+ *
+ * FIXED 2026-08-04: these previously hardcoded #1e8e3e while --primary
+ * resolves to #16A249 — two different greens both described as "the brand
+ * green", 24.2 apart in RGB and visibly different side by side. They are now
+ * derived from the token, so there is exactly one source of truth and dark
+ * mode follows automatically.
+ * ------------------------------------------------------------------------- */
+.afrera-green {
+  @apply text-primary;
+}
+
+.afrera-green-bg {
+  @apply bg-primary text-primary-foreground;
+}
+
+.afrera-orange {
+  @apply text-[hsl(var(--brand-accent))];
+}
+
+.afrera-orange-bg {
+  @apply bg-[hsl(var(--brand-accent))] text-[hsl(var(--brand-accent-foreground))];
+}
+
+/* Animation utilities */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Visually hidden, still announced by screen readers.
+   Used for table captions: a sighted user gets the surrounding heading, a
+   screen-reader user gets the table's purpose announced before its contents.
+   display:none would hide it from BOTH, which defeats the point. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

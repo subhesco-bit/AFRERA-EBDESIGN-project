@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Fuel Management (M108)
+-- Define tables and indexes here

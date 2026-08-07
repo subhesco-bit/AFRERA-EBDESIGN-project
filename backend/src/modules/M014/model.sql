@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Role Management (M014)
+-- Define tables and indexes here

@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Breakdown Maintenance (M107)
+-- Define tables and indexes here

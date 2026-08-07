@@ -1,0 +1,12 @@
+afrera-ai/src/
+├── models/
+│   ├── demandForecastingModel.py
+│   ├── priceProjectionModel.py
+│   └── cropRecommendationModel.py
+├── services/
+│   ├── aiService.py
+│   └── dataProcessingService.py
+├── utils/
+│   ├── dataUtils.py
+│   └── modelUtils.py
+└── main.py

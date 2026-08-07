@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Fleet Management (M105)
+-- Define tables and indexes here

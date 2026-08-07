@@ -1,0 +1,1 @@
+﻿# M072 - M072 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M072_generated.sql\n

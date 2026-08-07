@@ -1,0 +1,15 @@
+kubernetes/
+├── base/
+│   ├── afrera-api-deployment.yaml
+│   ├── afrera-api-service.yaml
+│   ├── afrera-ai-deployment.yaml
+│   └── afrera-ai-service.yaml
+├── overlays/
+│   ├── development/
+│   ├── staging/
+│   └── production/
+└── helm/
+    └── afrera/
+        ├── Chart.yaml
+        ├── values.yaml
+        └── templates/

@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Irrigation Management (M075)
+-- Define tables and indexes here

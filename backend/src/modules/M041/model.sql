@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Village Registry (M041)
+-- Define tables and indexes here

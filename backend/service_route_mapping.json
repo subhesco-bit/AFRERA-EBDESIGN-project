@@ -1,0 +1,2501 @@
+[
+  {
+    "serviceFile": "advancedAIService.js",
+    "serviceVar": "advancedAIService",
+    "mountPath": "/api/v1/advanced-ai",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/predict-demand"
+      },
+      {
+        "method": "POST",
+        "path": "/optimize-price"
+      },
+      {
+        "method": "POST",
+        "path": "/assess-credit-risk"
+      },
+      {
+        "method": "POST",
+        "path": "/detect-fraud"
+      },
+      {
+        "method": "POST",
+        "path": "/recommendations"
+      },
+      {
+        "method": "POST",
+        "path": "/detect-crop-disease"
+      },
+      {
+        "method": "GET",
+        "path": "/models"
+      },
+      {
+        "method": "GET",
+        "path": "/health"
+      }
+    ]
+  },
+  {
+    "serviceFile": "advancedVoiceAI.js",
+    "serviceVar": "advancedVoiceAI",
+    "mountPath": "/api/v1/advanced-voice",
+    "hasSetup": false,
+    "routeCount": 6,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/conversation"
+      },
+      {
+        "method": "POST",
+        "path": "/process"
+      },
+      {
+        "method": "GET",
+        "path": "/languages"
+      },
+      {
+        "method": "GET",
+        "path": "/intents"
+      },
+      {
+        "method": "POST",
+        "path": "/text-query"
+      },
+      {
+        "method": "GET",
+        "path": "/health"
+      }
+    ]
+  },
+  {
+    "serviceFile": "aiCopilotService.js",
+    "serviceVar": "aiCopilotService",
+    "mountPath": "/api/v1/ai-copilot",
+    "hasSetup": false,
+    "routeCount": 11,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/session"
+      },
+      {
+        "method": "POST",
+        "path": "/session/:id/message"
+      },
+      {
+        "method": "GET",
+        "path": "/session/:id/history"
+      },
+      {
+        "method": "PUT",
+        "path": "/session/:id/close"
+      },
+      {
+        "method": "GET",
+        "path": "/finance/analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/logistics/routes"
+      },
+      {
+        "method": "GET",
+        "path": "/warehouse/inventory"
+      },
+      {
+        "method": "GET",
+        "path": "/insurance/policies"
+      },
+      {
+        "method": "GET",
+        "path": "/nutrition/analysis"
+      },
+      {
+        "method": "GET",
+        "path": "/marketplace/trends"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics"
+      }
+    ]
+  },
+  {
+    "serviceFile": "aiService.js",
+    "serviceVar": "aiService",
+    "mountPath": "/api/v1/ai",
+    "hasSetup": false,
+    "routeCount": 5,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/predict/demand"
+      },
+      {
+        "method": "POST",
+        "path": "/optimize/price"
+      },
+      {
+        "method": "POST",
+        "path": "/assess/credit-risk"
+      },
+      {
+        "method": "POST",
+        "path": "/detect/fraud"
+      },
+      {
+        "method": "POST",
+        "path": "/recommend"
+      }
+    ]
+  },
+  {
+    "serviceFile": "analyticsService.js",
+    "serviceVar": "analyticsService",
+    "mountPath": "/api/v1/analytics",
+    "hasSetup": false,
+    "routeCount": 3,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/overview"
+      },
+      {
+        "method": "GET",
+        "path": "/insights"
+      },
+      {
+        "method": "GET",
+        "path": "/platform-stats"
+      }
+    ]
+  },
+  {
+    "serviceFile": "arVrService.js",
+    "serviceVar": "arVrService",
+    "mountPath": "/api/v1/ar-vr",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/experiences"
+      },
+      {
+        "method": "GET",
+        "path": "/experiences"
+      },
+      {
+        "method": "PATCH",
+        "path": "/experiences/:experienceId/publish"
+      },
+      {
+        "method": "POST",
+        "path": "/assets"
+      },
+      {
+        "method": "GET",
+        "path": "/assets"
+      },
+      {
+        "method": "POST",
+        "path": "/interaction-points"
+      },
+      {
+        "method": "GET",
+        "path": "/experiences/:experienceId/interaction-points"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions"
+      },
+      {
+        "method": "PATCH",
+        "path": "/sessions/:sessionId/end"
+      },
+      {
+        "method": "POST",
+        "path": "/ar-vr-analytics"
+      }
+    ]
+  },
+  {
+    "serviceFile": "authService.js",
+    "serviceVar": "authService",
+    "mountPath": "/api/v1/auth",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/register"
+      },
+      {
+        "method": "POST",
+        "path": "/login"
+      },
+      {
+        "method": "POST",
+        "path": "/refresh"
+      },
+      {
+        "method": "POST",
+        "path": "/logout"
+      },
+      {
+        "method": "POST",
+        "path": "/2fa/setup"
+      },
+      {
+        "method": "POST",
+        "path": "/2fa/verify"
+      },
+      {
+        "method": "POST",
+        "path": "/2fa/disable"
+      },
+      {
+        "method": "GET",
+        "path": "/oauth/:provider/url"
+      },
+      {
+        "method": "POST",
+        "path": "/oauth/:provider/callback"
+      },
+      {
+        "method": "GET",
+        "path": "/me"
+      }
+    ]
+  },
+  {
+    "serviceFile": "biodiversityService.js",
+    "serviceVar": "biodiversityService",
+    "mountPath": "/api/v1/biodiversity",
+    "hasSetup": false,
+    "routeCount": 17,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/species"
+      },
+      {
+        "method": "GET",
+        "path": "/species"
+      },
+      {
+        "method": "GET",
+        "path": "/species/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/native-crops"
+      },
+      {
+        "method": "GET",
+        "path": "/native-crops"
+      },
+      {
+        "method": "POST",
+        "path": "/traditional-varieties"
+      },
+      {
+        "method": "GET",
+        "path": "/traditional-varieties"
+      },
+      {
+        "method": "POST",
+        "path": "/medicinal-plants"
+      },
+      {
+        "method": "GET",
+        "path": "/medicinal-plants"
+      },
+      {
+        "method": "POST",
+        "path": "/wild-foods"
+      },
+      {
+        "method": "GET",
+        "path": "/wild-foods"
+      },
+      {
+        "method": "POST",
+        "path": "/conservation"
+      },
+      {
+        "method": "GET",
+        "path": "/conservation"
+      },
+      {
+        "method": "PUT",
+        "path": "/conservation/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/risk-prediction"
+      },
+      {
+        "method": "GET",
+        "path": "/risk-predictions"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics/dashboard"
+      }
+    ]
+  },
+  {
+    "serviceFile": "blockchainTraceabilityService.js",
+    "serviceVar": "blockchainTraceabilityService",
+    "mountPath": "/api/v1/blockchain-traceability",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/blockchain-transactions"
+      },
+      {
+        "method": "GET",
+        "path": "/blockchain-transactions/:hash"
+      },
+      {
+        "method": "POST",
+        "path": "/traceability-events"
+      },
+      {
+        "method": "GET",
+        "path": "/traceability-events/:productId"
+      },
+      {
+        "method": "POST",
+        "path": "/chain-of-custody"
+      },
+      {
+        "method": "GET",
+        "path": "/chain-of-custody/verify/:productId"
+      },
+      {
+        "method": "POST",
+        "path": "/blockchain-certificates"
+      },
+      {
+        "method": "GET",
+        "path": "/blockchain-certificates/verify/:certificateNumber"
+      },
+      {
+        "method": "POST",
+        "path": "/verification-requests"
+      },
+      {
+        "method": "POST",
+        "path": "/blockchain-analytics"
+      }
+    ]
+  },
+  {
+    "serviceFile": "catalogIntelligenceService.js",
+    "serviceVar": "catalogIntelligenceService",
+    "mountPath": "/api/v1/catalog-intelligence",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/in-season"
+      },
+      {
+        "method": "GET",
+        "path": "/product-calendar"
+      },
+      {
+        "method": "GET",
+        "path": "/glut-forecast"
+      },
+      {
+        "method": "GET",
+        "path": "/scarcity-months"
+      },
+      {
+        "method": "GET",
+        "path": "/wellness"
+      },
+      {
+        "method": "GET",
+        "path": "/wellness/concerns"
+      },
+      {
+        "method": "GET",
+        "path": "/explain"
+      },
+      {
+        "method": "GET",
+        "path": "/glossary"
+      }
+    ]
+  },
+  {
+    "serviceFile": "commerceRulesService.js",
+    "serviceVar": "commerceRulesService",
+    "mountPath": "/api/v1/commerce-rules",
+    "hasSetup": false,
+    "routeCount": 5,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/delivery-zone"
+      },
+      {
+        "method": "GET",
+        "path": "/serviceable-pincodes"
+      },
+      {
+        "method": "POST",
+        "path": "/subscription-plan"
+      },
+      {
+        "method": "POST",
+        "path": "/price-freeze"
+      },
+      {
+        "method": "POST",
+        "path": "/loyalty-redemption"
+      }
+    ]
+  },
+  {
+    "serviceFile": "consumerHealthService.js",
+    "serviceVar": "consumerHealthService",
+    "mountPath": "/api/v1/consumer-health",
+    "hasSetup": false,
+    "routeCount": 14,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/health-profiles"
+      },
+      {
+        "method": "GET",
+        "path": "/health-profiles"
+      },
+      {
+        "method": "POST",
+        "path": "/dietary-profiles"
+      },
+      {
+        "method": "POST",
+        "path": "/health-metrics"
+      },
+      {
+        "method": "GET",
+        "path": "/health-metrics"
+      },
+      {
+        "method": "POST",
+        "path": "/health-goals"
+      },
+      {
+        "method": "GET",
+        "path": "/health-goals"
+      },
+      {
+        "method": "POST",
+        "path": "/dietary-recommendations"
+      },
+      {
+        "method": "GET",
+        "path": "/dietary-recommendations"
+      },
+      {
+        "method": "POST",
+        "path": "/health-alerts"
+      },
+      {
+        "method": "GET",
+        "path": "/health-alerts"
+      },
+      {
+        "method": "POST",
+        "path": "/food-consumption"
+      },
+      {
+        "method": "GET",
+        "path": "/health-analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/bmi"
+      }
+    ]
+  },
+  {
+    "serviceFile": "conversationalAIService.js",
+    "serviceVar": "conversationalAIService",
+    "mountPath": "/api/v1/conversational-ai",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/sessions"
+      },
+      {
+        "method": "GET",
+        "path": "/sessions/:sessionId"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/:sessionId/messages"
+      },
+      {
+        "method": "GET",
+        "path": "/sessions/:sessionId/messages"
+      },
+      {
+        "method": "POST",
+        "path": "/detect-intent"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/:sessionId/respond"
+      },
+      {
+        "method": "GET",
+        "path": "/domains"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/:sessionId/context"
+      },
+      {
+        "method": "GET",
+        "path": "/sessions/:sessionId/context"
+      },
+      {
+        "method": "POST",
+        "path": "/sessions/:sessionId/end"
+      }
+    ]
+  },
+  {
+    "serviceFile": "decisionSupportService.js",
+    "serviceVar": "decisionSupportService",
+    "mountPath": "setupRoutes",
+    "hasSetup": false,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "digitalProductPassportService.js",
+    "serviceVar": "digitalProductPassportService",
+    "mountPath": "/api/v1/digital-product-passport",
+    "hasSetup": false,
+    "routeCount": 25,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/product-id"
+      },
+      {
+        "method": "GET",
+        "path": "/product-id/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/batches"
+      },
+      {
+        "method": "GET",
+        "path": "/batches"
+      },
+      {
+        "method": "POST",
+        "path": "/farm-info"
+      },
+      {
+        "method": "GET",
+        "path": "/farm-info"
+      },
+      {
+        "method": "POST",
+        "path": "/farmer-info"
+      },
+      {
+        "method": "GET",
+        "path": "/farmer-info"
+      },
+      {
+        "method": "POST",
+        "path": "/certification-info"
+      },
+      {
+        "method": "GET",
+        "path": "/certification-info"
+      },
+      {
+        "method": "POST",
+        "path": "/processing-history"
+      },
+      {
+        "method": "GET",
+        "path": "/processing-history"
+      },
+      {
+        "method": "POST",
+        "path": "/logistics-history"
+      },
+      {
+        "method": "GET",
+        "path": "/logistics-history"
+      },
+      {
+        "method": "POST",
+        "path": "/sustainability-data"
+      },
+      {
+        "method": "GET",
+        "path": "/sustainability-data"
+      },
+      {
+        "method": "POST",
+        "path": "/carbon-data"
+      },
+      {
+        "method": "GET",
+        "path": "/carbon-data"
+      },
+      {
+        "method": "POST",
+        "path": "/quality-reports"
+      },
+      {
+        "method": "GET",
+        "path": "/quality-reports"
+      },
+      {
+        "method": "POST",
+        "path": "/recall-status"
+      },
+      {
+        "method": "GET",
+        "path": "/recall-status"
+      },
+      {
+        "method": "POST",
+        "path": "/qr-code"
+      },
+      {
+        "method": "GET",
+        "path": "/qr-code/:id"
+      },
+      {
+        "method": "GET",
+        "path": "/passport/:product_id/:batch_id"
+      }
+    ]
+  },
+  {
+    "serviceFile": "dynamicPricingService.js",
+    "serviceVar": "dynamicPricingService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "enterpriseControlService.js",
+    "serviceVar": "enterpriseControlService",
+    "mountPath": "/api/v1/control",
+    "hasSetup": false,
+    "routeCount": 13,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/workflow/start"
+      },
+      {
+        "method": "POST",
+        "path": "/workflow/:instanceCode/act"
+      },
+      {
+        "method": "GET",
+        "path": "/workflow/pending"
+      },
+      {
+        "method": "POST",
+        "path": "/crm/leads"
+      },
+      {
+        "method": "POST",
+        "path": "/crm/leads/:leadCode/convert"
+      },
+      {
+        "method": "GET",
+        "path": "/crm/pipeline"
+      },
+      {
+        "method": "GET",
+        "path": "/clients/:id/health"
+      },
+      {
+        "method": "GET",
+        "path": "/legal/calendar"
+      },
+      {
+        "method": "POST",
+        "path": "/risk/:riskCode/assess"
+      },
+      {
+        "method": "GET",
+        "path": "/risk/heatmap"
+      },
+      {
+        "method": "POST",
+        "path": "/emergency/incidents"
+      },
+      {
+        "method": "POST",
+        "path": "/emergency/incidents/:incidentCode/acknowledge"
+      },
+      {
+        "method": "GET",
+        "path": "/emergency/active"
+      }
+    ]
+  },
+  {
+    "serviceFile": "erpService.js",
+    "serviceVar": "erpService",
+    "mountPath": "/api/v1/erp",
+    "hasSetup": false,
+    "routeCount": 7,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/status"
+      },
+      {
+        "method": "POST",
+        "path": "/sync/product"
+      },
+      {
+        "method": "POST",
+        "path": "/sync/order"
+      },
+      {
+        "method": "POST",
+        "path": "/sync/farmer"
+      },
+      {
+        "method": "POST",
+        "path": "/sync/transaction"
+      },
+      {
+        "method": "POST",
+        "path": "/sync/asset"
+      },
+      {
+        "method": "POST",
+        "path": "/sync/bulk"
+      }
+    ]
+  },
+  {
+    "serviceFile": "farmerService.js",
+    "serviceVar": "farmerService",
+    "mountPath": null,
+    "hasSetup": false,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "farmerTrainingService.js",
+    "serviceVar": "farmerTrainingService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "farmerValueService.js",
+    "serviceVar": "farmerValueService",
+    "mountPath": "/api/v1/value",
+    "hasSetup": false,
+    "routeCount": 5,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/farmers/:farmerId/value-index"
+      },
+      {
+        "method": "POST",
+        "path": "/farmers/:farmerId/value-index/compute"
+      },
+      {
+        "method": "GET",
+        "path": "/farmers/:farmerId/unclaimed-support"
+      },
+      {
+        "method": "GET",
+        "path": "/farmers/:farmerId/cash-flow"
+      },
+      {
+        "method": "GET",
+        "path": "/farmers/:farmerId/ledger"
+      }
+    ]
+  },
+  {
+    "serviceFile": "financialService.js",
+    "serviceVar": "financialService",
+    "mountPath": "/api/v1/financial",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/loans"
+      },
+      {
+        "method": "GET",
+        "path": "/loans/farmer/:farmerId"
+      },
+      {
+        "method": "POST",
+        "path": "/loans/:id/approve"
+      },
+      {
+        "method": "GET",
+        "path": "/loans/:id/emi"
+      },
+      {
+        "method": "POST",
+        "path": "/emi/:id/pay"
+      },
+      {
+        "method": "POST",
+        "path": "/advances"
+      },
+      {
+        "method": "GET",
+        "path": "/advances/farmer/:farmerId"
+      },
+      {
+        "method": "GET",
+        "path": "/credit-score/:farmerId"
+      }
+    ]
+  },
+  {
+    "serviceFile": "foodIntelligenceService.js",
+    "serviceVar": "foodIntelligenceService",
+    "mountPath": "/api/v1/food-intelligence",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/food-items"
+      },
+      {
+        "method": "GET",
+        "path": "/food-items/search"
+      },
+      {
+        "method": "POST",
+        "path": "/quality-assessments"
+      },
+      {
+        "method": "GET",
+        "path": "/food-items/:foodItemId/quality-assessments"
+      },
+      {
+        "method": "POST",
+        "path": "/contaminant-tests"
+      },
+      {
+        "method": "GET",
+        "path": "/food-items/:foodItemId/contaminant-tests"
+      },
+      {
+        "method": "POST",
+        "path": "/freshness-assessments"
+      },
+      {
+        "method": "POST",
+        "path": "/food-recalls"
+      },
+      {
+        "method": "GET",
+        "path": "/food-recalls/active"
+      },
+      {
+        "method": "POST",
+        "path": "/food-intelligence"
+      }
+    ]
+  },
+  {
+    "serviceFile": "foodSafetyService.js",
+    "serviceVar": "foodSafetyService",
+    "mountPath": "/api/v1/food-safety",
+    "hasSetup": false,
+    "routeCount": 21,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/haccp"
+      },
+      {
+        "method": "GET",
+        "path": "/haccp"
+      },
+      {
+        "method": "POST",
+        "path": "/haccp/:id/monitoring"
+      },
+      {
+        "method": "POST",
+        "path": "/fssai"
+      },
+      {
+        "method": "GET",
+        "path": "/fssai"
+      },
+      {
+        "method": "POST",
+        "path": "/iso22000"
+      },
+      {
+        "method": "GET",
+        "path": "/iso22000"
+      },
+      {
+        "method": "POST",
+        "path": "/recalls"
+      },
+      {
+        "method": "PUT",
+        "path": "/recalls/:id/status"
+      },
+      {
+        "method": "GET",
+        "path": "/recalls"
+      },
+      {
+        "method": "POST",
+        "path": "/capa"
+      },
+      {
+        "method": "PUT",
+        "path": "/capa/:id/status"
+      },
+      {
+        "method": "GET",
+        "path": "/capa"
+      },
+      {
+        "method": "POST",
+        "path": "/audits"
+      },
+      {
+        "method": "GET",
+        "path": "/audits"
+      },
+      {
+        "method": "POST",
+        "path": "/risk-assessment"
+      },
+      {
+        "method": "GET",
+        "path": "/risk-assessment"
+      },
+      {
+        "method": "POST",
+        "path": "/corrective-actions"
+      },
+      {
+        "method": "PUT",
+        "path": "/corrective-actions/:id/status"
+      },
+      {
+        "method": "GET",
+        "path": "/corrective-actions"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard"
+      }
+    ]
+  },
+  {
+    "serviceFile": "formService.js",
+    "serviceVar": "formService",
+    "mountPath": "/api/v1/forms",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/templates"
+      },
+      {
+        "method": "POST",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/:id"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/submit"
+      },
+      {
+        "method": "GET",
+        "path": "/:id/submissions"
+      }
+    ]
+  },
+  {
+    "serviceFile": "giIntelligenceService.js",
+    "serviceVar": "giIntelligenceService",
+    "mountPath": "/api/v1/gi-intelligence",
+    "hasSetup": false,
+    "routeCount": 11,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/gi-products"
+      },
+      {
+        "method": "GET",
+        "path": "/gi-products"
+      },
+      {
+        "method": "POST",
+        "path": "/gi-producers"
+      },
+      {
+        "method": "GET",
+        "path": "/gi-products/:giProductId/producers"
+      },
+      {
+        "method": "POST",
+        "path": "/gi-pricing"
+      },
+      {
+        "method": "POST",
+        "path": "/gi-authentication"
+      },
+      {
+        "method": "GET",
+        "path": "/gi-authentication/verify/:authCode"
+      },
+      {
+        "method": "POST",
+        "path": "/gi-marketplace"
+      },
+      {
+        "method": "GET",
+        "path": "/gi-marketplace"
+      },
+      {
+        "method": "POST",
+        "path": "/gi-analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/gi-analytics/:giProductId"
+      }
+    ]
+  },
+  {
+    "serviceFile": "governmentSchemeService.js",
+    "serviceVar": "governmentSchemeService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "greenhouseService.js",
+    "serviceVar": "greenhouseService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "gstService.js",
+    "serviceVar": "gstService",
+    "mountPath": null,
+    "hasSetup": false,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "indigenousKnowledgeService.js",
+    "serviceVar": "indigenousKnowledgeService",
+    "mountPath": "/api/v1/indigenous-knowledge",
+    "hasSetup": false,
+    "routeCount": 19,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/traditional-recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/traditional-recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/traditional-recipes/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/traditional-medicine"
+      },
+      {
+        "method": "GET",
+        "path": "/traditional-medicine"
+      },
+      {
+        "method": "POST",
+        "path": "/indigenous-farming"
+      },
+      {
+        "method": "GET",
+        "path": "/indigenous-farming"
+      },
+      {
+        "method": "POST",
+        "path": "/oral-history"
+      },
+      {
+        "method": "GET",
+        "path": "/oral-history"
+      },
+      {
+        "method": "POST",
+        "path": "/tribal-knowledge"
+      },
+      {
+        "method": "GET",
+        "path": "/tribal-knowledge"
+      },
+      {
+        "method": "POST",
+        "path": "/documentation"
+      },
+      {
+        "method": "GET",
+        "path": "/documentation"
+      },
+      {
+        "method": "POST",
+        "path": "/protection"
+      },
+      {
+        "method": "PUT",
+        "path": "/protection/:id/status"
+      },
+      {
+        "method": "GET",
+        "path": "/protection"
+      },
+      {
+        "method": "POST",
+        "path": "/ip-management"
+      },
+      {
+        "method": "GET",
+        "path": "/ip-management"
+      },
+      {
+        "method": "PUT",
+        "path": "/ip-management/:id"
+      }
+    ]
+  },
+  {
+    "serviceFile": "institutionalProcurementService.js",
+    "serviceVar": "institutionalProcurementService",
+    "mountPath": "/api/v1/institutional-procurement",
+    "hasSetup": false,
+    "routeCount": 16,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/tenders"
+      },
+      {
+        "method": "GET",
+        "path": "/tenders"
+      },
+      {
+        "method": "POST",
+        "path": "/tenders/:id/bids"
+      },
+      {
+        "method": "POST",
+        "path": "/demand-forecast"
+      },
+      {
+        "method": "GET",
+        "path": "/demand-forecast"
+      },
+      {
+        "method": "POST",
+        "path": "/menu-plans"
+      },
+      {
+        "method": "GET",
+        "path": "/menu-plans"
+      },
+      {
+        "method": "POST",
+        "path": "/nutrition-compliance"
+      },
+      {
+        "method": "GET",
+        "path": "/nutrition-compliance"
+      },
+      {
+        "method": "POST",
+        "path": "/contracts"
+      },
+      {
+        "method": "GET",
+        "path": "/contracts"
+      },
+      {
+        "method": "POST",
+        "path": "/quality-inspections"
+      },
+      {
+        "method": "GET",
+        "path": "/quality-inspections"
+      },
+      {
+        "method": "POST",
+        "path": "/settlements"
+      },
+      {
+        "method": "GET",
+        "path": "/settlements"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard"
+      }
+    ]
+  },
+  {
+    "serviceFile": "insuranceClaimsService.js",
+    "serviceVar": "insuranceClaimsService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "insuranceService.js",
+    "serviceVar": "insuranceService",
+    "mountPath": "/api/v1/insurance",
+    "hasSetup": false,
+    "routeCount": 11,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/policies"
+      },
+      {
+        "method": "GET",
+        "path": "/policies/:id"
+      },
+      {
+        "method": "GET",
+        "path": "/policies"
+      },
+      {
+        "method": "POST",
+        "path": "/claims"
+      },
+      {
+        "method": "GET",
+        "path": "/claims/:id"
+      },
+      {
+        "method": "GET",
+        "path": "/claims"
+      },
+      {
+        "method": "PUT",
+        "path": "/claims/:id/process"
+      },
+      {
+        "method": "POST",
+        "path": "/master-policies"
+      },
+      {
+        "method": "GET",
+        "path": "/master-policies"
+      },
+      {
+        "method": "GET",
+        "path": "/products"
+      },
+      {
+        "method": "POST",
+        "path": "/calculate-premium"
+      }
+    ]
+  },
+  {
+    "serviceFile": "iotIntegrationService.js",
+    "serviceVar": "iotIntegrationService",
+    "mountPath": "/api/v1/iot-integration",
+    "hasSetup": false,
+    "routeCount": 11,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/iot-devices"
+      },
+      {
+        "method": "GET",
+        "path": "/iot-devices"
+      },
+      {
+        "method": "PATCH",
+        "path": "/iot-devices/:deviceId/status"
+      },
+      {
+        "method": "POST",
+        "path": "/sensor-data"
+      },
+      {
+        "method": "GET",
+        "path": "/sensor-data/:deviceId"
+      },
+      {
+        "method": "POST",
+        "path": "/device-commands"
+      },
+      {
+        "method": "GET",
+        "path": "/device-commands/:deviceId"
+      },
+      {
+        "method": "POST",
+        "path": "/device-alerts"
+      },
+      {
+        "method": "GET",
+        "path": "/device-alerts/unacknowledged"
+      },
+      {
+        "method": "GET",
+        "path": "/iot-devices/:deviceId/health"
+      },
+      {
+        "method": "POST",
+        "path": "/iot-analytics"
+      }
+    ]
+  },
+  {
+    "serviceFile": "knowledgeGraphService.js",
+    "serviceVar": "knowledgeGraphService",
+    "mountPath": "/api/v1/knowledge-graph",
+    "hasSetup": false,
+    "routeCount": 7,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/knowledge-nodes"
+      },
+      {
+        "method": "GET",
+        "path": "/knowledge-nodes/search"
+      },
+      {
+        "method": "POST",
+        "path": "/relationships"
+      },
+      {
+        "method": "GET",
+        "path": "/knowledge-nodes/:nodeId/related"
+      },
+      {
+        "method": "POST",
+        "path": "/graph-queries"
+      },
+      {
+        "method": "POST",
+        "path": "/graph-queries/:queryId/execute"
+      },
+      {
+        "method": "POST",
+        "path": "/knowledge-analytics"
+      }
+    ]
+  },
+  {
+    "serviceFile": "laboratoryERPService.js",
+    "serviceVar": "laboratoryERPService",
+    "mountPath": "/api/v1/laboratory-erp",
+    "hasSetup": false,
+    "routeCount": 13,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/laboratories"
+      },
+      {
+        "method": "GET",
+        "path": "/laboratories"
+      },
+      {
+        "method": "GET",
+        "path": "/test-categories"
+      },
+      {
+        "method": "GET",
+        "path": "/test-methods"
+      },
+      {
+        "method": "POST",
+        "path": "/samples"
+      },
+      {
+        "method": "GET",
+        "path": "/samples"
+      },
+      {
+        "method": "GET",
+        "path": "/samples/:sampleNumber"
+      },
+      {
+        "method": "POST",
+        "path": "/test-assignments"
+      },
+      {
+        "method": "PUT",
+        "path": "/test-assignments/:assignmentId/results"
+      },
+      {
+        "method": "POST",
+        "path": "/certification-reports"
+      },
+      {
+        "method": "GET",
+        "path": "/certification-reports/:reportNumber"
+      },
+      {
+        "method": "POST",
+        "path": "/samples/:sampleId/tracking"
+      },
+      {
+        "method": "GET",
+        "path": "/samples/:sampleId/tracking"
+      }
+    ]
+  },
+  {
+    "serviceFile": "logisticsService.js",
+    "serviceVar": "logisticsService",
+    "mountPath": "/api/v1/logistics",
+    "hasSetup": false,
+    "routeCount": 11,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/shipments"
+      },
+      {
+        "method": "GET",
+        "path": "/shipments/:id"
+      },
+      {
+        "method": "GET",
+        "path": "/shipments"
+      },
+      {
+        "method": "PUT",
+        "path": "/shipments/:id/status"
+      },
+      {
+        "method": "POST",
+        "path": "/shipments/:id/tracking"
+      },
+      {
+        "method": "GET",
+        "path": "/shipments/:id/tracking"
+      },
+      {
+        "method": "POST",
+        "path": "/vehicles"
+      },
+      {
+        "method": "GET",
+        "path": "/vehicles"
+      },
+      {
+        "method": "POST",
+        "path": "/drivers"
+      },
+      {
+        "method": "GET",
+        "path": "/drivers"
+      },
+      {
+        "method": "GET",
+        "path": "/modes"
+      }
+    ]
+  },
+  {
+    "serviceFile": "merchandisingService.js",
+    "serviceVar": "merchandisingService",
+    "mountPath": "/api/v1/merchandising",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/moods"
+      },
+      {
+        "method": "GET",
+        "path": "/mood"
+      },
+      {
+        "method": "GET",
+        "path": "/rituals"
+      },
+      {
+        "method": "GET",
+        "path": "/ritual"
+      },
+      {
+        "method": "GET",
+        "path": "/tips"
+      },
+      {
+        "method": "GET",
+        "path": "/tips/audiences"
+      },
+      {
+        "method": "GET",
+        "path": "/portals"
+      },
+      {
+        "method": "GET",
+        "path": "/portal"
+      },
+      {
+        "method": "GET",
+        "path": "/occasions"
+      },
+      {
+        "method": "GET",
+        "path": "/occasions/upcoming"
+      }
+    ]
+  },
+  {
+    "serviceFile": "moduleCatalogService.js",
+    "serviceVar": "moduleCatalogService",
+    "mountPath": "/api/v1/modules",
+    "hasSetup": false,
+    "routeCount": 4,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/overview"
+      },
+      {
+        "method": "GET",
+        "path": "/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/assistant"
+      }
+    ]
+  },
+  {
+    "serviceFile": "multilingualService.js",
+    "serviceVar": "multilingualService",
+    "mountPath": "/api/v1/multilingual",
+    "hasSetup": false,
+    "routeCount": 12,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/detect"
+      },
+      {
+        "method": "POST",
+        "path": "/translate"
+      },
+      {
+        "method": "GET",
+        "path": "/content"
+      },
+      {
+        "method": "GET",
+        "path": "/content/:key"
+      },
+      {
+        "method": "POST",
+        "path": "/content"
+      },
+      {
+        "method": "GET",
+        "path": "/preferences"
+      },
+      {
+        "method": "PUT",
+        "path": "/preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/languages"
+      },
+      {
+        "method": "GET",
+        "path": "/pronunciation/:term"
+      },
+      {
+        "method": "GET",
+        "path": "/pronunciation"
+      },
+      {
+        "method": "POST",
+        "path": "/pronunciation"
+      },
+      {
+        "method": "GET",
+        "path": "/memory/stats"
+      }
+    ]
+  },
+  {
+    "serviceFile": "neProductIntelligenceService.js",
+    "serviceVar": "neProductIntelligenceService",
+    "mountPath": "/api/v1/ne-intelligence",
+    "hasSetup": false,
+    "routeCount": 6,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/curcumin"
+      },
+      {
+        "method": "GET",
+        "path": "/chilli-heat"
+      },
+      {
+        "method": "GET",
+        "path": "/costed-products"
+      },
+      {
+        "method": "POST",
+        "path": "/scheme-eligibility"
+      },
+      {
+        "method": "POST",
+        "path": "/emi"
+      },
+      {
+        "method": "POST",
+        "path": "/landed-cost"
+      }
+    ]
+  },
+  {
+    "serviceFile": "nutritionIntelligenceService.js",
+    "serviceVar": "nutritionIntelligenceService",
+    "mountPath": "/api/v1/nutrition-intelligence",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/nutrients"
+      },
+      {
+        "method": "POST",
+        "path": "/food-profiles"
+      },
+      {
+        "method": "GET",
+        "path": "/food-profiles/search"
+      },
+      {
+        "method": "POST",
+        "path": "/product-nutrition"
+      },
+      {
+        "method": "GET",
+        "path": "/product-nutrition/:productId"
+      },
+      {
+        "method": "POST",
+        "path": "/product-nutrition/:productId/score"
+      },
+      {
+        "method": "GET",
+        "path": "/product-nutrition/:productId/score"
+      },
+      {
+        "method": "POST",
+        "path": "/product-nutrition/:productId/pricing"
+      },
+      {
+        "method": "POST",
+        "path": "/compare"
+      },
+      {
+        "method": "GET",
+        "path": "/dietary-profiles"
+      }
+    ]
+  },
+  {
+    "serviceFile": "offlinePaymentService.js",
+    "serviceVar": "offlinePaymentService",
+    "mountPath": "/api/v1/offline-payment",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/generate-qr"
+      },
+      {
+        "method": "POST",
+        "path": "/process"
+      },
+      {
+        "method": "POST",
+        "path": "/ussd/generate"
+      },
+      {
+        "method": "POST",
+        "path": "/ussd/process"
+      },
+      {
+        "method": "POST",
+        "path": "/sync"
+      },
+      {
+        "method": "GET",
+        "path": "/status/:transactionId"
+      },
+      {
+        "method": "GET",
+        "path": "/pending"
+      },
+      {
+        "method": "POST",
+        "path": "/set-pin"
+      },
+      {
+        "method": "GET",
+        "path": "/config"
+      },
+      {
+        "method": "GET",
+        "path": "/health"
+      }
+    ]
+  },
+  {
+    "serviceFile": "offlineSyncService.js",
+    "serviceVar": "offlineSyncService",
+    "mountPath": "/api/v1/offline-sync",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/queue"
+      },
+      {
+        "method": "POST",
+        "path": "/process"
+      },
+      {
+        "method": "GET",
+        "path": "/status"
+      },
+      {
+        "method": "POST",
+        "path": "/resolve-conflict"
+      },
+      {
+        "method": "GET",
+        "path": "/snapshot/:entityType"
+      },
+      {
+        "method": "PUT",
+        "path": "/preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/health"
+      }
+    ]
+  },
+  {
+    "serviceFile": "omnichannelAIService.js",
+    "serviceVar": "omnichannelAIService",
+    "mountPath": "/api/v1/omnichannel-ai",
+    "hasSetup": false,
+    "routeCount": 15,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/session"
+      },
+      {
+        "method": "POST",
+        "path": "/message"
+      },
+      {
+        "method": "GET",
+        "path": "/web/config"
+      },
+      {
+        "method": "POST",
+        "path": "/android/push"
+      },
+      {
+        "method": "POST",
+        "path": "/ios/push"
+      },
+      {
+        "method": "POST",
+        "path": "/whatsapp/template"
+      },
+      {
+        "method": "POST",
+        "path": "/sms/send"
+      },
+      {
+        "method": "POST",
+        "path": "/telegram/webhook"
+      },
+      {
+        "method": "POST",
+        "path": "/email/send"
+      },
+      {
+        "method": "POST",
+        "path": "/voice/transcribe"
+      },
+      {
+        "method": "POST",
+        "path": "/ivr/call-flow"
+      },
+      {
+        "method": "POST",
+        "path": "/kiosk/screen"
+      },
+      {
+        "method": "GET",
+        "path": "/analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/config/:channel_type"
+      },
+      {
+        "method": "PUT",
+        "path": "/config/:channel_type"
+      }
+    ]
+  },
+  {
+    "serviceFile": "orderService.js",
+    "serviceVar": "orderService",
+    "mountPath": "/api/v1/orders",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/cart"
+      },
+      {
+        "method": "POST",
+        "path": "/cart"
+      },
+      {
+        "method": "PUT",
+        "path": "/cart/:id"
+      },
+      {
+        "method": "DELETE",
+        "path": "/cart/:id"
+      },
+      {
+        "method": "DELETE",
+        "path": "/cart"
+      },
+      {
+        "method": "POST",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/:id"
+      },
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id/status"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/payment"
+      }
+    ]
+  },
+  {
+    "serviceFile": "organicTraceabilityService.js",
+    "serviceVar": "organicTraceabilityService",
+    "mountPath": "/api/v1/organic-traceability",
+    "hasSetup": false,
+    "routeCount": 13,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/farms"
+      },
+      {
+        "method": "GET",
+        "path": "/farms"
+      },
+      {
+        "method": "POST",
+        "path": "/plots"
+      },
+      {
+        "method": "GET",
+        "path": "/farms/:farmId/plots"
+      },
+      {
+        "method": "POST",
+        "path": "/crops"
+      },
+      {
+        "method": "POST",
+        "path": "/harvests"
+      },
+      {
+        "method": "POST",
+        "path": "/chain-of-custody"
+      },
+      {
+        "method": "GET",
+        "path": "/chain-of-custody/:productId"
+      },
+      {
+        "method": "GET",
+        "path": "/qr-data/:productId"
+      },
+      {
+        "method": "POST",
+        "path": "/consumer-transparency"
+      },
+      {
+        "method": "GET",
+        "path": "/consumer-transparency/qr/:qrCode"
+      },
+      {
+        "method": "GET",
+        "path": "/standards"
+      },
+      {
+        "method": "POST",
+        "path": "/fraud-alerts"
+      }
+    ]
+  },
+  {
+    "serviceFile": "predictiveAnalyticsService.js",
+    "serviceVar": "predictiveAnalyticsService",
+    "mountPath": "/api/v1/predictive-analytics",
+    "hasSetup": false,
+    "routeCount": 9,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/predictive-models"
+      },
+      {
+        "method": "GET",
+        "path": "/predictive-models"
+      },
+      {
+        "method": "POST",
+        "path": "/predictions"
+      },
+      {
+        "method": "GET",
+        "path": "/predictions/:entityId/:entityType"
+      },
+      {
+        "method": "POST",
+        "path": "/forecasts"
+      },
+      {
+        "method": "GET",
+        "path": "/forecasts"
+      },
+      {
+        "method": "POST",
+        "path": "/prediction-alerts"
+      },
+      {
+        "method": "GET",
+        "path": "/prediction-alerts/unacknowledged"
+      },
+      {
+        "method": "POST",
+        "path": "/predictive-analytics"
+      }
+    ]
+  },
+  {
+    "serviceFile": "preSeasonOrderService.js",
+    "serviceVar": "preSeasonOrderService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "productService.js",
+    "serviceVar": "productService",
+    "mountPath": "/api/v1/products",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/"
+      },
+      {
+        "method": "GET",
+        "path": "/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id"
+      },
+      {
+        "method": "GET",
+        "path": "/categories/list"
+      },
+      {
+        "method": "GET",
+        "path": "/states/list"
+      },
+      {
+        "method": "GET",
+        "path": "/search"
+      }
+    ]
+  },
+  {
+    "serviceFile": "recipeIntelligenceService.js",
+    "serviceVar": "recipeIntelligenceService",
+    "mountPath": "/api/v1/recipe-intelligence",
+    "hasSetup": false,
+    "routeCount": 17,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/recipes/:id"
+      },
+      {
+        "method": "POST",
+        "path": "/generate-recipe"
+      },
+      {
+        "method": "POST",
+        "path": "/nutrition-calculation"
+      },
+      {
+        "method": "GET",
+        "path": "/nutrition-data/:ingredient"
+      },
+      {
+        "method": "POST",
+        "path": "/ingredient-substitution"
+      },
+      {
+        "method": "POST",
+        "path": "/cost-calculation"
+      },
+      {
+        "method": "GET",
+        "path": "/ingredient-pricing/:ingredient"
+      },
+      {
+        "method": "GET",
+        "path": "/seasonal-recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/seasonal-ingredients"
+      },
+      {
+        "method": "GET",
+        "path": "/regional-recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/regional-cuisine/:region"
+      },
+      {
+        "method": "POST",
+        "path": "/institutional-recipes"
+      },
+      {
+        "method": "GET",
+        "path": "/institutional-recipes"
+      },
+      {
+        "method": "POST",
+        "path": "/scale-recipe"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard"
+      }
+    ]
+  },
+  {
+    "serviceFile": "sharedInfraService.js",
+    "serviceVar": "sharedInfraService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "shelfLifeService.js",
+    "serviceVar": "shelfLifeService",
+    "mountPath": "/api/v1/shelf-life",
+    "hasSetup": false,
+    "routeCount": 16,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/temperature"
+      },
+      {
+        "method": "GET",
+        "path": "/temperature"
+      },
+      {
+        "method": "GET",
+        "path": "/temperature/analytics"
+      },
+      {
+        "method": "POST",
+        "path": "/humidity"
+      },
+      {
+        "method": "GET",
+        "path": "/humidity"
+      },
+      {
+        "method": "POST",
+        "path": "/packaging-analysis"
+      },
+      {
+        "method": "GET",
+        "path": "/packaging-analysis"
+      },
+      {
+        "method": "POST",
+        "path": "/transport-analysis"
+      },
+      {
+        "method": "GET",
+        "path": "/transport-analysis"
+      },
+      {
+        "method": "POST",
+        "path": "/storage-analysis"
+      },
+      {
+        "method": "GET",
+        "path": "/storage-analysis"
+      },
+      {
+        "method": "POST",
+        "path": "/shelf-life-prediction"
+      },
+      {
+        "method": "GET",
+        "path": "/shelf-life-prediction"
+      },
+      {
+        "method": "POST",
+        "path": "/spoilage-risk"
+      },
+      {
+        "method": "GET",
+        "path": "/spoilage-risk"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard"
+      }
+    ]
+  },
+  {
+    "serviceFile": "smsAuthService.js",
+    "serviceVar": "smsAuthService",
+    "mountPath": "/api/v1/sms-auth",
+    "hasSetup": false,
+    "routeCount": 5,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/initiate"
+      },
+      {
+        "method": "POST",
+        "path": "/verify"
+      },
+      {
+        "method": "POST",
+        "path": "/register"
+      },
+      {
+        "method": "POST",
+        "path": "/complete-registration"
+      },
+      {
+        "method": "GET",
+        "path": "/languages"
+      }
+    ]
+  },
+  {
+    "serviceFile": "soilTestingService.js",
+    "serviceVar": "soilTestingService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "subsidyService.js",
+    "serviceVar": "subsidyService",
+    "mountPath": "setupRoutes",
+    "hasSetup": true,
+    "routeCount": 0,
+    "routes": []
+  },
+  {
+    "serviceFile": "v42IntelligenceService.js",
+    "serviceVar": "v42IntelligenceService",
+    "mountPath": "/api/v1/intel",
+    "hasSetup": false,
+    "routeCount": 11,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/crops/resolve"
+      },
+      {
+        "method": "GET",
+        "path": "/crops/:conceptKey/terms"
+      },
+      {
+        "method": "GET",
+        "path": "/freight/quote"
+      },
+      {
+        "method": "GET",
+        "path": "/freight/slots"
+      },
+      {
+        "method": "POST",
+        "path": "/freight/slots/:slotCode/book"
+      },
+      {
+        "method": "POST",
+        "path": "/promos/validate"
+      },
+      {
+        "method": "GET",
+        "path": "/engines"
+      },
+      {
+        "method": "GET",
+        "path": "/organic-inputs"
+      },
+      {
+        "method": "GET",
+        "path": "/insurance-plans"
+      },
+      {
+        "method": "GET",
+        "path": "/accessibility-modes"
+      },
+      {
+        "method": "POST",
+        "path": "/freight/slots/:slotCode/release"
+      }
+    ]
+  },
+  {
+    "serviceFile": "valueCommerceService.js",
+    "serviceVar": "valueCommerceService",
+    "mountPath": "/api/v1/value-commerce",
+    "hasSetup": false,
+    "routeCount": 8,
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/value-factors"
+      },
+      {
+        "method": "POST",
+        "path": "/product-value-scores"
+      },
+      {
+        "method": "GET",
+        "path": "/product-value-scores/:productId"
+      },
+      {
+        "method": "POST",
+        "path": "/value-pricing"
+      },
+      {
+        "method": "POST",
+        "path": "/consumer-preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/consumer-preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/recommendations"
+      },
+      {
+        "method": "GET",
+        "path": "/value-tiers"
+      }
+    ]
+  },
+  {
+    "serviceFile": "voiceAIService.js",
+    "serviceVar": "voiceAIService",
+    "mountPath": "/api/v1/voice-ai",
+    "hasSetup": false,
+    "routeCount": 10,
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/voice-sessions"
+      },
+      {
+        "method": "POST",
+        "path": "/voice-sessions/:sessionId/end"
+      },
+      {
+        "method": "POST",
+        "path": "/voice-commands"
+      },
+      {
+        "method": "GET",
+        "path": "/voice-sessions/:sessionId/commands"
+      },
+      {
+        "method": "POST",
+        "path": "/speech-recognition"
+      },
+      {
+        "method": "POST",
+        "path": "/voice-responses"
+      },
+      {
+        "method": "POST",
+        "path": "/voice-preferences"
+      },
+      {
+        "method": "GET",
+        "path": "/voice-preferences"
+      },
+      {
+        "method": "POST",
+        "path": "/voice-analytics"
+      },
+      {
+        "method": "GET",
+        "path": "/voice-analytics"
+      }
+    ]
+  }
+]

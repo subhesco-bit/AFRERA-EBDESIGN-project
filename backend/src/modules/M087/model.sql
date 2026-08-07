@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Pest Forecasting (M087)
+-- Define tables and indexes here

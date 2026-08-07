@@ -1,0 +1,72 @@
+openapi: 3.0.0
+info:
+  title: AFRERA Farmers API (stub)
+  version: 1.0.0
+servers:
+  - url: /api/v1/farmers
+paths:
+  /:
+    get:
+      summary: List farmers
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Farmer'
+    post:
+      summary: Create farmer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FarmerCreate'
+      responses:
+        '201':
+          description: Created
+  /{id}:
+    get:
+      summary: Get farmer by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Farmer'
+components:
+  schemas:
+    Farmer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        village:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    FarmerCreate:
+      type: object
+      required: [name, phone]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        village:
+          type: string

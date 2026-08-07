@@ -1,0 +1,96 @@
+{
+  "_README": [
+    "Deliberate answers to table-name collisions found by tools/schema-collisions.js.",
+    "",
+    "A collision happens when two migrations declare the same table. PostgreSQL's",
+    "CREATE TABLE IF NOT EXISTS silently skips the second one, so its columns are",
+    "never created and the migration still reports success. Somebody has to decide",
+    "what the collision MEANT. This file records those decisions so the checker",
+    "does not re-report a question that has already been answered, and so the next",
+    "person can see the reasoning instead of guessing.",
+    "",
+    "Three kinds of answer:",
+    "  synonym  - the losing column is the same fact under a different name.",
+    "             DO NOT add it. Two columns holding one number will drift.",
+    "  merged   - the losing columns were genuinely new and have been added to the",
+    "             winning table by an explicit ALTER. Record where.",
+    "  renamed  - the two tables were different concepts that happened to share a",
+    "             name. The later one was renamed. Record the new name."
+  ],
+  "decisions": [
+    {
+      "table": "gst_invoices",
+      "winner": "028_gst_schema.sql",
+      "loser": "047_gst_tables.sql",
+      "kind": "synonym",
+      "columns": {
+        "buyer_name": "customer_name",
+        "buyer_state": "customer_state",
+        "seller_state": "supplier_state"
+      },
+      "also_merged": [
+        "eway_bill_number"
+      ],
+      "rationale": "047 uses buyer/seller vocabulary, 028 uses customer/supplier. Same facts. 028 wins because it runs first and is the more normalised of the two (028 stores the tax split in columns; 047 stores it in a gst_calculation JSONB blob). eway_bill_number was genuinely absent from 028 and has been added \u2014 an e-way bill is legally required above Rs 50,000 and is asked for at inter-state check posts."
+    },
+    {
+      "table": "gst_invoice_items",
+      "winner": "028_gst_schema.sql",
+      "loser": "047_gst_tables.sql",
+      "kind": "synonym",
+      "columns": {
+        "name": "product_name",
+        "cgst": "cgst_amount",
+        "sgst": "sgst_amount",
+        "igst": "igst_amount",
+        "total_gst": "total_gst_amount"
+      },
+      "also_merged": [
+        "taxable_value"
+      ],
+      "rationale": "Identical tax fields, shorter names. taxable_value was genuinely absent: 028 records total_amount and discount_amount but not the assessable base between them, which GSTR returns and e-invoice IRN payloads both require. Deriving it at read time invites two callers deriving it differently."
+    },
+    {
+      "table": "smart_contracts",
+      "winner": "015_advanced_features.sql",
+      "loser": "019_blockchain_traceability_schema.sql",
+      "kind": "merged",
+      "merged_by": "019_blockchain_traceability_schema.sql (ALTER statements following its own CREATE)",
+      "columns": [
+        "contract_address",
+        "contract_name",
+        "deployed_by",
+        "deployment_tx_hash",
+        "deployment_block",
+        "network",
+        "abi",
+        "is_active"
+      ],
+      "rationale": "Merged rather than renamed, because these are one entity seen from two sides: 015 holds the agreement (parties, terms, value, currency) and 019 holds where that agreement lives on chain (address, abi, network, tx hash). 015 already carried blockchain_hash, so the two were always describing the same artifact. Contrast ai_predictions below, which was renamed because the two were unrelated.",
+      "note": "These columns appear absent when the migration chain is applied without the pgcrypto extension, because 019 aborts at its CREATE EXTENSION line and its ALTERs never run. That is an environment gap, not a schema gap. CI provisions pgcrypto."
+    },
+    {
+      "table": "ai_predictions",
+      "winner": "000_base_schema.sql",
+      "loser": "990_ai_outcomes.sql",
+      "kind": "renamed",
+      "renamed_to": "ai_prediction_log",
+      "rationale": "000's ai_predictions logs ML model inferences (model_type, features_used, model_version). 990 needed a calibration ledger for agent forecasts (stated_confidence, ape_pct, input_quality) \u2014 a different thing that happened to want the same name. Merging them would have produced one table where most columns are null for most rows, which is how the other collisions in this list were created. Renamed instead. The view v_ai_calibration failed with 'column actor_id does not exist' until this was fixed; the error pointed at the view, not at the collision that caused it, which is exactly why the checker exists."
+    },
+    {
+      "table": "demand_forecasts",
+      "winner": "015_advanced_features.sql",
+      "loser": "052_economic_layer.sql (was 999_economic_layer.sql), 030_institutional_procurement_schema.sql",
+      "kind": "merged",
+      "merged_by": "052_economic_layer.sql ALTER statements; 030's columns via 999_schema_reconciliation.sql",
+      "columns": [
+        "region_id",
+        "forecast_date",
+        "forecast_qty",
+        "confidence"
+      ],
+      "rationale": "Three files declare demand_forecasts for three different things: 015 stores ML model output (forecast_data JSONB, accuracy, model_version), 030 stores institutional menu planning, and 052 stores a scalar regional quantity for a date. 015 wins because it runs first and other code already reads it. 052's four columns are additive scalars rather than competing spellings, so they are added by ALTER rather than dropped. Note that 015's 'accuracy' and 052's 'confidence' are NOT the same measure \u2014 accuracy is observed after the fact, confidence is claimed before it \u2014 and averaging them would produce a number that means nothing.",
+      "note": "Caught by tools/schema-collisions.js after 999_economic_layer.sql was added. The file was also renumbered from 999 to 052: it shared the 999_ prefix with 999_schema_reconciliation.sql, and reconciliation must run last."
+    }
+  ]
+}

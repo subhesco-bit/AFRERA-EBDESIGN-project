@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Tractor Management (M101)
+-- Define tables and indexes here

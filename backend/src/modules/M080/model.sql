@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Water Analytics (M080)
+-- Define tables and indexes here

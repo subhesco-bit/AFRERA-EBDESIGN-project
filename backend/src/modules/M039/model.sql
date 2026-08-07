@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Survey Management (M039)
+-- Define tables and indexes here

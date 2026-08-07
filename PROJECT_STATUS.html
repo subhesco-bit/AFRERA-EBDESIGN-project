@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AFRERA — project status</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#30363d; --fg:#e6edf3; --mut:#8b949e;
+    --ok:#3fb950; --warn:#d29922; --bad:#f85149; --info:#58a6ff;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#ffffff; --panel:#f6f8fa; --line:#d0d7de; --fg:#1f2328; --mut:#656d76;
+           --ok:#1a7f37; --warn:#9a6700; --bad:#cf222e; --info:#0969da; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 80px}
+  h1{margin:0 0 4px;font-size:26px}
+  h2{font-size:18px;margin:34px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:15px;margin:20px 0 8px}
+  .sub{color:var(--mut);margin:0 0 20px;font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px}
+  .card .n{font-size:28px;font-weight:600;line-height:1.1}
+  .card .l{color:var(--mut);font-size:12px;margin-top:3px}
+  .bar{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:10px 0 6px}
+  .seg{height:100%}
+  .s-BUILT,.seg.built{background:var(--ok)}
+  .s-NO_UI,.seg.noui{background:var(--info)}
+  .s-PARTIAL,.seg.partial{background:var(--warn)}
+  .s-ABSENT,.seg.absent{background:var(--bad)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--mut)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  .pill{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;border-bottom:2px solid var(--line);padding:7px 8px;position:sticky;top:0;background:var(--bg)}
+  td{border-bottom:1px solid var(--line);padding:6px 8px;vertical-align:top}
+  code{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11px}
+  .ev code{display:inline-block;margin:1px 0}
+  .q{color:var(--mut);font-size:12px}
+  .note{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--info);
+        border-radius:6px;padding:12px 14px;margin:14px 0}
+  .note.warn{border-left-color:var(--warn)}
+  .note.bad{border-left-color:var(--bad)}
+  .note.ok{border-left-color:var(--ok)}
+  .note p{margin:6px 0 0}
+  .note strong:first-child{display:block}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  select,input{background:var(--panel);color:var(--fg);border:1px solid var(--line);
+               border-radius:6px;padding:6px 9px;font:inherit;font-size:13px}
+  label{font-size:12px;color:var(--mut);display:flex;flex-direction:column;gap:3px}
+  .scroll{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+  ul{margin:6px 0;padding-left:20px}
+  li{margin:3px 0}
+  .foot{margin-top:40px;color:var(--mut);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>AFRERA — project status</h1>
+  <p class="sub">
+    Generated 2026-08-06 02:51 by
+    <code>tools/build-status-page.js</code>. Every number is measured from the
+    repository at build time; none is typed in.
+  </p>
+
+  <h2>Scale</h2>
+  <div class="grid">
+    <div class="card"><div class="n">63</div><div class="l">migration files</div></div>
+    <div class="card"><div class="n">616</div><div class="l">tables declared</div></div>
+    <div class="card"><div class="n">63</div><div class="l">views</div></div>
+    <div class="card"><div class="n">85</div><div class="l">backend services</div></div>
+    <div class="card"><div class="n">304</div><div class="l">API endpoints</div></div>
+    <div class="card"><div class="n">179</div><div class="l">backend JS files</div></div>
+    <div class="card"><div class="n">49</div><div class="l">frontend pages</div></div>
+    <div class="card"><div class="n">34</div><div class="l">components</div></div>
+    <div class="card"><div class="n">44</div><div class="l">frontend routes</div></div>
+  </div>
+
+  <h2>Health checks</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="n" style="color:var(--ok)">
+        0
+      </div>
+      <div class="l">schema collision errors</div>
+    </div>
+    <div class="card">
+      <div class="n" style="color:var(--ok)">0</div>
+      <div class="l">accessibility issues</div>
+    </div>
+    <div class="card">
+      <div class="n">4</div>
+      <div class="l">collisions ruled on</div>
+    </div>
+    <div class="card">
+      <div class="n">14</div>
+      <div class="l">collisions auto-repaired</div>
+    </div>
+  </div>
+
+  <h2>Module coverage (M001–M150)</h2>
+  <div class="bar">
+    <div class="seg built" style="width:17.333333333333336%" title="26"></div><div class="seg noui" style="width:9.333333333333334%" title="14"></div><div class="seg partial" style="width:35.333333333333336%" title="53"></div><div class="seg absent" style="width:38%" title="57"></div>
+  </div>
+  <div class="legend">
+    <span><i class="seg built"></i>Written 26 — backend and UI</span>
+    <span><i class="seg noui"></i>UI To Be Written 14 — backend only</span>
+    <span><i class="seg partial"></i>Partial Written 53 — schema-only evidence</span>
+    <span><i class="seg absent"></i>Draft 57 — no artefact found</span>
+  </div>
+
+  <div class="note ok">
+    <strong>Completion language normalization.</strong>
+    <p>
+      Modules classified as <strong>Written</strong> have visible backend and UI artefacts.
+      Modules marked <strong>UI To Be Written</strong> are backed by backend-only service evidence and still need a frontend surface.
+      Modules shown as <strong>Partial Written</strong> are schema- or reference-level only.
+      Modules shown as <strong>Draft</strong> are effectively non-written and need explicit documentation or implementation work.
+    </p>
+  </div>
+
+  <div class="note warn">
+    <strong>Read this number carefully.</strong>
+    <p>
+      Status is decided by matching a catalogue module name against file names on
+      disk. 62 of the matches rest on a single
+      subject word — the weakest evidence the tool accepts — and the
+      <em>Match</em> column below says which.
+    </p>
+    <p>
+      It also under-reports. Pages named <code>ForwardPricingPage</code> or
+      <code>LedgerPage</code> do not lexically match catalogue entries like
+      &ldquo;Weather Monitoring&rdquo;, so working UI can still read as NO_UI. The
+      figure is a floor, not a score, and it has deliberately not been tuned
+      upward to look better.
+    </p>
+  </div>
+
+  <div class="controls">
+    <label>Status
+      <select id="fStatus">
+        <option value="">all</option>
+        <option>BUILT</option><option>NO_UI</option><option>PARTIAL</option><option>ABSENT</option>
+      </select>
+    </label>
+    <label>Search
+      <input id="fText" type="search" placeholder="module or domain">
+    </label>
+    <label>&nbsp;
+      <span id="count" style="color:var(--fg);font-size:13px"></span>
+    </label>
+  </div>
+
+  <div class="scroll">
+    <table id="modules">
+      <caption class="sr-only">Module status against the source catalogue</caption>
+      <thead><tr>
+        <th scope="col">ID</th><th scope="col">Module</th><th scope="col">Domain</th>
+        <th scope="col">Status</th><th scope="col">Match</th><th scope="col">Evidence</th>
+      </tr></thead>
+      <tbody>
+    <tr data-status="ABSENT" data-domain="Platform Foundation">
+      <td>M001</td>
+      <td>Platform Core</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Platform Foundation">
+      <td>M002</td>
+      <td>Platform Configuration</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/037_omnichannel_ai_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Platform Foundation">
+      <td>M003</td>
+      <td>Tenant Management</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Platform Foundation">
+      <td>M004</td>
+      <td>Organization Management</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Platform Foundation">
+      <td>M005</td>
+      <td>Environment Management</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Platform Foundation">
+      <td>M006</td>
+      <td>System Administration</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>frontend/src/pages/AdminDashboardPage.jsx</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Platform Foundation">
+      <td>M007</td>
+      <td>Feature Flag Management</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>backend/src/services/advancedFeaturesService.js</code><br><code>backend/src/routes/advancedFeatures.js</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Platform Foundation">
+      <td>M008</td>
+      <td>Localization Management</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Platform Foundation">
+      <td>M009</td>
+      <td>Time Zone Management</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>frontend/src/components/Logistics/RealTimeTracking.jsx</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Platform Foundation">
+      <td>M010</td>
+      <td>Master Configuration</td>
+      <td>Platform Foundation</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/037_omnichannel_ai_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Identity">
+      <td>M011</td>
+      <td>User Management</td>
+      <td>Identity</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Identity">
+      <td>M012</td>
+      <td>Authentication</td>
+      <td>Identity</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/027_gi_intelligence_schema.sql</code><br><code>migrations/050_sms_auth_tables.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Identity">
+      <td>M013</td>
+      <td>Authorization</td>
+      <td>Identity</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/050_sms_auth_tables.sql</code><br><code>backend/src/services/authService.js</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Identity">
+      <td>M014</td>
+      <td>Role Management</td>
+      <td>Identity</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Identity">
+      <td>M015</td>
+      <td>Permission Management</td>
+      <td>Identity</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Identity">
+      <td>M016</td>
+      <td>Single Sign-On</td>
+      <td>Identity</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Identity">
+      <td>M017</td>
+      <td>Multi-Factor Authentication</td>
+      <td>Identity</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>backend/src/services/multilingualService.js</code><br><code>frontend/src/components/Multilingual/MultilingualProvider.jsx</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Identity">
+      <td>M018</td>
+      <td>Digital Identity</td>
+      <td>Identity</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/023_engineering_schema.sql</code><br><code>migrations/023_engineering_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Identity">
+      <td>M019</td>
+      <td>Consent Management</td>
+      <td>Identity</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Identity">
+      <td>M020</td>
+      <td>Session Management</td>
+      <td>Identity</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/016_ai_copilot_schema.sql</code><br><code>migrations/017_ar_vr_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M021</td>
+      <td>Farmer Registry</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M022</td>
+      <td>Farmer Profile</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M023</td>
+      <td>Farmer Family</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M024</td>
+      <td>Farmer KYC</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M025</td>
+      <td>Farmer Verification</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M026</td>
+      <td>Farmer Skill Management</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M027</td>
+      <td>Farmer Certification</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M028</td>
+      <td>Farmer Advisory</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>frontend/src/pages/FarmAdvisorPage.jsx</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M029</td>
+      <td>Farmer Health &amp; Welfare</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Farmer">
+      <td>M030</td>
+      <td>Farmer Performance</td>
+      <td>Farmer</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Land">
+      <td>M031</td>
+      <td>Land Registry</td>
+      <td>Land</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/055_business_report_recovery.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Land">
+      <td>M032</td>
+      <td>Land Ownership</td>
+      <td>Land</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/055_business_report_recovery.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Land">
+      <td>M033</td>
+      <td>Land Lease Management</td>
+      <td>Land</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/055_business_report_recovery.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Land">
+      <td>M034</td>
+      <td>Parcel Mapping</td>
+      <td>Land</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/991_aeos_folu_ne_policy.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Land">
+      <td>M035</td>
+      <td>GIS Land Mapping</td>
+      <td>Land</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Land">
+      <td>M036</td>
+      <td>Soil Mapping</td>
+      <td>Land</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>backend/src/services/soilTestingService.js</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Land">
+      <td>M037</td>
+      <td>Water Resource Mapping</td>
+      <td>Land</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Land">
+      <td>M038</td>
+      <td>Geo Boundary Management</td>
+      <td>Land</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/013_logistics_enhancements.sql</code><br><code>frontend/src/hooks/useGeolocation.js</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Land">
+      <td>M039</td>
+      <td>Survey Management</td>
+      <td>Land</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/023_engineering_schema.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Land">
+      <td>M040</td>
+      <td>Digital Land Records</td>
+      <td>Land</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/023_engineering_schema.sql</code><br><code>migrations/023_engineering_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M041</td>
+      <td>Village Registry</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/012_governance_module.sql</code><br><code>migrations/052_economic_layer.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M042</td>
+      <td>Panchayat Management</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/012_governance_module.sql</code><br><code>migrations/012_governance_module.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Community">
+      <td>M043</td>
+      <td>Block Management</td>
+      <td>Community</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/019_blockchain_traceability_schema.sql</code><br><code>migrations/019_blockchain_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M044</td>
+      <td>District Management</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/051_arp_forward_pricing.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M045</td>
+      <td>State Management</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Community">
+      <td>M046</td>
+      <td>SHG Management</td>
+      <td>Community</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M047</td>
+      <td>Cooperative Management</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/012_governance_module.sql</code><br><code>migrations/012_governance_module.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M048</td>
+      <td>Producer Group Management</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/027_gi_intelligence_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Community">
+      <td>M049</td>
+      <td>Community Asset Management</td>
+      <td>Community</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Community">
+      <td>M050</td>
+      <td>Rural Development Management</td>
+      <td>Community</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/041_rural_life_os_schema.sql</code><br><code>migrations/041_rural_life_os_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M051</td>
+      <td>FPO Registration</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M052</td>
+      <td>FPO Governance</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M053</td>
+      <td>FPO Membership</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M054</td>
+      <td>FPO Finance</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M055</td>
+      <td>FPO Procurement</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M056</td>
+      <td>FPO Inventory</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M057</td>
+      <td>FPO Marketing</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M058</td>
+      <td>FPO Sales</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M059</td>
+      <td>FPO Compliance</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="FPO">
+      <td>M060</td>
+      <td>FPO Analytics</td>
+      <td>FPO</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/056_named_missing_modules.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Crop">
+      <td>M061</td>
+      <td>Crop Planning</td>
+      <td>Crop</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>backend/src/services/cropPlanningService.js</code><br><code>migrations/011_farmer_portal_enhancements.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Crop">
+      <td>M062</td>
+      <td>Crop Calendar</td>
+      <td>Crop</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/018_biodiversity_schema.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Crop">
+      <td>M063</td>
+      <td>Crop Registration</td>
+      <td>Crop</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/018_biodiversity_schema.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Crop">
+      <td>M064</td>
+      <td>Crop Variety Management</td>
+      <td>Crop</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/018_biodiversity_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Crop">
+      <td>M065</td>
+      <td>Seed Planning</td>
+      <td>Crop</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>frontend/src/pages/SeedVaultPage.jsx</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Crop">
+      <td>M066</td>
+      <td>Nursery Management</td>
+      <td>Crop</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Crop">
+      <td>M067</td>
+      <td>Sowing Management</td>
+      <td>Crop</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Crop">
+      <td>M068</td>
+      <td>Crop Monitoring</td>
+      <td>Crop</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/011_farmer_portal_enhancements.sql</code><br><code>migrations/018_biodiversity_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Crop">
+      <td>M069</td>
+      <td>Harvest Planning</td>
+      <td>Crop</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>frontend/src/pages/HarvestPlanPage.jsx</code><br><code>migrations/038_organic_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Crop">
+      <td>M070</td>
+      <td>Yield Recording</td>
+      <td>Crop</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/991_aeos_folu_ne_policy.sql</code><br><code>frontend/src/pages/YieldManagementPage.jsx</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Soil">
+      <td>M071</td>
+      <td>Soil Health Management</td>
+      <td>Soil</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>backend/src/services/soilTestingService.js</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Soil">
+      <td>M072</td>
+      <td>Soil Test Management</td>
+      <td>Soil</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>backend/src/services/soilTestingService.js</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Soil">
+      <td>M073</td>
+      <td>Nutrient Management</td>
+      <td>Soil</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/036_nutrition_intelligence_schema.sql</code><br><code>migrations/036_nutrition_intelligence_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Soil">
+      <td>M074</td>
+      <td>Fertility Management</td>
+      <td>Soil</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Water">
+      <td>M075</td>
+      <td>Irrigation Management</td>
+      <td>Water</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Water">
+      <td>M076</td>
+      <td>Water Budgeting</td>
+      <td>Water</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Water">
+      <td>M077</td>
+      <td>Water Quality Monitoring</td>
+      <td>Water</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Water">
+      <td>M078</td>
+      <td>Rainwater Harvesting</td>
+      <td>Water</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Water">
+      <td>M079</td>
+      <td>Watershed Management</td>
+      <td>Water</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Water">
+      <td>M080</td>
+      <td>Water Analytics</td>
+      <td>Water</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Climate">
+      <td>M081</td>
+      <td>Weather Monitoring</td>
+      <td>Climate</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code><br><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Climate">
+      <td>M082</td>
+      <td>Weather Forecasting</td>
+      <td>Climate</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code><br><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Climate">
+      <td>M083</td>
+      <td>Climate Advisory</td>
+      <td>Climate</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code><br><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Climate">
+      <td>M084</td>
+      <td>Disaster Alerts</td>
+      <td>Climate</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Climate">
+      <td>M085</td>
+      <td>Drought Monitoring</td>
+      <td>Climate</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Climate">
+      <td>M086</td>
+      <td>Flood Monitoring</td>
+      <td>Climate</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Climate">
+      <td>M087</td>
+      <td>Pest Forecasting</td>
+      <td>Climate</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Climate">
+      <td>M088</td>
+      <td>Disease Forecasting</td>
+      <td>Climate</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Climate">
+      <td>M089</td>
+      <td>Climate Risk Assessment</td>
+      <td>Climate</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code><br><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Climate">
+      <td>M090</td>
+      <td>Agro-Meteorology</td>
+      <td>Climate</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Operations">
+      <td>M091</td>
+      <td>Farm Activity Management</td>
+      <td>Operations</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Operations">
+      <td>M092</td>
+      <td>Farm Task Scheduling</td>
+      <td>Operations</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Operations">
+      <td>M093</td>
+      <td>Labour Management</td>
+      <td>Operations</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Operations">
+      <td>M094</td>
+      <td>Contractor Management</td>
+      <td>Operations</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/054_v8_v9_commerce_recovery.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Operations">
+      <td>M095</td>
+      <td>Machinery Operations</td>
+      <td>Operations</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/041_rural_life_os_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Operations">
+      <td>M096</td>
+      <td>Equipment Scheduling</td>
+      <td>Operations</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/023_engineering_schema.sql</code><br><code>migrations/033_laboratory_erp_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Operations">
+      <td>M097</td>
+      <td>Input Consumption</td>
+      <td>Operations</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/038_organic_traceability_schema.sql</code><br><code>migrations/038_organic_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Operations">
+      <td>M098</td>
+      <td>Farm Costing</td>
+      <td>Operations</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Operations">
+      <td>M099</td>
+      <td>Farm Productivity</td>
+      <td>Operations</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Operations">
+      <td>M100</td>
+      <td>Farm Operations Dashboard</td>
+      <td>Operations</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Machinery">
+      <td>M101</td>
+      <td>Tractor Management</td>
+      <td>Machinery</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Machinery">
+      <td>M102</td>
+      <td>Implement Management</td>
+      <td>Machinery</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Machinery">
+      <td>M103</td>
+      <td>Equipment Inventory</td>
+      <td>Machinery</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/023_engineering_schema.sql</code><br><code>migrations/033_laboratory_erp_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Machinery">
+      <td>M104</td>
+      <td>Equipment Rental</td>
+      <td>Machinery</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/023_engineering_schema.sql</code><br><code>migrations/033_laboratory_erp_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Machinery">
+      <td>M105</td>
+      <td>Fleet Management</td>
+      <td>Machinery</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/013_logistics_enhancements.sql</code></td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Machinery">
+      <td>M106</td>
+      <td>Preventive Maintenance</td>
+      <td>Machinery</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>backend/src/services/preSeasonOrderService.js</code><br><code>frontend/src/pages/PreOrderPage.jsx</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Machinery">
+      <td>M107</td>
+      <td>Breakdown Maintenance</td>
+      <td>Machinery</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Machinery">
+      <td>M108</td>
+      <td>Fuel Management</td>
+      <td>Machinery</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Machinery">
+      <td>M109</td>
+      <td>Spare Parts Management</td>
+      <td>Machinery</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Machinery">
+      <td>M110</td>
+      <td>Asset Lifecycle Management</td>
+      <td>Machinery</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/000_base_schema.sql</code><br><code>migrations/000_base_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Input Supply">
+      <td>M111</td>
+      <td>Seed Inventory</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>frontend/src/pages/SeedVaultPage.jsx</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Input Supply">
+      <td>M112</td>
+      <td>Fertilizer Inventory</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Input Supply">
+      <td>M113</td>
+      <td>Biofertilizer Management</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Input Supply">
+      <td>M114</td>
+      <td>Pesticide Inventory</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/057_climate_weather_d14.sql</code></td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Input Supply">
+      <td>M115</td>
+      <td>Bio-Pesticide Management</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/018_biodiversity_schema.sql</code><br><code>backend/src/services/biodiversityService.js</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Input Supply">
+      <td>M116</td>
+      <td>Micronutrient Management</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Input Supply">
+      <td>M117</td>
+      <td>Organic Input Management</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/038_organic_traceability_schema.sql</code><br><code>migrations/038_organic_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Input Supply">
+      <td>M118</td>
+      <td>Input Procurement</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/038_organic_traceability_schema.sql</code><br><code>migrations/038_organic_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Input Supply">
+      <td>M119</td>
+      <td>Input Distribution</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/038_organic_traceability_schema.sql</code><br><code>migrations/038_organic_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Input Supply">
+      <td>M120</td>
+      <td>Input Traceability</td>
+      <td>Input Supply</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/038_organic_traceability_schema.sql</code><br><code>migrations/038_organic_traceability_schema.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M121</td>
+      <td>Dairy Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M122</td>
+      <td>Cattle Registry</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M123</td>
+      <td>Poultry Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M124</td>
+      <td>Goat Farming Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M125</td>
+      <td>Sheep Farming Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M126</td>
+      <td>Pig Farming Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M127</td>
+      <td>Animal Health Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Livestock">
+      <td>M128</td>
+      <td>Feed Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/046_advanced_voice_ai_tables.sql</code><br><code>migrations/060_experience_layer_dxp.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M129</td>
+      <td>Breeding Management</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Livestock">
+      <td>M130</td>
+      <td>Livestock Analytics</td>
+      <td>Livestock</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M131</td>
+      <td>Biofloc Farm Management</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M132</td>
+      <td>Pond Management</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M133</td>
+      <td>Hatchery Management</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M134</td>
+      <td>Fish Feed Management</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M135</td>
+      <td>Water Quality Control</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M136</td>
+      <td>Fish Health Management</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Fisheries">
+      <td>M137</td>
+      <td>Harvest Management (Fisheries)</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>migrations/038_organic_traceability_schema.sql</code><br><code>frontend/src/pages/HarvestPlanPage.jsx</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M138</td>
+      <td>Fish Processing Management</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Fisheries">
+      <td>M139</td>
+      <td>Cold Fish Chain</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>migrations/994_recovered_capabilities.sql</code><br><code>migrations/994_recovered_capabilities.sql</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Fisheries">
+      <td>M140</td>
+      <td>Aquaculture Analytics</td>
+      <td>Fisheries</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M141</td>
+      <td>Orchard Management</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M142</td>
+      <td>Vegetable Production</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M143</td>
+      <td>Floriculture Management</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="NO_UI" data-domain="Horticulture">
+      <td>M144</td>
+      <td>Greenhouse Management</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-NO_UI">NO_UI</span></td>
+      <td class="q">strong</td>
+      <td class="ev"><code>backend/src/services/greenhouseService.js</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M145</td>
+      <td>Polyhouse Management</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M146</td>
+      <td>Hydroponics Management</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M147</td>
+      <td>Aeroponics Management</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr>
+    <tr data-status="BUILT" data-domain="Horticulture">
+      <td>M148</td>
+      <td>Precision Horticulture</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-BUILT">BUILT</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>backend/src/services/preSeasonOrderService.js</code><br><code>frontend/src/pages/PreOrderPage.jsx</code></td>
+    </tr>
+    <tr data-status="PARTIAL" data-domain="Horticulture">
+      <td>M149</td>
+      <td>Protected Cultivation</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-PARTIAL">PARTIAL</span></td>
+      <td class="q">subject</td>
+      <td class="ev"><code>frontend/src/components/ProtectedRoute.jsx</code></td>
+    </tr>
+    <tr data-status="ABSENT" data-domain="Horticulture">
+      <td>M150</td>
+      <td>Horticulture Analytics</td>
+      <td>Horticulture</td>
+      <td><span class="pill s-ABSENT">ABSENT</span></td>
+      <td class="q">—</td>
+      <td class="ev">—</td>
+    </tr></tbody>
+    </table>
+  </div>
+
+  <h2>Schema integrity</h2>
+  <div class="note ok"><strong>No undecided table collisions.</strong>
+        <p>14 collision(s) are repaired by ALTER statements in the
+        chain and 4 have a recorded ruling in
+        <code>backend/src/database/schema-decisions.json</code>.</p></div>
+
+  <div class="note">
+    <strong>Why this check exists.</strong>
+    <p>
+      PostgreSQL's <code>CREATE TABLE IF NOT EXISTS</code> is silent when the name is
+      already taken. The second definition's columns are never created and the
+      migration still reports success — the failure surfaces much later as
+      &ldquo;column does not exist&rdquo; somewhere unrelated. This has happened
+      18 times here.
+    </p>
+  </div>
+
+  <h2>What is not done</h2>
+  <div class="note warn">
+    <strong>Open items, stated plainly.</strong>
+    <ul>
+      <li><strong>Feeds are empty.</strong> <code>mandi_prices</code>,
+        <code>weather_observations</code>, <code>driver_location</code> and
+        <code>price_intelligence</code> accept data and have none. Until they are fed,
+        forward prices fall back to a constant and the booking curve has no history.</li>
+      <li><strong>Model slots unassigned.</strong> All 6 are disabled; every routing
+        intent is unserved. Assigning one requires answering where it is hosted
+        (DPDP Act), what a call costs, and what happens when it is unreachable.</li>
+      <li><strong>BR-08: 44 transaction boundaries.</strong> Multi-statement writes with
+        no BEGIN/COMMIT. Each needs a per-module judgement about what must commit
+        together; a blanket wrapper would hold locks across unrelated work.</li>
+      <li><strong>Frontend build unverified here.</strong> Rollup and esbuild native
+        binaries are missing in the sandbox. All files parse under Babel, but
+        <code>npm run build</code> has not been run.</li>
+      <li><strong>Test suite not run.</strong> Coverage is unknown, which is not the
+        same as zero — and not the same as passing.</li>
+    </ul>
+  </div>
+
+  <h2>Migration chain</h2>
+  <div class="scroll" style="max-height:260px">
+    <table>
+      <caption class="sr-only">Migration files in apply order</caption>
+      <thead><tr><th scope="col">#</th><th scope="col">File</th></tr></thead>
+      <tbody><tr><td>1</td><td><code>000_base_schema.sql</code></td></tr><tr><td>2</td><td><code>009_marketplace_enhancements.sql</code></td></tr><tr><td>3</td><td><code>010_insurance_enhancements.sql</code></td></tr><tr><td>4</td><td><code>011_farmer_portal_enhancements.sql</code></td></tr><tr><td>5</td><td><code>012_governance_module.sql</code></td></tr><tr><td>6</td><td><code>013_logistics_enhancements.sql</code></td></tr><tr><td>7</td><td><code>014_audit_system.sql</code></td></tr><tr><td>8</td><td><code>015_advanced_features.sql</code></td></tr><tr><td>9</td><td><code>016_ai_copilot_schema.sql</code></td></tr><tr><td>10</td><td><code>017_ar_vr_schema.sql</code></td></tr><tr><td>11</td><td><code>018_biodiversity_schema.sql</code></td></tr><tr><td>12</td><td><code>019_blockchain_traceability_schema.sql</code></td></tr><tr><td>13</td><td><code>020_consumer_health_schema.sql</code></td></tr><tr><td>14</td><td><code>021_conversational_ai_schema.sql</code></td></tr><tr><td>15</td><td><code>022_digital_product_passport_schema.sql</code></td></tr><tr><td>16</td><td><code>023_engineering_schema.sql</code></td></tr><tr><td>17</td><td><code>024_food_intelligence_schema.sql</code></td></tr><tr><td>18</td><td><code>025_food_safety_schema.sql</code></td></tr><tr><td>19</td><td><code>026_form_management_schema.sql</code></td></tr><tr><td>20</td><td><code>027_gi_intelligence_schema.sql</code></td></tr><tr><td>21</td><td><code>028_gst_schema.sql</code></td></tr><tr><td>22</td><td><code>029_indigenous_knowledge_schema.sql</code></td></tr><tr><td>23</td><td><code>030_institutional_procurement_schema.sql</code></td></tr><tr><td>24</td><td><code>031_iot_integration_schema.sql</code></td></tr><tr><td>25</td><td><code>032_knowledge_graph_schema.sql</code></td></tr><tr><td>26</td><td><code>033_laboratory_erp_schema.sql</code></td></tr><tr><td>27</td><td><code>034_logistics_enhancement_schema.sql</code></td></tr><tr><td>28</td><td><code>035_multilingual_schema.sql</code></td></tr><tr><td>29</td><td><code>036_nutrition_intelligence_schema.sql</code></td></tr><tr><td>30</td><td><code>037_omnichannel_ai_schema.sql</code></td></tr><tr><td>31</td><td><code>038_organic_traceability_schema.sql</code></td></tr><tr><td>32</td><td><code>039_predictive_analytics_schema.sql</code></td></tr><tr><td>33</td><td><code>040_recipe_intelligence_schema.sql</code></td></tr><tr><td>34</td><td><code>041_rural_life_os_schema.sql</code></td></tr><tr><td>35</td><td><code>042_rural_procurement_logistics_mobility_schema.sql</code></td></tr><tr><td>36</td><td><code>043_shelf_life_schema.sql</code></td></tr><tr><td>37</td><td><code>044_value_commerce_schema.sql</code></td></tr><tr><td>38</td><td><code>045_voice_ai_schema.sql</code></td></tr><tr><td>39</td><td><code>046_advanced_voice_ai_tables.sql</code></td></tr><tr><td>40</td><td><code>047_gst_tables.sql</code></td></tr><tr><td>41</td><td><code>048_offline_payment_tables.sql</code></td></tr><tr><td>42</td><td><code>049_offline_sync_tables.sql</code></td></tr><tr><td>43</td><td><code>050_sms_auth_tables.sql</code></td></tr><tr><td>44</td><td><code>051_arp_forward_pricing.sql</code></td></tr><tr><td>45</td><td><code>052_economic_layer.sql</code></td></tr><tr><td>46</td><td><code>053_v42_recovered_finance.sql</code></td></tr><tr><td>47</td><td><code>054_v8_v9_commerce_recovery.sql</code></td></tr><tr><td>48</td><td><code>055_business_report_recovery.sql</code></td></tr><tr><td>49</td><td><code>056_named_missing_modules.sql</code></td></tr><tr><td>50</td><td><code>057_climate_weather_d14.sql</code></td></tr><tr><td>51</td><td><code>058_sam_ai_orchestration.sql</code></td></tr><tr><td>52</td><td><code>059_yield_management_pricing.sql</code></td></tr><tr><td>53</td><td><code>060_experience_layer_dxp.sql</code></td></tr><tr><td>54</td><td><code>990_ai_outcomes.sql</code></td></tr><tr><td>55</td><td><code>991_aeos_folu_ne_policy.sql</code></td></tr><tr><td>56</td><td><code>992_v42_recovered_intelligence.sql</code></td></tr><tr><td>57</td><td><code>993_enterprise_control_layer.sql</code></td></tr><tr><td>58</td><td><code>994_recovered_capabilities.sql</code></td></tr><tr><td>59</td><td><code>995_erp_process_layer.sql</code></td></tr><tr><td>60</td><td><code>996_enterprise_foundation.sql</code></td></tr><tr><td>61</td><td><code>997_geospatial_indexes.sql</code></td></tr><tr><td>62</td><td><code>998_foreign_key_indexes.sql</code></td></tr><tr><td>63</td><td><code>999_schema_reconciliation.sql</code></td></tr></tbody>
+    </table>
+  </div>
+
+  <p class="foot">
+    Regenerate with <code>node tools/build-status-page.js</code>. This page reads the
+    repository directly and holds no stored state, so it cannot drift from what is
+    actually on disk — but it also cannot see whether the code is <em>correct</em>,
+    only whether it is <em>present</em>.
+  </p>
+</div>
+
+<script>
+  // Filtering only. No data is computed here — everything above was measured at
+  // build time, so the page cannot quietly disagree with the tools that made it.
+  const rows = Array.from(document.querySelectorAll('#modules tbody tr'));
+  const fs_ = document.getElementById('fStatus');
+  const ft = document.getElementById('fText');
+  const count = document.getElementById('count');
+  function apply() {
+    const s = fs_.value;
+    const t = ft.value.trim().toLowerCase();
+    let shown = 0;
+    for (const r of rows) {
+      const okS = !s || r.dataset.status === s;
+      const okT = !t || r.textContent.toLowerCase().includes(t);
+      const vis = okS && okT;
+      r.style.display = vis ? '' : 'none';
+      if (vis) shown++;
+    }
+    count.textContent = shown + ' of ' + rows.length + ' modules';
+  }
+  fs_.addEventListener('change', apply);
+  ft.addEventListener('input', apply);
+  apply();
+</script>
+</body>
+</html>

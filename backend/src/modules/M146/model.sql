@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Hydroponics Management (M146)
+-- Define tables and indexes here

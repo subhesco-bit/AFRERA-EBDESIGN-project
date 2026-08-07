@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for User Management (M011)
+-- Define tables and indexes here

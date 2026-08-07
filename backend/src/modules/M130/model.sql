@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Livestock Analytics (M130)
+-- Define tables and indexes here

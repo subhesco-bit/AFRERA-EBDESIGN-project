@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Platform Core (M001)
+-- Define tables and indexes here

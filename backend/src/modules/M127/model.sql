@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Animal Health Management (M127)
+-- Define tables and indexes here

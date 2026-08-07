@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Organization Management (M004)
+-- Define tables and indexes here

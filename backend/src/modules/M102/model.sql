@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Implement Management (M102)
+-- Define tables and indexes here

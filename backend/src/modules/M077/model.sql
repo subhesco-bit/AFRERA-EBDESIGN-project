@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Water Quality Monitoring (M077)
+-- Define tables and indexes here

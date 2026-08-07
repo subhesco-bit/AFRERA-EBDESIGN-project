@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Poultry Management (M123)
+-- Define tables and indexes here

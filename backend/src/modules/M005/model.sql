@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Environment Management (M005)
+-- Define tables and indexes here

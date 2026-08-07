@@ -1,0 +1,194 @@
+# Devin environment for AFRERA (monorepo: backend/ Express + frontend/ Vite-React)
+#
+# REWRITTEN 2026-08-04. The previous version could not execute. Four defects:
+#
+#   1. PowerShell syntax in bash blocks — `if (-not (Test-Path node_modules))`
+#      and `Write-Host`. Devin runs Linux/bash; these are syntax errors.
+#   2. Windows path separators — `cd ..\frontend` is not a path on Linux.
+#   3. Broken cd chain — `cd backend; ...; cd frontend` looks for
+#      backend/frontend, which does not exist. The frontend install never ran.
+#   4. No DATABASE_URL and no database in `initialize`, so `npm run migrate`
+#      and every DB-backed test failed on connection.
+#
+# Each `run:` block is independent, so paths are anchored rather than chained.
+
+initialize:
+  - run: |
+      set -euo pipefail
+      cd backend  && npm ci
+      cd ../frontend && npm ci
+
+  # Postgres must exist before migrations. The repo's own compose file already
+  # defines it (postgres:15-alpine, user afrera / db afrera_db).
+  - run: |
+      set -euo pipefail
+      cd backend
+      (docker compose up -d postgres redis mongodb \
+        || docker-compose up -d postgres redis mongodb)
+      # Wait for readiness rather than sleeping a fixed interval.
+      for i in $(seq 1 30); do
+        docker exec afrera-postgres pg_isready -U afrera >/dev/null 2>&1 && break
+        sleep 2
+      done
+      docker exec afrera-postgres pg_isready -U afrera
+
+maintenance:
+  - run: |
+      set -euo pipefail
+      cd backend     && { [ -d node_modules ] || npm ci; }
+      cd ../frontend && { [ -d node_modules ] || npm ci; }
+
+# The backend reads BOTH forms: migrate.js uses DATABASE_URL, the services read
+# the PG_* variables. Set both or half the stack fails with no obvious reason.
+env:
+  NODE_ENV: development
+  DATABASE_URL: postgresql://afrera:afrera_password@localhost:5432/afrera_db
+  PG_HOST: localhost
+  PG_PORT: "5432"
+  PG_DATABASE: afrera_db
+  PG_USER: afrera
+  PG_PASSWORD: afrera_password
+  MONGO_URI: mongodb://localhost:27017/afrera
+  REDIS_HOST: localhost
+  REDIS_PORT: "6379"
+  JWT_SECRET: dev-only-not-a-real-secret
+
+knowledge:
+  # ---------------------------------------------------------------------------
+  # READ docs/MIGRATION_CHAIN_VERIFIED.md BEFORE TOUCHING src/database/.
+  # The 51-migration chain was broken for the whole project history — 32 files
+  # failing, ~400 errors — and was repaired on 2026-08-04. Do not regress it.
+  # ---------------------------------------------------------------------------
+
+  - name: verify-migrations-syntax
+    contents: |
+      # Parse every migration with the REAL PostgreSQL grammar. Takes seconds,
+      # needs no database, and names the offending file. Run before any DB work.
+      pip install --quiet pglast
+      cd backend
+      python3 - <<'EOF'
+      import glob, sys
+      from pglast import parse_sql
+      bad = []
+      files = sorted(glob.glob('src/database/migrations/*.sql'))
+      for f in files:
+          try: parse_sql(open(f, encoding='utf-8', errors='ignore').read())
+          except Exception as e: bad.append((f, str(e)[:200]))
+      print(f"parsed {len(files)-len(bad)}/{len(files)}")
+      for f, e in bad: print(f"  FAIL {f}\n       {e}")
+      sys.exit(1 if bad else 0)
+      EOF
+
+  - name: verify-schema-landed
+    contents: |
+      # `npm run migrate` exiting 0 does NOT mean the schema is correct —
+      # CREATE TABLE IF NOT EXISTS silently no-ops, and an index on a missing
+      # column fails without changing the exit code. Assert the result.
+      # Baseline as of 2026-08-04: 506 tables, 2058 indexes, 525 foreign keys.
+      export PGPASSWORD=afrera_password
+      psql -h localhost -U afrera -d afrera_db -tAc \
+        "select 'tables='||count(*) from information_schema.tables
+          where table_schema='public' and table_type='BASE TABLE'"
+      psql -h localhost -U afrera -d afrera_db -tAc \
+        "select 'indexes='||count(*) from pg_indexes where schemaname='public'"
+      psql -h localhost -U afrera -d afrera_db -tAc \
+        "select 'fks='||count(*) from pg_constraint where contype='f'"
+
+  - name: backend-migrate
+    contents: |
+      cd backend && npm run migrate
+
+  - name: backend-lint
+    contents: |
+      cd backend && npm run lint
+
+  - name: backend-lint-fix
+    contents: |
+      cd backend && npm run lint:fix
+
+  - name: backend-test
+    contents: |
+      # jest.config.js sets forceExit: true — 18 of 22 test files load the
+      # database layer, which opens a pg Pool at require time and keeps the
+      # event loop alive. Without forceExit the process never terminates.
+      cd backend && npm test
+
+  - name: backend-start
+    contents: |
+      cd backend && npm run dev
+
+  - name: frontend-lint
+    contents: |
+      cd frontend && npm run lint
+
+  - name: frontend-lint-fix
+    contents: |
+      cd frontend && npm run lint:fix
+
+  - name: frontend-test
+    contents: |
+      # vitest watches by default; --run is required in an agent context or it
+      # never exits.
+      cd frontend && npx vitest --run
+
+  - name: frontend-test-coverage
+    contents: |
+      cd frontend && npm run test:coverage
+
+  - name: frontend-build
+    contents: |
+      cd frontend && npm run build
+
+  - name: frontend-start
+    contents: |
+      cd frontend && npm run dev
+
+  - name: backend-seed
+    contents: |
+      cd backend && npm run seed
+
+  - name: docker-up
+    contents: |
+      cd backend && (docker compose up -d || docker-compose up -d)
+
+  - name: docker-down
+    contents: |
+      cd backend && (docker compose down || docker-compose down)
+
+  - name: full-setup
+    contents: |
+      set -euo pipefail
+      cd backend     && npm ci
+      cd ../frontend && npm ci
+      cd ../backend  && (docker compose up -d || docker-compose up -d)
+      for i in $(seq 1 30); do
+        docker exec afrera-postgres pg_isready -U afrera >/dev/null 2>&1 && break
+        sleep 2
+      done
+      npm run migrate
+      echo "Setup complete. Run 'npm run dev' in backend/ and frontend/."
+
+  # ---------------------------------------------------------------------------
+  # RULES THAT PREVENT DUPLICATED WORK — full reasoning in
+  # docs/EBDESIGN_ALIGNMENT.md
+  # ---------------------------------------------------------------------------
+  - name: project-rules
+    contents: |
+      # 1. The ~450 KB of AFRERA_*.md specs at the repo root are ASPIRATIONAL,
+      #    not descriptive. Do NOT treat them as a gap list. Code wins.
+      # 2. Before building anything a document calls "missing", grep for the
+      #    CAPABILITY, not the name. In a prior audit 136 of 294 items that
+      #    looked absent already existed under different names.
+      # 3. One migration chain (backend/src/database/migrations/), one agent
+      #    register (backend/src/core/erpAgents.js), one signal bus
+      #    (backend/src/core/signalBus.js), one token layer
+      #    (frontend/src/index.css). Never create a parallel second one.
+      # 4. v42 / v43 / v44 and ne(3).zip are READ-ONLY archaeology. Extract the
+      #    business rule, express it in the current architecture, cite the
+      #    source. Never restore an old file wholesale.
+      # 5. New CREATE INDEX and CREATE TRIGGER must be idempotent
+      #    (IF NOT EXISTS / DROP ... IF EXISTS first). The chain is re-runnable
+      #    and must stay that way.
+      # 6. users.id is UUID. Any FK to it must be UUID. An INTEGER FK to a UUID
+      #    parent fails the ENTIRE CREATE TABLE, not just the constraint — this
+      #    silently destroyed 68 columns across 12 files before 2026-08-04.

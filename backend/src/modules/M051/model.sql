@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for FPO Registration (M051)
+-- Define tables and indexes here

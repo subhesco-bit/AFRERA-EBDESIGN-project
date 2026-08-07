@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AFRERA - Empowering Rural India Through Technology" />
+
+    <!-- PWA: makes the app installable and usable on an intermittent
+         connection. The backend already had offlineSyncService and
+         offlinePaymentService; without these tags none of that was reachable
+         from the browser. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AFRERA" />
+
+    <!-- Discoverability (Open Graph / Twitter) - previously absent entirely,
+         so any shared link rendered with no title, description or image. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AFRERA" />
+    <meta property="og:title" content="AFRERA - Agriculture &amp; Rural Economy Platform" />
+    <meta property="og:description" content="Marketplace, farmer services, logistics and insurance for rural India." />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AFRERA - Agriculture &amp; Rural Economy Platform" />
+    <meta name="twitter:description" content="Marketplace, farmer services, logistics and insurance for rural India." />
+
+    <title>AFRERA Platform</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      // Register the service worker. Guarded on production + support so local
+      // development is not served stale assets from cache.
+      if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function (err) {
+            // Registration failure must never break the app - it only means
+            // the user loses offline capability, not the site.
+            console.warn('Service worker registration failed:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

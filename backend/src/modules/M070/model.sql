@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Yield Recording (M070)
+-- Define tables and indexes here

@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Climate Advisory (M083)
+-- Define tables and indexes here

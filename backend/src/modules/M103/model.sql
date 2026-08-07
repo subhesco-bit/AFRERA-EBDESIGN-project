@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Equipment Inventory (M103)
+-- Define tables and indexes here

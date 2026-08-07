@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Cattle Registry (M122)
+-- Define tables and indexes here

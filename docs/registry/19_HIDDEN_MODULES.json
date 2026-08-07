@@ -1,0 +1,4436 @@
+{
+  "generated": "2026-08-07T05:20:15.515Z",
+  "tally": {
+    "UNSCORABLE": 1,
+    "LEAD": 49,
+    "HIDDEN": 73,
+    "CLUBBED": 20,
+    "ABSENT": 4,
+    "FOUND": 3
+  },
+  "modules": [
+    {
+      "id": "M001",
+      "name": "Platform Core",
+      "domain": "Platform Foundation",
+      "status": "UNSCORABLE",
+      "why": "name has no distinguishing words",
+      "evidence": []
+    },
+    {
+      "id": "M002",
+      "name": "Platform Configuration",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/conversational_ai_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/gst_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "configuration"
+      ]
+    },
+    {
+      "id": "M003",
+      "name": "Tenant Management",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/060_experience_layer_dxp.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/994_recovered_capabilities.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "tenant"
+      ]
+    },
+    {
+      "id": "M004",
+      "name": "Organization Management",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/012_governance_module.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "organization"
+      ]
+    },
+    {
+      "id": "M005",
+      "name": "Environment Management",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/ar_vr_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/017_ar_vr_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "environment"
+      ]
+    },
+    {
+      "id": "M006",
+      "name": "System Administration",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/1002_system_administration.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M006/controller.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "administration"
+      ]
+    },
+    {
+      "id": "M007",
+      "name": "Feature Flag Management",
+      "domain": "Platform Foundation",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/1001_platform_configuration.sql",
+          "area": "schema",
+          "line": 16
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M007/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M007/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "feature",
+        "flag"
+      ]
+    },
+    {
+      "id": "M008",
+      "name": "Localization Management",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/modules/M008/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M008/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M008/model.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "localization"
+      ]
+    },
+    {
+      "id": "M009",
+      "name": "Time Zone Management",
+      "domain": "Platform Foundation",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/form_management_schema.sql",
+          "area": "schema",
+          "line": 11
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema",
+          "line": 66
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/026_form_management_schema.sql",
+          "area": "schema",
+          "line": 11
+        }
+      ],
+      "terms": [
+        "time",
+        "zone"
+      ]
+    },
+    {
+      "id": "M010",
+      "name": "Master Configuration",
+      "domain": "Platform Foundation",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/conversational_ai_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/gst_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "configuration"
+      ]
+    },
+    {
+      "id": "M011",
+      "name": "User Management",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/effectors.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/mcda.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "user"
+      ]
+    },
+    {
+      "id": "M012",
+      "name": "Authentication",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "authentication"
+      ]
+    },
+    {
+      "id": "M013",
+      "name": "Authorization",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "authorization"
+      ]
+    },
+    {
+      "id": "M014",
+      "name": "Role Management",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/effectors.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/signalBus.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "role"
+      ]
+    },
+    {
+      "id": "M015",
+      "name": "Permission Management",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/014_audit_system.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "permission"
+      ]
+    },
+    {
+      "id": "M016",
+      "name": "Single Sign-On",
+      "domain": "Identity",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/core/decisionEngine.js",
+          "area": "other",
+          "line": 14
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M016/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M016/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "single",
+        "sign"
+      ]
+    },
+    {
+      "id": "M017",
+      "name": "Multi-Factor Authentication",
+      "domain": "Identity",
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/pool.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/authService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service"
+      ],
+      "terms": [
+        "multi",
+        "factor",
+        "authentication"
+      ]
+    },
+    {
+      "id": "M018",
+      "name": "Digital Identity",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/decisionEngine.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/signalBus.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/gst_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "identity"
+      ]
+    },
+    {
+      "id": "M019",
+      "name": "Consent Management",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/indigenous_knowledge_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "consent"
+      ]
+    },
+    {
+      "id": "M020",
+      "name": "Session Management",
+      "domain": "Identity",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/ai_copilot_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/ar_vr_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/conversational_ai_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "session"
+      ]
+    },
+    {
+      "id": "M021",
+      "name": "Farmer Registry",
+      "domain": "Farmer",
+      "status": "CLUBBED",
+      "why": "key terms spread across 14 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service"
+      ],
+      "terms": [
+        "farmer",
+        "registry"
+      ]
+    },
+    {
+      "id": "M022",
+      "name": "Farmer Profile",
+      "domain": "Farmer",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/conversational_ai_schema.sql",
+          "area": "schema",
+          "line": 27
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema",
+          "line": 1062
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+          "area": "schema",
+          "line": 32
+        }
+      ],
+      "terms": [
+        "farmer",
+        "profile"
+      ]
+    },
+    {
+      "id": "M023",
+      "name": "Farmer Family",
+      "domain": "Farmer",
+      "status": "CLUBBED",
+      "why": "key terms spread across 5 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/994_recovered_capabilities.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/pool.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service"
+      ],
+      "terms": [
+        "farmer",
+        "family"
+      ]
+    },
+    {
+      "id": "M024",
+      "name": "Farmer KYC",
+      "domain": "Farmer",
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/authService.js",
+          "area": "service"
+        },
+        {
+          "file": "backend/src/tests/e2e/farmer-journey.test.js",
+          "area": "other"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service",
+        "other"
+      ],
+      "terms": [
+        "farmer",
+        "kyc"
+      ]
+    },
+    {
+      "id": "M025",
+      "name": "Farmer Verification",
+      "domain": "Farmer",
+      "status": "CLUBBED",
+      "why": "key terms spread across 34 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/blockchain_traceability_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/digital_product_passport_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service",
+        "component",
+        "page"
+      ],
+      "terms": [
+        "farmer",
+        "verification"
+      ]
+    },
+    {
+      "id": "M026",
+      "name": "Farmer Skill Management",
+      "domain": "Farmer",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/farmerTrainingService.js",
+          "area": "service",
+          "line": 314
+        }
+      ],
+      "terms": [
+        "farmer",
+        "skill"
+      ]
+    },
+    {
+      "id": "M027",
+      "name": "Farmer Certification",
+      "domain": "Farmer",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema",
+          "line": 361
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
+          "area": "schema",
+          "line": 230
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/schema.sql",
+          "area": "schema",
+          "line": 354
+        }
+      ],
+      "terms": [
+        "farmer",
+        "certification"
+      ]
+    },
+    {
+      "id": "M028",
+      "name": "Farmer Advisory",
+      "domain": "Farmer",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/058_sam_ai_orchestration.sql",
+          "area": "schema",
+          "line": 114
+        }
+      ],
+      "terms": [
+        "farmer",
+        "advisory"
+      ]
+    },
+    {
+      "id": "M029",
+      "name": "Farmer Health & Welfare",
+      "domain": "Farmer",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "farmer",
+        "health",
+        "welfare"
+      ]
+    },
+    {
+      "id": "M030",
+      "name": "Farmer Performance",
+      "domain": "Farmer",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/dynamicPricingService.js",
+          "area": "service",
+          "line": 210
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/preSeasonOrderService.js",
+          "area": "service",
+          "line": 122
+        }
+      ],
+      "terms": [
+        "farmer",
+        "performance"
+      ]
+    },
+    {
+      "id": "M031",
+      "name": "Land Registry",
+      "domain": "Land",
+      "status": "CLUBBED",
+      "why": "key terms spread across 10 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "other",
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "land",
+        "registry"
+      ]
+    },
+    {
+      "id": "M032",
+      "name": "Land Ownership",
+      "domain": "Land",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/landRecordsService.js",
+          "area": "service",
+          "line": 357
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/subsidyService.js",
+          "area": "service",
+          "line": 23
+        }
+      ],
+      "terms": [
+        "land",
+        "ownership"
+      ]
+    },
+    {
+      "id": "M033",
+      "name": "Land Lease Management",
+      "domain": "Land",
+      "status": "CLUBBED",
+      "why": "key terms spread across 22 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/withTransaction.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/connection.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/migrate.js",
+          "area": "other"
+        }
+      ],
+      "areas": [
+        "other",
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "land",
+        "lease"
+      ]
+    },
+    {
+      "id": "M034",
+      "name": "Parcel Mapping",
+      "domain": "Land",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M034/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M034/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M034/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "parcel",
+        "mapping"
+      ]
+    },
+    {
+      "id": "M035",
+      "name": "GIS Land Mapping",
+      "domain": "Land",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M035/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M035/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M035/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "gis",
+        "land",
+        "mapping"
+      ]
+    },
+    {
+      "id": "M036",
+      "name": "Soil Mapping",
+      "domain": "Land",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/tests/e2e/farmer-journey.test.js",
+          "area": "other"
+        }
+      ],
+      "areas": [
+        "other"
+      ],
+      "terms": [
+        "soil",
+        "mapping"
+      ]
+    },
+    {
+      "id": "M037",
+      "name": "Water Resource Mapping",
+      "domain": "Land",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M037/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M037/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M037/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "water",
+        "resource",
+        "mapping"
+      ]
+    },
+    {
+      "id": "M038",
+      "name": "Geo Boundary Management",
+      "domain": "Land",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M038/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M038/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M038/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "geo",
+        "boundary"
+      ]
+    },
+    {
+      "id": "M039",
+      "name": "Survey Management",
+      "domain": "Land",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "survey"
+      ]
+    },
+    {
+      "id": "M040",
+      "name": "Digital Land Records",
+      "domain": "Land",
+      "status": "FOUND",
+      "why": "file named for this module",
+      "evidence": [
+        {
+          "file": "backend/src/services/landRecordsService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/components/FarmerPortal/LandRecords.jsx",
+          "area": "component"
+        }
+      ],
+      "terms": [
+        "land",
+        "records"
+      ]
+    },
+    {
+      "id": "M041",
+      "name": "Village Registry",
+      "domain": "Community",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M041/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M041/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M041/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "village",
+        "registry"
+      ]
+    },
+    {
+      "id": "M042",
+      "name": "Panchayat Management",
+      "domain": "Community",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/012_governance_module.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/routes/governanceModule.js",
+          "area": "route"
+        },
+        {
+          "file": "backend/src/services/governanceService.js",
+          "area": "service"
+        }
+      ],
+      "terms": [
+        "panchayat"
+      ]
+    },
+    {
+      "id": "M043",
+      "name": "Block Management",
+      "domain": "Community",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/decisionEngine.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/effectors.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "block"
+      ]
+    },
+    {
+      "id": "M044",
+      "name": "District Management",
+      "domain": "Community",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/012_governance_module.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "district"
+      ]
+    },
+    {
+      "id": "M045",
+      "name": "State Management",
+      "domain": "Community",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/effectors.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/mcda.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "state"
+      ]
+    },
+    {
+      "id": "M046",
+      "name": "SHG Management",
+      "domain": "Community",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/food_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "shg"
+      ]
+    },
+    {
+      "id": "M047",
+      "name": "Cooperative Management",
+      "domain": "Community",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/digital_product_passport_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/012_governance_module.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "cooperative"
+      ]
+    },
+    {
+      "id": "M048",
+      "name": "Producer Group Management",
+      "domain": "Community",
+      "status": "CLUBBED",
+      "why": "key terms spread across 8 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "producer",
+        "group"
+      ]
+    },
+    {
+      "id": "M049",
+      "name": "Community Asset Management",
+      "domain": "Community",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M049/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M049/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M049/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "community",
+        "asset"
+      ]
+    },
+    {
+      "id": "M050",
+      "name": "Rural Development Management",
+      "domain": "Community",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "rural",
+        "development"
+      ]
+    },
+    {
+      "id": "M051",
+      "name": "FPO Registration",
+      "domain": "FPO",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M051/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M051/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M051/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "fpo",
+        "registration"
+      ]
+    },
+    {
+      "id": "M052",
+      "name": "FPO Governance",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 9 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/060_experience_layer_dxp.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "fpo",
+        "governance"
+      ]
+    },
+    {
+      "id": "M053",
+      "name": "FPO Membership",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 5 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "fpo",
+        "membership"
+      ]
+    },
+    {
+      "id": "M054",
+      "name": "FPO Finance",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 12 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/053_v42_recovered_finance.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "fpo",
+        "finance"
+      ]
+    },
+    {
+      "id": "M055",
+      "name": "FPO Procurement",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 13 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "fpo",
+        "procurement"
+      ]
+    },
+    {
+      "id": "M056",
+      "name": "FPO Inventory",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 6 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/059_yield_management_pricing.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/dynamicPricingService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "fpo",
+        "inventory"
+      ]
+    },
+    {
+      "id": "M057",
+      "name": "FPO Marketing",
+      "domain": "FPO",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/middleware/compliance.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/services/neProductIntelligenceService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service"
+      ],
+      "terms": [
+        "fpo",
+        "marketing"
+      ]
+    },
+    {
+      "id": "M058",
+      "name": "FPO Sales",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 10 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service"
+      ],
+      "terms": [
+        "fpo",
+        "sales"
+      ]
+    },
+    {
+      "id": "M059",
+      "name": "FPO Compliance",
+      "domain": "FPO",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M059/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M059/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M059/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "fpo",
+        "compliance"
+      ]
+    },
+    {
+      "id": "M060",
+      "name": "FPO Analytics",
+      "domain": "FPO",
+      "status": "CLUBBED",
+      "why": "key terms spread across 21 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/blockchain_traceability_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/gi_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "fpo",
+        "analytics"
+      ]
+    },
+    {
+      "id": "M061",
+      "name": "Crop Planning",
+      "domain": "Crop",
+      "status": "FOUND",
+      "why": "file named for this module",
+      "evidence": [
+        {
+          "file": "backend/src/services/cropPlanningService.js",
+          "area": "service"
+        }
+      ],
+      "terms": [
+        "crop",
+        "planning"
+      ]
+    },
+    {
+      "id": "M062",
+      "name": "Crop Calendar",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M062/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M062/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M062/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "crop",
+        "calendar"
+      ]
+    },
+    {
+      "id": "M063",
+      "name": "Crop Registration",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M063/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M063/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M063/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "crop",
+        "registration"
+      ]
+    },
+    {
+      "id": "M064",
+      "name": "Crop Variety Management",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M064/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M064/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M064/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "crop",
+        "variety"
+      ]
+    },
+    {
+      "id": "M065",
+      "name": "Seed Planning",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M065/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M065/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M065/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "seed",
+        "planning"
+      ]
+    },
+    {
+      "id": "M066",
+      "name": "Nursery Management",
+      "domain": "Crop",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M066/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M066/index.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "nursery"
+      ]
+    },
+    {
+      "id": "M067",
+      "name": "Sowing Management",
+      "domain": "Crop",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/pool.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "sowing"
+      ]
+    },
+    {
+      "id": "M068",
+      "name": "Crop Monitoring",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M068/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M068/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M068/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "crop",
+        "monitoring"
+      ]
+    },
+    {
+      "id": "M069",
+      "name": "Harvest Planning",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M069/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M069/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M069/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "harvest",
+        "planning"
+      ]
+    },
+    {
+      "id": "M070",
+      "name": "Yield Recording",
+      "domain": "Crop",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M070/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M070/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M070/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "yield",
+        "recording"
+      ]
+    },
+    {
+      "id": "M071",
+      "name": "Soil Health Management",
+      "domain": "Soil",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/digital_product_passport_schema.sql",
+          "area": "schema",
+          "line": 200
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+          "area": "schema",
+          "line": 203
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema",
+          "line": 758
+        }
+      ],
+      "terms": [
+        "soil",
+        "health"
+      ]
+    },
+    {
+      "id": "M072",
+      "name": "Soil Test Management",
+      "domain": "Soil",
+      "status": "FOUND",
+      "why": "file named for this module",
+      "evidence": [
+        {
+          "file": "backend/src/services/soilTestingService.js",
+          "area": "service"
+        }
+      ],
+      "terms": [
+        "soil",
+        "test"
+      ]
+    },
+    {
+      "id": "M073",
+      "name": "Nutrient Management",
+      "domain": "Soil",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/consumer_health_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/knowledge_graph_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/laboratory_erp_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "nutrient"
+      ]
+    },
+    {
+      "id": "M074",
+      "name": "Fertility Management",
+      "domain": "Soil",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/modules/M074/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M074/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M074/model.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "fertility"
+      ]
+    },
+    {
+      "id": "M075",
+      "name": "Irrigation Management",
+      "domain": "Water",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/digital_product_passport_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "irrigation"
+      ]
+    },
+    {
+      "id": "M076",
+      "name": "Water Budgeting",
+      "domain": "Water",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M076/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M076/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M076/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "water",
+        "budgeting"
+      ]
+    },
+    {
+      "id": "M077",
+      "name": "Water Quality Monitoring",
+      "domain": "Water",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M077/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M077/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M077/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "water",
+        "quality",
+        "monitoring"
+      ]
+    },
+    {
+      "id": "M078",
+      "name": "Rainwater Harvesting",
+      "domain": "Water",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M078/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M078/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M078/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "rainwater",
+        "harvesting"
+      ]
+    },
+    {
+      "id": "M079",
+      "name": "Watershed Management",
+      "domain": "Water",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/modules/M079/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M079/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M079/model.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "watershed"
+      ]
+    },
+    {
+      "id": "M080",
+      "name": "Water Analytics",
+      "domain": "Water",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M080/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M080/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M080/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "water",
+        "analytics"
+      ]
+    },
+    {
+      "id": "M081",
+      "name": "Weather Monitoring",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 17
+        }
+      ],
+      "terms": [
+        "weather",
+        "monitoring"
+      ]
+    },
+    {
+      "id": "M082",
+      "name": "Weather Forecasting",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 18
+        }
+      ],
+      "terms": [
+        "weather",
+        "forecasting"
+      ]
+    },
+    {
+      "id": "M083",
+      "name": "Climate Advisory",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 19
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M083/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M083/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "climate",
+        "advisory"
+      ]
+    },
+    {
+      "id": "M084",
+      "name": "Disaster Alerts",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 20
+        }
+      ],
+      "terms": [
+        "disaster",
+        "alerts"
+      ]
+    },
+    {
+      "id": "M085",
+      "name": "Drought Monitoring",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 21
+        }
+      ],
+      "terms": [
+        "drought",
+        "monitoring"
+      ]
+    },
+    {
+      "id": "M086",
+      "name": "Flood Monitoring",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 17
+        }
+      ],
+      "terms": [
+        "flood",
+        "monitoring"
+      ]
+    },
+    {
+      "id": "M087",
+      "name": "Pest Forecasting",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 18
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M087/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M087/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "pest",
+        "forecasting"
+      ]
+    },
+    {
+      "id": "M088",
+      "name": "Disease Forecasting",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 19
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M088/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M088/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "disease",
+        "forecasting"
+      ]
+    },
+    {
+      "id": "M089",
+      "name": "Climate Risk Assessment",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 20
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M089/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M089/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "climate",
+        "risk",
+        "assessment"
+      ]
+    },
+    {
+      "id": "M090",
+      "name": "Agro-Meteorology",
+      "domain": "Climate",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 21
+        }
+      ],
+      "terms": [
+        "agro",
+        "meteorology"
+      ]
+    },
+    {
+      "id": "M091",
+      "name": "Farm Activity Management",
+      "domain": "Operations",
+      "status": "CLUBBED",
+      "why": "key terms spread across 18 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/conversational_ai_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "other",
+        "schema",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "farm",
+        "activity"
+      ]
+    },
+    {
+      "id": "M092",
+      "name": "Farm Task Scheduling",
+      "domain": "Operations",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "farm",
+        "task",
+        "scheduling"
+      ]
+    },
+    {
+      "id": "M093",
+      "name": "Labour Management",
+      "domain": "Operations",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "labour"
+      ]
+    },
+    {
+      "id": "M094",
+      "name": "Contractor Management",
+      "domain": "Operations",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "contractor"
+      ]
+    },
+    {
+      "id": "M095",
+      "name": "Machinery Operations",
+      "domain": "Operations",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M095/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M095/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M095/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "machinery",
+        "operations"
+      ]
+    },
+    {
+      "id": "M096",
+      "name": "Equipment Scheduling",
+      "domain": "Operations",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M096/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M096/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M096/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "equipment",
+        "scheduling"
+      ]
+    },
+    {
+      "id": "M097",
+      "name": "Input Consumption",
+      "domain": "Operations",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M097/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M097/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M097/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "input",
+        "consumption"
+      ]
+    },
+    {
+      "id": "M098",
+      "name": "Farm Costing",
+      "domain": "Operations",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/054_v8_v9_commerce_recovery.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/recipeIntelligenceService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "farm",
+        "costing"
+      ]
+    },
+    {
+      "id": "M099",
+      "name": "Farm Productivity",
+      "domain": "Operations",
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/moduleCatalogService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/pages/SubsidyManagementPage.jsx",
+          "area": "page"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "farm",
+        "productivity"
+      ]
+    },
+    {
+      "id": "M100",
+      "name": "Farm Operations Dashboard",
+      "domain": "Operations",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
+          "area": "schema",
+          "line": 330
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/advancedAIService.js",
+          "area": "service",
+          "line": 354
+        }
+      ],
+      "terms": [
+        "farm",
+        "operations"
+      ]
+    },
+    {
+      "id": "M101",
+      "name": "Tractor Management",
+      "domain": "Machinery",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "tractor"
+      ]
+    },
+    {
+      "id": "M102",
+      "name": "Implement Management",
+      "domain": "Machinery",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/010_insurance_enhancements.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "implement"
+      ]
+    },
+    {
+      "id": "M103",
+      "name": "Equipment Inventory",
+      "domain": "Machinery",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M103/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M103/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M103/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "equipment",
+        "inventory"
+      ]
+    },
+    {
+      "id": "M104",
+      "name": "Equipment Rental",
+      "domain": "Machinery",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+          "area": "schema",
+          "line": 74
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M104/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M104/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "equipment",
+        "rental"
+      ]
+    },
+    {
+      "id": "M105",
+      "name": "Fleet Management",
+      "domain": "Machinery",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/ai_copilot_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/logistics_enhancement_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/013_logistics_enhancements.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "fleet"
+      ]
+    },
+    {
+      "id": "M106",
+      "name": "Preventive Maintenance",
+      "domain": "Machinery",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/995_erp_process_layer.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "preventive",
+        "maintenance"
+      ]
+    },
+    {
+      "id": "M107",
+      "name": "Breakdown Maintenance",
+      "domain": "Machinery",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M107/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M107/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M107/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "breakdown",
+        "maintenance"
+      ]
+    },
+    {
+      "id": "M108",
+      "name": "Fuel Management",
+      "domain": "Machinery",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/logistics_enhancement_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/013_logistics_enhancements.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "fuel"
+      ]
+    },
+    {
+      "id": "M109",
+      "name": "Spare Parts Management",
+      "domain": "Machinery",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M109/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M109/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M109/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "spare",
+        "parts"
+      ]
+    },
+    {
+      "id": "M110",
+      "name": "Asset Lifecycle Management",
+      "domain": "Machinery",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M110/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M110/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M110/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "asset",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "M111",
+      "name": "Seed Inventory",
+      "domain": "Input Supply",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "frontend/src/pages/SeedVaultPage.jsx",
+          "area": "page",
+          "line": 45
+        }
+      ],
+      "terms": [
+        "seed",
+        "inventory"
+      ]
+    },
+    {
+      "id": "M112",
+      "name": "Fertilizer Inventory",
+      "domain": "Input Supply",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M112/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M112/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M112/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "fertilizer",
+        "inventory"
+      ]
+    },
+    {
+      "id": "M113",
+      "name": "Biofertilizer Management",
+      "domain": "Input Supply",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "biofertilizer"
+      ]
+    },
+    {
+      "id": "M114",
+      "name": "Pesticide Inventory",
+      "domain": "Input Supply",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "pesticide",
+        "inventory"
+      ]
+    },
+    {
+      "id": "M115",
+      "name": "Bio-Pesticide Management",
+      "domain": "Input Supply",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema",
+          "line": 196
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema",
+          "line": 284
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema",
+          "line": 471
+        }
+      ],
+      "terms": [
+        "bio",
+        "pesticide"
+      ]
+    },
+    {
+      "id": "M116",
+      "name": "Micronutrient Management",
+      "domain": "Input Supply",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/consumer_health_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/020_consumer_health_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "micronutrient"
+      ]
+    },
+    {
+      "id": "M117",
+      "name": "Organic Input Management",
+      "domain": "Input Supply",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+          "area": "schema",
+          "line": 95
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema",
+          "line": 292
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+          "area": "schema",
+          "line": 25
+        }
+      ],
+      "terms": [
+        "organic",
+        "input"
+      ]
+    },
+    {
+      "id": "M118",
+      "name": "Input Procurement",
+      "domain": "Input Supply",
+      "status": "CLUBBED",
+      "why": "key terms spread across 15 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/000_base_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema",
+        "route",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "input",
+        "procurement"
+      ]
+    },
+    {
+      "id": "M119",
+      "name": "Input Distribution",
+      "domain": "Input Supply",
+      "status": "CLUBBED",
+      "why": "key terms spread across 5 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/054_v8_v9_commerce_recovery.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/995_erp_process_layer.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/routes/vendorRoutes.js",
+          "area": "route"
+        },
+        {
+          "file": "frontend/src/components/Marketplace/ProductReview.jsx",
+          "area": "component"
+        }
+      ],
+      "areas": [
+        "schema",
+        "route",
+        "component",
+        "page"
+      ],
+      "terms": [
+        "input",
+        "distribution"
+      ]
+    },
+    {
+      "id": "M120",
+      "name": "Input Traceability",
+      "domain": "Input Supply",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/rfqService.js",
+          "area": "service",
+          "line": null
+        }
+      ],
+      "terms": [
+        "input",
+        "traceability"
+      ]
+    },
+    {
+      "id": "M121",
+      "name": "Dairy Management",
+      "domain": "Livestock",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/food_intelligence_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "dairy"
+      ]
+    },
+    {
+      "id": "M122",
+      "name": "Cattle Registry",
+      "domain": "Livestock",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M122/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M122/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M122/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "cattle",
+        "registry"
+      ]
+    },
+    {
+      "id": "M123",
+      "name": "Poultry Management",
+      "domain": "Livestock",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M123/controller.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "poultry"
+      ]
+    },
+    {
+      "id": "M124",
+      "name": "Goat Farming Management",
+      "domain": "Livestock",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema",
+          "line": 376
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema",
+          "line": 335
+        }
+      ],
+      "terms": [
+        "goat",
+        "farming"
+      ]
+    },
+    {
+      "id": "M125",
+      "name": "Sheep Farming Management",
+      "domain": "Livestock",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "sheep",
+        "farming"
+      ]
+    },
+    {
+      "id": "M126",
+      "name": "Pig Farming Management",
+      "domain": "Livestock",
+      "status": "CLUBBED",
+      "why": "key terms spread across 7 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/services/catalogIntelligenceService.js",
+          "area": "service"
+        },
+        {
+          "file": "backend/src/services/farmerTrainingService.js",
+          "area": "service"
+        },
+        {
+          "file": "backend/src/services/preSeasonOrderService.js",
+          "area": "service"
+        },
+        {
+          "file": "backend/src/services/soilTestingService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "service",
+        "page"
+      ],
+      "terms": [
+        "pig",
+        "farming"
+      ]
+    },
+    {
+      "id": "M127",
+      "name": "Animal Health Management",
+      "domain": "Livestock",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M127/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M127/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M127/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "animal",
+        "health"
+      ]
+    },
+    {
+      "id": "M128",
+      "name": "Feed Management",
+      "domain": "Livestock",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/decisionEngine.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/effectors.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/outcomeSink.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "feed"
+      ]
+    },
+    {
+      "id": "M129",
+      "name": "Breeding Management",
+      "domain": "Livestock",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/biodiversity_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/018_biodiversity_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M129/controller.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "breeding"
+      ]
+    },
+    {
+      "id": "M130",
+      "name": "Livestock Analytics",
+      "domain": "Livestock",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M130/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M130/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M130/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "livestock",
+        "analytics"
+      ]
+    },
+    {
+      "id": "M131",
+      "name": "Biofloc Farm Management",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M131/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M131/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M131/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "biofloc",
+        "farm"
+      ]
+    },
+    {
+      "id": "M132",
+      "name": "Pond Management",
+      "domain": "Fisheries",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/withTransaction.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "pond"
+      ]
+    },
+    {
+      "id": "M133",
+      "name": "Hatchery Management",
+      "domain": "Fisheries",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M133/controller.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "hatchery"
+      ]
+    },
+    {
+      "id": "M134",
+      "name": "Fish Feed Management",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M134/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M134/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M134/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "fish",
+        "feed"
+      ]
+    },
+    {
+      "id": "M135",
+      "name": "Water Quality Control",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M135/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M135/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M135/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "water",
+        "quality",
+        "control"
+      ]
+    },
+    {
+      "id": "M136",
+      "name": "Fish Health Management",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M136/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M136/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M136/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "fish",
+        "health"
+      ]
+    },
+    {
+      "id": "M137",
+      "name": "Harvest Management (Fisheries)",
+      "domain": "Fisheries",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/core/effectors.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/database/biodiversity_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "harvest"
+      ]
+    },
+    {
+      "id": "M138",
+      "name": "Fish Processing Management",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema",
+          "line": 291
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M138/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M138/index.js",
+          "area": "other",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "fish",
+        "processing"
+      ]
+    },
+    {
+      "id": "M139",
+      "name": "Cold Fish Chain",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "cold",
+        "fish",
+        "chain"
+      ]
+    },
+    {
+      "id": "M140",
+      "name": "Aquaculture Analytics",
+      "domain": "Fisheries",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M140/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M140/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M140/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "aquaculture",
+        "analytics"
+      ]
+    },
+    {
+      "id": "M141",
+      "name": "Orchard Management",
+      "domain": "Horticulture",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/modules/M141/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M141/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M141/model.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "orchard"
+      ]
+    },
+    {
+      "id": "M142",
+      "name": "Vegetable Production",
+      "domain": "Horticulture",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M142/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M142/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M142/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "vegetable",
+        "production"
+      ]
+    },
+    {
+      "id": "M143",
+      "name": "Floriculture Management",
+      "domain": "Horticulture",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/modules/M143/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M143/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M143/model.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "floriculture"
+      ]
+    },
+    {
+      "id": "M144",
+      "name": "Greenhouse Management",
+      "domain": "Horticulture",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/iot_integration_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "greenhouse"
+      ]
+    },
+    {
+      "id": "M145",
+      "name": "Polyhouse Management",
+      "domain": "Horticulture",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M145/controller.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "polyhouse"
+      ]
+    },
+    {
+      "id": "M146",
+      "name": "Hydroponics Management",
+      "domain": "Horticulture",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M146/controller.js",
+          "area": "other"
+        }
+      ],
+      "terms": [
+        "hydroponics"
+      ]
+    },
+    {
+      "id": "M147",
+      "name": "Aeroponics Management",
+      "domain": "Horticulture",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/modules/M147/controller.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M147/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M147/model.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "aeroponics"
+      ]
+    },
+    {
+      "id": "M148",
+      "name": "Precision Horticulture",
+      "domain": "Horticulture",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "precision",
+        "horticulture"
+      ]
+    },
+    {
+      "id": "M149",
+      "name": "Protected Cultivation",
+      "domain": "Horticulture",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/biodiversity_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/018_biodiversity_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/biodiversityService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "protected",
+        "cultivation"
+      ]
+    },
+    {
+      "id": "M150",
+      "name": "Horticulture Analytics",
+      "domain": "Horticulture",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M150/controller.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M150/index.js",
+          "area": "other",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M150/model.sql",
+          "area": "schema",
+          "line": 1
+        }
+      ],
+      "terms": [
+        "horticulture",
+        "analytics"
+      ]
+    }
+  ],
+  "namedMissing": [
+    {
+      "id": "NM",
+      "name": "RFQ (Request for Quote) & Dynamic Negotiation Engine",
+      "domain": "named-missing",
+      "purpose": "Allow corporate buyers to post bulk requirements (e.g., \"500 kg Turmeric, Grade A\"). Farmers/FPOs bid anonymously. The platform takes a small success fee. Sales Hook: \"Name your price; let the farm compete for your business.\"",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "rfq",
+        "dynamic",
+        "negotiation"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Subscription / \"SIP\" (Systematic Investment Plan) for Staples",
+      "domain": "named-missing",
+      "purpose": "Allow RWAs and HoReCa to set monthly auto-orders (e.g., \"50kg rice every 30 days\"). This generates predictable Monthly Recurring Revenue (MRR) for the platform.",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/commerceRulesService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "subscription",
+        "sip",
+        "staples"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "\"Quote-to-Order\" Conversion Dashboard",
+      "domain": "named-missing",
+      "purpose": "Track why quotes are lost (price vs. delivery). This gives the sales team data to adjust pricing dynamically based on real buyer behavior, not just competitor scrapes.",
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/enterpriseControlService.js",
+          "area": "service"
+        },
+        {
+          "file": "backend/src/services/rfqService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/pages/RfqPage.jsx",
+          "area": "page"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service",
+        "page"
+      ],
+      "terms": [
+        "quote",
+        "order",
+        "conversion"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Sponsored GI Listings (Auction-based)",
+      "domain": "named-missing",
+      "purpose": "Allow high-margin brands (e.g., Lakadong Turmeric) to bid for the \"Top Slot\" in category searches. This creates a new revenue stream (Ad Inventory) without charging farmers directly.",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema",
+          "line": 164
+        }
+      ],
+      "terms": [
+        "sponsored",
+        "listings"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Affiliate & Influencer Tracking",
+      "domain": "named-missing",
+      "purpose": "Generate unique referral links for food bloggers and influencers. Pay them a commission (e.g., 10%) on every sale they drive. Marketing Hook: \"Earn by sharing Northeast India's story.\"",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "affiliate",
+        "influencer",
+        "tracking"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Pixel & Retargeting Integration",
+      "domain": "named-missing",
+      "purpose": "Plug in Meta (Facebook) and Google Ads pixels. When a user abandons a cart, the platform triggers a retargeting ad automatically. Without this, advertising spend is wasted.",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "pixel",
+        "retargeting",
+        "integration"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "TDS (Tax Deducted at Source) Engine",
+      "domain": "named-missing",
+      "purpose": "The platform generates commission revenue. Under the Income Tax Act, TDS must be deducted on payments to transporters and FPOs. This module auto-calculates TDS (e.g., 1% on transport, 2% on commission) and issues Form 16/26Q reports. Accounting Hook: \"We make your tax compliance audit-proof.\"",
+      "status": "LEAD",
+      "why": "single-word match only — must be checked by hand before building",
+      "evidence": [
+        {
+          "file": "backend/src/database/engineering_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/logistics_enhancement_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "terms": [
+        "tds"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Automated Bank Reconciliation (via UPI/Razorpay)",
+      "domain": "named-missing",
+      "purpose": "Match the platform's ledger (sales revenue, farmer payouts) with the actual bank statements via a bank API. Flag mismatches in real-time, reducing the CA's month-end workload by 80%.",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "automated",
+        "bank",
+        "reconciliation"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Asset Capitalization & Depreciation Schedule",
+      "domain": "named-missing",
+      "purpose": "Link the \"AF-AA\" asset register to specific projects (e.g., TC-01 Cold Store). When a corporate buys a share of the cold store, the platform automatically generates their depreciation certificate for their own books.",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "asset",
+        "capitalization",
+        "depreciation",
+        "schedule"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "E-Invoice IRN (Invoice Reference Number) Generation",
+      "domain": "named-missing",
+      "purpose": "Directly integrate with the NIC (National Informatics Centre) IRP sandbox. The moment an order is placed, the platform generates the legally valid IRN and QR code. Taxation Hook: \"One click to a legally valid invoice; no manual portal entry.\"",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/services/complianceService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "service"
+      ],
+      "terms": [
+        "invoice",
+        "irn",
+        "generation"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "GSTR-1 & GSTR-3B Auto-Population",
+      "domain": "named-missing",
+      "purpose": "Aggregate all B2B and B2C sales for the month and auto-generate the JSON file required to file GST returns. No re-keying of data.",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "gstr1",
+        "gstr3b",
+        "auto",
+        "population"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Reverse Charge Mechanism (RCM) Handler",
+      "domain": "named-missing",
+      "purpose": "When buying from unregistered farmers (raw agricultural produce), the corporate buyer must pay GST under RCM. This module auto-calculates the RCM liability and flags it on the invoice for the CA.",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "reverse",
+        "charge",
+        "mechanism",
+        "handler"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Farm Plot & Land Bank Management",
+      "domain": "named-missing",
+      "purpose": "Move beyond \"Farmer Name\" to \"Plot ID.\" Map each farmer's parcels (geo-tagged). Link each batch (lot code) to a specific plot. ERP Hook: \"True 'Farm-to-Fork' traceability starts at the soil, not the warehouse gate.\"",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "farm",
+        "plot",
+        "land",
+        "bank"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Agri-Input Inventory (Seed/Fertilizer/PPE) Tracking",
+      "domain": "named-missing",
+      "purpose": "Track the inputs issued to farmers (via the Pre-Season Advance). Link these inputs to the final harvest yield. If a farmer uses banned pesticides, the lot is automatically flagged for export rejection.",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "area": "schema"
+        }
+      ],
+      "areas": [
+        "schema"
+      ],
+      "terms": [
+        "agri",
+        "input",
+        "inventory",
+        "tracking"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Mandi / APMC Price Integration (Live)",
+      "domain": "named-missing",
+      "purpose": "Pull live prices from e-NAM and local APMCs directly into the \"Sell-Timing Advisor\" and \"Dynamic Pricing\" modules. Marketing sells this as: \"Don't guess the market; read it in real-time.\"",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/services/marketDataService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "service"
+      ],
+      "terms": [
+        "mandi",
+        "apmc",
+        "price",
+        "integration"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Quality Control (QC) Hold & Release Workflow",
+      "domain": "named-missing",
+      "purpose": "If a lab report fails (e.g., Aflatoxin > limit), the system automatically blocks that lot from \"Ready for Dispatch\" status. Only the QC manager can \"Override/Hold-Release\" with a digital signature.",
+      "status": "HIDDEN",
+      "why": "all key terms appear together in a small number of files",
+      "evidence": [
+        {
+          "file": "backend/src/core/erpAgents.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/services/enterpriseControlService.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "other",
+        "service"
+      ],
+      "terms": [
+        "quality",
+        "control",
+        "hold",
+        "release",
+        "workflow"
+      ]
+    },
+    {
+      "id": "NM",
+      "name": "Multi-Location FPO Cost Centers",
+      "domain": "named-missing",
+      "purpose": "Allow a single large FPO to manage multiple collection centers. Each center has its own P&L (Profit & Loss) statement. CAs can audit center-wise performance, preventing internal fraud.",
+      "status": "ABSENT",
+      "why": "no occurrence of these terms anywhere in backend or frontend",
+      "evidence": [],
+      "terms": [
+        "multi",
+        "location",
+        "fpo",
+        "cost",
+        "centers"
+      ]
+    }
+  ]
+}

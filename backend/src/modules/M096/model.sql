@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Equipment Scheduling (M096)
+-- Define tables and indexes here

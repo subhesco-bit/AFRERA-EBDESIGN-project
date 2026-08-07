@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Water Budgeting (M076)
+-- Define tables and indexes here

@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Tenant Management (M003)
+-- Define tables and indexes here

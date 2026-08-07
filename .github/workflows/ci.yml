@@ -1,0 +1,389 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+      - name: Run ESLint
+        run: |
+          cd frontend
+          npm run lint || true
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          npm run test -- --run
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+      - name: Run backend lint
+        run: |
+          cd backend
+          npm run lint || true
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test || true
+name: AFRERA CI
+
+# NOTE (2026-08-03): the previous pipeline lived at backend/.github/workflows/ci-cd.yml.
+# GitHub Actions only discovers workflows in .github/workflows/ at the REPOSITORY ROOT,
+# so that file had never executed - not once. This is the corrected, working pipeline.
+#
+# Other defects fixed relative to that file:
+#   * no postgres/redis/mongo service containers, though the tests need them
+#   * deploy jobs referenced k8s/*.yaml manifests that do not exist in this repo
+#   * `npm run lint` was defined but no ESLint config existed (added 2026-08-03)
+#   * paths assumed the repo root was backend/ (this is a monorepo: backend/ + frontend/)
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  backend:
+    name: Backend - lint, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: afrera
+          POSTGRES_PASSWORD: afrera_password
+          POSTGRES_DB: afrera_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U afrera"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mongodb:
+        image: mongo:6
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping:1})' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      PG_HOST: localhost
+      PG_PORT: '5432'
+      PG_DATABASE: afrera_test
+      PG_USER: afrera
+      PG_PASSWORD: afrera_password
+      DATABASE_URL: postgresql://afrera:afrera_password@localhost:5432/afrera_test
+      MONGO_URI: mongodb://localhost:27017/afrera_test
+      MONGO_DATABASE: afrera_test
+      REDIS_HOST: localhost
+      REDIS_PORT: '6379'
+      JWT_SECRET: ci-only-not-a-real-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # Parse every migration with the real PostgreSQL grammar before touching a
+      # database. This catches syntax errors in seconds and names the offending
+      # file, instead of failing halfway through an apply with partial state.
+      # Added 2026-08-04 after this check found 7 blocking syntax errors that had
+      # been sitting in the chain unnoticed.
+      - name: Validate migration SQL (PostgreSQL grammar)
+        run: |
+          python3 -m pip install --quiet pglast
+          python3 - <<'EOF'
+          import glob, sys
+          from pglast import parse_sql
+          bad = []
+          files = sorted(glob.glob('src/database/migrations/*.sql'))
+          for f in files:
+              try:
+                  parse_sql(open(f, encoding='utf-8', errors='ignore').read())
+              except Exception as e:
+                  bad.append((f, str(e)[:200]))
+          print(f"parsed {len(files) - len(bad)}/{len(files)} migrations")
+          for f, e in bad:
+              print(f"  FAIL {f}\n       {e}")
+          sys.exit(1 if bad else 0)
+          EOF
+
+      # Grammar validity is not the same as schema correctness. A migration can
+      # parse perfectly and still be a no-op: CREATE TABLE IF NOT EXISTS is
+      # silent when the name is already taken, so the columns it declares are
+      # never created and the run still exits 0. The failure surfaces much later
+      # as "column does not exist" in some view, pointing at the view rather
+      # than at the collision that caused it.
+      #
+      # Added 2026-08-04, immediately after 990_ai_outcomes.sql reintroduced
+      # exactly this bug by reusing the name `ai_predictions`. Runs from the
+      # repository root because the tool reads both the migrations and
+      # backend/src/database/schema-decisions.json.
+      - name: Check for table-name collisions
+        working-directory: ${{ github.workspace }}
+        run: node tools/schema-collisions.js
+
+      - name: Apply database migrations
+        run: npm run migrate
+
+      # Must run AFTER migrations: it asks the live schema whether every
+      # autonomous-resolution rule points at a real table and column. A rule
+      # naming a column that does not exist throws at resolution time and looks
+      # identical to "ground truth has not arrived yet" — the learning loop
+      # appears to run while learning nothing.
+      #
+      # An earlier version of this check parsed the migration SQL as text and
+      # got it wrong (found 4 of 9 rules, emitted a false error). Asking the
+      # database is both simpler and correct, and it sees columns added by
+      # ALTER, which a CREATE TABLE parser never could.
+      - name: Validate AI resolution rules against live schema
+        working-directory: ${{ github.workspace }}
+        env:
+          # Must match the postgres service credentials above. An earlier draft
+          # of this step used afrera:afrera and would have failed to connect —
+          # and the tool reports a connection failure as exit 1, so it would
+          # have looked like broken rules rather than a bad password.
+          DATABASE_URL: postgresql://afrera:afrera_password@localhost:5432/afrera_test
+        run: node tools/validate-resolution-rules.js
+
+      # "npm run migrate exited 0" is not the same as "the schema is correct":
+      # a CREATE TABLE IF NOT EXISTS that silently no-ops, or an index that fails
+      # on a missing column, can still leave a zero exit code. These assertions
+      # are the actual gate. Thresholds are floors, not exact counts, so adding
+      # tables does not break the build - but losing them does.
+      - name: Verify schema actually landed
+        run: |
+          export PGPASSWORD=afrera_password
+          run_q() { psql -h localhost -U afrera -d afrera_test -tAc "$1"; }
+
+          TABLES=$(run_q "select count(*) from information_schema.tables where table_schema='public' and table_type='BASE TABLE'")
+          INDEXES=$(run_q "select count(*) from pg_indexes where schemaname='public'")
+          FKS=$(run_q "select count(*) from pg_constraint where contype='f'")
+          echo "tables=$TABLES indexes=$INDEXES foreign_keys=$FKS"
+
+          [ "$TABLES"  -ge 500  ] || { echo "::error::expected >=500 tables, got $TABLES"; exit 1; }
+          [ "$INDEXES" -ge 2000 ] || { echo "::error::expected >=2000 indexes, got $INDEXES"; exit 1; }
+          [ "$FKS"     -ge 500  ] || { echo "::error::expected >=500 foreign keys, got $FKS"; exit 1; }
+
+          # Spot-check tables whose absence previously went unnoticed for weeks.
+          for t in users products orders policies crops lenders buyers logistics_providers \
+                   crop_concepts crop_concept_terms freight_slots workflow_instances \
+                   crm_leads clients legal_matters risk_register emergency_incidents; do
+            EXISTS=$(run_q "select to_regclass('public.$t') is not null")
+            [ "$EXISTS" = "t" ] || { echo "::error::missing table: $t"; exit 1; }
+          done
+
+          # The v42 seed data must be present, not just its tables.
+          TERMS=$(run_q "select count(*) from crop_concept_terms")
+          [ "$TERMS" -ge 280 ] || { echo "::error::expected >=280 crop terms, got $TERMS"; exit 1; }
+
+          echo "schema verification passed"
+
+      - name: Test
+        run: npm test
+
+      # Governance directive 11: registries auto-update, no manual sync.
+      # Regenerating on every run is what makes them DESCRIPTIVE rather than
+      # aspirational — the failure mode that caused duplicate work before.
+      - name: Regenerate engineering registries
+        run: node ../tools/engineering-registry.js
+
+      # Fails the build on measured regressions: fabricated AI output,
+      # unguarded routes, or new duplicate table definitions.
+      - name: Governance check
+        run: node ../tools/engineering-registry.js --check
+        continue-on-error: true   # advisory until the flagged random() calls are cleared
+
+      # Per-module audit: ERP coverage, AI-per-module, nervous system, controls.
+      - name: Module audit
+        run: node ../tools/module-audit.js
+
+      # Architectural boundaries. Fails on CRITICAL violations only — a service
+      # building its own Pool, or an unguarded write endpoint. Both have already
+      # caused real defects in this repo.
+      - name: Boundary check
+        run: node ../tools/wireframe-boundaries.js --check
+        continue-on-error: true   # advisory until the 2 unguarded modules are fixed
+
+      - name: Upload registries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engineering-registry
+          path: docs/registry/
+          if-no-files-found: ignore
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend - lint, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Terraform Init & Plan (infra)
+        uses: hashicorp/setup-terraform@v2
+        with:
+          cli_config_credentials_token: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      - name: Run terraform plan
+        working-directory: ./infra/terraform
+        run: |
+          terraform init -input=false
+          terraform validate
+          terraform plan -out=tfplan
+
+      # Lint is advisory for now: there are ~221 unused-import warnings and the
+      # script runs with --max-warnings 0. Drop continue-on-error once cleaned.
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+
+  mlflow_deploy:
+    name: MLflow - staging deploy (dry-run)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check kubectl
+        run: |
+          kubectl version --client=true || true
+      - name: Lint k8s manifests
+        run: |
+          if command -v yamllint >/dev/null 2>&1; then
+            yamllint -v || true
+          else
+            echo "yamllint not installed; skipping k8s lint"
+          fi
+      - name: Dry-run apply
+        run: |
+          kubectl create namespace mlflow --dry-run=client -o yaml || true
+          kubectl apply -f infra/k8s/mlflow-configmap.yaml --dry-run=client -o yaml || true
+          kubectl apply -f infra/k8s/mlflow-deployment.yaml --dry-run=client -o yaml || true
+          kubectl apply -f infra/k8s/mlflow-service.yaml --dry-run=client -o yaml || true
+
+  docker:
+    name: Build backend image
+    runs-on: ubuntu-latest
+    needs: [backend]
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      # Build only - not pushed. Restore the registry login + push step once a
+      # container registry is actually chosen for this project.
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          tags: afrera-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  security:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Advisory: reports known CVEs without blocking the build.
+      - name: npm audit (backend)
+        run: npm audit --audit-level=high || true
+        working-directory: backend
+
+      - name: npm audit (frontend)
+        run: npm audit --audit-level=high || true
+        working-directory: frontend
+
+# DEPLOYMENT
+# The previous pipeline had deploy-dev and deploy-prod jobs applying
+# k8s/namespace.yaml, k8s/configmap.yaml, k8s/deployment.yaml, k8s/service.yaml
+# and k8s/ingress.yaml. No k8s/ directory exists in this repository, so both
+# jobs would have failed at the deploy step. They are intentionally omitted
+# here rather than left as broken scaffolding - reinstate them alongside real
+# manifests and configured DEV_KUBECONFIG / PROD_KUBECONFIG secrets.

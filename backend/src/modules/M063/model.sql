@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Crop Registration (M063)
+-- Define tables and indexes here

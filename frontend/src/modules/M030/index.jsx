@@ -1,0 +1,1 @@
+﻿export { default as M030Page } from './M030Page';\n

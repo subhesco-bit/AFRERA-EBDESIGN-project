@@ -1,0 +1,27 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
+  },
+  "settings": {
+    "react": { "version": "detect" }
+  },
+  "extends": ["eslint:recommended"],
+  "globals": {
+    "React": "readonly"
+  },
+  "rules": {
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^React$" }],
+    "no-undef": "error",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "prefer-const": "warn",
+    "eqeqeq": ["warn", "smart"]
+  },
+  "ignorePatterns": ["node_modules/", "dist/", "coverage/"]
+}

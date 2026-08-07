@@ -1,0 +1,5485 @@
+{
+  "generated": "2026-08-04",
+  "objects": [
+    {
+      "objectId": "SVC-ADVANCEDAISERVICE",
+      "type": "Service",
+      "name": "advancedAIService",
+      "evidence": "backend/src/services/advancedAIService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ADVANCEDFEATURESSERVICE",
+      "type": "Service",
+      "name": "advancedFeaturesService",
+      "evidence": "backend/src/services/advancedFeaturesService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ADVANCEDVOICEAI",
+      "type": "Service",
+      "name": "advancedVoiceAI",
+      "evidence": "backend/src/services/advancedVoiceAI.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-AICOPILOTSERVICE",
+      "type": "Service",
+      "name": "aiCopilotService",
+      "evidence": "backend/src/services/aiCopilotService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-AISERVICE",
+      "type": "Service",
+      "name": "aiService",
+      "evidence": "backend/src/services/aiService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ANALYTICSSERVICE",
+      "type": "Service",
+      "name": "analyticsService",
+      "evidence": "backend/src/services/analyticsService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ARVRSERVICE",
+      "type": "Service",
+      "name": "arVrService",
+      "evidence": "backend/src/services/arVrService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-AUDITSERVICE",
+      "type": "Service",
+      "name": "auditService",
+      "evidence": "backend/src/services/auditService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AUTHSERVICE",
+      "type": "Service",
+      "name": "authService",
+      "evidence": "backend/src/services/authService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-BIODIVERSITYSERVICE",
+      "type": "Service",
+      "name": "biodiversityService",
+      "evidence": "backend/src/services/biodiversityService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-BLOCKCHAINTRACEABILITYSERVICE",
+      "type": "Service",
+      "name": "blockchainTraceabilityService",
+      "evidence": "backend/src/services/blockchainTraceabilityService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-BULKORDERSERVICE",
+      "type": "Service",
+      "name": "bulkOrderService",
+      "evidence": "backend/src/services/bulkOrderService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CATALOGINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "catalogIntelligenceService",
+      "evidence": "backend/src/services/catalogIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-COMMERCERULESSERVICE",
+      "type": "Service",
+      "name": "commerceRulesService",
+      "evidence": "backend/src/services/commerceRulesService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CONSUMERHEALTHSERVICE",
+      "type": "Service",
+      "name": "consumerHealthService",
+      "evidence": "backend/src/services/consumerHealthService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CONVERSATIONALAISERVICE",
+      "type": "Service",
+      "name": "conversationalAIService",
+      "evidence": "backend/src/services/conversationalAIService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CROPPLANNINGSERVICE",
+      "type": "Service",
+      "name": "cropPlanningService",
+      "evidence": "backend/src/services/cropPlanningService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DECISIONSUPPORTSERVICE",
+      "type": "Service",
+      "name": "decisionSupportService",
+      "evidence": "backend/src/services/decisionSupportService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DIGITALPRODUCTPASSPORTSERVICE",
+      "type": "Service",
+      "name": "digitalProductPassportService",
+      "evidence": "backend/src/services/digitalProductPassportService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-DYNAMICPRICINGSERVICE",
+      "type": "Service",
+      "name": "dynamicPricingService",
+      "evidence": "backend/src/services/dynamicPricingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ENTERPRISEAISERVICE",
+      "type": "Service",
+      "name": "enterpriseAIService",
+      "evidence": "backend/src/services/enterpriseAIService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ENTERPRISECONTROLSERVICE",
+      "type": "Service",
+      "name": "enterpriseControlService",
+      "evidence": "backend/src/services/enterpriseControlService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ERPSERVICE",
+      "type": "Service",
+      "name": "erpService",
+      "evidence": "backend/src/services/erpService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FARMERSERVICE",
+      "type": "Service",
+      "name": "farmerService",
+      "evidence": "backend/src/services/farmerService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FARMERTRAININGSERVICE",
+      "type": "Service",
+      "name": "farmerTrainingService",
+      "evidence": "backend/src/services/farmerTrainingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FARMERVALUESERVICE",
+      "type": "Service",
+      "name": "farmerValueService",
+      "evidence": "backend/src/services/farmerValueService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FINANCIALSERVICE",
+      "type": "Service",
+      "name": "financialService",
+      "evidence": "backend/src/services/financialService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FOODINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "foodIntelligenceService",
+      "evidence": "backend/src/services/foodIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FOODSAFETYSERVICE",
+      "type": "Service",
+      "name": "foodSafetyService",
+      "evidence": "backend/src/services/foodSafetyService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FORMSERVICE",
+      "type": "Service",
+      "name": "formService",
+      "evidence": "backend/src/services/formService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-GIINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "giIntelligenceService",
+      "evidence": "backend/src/services/giIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-GOVERNANCESERVICE",
+      "type": "Service",
+      "name": "governanceService",
+      "evidence": "backend/src/services/governanceService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-GOVERNMENTSCHEMESERVICE",
+      "type": "Service",
+      "name": "governmentSchemeService",
+      "evidence": "backend/src/services/governmentSchemeService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-GREENHOUSESERVICE",
+      "type": "Service",
+      "name": "greenhouseService",
+      "evidence": "backend/src/services/greenhouseService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-GSTSERVICE",
+      "type": "Service",
+      "name": "gstService",
+      "evidence": "backend/src/services/gstService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-INDIGENOUSKNOWLEDGESERVICE",
+      "type": "Service",
+      "name": "indigenousKnowledgeService",
+      "evidence": "backend/src/services/indigenousKnowledgeService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-INSTITUTIONALPROCUREMENTSERVICE",
+      "type": "Service",
+      "name": "institutionalProcurementService",
+      "evidence": "backend/src/services/institutionalProcurementService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-INSURANCECLAIMSSERVICE",
+      "type": "Service",
+      "name": "insuranceClaimsService",
+      "evidence": "backend/src/services/insuranceClaimsService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-INSURANCEFRAUDDETECTIONSERVICE",
+      "type": "Service",
+      "name": "insuranceFraudDetectionService",
+      "evidence": "backend/src/services/insuranceFraudDetectionService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-INSURANCEPOLICYISSUANCESERVICE",
+      "type": "Service",
+      "name": "insurancePolicyIssuanceService",
+      "evidence": "backend/src/services/insurancePolicyIssuanceService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-INSURANCEPREMIUMSERVICE",
+      "type": "Service",
+      "name": "insurancePremiumService",
+      "evidence": "backend/src/services/insurancePremiumService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-INSURANCESERVICE",
+      "type": "Service",
+      "name": "insuranceService",
+      "evidence": "backend/src/services/insuranceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-IOTINTEGRATIONSERVICE",
+      "type": "Service",
+      "name": "iotIntegrationService",
+      "evidence": "backend/src/services/iotIntegrationService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-KNOWLEDGEGRAPHSERVICE",
+      "type": "Service",
+      "name": "knowledgeGraphService",
+      "evidence": "backend/src/services/knowledgeGraphService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-LABORATORYERPSERVICE",
+      "type": "Service",
+      "name": "laboratoryERPService",
+      "evidence": "backend/src/services/laboratoryERPService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-LANDRECORDSSERVICE",
+      "type": "Service",
+      "name": "landRecordsService",
+      "evidence": "backend/src/services/landRecordsService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-LOGISTICSENHANCEMENTSERVICE",
+      "type": "Service",
+      "name": "logisticsEnhancementService",
+      "evidence": "backend/src/services/logisticsEnhancementService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-LOGISTICSSERVICE",
+      "type": "Service",
+      "name": "logisticsService",
+      "evidence": "backend/src/services/logisticsService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-MERCHANDISINGSERVICE",
+      "type": "Service",
+      "name": "merchandisingService",
+      "evidence": "backend/src/services/merchandisingService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-MODULECATALOGSERVICE",
+      "type": "Service",
+      "name": "moduleCatalogService",
+      "evidence": "backend/src/services/moduleCatalogService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-MULTILINGUALSERVICE",
+      "type": "Service",
+      "name": "multilingualService",
+      "evidence": "backend/src/services/multilingualService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-NEPRODUCTINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "neProductIntelligenceService",
+      "evidence": "backend/src/services/neProductIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-NUTRITIONINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "nutritionIntelligenceService",
+      "evidence": "backend/src/services/nutritionIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-OFFLINEPAYMENTSERVICE",
+      "type": "Service",
+      "name": "offlinePaymentService",
+      "evidence": "backend/src/services/offlinePaymentService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-OFFLINESYNCSERVICE",
+      "type": "Service",
+      "name": "offlineSyncService",
+      "evidence": "backend/src/services/offlineSyncService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-OMNICHANNELAISERVICE",
+      "type": "Service",
+      "name": "omnichannelAIService",
+      "evidence": "backend/src/services/omnichannelAIService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ORDERSERVICE",
+      "type": "Service",
+      "name": "orderService",
+      "evidence": "backend/src/services/orderService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ORGANICTRACEABILITYSERVICE",
+      "type": "Service",
+      "name": "organicTraceabilityService",
+      "evidence": "backend/src/services/organicTraceabilityService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-PRESEASONORDERSERVICE",
+      "type": "Service",
+      "name": "preSeasonOrderService",
+      "evidence": "backend/src/services/preSeasonOrderService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-PREDICTIVEANALYTICSSERVICE",
+      "type": "Service",
+      "name": "predictiveAnalyticsService",
+      "evidence": "backend/src/services/predictiveAnalyticsService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-PRODUCTREVIEWSERVICE",
+      "type": "Service",
+      "name": "productReviewService",
+      "evidence": "backend/src/services/productReviewService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-PRODUCTSERVICE",
+      "type": "Service",
+      "name": "productService",
+      "evidence": "backend/src/services/productService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-RECIPEINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "recipeIntelligenceService",
+      "evidence": "backend/src/services/recipeIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-SHAREDINFRASERVICE",
+      "type": "Service",
+      "name": "sharedInfraService",
+      "evidence": "backend/src/services/sharedInfraService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-SHELFLIFESERVICE",
+      "type": "Service",
+      "name": "shelfLifeService",
+      "evidence": "backend/src/services/shelfLifeService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-SMSAUTHSERVICE",
+      "type": "Service",
+      "name": "smsAuthService",
+      "evidence": "backend/src/services/smsAuthService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-SOILTESTINGSERVICE",
+      "type": "Service",
+      "name": "soilTestingService",
+      "evidence": "backend/src/services/soilTestingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-SUBSIDYSERVICE",
+      "type": "Service",
+      "name": "subsidyService",
+      "evidence": "backend/src/services/subsidyService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-V42INTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "v42IntelligenceService",
+      "evidence": "backend/src/services/v42IntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-VALUECOMMERCESERVICE",
+      "type": "Service",
+      "name": "valueCommerceService",
+      "evidence": "backend/src/services/valueCommerceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-VOICEAISERVICE",
+      "type": "Service",
+      "name": "voiceAIService",
+      "evidence": "backend/src/services/voiceAIService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-ADVANCEDFEATURES",
+      "type": "Route",
+      "name": "advancedFeatures",
+      "evidence": "backend/src/routes/advancedFeatures.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-AUDITROUTES",
+      "type": "Route",
+      "name": "auditRoutes",
+      "evidence": "backend/src/routes/auditRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-DECISIONSUPPORTROUTES",
+      "type": "Route",
+      "name": "decisionSupportRoutes",
+      "evidence": "backend/src/routes/decisionSupportRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-FARMERPORTALENHANCEMENTS",
+      "type": "Route",
+      "name": "farmerPortalEnhancements",
+      "evidence": "backend/src/routes/farmerPortalEnhancements.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-FARMERROUTES",
+      "type": "Route",
+      "name": "farmerRoutes",
+      "evidence": "backend/src/routes/farmerRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-GOVERNANCEMODULE",
+      "type": "Route",
+      "name": "governanceModule",
+      "evidence": "backend/src/routes/governanceModule.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-GSTROUTES",
+      "type": "Route",
+      "name": "gstRoutes",
+      "evidence": "backend/src/routes/gstRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-INSURANCEENHANCEMENTS",
+      "type": "Route",
+      "name": "insuranceEnhancements",
+      "evidence": "backend/src/routes/insuranceEnhancements.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-LOGISTICSENHANCEMENTROUTES",
+      "type": "Route",
+      "name": "logisticsEnhancementRoutes",
+      "evidence": "backend/src/routes/logisticsEnhancementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-LOGISTICSENHANCEMENTS",
+      "type": "Route",
+      "name": "logisticsEnhancements",
+      "evidence": "backend/src/routes/logisticsEnhancements.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-MARKETPLACEENHANCEMENTS",
+      "type": "Route",
+      "name": "marketplaceEnhancements",
+      "evidence": "backend/src/routes/marketplaceEnhancements.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-VENDORROUTES",
+      "type": "Route",
+      "name": "vendorRoutes",
+      "evidence": "backend/src/routes/vendorRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "TBL-USERS",
+      "type": "Table",
+      "name": "users",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_PROFILES",
+      "type": "Table",
+      "name": "user_profiles",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ADDRESSES",
+      "type": "Table",
+      "name": "addresses",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ROLES",
+      "type": "Table",
+      "name": "roles",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_ROLES",
+      "type": "Table",
+      "name": "user_roles",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CATEGORIES",
+      "type": "Table",
+      "name": "categories",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-STATES",
+      "type": "Table",
+      "name": "states",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-UNITS",
+      "type": "Table",
+      "name": "units",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCTS",
+      "type": "Table",
+      "name": "products",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_VARIANTS",
+      "type": "Table",
+      "name": "product_variants",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CERTIFICATIONS",
+      "type": "Table",
+      "name": "certifications",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORDERS",
+      "type": "Table",
+      "name": "orders",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORDER_ITEMS",
+      "type": "Table",
+      "name": "order_items",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CART",
+      "type": "Table",
+      "name": "cart",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PAYMENTS",
+      "type": "Table",
+      "name": "payments",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COUPONS",
+      "type": "Table",
+      "name": "coupons",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FPOS",
+      "type": "Table",
+      "name": "fpos",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMERS",
+      "type": "Table",
+      "name": "farmers",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_CERTIFICATIONS",
+      "type": "Table",
+      "name": "farmer_certifications",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRAINING_RECORDS",
+      "type": "Table",
+      "name": "training_records",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CREDIT_SCORES",
+      "type": "Table",
+      "name": "credit_scores",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOANS",
+      "type": "Table",
+      "name": "loans",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMI_SCHEDULE",
+      "type": "Table",
+      "name": "emi_schedule",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ADVANCES",
+      "type": "Table",
+      "name": "advances",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FINANCIAL_TRANSACTIONS",
+      "type": "Table",
+      "name": "financial_transactions",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSURANCE_PRODUCTS",
+      "type": "Table",
+      "name": "insurance_products",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POLICIES",
+      "type": "Table",
+      "name": "policies",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CLAIMS",
+      "type": "Table",
+      "name": "claims",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MASTER_POLICIES",
+      "type": "Table",
+      "name": "master_policies",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHIPMENT_MODES",
+      "type": "Table",
+      "name": "shipment_modes",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHIPMENTS",
+      "type": "Table",
+      "name": "shipments",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHIPMENT_TRACKING",
+      "type": "Table",
+      "name": "shipment_tracking",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-VEHICLES",
+      "type": "Table",
+      "name": "vehicles",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DRIVERS",
+      "type": "Table",
+      "name": "drivers",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONTRACTS",
+      "type": "Table",
+      "name": "contracts",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONTRACT_MILESTONES",
+      "type": "Table",
+      "name": "contract_milestones",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ESCROW_ACCOUNTS",
+      "type": "Table",
+      "name": "escrow_accounts",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ASSET_TYPES",
+      "type": "Table",
+      "name": "asset_types",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ASSETS",
+      "type": "Table",
+      "name": "assets",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ASSET_BOOKINGS",
+      "type": "Table",
+      "name": "asset_bookings",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MAINTENANCE_RECORDS",
+      "type": "Table",
+      "name": "maintenance_records",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-SCHEMES",
+      "type": "Table",
+      "name": "schemes",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SUBSIDY_CLAIMS",
+      "type": "Table",
+      "name": "subsidy_claims",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AUDIT_LOGS",
+      "type": "Table",
+      "name": "audit_logs",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/014_audit_system.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-COMPLIANCE_RECORDS",
+      "type": "Table",
+      "name": "compliance_records",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-ERP_SYNC_LOGS",
+      "type": "Table",
+      "name": "erp_sync_logs",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_PREDICTIONS",
+      "type": "Table",
+      "name": "ai_predictions",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RECOMMENDATIONS",
+      "type": "Table",
+      "name": "recommendations",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ANALYTICS_EVENTS",
+      "type": "Table",
+      "name": "analytics_events",
+      "evidence": "backend/src/database/migrations/000_base_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_REVIEWS",
+      "type": "Table",
+      "name": "product_reviews",
+      "evidence": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REVIEW_HELPFUL",
+      "type": "Table",
+      "name": "review_helpful",
+      "evidence": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REVIEW_REPORTS",
+      "type": "Table",
+      "name": "review_reports",
+      "evidence": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BULK_ORDERS",
+      "type": "Table",
+      "name": "bulk_orders",
+      "evidence": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BULK_ORDER_QUOTATIONS",
+      "type": "Table",
+      "name": "bulk_order_quotations",
+      "evidence": "backend/src/database/migrations/009_marketplace_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSURANCE_QUOTES",
+      "type": "Table",
+      "name": "insurance_quotes",
+      "evidence": "backend/src/database/migrations/010_insurance_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POLICY_DOCUMENTS",
+      "type": "Table",
+      "name": "policy_documents",
+      "evidence": "backend/src/database/migrations/010_insurance_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CLAIM_DOCUMENTS",
+      "type": "Table",
+      "name": "claim_documents",
+      "evidence": "backend/src/database/migrations/010_insurance_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FRAUD_ANALYSIS",
+      "type": "Table",
+      "name": "fraud_analysis",
+      "evidence": "backend/src/database/migrations/010_insurance_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RISK_FACTORS",
+      "type": "Table",
+      "name": "risk_factors",
+      "evidence": "backend/src/database/migrations/010_insurance_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAND_RECORDS",
+      "type": "Table",
+      "name": "land_records",
+      "evidence": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_PLANS",
+      "type": "Table",
+      "name": "crop_plans",
+      "evidence": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_WALLETS",
+      "type": "Table",
+      "name": "farmer_wallets",
+      "evidence": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WALLET_TRANSACTIONS",
+      "type": "Table",
+      "name": "wallet_transactions",
+      "evidence": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_BANK_ACCOUNTS",
+      "type": "Table",
+      "name": "farmer_bank_accounts",
+      "evidence": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VILLAGES",
+      "type": "Table",
+      "name": "villages",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PANCHAYATS",
+      "type": "Table",
+      "name": "panchayats",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PANCHAYAT_SCHEMES",
+      "type": "Table",
+      "name": "panchayat_schemes",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CSR_PROJECTS",
+      "type": "Table",
+      "name": "csr_projects",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CSR_CONTRIBUTIONS",
+      "type": "Table",
+      "name": "csr_contributions",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPLIANCE_REPORTS",
+      "type": "Table",
+      "name": "compliance_reports",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COOPERATIVES",
+      "type": "Table",
+      "name": "cooperatives",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COOPERATIVE_MEMBERS",
+      "type": "Table",
+      "name": "cooperative_members",
+      "evidence": "backend/src/database/migrations/012_governance_module.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLEET_VEHICLES",
+      "type": "Table",
+      "name": "fleet_vehicles",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-VEHICLE_MAINTENANCE",
+      "type": "Table",
+      "name": "vehicle_maintenance",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-SHIPMENT_GEOFENCES",
+      "type": "Table",
+      "name": "shipment_geofences",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-TEMPERATURE_READINGS",
+      "type": "Table",
+      "name": "temperature_readings",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-TEMPERATURE_ALERTS",
+      "type": "Table",
+      "name": "temperature_alerts",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-TEMPERATURE_ALERT_LOG",
+      "type": "Table",
+      "name": "temperature_alert_log",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WAREHOUSES",
+      "type": "Table",
+      "name": "warehouses",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WAREHOUSE_INVENTORY",
+      "type": "Table",
+      "name": "warehouse_inventory",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-WAREHOUSE_SHIPMENTS",
+      "type": "Table",
+      "name": "warehouse_shipments",
+      "evidence": "backend/src/database/migrations/013_logistics_enhancements.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AUDIT_REPORTS",
+      "type": "Table",
+      "name": "audit_reports",
+      "evidence": "backend/src/database/migrations/014_audit_system.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AUDIT_ALERTS",
+      "type": "Table",
+      "name": "audit_alerts",
+      "evidence": "backend/src/database/migrations/014_audit_system.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AUDIT_ALERT_LOG",
+      "type": "Table",
+      "name": "audit_alert_log",
+      "evidence": "backend/src/database/migrations/014_audit_system.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SMART_CONTRACTS",
+      "type": "Table",
+      "name": "smart_contracts",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-IOT_DEVICES",
+      "type": "Table",
+      "name": "iot_devices",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-IOT_READINGS",
+      "type": "Table",
+      "name": "iot_readings",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IOT_AUTOMATION_RULES",
+      "type": "Table",
+      "name": "iot_automation_rules",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEMAND_FORECASTS",
+      "type": "Table",
+      "name": "demand_forecasts",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-AR_VR_EXPERIENCES",
+      "type": "Table",
+      "name": "ar_vr_experiences",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/017_ar_vr_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-VOICE_COMMANDS",
+      "type": "Table",
+      "name": "voice_commands",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-KNOWLEDGE_GRAPH",
+      "type": "Table",
+      "name": "knowledge_graph",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_RECOMMENDATIONS",
+      "type": "Table",
+      "name": "ai_recommendations",
+      "evidence": "backend/src/database/migrations/015_advanced_features.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COPILOT_SESSIONS",
+      "type": "Table",
+      "name": "copilot_sessions",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COPILOT_MESSAGES",
+      "type": "Table",
+      "name": "copilot_messages",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FINANCE_COPILOT_DATA",
+      "type": "Table",
+      "name": "finance_copilot_data",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOGISTICS_COPILOT_DATA",
+      "type": "Table",
+      "name": "logistics_copilot_data",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WAREHOUSE_COPILOT_DATA",
+      "type": "Table",
+      "name": "warehouse_copilot_data",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSURANCE_COPILOT_DATA",
+      "type": "Table",
+      "name": "insurance_copilot_data",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_COPILOT_DATA",
+      "type": "Table",
+      "name": "nutrition_copilot_data",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MARKETPLACE_COPILOT_DATA",
+      "type": "Table",
+      "name": "marketplace_copilot_data",
+      "evidence": "backend/src/database/migrations/016_ai_copilot_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AR_VR_ASSETS",
+      "type": "Table",
+      "name": "ar_vr_assets",
+      "evidence": "backend/src/database/migrations/017_ar_vr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EXPERIENCE_ASSETS",
+      "type": "Table",
+      "name": "experience_assets",
+      "evidence": "backend/src/database/migrations/017_ar_vr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INTERACTION_POINTS",
+      "type": "Table",
+      "name": "interaction_points",
+      "evidence": "backend/src/database/migrations/017_ar_vr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AR_VR_SESSIONS",
+      "type": "Table",
+      "name": "ar_vr_sessions",
+      "evidence": "backend/src/database/migrations/017_ar_vr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AR_VR_ANALYTICS",
+      "type": "Table",
+      "name": "ar_vr_analytics",
+      "evidence": "backend/src/database/migrations/017_ar_vr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SPECIES_DATABASE",
+      "type": "Table",
+      "name": "species_database",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NATIVE_CROPS_DATABASE",
+      "type": "Table",
+      "name": "native_crops_database",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRADITIONAL_VARIETIES_DATABASE",
+      "type": "Table",
+      "name": "traditional_varieties_database",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MEDICINAL_PLANTS_DATABASE",
+      "type": "Table",
+      "name": "medicinal_plants_database",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WILD_FOODS_DATABASE",
+      "type": "Table",
+      "name": "wild_foods_database",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONSERVATION_TRACKING",
+      "type": "Table",
+      "name": "conservation_tracking",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BIODIVERSITY_RISK_PREDICTIONS",
+      "type": "Table",
+      "name": "biodiversity_risk_predictions",
+      "evidence": "backend/src/database/migrations/018_biodiversity_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BLOCKCHAIN_TRANSACTIONS",
+      "type": "Table",
+      "name": "blockchain_transactions",
+      "evidence": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRACEABILITY_EVENTS",
+      "type": "Table",
+      "name": "traceability_events",
+      "evidence": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CHAIN_OF_CUSTODY",
+      "type": "Table",
+      "name": "chain_of_custody",
+      "evidence": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BLOCKCHAIN_CERTIFICATES",
+      "type": "Table",
+      "name": "blockchain_certificates",
+      "evidence": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BLOCKCHAIN_ANALYTICS",
+      "type": "Table",
+      "name": "blockchain_analytics",
+      "evidence": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VERIFICATION_REQUESTS",
+      "type": "Table",
+      "name": "verification_requests",
+      "evidence": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HEALTH_PROFILES",
+      "type": "Table",
+      "name": "health_profiles",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DIETARY_PROFILES",
+      "type": "Table",
+      "name": "dietary_profiles",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql + backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-HEALTH_METRICS",
+      "type": "Table",
+      "name": "health_metrics",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HEALTH_GOALS",
+      "type": "Table",
+      "name": "health_goals",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DIETARY_RECOMMENDATIONS",
+      "type": "Table",
+      "name": "dietary_recommendations",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HEALTH_ALERTS",
+      "type": "Table",
+      "name": "health_alerts",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_CONSUMPTION_LOGS",
+      "type": "Table",
+      "name": "food_consumption_logs",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HEALTH_ANALYTICS",
+      "type": "Table",
+      "name": "health_analytics",
+      "evidence": "backend/src/database/migrations/020_consumer_health_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONVERSATION_DOMAINS",
+      "type": "Table",
+      "name": "conversation_domains",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONVERSATION_SESSIONS",
+      "type": "Table",
+      "name": "conversation_sessions",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONVERSATION_MESSAGES",
+      "type": "Table",
+      "name": "conversation_messages",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INTENTS",
+      "type": "Table",
+      "name": "intents",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONVERSATION_CONTEXT",
+      "type": "Table",
+      "name": "conversation_context",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KNOWLEDGE_BASE_ARTICLES",
+      "type": "Table",
+      "name": "knowledge_base_articles",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONVERSATION_ANALYTICS",
+      "type": "Table",
+      "name": "conversation_analytics",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_MODELS",
+      "type": "Table",
+      "name": "ai_models",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONVERSATION_HANDOFFS",
+      "type": "Table",
+      "name": "conversation_handoffs",
+      "evidence": "backend/src/database/migrations/021_conversational_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_IDS",
+      "type": "Table",
+      "name": "product_ids",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BATCH_TRACKING",
+      "type": "Table",
+      "name": "batch_tracking",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARM_INFORMATION",
+      "type": "Table",
+      "name": "farm_information",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_INFORMATION",
+      "type": "Table",
+      "name": "farmer_information",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CERTIFICATION_INFORMATION",
+      "type": "Table",
+      "name": "certification_information",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROCESSING_HISTORY",
+      "type": "Table",
+      "name": "processing_history",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOGISTICS_HISTORY",
+      "type": "Table",
+      "name": "logistics_history",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SUSTAINABILITY_DATA",
+      "type": "Table",
+      "name": "sustainability_data",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CARBON_DATA",
+      "type": "Table",
+      "name": "carbon_data",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QUALITY_REPORTS",
+      "type": "Table",
+      "name": "quality_reports",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RECALL_STATUS",
+      "type": "Table",
+      "name": "recall_status",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QR_CODES",
+      "type": "Table",
+      "name": "qr_codes",
+      "evidence": "backend/src/database/migrations/022_digital_product_passport_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENGINEERING_PROJECTS",
+      "type": "Table",
+      "name": "engineering_projects",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DESIGN_DOCUMENTS",
+      "type": "Table",
+      "name": "design_documents",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_ANALYSIS_RESULTS",
+      "type": "Table",
+      "name": "ai_analysis_results",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BOQ_ITEMS",
+      "type": "Table",
+      "name": "boq_items",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COST_ESTIMATES",
+      "type": "Table",
+      "name": "cost_estimates",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MATERIAL_PRICES",
+      "type": "Table",
+      "name": "material_prices",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LABOR_RATES",
+      "type": "Table",
+      "name": "labor_rates",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_RATES",
+      "type": "Table",
+      "name": "equipment_rates",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROJECT_SCHEDULES",
+      "type": "Table",
+      "name": "project_schedules",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SCHEDULE_ACTIVITIES",
+      "type": "Table",
+      "name": "schedule_activities",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BIM_MODELS",
+      "type": "Table",
+      "name": "bim_models",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CAD_FILES",
+      "type": "Table",
+      "name": "cad_files",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DIGITAL_TWIN_SENSORS",
+      "type": "Table",
+      "name": "digital_twin_sensors",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DIGITAL_TWIN_DATA",
+      "type": "Table",
+      "name": "digital_twin_data",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DPR_DOCUMENTS",
+      "type": "Table",
+      "name": "dpr_documents",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TENDER_DOCUMENTS",
+      "type": "Table",
+      "name": "tender_documents",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TENDER_BIDS",
+      "type": "Table",
+      "name": "tender_bids",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql + backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-CONSTRUCTION_PROGRESS",
+      "type": "Table",
+      "name": "construction_progress",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QUALITY_CHECKS",
+      "type": "Table",
+      "name": "quality_checks",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DRONE_SURVEYS",
+      "type": "Table",
+      "name": "drone_surveys",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FACILITY_OPERATIONS",
+      "type": "Table",
+      "name": "facility_operations",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VENDORS",
+      "type": "Table",
+      "name": "vendors",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENGINEERING_AUDIT_LOG",
+      "type": "Table",
+      "name": "engineering_audit_log",
+      "evidence": "backend/src/database/migrations/023_engineering_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_CATEGORIES",
+      "type": "Table",
+      "name": "food_categories",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_ITEMS",
+      "type": "Table",
+      "name": "food_items",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_SAFETY_STANDARDS",
+      "type": "Table",
+      "name": "food_safety_standards",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_SAFETY_CERTIFICATIONS",
+      "type": "Table",
+      "name": "food_safety_certifications",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_QUALITY_PARAMETERS",
+      "type": "Table",
+      "name": "food_quality_parameters",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_QUALITY_ASSESSMENTS",
+      "type": "Table",
+      "name": "food_quality_assessments",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONTAMINANT_TYPES",
+      "type": "Table",
+      "name": "contaminant_types",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_CONTAMINANT_TESTS",
+      "type": "Table",
+      "name": "food_contaminant_tests",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FRESHNESS_INDICATORS",
+      "type": "Table",
+      "name": "freshness_indicators",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_FRESHNESS_ASSESSMENTS",
+      "type": "Table",
+      "name": "food_freshness_assessments",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_RECALLS",
+      "type": "Table",
+      "name": "food_recalls",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_INTELLIGENCE_ANALYTICS",
+      "type": "Table",
+      "name": "food_intelligence_analytics",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_RECIPES",
+      "type": "Table",
+      "name": "food_recipes",
+      "evidence": "backend/src/database/migrations/024_food_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HACCP_PLANS",
+      "type": "Table",
+      "name": "haccp_plans",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HACCP_MONITORING_RECORDS",
+      "type": "Table",
+      "name": "haccp_monitoring_records",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FSSAI_COMPLIANCE",
+      "type": "Table",
+      "name": "fssai_compliance",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ISO22000_COMPLIANCE",
+      "type": "Table",
+      "name": "iso22000_compliance",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_SAFETY_RECALLS",
+      "type": "Table",
+      "name": "food_safety_recalls",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CAPA_RECORDS",
+      "type": "Table",
+      "name": "capa_records",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_SAFETY_AUDITS",
+      "type": "Table",
+      "name": "food_safety_audits",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_SAFETY_RISK_ASSESSMENTS",
+      "type": "Table",
+      "name": "food_safety_risk_assessments",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CORRECTIVE_ACTIONS",
+      "type": "Table",
+      "name": "corrective_actions",
+      "evidence": "backend/src/database/migrations/025_food_safety_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FORM_DEFINITIONS",
+      "type": "Table",
+      "name": "form_definitions",
+      "evidence": "backend/src/database/migrations/026_form_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FORM_SUBMISSIONS",
+      "type": "Table",
+      "name": "form_submissions",
+      "evidence": "backend/src/database/migrations/026_form_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_PRODUCTS",
+      "type": "Table",
+      "name": "gi_products",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_PRODUCERS",
+      "type": "Table",
+      "name": "gi_producers",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_VERIFICATIONS",
+      "type": "Table",
+      "name": "gi_verifications",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_PRICING_RULES",
+      "type": "Table",
+      "name": "gi_pricing_rules",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_PRODUCT_PRICING",
+      "type": "Table",
+      "name": "gi_product_pricing",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_QUALITY_TIERS",
+      "type": "Table",
+      "name": "gi_quality_tiers",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_PRODUCT_QUALITY_RATINGS",
+      "type": "Table",
+      "name": "gi_product_quality_ratings",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_AUTHENTICATION",
+      "type": "Table",
+      "name": "gi_authentication",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_MARKETPLACE_LISTINGS",
+      "type": "Table",
+      "name": "gi_marketplace_listings",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_EDUCATIONAL_CONTENT",
+      "type": "Table",
+      "name": "gi_educational_content",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GI_ANALYTICS",
+      "type": "Table",
+      "name": "gi_analytics",
+      "evidence": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_RATES",
+      "type": "Table",
+      "name": "gst_rates",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_CALCULATIONS",
+      "type": "Table",
+      "name": "gst_calculations",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_INVOICES",
+      "type": "Table",
+      "name": "gst_invoices",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql + backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-GST_INVOICE_ITEMS",
+      "type": "Table",
+      "name": "gst_invoice_items",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql + backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Duplicate"
+    },
+    {
+      "objectId": "TBL-GST_RETURNS",
+      "type": "Table",
+      "name": "gst_returns",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_PAYMENTS",
+      "type": "Table",
+      "name": "gst_payments",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_NOTIFICATIONS",
+      "type": "Table",
+      "name": "gst_notifications",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_COMPLIANCE_RECORDS",
+      "type": "Table",
+      "name": "gst_compliance_records",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_AUDIT_LOGS",
+      "type": "Table",
+      "name": "gst_audit_logs",
+      "evidence": "backend/src/database/migrations/028_gst_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRADITIONAL_RECIPES",
+      "type": "Table",
+      "name": "traditional_recipes",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRADITIONAL_MEDICINE",
+      "type": "Table",
+      "name": "traditional_medicine",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INDIGENOUS_FARMING_PRACTICES",
+      "type": "Table",
+      "name": "indigenous_farming_practices",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORAL_HISTORY",
+      "type": "Table",
+      "name": "oral_history",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRIBAL_KNOWLEDGE",
+      "type": "Table",
+      "name": "tribal_knowledge",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INDIGENOUS_DOCUMENTATION",
+      "type": "Table",
+      "name": "indigenous_documentation",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INDIGENOUS_PROTECTION",
+      "type": "Table",
+      "name": "indigenous_protection",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INDIGENOUS_IP_MANAGEMENT",
+      "type": "Table",
+      "name": "indigenous_ip_management",
+      "evidence": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROCUREMENT_TENDERS",
+      "type": "Table",
+      "name": "procurement_tenders",
+      "evidence": "backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MENU_PLANS",
+      "type": "Table",
+      "name": "menu_plans",
+      "evidence": "backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_COMPLIANCE",
+      "type": "Table",
+      "name": "nutrition_compliance",
+      "evidence": "backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SUPPLY_CONTRACTS",
+      "type": "Table",
+      "name": "supply_contracts",
+      "evidence": "backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QUALITY_INSPECTIONS",
+      "type": "Table",
+      "name": "quality_inspections",
+      "evidence": "backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SETTLEMENT_RECORDS",
+      "type": "Table",
+      "name": "settlement_records",
+      "evidence": "backend/src/database/migrations/030_institutional_procurement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SENSOR_DATA",
+      "type": "Table",
+      "name": "sensor_data",
+      "evidence": "backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEVICE_COMMANDS",
+      "type": "Table",
+      "name": "device_commands",
+      "evidence": "backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEVICE_ALERTS",
+      "type": "Table",
+      "name": "device_alerts",
+      "evidence": "backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEVICE_GROUPS",
+      "type": "Table",
+      "name": "device_groups",
+      "evidence": "backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEVICE_GROUP_MEMBERS",
+      "type": "Table",
+      "name": "device_group_members",
+      "evidence": "backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IOT_ANALYTICS",
+      "type": "Table",
+      "name": "iot_analytics",
+      "evidence": "backend/src/database/migrations/031_iot_integration_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KNOWLEDGE_NODES",
+      "type": "Table",
+      "name": "knowledge_nodes",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KNOWLEDGE_RELATIONSHIPS",
+      "type": "Table",
+      "name": "knowledge_relationships",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KNOWLEDGE_GRAPHS",
+      "type": "Table",
+      "name": "knowledge_graphs",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GRAPH_QUERIES",
+      "type": "Table",
+      "name": "graph_queries",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QUERY_RESULTS",
+      "type": "Table",
+      "name": "query_results",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SEMANTIC_SEARCH_INDEX",
+      "type": "Table",
+      "name": "semantic_search_index",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KNOWLEDGE_ANALYTICS",
+      "type": "Table",
+      "name": "knowledge_analytics",
+      "evidence": "backend/src/database/migrations/032_knowledge_graph_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LABORATORIES",
+      "type": "Table",
+      "name": "laboratories",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TEST_CATEGORIES",
+      "type": "Table",
+      "name": "test_categories",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TEST_METHODS",
+      "type": "Table",
+      "name": "test_methods",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SAMPLE_REGISTRATIONS",
+      "type": "Table",
+      "name": "sample_registrations",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SAMPLE_TRACKING",
+      "type": "Table",
+      "name": "sample_tracking",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TEST_ASSIGNMENTS",
+      "type": "Table",
+      "name": "test_assignments",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TEST_RESULTS",
+      "type": "Table",
+      "name": "test_results",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CERTIFICATION_REPORTS",
+      "type": "Table",
+      "name": "certification_reports",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QUALITY_CONTROL_SAMPLES",
+      "type": "Table",
+      "name": "quality_control_samples",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_CALIBRATION",
+      "type": "Table",
+      "name": "equipment_calibration",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LABORATORY_ANALYSTS",
+      "type": "Table",
+      "name": "laboratory_analysts",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LABORATORY_INVOICES",
+      "type": "Table",
+      "name": "laboratory_invoices",
+      "evidence": "backend/src/database/migrations/033_laboratory_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WAREHOUSE_LOCATIONS",
+      "type": "Table",
+      "name": "warehouse_locations",
+      "evidence": "backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INVENTORY_MOVEMENTS",
+      "type": "Table",
+      "name": "inventory_movements",
+      "evidence": "backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WAREHOUSE_PERFORMANCE",
+      "type": "Table",
+      "name": "warehouse_performance",
+      "evidence": "backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ROUTE_OPTIMIZATION",
+      "type": "Table",
+      "name": "route_optimization",
+      "evidence": "backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DELIVERY_SCHEDULES",
+      "type": "Table",
+      "name": "delivery_schedules",
+      "evidence": "backend/src/database/migrations/034_logistics_enhancement_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LANGUAGES",
+      "type": "Table",
+      "name": "languages",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOCALES",
+      "type": "Table",
+      "name": "locales",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRANSLATION_MEMORY",
+      "type": "Table",
+      "name": "translation_memory",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONTENT_TRANSLATIONS",
+      "type": "Table",
+      "name": "content_translations",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LANGUAGE_DETECTION_LOGS",
+      "type": "Table",
+      "name": "language_detection_logs",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRANSLATION_REQUESTS",
+      "type": "Table",
+      "name": "translation_requests",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_LANGUAGE_PREFERENCES",
+      "type": "Table",
+      "name": "user_language_preferences",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRONUNCIATION_GUIDES",
+      "type": "Table",
+      "name": "pronunciation_guides",
+      "evidence": "backend/src/database/migrations/035_multilingual_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRIENT_CATEGORIES",
+      "type": "Table",
+      "name": "nutrient_categories",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRIENTS",
+      "type": "Table",
+      "name": "nutrients",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOOD_NUTRITION_PROFILES",
+      "type": "Table",
+      "name": "food_nutrition_profiles",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_NUTRITION",
+      "type": "Table",
+      "name": "product_nutrition",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_SCORING_MODELS",
+      "type": "Table",
+      "name": "nutrition_scoring_models",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_NUTRITION_SCORES",
+      "type": "Table",
+      "name": "product_nutrition_scores",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_PRICING_RULES",
+      "type": "Table",
+      "name": "nutrition_pricing_rules",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_NUTRITION_PRICING",
+      "type": "Table",
+      "name": "product_nutrition_pricing",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_RECOMMENDATIONS",
+      "type": "Table",
+      "name": "nutrition_recommendations",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_LABELS",
+      "type": "Table",
+      "name": "nutrition_labels",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRITION_COMPARISONS",
+      "type": "Table",
+      "name": "nutrition_comparisons",
+      "evidence": "backend/src/database/migrations/036_nutrition_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OMNICHANNEL_SESSIONS",
+      "type": "Table",
+      "name": "omnichannel_sessions",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OMNICHANNEL_MESSAGES",
+      "type": "Table",
+      "name": "omnichannel_messages",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OMNICHANNEL_CONFIG",
+      "type": "Table",
+      "name": "omnichannel_config",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WEB_AI_INTEGRATION",
+      "type": "Table",
+      "name": "web_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ANDROID_AI_INTEGRATION",
+      "type": "Table",
+      "name": "android_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ANDROID_PUSH_NOTIFICATIONS",
+      "type": "Table",
+      "name": "android_push_notifications",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IOS_AI_INTEGRATION",
+      "type": "Table",
+      "name": "ios_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IOS_PUSH_NOTIFICATIONS",
+      "type": "Table",
+      "name": "ios_push_notifications",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WHATSAPP_AI_INTEGRATION",
+      "type": "Table",
+      "name": "whatsapp_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WHATSAPP_TEMPLATES",
+      "type": "Table",
+      "name": "whatsapp_templates",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SMS_AI_INTEGRATION",
+      "type": "Table",
+      "name": "sms_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TELEGRAM_AI_INTEGRATION",
+      "type": "Table",
+      "name": "telegram_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMAIL_AI_INTEGRATION",
+      "type": "Table",
+      "name": "email_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_AI_INTEGRATION",
+      "type": "Table",
+      "name": "voice_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IVR_AI_INTEGRATION",
+      "type": "Table",
+      "name": "ivr_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IVR_CALL_FLOWS",
+      "type": "Table",
+      "name": "ivr_call_flows",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KIOSK_AI_INTEGRATION",
+      "type": "Table",
+      "name": "kiosk_ai_integration",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KIOSK_SCREENS",
+      "type": "Table",
+      "name": "kiosk_screens",
+      "evidence": "backend/src/database/migrations/037_omnichannel_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_STANDARDS",
+      "type": "Table",
+      "name": "organic_standards",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_FARMS",
+      "type": "Table",
+      "name": "organic_farms",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_PLOTS",
+      "type": "Table",
+      "name": "organic_plots",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_INPUT_TYPES",
+      "type": "Table",
+      "name": "organic_input_types",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_INPUTS",
+      "type": "Table",
+      "name": "organic_inputs",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_INPUT_USAGE",
+      "type": "Table",
+      "name": "organic_input_usage",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_CROPS",
+      "type": "Table",
+      "name": "organic_crops",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_HARVESTS",
+      "type": "Table",
+      "name": "organic_harvests",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_PROCESSING_FACILITIES",
+      "type": "Table",
+      "name": "organic_processing_facilities",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_PROCESSING_BATCHES",
+      "type": "Table",
+      "name": "organic_processing_batches",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_STORAGE_FACILITIES",
+      "type": "Table",
+      "name": "organic_storage_facilities",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_STORAGE_RECORDS",
+      "type": "Table",
+      "name": "organic_storage_records",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_TRANSPORT_RECORDS",
+      "type": "Table",
+      "name": "organic_transport_records",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_PACKAGING_MATERIALS",
+      "type": "Table",
+      "name": "organic_packaging_materials",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_PACKAGING_RECORDS",
+      "type": "Table",
+      "name": "organic_packaging_records",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_CHAIN_OF_CUSTODY",
+      "type": "Table",
+      "name": "organic_chain_of_custody",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_AUDITS",
+      "type": "Table",
+      "name": "organic_audits",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_CONSUMER_TRANSPARENCY",
+      "type": "Table",
+      "name": "organic_consumer_transparency",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_FRAUD_ALERTS",
+      "type": "Table",
+      "name": "organic_fraud_alerts",
+      "evidence": "backend/src/database/migrations/038_organic_traceability_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PREDICTIVE_MODELS",
+      "type": "Table",
+      "name": "predictive_models",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PREDICTIONS",
+      "type": "Table",
+      "name": "predictions",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FORECASTS",
+      "type": "Table",
+      "name": "forecasts",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MODEL_PERFORMANCE",
+      "type": "Table",
+      "name": "model_performance",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MODEL_TRAINING_HISTORY",
+      "type": "Table",
+      "name": "model_training_history",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ANOMALY_DETECTION",
+      "type": "Table",
+      "name": "anomaly_detection",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_ANALYSIS",
+      "type": "Table",
+      "name": "trend_analysis",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WHAT_IF_SCENARIOS",
+      "type": "Table",
+      "name": "what_if_scenarios",
+      "evidence": "backend/src/database/migrations/039_predictive_analytics_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RECIPE_DATABASE",
+      "type": "Table",
+      "name": "recipe_database",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INGREDIENT_SUBSTITUTIONS",
+      "type": "Table",
+      "name": "ingredient_substitutions",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INGREDIENT_PRICING",
+      "type": "Table",
+      "name": "ingredient_pricing",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SEASONAL_INGREDIENTS",
+      "type": "Table",
+      "name": "seasonal_ingredients",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REGIONAL_CUISINE",
+      "type": "Table",
+      "name": "regional_cuisine",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSTITUTIONAL_RECIPES",
+      "type": "Table",
+      "name": "institutional_recipes",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSTITUTIONAL_INGREDIENT_SUBSTITUTIONS",
+      "type": "Table",
+      "name": "institutional_ingredient_substitutions",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSTITUTIONAL_NUTRITION_REQUIREMENTS",
+      "type": "Table",
+      "name": "institutional_nutrition_requirements",
+      "evidence": "backend/src/database/migrations/040_recipe_intelligence_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROPS",
+      "type": "Table",
+      "name": "crops",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RURAL_ECONOMIC_UNITS",
+      "type": "Table",
+      "name": "rural_economic_units",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HOUSEHOLD_ECONOMY",
+      "type": "Table",
+      "name": "household_economy",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HOUSEHOLD_ORDERS",
+      "type": "Table",
+      "name": "household_orders",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARM_CONSUMABLES",
+      "type": "Table",
+      "name": "farm_consumables",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MACHINERY_ACCESS",
+      "type": "Table",
+      "name": "machinery_access",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHARED_INFRASTRUCTURE_ACCESS",
+      "type": "Table",
+      "name": "shared_infrastructure_access",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RURAL_ENTERPRISES",
+      "type": "Table",
+      "name": "rural_enterprises",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENTERPRISE_FEASIBILITY_ANALYSIS",
+      "type": "Table",
+      "name": "enterprise_feasibility_analysis",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RENEWABLE_ENERGY_SYSTEMS",
+      "type": "Table",
+      "name": "renewable_energy_systems",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENERGY_GENERATION_DATA",
+      "type": "Table",
+      "name": "energy_generation_data",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LENDERS",
+      "type": "Table",
+      "name": "lenders",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RURAL_FINANCE",
+      "type": "Table",
+      "name": "rural_finance",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FINANCIAL_NEEDS_ASSESSMENT",
+      "type": "Table",
+      "name": "financial_needs_assessment",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_ADVISORIES",
+      "type": "Table",
+      "name": "ai_advisories",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ADVISORY_ATTACHMENTS",
+      "type": "Table",
+      "name": "advisory_attachments",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BUYERS",
+      "type": "Table",
+      "name": "buyers",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOGISTICS_PROVIDERS",
+      "type": "Table",
+      "name": "logistics_providers",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MARKET_ACCESS",
+      "type": "Table",
+      "name": "market_access",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MARKET_INTELLIGENCE",
+      "type": "Table",
+      "name": "market_intelligence",
+      "evidence": "backend/src/database/migrations/041_rural_life_os_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROCUREMENT_ORDERS",
+      "type": "Table",
+      "name": "procurement_orders",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRICE_INTELLIGENCE",
+      "type": "Table",
+      "name": "price_intelligence",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BUYING_CLUBS",
+      "type": "Table",
+      "name": "buying_clubs",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROCUREMENT_SUBSCRIPTIONS",
+      "type": "Table",
+      "name": "procurement_subscriptions",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOGISTICS_ORDERS",
+      "type": "Table",
+      "name": "logistics_orders",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LOGISTICS_PARTNERS",
+      "type": "Table",
+      "name": "logistics_partners",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAST_MILE_PARTNERS",
+      "type": "Table",
+      "name": "last_mile_partners",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REVERSE_LOGISTICS",
+      "type": "Table",
+      "name": "reverse_logistics",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BACKHAUL_OPPORTUNITIES",
+      "type": "Table",
+      "name": "backhaul_opportunities",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MOBILITY_RIDES",
+      "type": "Table",
+      "name": "mobility_rides",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MOBILITY_VEHICLES",
+      "type": "Table",
+      "name": "mobility_vehicles",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SAFETY_INCIDENTS",
+      "type": "Table",
+      "name": "safety_incidents",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRUST_SCORES",
+      "type": "Table",
+      "name": "trust_scores",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROSS_SYSTEM_SAVINGS",
+      "type": "Table",
+      "name": "cross_system_savings",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROSS_SYSTEM_ORDERS",
+      "type": "Table",
+      "name": "cross_system_orders",
+      "evidence": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TEMPERATURE_MONITORING",
+      "type": "Table",
+      "name": "temperature_monitoring",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HUMIDITY_MONITORING",
+      "type": "Table",
+      "name": "humidity_monitoring",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PACKAGING_ANALYSIS",
+      "type": "Table",
+      "name": "packaging_analysis",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRANSPORT_ANALYSIS",
+      "type": "Table",
+      "name": "transport_analysis",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-STORAGE_ANALYSIS",
+      "type": "Table",
+      "name": "storage_analysis",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHELF_LIFE_PREDICTIONS",
+      "type": "Table",
+      "name": "shelf_life_predictions",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SPOILAGE_RISK_PREDICTIONS",
+      "type": "Table",
+      "name": "spoilage_risk_predictions",
+      "evidence": "backend/src/database/migrations/043_shelf_life_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VALUE_FACTORS",
+      "type": "Table",
+      "name": "value_factors",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VALUE_CALCULATION_MODELS",
+      "type": "Table",
+      "name": "value_calculation_models",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_VALUE_SCORES",
+      "type": "Table",
+      "name": "product_value_scores",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VALUE_PRICING_RULES",
+      "type": "Table",
+      "name": "value_pricing_rules",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_VALUE_PRICING",
+      "type": "Table",
+      "name": "product_value_pricing",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VALUE_TIERS",
+      "type": "Table",
+      "name": "value_tiers",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONSUMER_VALUE_PREFERENCES",
+      "type": "Table",
+      "name": "consumer_value_preferences",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VALUE_RECOMMENDATIONS",
+      "type": "Table",
+      "name": "value_recommendations",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VALUE_COMMERCE_ANALYTICS",
+      "type": "Table",
+      "name": "value_commerce_analytics",
+      "evidence": "backend/src/database/migrations/044_value_commerce_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_SESSIONS",
+      "type": "Table",
+      "name": "voice_sessions",
+      "evidence": "backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SPEECH_RECOGNITION_LOGS",
+      "type": "Table",
+      "name": "speech_recognition_logs",
+      "evidence": "backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_RESPONSES",
+      "type": "Table",
+      "name": "voice_responses",
+      "evidence": "backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_INTENTS",
+      "type": "Table",
+      "name": "voice_intents",
+      "evidence": "backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_ANALYTICS",
+      "type": "Table",
+      "name": "voice_analytics",
+      "evidence": "backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_PREFERENCES",
+      "type": "Table",
+      "name": "voice_preferences",
+      "evidence": "backend/src/database/migrations/045_voice_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_CONVERSATIONS",
+      "type": "Table",
+      "name": "voice_conversations",
+      "evidence": "backend/src/database/migrations/046_advanced_voice_ai_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_CONVERSATION_TURNS",
+      "type": "Table",
+      "name": "voice_conversation_turns",
+      "evidence": "backend/src/database/migrations/046_advanced_voice_ai_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_COMMAND_ANALYTICS",
+      "type": "Table",
+      "name": "voice_command_analytics",
+      "evidence": "backend/src/database/migrations/046_advanced_voice_ai_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_LANGUAGE_PREFERENCES",
+      "type": "Table",
+      "name": "voice_language_preferences",
+      "evidence": "backend/src/database/migrations/046_advanced_voice_ai_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_FEEDBACK",
+      "type": "Table",
+      "name": "voice_feedback",
+      "evidence": "backend/src/database/migrations/046_advanced_voice_ai_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HSN_GST_MAPPING",
+      "type": "Table",
+      "name": "hsn_gst_mapping",
+      "evidence": "backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EWAY_BILLS",
+      "type": "Table",
+      "name": "eway_bills",
+      "evidence": "backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_ITC_LEDGER",
+      "type": "Table",
+      "name": "gst_itc_ledger",
+      "evidence": "backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_COMPLIANCE_TRACKING",
+      "type": "Table",
+      "name": "gst_compliance_tracking",
+      "evidence": "backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GST_RETURNS_HISTORY",
+      "type": "Table",
+      "name": "gst_returns_history",
+      "evidence": "backend/src/database/migrations/047_gst_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OFFLINE_PAYMENT_REQUESTS",
+      "type": "Table",
+      "name": "offline_payment_requests",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OFFLINE_TRANSACTIONS",
+      "type": "Table",
+      "name": "offline_transactions",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OFFLINE_SYNC_QUEUE",
+      "type": "Table",
+      "name": "offline_sync_queue",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USSD_PAYMENT_REQUESTS",
+      "type": "Table",
+      "name": "ussd_payment_requests",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_PAYMENT_SETTINGS",
+      "type": "Table",
+      "name": "user_payment_settings",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_WALLETS",
+      "type": "Table",
+      "name": "user_wallets",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRANSACTIONS",
+      "type": "Table",
+      "name": "transactions",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NFC_PAYMENT_CARDS",
+      "type": "Table",
+      "name": "nfc_payment_cards",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OFFLINE_PAYMENT_ANALYTICS",
+      "type": "Table",
+      "name": "offline_payment_analytics",
+      "evidence": "backend/src/database/migrations/048_offline_payment_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SYNC_QUEUE",
+      "type": "Table",
+      "name": "sync_queue",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SYNC_CONFLICTS",
+      "type": "Table",
+      "name": "sync_conflicts",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_SYNC_PREFERENCES",
+      "type": "Table",
+      "name": "user_sync_preferences",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GENERIC_ENTITIES",
+      "type": "Table",
+      "name": "generic_entities",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SYNC_AUDIT_LOG",
+      "type": "Table",
+      "name": "sync_audit_log",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-OFFLINE_DATA_SNAPSHOTS",
+      "type": "Table",
+      "name": "offline_data_snapshots",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NETWORK_STATUS_TRACKING",
+      "type": "Table",
+      "name": "network_status_tracking",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SYNC_STATISTICS",
+      "type": "Table",
+      "name": "sync_statistics",
+      "evidence": "backend/src/database/migrations/049_offline_sync_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SMS_OTPS",
+      "type": "Table",
+      "name": "sms_otps",
+      "evidence": "backend/src/database/migrations/050_sms_auth_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PENDING_REGISTRATIONS",
+      "type": "Table",
+      "name": "pending_registrations",
+      "evidence": "backend/src/database/migrations/050_sms_auth_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SMS_AUTH_AUDIT_LOG",
+      "type": "Table",
+      "name": "sms_auth_audit_log",
+      "evidence": "backend/src/database/migrations/050_sms_auth_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VOICE_CALL_LOGS",
+      "type": "Table",
+      "name": "voice_call_logs",
+      "evidence": "backend/src/database/migrations/050_sms_auth_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SMS_DELIVERY_LOGS",
+      "type": "Table",
+      "name": "sms_delivery_logs",
+      "evidence": "backend/src/database/migrations/050_sms_auth_tables.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_OUTCOMES",
+      "type": "Table",
+      "name": "ai_outcomes",
+      "evidence": "backend/src/database/migrations/990_ai_outcomes.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_PREDICTION_LOG",
+      "type": "Table",
+      "name": "ai_prediction_log",
+      "evidence": "backend/src/database/migrations/990_ai_outcomes.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_AGENT_SCORECARD",
+      "type": "Table",
+      "name": "ai_agent_scorecard",
+      "evidence": "backend/src/database/migrations/990_ai_outcomes.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-YIELD_ACTUALS",
+      "type": "Table",
+      "name": "yield_actuals",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_REVENUE",
+      "type": "Table",
+      "name": "farmer_revenue",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_CASH_FLOW",
+      "type": "Table",
+      "name": "farmer_cash_flow",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_VALUE_INDEX",
+      "type": "Table",
+      "name": "farmer_value_index",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOLU_LAND_PARCELS",
+      "type": "Table",
+      "name": "folu_land_parcels",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOLU_LAND_USE_CHANGE",
+      "type": "Table",
+      "name": "folu_land_use_change",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FOLU_CARBON_ESTIMATES",
+      "type": "Table",
+      "name": "folu_carbon_estimates",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NE_ORGANIC_SCHEMES",
+      "type": "Table",
+      "name": "ne_organic_schemes",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NE_ORGANIC_ENROLMENT",
+      "type": "Table",
+      "name": "ne_organic_enrolment",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_LISTINGS",
+      "type": "Table",
+      "name": "farmer_listings",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DRIVER_LOCATION",
+      "type": "Table",
+      "name": "driver_location",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FACILITY_BOOKINGS",
+      "type": "Table",
+      "name": "facility_bookings",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MEDIA_ASSETS",
+      "type": "Table",
+      "name": "media_assets",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPLAINTS",
+      "type": "Table",
+      "name": "complaints",
+      "evidence": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_CONCEPTS",
+      "type": "Table",
+      "name": "crop_concepts",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_CONCEPT_TERMS",
+      "type": "Table",
+      "name": "crop_concept_terms",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FREIGHT_LANES",
+      "type": "Table",
+      "name": "freight_lanes",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRANSPORT_MODES",
+      "type": "Table",
+      "name": "transport_modes",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FREIGHT_SLOTS",
+      "type": "Table",
+      "name": "freight_slots",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHIPMENT_STATUSES",
+      "type": "Table",
+      "name": "shipment_statuses",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HANDLING_ENGINES",
+      "type": "Table",
+      "name": "handling_engines",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HANDLING_ENGINE_RULES",
+      "type": "Table",
+      "name": "handling_engine_rules",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_INPUT_RATES",
+      "type": "Table",
+      "name": "organic_input_rates",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INSURANCE_PLAN_CATALOG",
+      "type": "Table",
+      "name": "insurance_plan_catalog",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROMO_CODES",
+      "type": "Table",
+      "name": "promo_codes",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RETURN_REASONS",
+      "type": "Table",
+      "name": "return_reasons",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DISPUTE_KINDS",
+      "type": "Table",
+      "name": "dispute_kinds",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ACCESSIBILITY_MODES",
+      "type": "Table",
+      "name": "accessibility_modes",
+      "evidence": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WORKFLOW_DEFINITIONS",
+      "type": "Table",
+      "name": "workflow_definitions",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WORKFLOW_STEPS",
+      "type": "Table",
+      "name": "workflow_steps",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WORKFLOW_INSTANCES",
+      "type": "Table",
+      "name": "workflow_instances",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WORKFLOW_ACTIONS",
+      "type": "Table",
+      "name": "workflow_actions",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CRM_LEADS",
+      "type": "Table",
+      "name": "crm_leads",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CRM_OPPORTUNITIES",
+      "type": "Table",
+      "name": "crm_opportunities",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CRM_ACTIVITIES",
+      "type": "Table",
+      "name": "crm_activities",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CLIENTS",
+      "type": "Table",
+      "name": "clients",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CLIENT_CONTACTS",
+      "type": "Table",
+      "name": "client_contacts",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LEGAL_MATTERS",
+      "type": "Table",
+      "name": "legal_matters",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LEGAL_EVENTS",
+      "type": "Table",
+      "name": "legal_events",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LEGAL_OBLIGATIONS",
+      "type": "Table",
+      "name": "legal_obligations",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RISK_REGISTER",
+      "type": "Table",
+      "name": "risk_register",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RISK_CONTROLS",
+      "type": "Table",
+      "name": "risk_controls",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RISK_INDICATORS",
+      "type": "Table",
+      "name": "risk_indicators",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMERGENCY_TYPES",
+      "type": "Table",
+      "name": "emergency_types",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMERGENCY_INCIDENTS",
+      "type": "Table",
+      "name": "emergency_incidents",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMERGENCY_ESCALATIONS",
+      "type": "Table",
+      "name": "emergency_escalations",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMERGENCY_ACTIONS",
+      "type": "Table",
+      "name": "emergency_actions",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMERGENCY_CONTACTS",
+      "type": "Table",
+      "name": "emergency_contacts",
+      "evidence": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CSA_SUBSCRIPTIONS",
+      "type": "Table",
+      "name": "csa_subscriptions",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CSA_DELIVERIES",
+      "type": "Table",
+      "name": "csa_deliveries",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INCENTIVE_POOLS",
+      "type": "Table",
+      "name": "incentive_pools",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INCENTIVE_POOL_TRANSACTIONS",
+      "type": "Table",
+      "name": "incentive_pool_transactions",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GIFT_HAMPERS",
+      "type": "Table",
+      "name": "gift_hampers",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GIFT_HAMPER_ORDERS",
+      "type": "Table",
+      "name": "gift_hamper_orders",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COLD_STORAGE_BAYS",
+      "type": "Table",
+      "name": "cold_storage_bays",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COLD_STORAGE_BOOKINGS",
+      "type": "Table",
+      "name": "cold_storage_bookings",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WALLETS",
+      "type": "Table",
+      "name": "wallets",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PORTAL_ROLES",
+      "type": "Table",
+      "name": "portal_roles",
+      "evidence": "backend/src/database/migrations/994_recovered_capabilities.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MDM_CHANGE_REQUESTS",
+      "type": "Table",
+      "name": "mdm_change_requests",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PURCHASE_REQUISITIONS",
+      "type": "Table",
+      "name": "purchase_requisitions",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PURCHASE_REQUISITION_LINES",
+      "type": "Table",
+      "name": "purchase_requisition_lines",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RFQ_HEADERS",
+      "type": "Table",
+      "name": "rfq_headers",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RFQ_RESPONSES",
+      "type": "Table",
+      "name": "rfq_responses",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PURCHASE_ORDERS",
+      "type": "Table",
+      "name": "purchase_orders",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PURCHASE_ORDER_LINES",
+      "type": "Table",
+      "name": "purchase_order_lines",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GOODS_RECEIPTS",
+      "type": "Table",
+      "name": "goods_receipts",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GOODS_RECEIPT_LINES",
+      "type": "Table",
+      "name": "goods_receipt_lines",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INVOICE_MATCH_RESULTS",
+      "type": "Table",
+      "name": "invoice_match_results",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SALES_LISTINGS",
+      "type": "Table",
+      "name": "sales_listings",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LISTING_FLOOR_PRIVATE",
+      "type": "Table",
+      "name": "listing_floor_private",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PICK_LISTS",
+      "type": "Table",
+      "name": "pick_lists",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PACKING_UNITS",
+      "type": "Table",
+      "name": "packing_units",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GATE_PASSES",
+      "type": "Table",
+      "name": "gate_passes",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DISPATCH_PASSES",
+      "type": "Table",
+      "name": "dispatch_passes",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DISPATCH_EVENTS",
+      "type": "Table",
+      "name": "dispatch_events",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QM_INSPECTIONS",
+      "type": "Table",
+      "name": "qm_inspections",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NON_CONFORMANCES",
+      "type": "Table",
+      "name": "non_conformances",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCTION_ORDERS",
+      "type": "Table",
+      "name": "production_orders",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MAINTENANCE_TICKETS",
+      "type": "Table",
+      "name": "maintenance_tickets",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_PROPOSALS",
+      "type": "Table",
+      "name": "ai_proposals",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOD_RULES",
+      "type": "Table",
+      "name": "sod_rules",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOD_VIOLATIONS",
+      "type": "Table",
+      "name": "sod_violations",
+      "evidence": "backend/src/database/migrations/995_erp_process_layer.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPANIES",
+      "type": "Table",
+      "name": "companies",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BUSINESS_UNITS",
+      "type": "Table",
+      "name": "business_units",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BRANCHES",
+      "type": "Table",
+      "name": "branches",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEPARTMENTS",
+      "type": "Table",
+      "name": "departments",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COST_CENTERS",
+      "type": "Table",
+      "name": "cost_centers",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROFIT_CENTERS",
+      "type": "Table",
+      "name": "profit_centers",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISCAL_YEARS",
+      "type": "Table",
+      "name": "fiscal_years",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISCAL_PERIODS",
+      "type": "Table",
+      "name": "fiscal_periods",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CHART_OF_ACCOUNTS",
+      "type": "Table",
+      "name": "chart_of_accounts",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-JOURNAL_ENTRIES",
+      "type": "Table",
+      "name": "journal_entries",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-JOURNAL_LINES",
+      "type": "Table",
+      "name": "journal_lines",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AP_INVOICES",
+      "type": "Table",
+      "name": "ap_invoices",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AR_INVOICES",
+      "type": "Table",
+      "name": "ar_invoices",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PAYMENT_ALLOCATIONS",
+      "type": "Table",
+      "name": "payment_allocations",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FIXED_ASSETS",
+      "type": "Table",
+      "name": "fixed_assets",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEPRECIATION_SCHEDULE",
+      "type": "Table",
+      "name": "depreciation_schedule",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BUDGETS",
+      "type": "Table",
+      "name": "budgets",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BUDGET_LINES",
+      "type": "Table",
+      "name": "budget_lines",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "AGT-FINANCE_CASHFLOW",
+      "type": "AI Agent",
+      "name": "finance.cashflow",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-FINANCE_RECEIVABLES",
+      "type": "AI Agent",
+      "name": "finance.receivables",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-PROCUREMENT_VENDOR_SELECTION",
+      "type": "AI Agent",
+      "name": "procurement.vendor_selection",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-INVENTORY_REPLENISHMENT",
+      "type": "AI Agent",
+      "name": "inventory.replenishment",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-INVENTORY_SLOW_MOVING",
+      "type": "AI Agent",
+      "name": "inventory.slow_moving",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-SALES_DEMAND_FORECAST",
+      "type": "AI Agent",
+      "name": "sales.demand_forecast",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-QUALITY_NCR_TREND",
+      "type": "AI Agent",
+      "name": "quality.ncr_trend",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-MAINTENANCE_PREDICTIVE",
+      "type": "AI Agent",
+      "name": "maintenance.predictive",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-AGRI_GLUT_WARNING",
+      "type": "AI Agent",
+      "name": "agri.glut_warning",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-WORKFLOW_SLA_BREACH",
+      "type": "AI Agent",
+      "name": "workflow.sla_breach",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-CRM_LEAD_QUALIFICATION",
+      "type": "AI Agent",
+      "name": "crm.lead_qualification",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-LEGAL_OBLIGATION_WATCH",
+      "type": "AI Agent",
+      "name": "legal.obligation_watch",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-RISK_REGISTER_HEALTH",
+      "type": "AI Agent",
+      "name": "risk.register_health",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-EMERGENCY_INCIDENT_COMMAND",
+      "type": "AI Agent",
+      "name": "emergency.incident_command",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-COMPLIANCE_SOD",
+      "type": "AI Agent",
+      "name": "compliance.sod",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "CAP-MARKETPLACE_CATALOG",
+      "type": "Capability",
+      "name": "Marketplace / catalog",
+      "evidence": "{\"tables\":7,\"services\":7,\"endpoints\":61,\"components\":5,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-ORDERS_CHECKOUT",
+      "type": "Capability",
+      "name": "Orders / checkout",
+      "evidence": "{\"tables\":2,\"services\":3,\"endpoints\":10,\"components\":3,\"tests\":0}",
+      "completion": 80,
+      "status": "Testing Pending"
+    },
+    {
+      "objectId": "CAP-PAYMENTS",
+      "type": "Capability",
+      "name": "Payments",
+      "evidence": "{\"tables\":14,\"services\":2,\"endpoints\":18,\"components\":1,\"tests\":0}",
+      "completion": 80,
+      "status": "Testing Pending"
+    },
+    {
+      "objectId": "CAP-WALLET",
+      "type": "Capability",
+      "name": "Wallet",
+      "evidence": "{\"tables\":4,\"services\":1,\"endpoints\":10,\"components\":0,\"tests\":0}",
+      "completion": 60,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-ESCROW",
+      "type": "Capability",
+      "name": "Escrow",
+      "evidence": "{\"tables\":1,\"services\":0,\"endpoints\":0,\"components\":0,\"tests\":0}",
+      "completion": 20,
+      "status": "Database Only"
+    },
+    {
+      "objectId": "CAP-GST_TAX",
+      "type": "Capability",
+      "name": "GST / tax",
+      "evidence": "{\"tables\":13,\"services\":2,\"endpoints\":16,\"components\":1,\"tests\":0}",
+      "completion": 80,
+      "status": "Testing Pending"
+    },
+    {
+      "objectId": "CAP-ACCOUNTING_DOUBLE_ENTRY_",
+      "type": "Capability",
+      "name": "Accounting (double-entry)",
+      "evidence": "{\"tables\":4,\"services\":1,\"endpoints\":8,\"components\":0,\"tests\":0}",
+      "completion": 60,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-SUBSIDY",
+      "type": "Capability",
+      "name": "Subsidy",
+      "evidence": "{\"tables\":1,\"services\":1,\"endpoints\":0,\"components\":1,\"tests\":0}",
+      "completion": 60,
+      "status": "Testing Pending"
+    },
+    {
+      "objectId": "CAP-INSURANCE",
+      "type": "Capability",
+      "name": "Insurance",
+      "evidence": "{\"tables\":6,\"services\":6,\"endpoints\":29,\"components\":2,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-LOGISTICS_SHIPMENT",
+      "type": "Capability",
+      "name": "Logistics / shipment",
+      "evidence": "{\"tables\":8,\"services\":4,\"endpoints\":54,\"components\":3,\"tests\":0}",
+      "completion": 80,
+      "status": "Testing Pending"
+    },
+    {
+      "objectId": "CAP-COLD_CHAIN_TEMPERATURE",
+      "type": "Capability",
+      "name": "Cold chain / temperature",
+      "evidence": "{\"tables\":6,\"services\":2,\"endpoints\":27,\"components\":0,\"tests\":1}",
+      "completion": 80,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-FARMER_PORTAL",
+      "type": "Capability",
+      "name": "Farmer portal",
+      "evidence": "{\"tables\":3,\"services\":5,\"endpoints\":31,\"components\":5,\"tests\":2}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-ORGANIC_TRACEABILITY",
+      "type": "Capability",
+      "name": "Organic traceability",
+      "evidence": "{\"tables\":22,\"services\":1,\"endpoints\":13,\"components\":2,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-GI_INTELLIGENCE",
+      "type": "Capability",
+      "name": "GI intelligence",
+      "evidence": "{\"tables\":11,\"services\":1,\"endpoints\":11,\"components\":1,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-MULTILINGUAL",
+      "type": "Capability",
+      "name": "Multilingual",
+      "evidence": "{\"tables\":7,\"services\":1,\"endpoints\":11,\"components\":3,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-WORKFLOW_APPROVALS",
+      "type": "Capability",
+      "name": "Workflow / approvals",
+      "evidence": "{\"tables\":4,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
+      "completion": 80,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-CRM",
+      "type": "Capability",
+      "name": "CRM",
+      "evidence": "{\"tables\":3,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
+      "completion": 80,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-RISK_MANAGEMENT",
+      "type": "Capability",
+      "name": "Risk management",
+      "evidence": "{\"tables\":7,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
+      "completion": 80,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-LEGAL_MANAGEMENT",
+      "type": "Capability",
+      "name": "Legal management",
+      "evidence": "{\"tables\":3,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
+      "completion": 80,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-EMERGENCY_MANAGEMENT",
+      "type": "Capability",
+      "name": "Emergency management",
+      "evidence": "{\"tables\":5,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
+      "completion": 80,
+      "status": "Backend Complete / Frontend Missing"
+    },
+    {
+      "objectId": "CAP-CROP_SEMANTIC_SEARCH",
+      "type": "Capability",
+      "name": "Crop semantic search",
+      "evidence": "{\"tables\":2,\"services\":1,\"endpoints\":11,\"components\":1,\"tests\":0}",
+      "completion": 80,
+      "status": "Testing Pending"
+    },
+    {
+      "objectId": "CAP-DISRUPTION_REROUTING",
+      "type": "Capability",
+      "name": "Disruption / rerouting",
+      "evidence": "{\"tables\":0,\"services\":0,\"endpoints\":0,\"components\":0,\"tests\":0}",
+      "completion": 0,
+      "status": "Missing"
+    },
+    {
+      "objectId": "CAP-KNOWLEDGE_GRAPH",
+      "type": "Capability",
+      "name": "Knowledge graph",
+      "evidence": "{\"tables\":1,\"services\":1,\"endpoints\":7,\"components\":1,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
+    },
+    {
+      "objectId": "CAP-MANDI_REFERENCE_PRICE",
+      "type": "Capability",
+      "name": "Mandi / reference price",
+      "evidence": "{\"tables\":0,\"services\":0,\"endpoints\":0,\"components\":0,\"tests\":0}",
+      "completion": 0,
+      "status": "Missing"
+    },
+    {
+      "objectId": "CAP-GOVERNMENT_DPI_ONDC_ETC_",
+      "type": "Capability",
+      "name": "Government DPI (ONDC etc.)",
+      "evidence": "{\"tables\":0,\"services\":0,\"endpoints\":0,\"components\":0,\"tests\":0}",
+      "completion": 0,
+      "status": "Missing"
+    },
+    {
+      "objectId": "CAP-MONITORING_OBSERVABILITY",
+      "type": "Capability",
+      "name": "Monitoring / observability",
+      "evidence": "{\"tables\":1,\"services\":0,\"endpoints\":0,\"components\":1,\"tests\":0}",
+      "completion": 40,
+      "status": "Database Only"
+    },
+    {
+      "objectId": "UI-ADMINDASHBOARDPAGE",
+      "type": "Page",
+      "name": "AdminDashboardPage.jsx",
+      "evidence": "frontend/src/pages/AdminDashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-ANALYTICSPAGE",
+      "type": "Page",
+      "name": "AnalyticsPage.jsx",
+      "evidence": "frontend/src/pages/AnalyticsPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-BANKERDASHBOARDPAGE",
+      "type": "Page",
+      "name": "BankerDashboardPage.jsx",
+      "evidence": "frontend/src/pages/BankerDashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-CADASHBOARDPAGE",
+      "type": "Page",
+      "name": "CADashboardPage.jsx",
+      "evidence": "frontend/src/pages/CADashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-CARTPAGE",
+      "type": "Page",
+      "name": "CartPage.jsx",
+      "evidence": "frontend/src/pages/CartPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-CHECKOUTPAGE",
+      "type": "Page",
+      "name": "CheckoutPage.jsx",
+      "evidence": "frontend/src/pages/CheckoutPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-COMPAREPAGE",
+      "type": "Page",
+      "name": "ComparePage.jsx",
+      "evidence": "frontend/src/pages/ComparePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-CORPORATEBUYERPAGE",
+      "type": "Page",
+      "name": "CorporateBuyerPage.jsx",
+      "evidence": "frontend/src/pages/CorporateBuyerPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-DASHBOARDPAGE",
+      "type": "Page",
+      "name": "DashboardPage.jsx",
+      "evidence": "frontend/src/pages/DashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-DISCOVERPAGE",
+      "type": "Page",
+      "name": "DiscoverPage.jsx",
+      "evidence": "frontend/src/pages/DiscoverPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-DYNAMICPRICINGPAGE",
+      "type": "Page",
+      "name": "DynamicPricingPage.jsx",
+      "evidence": "frontend/src/pages/DynamicPricingPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FPODASHBOARDPAGE",
+      "type": "Page",
+      "name": "FPODashboardPage.jsx",
+      "evidence": "frontend/src/pages/FPODashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FARMADVISORPAGE",
+      "type": "Page",
+      "name": "FarmAdvisorPage.jsx",
+      "evidence": "frontend/src/pages/FarmAdvisorPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FARMERFIELDPAGE",
+      "type": "Page",
+      "name": "FarmerFieldPage.jsx",
+      "evidence": "frontend/src/pages/FarmerFieldPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FARMERHOMEPAGE",
+      "type": "Page",
+      "name": "FarmerHomePage.jsx",
+      "evidence": "frontend/src/pages/FarmerHomePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FARMERPORTALPAGE",
+      "type": "Page",
+      "name": "FarmerPortalPage.jsx",
+      "evidence": "frontend/src/pages/FarmerPortalPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FARMERSELLPAGE",
+      "type": "Page",
+      "name": "FarmerSellPage.jsx",
+      "evidence": "frontend/src/pages/FarmerSellPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FORMMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "FormManagementPage.jsx",
+      "evidence": "frontend/src/pages/FormManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-GOVERNMENTDASHBOARDPAGE",
+      "type": "Page",
+      "name": "GovernmentDashboardPage.jsx",
+      "evidence": "frontend/src/pages/GovernmentDashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-HARVESTPLANPAGE",
+      "type": "Page",
+      "name": "HarvestPlanPage.jsx",
+      "evidence": "frontend/src/pages/HarvestPlanPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-HARVESTSCOREPAGE",
+      "type": "Page",
+      "name": "HarvestScorePage.jsx",
+      "evidence": "frontend/src/pages/HarvestScorePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-HOMEPAGE",
+      "type": "Page",
+      "name": "HomePage.jsx",
+      "evidence": "frontend/src/pages/HomePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-INSURANCEPAGE",
+      "type": "Page",
+      "name": "InsurancePage.jsx",
+      "evidence": "frontend/src/pages/InsurancePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-LOGINPAGE",
+      "type": "Page",
+      "name": "LoginPage.jsx",
+      "evidence": "frontend/src/pages/LoginPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-LOGISTICSPAGE",
+      "type": "Page",
+      "name": "LogisticsPage.jsx",
+      "evidence": "frontend/src/pages/LogisticsPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-LOGISTICSPROVIDERPAGE",
+      "type": "Page",
+      "name": "LogisticsProviderPage.jsx",
+      "evidence": "frontend/src/pages/LogisticsProviderPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-MARKETPLACEPAGE",
+      "type": "Page",
+      "name": "MarketplacePage.jsx",
+      "evidence": "frontend/src/pages/MarketplacePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-MODULEHUBPAGE",
+      "type": "Page",
+      "name": "ModuleHubPage.jsx",
+      "evidence": "frontend/src/pages/ModuleHubPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-PREORDERPAGE",
+      "type": "Page",
+      "name": "PreOrderPage.jsx",
+      "evidence": "frontend/src/pages/PreOrderPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-PRICEBUILDPAGE",
+      "type": "Page",
+      "name": "PriceBuildPage.jsx",
+      "evidence": "frontend/src/pages/PriceBuildPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-PRICECHECKPAGE",
+      "type": "Page",
+      "name": "PriceCheckPage.jsx",
+      "evidence": "frontend/src/pages/PriceCheckPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-PRODUCTDETAILPAGE",
+      "type": "Page",
+      "name": "ProductDetailPage.jsx",
+      "evidence": "frontend/src/pages/ProductDetailPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-REGISTERPAGE",
+      "type": "Page",
+      "name": "RegisterPage.jsx",
+      "evidence": "frontend/src/pages/RegisterPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-RESEARCHDASHBOARDPAGE",
+      "type": "Page",
+      "name": "ResearchDashboardPage.jsx",
+      "evidence": "frontend/src/pages/ResearchDashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-SEEDVAULTPAGE",
+      "type": "Page",
+      "name": "SeedVaultPage.jsx",
+      "evidence": "frontend/src/pages/SeedVaultPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-SELLTIMINGPAGE",
+      "type": "Page",
+      "name": "SellTimingPage.jsx",
+      "evidence": "frontend/src/pages/SellTimingPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-SUBSIDYMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "SubsidyManagementPage.jsx",
+      "evidence": "frontend/src/pages/SubsidyManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-WHATGROWPAGE",
+      "type": "Page",
+      "name": "WhatGrowPage.jsx",
+      "evidence": "frontend/src/pages/WhatGrowPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    }
+  ]
+}

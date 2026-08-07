@@ -1,0 +1,68 @@
+{
+  "forms": [
+    {
+      "id": "form-1786017008804-rhls3c",
+      "title": "Submission test",
+      "description": "Capture payload",
+      "category": "operations",
+      "status": "draft",
+      "version": 1,
+      "fields": [
+        {
+          "id": "field-1",
+          "label": "Amount",
+          "type": "number",
+          "required": true,
+          "placeholder": "",
+          "options": [],
+          "defaultValue": "",
+          "helpText": ""
+        }
+      ],
+      "workflow": {
+        "enabled": true,
+        "stages": [
+          {
+            "name": "Draft",
+            "role": "submitter"
+          },
+          {
+            "name": "Review",
+            "role": "manager"
+          },
+          {
+            "name": "Approval",
+            "role": "approver"
+          }
+        ]
+      },
+      "metadata": {
+        "owner": "system",
+        "department": "operations",
+        "compliance": "standard",
+        "tags": []
+      },
+      "aiInsights": {
+        "score": 87,
+        "summary": [
+          "The form is ready for pilot deployment."
+        ],
+        "generatedAt": "2026-08-06T11:50:08.804Z"
+      },
+      "createdAt": "2026-08-06T11:50:08.804Z",
+      "updatedAt": "2026-08-06T11:50:08.804Z"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "submission-1786017008808-fn8qh9",
+      "formId": "form-1786017008804-rhls3c",
+      "payload": {
+        "amount": 120
+      },
+      "status": "submitted",
+      "submittedAt": "2026-08-06T11:50:08.808Z",
+      "reviewState": "pending"
+    }
+  ]
+}

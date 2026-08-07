@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Digital Identity (M018)
+-- Define tables and indexes here

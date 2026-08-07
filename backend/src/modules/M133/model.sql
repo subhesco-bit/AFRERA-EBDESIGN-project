@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Hatchery Management (M133)
+-- Define tables and indexes here

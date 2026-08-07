@@ -1,0 +1,1 @@
+﻿# M024 - M024 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M024_generated.sql\n

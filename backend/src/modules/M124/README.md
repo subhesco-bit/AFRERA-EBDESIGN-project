@@ -1,0 +1,1 @@
+﻿# M124 - M124 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M124_generated.sql\n

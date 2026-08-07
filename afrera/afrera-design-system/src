@@ -1,0 +1,47 @@
+// src/index.js
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './styles.css';
+
+export const Button = ({ label, onClick }) => {
+    return (
+        <button className="design-system-button" onClick={onClick}>
+            {label}
+        </button>
+    );
+};
+
+export const Input = ({ placeholder, value, onChange }) => {
+    return (
+        <input
+            className="design-system-input"
+            type="text"
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+        />
+    );
+};
+
+// src/styles.css
+
+.design-system-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.design-system-button:hover {
+    background-color: #0056b3;
+}
+
+.design-system-input {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 10px;
+    width: 100%;
+}

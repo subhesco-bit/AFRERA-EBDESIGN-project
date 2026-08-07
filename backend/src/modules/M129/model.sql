@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Breeding Management (M129)
+-- Define tables and indexes here

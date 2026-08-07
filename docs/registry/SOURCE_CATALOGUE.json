@@ -1,0 +1,1247 @@
+{
+ "source": "No project chats (1).docx  md5 d217a852325fb6c0cbc4437ba26590c8",
+ "extracted": "2026-08-04",
+ "domains": {
+  "D01": {
+   "name": "Platform Foundation",
+   "examples": "Platform Core, Configuration, Environment, Feature Management"
+  },
+  "D02": {
+   "name": "Identity & Access Management",
+   "examples": "Authentication, Authorization, SSO, MFA, RBAC, Consent"
+  },
+  "D03": {
+   "name": "User & Stakeholder Management",
+   "examples": "User Profiles, Organizations, Teams, Delegation"
+  },
+  "D04": {
+   "name": "Farmer Ecosystem",
+   "examples": "Farmer Registry, Family, Skills, Experience"
+  },
+  "D05": {
+   "name": "Land & Property",
+   "examples": "Land Records, Ownership, Lease, GIS Mapping"
+  },
+  "D06": {
+   "name": "Village & Community",
+   "examples": "Village Registry, Panchayat, SHG, Cooperatives"
+  },
+  "D07": {
+   "name": "FPO & Producer Organizations",
+   "examples": "FPO Lifecycle, Governance, Membership"
+  },
+  "D08": {
+   "name": "Crop Management",
+   "examples": "Planning, Sowing, Crop Calendar, Harvest"
+  },
+  "D09": {
+   "name": "Horticulture",
+   "examples": "Fruits, Vegetables, Floriculture, Protected Cultivation"
+  },
+  "D10": {
+   "name": "Livestock",
+   "examples": "Dairy, Poultry, Goatery, Sheep, Piggery"
+  },
+  "D11": {
+   "name": "Fisheries & Aquaculture",
+   "examples": "Biofloc, Pond Farming, Hatchery, Feed"
+  },
+  "D12": {
+   "name": "Forestry & Agroforestry",
+   "examples": "Trees, Bamboo, Carbon Assets"
+  },
+  "D13": {
+   "name": "Soil & Water",
+   "examples": "Soil Health, Irrigation, Water Budgeting"
+  },
+  "D14": {
+   "name": "Climate & Weather",
+   "examples": "Forecasting, Alerts, Climate Risk"
+  },
+  "D15": {
+   "name": "Farm Operations",
+   "examples": "Activities, Labour, Machinery, Scheduling"
+  },
+  "D16": {
+   "name": "Farm Equipment & Machinery",
+   "examples": "Equipment Registry, Rentals, Maintenance"
+  },
+  "D17": {
+   "name": "Input Supply Chain",
+   "examples": "Seeds, Fertilizers, Pesticides, Bio-inputs"
+  },
+  "D18": {
+   "name": "Production Planning",
+   "examples": "Capacity, Yield Planning, Seasonal Plans"
+  },
+  "D19": {
+   "name": "Procurement",
+   "examples": "Direct Procurement, Contracts, Aggregation"
+  },
+  "D20": {
+   "name": "Inventory & Warehouse",
+   "examples": "Stock, Batch, Bin, Storage"
+  },
+  "D21": {
+   "name": "Cold Chain",
+   "examples": "Cold Rooms, Blast Freezing, Monitoring"
+  },
+  "D22": {
+   "name": "Processing & Manufacturing",
+   "examples": "Food Processing, Packaging, Value Addition"
+  },
+  "D23": {
+   "name": "Quality & Laboratory",
+   "examples": "Testing, Certification, Traceability"
+  },
+  "D24": {
+   "name": "Food Safety & Compliance",
+   "examples": "HACCP, FSSAI, GMP, Audit"
+  },
+  "D25": {
+   "name": "Packaging",
+   "examples": "Packaging Design, Labelling, Barcoding"
+  },
+  "D26": {
+   "name": "Marketplace",
+   "examples": "B2B, B2C, Institutional Sales"
+  },
+  "D27": {
+   "name": "E-Commerce",
+   "examples": "Catalogues, Orders, Checkout"
+  },
+  "D28": {
+   "name": "Supply Chain",
+   "examples": "End-to-End Supply Planning"
+  },
+  "D29": {
+   "name": "Logistics & Transportation",
+   "examples": "Fleet, Routing, Delivery"
+  },
+  "D30": {
+   "name": "Export & International Trade",
+   "examples": "Export Compliance, Documentation"
+  },
+  "D31": {
+   "name": "Retail & Distribution",
+   "examples": "Dealers, Retail Chains, HoReCa"
+  },
+  "D32": {
+   "name": "CRM / ERM",
+   "examples": "Customer, Ecosystem & Relationship Management"
+  },
+  "D33": {
+   "name": "Sales Management",
+   "examples": "Quotations, Sales Orders, Pricing"
+  },
+  "D34": {
+   "name": "Marketing",
+   "examples": "Campaigns, Promotions, Branding"
+  },
+  "D35": {
+   "name": "Customer Support",
+   "examples": "Tickets, Complaints, Call Centre"
+  },
+  "D36": {
+   "name": "Finance & Accounting",
+   "examples": "GL, AP, AR, Costing"
+  },
+  "D37": {
+   "name": "Banking & Payments",
+   "examples": "Banking, UPI, Wallets, Escrow"
+  },
+  "D38": {
+   "name": "Subsidy & Government Schemes",
+   "examples": "Eligibility, Claims, Benefits"
+  },
+  "D39": {
+   "name": "Insurance",
+   "examples": "Crop, Livestock, Asset Insurance"
+  },
+  "D40": {
+   "name": "Investment & Funding",
+   "examples": "Investors, Grants, CSR"
+  },
+  "D41": {
+   "name": "Procurement Finance",
+   "examples": "Trade Finance, Working Capital"
+  },
+  "D42": {
+   "name": "Human Resource Management",
+   "examples": "Employees, Payroll, Attendance"
+  },
+  "D43": {
+   "name": "Workforce & Labour",
+   "examples": "Seasonal Labour, Contractors"
+  },
+  "D44": {
+   "name": "Learning & Capacity Building",
+   "examples": "LMS, Certifications, Training"
+  },
+  "D45": {
+   "name": "Research & Innovation",
+   "examples": "R&D, Trials, Demonstrations"
+  },
+  "D46": {
+   "name": "Knowledge Management",
+   "examples": "SOPs, Best Practices, Repository"
+  },
+  "D47": {
+   "name": "AI & Decision Intelligence",
+   "examples": "AI Copilots, AI Advisors, Prediction"
+  },
+  "D48": {
+   "name": "Generative AI",
+   "examples": "Content, Reports, Conversational AI"
+  },
+  "D49": {
+   "name": "Computer Vision",
+   "examples": "Disease Detection, Image Analysis"
+  },
+  "D50": {
+   "name": "Recommendation Engine",
+   "examples": "Crop, Market, Input Recommendations"
+  },
+  "D51": {
+   "name": "Forecasting & Analytics",
+   "examples": "Yield, Demand, Price Forecasts"
+  },
+  "D52": {
+   "name": "Business Intelligence",
+   "examples": "Dashboards, KPIs, Executive Reports"
+  },
+  "D53": {
+   "name": "Data Platform",
+   "examples": "Data Lake, Data Warehouse, MDM"
+  },
+  "D54": {
+   "name": "GIS & Spatial Intelligence",
+   "examples": "Maps, Geofencing, Layers"
+  },
+  "D55": {
+   "name": "Satellite Intelligence",
+   "examples": "Remote Sensing, NDVI"
+  },
+  "D56": {
+   "name": "Drone Operations",
+   "examples": "Flight Planning, Survey, Spraying"
+  },
+  "D57": {
+   "name": "IoT Platform",
+   "examples": "Sensors, Devices, Telemetry"
+  },
+  "D58": {
+   "name": "Automation & Smart Farming",
+   "examples": "Rules Engine, Process Automation"
+  },
+  "D59": {
+   "name": "Asset Management",
+   "examples": "Assets, Depreciation, Maintenance"
+  },
+  "D60": {
+   "name": "Energy Management",
+   "examples": "Solar, DG, Utilities"
+  },
+  "D61": {
+   "name": "Water Infrastructure",
+   "examples": "STP, RO, Pumps, Distribution"
+  },
+  "D62": {
+   "name": "Waste & Circular Economy",
+   "examples": "Waste Processing, Compost, Recycling"
+  },
+  "D63": {
+   "name": "Sustainability & ESG",
+   "examples": "Carbon, Water, ESG Reporting"
+  },
+  "D64": {
+   "name": "Carbon Credits",
+   "examples": "Carbon Accounting, Trading"
+  },
+  "D65": {
+   "name": "Biodiversity",
+   "examples": "Biodiversity Monitoring"
+  },
+  "D66": {
+   "name": "Government Digital Public Infrastructure",
+   "examples": "Registries, Public Platforms, Interoperability"
+  },
+  "D67": {
+   "name": "Regulatory Compliance",
+   "examples": "Legal, Licenses, Inspections"
+  },
+  "D68": {
+   "name": "Audit & Risk",
+   "examples": "Internal Audit, Enterprise Risk"
+  },
+  "D69": {
+   "name": "Legal & Contract Management",
+   "examples": "Contracts, Litigation, Notices"
+  },
+  "D70": {
+   "name": "Document Management",
+   "examples": "Document Repository, OCR, Versioning"
+  },
+  "D71": {
+   "name": "Workflow & BPM",
+   "examples": "Workflow Designer, Approvals"
+  },
+  "D72": {
+   "name": "Notification & Communication",
+   "examples": "SMS, Email, WhatsApp, Voice, IVR"
+  },
+  "D73": {
+   "name": "Multilingual & Accessibility",
+   "examples": "Regional Languages, Accessibility"
+  },
+  "D74": {
+   "name": "Offline & Edge Computing",
+   "examples": "Offline Sync, Local Storage"
+  },
+  "D75": {
+   "name": "Mobile Platform",
+   "examples": "Android, iOS, Progressive Web App"
+  },
+  "D76": {
+   "name": "Portal Framework",
+   "examples": "Farmer, FPO, Government, Enterprise Portals"
+  },
+  "D77": {
+   "name": "API & Integration Platform",
+   "examples": "REST APIs, Webhooks, Connectors"
+  },
+  "D78": {
+   "name": "Enterprise Service Bus",
+   "examples": "Messaging, Event Streaming"
+  },
+  "D79": {
+   "name": "Security Operations",
+   "examples": "SOC, Threat Detection, SIEM"
+  },
+  "D80": {
+   "name": "Privacy & Consent",
+   "examples": "Data Governance, Consent Management"
+  },
+  "D81": {
+   "name": "Infrastructure & Cloud",
+   "examples": "Compute, Storage, Networking"
+  },
+  "D82": {
+   "name": "DevSecOps",
+   "examples": "CI/CD, Release Management"
+  },
+  "D83": {
+   "name": "Monitoring & Observability",
+   "examples": "Logs, Metrics, Tracing"
+  },
+  "D84": {
+   "name": "Backup & Disaster Recovery",
+   "examples": "Backup, Replication, Recovery"
+  },
+  "D85": {
+   "name": "Administration & Configuration",
+   "examples": "System Admin, Master Configuration"
+  },
+  "D86": {
+   "name": "Business Rules Engine",
+   "examples": "Rules, Policies, Validation"
+  },
+  "D87": {
+   "name": "Reporting & Printing",
+   "examples": "Operational, MIS, Statutory Reports"
+  },
+  "D88": {
+   "name": "Project & Program Management",
+   "examples": "Projects, Milestones, PMO"
+  },
+  "D89": {
+   "name": "Innovation Marketplace",
+   "examples": "Startups, Technologies, Pilots"
+  },
+  "D90": {
+   "name": "Partner Ecosystem",
+   "examples": "NGOs, CSR, Universities, OEMs"
+  },
+  "D91": {
+   "name": "Digital Commerce Network",
+   "examples": "Buyers, Sellers, Aggregators"
+  },
+  "D92": {
+   "name": "Food Security Operations",
+   "examples": "Institutional Food Supply, Defence Supply"
+  },
+  "D93": {
+   "name": "Agro-Industrial Parks",
+   "examples": "Cluster Management, Shared Infrastructure"
+  },
+  "D94": {
+   "name": "Smart Campus Management",
+   "examples": "Utilities, Facilities, Security"
+  },
+  "D95": {
+   "name": "Enterprise ERP Core",
+   "examples": "Enterprise Planning, Cross-Functional ERP"
+  },
+  "D96": {
+   "name": "Enterprise Performance Management",
+   "examples": "Budgeting, Planning, KPIs"
+  },
+  "D97": {
+   "name": "Master Data Management",
+   "examples": "Reference Data, Code Lists"
+  },
+  "D98": {
+   "name": "Metadata & Governance",
+   "examples": "Data Catalog, Lineage"
+  },
+  "D99": {
+   "name": "Innovation & Future Technologies",
+   "examples": "Blockchain, Digital Twins, Robotics"
+  },
+  "D100": {
+   "name": "Ecosystem Orchestration",
+   "examples": "Cross-domain Coordination, Digital Ecosystem Management"
+  }
+ },
+ "modules": {
+  "M001": {
+   "name": "Platform Core",
+   "domain": "Platform Foundation"
+  },
+  "M002": {
+   "name": "Platform Configuration",
+   "domain": "Platform Foundation"
+  },
+  "M003": {
+   "name": "Tenant Management",
+   "domain": "Platform Foundation"
+  },
+  "M004": {
+   "name": "Organization Management",
+   "domain": "Platform Foundation"
+  },
+  "M005": {
+   "name": "Environment Management",
+   "domain": "Platform Foundation"
+  },
+  "M006": {
+   "name": "System Administration",
+   "domain": "Platform Foundation"
+  },
+  "M007": {
+   "name": "Feature Flag Management",
+   "domain": "Platform Foundation"
+  },
+  "M008": {
+   "name": "Localization Management",
+   "domain": "Platform Foundation"
+  },
+  "M009": {
+   "name": "Time Zone Management",
+   "domain": "Platform Foundation"
+  },
+  "M010": {
+   "name": "Master Configuration",
+   "domain": "Platform Foundation"
+  },
+  "M011": {
+   "name": "User Management",
+   "domain": "Identity"
+  },
+  "M012": {
+   "name": "Authentication",
+   "domain": "Identity"
+  },
+  "M013": {
+   "name": "Authorization",
+   "domain": "Identity"
+  },
+  "M014": {
+   "name": "Role Management",
+   "domain": "Identity"
+  },
+  "M015": {
+   "name": "Permission Management",
+   "domain": "Identity"
+  },
+  "M016": {
+   "name": "Single Sign-On",
+   "domain": "Identity"
+  },
+  "M017": {
+   "name": "Multi-Factor Authentication",
+   "domain": "Identity"
+  },
+  "M018": {
+   "name": "Digital Identity",
+   "domain": "Identity"
+  },
+  "M019": {
+   "name": "Consent Management",
+   "domain": "Identity"
+  },
+  "M020": {
+   "name": "Session Management",
+   "domain": "Identity"
+  },
+  "M021": {
+   "name": "Farmer Registry",
+   "domain": "Farmer"
+  },
+  "M022": {
+   "name": "Farmer Profile",
+   "domain": "Farmer"
+  },
+  "M023": {
+   "name": "Farmer Family",
+   "domain": "Farmer"
+  },
+  "M024": {
+   "name": "Farmer KYC",
+   "domain": "Farmer"
+  },
+  "M025": {
+   "name": "Farmer Verification",
+   "domain": "Farmer"
+  },
+  "M026": {
+   "name": "Farmer Skill Management",
+   "domain": "Farmer"
+  },
+  "M027": {
+   "name": "Farmer Certification",
+   "domain": "Farmer"
+  },
+  "M028": {
+   "name": "Farmer Advisory",
+   "domain": "Farmer"
+  },
+  "M029": {
+   "name": "Farmer Health & Welfare",
+   "domain": "Farmer"
+  },
+  "M030": {
+   "name": "Farmer Performance",
+   "domain": "Farmer"
+  },
+  "M031": {
+   "name": "Land Registry",
+   "domain": "Land"
+  },
+  "M032": {
+   "name": "Land Ownership",
+   "domain": "Land"
+  },
+  "M033": {
+   "name": "Land Lease Management",
+   "domain": "Land"
+  },
+  "M034": {
+   "name": "Parcel Mapping",
+   "domain": "Land"
+  },
+  "M035": {
+   "name": "GIS Land Mapping",
+   "domain": "Land"
+  },
+  "M036": {
+   "name": "Soil Mapping",
+   "domain": "Land"
+  },
+  "M037": {
+   "name": "Water Resource Mapping",
+   "domain": "Land"
+  },
+  "M038": {
+   "name": "Geo Boundary Management",
+   "domain": "Land"
+  },
+  "M039": {
+   "name": "Survey Management",
+   "domain": "Land"
+  },
+  "M040": {
+   "name": "Digital Land Records",
+   "domain": "Land"
+  },
+  "M041": {
+   "name": "Village Registry",
+   "domain": "Community"
+  },
+  "M042": {
+   "name": "Panchayat Management",
+   "domain": "Community"
+  },
+  "M043": {
+   "name": "Block Management",
+   "domain": "Community"
+  },
+  "M044": {
+   "name": "District Management",
+   "domain": "Community"
+  },
+  "M045": {
+   "name": "State Management",
+   "domain": "Community"
+  },
+  "M046": {
+   "name": "SHG Management",
+   "domain": "Community"
+  },
+  "M047": {
+   "name": "Cooperative Management",
+   "domain": "Community"
+  },
+  "M048": {
+   "name": "Producer Group Management",
+   "domain": "Community"
+  },
+  "M049": {
+   "name": "Community Asset Management",
+   "domain": "Community"
+  },
+  "M050": {
+   "name": "Rural Development Management",
+   "domain": "Community"
+  },
+  "M051": {
+   "name": "FPO Registration",
+   "domain": "FPO"
+  },
+  "M052": {
+   "name": "FPO Governance",
+   "domain": "FPO"
+  },
+  "M053": {
+   "name": "FPO Membership",
+   "domain": "FPO"
+  },
+  "M054": {
+   "name": "FPO Finance",
+   "domain": "FPO"
+  },
+  "M055": {
+   "name": "FPO Procurement",
+   "domain": "FPO"
+  },
+  "M056": {
+   "name": "FPO Inventory",
+   "domain": "FPO"
+  },
+  "M057": {
+   "name": "FPO Marketing",
+   "domain": "FPO"
+  },
+  "M058": {
+   "name": "FPO Sales",
+   "domain": "FPO"
+  },
+  "M059": {
+   "name": "FPO Compliance",
+   "domain": "FPO"
+  },
+  "M060": {
+   "name": "FPO Analytics",
+   "domain": "FPO"
+  },
+  "M061": {
+   "name": "Crop Planning",
+   "domain": "Crop"
+  },
+  "M062": {
+   "name": "Crop Calendar",
+   "domain": "Crop"
+  },
+  "M063": {
+   "name": "Crop Registration",
+   "domain": "Crop"
+  },
+  "M064": {
+   "name": "Crop Variety Management",
+   "domain": "Crop"
+  },
+  "M065": {
+   "name": "Seed Planning",
+   "domain": "Crop"
+  },
+  "M066": {
+   "name": "Nursery Management",
+   "domain": "Crop"
+  },
+  "M067": {
+   "name": "Sowing Management",
+   "domain": "Crop"
+  },
+  "M068": {
+   "name": "Crop Monitoring",
+   "domain": "Crop"
+  },
+  "M069": {
+   "name": "Harvest Planning",
+   "domain": "Crop"
+  },
+  "M070": {
+   "name": "Yield Recording",
+   "domain": "Crop"
+  },
+  "M071": {
+   "name": "Soil Health Management",
+   "domain": "Soil"
+  },
+  "M072": {
+   "name": "Soil Test Management",
+   "domain": "Soil"
+  },
+  "M073": {
+   "name": "Nutrient Management",
+   "domain": "Soil"
+  },
+  "M074": {
+   "name": "Fertility Management",
+   "domain": "Soil"
+  },
+  "M075": {
+   "name": "Irrigation Management",
+   "domain": "Water"
+  },
+  "M076": {
+   "name": "Water Budgeting",
+   "domain": "Water"
+  },
+  "M077": {
+   "name": "Water Quality Monitoring",
+   "domain": "Water"
+  },
+  "M078": {
+   "name": "Rainwater Harvesting",
+   "domain": "Water"
+  },
+  "M079": {
+   "name": "Watershed Management",
+   "domain": "Water"
+  },
+  "M080": {
+   "name": "Water Analytics",
+   "domain": "Water"
+  },
+  "M081": {
+   "name": "Weather Monitoring",
+   "domain": "Climate"
+  },
+  "M082": {
+   "name": "Weather Forecasting",
+   "domain": "Climate"
+  },
+  "M083": {
+   "name": "Climate Advisory",
+   "domain": "Climate"
+  },
+  "M084": {
+   "name": "Disaster Alerts",
+   "domain": "Climate"
+  },
+  "M085": {
+   "name": "Drought Monitoring",
+   "domain": "Climate"
+  },
+  "M086": {
+   "name": "Flood Monitoring",
+   "domain": "Climate"
+  },
+  "M087": {
+   "name": "Pest Forecasting",
+   "domain": "Climate"
+  },
+  "M088": {
+   "name": "Disease Forecasting",
+   "domain": "Climate"
+  },
+  "M089": {
+   "name": "Climate Risk Assessment",
+   "domain": "Climate"
+  },
+  "M090": {
+   "name": "Agro-Meteorology",
+   "domain": "Climate"
+  },
+  "M091": {
+   "name": "Farm Activity Management",
+   "domain": "Operations"
+  },
+  "M092": {
+   "name": "Farm Task Scheduling",
+   "domain": "Operations"
+  },
+  "M093": {
+   "name": "Labour Management",
+   "domain": "Operations"
+  },
+  "M094": {
+   "name": "Contractor Management",
+   "domain": "Operations"
+  },
+  "M095": {
+   "name": "Machinery Operations",
+   "domain": "Operations"
+  },
+  "M096": {
+   "name": "Equipment Scheduling",
+   "domain": "Operations"
+  },
+  "M097": {
+   "name": "Input Consumption",
+   "domain": "Operations"
+  },
+  "M098": {
+   "name": "Farm Costing",
+   "domain": "Operations"
+  },
+  "M099": {
+   "name": "Farm Productivity",
+   "domain": "Operations"
+  },
+  "M100": {
+   "name": "Farm Operations Dashboard",
+   "domain": "Operations"
+  },
+  "M101": {
+   "name": "Tractor Management",
+   "domain": "Machinery"
+  },
+  "M102": {
+   "name": "Implement Management",
+   "domain": "Machinery"
+  },
+  "M103": {
+   "name": "Equipment Inventory",
+   "domain": "Machinery"
+  },
+  "M104": {
+   "name": "Equipment Rental",
+   "domain": "Machinery"
+  },
+  "M105": {
+   "name": "Fleet Management",
+   "domain": "Machinery"
+  },
+  "M106": {
+   "name": "Preventive Maintenance",
+   "domain": "Machinery"
+  },
+  "M107": {
+   "name": "Breakdown Maintenance",
+   "domain": "Machinery"
+  },
+  "M108": {
+   "name": "Fuel Management",
+   "domain": "Machinery"
+  },
+  "M109": {
+   "name": "Spare Parts Management",
+   "domain": "Machinery"
+  },
+  "M110": {
+   "name": "Asset Lifecycle Management",
+   "domain": "Machinery"
+  },
+  "M111": {
+   "name": "Seed Inventory",
+   "domain": "Input Supply"
+  },
+  "M112": {
+   "name": "Fertilizer Inventory",
+   "domain": "Input Supply"
+  },
+  "M113": {
+   "name": "Biofertilizer Management",
+   "domain": "Input Supply"
+  },
+  "M114": {
+   "name": "Pesticide Inventory",
+   "domain": "Input Supply"
+  },
+  "M115": {
+   "name": "Bio-Pesticide Management",
+   "domain": "Input Supply"
+  },
+  "M116": {
+   "name": "Micronutrient Management",
+   "domain": "Input Supply"
+  },
+  "M117": {
+   "name": "Organic Input Management",
+   "domain": "Input Supply"
+  },
+  "M118": {
+   "name": "Input Procurement",
+   "domain": "Input Supply"
+  },
+  "M119": {
+   "name": "Input Distribution",
+   "domain": "Input Supply"
+  },
+  "M120": {
+   "name": "Input Traceability",
+   "domain": "Input Supply"
+  },
+  "M121": {
+   "name": "Dairy Management",
+   "domain": "Livestock"
+  },
+  "M122": {
+   "name": "Cattle Registry",
+   "domain": "Livestock"
+  },
+  "M123": {
+   "name": "Poultry Management",
+   "domain": "Livestock"
+  },
+  "M124": {
+   "name": "Goat Farming Management",
+   "domain": "Livestock"
+  },
+  "M125": {
+   "name": "Sheep Farming Management",
+   "domain": "Livestock"
+  },
+  "M126": {
+   "name": "Pig Farming Management",
+   "domain": "Livestock"
+  },
+  "M127": {
+   "name": "Animal Health Management",
+   "domain": "Livestock"
+  },
+  "M128": {
+   "name": "Feed Management",
+   "domain": "Livestock"
+  },
+  "M129": {
+   "name": "Breeding Management",
+   "domain": "Livestock"
+  },
+  "M130": {
+   "name": "Livestock Analytics",
+   "domain": "Livestock"
+  },
+  "M131": {
+   "name": "Biofloc Farm Management",
+   "domain": "Fisheries"
+  },
+  "M132": {
+   "name": "Pond Management",
+   "domain": "Fisheries"
+  },
+  "M133": {
+   "name": "Hatchery Management",
+   "domain": "Fisheries"
+  },
+  "M134": {
+   "name": "Fish Feed Management",
+   "domain": "Fisheries"
+  },
+  "M135": {
+   "name": "Water Quality Control",
+   "domain": "Fisheries"
+  },
+  "M136": {
+   "name": "Fish Health Management",
+   "domain": "Fisheries"
+  },
+  "M137": {
+   "name": "Harvest Management (Fisheries)",
+   "domain": "Fisheries"
+  },
+  "M138": {
+   "name": "Fish Processing Management",
+   "domain": "Fisheries"
+  },
+  "M139": {
+   "name": "Cold Fish Chain",
+   "domain": "Fisheries"
+  },
+  "M140": {
+   "name": "Aquaculture Analytics",
+   "domain": "Fisheries"
+  },
+  "M141": {
+   "name": "Orchard Management",
+   "domain": "Horticulture"
+  },
+  "M142": {
+   "name": "Vegetable Production",
+   "domain": "Horticulture"
+  },
+  "M143": {
+   "name": "Floriculture Management",
+   "domain": "Horticulture"
+  },
+  "M144": {
+   "name": "Greenhouse Management",
+   "domain": "Horticulture"
+  },
+  "M145": {
+   "name": "Polyhouse Management",
+   "domain": "Horticulture"
+  },
+  "M146": {
+   "name": "Hydroponics Management",
+   "domain": "Horticulture"
+  },
+  "M147": {
+   "name": "Aeroponics Management",
+   "domain": "Horticulture"
+  },
+  "M148": {
+   "name": "Precision Horticulture",
+   "domain": "Horticulture"
+  },
+  "M149": {
+   "name": "Protected Cultivation",
+   "domain": "Horticulture"
+  },
+  "M150": {
+   "name": "Horticulture Analytics",
+   "domain": "Horticulture"
+  }
+ },
+ "named_missing_modules": [
+  {
+   "module": "RFQ (Request for Quote) & Dynamic Negotiation Engine",
+   "purpose": "Allow corporate buyers to post bulk requirements (e.g., \"500 kg Turmeric, Grade A\"). Farmers/FPOs bid anonymously. The platform takes a small success fee. Sales Hook: \"Name your price; let the farm compete for your business.\""
+  },
+  {
+   "module": "Subscription / \"SIP\" (Systematic Investment Plan) for Staples",
+   "purpose": "Allow RWAs and HoReCa to set monthly auto-orders (e.g., \"50kg rice every 30 days\"). This generates predictable Monthly Recurring Revenue (MRR) for the platform."
+  },
+  {
+   "module": "\"Quote-to-Order\" Conversion Dashboard",
+   "purpose": "Track why quotes are lost (price vs. delivery). This gives the sales team data to adjust pricing dynamically based on real buyer behavior, not just competitor scrapes."
+  },
+  {
+   "module": "Sponsored GI Listings (Auction-based)",
+   "purpose": "Allow high-margin brands (e.g., Lakadong Turmeric) to bid for the \"Top Slot\" in category searches. This creates a new revenue stream (Ad Inventory) without charging farmers directly."
+  },
+  {
+   "module": "Affiliate & Influencer Tracking",
+   "purpose": "Generate unique referral links for food bloggers and influencers. Pay them a commission (e.g., 10%) on every sale they drive. Marketing Hook: \"Earn by sharing Northeast India's story.\""
+  },
+  {
+   "module": "Pixel & Retargeting Integration",
+   "purpose": "Plug in Meta (Facebook) and Google Ads pixels. When a user abandons a cart, the platform triggers a retargeting ad automatically. Without this, advertising spend is wasted."
+  },
+  {
+   "module": "TDS (Tax Deducted at Source) Engine",
+   "purpose": "The platform generates commission revenue. Under the Income Tax Act, TDS must be deducted on payments to transporters and FPOs. This module auto-calculates TDS (e.g., 1% on transport, 2% on commission) and issues Form 16/26Q reports. Accounting Hook: \"We make your tax compliance audit-proof.\""
+  },
+  {
+   "module": "Automated Bank Reconciliation (via UPI/Razorpay)",
+   "purpose": "Match the platform's ledger (sales revenue, farmer payouts) with the actual bank statements via a bank API. Flag mismatches in real-time, reducing the CA's month-end workload by 80%."
+  },
+  {
+   "module": "Asset Capitalization & Depreciation Schedule",
+   "purpose": "Link the \"AF-AA\" asset register to specific projects (e.g., TC-01 Cold Store). When a corporate buys a share of the cold store, the platform automatically generates their depreciation certificate for their own books."
+  },
+  {
+   "module": "E-Invoice IRN (Invoice Reference Number) Generation",
+   "purpose": "Directly integrate with the NIC (National Informatics Centre) IRP sandbox. The moment an order is placed, the platform generates the legally valid IRN and QR code. Taxation Hook: \"One click to a legally valid invoice; no manual portal entry.\""
+  },
+  {
+   "module": "GSTR-1 & GSTR-3B Auto-Population",
+   "purpose": "Aggregate all B2B and B2C sales for the month and auto-generate the JSON file required to file GST returns. No re-keying of data."
+  },
+  {
+   "module": "Reverse Charge Mechanism (RCM) Handler",
+   "purpose": "When buying from unregistered farmers (raw agricultural produce), the corporate buyer must pay GST under RCM. This module auto-calculates the RCM liability and flags it on the invoice for the CA."
+  },
+  {
+   "module": "Farm Plot & Land Bank Management",
+   "purpose": "Move beyond \"Farmer Name\" to \"Plot ID.\" Map each farmer's parcels (geo-tagged). Link each batch (lot code) to a specific plot. ERP Hook: \"True 'Farm-to-Fork' traceability starts at the soil, not the warehouse gate.\""
+  },
+  {
+   "module": "Agri-Input Inventory (Seed/Fertilizer/PPE) Tracking",
+   "purpose": "Track the inputs issued to farmers (via the Pre-Season Advance). Link these inputs to the final harvest yield. If a farmer uses banned pesticides, the lot is automatically flagged for export rejection."
+  },
+  {
+   "module": "Mandi / APMC Price Integration (Live)",
+   "purpose": "Pull live prices from e-NAM and local APMCs directly into the \"Sell-Timing Advisor\" and \"Dynamic Pricing\" modules. Marketing sells this as: \"Don't guess the market; read it in real-time.\""
+  },
+  {
+   "module": "Quality Control (QC) Hold & Release Workflow",
+   "purpose": "If a lab report fails (e.g., Aflatoxin > limit), the system automatically blocks that lot from \"Ready for Dispatch\" status. Only the QC manager can \"Override/Hold-Release\" with a digital signature."
+  },
+  {
+   "module": "Multi-Location FPO Cost Centers",
+   "purpose": "Allow a single large FPO to manage multiple collection centers. Each center has its own P&L (Profit & Loss) statement. CAs can audit center-wise performance, preventing internal fraud."
+  }
+ ],
+ "sap_equivalence": [
+  {
+   "sap": "General Ledger (FI\u2011GL)",
+   "afrera": "Financial OS (Derived GL)",
+   "function": "Double\u2011entry bookkeeping derived from platform events; trial balance."
+  },
+  {
+   "sap": "Cost & Profit Centers (CO)",
+   "afrera": "AF\u2011CO Controlling, Price Build\u2011Up",
+   "function": "Tracks product margins, lane costs, freight variance, and transparent cost waterfall."
+  },
+  {
+   "sap": "Asset Accounting (FI\u2011AA)",
+   "afrera": "AF\u2011AA Asset Register",
+   "function": "SLM depreciation, gross block, written\u2011down value, and asset lifecycle tracking."
+  },
+  {
+   "sap": "Banking & Credit (FI\u2011Treasury)",
+   "afrera": "Bank Lender Matcher, Escrow/TRA, EMI Calculator",
+   "function": "Surfaces loan eligibility, escrow waterfall (statutory\u2192debt\u2192farmer), and loan EMIs."
+  },
+  {
+   "sap": "Tax (FI\u2011Tax)",
+   "afrera": "GST Invoice Engine v2",
+   "function": "HSN classification, CGST/SGST vs IGST, e\u2011Way bill generation (fresh produce NIL\u2011rated)."
+  },
+  {
+   "sap": "Transportation Management (TM)",
+   "afrera": "AF\u2011TM Booking Engine, TrackDart",
+   "function": "Lane selection, freight classes, dispatch pass, GPS\u2011style tracking, POD capture."
+  },
+  {
+   "sap": "Warehouse Management (EWM)",
+   "afrera": "Warehouse OS (Racks, FEFO, Expiry), AF\u2011LE (Pick/Pack/Gate)",
+   "function": "Rack utilisation, first\u2011expiry\u2011first\u2011out, temperature zones, and dispatch barrier control."
+  },
+  {
+   "sap": "Materials Management (MM)",
+   "afrera": "Shared Infrastructure, Fixed Facilities, Mechanization Hub",
+   "function": "Rental/co\u2011op/corporate access to cold stores, packhouses, and farm machinery."
+  },
+  {
+   "sap": "Inventory Management (IM)",
+   "afrera": "Inventory (Derived from Listings + Committed)",
+   "function": "Real\u2011time available stock = listed quantity minus committed orders."
+  },
+  {
+   "sap": "Order Management",
+   "afrera": "Order Orchestration, Procurement Ops (PO/RFQ)",
+   "function": "Handles B2B purchase orders, RFQs, order\u2011to\u2011cash (O2C) workflow."
+  },
+  {
+   "sap": "Pricing & Billing",
+   "afrera": "Nutrient\u2011based Billing, Corporate MOQ Tiers",
+   "function": "Price based on certified nutrient content and volume\u2011based tiered pricing."
+  },
+  {
+   "sap": "Customer Relationship (CRM)",
+   "afrera": "CRM Database",
+   "function": "Master record of all registered users, buyers, FPOs, and their activity."
+  },
+  {
+   "sap": "Production Orders (PP)",
+   "afrera": "AF\u2011PP Processing, Mobile Mill Circuit",
+   "function": "Input lot \u2192 output batch, yield %, loss tracking, batch genealogy."
+  },
+  {
+   "sap": "Quality Management (QM)",
+   "afrera": "Lab Reports, Organic Trust Chain, CAPA",
+   "function": "NABL parameter results, NPOP/PGS certs, non\u2011conformance root\u2011cause analysis."
+  },
+  {
+   "sap": "Maintenance (EAM/PM)",
+   "afrera": "AF\u2011PM Maintenance",
+   "function": "Calibration, preventive, and breakdown tickets with expiry\u2011based dispatch blocking."
+  },
+  {
+   "sap": "Personnel Management",
+   "afrera": "AF\u2011HCM Field Operations",
+   "function": "Staff certification (DL, FoSTaC), expiry alerts, and duty assignment."
+  },
+  {
+   "sap": "Master Data Governance (MDM)",
+   "afrera": "AF\u2011MDM Master Data",
+   "function": "Single source of truth for products, lots, lanes, assets, and schemes."
+  },
+  {
+   "sap": "Governance, Risk & Compliance (GRC)",
+   "afrera": "AF\u2011SEC Security, User Management, Audit Trail",
+   "function": "Role\u2011based gating, segregation of duties, and tamper\u2011evident event ledger."
+  }
+ ],
+ "screen_specs": [
+  {
+   "screen": "Login (OTP-based)",
+   "process": "Driver enters phone number. Server sends OTP.",
+   "wiring": "Links to /fieldops (certification check). If DL expired, login is blocked."
+  },
+  {
+   "screen": "Availability Toggle",
+   "process": "Swipe \"Go Online\" / \"Go Offline\". Sends GPS location to server every 5 seconds.",
+   "wiring": "Updates driver_availability table. Feeds real-time data to the /orderrouting AI."
+  },
+  {
+   "screen": "Job List / Offer",
+   "process": "Receives a push notification for a new order. Shows Pickup Location, Weight, Distance, Estimated Earning.",
+   "wiring": "Triggered by the server's RouteAssignment() action (Part 1.2)."
+  },
+  {
+   "screen": "Accept / Reject",
+   "process": "Driver taps \"Accept\". Server locks the order and assigns it.",
+   "wiring": "Updates shipments.assigned_driver_id and orders.status."
+  },
+  {
+   "screen": "Navigation",
+   "process": "Opens integrated Maps (Google/OSM) to the pickup point.",
+   "wiring": "N/A (Utility)."
+  },
+  {
+   "screen": "Scan & Pickup",
+   "process": "Driver scans a QR code on the farmer's consignment label. Marks \"Picked Up\".",
+   "wiring": "Updates shipments.status = IN_TRANSIT. Sends SMS to buyer."
+  },
+  {
+   "screen": "Delivery & OTP",
+   "process": "Driver reaches buyer location. Buyer provides a 4-digit OTP (from SMS). Driver enters OTP to complete.",
+   "wiring": "Calls the Escrow Release API (Part 1.2). Triggers the platform settlement."
+  },
+  {
+   "screen": "Earnings Wallet",
+   "process": "Shows daily trip count, total earnings, payout history.",
+   "wiring": "Reads from the transactions table."
+  },
+  {
+   "screen": "Ticket Queue",
+   "process": "Lists all open complaints (/care) with an SLA timer.",
+   "wiring": "Fetches from complaints table. Sorts by sla_deadline (SLA breach alerts)."
+  },
+  {
+   "screen": "Agent Assignment",
+   "process": "Agent taps \"Assign to Me\". Complaint status changes from \"Open\" to \"Assigned\".",
+   "wiring": "Updates complaints.assigned_agent_id. Logs the action in the audit trail."
+  },
+  {
+   "screen": "Warehouse / FEFO Picking",
+   "process": "Warehouse agent receives a \"Pick List\" for a new order. Scans barcode of the rack to confirm.",
+   "wiring": "Connects to /warehouse module. Updates inventory_lots.qty_available in real-time."
+  },
+  {
+   "screen": "Facility Approvals",
+   "process": "Approves cold-storage bookings (/facilities) or Media Uploads (/medialibrary).",
+   "wiring": "Updates facility_bookings.status or media_assets.status."
+  },
+  {
+   "screen": "New Order Alert",
+   "process": "Farmer receives a push notification when a buyer places an order for their MAP-A floor.",
+   "wiring": "Fetches from inventory_lots and orders table."
+  },
+  {
+   "screen": "Dynamic Pricing Suggestion",
+   "process": "Farmer receives an AI-generated price adjustment suggestion (from /dynamicpricing) on their dashboard.",
+   "wiring": "Pushes recommendations from dpRecommend() calculation."
+  },
+  {
+   "screen": "Payout Notification",
+   "process": "Farmer gets a \"Money Credited\" alert when the escrow is released.",
+   "wiring": "Triggered by Transaction.Settled event."
+  }
+ ]
+}

@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for System Administration (M006)
+-- Define tables and indexes here
