@@ -1,20 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { nutritionAPI } from '../../services/api';
 
 /**
  * Nutrition Label Component
  * Displays standardized nutrition information for products
+ *
+ * FE-02 note: no current parent page renders this component (unmounted as of
+ * 2026-08-07). Accepts optional `nutritionData`/`scoreData` props so a future
+ * parent page (e.g. a product detail page) can supply data directly; falls
+ * back to self-fetching by productId when omitted.
  */
-const NutritionLabel = ({ productId, showComparison = false }) => {
-  const [nutritionData, setNutritionData] = useState(null);
-  const [scoreData, setScoreData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutritionDataProp, scoreData: scoreDataProp }) => {
+  const [nutritionData, setNutritionData] = useState(nutritionDataProp || null);
+  const [scoreData, setScoreData] = useState(scoreDataProp || null);
+  const [loading, setLoading] = useState(!nutritionDataProp);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (nutritionDataProp) {
+      setNutritionData(nutritionDataProp);
+      setScoreData(scoreDataProp || null);
+      setLoading(false);
+      return;
+    }
     if (productId) {
       fetchNutritionData();
     }
-  }, [productId]);
+  }, [productId, nutritionDataProp, scoreDataProp]);
 
   const fetchNutritionData = async () => {
     setLoading(true);
@@ -22,18 +34,14 @@ const NutritionLabel = ({ productId, showComparison = false }) => {
 
     try {
       const [nutritionResponse, scoreResponse] = await Promise.all([
-        fetch(`/api/v1/nutrition-intelligence/product-nutrition/${productId}`),
-        fetch(`/api/v1/nutrition-intelligence/product-nutrition/${productId}/score`)
+        nutritionAPI.getProductNutrition(productId),
+        nutritionAPI.getNutritionScore(productId).catch(() => null)
       ]);
 
-      if (!nutritionResponse.ok) throw new Error('Failed to fetch nutrition data');
-      
-      const nutrition = await nutritionResponse.json();
-      setNutritionData(nutrition);
+      setNutritionData(nutritionResponse.data);
 
-      if (scoreResponse.ok) {
-        const score = await scoreResponse.json();
-        setScoreData(score);
+      if (scoreResponse) {
+        setScoreData(scoreResponse.data);
       }
     } catch (err) {
       setError(err.message);

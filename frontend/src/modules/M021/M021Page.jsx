@@ -1,14 +1,20 @@
-﻿import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import './styles.css';
 
-export default function M021Page(){
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  useEffect(()=>{ setLoading(true); fetch(/api/v1/).then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
-  return (<div className='module-M021 p-4'>
-    <h1>M021 Module</h1>
-    {loading? <div>Loading…</div> : (
-      <ul>{items.map(it => <li key={it.id}>{JSON.stringify(it.data)}</li>)}</ul>
-    )}
-  </div>);
+// Real implementation lives in the farmer portal pages, not here.
+export default function M021Page() {
+  return (
+    <div className='module-M021 p-4'>
+      <h1>Farmer Registry (M021)</h1>
+      <p>Domain: Farmer — Status: HIDDEN</p>
+      <p className="text-sm text-gray-600 mt-2">
+        This capability is implemented at <code>pages/FarmerPortalPage.jsx</code>
+        {' '}and <code>pages/FarmerHomePage.jsx</code>, not here.
+      </p>
+      <Link to="/farmer-portal" className="text-blue-600 underline">
+        Go to the Farmer Portal →
+      </Link>
+    </div>
+  );
 }

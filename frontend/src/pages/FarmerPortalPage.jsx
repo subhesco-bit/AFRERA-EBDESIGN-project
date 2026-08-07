@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { farmersAPI, financialAPI } from '../services/api'
-import { Leaf, Award, TrendingUp, DollarSign, Package } from 'lucide-react'
+import { Leaf, Award, TrendingUp, DollarSign, Package, MapPin } from 'lucide-react'
+import LandRecords from '../components/FarmerPortal/LandRecords'
 
 function FarmerPortalPage() {
   const { data: farmerData } = useQuery('farmer-profile', () =>
@@ -91,6 +92,15 @@ function FarmerPortalPage() {
           <h3 className="font-semibold text-gray-800 mb-1">Certifications</h3>
           <p className="text-sm text-gray-600">View and add certifications</p>
         </div>
+      </div>
+
+      {/* Land Records */}
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+          <MapPin className="w-5 h-5 mr-2 text-green-600" />
+          Land Records
+        </h2>
+        <LandRecords farmerId="current-farmer-id" />
       </div>
 
       {/* Recent Activity */}

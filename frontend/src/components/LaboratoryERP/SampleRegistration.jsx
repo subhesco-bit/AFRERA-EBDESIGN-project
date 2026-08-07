@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { laboratoryERPAPI } from '../../services/api';
 
 /**
  * Sample Registration Component
  * Allows users to register samples for laboratory testing
+ *
+ * FE-02 note: not resolved here. Laboratory/category/method lists are
+ * reference data for a form, and the submit is a user-triggered POST — there
+ * is no current parent page (unmounted as of 2026-08-07) to lift these into.
+ * FE-01 (routing through api.js) is fixed below.
  */
 const SampleRegistration = ({ onSuccess }) => {
   const [laboratories, setLaboratories] = useState([]);
@@ -32,9 +38,8 @@ const SampleRegistration = ({ onSuccess }) => {
 
   const fetchLaboratories = async () => {
     try {
-      const response = await fetch('/api/v1/laboratory-erp/laboratories');
-      const data = await response.json();
-      setLaboratories(data);
+      const response = await laboratoryERPAPI.getLaboratories();
+      setLaboratories(response.data);
     } catch (err) {
       console.error('Failed to fetch laboratories:', err);
     }
@@ -42,9 +47,8 @@ const SampleRegistration = ({ onSuccess }) => {
 
   const fetchTestCategories = async () => {
     try {
-      const response = await fetch('/api/v1/laboratory-erp/test-categories');
-      const data = await response.json();
-      setTestCategories(data);
+      const response = await laboratoryERPAPI.getTestCategories();
+      setTestCategories(response.data);
     } catch (err) {
       console.error('Failed to fetch test categories:', err);
     }
@@ -52,9 +56,8 @@ const SampleRegistration = ({ onSuccess }) => {
 
   const fetchTestMethods = async (categoryId) => {
     try {
-      const response = await fetch(`/api/v1/laboratory-erp/test-methods?category_id=${categoryId}`);
-      const data = await response.json();
-      setTestMethods(data);
+      const response = await laboratoryERPAPI.getTestMethods(categoryId);
+      setTestMethods(response.data);
     } catch (err) {
       console.error('Failed to fetch test methods:', err);
     }
@@ -89,23 +92,13 @@ const SampleRegistration = ({ onSuccess }) => {
     setError(null);
 
     try {
-      const response = await fetch('/api/v1/laboratory-erp/samples', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          ...formData,
-          quantity_g: parseFloat(formData.quantity_g),
-          requested_tests: selectedTests
-        })
+      const response = await laboratoryERPAPI.registerSample({
+        ...formData,
+        quantity_g: parseFloat(formData.quantity_g),
+        requested_tests: selectedTests
       });
 
-      if (!response.ok) throw new Error('Sample registration failed');
-
-      const result = await response.json();
-      onSuccess?.(result);
+      onSuccess?.(response.data);
       
       // Reset form
       setFormData({

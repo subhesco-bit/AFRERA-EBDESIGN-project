@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
+import { giIntelligenceAPI } from '../../services/api';
 
 /**
  * GI Product Card Component
  * Displays Geographical Indication product information with premium pricing
+ *
+ * FE-02 note: the display data already arrives via the `giProduct` prop, so
+ * this component satisfies FE-02 for its primary content. Only the
+ * authenticity-verify action still fetches, and that's inherent to the
+ * feature — it looks up whatever code the user types at the moment they type
+ * it, which isn't something a parent page could pre-fetch as props.
  */
 const GIProductCard = ({ giProduct, onVerify }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -15,15 +22,10 @@ const GIProductCard = ({ giProduct, onVerify }) => {
 
     setVerifying(true);
     try {
-      const response = await fetch(`/api/v1/gi-intelligence/gi-authentication/verify/${authCode}`);
-      if (response.ok) {
-        const data = await response.json();
-        setVerificationResult(data);
-      } else {
-        setVerificationResult({ error: 'Invalid authentication code' });
-      }
+      const response = await giIntelligenceAPI.verifyAuthentication(authCode);
+      setVerificationResult(response.data);
     } catch (err) {
-      setVerificationResult({ error: 'Verification failed' });
+      setVerificationResult({ error: err.response?.status === 404 ? 'Invalid authentication code' : 'Verification failed' });
     } finally {
       setVerifying(false);
     }

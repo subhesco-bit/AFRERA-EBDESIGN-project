@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMultilingual } from './MultilingualProvider';
+import { multilingualAPI } from '../../services/api';
 
 /**
  * Language Selector Component
@@ -14,25 +15,38 @@ import { useMultilingual } from './MultilingualProvider';
  *  - currentLanguage/onLanguageChange were required props with no defaults, so
  *    rendering <LanguageSelector /> standalone (e.g. in the header) threw on
  *    selection. They now fall back to the MultilingualProvider context.
+ *
+ * FE-01/FE-02 fix (2026-08-07): this component fetched its own copy of the
+ * language list with a raw fetch() (no auth header, and a duplicate of the
+ * list MultilingualProvider already loads). It now reads `languages` from the
+ * MultilingualProvider context first — the actual FE-02 fix, since the data
+ * this component needs is already sitting one level up — and only falls back
+ * to fetching for itself (via multilingualAPI, so auth is attached) when
+ * rendered outside a MultilingualProvider.
  */
 const LanguageSelector = ({ currentLanguage, onLanguageChange, showFlags = true }) => {
   const ctx = useMultilingual();
   const activeLanguage = currentLanguage ?? ctx?.currentLanguage ?? 'en';
   const changeLanguage = onLanguageChange ?? ctx?.changeLanguage ?? (() => {});
+  const contextLanguages = ctx?.languages
 
-  const [languages, setLanguages] = useState([]);
+  const [languages, setLanguages] = useState(contextLanguages || []);
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!contextLanguages || contextLanguages.length === 0);
 
   useEffect(() => {
+    if (contextLanguages && contextLanguages.length > 0) {
+      setLanguages(contextLanguages);
+      setLoading(false);
+      return;
+    }
     fetchLanguages();
-  }, []);
+  }, [contextLanguages]);
 
   const fetchLanguages = async () => {
     try {
-      const response = await fetch('/api/v1/multilingual/languages');
-      const data = await response.json();
-      setLanguages(data);
+      const response = await multilingualAPI.getLanguages();
+      setLanguages(response.data);
     } catch (error) {
       console.error('Failed to fetch languages:', error);
     } finally {

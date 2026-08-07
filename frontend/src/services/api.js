@@ -131,6 +131,9 @@ export const logisticsAPI = {
   registerDriver: (data) => api.post('/logistics/drivers', data),
   getDrivers: (filters) => api.get('/logistics/drivers', { params: filters }),
   getShipmentModes: () => api.get('/logistics/modes'),
+  getLiveTracking: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/live-tracking`),
+  getTemperatureData: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature`),
+  getTemperatureAlerts: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature-alerts`),
 }
 
 // Insurance API
@@ -146,6 +149,8 @@ export const insuranceAPI = {
   getMasterPolicies: (filters) => api.get('/insurance/master-policies', { params: filters }),
   getInsuranceProducts: (filters) => api.get('/insurance/products', { params: filters }),
   calculatePremium: (data) => api.post('/insurance/calculate-premium', data),
+  calculatePremiumByType: (type, data) => api.post(`/insurance/calculate/${type}`, data),
+  generateQuote: (data) => api.post('/insurance/quotes', data),
 }
 
 // AI API
@@ -406,6 +411,304 @@ export const researchAPI = {
 export const subsidyAPI = {
   getStats: () => api.get('/subsidy/stats'),
   getPending: () => api.get('/subsidy/pending'),
+}
+
+// ---------------------------------------------------------------------------
+// Component callers recovered 2026-08-07 (FE-01 fix, docs/registry/20_FRONTEND_BOUNDARIES.md).
+// Same rationale as the dashboard section above: these callers bypassed
+// services/api.js with raw fetch() and never attached the Authorization
+// header. Paths are unchanged from the original fetch() calls.
+// ---------------------------------------------------------------------------
+
+/** AR/VR experience viewer (components/ArVr/ExperienceViewer.jsx). */
+export const arVrAPI = {
+  getExperiences: (targetEntityId, targetEntityType = 'product') =>
+    api.get('/ar-vr/experiences', { params: { target_entity_id: targetEntityId, target_entity_type: targetEntityType } }),
+  getInteractionPoints: (experienceId) => api.get(`/ar-vr/experiences/${experienceId}/interaction-points`),
+}
+
+/** Blockchain traceability viewer (components/BlockchainTraceability/TraceabilityViewer.jsx). */
+export const blockchainTraceabilityAPI = {
+  getTraceabilityEvents: (productId, batchNumber) =>
+    api.get(`/blockchain-traceability/traceability-events/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : {} }),
+  verifyChainOfCustody: (productId, batchNumber) =>
+    api.get(`/blockchain-traceability/chain-of-custody/verify/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : {} }),
+}
+
+/** Consumer health dashboard (components/ConsumerHealth/HealthDashboard.jsx). */
+export const consumerHealthAPI = {
+  getHealthProfiles: () => api.get('/consumer-health/health-profiles'),
+  getHealthMetrics: () => api.get('/consumer-health/health-metrics'),
+  getHealthGoals: () => api.get('/consumer-health/health-goals'),
+  getDietaryRecommendations: () => api.get('/consumer-health/dietary-recommendations'),
+  getBMI: () => api.get('/consumer-health/bmi'),
+}
+
+/** Conversational AI chat (components/ConversationalAI/ChatInterface.jsx). */
+export const conversationalAIAPI = {
+  getDomains: () => api.get('/conversational-ai/domains'),
+  createSession: (body) => api.post('/conversational-ai/sessions', body),
+  respond: (sessionId, message) => api.post(`/conversational-ai/sessions/${sessionId}/respond`, { message }),
+  endSession: (sessionId, body) => api.post(`/conversational-ai/sessions/${sessionId}/end`, body),
+}
+
+/** Farmer portal land records (components/FarmerPortal/LandRecords.jsx). */
+export const farmerPortalAPI = {
+  getLandRecords: () => api.get('/farmer-portal/land-records'),
+  addLandRecord: (data) => api.post('/farmer-portal/land-records', data),
+  syncGovernmentLandRecords: () => api.post('/farmer-portal/land-records/sync-government'),
+}
+
+/** Food intelligence recalls (components/FoodIntelligence/FoodSafetyDashboard.jsx). */
+export const foodIntelligenceAPI = {
+  getActiveRecalls: () => api.get('/food-intelligence/food-recalls/active'),
+}
+
+/** GI (Geographical Indication) authenticity verification (components/GIIntelligence/GIProductCard.jsx). */
+export const giIntelligenceAPI = {
+  verifyAuthentication: (authCode) => api.get(`/gi-intelligence/gi-authentication/verify/${authCode}`),
+}
+
+/** IoT device monitoring (components/IoTIntegration/DeviceMonitor.jsx). */
+export const iotAPI = {
+  getDevices: () => api.get('/iot-integration/iot-devices'),
+  getUnacknowledgedAlerts: () => api.get('/iot-integration/device-alerts/unacknowledged'),
+  getSensorData: (deviceId) => api.get(`/iot-integration/sensor-data/${deviceId}`),
+}
+
+/** Knowledge graph explorer (components/KnowledgeGraph/KnowledgeExplorer.jsx). */
+export const knowledgeGraphAPI = {
+  getRelatedNodes: (nodeId) => api.get(`/knowledge-graph/knowledge-nodes/${nodeId}/related`),
+  searchNodes: (query) => api.get('/knowledge-graph/knowledge-nodes/search', { params: { q: query } }),
+}
+
+/** Laboratory ERP sample intake (components/LaboratoryERP/SampleRegistration.jsx). */
+export const laboratoryERPAPI = {
+  getLaboratories: () => api.get('/laboratory-erp/laboratories'),
+  getTestCategories: () => api.get('/laboratory-erp/test-categories'),
+  getTestMethods: (categoryId) => api.get('/laboratory-erp/test-methods', { params: { category_id: categoryId } }),
+  registerSample: (data) => api.post('/laboratory-erp/samples', data),
+}
+
+/** GST + review sub-resources served under /marketplace (distinct from productsAPI/ordersAPI). */
+export const marketplaceAPI = {
+  calculateProductGST: (product) => api.post('/marketplace/gst/calculate/product', product),
+  calculateOrderGST: (orderId) => api.post(`/marketplace/gst/calculate/order/${orderId}`),
+  generateGstInvoice: (orderId) => api.post(`/marketplace/gst/invoice/${orderId}`),
+  getProductReviews: (productId) => api.get(`/marketplace/reviews/product/${productId}`),
+  getProductReviewStats: (productId) => api.get(`/marketplace/reviews/product/${productId}/stats`),
+  getUserReviews: () => api.get('/marketplace/reviews/user'),
+  submitReview: (data) => api.post('/marketplace/reviews', data),
+  markReviewHelpful: (reviewId) => api.post(`/marketplace/reviews/${reviewId}/helpful`),
+}
+
+/** Multilingual content, translation and language preferences. */
+export const multilingualAPI = {
+  getLanguages: () => api.get('/multilingual/languages'),
+  getPreferences: () => api.get('/multilingual/preferences'),
+  updatePreferences: (body) => api.put('/multilingual/preferences', body),
+  getContent: (language) => api.get('/multilingual/content', { params: { language } }),
+  detect: (text) => api.post('/multilingual/detect', { text }),
+  translate: (body) => api.post('/multilingual/translate', body),
+}
+
+/** Nutrition intelligence (components/NutritionIntelligence/NutritionLabel.jsx). */
+export const nutritionAPI = {
+  getProductNutrition: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}`),
+  getNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
+}
+
+/** Organic traceability — farm registration, standards, consumer QR lookup. */
+export const organicTraceabilityAPI = {
+  getStandards: () => api.get('/organic-traceability/standards'),
+  registerFarm: (data) => api.post('/organic-traceability/farms', data),
+  getConsumerTransparency: (qrCode) => api.get(`/organic-traceability/consumer-transparency/qr/${qrCode}`),
+}
+
+/** Predictive analytics — demand forecasts and alerts. */
+export const predictiveAnalyticsAPI = {
+  getForecasts: (params) => api.get('/predictive-analytics/forecasts', { params }),
+  getPredictions: (entityId, entityType) => api.get(`/predictive-analytics/predictions/${entityId}/${entityType}`),
+  getUnacknowledgedAlerts: () => api.get('/predictive-analytics/prediction-alerts/unacknowledged'),
+}
+
+/** Voice AI assistant sessions and commands. */
+export const voiceAIAPI = {
+  createSession: (language) => api.post('/voice-ai/voice-sessions', { language }),
+  getPreferences: () => api.get('/voice-ai/voice-preferences'),
+  sendCommand: (body) => api.post('/voice-ai/voice-commands', body),
+  endSession: (sessionId) => api.post(`/voice-ai/voice-sessions/${sessionId}/end`),
+}
+
+// ---------------------------------------------------------------------------
+// Modules built 2026-08-07 for 15 confirmed STUB-ONLY frontends (M067, M031,
+// M093, M075, M121, M112, M041, M024, M141, M098, M132, M101, M013, M083,
+// M046). None of these had a dedicated backend route as of this change — the
+// shapes below follow the same REST convention as every namespace above
+// (/api/v1/<resource>) so a backend counterpart can be dropped in without a
+// frontend rewrite. See each module's README.md for the specific gap.
+// ---------------------------------------------------------------------------
+
+/** M067 — Sowing Management (Crop domain). No backend route found for sowing records. */
+export const sowingAPI = {
+  getRecords: (params) => api.get('/sowing/records', { params }),
+  getRecord: (id) => api.get(`/sowing/records/${id}`),
+  createRecord: (data) => api.post('/sowing/records', data),
+  updateRecord: (id, data) => api.put(`/sowing/records/${id}`, data),
+  deleteRecord: (id) => api.delete(`/sowing/records/${id}`),
+}
+
+/** M031 — Land Registry (Land domain). A `farm_plots` table exists (migration
+ *  056_named_missing_modules.sql) but no route reads or writes it. */
+export const landAPI = {
+  getParcels: (params) => api.get('/land/parcels', { params }),
+  getParcel: (id) => api.get(`/land/parcels/${id}`),
+  createParcel: (data) => api.post('/land/parcels', data),
+  updateParcel: (id, data) => api.put(`/land/parcels/${id}`, data),
+  deleteParcel: (id) => api.delete(`/land/parcels/${id}`),
+}
+
+/** M093 — Labour Management (Operations domain). No backend route found. */
+export const labourAPI = {
+  getWorkers: (params) => api.get('/labour/workers', { params }),
+  createWorker: (data) => api.post('/labour/workers', data),
+  updateWorker: (id, data) => api.put(`/labour/workers/${id}`, data),
+  getAttendance: (params) => api.get('/labour/attendance', { params }),
+  recordAttendance: (data) => api.post('/labour/attendance', data),
+  getPayments: (params) => api.get('/labour/payments', { params }),
+  recordPayment: (data) => api.post('/labour/payments', data),
+}
+
+/** M075 — Irrigation Management (Water domain). No backend route found. */
+export const irrigationAPI = {
+  getSchedules: (params) => api.get('/irrigation/schedules', { params }),
+  createSchedule: (data) => api.post('/irrigation/schedules', data),
+  updateSchedule: (id, data) => api.put(`/irrigation/schedules/${id}`, data),
+  deleteSchedule: (id) => api.delete(`/irrigation/schedules/${id}`),
+  getWaterSources: (params) => api.get('/irrigation/water-sources', { params }),
+  createWaterSource: (data) => api.post('/irrigation/water-sources', data),
+  getLogs: (params) => api.get('/irrigation/logs', { params }),
+  recordLog: (data) => api.post('/irrigation/logs', data),
+}
+
+/** M121 — Dairy Management (Livestock domain). No backend route found. */
+export const dairyAPI = {
+  getAnimals: (params) => api.get('/dairy/animals', { params }),
+  createAnimal: (data) => api.post('/dairy/animals', data),
+  updateAnimal: (id, data) => api.put(`/dairy/animals/${id}`, data),
+  deleteAnimal: (id) => api.delete(`/dairy/animals/${id}`),
+  getMilkRecords: (params) => api.get('/dairy/milk-records', { params }),
+  recordMilk: (data) => api.post('/dairy/milk-records', data),
+}
+
+/** M112 — Fertilizer Inventory (Input Supply domain). An `agri_input_issues`
+ *  table exists (migration 056) but no route reads or writes it. */
+export const fertilizerAPI = {
+  getInventory: (params) => api.get('/fertilizer/inventory', { params }),
+  createInventoryItem: (data) => api.post('/fertilizer/inventory', data),
+  updateInventoryItem: (id, data) => api.put(`/fertilizer/inventory/${id}`, data),
+  deleteInventoryItem: (id) => api.delete(`/fertilizer/inventory/${id}`),
+  getIssues: (params) => api.get('/fertilizer/issues', { params }),
+  issueStock: (id, data) => api.post(`/fertilizer/inventory/${id}/issue`, data),
+}
+
+/** M041 — Village Registry (Community domain). No backend route found. */
+export const villageAPI = {
+  getVillages: (params) => api.get('/villages', { params }),
+  getVillage: (id) => api.get(`/villages/${id}`),
+  createVillage: (data) => api.post('/villages', data),
+  updateVillage: (id, data) => api.put(`/villages/${id}`, data),
+  deleteVillage: (id) => api.delete(`/villages/${id}`),
+}
+
+/** M024 — Farmer KYC (Farmer domain). farmersAPI covers profile/FDI/certs but
+ *  no route handles a KYC verification workflow. */
+export const kycAPI = {
+  getApplications: (params) => api.get('/farmer-kyc/applications', { params }),
+  getApplication: (id) => api.get(`/farmer-kyc/applications/${id}`),
+  submitApplication: (data) => api.post('/farmer-kyc/applications', data),
+  verifyApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/verify`, data),
+  rejectApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/reject`, data),
+}
+
+/** M141 — Orchard Management (Horticulture domain). No backend route found. */
+export const orchardAPI = {
+  getOrchards: (params) => api.get('/orchards', { params }),
+  createOrchard: (data) => api.post('/orchards', data),
+  updateOrchard: (id, data) => api.put(`/orchards/${id}`, data),
+  deleteOrchard: (id) => api.delete(`/orchards/${id}`),
+  getHarvestLog: (orchardId) => api.get(`/orchards/${orchardId}/harvest-log`),
+  recordHarvest: (orchardId, data) => api.post(`/orchards/${orchardId}/harvest-log`, data),
+}
+
+/** M098 — Farm Costing (Operations domain). economicAPI.costBreakup covers
+ *  corridor-level cost models; no route handles per-farm cost records. */
+export const farmCostingAPI = {
+  getRecords: (params) => api.get('/farm-costing/records', { params }),
+  createRecord: (data) => api.post('/farm-costing/records', data),
+  updateRecord: (id, data) => api.put(`/farm-costing/records/${id}`, data),
+  deleteRecord: (id) => api.delete(`/farm-costing/records/${id}`),
+  getSummary: (params) => api.get('/farm-costing/summary', { params }),
+}
+
+/** M132 — Pond Management (Fisheries domain). No backend route found. */
+export const pondAPI = {
+  getPonds: (params) => api.get('/ponds', { params }),
+  createPond: (data) => api.post('/ponds', data),
+  updatePond: (id, data) => api.put(`/ponds/${id}`, data),
+  deletePond: (id) => api.delete(`/ponds/${id}`),
+  getWaterQualityLogs: (pondId) => api.get(`/ponds/${pondId}/water-quality-logs`),
+  recordWaterQuality: (pondId, data) => api.post(`/ponds/${pondId}/water-quality-logs`, data),
+  getHarvestLog: (pondId) => api.get(`/ponds/${pondId}/harvest-log`),
+  recordHarvest: (pondId, data) => api.post(`/ponds/${pondId}/harvest-log`, data),
+}
+
+/** M101 — Tractor Management (Machinery domain). A `machinery_access` table
+ *  exists (migration 041_rural_life_os_schema.sql) but no route reads or
+ *  writes it. */
+export const machineryAPI = {
+  getTractors: (params) => api.get('/machinery/tractors', { params }),
+  createTractor: (data) => api.post('/machinery/tractors', data),
+  updateTractor: (id, data) => api.put(`/machinery/tractors/${id}`, data),
+  deleteTractor: (id) => api.delete(`/machinery/tractors/${id}`),
+  getBookings: (params) => api.get('/machinery/bookings', { params }),
+  createBooking: (data) => api.post('/machinery/bookings', data),
+  updateBooking: (id, data) => api.put(`/machinery/bookings/${id}`, data),
+}
+
+/** M013 — Authorization (Identity domain). authService.getUserPermissions()
+ *  hardcodes a role→permission map server-side with no route to read, edit,
+ *  or audit it, and no route to change a user's role after signup. */
+export const authorizationAPI = {
+  getRoles: () => api.get('/authorization/roles'),
+  getRolePermissions: (role) => api.get(`/authorization/roles/${role}/permissions`),
+  updateRolePermissions: (role, data) => api.put(`/authorization/roles/${role}/permissions`, data),
+  getUsers: (params) => api.get('/authorization/users', { params }),
+  updateUserRole: (userId, data) => api.put(`/authorization/users/${userId}/role`, data),
+  getAuditLog: (params) => api.get('/authorization/audit-log', { params }),
+}
+
+/** M083 — Climate Advisory (Climate domain). weatherAPI already exposes
+ *  alerts/pest-forecast (migration 057); the `agromet_advisories` table from
+ *  the same migration has no route, so farmer-facing advisories have no CRUD. */
+export const climateAdvisoryAPI = {
+  getAdvisories: (params) => api.get('/climate-advisory/advisories', { params }),
+  getAdvisory: (id) => api.get(`/climate-advisory/advisories/${id}`),
+  createAdvisory: (data) => api.post('/climate-advisory/advisories', data),
+  updateAdvisory: (id, data) => api.put(`/climate-advisory/advisories/${id}`, data),
+}
+
+/** M046 — SHG Management (Community domain, self-help groups). No backend
+ *  route found. */
+export const shgAPI = {
+  getGroups: (params) => api.get('/shg/groups', { params }),
+  getGroup: (id) => api.get(`/shg/groups/${id}`),
+  createGroup: (data) => api.post('/shg/groups', data),
+  updateGroup: (id, data) => api.put(`/shg/groups/${id}`, data),
+  getMembers: (groupId) => api.get(`/shg/groups/${groupId}/members`),
+  addMember: (groupId, data) => api.post(`/shg/groups/${groupId}/members`, data),
+  getSavings: (groupId, params) => api.get(`/shg/groups/${groupId}/savings`, { params }),
+  recordSaving: (groupId, data) => api.post(`/shg/groups/${groupId}/savings`, data),
 }
 
 export default api

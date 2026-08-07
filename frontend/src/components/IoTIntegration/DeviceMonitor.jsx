@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react';
+import { iotAPI } from '../../services/api';
 
 /**
  * Device Monitor Component
  * Displays IoT device status, sensor data, and real-time monitoring
+ *
+ * FE-02 note: no current parent page renders this component (unmounted as of
+ * 2026-08-07), and it polls on an interval for live status — a one-time prop
+ * hand-off from a parent wouldn't fit its refresh model. It accepts optional
+ * `devices`/`alerts` props for the initial render; the polling fallback below
+ * still calls api.js so auth is always attached.
  */
-const DeviceMonitor = () => {
-  const [devices, setDevices] = useState([]);
-  const [alerts, setAlerts] = useState([]);
+const DeviceMonitor = ({ devices: devicesProp, alerts: alertsProp }) => {
+  const [devices, setDevices] = useState(devicesProp || []);
+  const [alerts, setAlerts] = useState(alertsProp || []);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [sensorData, setSensorData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!devicesProp);
 
   useEffect(() => {
+    if (devicesProp) {
+      setDevices(devicesProp);
+      setAlerts(alertsProp || []);
+      setLoading(false);
+      return;
+    }
+
     fetchDevices();
     fetchAlerts();
-    
+
     // Simulate real-time updates
     const interval = setInterval(fetchDevices, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [devicesProp, alertsProp]);
 
   const fetchDevices = async () => {
     try {
-      const response = await fetch('/api/v1/iot-integration/iot-devices', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      if (response.ok) setDevices(await response.json());
+      const response = await iotAPI.getDevices();
+      setDevices(response.data);
     } catch (err) {
       console.error('Failed to fetch devices:', err);
     } finally {
@@ -35,10 +47,8 @@ const DeviceMonitor = () => {
 
   const fetchAlerts = async () => {
     try {
-      const response = await fetch('/api/v1/iot-integration/device-alerts/unacknowledged', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      if (response.ok) setAlerts(await response.json());
+      const response = await iotAPI.getUnacknowledgedAlerts();
+      setAlerts(response.data);
     } catch (err) {
       console.error('Failed to fetch alerts:', err);
     }
@@ -46,8 +56,8 @@ const DeviceMonitor = () => {
 
   const fetchSensorData = async (deviceId) => {
     try {
-      const response = await fetch(`/api/v1/iot-integration/sensor-data/${deviceId}`);
-      if (response.ok) setSensorData(await response.json());
+      const response = await iotAPI.getSensorData(deviceId);
+      setSensorData(response.data);
     } catch (err) {
       console.error('Failed to fetch sensor data:', err);
     }

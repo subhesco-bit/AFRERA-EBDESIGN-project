@@ -1,28 +1,40 @@
 import React, { useState, useEffect } from 'react';
+import { blockchainTraceabilityAPI } from '../../services/api';
 
 /**
  * Traceability Viewer Component
  * Displays blockchain-based product traceability information
+ *
+ * FE-02 note: no current parent page renders this component (unmounted as of
+ * 2026-08-07). It accepts optional `traceabilityEvents`/`chainOfCustody` props
+ * so a future parent page can supply data directly; falls back to fetching by
+ * productId/batchNumber when they are omitted.
  */
-const TraceabilityViewer = ({ productId, batchNumber }) => {
-  const [traceabilityEvents, setTraceabilityEvents] = useState([]);
-  const [chainOfCustody, setChainOfCustody] = useState(null);
-  const [loading, setLoading] = useState(true);
+const TraceabilityViewer = ({ productId, batchNumber, traceabilityEvents: eventsProp, chainOfCustody: custodyProp }) => {
+  const [traceabilityEvents, setTraceabilityEvents] = useState(eventsProp || []);
+  const [chainOfCustody, setChainOfCustody] = useState(custodyProp || null);
+  const [loading, setLoading] = useState(!eventsProp);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (eventsProp) {
+      setTraceabilityEvents(eventsProp);
+      setChainOfCustody(custodyProp || null);
+      setLoading(false);
+      return;
+    }
     fetchTraceabilityData();
-  }, [productId, batchNumber]);
+  }, [productId, batchNumber, eventsProp, custodyProp]);
 
   const fetchTraceabilityData = async () => {
     try {
       const [eventsRes, custodyRes] = await Promise.all([
-        fetch(`/api/v1/blockchain-traceability/traceability-events/${productId}${batchNumber ? `?batch_number=${batchNumber}` : ''}`),
-        fetch(`/api/v1/blockchain-traceability/chain-of-custody/verify/${productId}${batchNumber ? `?batch_number=${batchNumber}` : ''}`)
+        blockchainTraceabilityAPI.getTraceabilityEvents(productId, batchNumber),
+        blockchainTraceabilityAPI.verifyChainOfCustody(productId, batchNumber)
       ]);
 
-      if (eventsRes.ok) setTraceabilityEvents(await eventsRes.json());
-      if (custodyRes.ok) setChainOfCustody(await custodyRes.json());
+      setTraceabilityEvents(eventsRes.data);
+      setChainOfCustody(custodyRes.data);
     } catch (err) {
       setError('Failed to load traceability data');
     } finally {

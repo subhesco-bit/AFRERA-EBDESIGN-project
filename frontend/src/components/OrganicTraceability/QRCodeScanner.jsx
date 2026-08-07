@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
+import { organicTraceabilityAPI } from '../../services/api';
 
 /**
  * QR Code Scanner Component
  * Allows consumers to scan QR codes and view organic traceability information
+ *
+ * FE-02 note: not resolved here. The lookup is driven by whatever QR code the
+ * user just typed/scanned — there's no fixed dataset a parent page could
+ * pre-fetch. FE-01 (routing through api.js) is fixed below.
  */
 const QRCodeScanner = () => {
   const [qrCode, setQrCode] = useState('');
@@ -19,19 +24,14 @@ const QRCodeScanner = () => {
     setTraceabilityData(null);
 
     try {
-      const response = await fetch(`/api/v1/organic-traceability/consumer-transparency/qr/${qrCode}`);
-      
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('QR code not found. Please verify the code and try again.');
-        }
-        throw new Error('Failed to fetch traceability data');
-      }
-
-      const data = await response.json();
-      setTraceabilityData(data);
+      const response = await organicTraceabilityAPI.getConsumerTransparency(qrCode);
+      setTraceabilityData(response.data);
     } catch (err) {
-      setError(err.message);
+      if (err.response?.status === 404) {
+        setError('QR code not found. Please verify the code and try again.');
+      } else {
+        setError('Failed to fetch traceability data');
+      }
     } finally {
       setLoading(false);
     }

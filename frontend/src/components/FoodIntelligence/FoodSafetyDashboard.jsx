@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from 'react';
+import { foodIntelligenceAPI } from '../../services/api';
 
 /**
  * Food Safety Dashboard Component
  * Displays food safety alerts, recalls, and quality metrics
+ *
+ * FE-02 note: no current parent page renders this component (unmounted as of
+ * 2026-08-07). Accepts an optional `activeRecalls` prop so a future parent
+ * page can supply data directly; falls back to self-fetching when omitted.
  */
-const FoodSafetyDashboard = () => {
-  const [activeRecalls, setActiveRecalls] = useState([]);
+const FoodSafetyDashboard = ({ activeRecalls: recallsProp }) => {
+  const [activeRecalls, setActiveRecalls] = useState(recallsProp || []);
   const [qualityMetrics, setQualityMetrics] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!recallsProp);
 
   useEffect(() => {
+    if (recallsProp) {
+      setActiveRecalls(recallsProp);
+      setLoading(false);
+      return;
+    }
     fetchActiveRecalls();
-  }, []);
+  }, [recallsProp]);
 
   const fetchActiveRecalls = async () => {
     try {
-      const response = await fetch('/api/v1/food-intelligence/food-recalls/active');
-      const data = await response.json();
-      setActiveRecalls(data);
+      const response = await foodIntelligenceAPI.getActiveRecalls();
+      setActiveRecalls(response.data);
     } catch (err) {
       console.error('Failed to fetch recalls:', err);
     } finally {

@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { conversationalAIAPI } from '../../services/api';
 
 /**
  * Chat Interface Component
  * AI-powered conversational interface for user assistance
+ *
+ * FE-02 note: not resolved here. This component's network calls are all
+ * driven by live user interaction (typed messages, session lifecycle), not a
+ * fixed dataset that could be fetched once by a parent page and passed down
+ * as props — and it has no current parent page (unmounted as of 2026-08-07)
+ * to lift the calls into anyway. FE-01 (routing through api.js for auth) is
+ * fixed below.
  */
 const ChatInterface = ({ domain = 'General', language = 'en' }) => {
   const [sessionId, setSessionId] = useState(null);
@@ -22,33 +30,24 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
 
   const initializeSession = async () => {
     try {
-      const response = await fetch('/api/v1/conversational-ai/domains');
-      const domains = await response.json();
+      const domainsResponse = await conversationalAIAPI.getDomains();
+      const domains = domainsResponse.data;
       const selectedDomain = domains.find(d => d.name === domain) || domains[0];
 
-      const sessionResponse = await fetch('/api/v1/conversational-ai/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          domain_id: selectedDomain?.id,
-          language
-        })
+      const sessionResponse = await conversationalAIAPI.createSession({
+        domain_id: selectedDomain?.id,
+        language
       });
 
-      if (sessionResponse.ok) {
-        const sessionData = await sessionResponse.json();
-        setSessionId(sessionData.id);
-        
-        // Add welcome message
-        setMessages([{
-          role: 'assistant',
-          content: `Hello! I'm your ${domain} assistant. How can I help you today?`,
-          timestamp: new Date()
-        }]);
-      }
+      const sessionData = sessionResponse.data;
+      setSessionId(sessionData.id);
+
+      // Add welcome message
+      setMessages([{
+        role: 'assistant',
+        content: `Hello! I'm your ${domain} assistant. How can I help you today?`,
+        timestamp: new Date()
+      }]);
     } catch (error) {
       console.error('Failed to initialize session:', error);
     }
@@ -76,30 +75,18 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
     try {
       setIsTyping(true);
 
-      const response = await fetch(`/api/v1/conversational-ai/sessions/${sessionId}/respond`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          message: userMessage
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessages([
-          ...newMessages,
-          {
-            role: 'assistant',
-            content: data.content,
-            timestamp: new Date(),
-            intent: data.intent,
-            confidence: data.confidence
-          }
-        ]);
-      }
+      const response = await conversationalAIAPI.respond(sessionId, userMessage);
+      const data = response.data;
+      setMessages([
+        ...newMessages,
+        {
+          role: 'assistant',
+          content: data.content,
+          timestamp: new Date(),
+          intent: data.intent,
+          confidence: data.confidence
+        }
+      ]);
     } catch (error) {
       console.error('Failed to send message:', error);
       setMessages([
@@ -127,16 +114,7 @@ const ChatInterface = ({ domain = 'General', language = 'en' }) => {
     if (!sessionId) return;
 
     try {
-      await fetch(`/api/v1/conversational-ai/sessions/${sessionId}/end`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          resolution_status: 'resolved'
-        })
-      });
+      await conversationalAIAPI.endSession(sessionId, { resolution_status: 'resolved' });
       setSessionId(null);
       setMessages([]);
     } catch (error) {

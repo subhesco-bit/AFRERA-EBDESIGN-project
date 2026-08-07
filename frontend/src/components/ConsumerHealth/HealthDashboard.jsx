@@ -1,46 +1,51 @@
 import React, { useState, useEffect } from 'react';
+import { consumerHealthAPI } from '../../services/api';
 
 /**
  * Health Dashboard Component
  * Displays consumer health metrics, goals, and recommendations
+ *
+ * FE-02 note: no current parent page renders this component (unmounted as of
+ * 2026-08-07). It accepts an optional `initialData` prop
+ * ({ profile, metrics, goals, recommendations, bmi }) so a future parent page
+ * can supply data directly; falls back to self-fetching when omitted.
  */
-const HealthDashboard = () => {
-  const [healthProfile, setHealthProfile] = useState(null);
-  const [healthMetrics, setHealthMetrics] = useState([]);
-  const [healthGoals, setHealthGoals] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
-  const [bmi, setBMI] = useState(null);
-  const [loading, setLoading] = useState(true);
+const HealthDashboard = ({ initialData }) => {
+  const [healthProfile, setHealthProfile] = useState(initialData?.profile || null);
+  const [healthMetrics, setHealthMetrics] = useState(initialData?.metrics || []);
+  const [healthGoals, setHealthGoals] = useState(initialData?.goals || []);
+  const [recommendations, setRecommendations] = useState(initialData?.recommendations || []);
+  const [bmi, setBMI] = useState(initialData?.bmi || null);
+  const [loading, setLoading] = useState(!initialData);
 
   useEffect(() => {
+    if (initialData) {
+      setHealthProfile(initialData.profile || null);
+      setHealthMetrics(initialData.metrics || []);
+      setHealthGoals(initialData.goals || []);
+      setRecommendations(initialData.recommendations || []);
+      setBMI(initialData.bmi || null);
+      setLoading(false);
+      return;
+    }
     fetchHealthData();
-  }, []);
+  }, [initialData]);
 
   const fetchHealthData = async () => {
     try {
       const [profileRes, metricsRes, goalsRes, recsRes, bmiRes] = await Promise.all([
-        fetch('/api/v1/consumer-health/health-profiles', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        }),
-        fetch('/api/v1/consumer-health/health-metrics', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        }),
-        fetch('/api/v1/consumer-health/health-goals', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        }),
-        fetch('/api/v1/consumer-health/dietary-recommendations', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        }),
-        fetch('/api/v1/consumer-health/bmi', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        })
+        consumerHealthAPI.getHealthProfiles(),
+        consumerHealthAPI.getHealthMetrics(),
+        consumerHealthAPI.getHealthGoals(),
+        consumerHealthAPI.getDietaryRecommendations(),
+        consumerHealthAPI.getBMI()
       ]);
 
-      if (profileRes.ok) setHealthProfile(await profileRes.json());
-      if (metricsRes.ok) setHealthMetrics(await metricsRes.json());
-      if (goalsRes.ok) setHealthGoals(await goalsRes.json());
-      if (recsRes.ok) setRecommendations(await recsRes.json());
-      if (bmiRes.ok) setBMI(await bmiRes.json());
+      setHealthProfile(profileRes.data);
+      setHealthMetrics(metricsRes.data);
+      setHealthGoals(goalsRes.data);
+      setRecommendations(recsRes.data);
+      setBMI(bmiRes.data);
     } catch (err) {
       console.error('Failed to fetch health data:', err);
     } finally {

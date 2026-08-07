@@ -10,10 +10,18 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Star } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { marketplaceAPI } from '../../services/api';
 
-const ProductReview = ({ productId, userId }) => {
-  const [reviews, setReviews] = useState([]);
-  const [stats, setStats] = useState(null);
+// FE-02 note: the read-only reviews/stats fetched on mount now accept
+// optional `initialReviews`/`initialStats` props (fallback self-fetch when
+// omitted — no current parent page renders this component as of 2026-08-07).
+// checkUserReview/submitReview/markHelpful stay as component-owned calls:
+// they depend on the logged-in user and on actions taken inside this
+// component (submitting a review, marking one helpful), not on data a parent
+// page could hand down up front.
+const ProductReview = ({ productId, userId, initialReviews, initialStats }) => {
+  const [reviews, setReviews] = useState(initialReviews || []);
+  const [stats, setStats] = useState(initialStats || null);
   const [loading, setLoading] = useState(false);
   const [userReview, setUserReview] = useState({
     rating: 5,
@@ -23,16 +31,15 @@ const ProductReview = ({ productId, userId }) => {
   const [hasReviewed, setHasReviewed] = useState(false);
 
   useEffect(() => {
-    loadReviews();
-    loadStats();
+    if (!initialReviews) loadReviews();
+    if (!initialStats) loadStats();
     checkUserReview();
-  }, [productId]);
+  }, [productId, initialReviews, initialStats]);
 
   const loadReviews = async () => {
     try {
-      const response = await fetch(`/api/v1/marketplace/reviews/product/${productId}`);
-      const data = await response.json();
-      setReviews(data.data.reviews);
+      const response = await marketplaceAPI.getProductReviews(productId);
+      setReviews(response.data.data.reviews);
     } catch (error) {
       console.error('Error loading reviews:', error);
     }
@@ -40,9 +47,8 @@ const ProductReview = ({ productId, userId }) => {
 
   const loadStats = async () => {
     try {
-      const response = await fetch(`/api/v1/marketplace/reviews/product/${productId}/stats`);
-      const data = await response.json();
-      setStats(data.data);
+      const response = await marketplaceAPI.getProductReviewStats(productId);
+      setStats(response.data.data);
     } catch (error) {
       console.error('Error loading stats:', error);
     }
@@ -50,11 +56,8 @@ const ProductReview = ({ productId, userId }) => {
 
   const checkUserReview = async () => {
     try {
-      const response = await fetch(`/api/v1/marketplace/reviews/user`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      const data = await response.json();
-      const userReviews = data.data.reviews.filter(r => r.product_id === productId);
+      const response = await marketplaceAPI.getUserReviews();
+      const userReviews = response.data.data.reviews.filter(r => r.product_id === productId);
       setHasReviewed(userReviews.length > 0);
     } catch (error) {
       console.error('Error checking user review:', error);
@@ -64,19 +67,11 @@ const ProductReview = ({ productId, userId }) => {
   const submitReview = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/marketplace/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          productId,
-          ...userReview
-        })
+      const response = await marketplaceAPI.submitReview({
+        productId,
+        ...userReview
       });
-      const data = await response.json();
-      if (data.success) {
+      if (response.data.success) {
         setUserReview({ rating: 5, title: '', comment: '' });
         setHasReviewed(true);
         loadReviews();
@@ -91,10 +86,7 @@ const ProductReview = ({ productId, userId }) => {
 
   const markHelpful = async (reviewId) => {
     try {
-      await fetch(`/api/v1/marketplace/reviews/${reviewId}/helpful`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
+      await marketplaceAPI.markReviewHelpful(reviewId);
       loadReviews();
     } catch (error) {
       console.error('Error marking helpful:', error);

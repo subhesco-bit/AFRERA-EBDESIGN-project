@@ -1,32 +1,43 @@
 import React, { useState, useEffect } from 'react';
+import { predictiveAnalyticsAPI } from '../../services/api';
 
 /**
  * Demand Forecast Component
  * Displays predictive demand forecasts and analytics
+ *
+ * FE-02 note: no current parent page renders this component (unmounted as of
+ * 2026-08-07). Accepts optional `forecasts`/`predictions`/`alerts` props so a
+ * future parent page can supply data directly; falls back to self-fetching
+ * by productId when omitted.
  */
-const DemandForecast = ({ productId }) => {
-  const [forecasts, setForecasts] = useState([]);
-  const [predictions, setPredictions] = useState([]);
-  const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
+const DemandForecast = ({ productId, forecasts: forecastsProp, predictions: predictionsProp, alerts: alertsProp }) => {
+  const [forecasts, setForecasts] = useState(forecastsProp || []);
+  const [predictions, setPredictions] = useState(predictionsProp || []);
+  const [alerts, setAlerts] = useState(alertsProp || []);
+  const [loading, setLoading] = useState(!forecastsProp);
 
   useEffect(() => {
+    if (forecastsProp) {
+      setForecasts(forecastsProp);
+      setPredictions(predictionsProp || []);
+      setAlerts(alertsProp || []);
+      setLoading(false);
+      return;
+    }
     fetchForecastData();
-  }, [productId]);
+  }, [productId, forecastsProp, predictionsProp, alertsProp]);
 
   const fetchForecastData = async () => {
     try {
       const [forecastsRes, predictionsRes, alertsRes] = await Promise.all([
-        fetch('/api/v1/predictive-analytics/forecasts?forecast_type=demand'),
-        fetch(`/api/v1/predictive-analytics/predictions/${productId}/product`),
-        fetch('/api/v1/predictive-analytics/prediction-alerts/unacknowledged', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        })
+        predictiveAnalyticsAPI.getForecasts({ forecast_type: 'demand' }).catch(() => null),
+        predictiveAnalyticsAPI.getPredictions(productId, 'product').catch(() => null),
+        predictiveAnalyticsAPI.getUnacknowledgedAlerts().catch(() => null)
       ]);
 
-      if (forecastsRes.ok) setForecasts(await forecastsRes.json());
-      if (predictionsRes.ok) setPredictions(await predictionsRes.json());
-      if (alertsRes.ok) setAlerts(await alertsRes.json());
+      if (forecastsRes) setForecasts(forecastsRes.data);
+      if (predictionsRes) setPredictions(predictionsRes.data);
+      if (alertsRes) setAlerts(alertsRes.data);
     } catch (err) {
       console.error('Failed to fetch forecast data:', err);
     } finally {

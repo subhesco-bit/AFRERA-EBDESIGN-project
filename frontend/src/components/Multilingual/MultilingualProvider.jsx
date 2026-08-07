@@ -1,8 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { multilingualAPI } from '../../services/api';
 
 /**
  * Multilingual Context Provider
  * Manages language state and provides translation functions
+ *
+ * FE-02 note: not resolved here by design. This *is* the data-fetching
+ * boundary for translations in this app — it exists specifically so
+ * descendants (LanguageSelector, AutoTranslate, any future consumer) read
+ * from context/props instead of fetching for themselves. Its own fetches
+ * can't be lifted further up without duplicating this same provider pattern
+ * one level higher. FE-01 (routing through api.js) is fixed below.
  */
 const MultilingualContext = createContext();
 
@@ -28,23 +36,20 @@ export const MultilingualProvider = ({ children }) => {
   const initializeMultilingual = async () => {
     try {
       // Fetch available languages
-      const langResponse = await fetch('/api/v1/multilingual/languages');
-      const langData = await langResponse.json();
-      setLanguages(langData);
+      const langResponse = await multilingualAPI.getLanguages();
+      setLanguages(langResponse.data);
 
       // Fetch user preferences
-      const prefResponse = await fetch('/api/v1/multilingual/preferences', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-      });
-      
-      if (prefResponse.ok) {
-        const prefData = await prefResponse.json();
+      try {
+        const prefResponse = await multilingualAPI.getPreferences();
+        const prefData = prefResponse.data;
         setPreferences(prefData);
         if (prefData.primary_language_code) {
           setCurrentLanguage(prefData.primary_language_code);
         }
+      } catch (prefError) {
+        // Preferences are optional (e.g. anonymous visitor) — fall through to defaults.
+        console.error('Failed to fetch language preferences:', prefError);
       }
 
       // Load translations for current language
@@ -60,9 +65,9 @@ export const MultilingualProvider = ({ children }) => {
     try {
       // In a real implementation, this would fetch all translations for the current language
       // For now, we'll use a basic implementation
-      const response = await fetch(`/api/v1/multilingual/content?language=${languageCode}`);
-      const data = await response.json();
-      
+      const response = await multilingualAPI.getContent(languageCode);
+      const data = response.data;
+
       // Convert array to key-value map
       const translationMap = {};
       if (Array.isArray(data)) {
@@ -78,19 +83,10 @@ export const MultilingualProvider = ({ children }) => {
 
   const changeLanguage = async (language) => {
     setCurrentLanguage(language.iso_code);
-    
+
     // Update user preferences
     try {
-      await fetch('/api/v1/multilingual/preferences', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          primary_language: language.iso_code
-        })
-      });
+      await multilingualAPI.updatePreferences({ primary_language: language.iso_code });
     } catch (error) {
       console.error('Failed to update language preference:', error);
     }
@@ -101,21 +97,13 @@ export const MultilingualProvider = ({ children }) => {
 
   const translate = async (text, targetLanguage = currentLanguage) => {
     try {
-      const response = await fetch('/api/v1/multilingual/translate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          text,
-          source_language: 'en', // Assuming source is English
-          target_language: targetLanguage
-        })
+      const response = await multilingualAPI.translate({
+        text,
+        source_language: 'en', // Assuming source is English
+        target_language: targetLanguage
       });
-      
-      const data = await response.json();
-      return data.translated_text;
+
+      return response.data.translated_text;
     } catch (error) {
       console.error('Translation failed:', error);
       return text; // Return original text on error
@@ -124,17 +112,8 @@ export const MultilingualProvider = ({ children }) => {
 
   const detectLanguage = async (text) => {
     try {
-      const response = await fetch('/api/v1/multilingual/detect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({ text })
-      });
-      
-      const data = await response.json();
-      return data;
+      const response = await multilingualAPI.detect(text);
+      return response.data;
     } catch (error) {
       console.error('Language detection failed:', error);
       return null;

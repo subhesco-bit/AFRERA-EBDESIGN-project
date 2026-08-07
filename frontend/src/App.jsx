@@ -47,6 +47,11 @@ import ModuleHubPage from './pages/ModuleHubPage'
 import CorporateBuyerPage from './pages/CorporateBuyerPage'
 import LogisticsProviderPage from './pages/LogisticsProviderPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+// FPODashboardPage was fully built (Overview/Members/Collective Orders/
+// Inventory/Finance/Profit Distribution tabs) but had no route — the same
+// class of bug as the other "recovered" modules above. Mounting it so the
+// M053/M054/M056/M058/M060 module stubs have a real page to point to.
+import FPODashboardPage from './pages/FPODashboardPage'
 import M011Page from './modules/M011/M011Page'
 import M006Page from './modules/M006/M006Page'
 // Auto-generated module imports
@@ -460,6 +465,14 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <EconomicDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fpo-dashboard"
+          element={
+            <ProtectedRoute requiredRole="fpo">
+              <FPODashboardPage />
             </ProtectedRoute>
           }
         />

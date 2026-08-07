@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { multilingualAPI } from '../../services/api';
 
 /**
  * Auto Translate Component
  * Automatically detects language and translates content
+ *
+ * FE-02 note: not resolved here. Detection/translation run against whatever
+ * `text` prop the parent passes at render time — that's already the "data
+ * via props" input; the network call itself can't be hoisted because it must
+ * re-run per distinct text. FE-01 (routing through api.js) is fixed below.
  */
-const AutoTranslate = ({ 
+const AutoTranslate = ({
   text, 
   targetLanguage, 
   onTranslated, 
@@ -31,15 +37,8 @@ const AutoTranslate = ({
 
     try {
       // First detect language
-      const detectResponse = await fetch('/api/v1/multilingual/detect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-      
-      if (!detectResponse.ok) throw new Error('Language detection failed');
-      
-      const detectData = await detectResponse.json();
+      const detectResponse = await multilingualAPI.detect(text);
+      const detectData = detectResponse.data;
       setDetectedLanguage(detectData);
 
       // If detected language is same as target, no need to translate
@@ -50,19 +49,13 @@ const AutoTranslate = ({
       }
 
       // Translate text
-      const translateResponse = await fetch('/api/v1/multilingual/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          source_language: detectData.iso_code,
-          target_language: targetLanguage
-        })
+      const translateResponse = await multilingualAPI.translate({
+        text,
+        source_language: detectData.iso_code,
+        target_language: targetLanguage
       });
 
-      if (!translateResponse.ok) throw new Error('Translation failed');
-
-      const translateData = await translateResponse.json();
+      const translateData = translateResponse.data;
       setTranslatedText(translateData.translated_text);
       onTranslated?.(translateData.translated_text, targetLanguage);
 

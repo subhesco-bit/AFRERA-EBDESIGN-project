@@ -12,7 +12,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { insuranceAPI } from '../../services/api';
 
+// FE-02 note: not resolved here. Both calls are triggered by explicit user
+// actions (submitting the calculator form, requesting a quote) over
+// form state the user just typed in — there's no fixed dataset a parent page
+// could pre-fetch and hand down as props. FE-01 (routing through api.js) is
+// fixed below.
 const InsurancePremiumCalculator = () => {
   const [loading, setLoading] = useState(false);
   const [insuranceType, setInsuranceType] = useState('crop');
@@ -48,13 +54,8 @@ const InsurancePremiumCalculator = () => {
   const calculatePremium = async (type, data) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/insurance/calculate/${type}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      const result = await response.json();
-      setPremiumResult(result.data);
+      const response = await insuranceAPI.calculatePremiumByType(type, data);
+      setPremiumResult(response.data.data);
     } catch (error) {
       console.error('Error calculating premium:', error);
     } finally {
@@ -68,17 +69,12 @@ const InsurancePremiumCalculator = () => {
       const data = insuranceType === 'crop' ? cropData :
                    insuranceType === 'transit' ? transitData : warehouseData;
 
-      const response = await fetch('/api/v1/insurance/quotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          insuranceType,
-          policyholderId: 1, // Would come from auth
-          ...data
-        })
+      const response = await insuranceAPI.generateQuote({
+        insuranceType,
+        policyholderId: 1, // Would come from auth
+        ...data
       });
-      const result = await response.json();
-      alert(`Quote Generated: ${result.data.quoteId}`);
+      alert(`Quote Generated: ${response.data.data.quoteId}`);
     } catch (error) {
       console.error('Error generating quote:', error);
     } finally {

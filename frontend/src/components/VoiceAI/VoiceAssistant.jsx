@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { voiceAIAPI } from '../../services/api';
 
 /**
  * Voice Assistant Component
  * Voice-activated AI assistant for hands-free interaction
+ *
+ * FE-02 note: not resolved here. Every call is tied to live session/voice
+ * interaction state (starting a session, processing whatever the user just
+ * said), not a fixed dataset a parent page could hand down as props, and
+ * there is no current parent page rendering it (unmounted as of 2026-08-07).
+ * FE-01 (routing through api.js) is fixed below.
  */
 const VoiceAssistant = ({ language = 'en' }) => {
   const [isListening, setIsListening] = useState(false);
@@ -57,18 +64,8 @@ const VoiceAssistant = ({ language = 'en' }) => {
 
   const initializeSession = async () => {
     try {
-      const response = await fetch('/api/v1/voice-ai/voice-sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({ language })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSessionId(data.id);
-      }
+      const response = await voiceAIAPI.createSession(language);
+      setSessionId(response.data.id);
     } catch (err) {
       console.error('Failed to initialize voice session:', err);
     }
@@ -76,12 +73,8 @@ const VoiceAssistant = ({ language = 'en' }) => {
 
   const fetchPreferences = async () => {
     try {
-      const response = await fetch('/api/v1/voice-ai/voice-preferences', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      if (response.ok) {
-        setPreferences(await response.json());
-      }
+      const response = await voiceAIAPI.getPreferences();
+      setPreferences(response.data);
     } catch (err) {
       console.error('Failed to fetch voice preferences:', err);
     }
@@ -107,30 +100,21 @@ const VoiceAssistant = ({ language = 'en' }) => {
   const processVoiceCommand = async (transcriptText) => {
     setIsProcessing(true);
     try {
-      const response = await fetch('/api/v1/voice-ai/voice-commands', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          session_id: sessionId,
-          transcript: transcriptText,
-          command_type: 'general',
-          parameters: {}
-        })
+      const response = await voiceAIAPI.sendCommand({
+        session_id: sessionId,
+        transcript: transcriptText,
+        command_type: 'general',
+        parameters: {}
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setResponse(`I understood: "${data.intent}". Processing your request...`);
-        
-        // Simulate response (in production, this would be actual AI response)
-        setTimeout(() => {
-          setResponse(`Here's what I found for "${transcriptText}"`);
-          setIsProcessing(false);
-        }, 1000);
-      }
+      const data = response.data;
+      setResponse(`I understood: "${data.intent}". Processing your request...`);
+
+      // Simulate response (in production, this would be actual AI response)
+      setTimeout(() => {
+        setResponse(`Here's what I found for "${transcriptText}"`);
+        setIsProcessing(false);
+      }, 1000);
     } catch (err) {
       console.error('Failed to process voice command:', err);
       setResponse('Sorry, I had trouble processing that request.');
@@ -141,10 +125,7 @@ const VoiceAssistant = ({ language = 'en' }) => {
   const endSession = async () => {
     if (sessionId) {
       try {
-        await fetch(`/api/v1/voice-ai/voice-sessions/${sessionId}/end`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        });
+        await voiceAIAPI.endSession(sessionId);
       } catch (err) {
         console.error('Failed to end session:', err);
       }

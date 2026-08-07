@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
+import { organicTraceabilityAPI } from '../../services/api';
 
 /**
  * Organic Farm Registration Component
  * Allows farmers to register their organic farms for certification
+ *
+ * FE-02 note: not resolved here. The standards list is form reference data
+ * and the submit is a user-triggered POST — no fixed dataset to prop-drill,
+ * and no current parent page renders this component (unmounted as of
+ * 2026-08-07). FE-01 (routing through api.js) is fixed below.
  */
 const OrganicFarmRegistration = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -24,9 +30,8 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
 
   const fetchOrganicStandards = async () => {
     try {
-      const response = await fetch('/api/v1/organic-traceability/standards');
-      const data = await response.json();
-      setStandards(data);
+      const response = await organicTraceabilityAPI.getStandards();
+      setStandards(response.data);
     } catch (err) {
       console.error('Failed to fetch standards:', err);
     }
@@ -38,24 +43,14 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
     setError(null);
 
     try {
-      const response = await fetch('/api/v1/organic-traceability/farms', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify({
-          ...formData,
-          total_area_hectares: parseFloat(formData.total_area_hectares),
-          organic_area_hectares: parseFloat(formData.organic_area_hectares),
-          in_conversion_area_hectares: parseFloat(formData.in_conversion_area_hectares) || 0
-        })
+      const response = await organicTraceabilityAPI.registerFarm({
+        ...formData,
+        total_area_hectares: parseFloat(formData.total_area_hectares),
+        organic_area_hectares: parseFloat(formData.organic_area_hectares),
+        in_conversion_area_hectares: parseFloat(formData.in_conversion_area_hectares) || 0
       });
 
-      if (!response.ok) throw new Error('Registration failed');
-
-      const result = await response.json();
-      onSuccess?.(result);
+      onSuccess?.(response.data);
       setFormData({
         farm_name: '',
         certification_standard_id: '',

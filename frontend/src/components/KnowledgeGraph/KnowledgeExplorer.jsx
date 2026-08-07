@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { knowledgeGraphAPI } from '../../services/api';
 
 /**
  * Knowledge Explorer Component
  * Interactive knowledge graph visualization and exploration
+ *
+ * FE-02 note: not resolved here. This is a search/explore tool — every fetch
+ * is driven by a search term or node click the user just made, not a fixed
+ * dataset a parent page could hand down as props. FE-01 (routing through
+ * api.js) is fixed below.
  */
 const KnowledgeExplorer = ({ initialNodeId = null }) => {
   const [nodes, setNodes] = useState([]);
@@ -25,10 +31,8 @@ const KnowledgeExplorer = ({ initialNodeId = null }) => {
       setSelectedNode({ id: nodeId, name: 'Sample Node', type: 'product' });
       
       // Fetch related nodes
-      const response = await fetch(`/api/v1/knowledge-graph/knowledge-nodes/${nodeId}/related`);
-      if (response.ok) {
-        setRelatedNodes(await response.json());
-      }
+      const response = await knowledgeGraphAPI.getRelatedNodes(nodeId);
+      setRelatedNodes(response.data);
     } catch (err) {
       console.error('Failed to load node:', err);
     } finally {
@@ -42,10 +46,8 @@ const KnowledgeExplorer = ({ initialNodeId = null }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/knowledge-graph/knowledge-nodes/search?q=${encodeURIComponent(searchQuery)}`);
-      if (response.ok) {
-        setSearchResults(await response.json());
-      }
+      const response = await knowledgeGraphAPI.searchNodes(searchQuery);
+      setSearchResults(response.data);
     } catch (err) {
       console.error('Search failed:', err);
     } finally {

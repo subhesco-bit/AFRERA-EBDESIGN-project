@@ -7,7 +7,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { MapPin, Truck, Clock, Navigation, AlertTriangle } from 'lucide-react';
+import { logisticsAPI } from '../../services/api';
 
+// FE-02 note: not resolved here. This component polls on a 5-second interval
+// for live position/temperature data tied to a specific shipmentId — a
+// one-time prop hand-off from a parent page wouldn't fit that refresh model,
+// and there is no current parent page rendering it (unmounted as of
+// 2026-08-07) to lift the initial fetch into anyway. FE-01 (routing through
+// api.js) is fixed below.
 const RealTimeTracking = ({ shipmentId }) => {
   const [trackingData, setTrackingData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,11 +29,8 @@ const RealTimeTracking = ({ shipmentId }) => {
 
   const loadTrackingData = async () => {
     try {
-      const response = await fetch(`/api/v1/logistics/shipments/${shipmentId}/live-tracking`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      const data = await response.json();
-      setTrackingData(data.data);
+      const response = await logisticsAPI.getLiveTracking(shipmentId);
+      setTrackingData(response.data.data);
       loadTemperatureData();
       loadAlerts();
     } catch (error) {
@@ -38,12 +42,9 @@ const RealTimeTracking = ({ shipmentId }) => {
 
   const loadTemperatureData = async () => {
     try {
-      const response = await fetch(`/api/v1/logistics/shipments/${shipmentId}/temperature`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      const data = await response.json();
-      if (data.data.length > 0) {
-        setTemperature(data.data[0]);
+      const response = await logisticsAPI.getTemperatureData(shipmentId);
+      if (response.data.data.length > 0) {
+        setTemperature(response.data.data[0]);
       }
     } catch (error) {
       console.error('Error loading temperature data:', error);
@@ -52,11 +53,8 @@ const RealTimeTracking = ({ shipmentId }) => {
 
   const loadAlerts = async () => {
     try {
-      const response = await fetch(`/api/v1/logistics/shipments/${shipmentId}/temperature-alerts`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      const data = await response.json();
-      setAlerts(data.data);
+      const response = await logisticsAPI.getTemperatureAlerts(shipmentId);
+      setAlerts(response.data.data);
     } catch (error) {
       console.error('Error loading alerts:', error);
     }

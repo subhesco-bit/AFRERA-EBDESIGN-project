@@ -11,7 +11,13 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
+import { marketplaceAPI } from '../../services/api';
 
+// FE-02 note: not resolved here. All three calculations are triggered by a
+// user clicking a button over form state or an orderId prop already passed
+// in — there's no fixed dataset to prop-drill, and no current parent page
+// renders this component (unmounted as of 2026-08-07). FE-01 (routing
+// through api.js) is fixed below.
 const GSTCalculator = ({ orderId, productId }) => {
   const [loading, setLoading] = useState(false);
   const [gstData, setGstData] = useState(null);
@@ -33,25 +39,15 @@ const GSTCalculator = ({ orderId, productId }) => {
     { value: 'beverages', label: 'Beverages (18%)', rate: 18 }
   ];
 
-  // All three GST endpoints are protected by authMiddleware on the backend and
-  // are declared as POST. This component previously sent no Authorization
-  // header (-> 401) and used GET for two of them (-> 404), so none of them
-  // could ever succeed.
-  const authHeaders = () => ({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('access_token')}`
-  });
-
+  // All three GST endpoints are protected by authMiddleware on the backend.
+  // This component previously sent no Authorization header (-> 401), so none
+  // of them could ever succeed. Routing through marketplaceAPI (services/api.js)
+  // fixes that.
   const calculateProductGST = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/marketplace/gst/calculate/product', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(product)
-      });
-      const data = await response.json();
-      setGstData(data.data);
+      const response = await marketplaceAPI.calculateProductGST(product);
+      setGstData(response.data.data);
     } catch (error) {
       console.error('Error calculating GST:', error);
     } finally {
@@ -62,12 +58,8 @@ const GSTCalculator = ({ orderId, productId }) => {
   const calculateOrderGST = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/marketplace/gst/calculate/order/${orderId}`, {
-        method: 'POST',
-        headers: authHeaders()
-      });
-      const data = await response.json();
-      setGstData(data.data);
+      const response = await marketplaceAPI.calculateOrderGST(orderId);
+      setGstData(response.data.data);
     } catch (error) {
       console.error('Error calculating order GST:', error);
     } finally {
@@ -78,12 +70,8 @@ const GSTCalculator = ({ orderId, productId }) => {
   const generateInvoice = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/marketplace/gst/invoice/${orderId}`, {
-        method: 'POST',
-        headers: authHeaders()
-      });
-      const data = await response.json();
-      alert(`Invoice Generated: ${data.data.invoiceNumber}`);
+      const response = await marketplaceAPI.generateGstInvoice(orderId);
+      alert(`Invoice Generated: ${response.data.data.invoiceNumber}`);
     } catch (error) {
       console.error('Error generating invoice:', error);
     } finally {

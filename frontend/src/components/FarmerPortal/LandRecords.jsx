@@ -13,7 +13,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { MapPin, FileText, Sync, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { farmerPortalAPI } from '../../services/api';
 
+// FE-02 note: not resolved here. Every call in this component is either an
+// authenticated read scoped to the logged-in farmer or a form
+// submit/government-sync action — there's no fixed dataset a parent page
+// could fetch once and hand down as props, so the calls stay in this
+// component rather than being lifted to the parent. Mounted in
+// FarmerPortalPage.jsx as of 2026-08-07.
+// FE-01 (routing through api.js for auth) is fixed below.
 const LandRecords = ({ farmerId }) => {
   const [landRecords, setLandRecords] = useState([]);
   const [totals, setTotals] = useState({ total_hectares: 0, total_acres: 0, total_plots: 0 });
@@ -39,10 +47,8 @@ const LandRecords = ({ farmerId }) => {
   const loadLandRecords = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/v1/farmer-portal/land-records`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      const data = await response.json();
+      const response = await farmerPortalAPI.getLandRecords();
+      const data = response.data;
       setLandRecords(data.data.records);
       setTotals(data.data.totals);
     } catch (error) {
@@ -55,15 +61,8 @@ const LandRecords = ({ farmerId }) => {
   const addLandRecord = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/farmer-portal/land-records', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        },
-        body: JSON.stringify(newRecord)
-      });
-      const data = await response.json();
+      const response = await farmerPortalAPI.addLandRecord(newRecord);
+      const data = response.data;
       if (data.success) {
         setDialogOpen(false);
         setNewRecord({
@@ -90,11 +89,8 @@ const LandRecords = ({ farmerId }) => {
   const syncWithGovernment = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/farmer-portal/land-records/sync-government', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-      });
-      const data = await response.json();
+      const response = await farmerPortalAPI.syncGovernmentLandRecords();
+      const data = response.data;
       alert(`Synced ${data.data.syncedCount} records from government`);
       loadLandRecords();
     } catch (error) {

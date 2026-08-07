@@ -1,24 +1,35 @@
 import React, { useState, useEffect } from 'react';
+import { arVrAPI } from '../../services/api';
 
 /**
  * Experience Viewer Component
  * Displays AR/VR experiences and interaction points
+ *
+ * FE-02 note: this component has no current parent page (unmounted/orphaned
+ * as of 2026-08-07 — grep finds no importer besides itself). It now accepts
+ * an optional `experiences` prop so a future parent page can supply data
+ * directly; when omitted it falls back to fetching for productId itself.
  */
-const ExperienceViewer = ({ productId }) => {
-  const [experiences, setExperiences] = useState([]);
+const ExperienceViewer = ({ productId, experiences: experiencesProp }) => {
+  const [experiences, setExperiences] = useState(experiencesProp || []);
   const [selectedExperience, setSelectedExperience] = useState(null);
   const [interactionPoints, setInteractionPoints] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!experiencesProp);
   const [isVrMode, setIsVrMode] = useState(false);
 
   useEffect(() => {
+    if (experiencesProp) {
+      setExperiences(experiencesProp);
+      setLoading(false);
+      return;
+    }
     fetchExperiences();
-  }, [productId]);
+  }, [productId, experiencesProp]);
 
   const fetchExperiences = async () => {
     try {
-      const response = await fetch(`/api/v1/ar-vr/experiences?target_entity_id=${productId}&target_entity_type=product`);
-      if (response.ok) setExperiences(await response.json());
+      const response = await arVrAPI.getExperiences(productId, 'product');
+      setExperiences(response.data);
     } catch (err) {
       console.error('Failed to fetch experiences:', err);
     } finally {
@@ -29,8 +40,8 @@ const ExperienceViewer = ({ productId }) => {
   const selectExperience = async (experience) => {
     setSelectedExperience(experience);
     try {
-      const response = await fetch(`/api/v1/ar-vr/experiences/${experience.id}/interaction-points`);
-      if (response.ok) setInteractionPoints(await response.json());
+      const response = await arVrAPI.getInteractionPoints(experience.id);
+      setInteractionPoints(response.data);
     } catch (err) {
       console.error('Failed to fetch interaction points:', err);
     }
