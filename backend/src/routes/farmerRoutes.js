@@ -9,6 +9,7 @@
 
 const express = require('express');
 const router = express.Router();
+const pool = require('../database/pool');
 const {
   getFarmerById,
   getFarmers,
@@ -19,6 +20,7 @@ const {
 } = require('../services/farmerService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
+const { resolveFarmerId } = require('../middleware/resolveFarmerId');
 
 // List / search farmers
 router.get('/', authMiddleware, async (req, res) => {
@@ -41,10 +43,15 @@ router.get('/fpos/list', authMiddleware, async (req, res) => {
   }
 });
 
-// Current farmer alias
-router.get('/me', authMiddleware, async (req, res) => {
+// Current farmer alias.
+// FIXED 2026-08-15: previously called getFarmerById(req.user.id) directly —
+// getFarmerById queries `WHERE f.id = $1` (farmers.id), but req.user.id is
+// a users.id (see middleware/resolveFarmerId.js for the full explanation).
+// This endpoint has always returned "Farmer not found" for every real
+// farmer.
+router.get('/me', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const farmer = await getFarmerById(req.user.id);
+    const farmer = await getFarmerById(req.farmerId);
     res.json({ success: true, data: farmer });
   } catch (error) {
     const status = error.message === 'Farmer not found' ? 404 : 500;
@@ -57,7 +64,11 @@ router.get('/:farmerId', authMiddleware, async (req, res) => {
   try {
     let farmerId = req.params.farmerId;
     if (farmerId === 'me' || farmerId === 'current-farmer-id') {
-      farmerId = req.user.id;
+      const result = await pool.query('SELECT id FROM farmers WHERE user_id = $1', [req.user.id]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ success: false, error: 'No farmer profile is associated with this account' });
+      }
+      farmerId = result.rows[0].id;
     }
     const farmer = await getFarmerById(farmerId);
     res.json({ success: true, data: farmer });
@@ -87,7 +98,10 @@ router.get('/:farmerId/certifications', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/:farmerId/certifications', adminMiddleware, async (req, res) => {
+// FIXED 2026-08-15: was mounted with only adminMiddleware, which checks
+// req.user but never authenticates (middleware/admin.js) — req.user was
+// always undefined here, so this endpoint 401'd on every call.
+router.post('/:farmerId/certifications', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const certification = await addFarmerCertification(req.params.farmerId, req.body);
     res.status(201).json({ success: true, data: certification });
