@@ -239,6 +239,7 @@ const freightPoolingRoutes = require('./routes/freightPoolingRoutes');
 const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes');
 const glutWarningRoutes = require('./routes/glutWarningRoutes');
 const trackDartRoutes = require('./routes/trackDartRoutes');
+const equipmentExchangeRoutes = require('./routes/equipmentExchangeRoutes');
 // Vision (sharp) + OCR (tesseract.js) — real image-quality/metadata/
 // thumbnail and text-extraction dispatch behind core/aiOrchestrator.js's
 // vision_engine / ocr_engine, which were "missing" before 2026-08-09.
@@ -614,6 +615,7 @@ app.use('/api/v1/freight-pooling', freightPoolingRoutes);
 app.use('/api/v1/return-load-board', returnLoadBoardRoutes);
 app.use('/api/v1/glut-warning', glutWarningRoutes);
 app.use('/api/v1/track', trackDartRoutes);
+app.use('/api/v1/equipment-exchange', equipmentExchangeRoutes);
 // Vision + OCR (real sharp / tesseract.js dispatch, see routes/visionRoutes.js).
 app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
