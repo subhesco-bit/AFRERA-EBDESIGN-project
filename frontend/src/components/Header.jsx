@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingCart, User, Menu, Search, LogOut, ChevronDown, Sprout, DollarSign, Package, Building2, Shield } from 'lucide-react'
+import { ShoppingCart, User, Menu, Search, LogOut, ChevronDown, Sprout, DollarSign, Package, Building2, Shield, Landmark, Brain, Megaphone, Leaf } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { useState } from 'react'
 import LanguageSelector from './Multilingual/LanguageSelector'
@@ -27,10 +27,10 @@ function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav aria-label="Main" className="hidden md:flex items-center space-x-8">
             {/* Marketplace Dropdown */}
             <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
+              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
                 <Package className="w-4 h-4" />
                 <span>Marketplace</span>
                 <ChevronDown className="w-4 h-4" />
@@ -56,12 +56,15 @@ function Header() {
 
             {/* Farmer Portal Dropdown */}
             <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
+              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
                 <Sprout className="w-4 h-4" />
                 <span>Farmer Portal</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                <Link to="/farmer-entrance" className="block px-4 py-2 text-green-700 font-medium hover:bg-gray-100 border-b border-gray-100 mb-1">
+                  Explore first — no sign-in
+                </Link>
                 <Link to="/farmerhome" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                   Farmer Home
                 </Link>
@@ -91,7 +94,7 @@ function Header() {
 
             {/* Pricing Tools Dropdown */}
             <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
+              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
                 <DollarSign className="w-4 h-4" />
                 <span>Pricing</span>
                 <ChevronDown className="w-4 h-4" />
@@ -105,6 +108,39 @@ function Header() {
                 </Link>
                 <Link to="/selltiming" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                   Sell Timing
+                </Link>
+              </div>
+            </div>
+
+            {/* Finance / ERP dropdown — ledger, compliance and procurement were
+                previously built with no link anywhere in the UI (an orphan-page
+                pattern this session keeps finding); the three ERP domains below
+                (asset accounting, cost control, project systems) are added here
+                for the same reason, rather than repeating the gap. */}
+            <div className="relative group">
+              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+                <Landmark className="w-4 h-4" />
+                <span>Finance / ERP</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                <Link to="/ledger" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  General Ledger
+                </Link>
+                <Link to="/compliance" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Tax Compliance
+                </Link>
+                <Link to="/procurement" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Procurement &amp; QC
+                </Link>
+                <Link to="/asset-accounting" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Asset Accounting
+                </Link>
+                <Link to="/cost-control" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Cost Control
+                </Link>
+                <Link to="/project-systems" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                  Project Systems
                 </Link>
               </div>
             </div>
@@ -128,7 +164,7 @@ function Header() {
             {/* Vendor Portal Dropdown */}
             {isAuthenticated && (user?.role === 'corporate' || user?.role === 'logistics') && (
               <div className="relative group">
-                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
+                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
                   <Building2 className="w-4 h-4" />
                   <span>Vendor Portal</span>
                   <ChevronDown className="w-4 h-4" />
@@ -151,7 +187,7 @@ function Header() {
             {/* Admin Portal Dropdown */}
             {isAuthenticated && user?.role === 'admin' && (
               <div className="relative group">
-                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
+                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
                   <Shield className="w-4 h-4" />
                   <span>Admin</span>
                   <ChevronDown className="w-4 h-4" />
@@ -159,6 +195,34 @@ function Header() {
                 <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
                   <Link to="/admin-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                     Admin Dashboard
+                  </Link>
+                  <Link to="/ai-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    AI Dashboard
+                  </Link>
+                  <Link to="/erp-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    ERP Dashboard
+                  </Link>
+                  <Link to="/marketing-center" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    Marketing Center
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Enterprise Portal Dropdown */}
+            {isAuthenticated && (
+              <div className="relative group">
+                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+                  <Building2 className="w-4 h-4" />
+                  <span>Enterprise</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                  <Link to="/b2b-marketplace" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    B2B Marketplace
+                  </Link>
+                  <Link to="/nutrient-value-marketplace" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    Nutrient-Value Marketplace
                   </Link>
                 </div>
               </div>
@@ -185,9 +249,9 @@ function Header() {
             <LanguageSelector />
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 text-gray-700 hover:text-green-600 transition">
+            <Link to="/cart" className="relative p-2 text-gray-700 hover:text-green-600 transition" aria-label="Cart, 0 items">
               <ShoppingCart className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span aria-hidden="true" className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 0
               </span>
             </Link>
@@ -195,7 +259,7 @@ function Header() {
             {/* User Menu */}
             {isAuthenticated ? (
               <div className="relative group">
-                <button className="flex items-center space-x-2 p-2 text-gray-700 hover:text-green-600 transition">
+                <button className="flex items-center space-x-2 p-2 text-gray-700 hover:text-green-600 transition" aria-haspopup="true" aria-label={`User menu for ${user?.firstName || user?.email || 'account'}`}>
                   <User className="w-6 h-6" />
                   <span className="hidden md:inline">{user?.firstName || user?.email}</span>
                 </button>
@@ -236,6 +300,9 @@ function Header() {
             <button
               className="md:hidden p-2 text-gray-700"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-menu"
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -244,8 +311,8 @@ function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <nav className="flex flex-col space-y-2">
+          <div id="mobile-nav-menu" className="md:hidden py-4 border-t">
+            <nav aria-label="Mobile" className="flex flex-col space-y-2">
               <div className="font-semibold text-gray-800 px-4 py-2">Marketplace</div>
               <Link
                 to="/marketplace"
@@ -284,6 +351,13 @@ function Header() {
               </Link>
 
               <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Farmer Portal</div>
+              <Link
+                to="/farmer-entrance"
+                className="text-green-700 font-medium hover:text-green-800 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Explore first — no sign-in
+              </Link>
               <Link
                 to="/farmerhome"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
@@ -362,6 +436,50 @@ function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sell Timing
+              </Link>
+
+              <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Finance / ERP</div>
+              <Link
+                to="/ledger"
+                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                General Ledger
+              </Link>
+              <Link
+                to="/compliance"
+                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Tax Compliance
+              </Link>
+              <Link
+                to="/procurement"
+                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Procurement &amp; QC
+              </Link>
+              <Link
+                to="/asset-accounting"
+                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Asset Accounting
+              </Link>
+              <Link
+                to="/cost-control"
+                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Cost Control
+              </Link>
+              <Link
+                to="/project-systems"
+                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Project Systems
               </Link>
 
               <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Other</div>

@@ -1,7 +1,9 @@
 import { Routes, Route } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { useEffect } from 'react'
+import ErrorBoundary from './components/ErrorBoundary'
 import Layout from './components/Layout'
+import { errorMonitoring } from './utils/errorMonitoring'
 import HomePage from './pages/HomePage'
 import MarketplacePage from './pages/MarketplacePage'
 import ProductDetailPage from './pages/ProductDetailPage'
@@ -28,6 +30,20 @@ import PreOrderPage from './pages/PreOrderPage'
 import LogisticsPage from './pages/LogisticsPage'
 import InsurancePage from './pages/InsurancePage'
 import DashboardPage from './pages/DashboardPage'
+// Four public "farmer doors" + central hub, recovered 2026-08-07. Built in an
+// earlier session but never mounted (same class of bug as the "14 built
+// pages" and FPODashboardPage below). Fixes the V43 login-wall problem: every
+// /farmer* route is <ProtectedRoute requiredRole="farmer">, which redirects
+// an unauthenticated first-time visitor to /login with zero context. These
+// five pages are a public discovery layer in front of that wall — explain
+// the section, link to real public tools, and offer "sign in to this
+// section" rather than forcing login before a visitor can evaluate anything.
+// See docs/V43_UX_IMPROVEMENTS_EXTRACTION.md.
+import FarmerEntranceHubPage from './pages/FarmerEntranceHubPage'
+import FarmerSellDoorPage from './pages/FarmerSellDoorPage'
+import FarmerHouseholdDoorPage from './pages/FarmerHouseholdDoorPage'
+import FarmerFieldDoorPage from './pages/FarmerFieldDoorPage'
+import FarmerSharedDoorPage from './pages/FarmerSharedDoorPage'
 // Modules recovered 2026-08-05 (migrations 051-058). Each had a working
 // backend service and nothing rendering it — the state the master index
 // reports as NO_UI.
@@ -38,6 +54,11 @@ import CompliancePage from './pages/CompliancePage'
 import RfqPage from './pages/RfqPage'
 import CorridorEconomicsPage from './pages/CorridorEconomicsPage'
 import LandUseCarbonPage from './pages/LandUseCarbonPage'
+// ERP domains AF-AA/AF-CO/AF-PS — real, ledger-integrated services (996 /
+// 9996 migrations) that had a working backend and no frontend caller.
+import AssetAccountingPage from './pages/AssetAccountingPage'
+import CostControlPage from './pages/CostControlPage'
+import ProjectSystemsPage from './pages/ProjectSystemsPage'
 import YieldManagementPage from './pages/YieldManagementPage'
 import CompetitivePositionPage from './pages/CompetitivePositionPage'
 import ExperienceLayerPage from './pages/ExperienceLayerPage'
@@ -52,6 +73,92 @@ import AdminDashboardPage from './pages/AdminDashboardPage'
 // class of bug as the other "recovered" modules above. Mounting it so the
 // M053/M054/M056/M058/M060 module stubs have a real page to point to.
 import FPODashboardPage from './pages/FPODashboardPage'
+// 14 more page components were fully built (real forms, react-query hooks,
+// wired to services/api.js clients that already existed) but were never
+// mounted — the same class of bug as FPODashboardPage above. Mounting them
+// so the M013/M024/M031/M041/M046/M075/M083/M093/M098/M101/M112/M121/M132/
+// M141 module stubs have a real page to point to.
+import AuthorizationPage from './pages/AuthorizationPage'
+import ClimateAdvisoryPage from './pages/ClimateAdvisoryPage'
+import DairyManagementPage from './pages/DairyManagementPage'
+import FarmCostingPage from './pages/FarmCostingPage'
+import FarmerKycPage from './pages/FarmerKycPage'
+import FertilizerInventoryPage from './pages/FertilizerInventoryPage'
+import IrrigationManagementPage from './pages/IrrigationManagementPage'
+import LabourManagementPage from './pages/LabourManagementPage'
+import LandRegistryPage from './pages/LandRegistryPage'
+import OrchardManagementPage from './pages/OrchardManagementPage'
+import PondManagementPage from './pages/PondManagementPage'
+import ShgManagementPage from './pages/ShgManagementPage'
+import TractorManagementPage from './pages/TractorManagementPage'
+import VillageRegistryPage from './pages/VillageRegistryPage'
+// Same class of bug, found separately: SowingManagementPage (M067) was also
+// fully built (sowingAPI already existed in services/api.js) but never mounted.
+import SowingManagementPage from './pages/SowingManagementPage'
+// Second batch, 2026-08-07: 20 confirmed STUB-ONLY module frontends built as
+// real pages (Farmer: M022/M023/M025/M026/M029, Crop: M062-M066/M068, Land:
+// M033/M035-M039 consolidated into one tabbed page, FPO: M051/M052/M055/
+// M057/M059 added as tabs on the existing FPODashboardPage). M032 is not a
+// new page — it points at the existing LandRegistryPage.jsx.
+import FarmerProfilePage from './pages/FarmerProfilePage'
+import FarmerFamilyPage from './pages/FarmerFamilyPage'
+import FarmerVerificationPage from './pages/FarmerVerificationPage'
+import FarmerSkillPage from './pages/FarmerSkillPage'
+import FarmerHealthWelfarePage from './pages/FarmerHealthWelfarePage'
+import CropCalendarPage from './pages/CropCalendarPage'
+import CropRegistrationPage from './pages/CropRegistrationPage'
+import CropVarietyPage from './pages/CropVarietyPage'
+import SeedPlanningPage from './pages/SeedPlanningPage'
+import NurseryManagementPage from './pages/NurseryManagementPage'
+import CropMonitoringPage from './pages/CropMonitoringPage'
+import LandManagementPage from './pages/LandManagementPage'
+// Third batch (2026-08-08): consolidated tabbed pages for previously
+// STUB-ONLY modules, matching the LandManagementPage.jsx pattern.
+import InputSupplyManagementPage from './pages/InputSupplyManagementPage'
+import LivestockManagementPage from './pages/LivestockManagementPage'
+import CommunityManagementPage from './pages/CommunityManagementPage'
+import SoilManagementPage from './pages/SoilManagementPage'
+import WaterManagementPage from './pages/WaterManagementPage'
+// SubsidyManagementPage was fully built (real subsidyAPI calls) but never
+// imported into App.jsx — found by V43_ROUTE_PARITY_ANALYSIS.md, the same
+// "built but never wired" bug this session keeps finding and fixing.
+import SubsidyManagementPage from './pages/SubsidyManagementPage'
+// Six more fully-built pages found unrouted during the API-completeness sweep
+// (2026-08-08): each already imports a real api.js client (bankerAPI, caAPI,
+// governmentAPI, researchAPI, plus the fertilizer/pesticide/biofertilizer/... and
+// livestock/dairy/... families) but had no <Route>, same bug class as
+// SubsidyManagementPage above.
+import BankerDashboardPage from './pages/BankerDashboardPage'
+import CADashboardPage from './pages/CADashboardPage'
+import GovernmentDashboardPage from './pages/GovernmentDashboardPage'
+import ResearchDashboardPage from './pages/ResearchDashboardPage'
+// Fourth batch (2026-08-08): Climate, Operations, Machinery, Horticulture,
+// Fisheries, Identity and Platform Foundation consolidated tabbed pages,
+// same LandManagementPage.jsx pattern as the third batch above.
+import ClimateMonitoringPage from './pages/ClimateMonitoringPage'
+import OperationsManagementPage from './pages/OperationsManagementPage'
+import MachineryManagementPage from './pages/MachineryManagementPage'
+import HorticultureManagementPage from './pages/HorticultureManagementPage'
+import FisheriesManagementPage from './pages/FisheriesManagementPage'
+import IdentityManagementPage from './pages/IdentityManagementPage'
+import PlatformFoundationPage from './pages/PlatformFoundationPage'
+import EnterpriseControlPage from './pages/EnterpriseControlPage'
+// M123-M127 Livestock Management — Poultry, Goat, Sheep, Pig, Animal Health
+import PoultryManagementPage from './pages/PoultryManagementPage'
+import GoatFarmingPage from './pages/GoatFarmingPage'
+import SheepFarmingPage from './pages/SheepFarmingPage'
+import PigFarmingPage from './pages/PigFarmingPage'
+import AnimalHealthPage from './pages/AnimalHealthPage'
+// Unified Ledger with Economy Segmentation — One Ledger + 9 Economies
+import UnifiedLedgerPage from './pages/UnifiedLedgerPage'
+// REOS Dashboard — Rural Economic Operating System
+import REOSDashboardPage from './pages/REOSDashboardPage'
+// New Enterprise Modules - AI, ERP, B2B, Marketing, Nutrient-Value
+import AIDashboard from './pages/AIDashboard'
+import ERPDashboard from './pages/ERPDashboard'
+import B2BMarketplace from './pages/B2BMarketplace'
+import MarketingCenter from './pages/MarketingCenter'
+import NutrientValueMarketplace from './pages/NutrientValueMarketplace'
 import M011Page from './modules/M011/M011Page'
 import M006Page from './modules/M006/M006Page'
 // Auto-generated module imports
@@ -211,33 +318,58 @@ import { MultilingualProvider } from './components/Multilingual/MultilingualProv
 // Outermost provider: a shared kiosk must not persist session state, so
 // this has to be established before anything below it stores anything.
 import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider'
+// NOTE: ErrorBoundary is already imported as a default export at the top of
+// this file (line 4). This was a duplicate named import of the same
+// identifier — ErrorBoundary.jsx has no named export, so this binding was
+// dead weight at best; two `import ErrorBoundary` declarations for the same
+// local name in one module is invalid (duplicate identifier).
 
 function App() {
-  const { initializeAuth } = useAuthStore()
+  const { user, checkAuth } = useAuthStore()
 
   useEffect(() => {
-    initializeAuth()
-  }, [initializeAuth])
+    checkAuth()
+    
+    // Register service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered:', registration)
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error)
+        })
+    }
+  }, [checkAuth])
 
-  // MultilingualProvider was fully implemented but never mounted, so the entire
-  // multilingual capability (720 lines of backend service, 8 tables, and seeded
-  // support for Hindi, Bengali, Assamese, Manipuri and Khasi) was unreachable
-  // from the UI — every user saw English only. Mounting it above the router so
-  // language context is available to every page.
+  useEffect(() => {
+    if (user) {
+      errorMonitoring.trackActiveUser(user.id, user.sessionId)
+    }
+  }, [user])
+
   return (
-    <AccessibilityProvider>
-    <MultilingualProvider>
-    <Layout>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/marketplace" element={<MarketplacePage />} />
-        <Route path="/products/:id" element={<ProductDetailPage />} />
-        <Route path="/forms" element={<FormManagementPage />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/modules" element={<ModuleHubPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <ErrorBoundary>
+      <AccessibilityProvider>
+        <MultilingualProvider>
+          <Layout>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/marketplace" element={<MarketplacePage />} />
+              <Route path="/products/:id" element={<ProductDetailPage />} />
+              <Route path="/forms" element={<FormManagementPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/modules" element={<ModuleHubPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+        {/* Four public farmer doors + hub — see import comment above. */}
+        <Route path="/farmer-entrance" element={<FarmerEntranceHubPage />} />
+        <Route path="/farmer-entrance/sell" element={<FarmerSellDoorPage />} />
+        <Route path="/farmer-entrance/household" element={<FarmerHouseholdDoorPage />} />
+        <Route path="/farmer-entrance/field" element={<FarmerFieldDoorPage />} />
+        <Route path="/farmer-entrance/shared" element={<FarmerSharedDoorPage />} />
 
 
         {/* Recovered modules (051-058).
@@ -289,6 +421,30 @@ function App() {
           element={(
             <ProtectedRoute>
               <RfqPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/asset-accounting"
+          element={(
+            <ProtectedRoute>
+              <AssetAccountingPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/cost-control"
+          element={(
+            <ProtectedRoute>
+              <CostControlPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/project-systems"
+          element={(
+            <ProtectedRoute>
+              <ProjectSystemsPage />
             </ProtectedRoute>
           )}
         />
@@ -477,6 +633,530 @@ function App() {
           }
         />
 
+        {/* 14 built pages recovered 2026-08-07 — real components with no
+            route (verified against api.js: every API client they import
+            already existed). Authorization is admin role/permission
+            management, so it's admin-gated like /users and /admin/settings;
+            the rest are operational records pages (dairy, irrigation,
+            fertilizer stock, KYC, land/village registry, etc.) gated the
+            same way as the other recovered-module business records above
+            (ledger, compliance, procurement) — logged-in, no specific role. */}
+        <Route
+          path="/authorization"
+          element={(
+            <ProtectedRoute requiredRole="admin">
+              <AuthorizationPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/climate-advisory"
+          element={(
+            <ProtectedRoute>
+              <ClimateAdvisoryPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/dairy-management"
+          element={(
+            <ProtectedRoute>
+              <DairyManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/poultry-management"
+          element={(
+            <ProtectedRoute>
+              <PoultryManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/goat-farming"
+          element={(
+            <ProtectedRoute>
+              <GoatFarmingPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/sheep-farming"
+          element={(
+            <ProtectedRoute>
+              <SheepFarmingPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/pig-farming"
+          element={(
+            <ProtectedRoute>
+              <PigFarmingPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/animal-health"
+          element={(
+            <ProtectedRoute>
+              <AnimalHealthPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/unified-ledger"
+          element={(
+            <ProtectedRoute>
+              <UnifiedLedgerPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/reos-dashboard"
+          element={(
+            <ProtectedRoute>
+              <REOSDashboardPage />
+            </ProtectedRoute>
+          )}
+        />
+        {/* New Enterprise Modules - AI, ERP, B2B, Marketing, Nutrient-Value */}
+        <Route
+          path="/ai-dashboard"
+          element={(
+            <ProtectedRoute requiredRole="admin">
+              <AIDashboard />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/erp-dashboard"
+          element={(
+            <ProtectedRoute requiredRole="admin">
+              <ERPDashboard />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/b2b-marketplace"
+          element={(
+            <ProtectedRoute>
+              <B2BMarketplace />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/marketing-center"
+          element={(
+            <ProtectedRoute requiredRole="admin">
+              <MarketingCenter />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/nutrient-value-marketplace"
+          element={(
+            <ProtectedRoute>
+              <NutrientValueMarketplace />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/farm-costing"
+          element={(
+            <ProtectedRoute>
+              <FarmCostingPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/farmer-kyc"
+          element={(
+            <ProtectedRoute>
+              <FarmerKycPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/fertilizer-inventory"
+          element={(
+            <ProtectedRoute>
+              <FertilizerInventoryPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/irrigation-management"
+          element={(
+            <ProtectedRoute>
+              <IrrigationManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/labour-management"
+          element={(
+            <ProtectedRoute>
+              <LabourManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/land-registry"
+          element={(
+            <ProtectedRoute>
+              <LandRegistryPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/orchard-management"
+          element={(
+            <ProtectedRoute>
+              <OrchardManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/pond-management"
+          element={(
+            <ProtectedRoute>
+              <PondManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/shg-management"
+          element={(
+            <ProtectedRoute>
+              <ShgManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/tractor-management"
+          element={(
+            <ProtectedRoute>
+              <TractorManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/shared-infra"
+          element={(
+            <ProtectedRoute>
+              <SharedInfraPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/village-registry"
+          element={(
+            <ProtectedRoute>
+              <VillageRegistryPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/sowing-management"
+          element={(
+            <ProtectedRoute>
+              <SowingManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+
+        {/* Second batch, 2026-08-07: Farmer, Crop and Land modules — same
+            logged-in/no-specific-role gating as the operational records
+            pages above. FPO tabs (M051/M052/M055/M057/M059) live inside
+            /fpo-dashboard, already routed. */}
+        <Route
+          path="/farmer-profile"
+          element={(
+            <ProtectedRoute>
+              <FarmerProfilePage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/farmer-family"
+          element={(
+            <ProtectedRoute>
+              <FarmerFamilyPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/farmer-verification"
+          element={(
+            <ProtectedRoute>
+              <FarmerVerificationPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/farmer-skills"
+          element={(
+            <ProtectedRoute>
+              <FarmerSkillPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/farmer-welfare"
+          element={(
+            <ProtectedRoute>
+              <FarmerHealthWelfarePage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/crop-calendar"
+          element={(
+            <ProtectedRoute>
+              <CropCalendarPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/crop-registration"
+          element={(
+            <ProtectedRoute>
+              <CropRegistrationPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/crop-varieties"
+          element={(
+            <ProtectedRoute>
+              <CropVarietyPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/seed-planning"
+          element={(
+            <ProtectedRoute>
+              <SeedPlanningPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/nursery-management"
+          element={(
+            <ProtectedRoute>
+              <NurseryManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/crop-monitoring"
+          element={(
+            <ProtectedRoute>
+              <CropMonitoringPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/land-management"
+          element={(
+            <ProtectedRoute>
+              <LandManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        {/* Third batch (2026-08-08): consolidated tabbed pages for
+            previously STUB-ONLY modules — Input Supply (M113-M120),
+            Livestock (M122-M130), Community (M042-M050), Soil (M071,
+            M073-M074), Water (M076-M080). */}
+        <Route
+          path="/input-supply-management"
+          element={(
+            <ProtectedRoute>
+              <InputSupplyManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/livestock-management"
+          element={(
+            <ProtectedRoute>
+              <LivestockManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/community-management"
+          element={(
+            <ProtectedRoute>
+              <CommunityManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/soil-management"
+          element={(
+            <ProtectedRoute>
+              <SoilManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/water-management"
+          element={(
+            <ProtectedRoute>
+              <WaterManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        {/* /subsidy, /subsidypassthrough, /schememonitor were three separate
+            v43 routes that all landed on the same subsidy-management screen —
+            kept as three paths to the same page rather than collapsing them,
+            since existing links/bookmarks to any of the three should work. */}
+        <Route
+          path="/subsidy"
+          element={(
+            <ProtectedRoute>
+              <SubsidyManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/subsidypassthrough"
+          element={(
+            <ProtectedRoute>
+              <SubsidyManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/schememonitor"
+          element={(
+            <ProtectedRoute>
+              <SubsidyManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+
+        {/* Four more built-but-unrouted dashboard pages found in the
+            2026-08-08 API-completeness sweep. Research Institution is a real
+            registration role (RegisterPage.jsx), so ResearchDashboardPage is
+            role-gated like corporate/logistics/fpo above. Banker/CA/
+            Government have no corresponding registration role, so they're
+            gated the same conservative way as ledger/compliance (logged-in,
+            no specific role) rather than inventing a role the auth layer
+            doesn't know about. */}
+        <Route
+          path="/banker-dashboard"
+          element={(
+            <ProtectedRoute>
+              <BankerDashboardPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/ca-dashboard"
+          element={(
+            <ProtectedRoute>
+              <CADashboardPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/government-dashboard"
+          element={(
+            <ProtectedRoute>
+              <GovernmentDashboardPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/research-dashboard"
+          element={(
+            <ProtectedRoute requiredRole="research">
+              <ResearchDashboardPage />
+            </ProtectedRoute>
+          )}
+        />
+
+        {/* Fourth batch (2026-08-08): Climate, Operations, Machinery,
+            Horticulture, Fisheries, Identity and Platform Foundation
+            consolidated pages. Identity and Platform Foundation are
+            admin-gated like /users and /admin/settings; the rest are
+            operational records pages, gated like Dairy/Fertilizer above. */}
+        <Route
+          path="/climate-monitoring"
+          element={(
+            <ProtectedRoute>
+              <ClimateMonitoringPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/operations-management"
+          element={(
+            <ProtectedRoute>
+              <OperationsManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/machinery-management"
+          element={(
+            <ProtectedRoute>
+              <MachineryManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/horticulture-management"
+          element={(
+            <ProtectedRoute>
+              <HorticultureManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/fisheries-management"
+          element={(
+            <ProtectedRoute>
+              <FisheriesManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/identity-management"
+          element={(
+            <ProtectedRoute requiredRole="admin">
+              <IdentityManagementPage />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/platform-foundation"
+          element={(
+            <ProtectedRoute requiredRole="admin">
+              <PlatformFoundationPage />
+            </ProtectedRoute>
+          )}
+        />
+        {/* Not admin-gated: the backend (enterpriseControlService.js) only
+            requires admin on the Legal and Risk-assessment routes; Workflow,
+            CRM, Clients and Emergency are authenticated-only by design ("the
+            person who sees the problem first is rarely the person with the
+            highest privilege"). The two admin-only actions surface the
+            backend's own 403 rather than the whole page being locked out. */}
+        <Route
+          path="/enterprise-control"
+          element={(
+            <ProtectedRoute>
+              <EnterpriseControlPage />
+            </ProtectedRoute>
+          )}
+        />
+
         {/* Auto-generated module routes (admin-protected) */}
         <Route path="/modules/m001" element={ ( <ProtectedRoute requiredRole="admin"> <M001Page /> </ProtectedRoute> ) } />
         <Route path="/modules/m002" element={ ( <ProtectedRoute requiredRole="admin"> <M002Page /> </ProtectedRoute> ) } />
@@ -635,6 +1315,7 @@ function App() {
     </Layout>
     </MultilingualProvider>
     </AccessibilityProvider>
+    </ErrorBoundary>
   )
 }
 
