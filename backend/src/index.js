@@ -737,6 +737,26 @@ function initializeDecisionLayer() {
     logger.info('autonomous learning cycle scheduled', { everyMinutes });
   }
 
+  // Daily Agmarknet (data.gov.in) mandi price refresh. jobs/loadMandiPrices.js
+  // was built as a standalone CLI script (`node src/jobs/loadMandiPrices.js`)
+  // with no in-process scheduling — real and working, but only ever ran
+  // manually. Same disable/interval-override convention as the learning
+  // cycle above.
+  if (process.env.NODE_ENV !== 'test' && process.env.MANDI_PRICE_REFRESH !== 'off') {
+    const mandiJob = require('./jobs/loadMandiPrices');
+    const everyHours = Number(process.env.MANDI_PRICE_REFRESH_HOURS || 24);
+    const runMandiRefresh = () => {
+      mandiJob.run({}).then((summary) => {
+        logger.info('mandi price refresh complete', { fetched: summary.fetched, neRecords: summary.neRecords, neCoverageNote: summary.neCoverageNote });
+      }).catch((error) => {
+        logger.warn('mandi price refresh failed', { error: error.message });
+      });
+    };
+    const mandiTimer = setInterval(runMandiRefresh, everyHours * 60 * 60 * 1000);
+    mandiTimer.unref();
+    logger.info('Agmarknet mandi price refresh scheduled', { everyHours });
+  }
+
   // Efferent path: every decision is pushed to connected operators in realtime.
   // Decisions requiring a human go to an explicit escalation room so they are not
   // lost in the general feed.
