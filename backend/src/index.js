@@ -231,6 +231,7 @@ const farmerHealthRoutes = require('./routes/farmerHealthRoutes');
 const foodRoutes = require('./routes/foodRoutes');
 const iotSensorService = require('./services/iotSensorService');
 const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes');
+const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes');
 // Vision (sharp) + OCR (tesseract.js) — real image-quality/metadata/
 // thumbnail and text-extraction dispatch behind core/aiOrchestrator.js's
 // vision_engine / ocr_engine, which were "missing" before 2026-08-09.
@@ -598,6 +599,7 @@ app.use('/api/v1/food', foodRoutes);
 iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
 iotSensorService.setupRoutes(app);
 app.use('/api/v1/variety-directory', regionalVarietyRoutes);
+app.use('/api/v1/folu-benchmark', foluBenchmarkRoutes);
 // Vision + OCR (real sharp / tesseract.js dispatch, see routes/visionRoutes.js).
 app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
