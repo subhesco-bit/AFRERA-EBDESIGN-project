@@ -57,6 +57,13 @@ const SIGNAL = Object.freeze({
   TEMPERATURE_BREACH: 'iot.temperature.breach',
   SENSOR_OFFLINE: 'iot.sensor.offline',
   SHIPMENT_DELAYED: 'logistics.shipment.delayed',
+  CIVIL_DISRUPTION_REPORTED: 'logistics.disruption.reported',
+  CIVIL_DISRUPTION_RESOLVED: 'logistics.disruption.resolved',
+
+  // Geofencing (circular zones, checked against a single GPS point in time —
+  // see backend/src/services/geofencingService.js for the honest scope note)
+  GEOFENCE_ENTERED: 'logistics.geofence.entered',
+  GEOFENCE_EXITED: 'logistics.geofence.exited',
 
   // Quality & safety
   QUALITY_FAILED: 'quality.test.failed',
@@ -67,6 +74,29 @@ const SIGNAL = Object.freeze({
   SOIL_RESULT_READY: 'agronomy.soil.result_ready',
   CROP_DISEASE_DETECTED: 'agronomy.disease.detected',
   WEATHER_ALERT: 'agronomy.weather.alert',
+
+  // Livestock
+  ANIMAL_HEALTH_CHECK: 'livestock.animal.health_check',
+  ANIMAL_TREATMENT: 'livestock.animal.treatment',
+  DISEASE_OUTBREAK: 'livestock.disease.outbreak',
+  QUARANTINE_ESTABLISHED: 'livestock.quarantine.established',
+  QUARANTINE_LIFTED: 'livestock.quarantine.lifted',
+  MILK_PRODUCTION_RECORDED: 'livestock.milk.production_recorded',
+  BREEDING_RECORDED: 'livestock.breeding.recorded',
+  VACCINATION_ADMINISTERED: 'livestock.vaccination.administered',
+  FEED_CONSUMPTION_RECORDED: 'livestock.feed.consumption_recorded',
+  HERD_PERFORMANCE_UPDATED: 'livestock.herd.performance_updated',
+
+  // Platform Foundation
+  TENANT_CREATED: 'platform.tenant.created',
+  TENANT_UPDATED: 'platform.tenant.updated',
+  TENANT_DELETED: 'platform.tenant.deleted',
+  ORGANIZATION_CREATED: 'platform.organization.created',
+  ORGANIZATION_UPDATED: 'platform.organization.updated',
+  CONFIGURATION_CHANGED: 'platform.configuration.changed',
+  SYSTEM_HEALTH_CHANGED: 'platform.system.health_changed',
+  CAPACITY_FORECAST_UPDATED: 'platform.capacity.forecast_updated',
+  SECURITY_THREAT_DETECTED: 'platform.security.threat_detected',
 
   // Enterprise control layer (993)
   WORKFLOW_STARTED: 'control.workflow.started',
