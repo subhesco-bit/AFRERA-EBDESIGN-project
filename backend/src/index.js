@@ -235,6 +235,9 @@ const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes');
 const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes');
 const sellerRankingRoutes = require('./routes/sellerRankingRoutes');
 const seedVaultRoutes = require('./routes/seedVaultRoutes');
+const freightPoolingRoutes = require('./routes/freightPoolingRoutes');
+const returnLoadBoardRoutes = require('./routes/returnLoadBoardRoutes');
+const glutWarningRoutes = require('./routes/glutWarningRoutes');
 // Vision (sharp) + OCR (tesseract.js) — real image-quality/metadata/
 // thumbnail and text-extraction dispatch behind core/aiOrchestrator.js's
 // vision_engine / ocr_engine, which were "missing" before 2026-08-09.
@@ -606,6 +609,9 @@ app.use('/api/v1/folu-benchmark', foluBenchmarkRoutes);
 app.use('/api/v1/civil-disruptions', civilDisruptionRoutes);
 app.use('/api/v1/seller-ranking', sellerRankingRoutes);
 app.use('/api/v1/seed-vault', seedVaultRoutes);
+app.use('/api/v1/freight-pooling', freightPoolingRoutes);
+app.use('/api/v1/return-load-board', returnLoadBoardRoutes);
+app.use('/api/v1/glut-warning', glutWarningRoutes);
 // Vision + OCR (real sharp / tesseract.js dispatch, see routes/visionRoutes.js).
 app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
