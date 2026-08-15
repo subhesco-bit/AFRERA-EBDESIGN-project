@@ -241,24 +241,15 @@ class AiGatewayService {
     return recommendations[modelType] || recommendations['default'];
   }
 
-  // Mock prediction methods
+  // Missed in the 2026-08-15 pass below (predictMarketPrice etc.) — same
+  // fabrication, same fix: honest null/implemented:false instead of a
+  // randomized fake yield or weather forecast presented as real output.
   predictCropYield(parameters, context) {
-    return {
-      predicted_yield: Math.random() * 10 + 5,
-      confidence: 0.85,
-      factors: ['soil_quality', 'weather', 'seed_variety'],
-      timeline: '3-4 months'
-    };
+    return { predicted_yield: null, confidence: null, factors: [], timeline: null, implemented: false, reason: 'No real crop-yield prediction model is connected to this gateway.' };
   }
 
   predictWeather(parameters, context) {
-    return {
-      temperature: 25 + Math.random() * 10,
-      humidity: 60 + Math.random() * 20,
-      rainfall: Math.random() * 50,
-      confidence: 0.78,
-      forecast_days: 7
-    };
+    return { temperature: null, humidity: null, rainfall: null, confidence: null, forecast_days: null, implemented: false, reason: 'No real weather-forecast provider is connected to this gateway — see whatever real weather integration exists elsewhere in the platform, if any, rather than this gateway.' };
   }
 
   // NOTE (2026-08-15): every method below this point previously used
@@ -355,11 +346,7 @@ class AiGatewayService {
   }
 
   genericRecommendation(context, options) {
-    return {
-      recommendation: 'generic_recommendation',
-      confidence: 0.75,
-      priority: 'medium'
-    };
+    return { recommendation: null, confidence: null, priority: null, implemented: false, reason: 'No real recommendation model is connected to this gateway.' };
   }
 
   /**

@@ -3,7 +3,7 @@
  * Future-ready capabilities including AI recommendations, blockchain integration, and IoT automation
  */
 
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 class AdvancedFeaturesService {
   constructor() {
@@ -111,15 +111,26 @@ class AdvancedFeaturesService {
     } = contractData;
 
     try {
+      // No blockchain network integration is configured in this environment
+      // (see core/aiOrchestrator.js's PROVIDER_ENV pattern for the
+      // honest-adapter convention used elsewhere). This previously used
+      // Math.random() to fabricate a "blockchain_hash" and stored the
+      // contract with status 'deployed' — a false claim that this contract
+      // was actually deployed to any chain. Fixed to store status 'draft'
+      // (the schema's honest not-yet-deployed value) and a real SHA-256
+      // content hash of the actual contract data (integrity-verifiable
+      // against tampering, and reusable as the real hash if this contract
+      // is later genuinely submitted to a blockchain network).
+      const crypto = require('crypto');
+      const contractContent = JSON.stringify({ contractType, parties, terms, conditions, value, currency });
+      const blockchainHash = `0x${crypto.createHash('sha256').update(contractContent).digest('hex')}`;
+
       const query = `
-        INSERT INTO smart_contracts 
+        INSERT INTO smart_contracts
         (contract_type, parties, terms, conditions, value, currency, status, blockchain_hash)
-        VALUES ($1, $2, $3, $4, $5, $6, 'deployed', $7)
+        VALUES ($1, $2, $3, $4, $5, $6, 'draft', $7)
         RETURNING *
       `;
-
-      // Generate mock blockchain hash
-      const blockchainHash = `0x${Math.random().toString(16).substr(2, 64)}`;
 
       const result = await this.pool.query(query, [
         contractType,
@@ -131,8 +142,8 @@ class AdvancedFeaturesService {
         blockchainHash
       ]);
 
-      logger.info(`Smart contract created: ${result.rows[0].id}`);
-      return result.rows[0];
+      logger.info(`Smart contract recorded (not deployed to any blockchain network — no provider configured): ${result.rows[0].id}`);
+      return { ...result.rows[0], blockchain_deployed: false, note: 'Content hash only — not submitted to any blockchain network in this environment.' };
     } catch (error) {
       logger.error('Error creating smart contract', { error: error.message, stack: error.stack });
       throw error;
