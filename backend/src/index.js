@@ -35,10 +35,18 @@ const consumerHealthService = require('./services/consumerHealthService');
 const voiceAIService = require('./services/voiceAIService');
 const blockchainTraceabilityService = require('./services/blockchainTraceabilityService');
 const knowledgeGraphService = require('./services/knowledgeGraphService');
+// Enterprise Memory ("Hippocampus" — AFRERA_CLAUDE_BUILD_DIRECTIVE.md §2.3):
+// case/episode log, real full-text retrieval. Was "missing" in
+// core/aiOrchestrator.js before 2026-08-09 — see that file's ENGINES.enterprise_memory
+// entry and migration 9997_enterprise_memory_schema.sql for the full rationale.
+const enterpriseMemoryService = require('./services/enterpriseMemoryService');
 const predictiveAnalyticsService = require('./services/predictiveAnalyticsService');
 const iotIntegrationService = require('./services/iotIntegrationService');
 const arVrService = require('./services/arVrService');
 const smsAuthService = require('./services/smsAuthService');
+// Real Twilio WhatsApp integration (outbound send + inbound webhook). Mirrors
+// smsAuthService's mock-mode-when-unconfigured pattern. See service header.
+const whatsappService = require('./services/whatsappService');
 const advancedVoiceAI = require('./services/advancedVoiceAI');
 const offlinePaymentService = require('./services/offlinePaymentService');
 const advancedAIService = require('./services/advancedAIService');
@@ -57,6 +65,7 @@ const omnichannelAIService = require('./services/omnichannelAIService');
 const foodSafetyService = require('./services/foodSafetyService');
 const shelfLifeService = require('./services/shelfLifeService');
 const institutionalProcurementService = require('./services/institutionalProcurementService');
+const millCircuitService = require('./services/millCircuitService');
 const digitalProductPassportService = require('./services/digitalProductPassportService');
 const recipeIntelligenceService = require('./services/recipeIntelligenceService');
 // Business rules recovered from the v43 prototype (see service header).
@@ -85,6 +94,14 @@ const subsidyService = require('./services/subsidyService');
 
 // Import enhancement routes
 const marketplaceEnhancements = require('./routes/marketplaceEnhancements');
+const ecommerceRoutes = require('./routes/ecommerceRoutes');
+const ecommerceIntegrationRoutes = require('./routes/ecommerceIntegrationRoutes');
+const ecommerceAIRoutes = require('./routes/ecommerceAIRoutes');
+const ecommerceERPRoutes = require('./routes/ecommerceERPRoutes');
+const ecommerceBusinessSalesRoutes = require('./routes/ecommerceBusinessSalesRoutes');
+const ecommerceMarketingRoutes = require('./routes/ecommerceMarketingRoutes');
+const nutrientValueSalesRoutes = require('./routes/nutrientValueSalesRoutes');
+const nervousSystemRoutes = require('./routes/nervousSystemRoutes');
 const insuranceEnhancements = require('./routes/insuranceEnhancements');
 const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements');
 const governanceModule = require('./routes/governanceModule');
@@ -95,7 +112,73 @@ const gstRoutes = require('./routes/gstRoutes');
 const logisticsOpsRoutes = require('./routes/logisticsEnhancementRoutes');
 const farmerRoutes = require('./routes/farmerRoutes');
 const auditRoutes = require('./routes/auditRoutes');
+// M121 Dairy Management + M112 Fertilizer Inventory (Livestock / Input
+// Supply, wave 1) — real backends for two pages that were UI-only until now.
+const dairyRoutes = require('./routes/dairyRoutes');
+const fertilizerRoutes = require('./routes/fertilizerRoutes');
 const revenueRoutes = require('./routes/revenueRoutes');
+// M123-M127 Livestock Management — Poultry, Goat, Sheep, Pig, Animal Health
+const poultryRoutes = require('./routes/poultryRoutes');
+const goatRoutes = require('./routes/goatRoutes');
+const sheepRoutes = require('./routes/sheepRoutes');
+const pigRoutes = require('./routes/pigRoutes');
+const animalHealthRoutes = require('./routes/animalHealthRoutes');
+// Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993)
+const enterpriseControlRoutes = require('./routes/enterpriseControlRoutes');
+// Unified Ledger with Economy Segmentation (migration 998) - One Ledger + 9 Economies
+const unifiedLedgerRoutes = require('./routes/unifiedLedgerRoutes');
+// Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
+const villageProfileService = require('./services/villageProfileService');
+// Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
+const procurementSubscriptionService = require('./services/procurementSubscriptionService');
+// Buying Club Service (REOS Missing Layer 1.10-1.11 - Group Buying / Community Buying)
+const buyingClubService = require('./services/buyingClubService');
+// Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table)
+const ruralEnterpriseService = require('./services/ruralEnterpriseService');
+// Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table)
+const renewableEnergyService = require('./services/renewableEnergyService');
+// Household Economy Service (REOS Rural Life OS - household_economy table)
+const householdEconomyService = require('./services/householdEconomyService');
+// Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table)
+const sharedInfrastructureService = require('./services/sharedInfrastructureService');
+// Machinery Access Service (REOS Rural Life OS - machinery_access table)
+const machineryAccessService = require('./services/machineryAccessService');
+// Rural Finance Service (REOS Rural Life OS - rural_finance table)
+const ruralFinanceService = require('./services/ruralFinanceService');
+// AI Advisory Service (REOS Rural Life OS - ai_advisories table)
+const aiAdvisoryService = require('./services/aiAdvisoryService');
+// Market Access Service (REOS Rural Life OS - market_access table)
+const marketAccessService = require('./services/marketAccessService');
+// Market Intelligence Service (REOS Rural Life OS - market_intelligence table)
+const marketIntelligenceService = require('./services/marketIntelligenceService');
+// Mobility Rides Service (REOS Rural Life OS - mobility_rides table)
+const mobilityRidesService = require('./services/mobilityRidesService');
+// Backup and Disaster Recovery Service
+const backupService = require('./services/backupService');
+// Analytics and Monitoring Service
+const analyticsMonitoringService = require('./services/analyticsMonitoringService');
+// AI Agentic Companion Service
+const aiAgenticCompanionService = require('./services/aiAgenticCompanionService');
+// Digital Twin Service
+const digitalTwinService = require('./services/digitalTwinService');
+// AI Gateway Service - Real AI Backbone System
+const aiGatewayService = require('./services/aiGatewayService');
+// AI Agent Service - Agentic AI Capabilities
+const aiAgentService = require('./services/aiAgentService');
+// AI Brain Service - Cognitive Processing Layer
+const aiBrainService = require('./services/aiBrainService');
+// AI Self-Healing Service - Autonomous Error Recovery Layer
+const aiSelfHealingService = require('./services/aiSelfHealingService');
+// AI Operation Intelligence Service - Real-Time Optimization Layer
+const aiOperationIntelligenceService = require('./services/aiOperationIntelligenceService');
+// SAP Module Architecture Service - Independent Module Architecture
+const sapModuleArchitectureService = require('./services/sapModuleArchitectureService');
+// Cloud Management Service - Multi-Cloud Deployment
+const cloudManagementService = require('./services/cloudManagementService');
+// Server Management Service - Infrastructure Provisioning and Monitoring
+const serverManagementService = require('./services/serverManagementService');
+// Database Management Service - Distributed Database Operations
+const databaseManagementService = require('./services/databaseManagementService');
 // Advance Rate Pricing — forward curves, basis, commitment advice.
 // Recovered from afrera_platform_v44.html (migration 051).
 const riskPricingRoutes = require('./routes/riskPricingRoutes');
@@ -103,6 +186,9 @@ const riskPricingRoutes = require('./routes/riskPricingRoutes');
 const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes');
 // Domain D14 Climate & Weather (057) — was completely empty before today.
 const weatherRoutes = require('./routes/weatherRoutes');
+// M083 Climate Advisory (Operations wave 2) — CRUD for agromet_advisories,
+// the migration-057 table ClimateAdvisoryPage.jsx has been waiting on.
+const climateAdvisoryRoutes = require('./routes/climateAdvisoryRoutes');
 // TDS, e-invoice IRN, GSTR, RCM (056).
 const complianceRoutes = require('./routes/complianceRoutes');
 // RFQ sealed bidding, quote outcomes, QC holds, FPO cost centres (056).
@@ -115,10 +201,74 @@ const marketDataRoutes = require('./routes/marketDataRoutes');
 // FOLU land use + NE organic schemes (991). Logic lives in
 // organicTraceabilityService — these are routes only, no parallel service.
 const foluRoutes = require('./routes/foluRoutes');
+// Geofencing — circular zone check-ins on top of real mobile GPS (useGeolocation)
+// and the existing driver_location pipeline. See services/geofencingService.js.
+const geofencingRoutes = require('./routes/geofencingRoutes');
 // Experience Layer / DXP — the 15 engines (migration 060).
 const experienceRoutes = require('./routes/experienceRoutes');
 const demandRoutes = require('./routes/demandRoutes');
 const costRoutes = require('./routes/costRoutes');
+// AF-AA (Asset Accounting) / AF-CO (Controlling) — named MISSING in
+// docs/registry/12_ERP_COVERAGE.md and AFRERA_CLAUDE_BUILD_DIRECTIVE.md §8.6.
+// Schema (fixed_assets, depreciation_schedule, cost_centers, budgets) already
+// existed in migration 996; these give it a service/route layer for the
+// first time.
+const assetAccountingRoutes = require('./routes/assetAccountingRoutes');
+const costControlRoutes = require('./routes/costControlRoutes');
+// AF-PS (Project Systems) — the third domain named MISSING alongside AF-AA/
+// AF-CO. Unlike those two, AF-PS had no schema at all; it is created fresh
+// in migration 9996_project_systems_schema.sql (see that file's header for
+// why it is numbered after 996 rather than in the 060s sequence).
+const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
+const coldStorageRoutes = require('./routes/coldStorageRoutes');
+const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
+const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes');
+const wikipediaRoutes = require('./routes/wikipediaRoutes');
+// Vision (sharp) + OCR (tesseract.js) — real image-quality/metadata/
+// thumbnail and text-extraction dispatch behind core/aiOrchestrator.js's
+// vision_engine / ocr_engine, which were "missing" before 2026-08-09.
+const visionRoutes = require('./routes/visionRoutes');
+// AI Gateway Routes - Real AI Backbone System
+const aiGatewayRoutes = require('./routes/aiGatewayRoutes');
+// AI Agent Routes - Agentic AI Capabilities
+const aiAgentRoutes = require('./routes/aiAgentRoutes');
+// AI Brain Routes - Cognitive Processing Layer
+const aiBrainRoutes = require('./routes/aiBrainRoutes');
+// AI Self-Healing Routes - Autonomous Error Recovery Layer
+const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes');
+// AI Operation Intelligence Routes - Real-Time Optimization Layer
+const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes');
+// SAP Module Architecture Routes - Independent Module Architecture
+const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes');
+// Cloud Management Routes - Multi-Cloud Deployment
+const cloudManagementRoutes = require('./routes/cloudManagementRoutes');
+// Server Management Routes - Infrastructure Provisioning and Monitoring
+const serverManagementRoutes = require('./routes/serverManagementRoutes');
+// Database Management Routes - Distributed Database Operations
+const databaseManagementRoutes = require('./routes/databaseManagementRoutes');
+// Public Domain Data Extraction Routes - Data Extraction and Subsidy Management
+const publicDomainDataExtractionRoutes = require('./routes/publicDomainDataExtractionRoutes');
+// Research and Development Routes - R&D Management with AI Integration
+const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes');
+// Module Support Infrastructure Routes - Module Management with AI Integration
+const moduleSupportInfrastructureRoutes = require('./routes/moduleSupportInfrastructureRoutes');
+// Startup Environment Routes - Startup Management with AI Integration
+const startupEnvironmentRoutes = require('./routes/startupEnvironmentRoutes');
+// Information Sharing Routes - Document and Knowledge Sharing with AI Integration
+const informationSharingRoutes = require('./routes/informationSharingRoutes');
+// Community Routes - Community Management with AI Integration
+const communityRoutes = require('./routes/communityRoutes');
+// Knowledge Routes - Knowledge Management with AI Integration
+const knowledgeRoutes = require('./routes/knowledgeRoutes');
+// Company lookup — resolves accounting UI gap for companyId/fiscalYear/chart-of-accounts
+const companyRoutes = require('./routes/companyRoutes');
+// Platform Foundation Routes - AI Enhanced Platform Foundation (D01)
+const platformCoreRoutes = require('./routes/platformCoreRoutes');
+const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes');
+const tenantManagementRoutes = require('./routes/tenantManagementRoutes');
+const organizationManagementRoutes = require('./routes/organizationManagementRoutes');
+const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes');
+// Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already required above.
 
 // Cross-module nervous system + decision layer.
 // Services emit signals; the engine correlates them across module boundaries
@@ -134,6 +284,7 @@ const erpAgents = require('./core/erpAgents');
 const { errorHandler } = require('./middleware/errorHandler');
 const { rateLimiter } = require('./middleware/rateLimiter');
 const { authMiddleware } = require('./middleware/auth');
+const { validateBody } = require('./middleware/inputValidation');
 const { logger } = require('./utils/logger');
 
 // Initialize Express app
@@ -211,6 +362,9 @@ app.get('/health', (req, res) => {
   if (typeof institutionalProcurementService !== 'undefined') {
     healthChecks.institutional_procurement = typeof institutionalProcurementService.isHealthy === 'function' ? institutionalProcurementService.isHealthy() : { status: 'ok' };
   }
+  if (typeof millCircuitService !== 'undefined') {
+    healthChecks.mill_circuit = typeof millCircuitService.isHealthy === 'function' ? millCircuitService.isHealthy() : { status: 'ok' };
+  }
   if (typeof digitalProductPassportService !== 'undefined') {
     healthChecks.digital_product_passport = typeof digitalProductPassportService.isHealthy === 'function' ? digitalProductPassportService.isHealthy() : { status: 'ok' };
   }
@@ -259,10 +413,12 @@ mountRoute('/api/v1/consumer-health', consumerHealthService);
 mountRoute('/api/v1/voice-ai', voiceAIService);
 mountRoute('/api/v1/blockchain-traceability', blockchainTraceabilityService);
 mountRoute('/api/v1/knowledge-graph', knowledgeGraphService);
+mountRoute('/api/v1/enterprise-memory', enterpriseMemoryService);
 mountRoute('/api/v1/predictive-analytics', predictiveAnalyticsService);
 mountRoute('/api/v1/iot-integration', iotIntegrationService);
 mountRoute('/api/v1/ar-vr', arVrService);
 mountRoute('/api/v1/sms-auth', smsAuthService);
+mountRoute('/api/v1/whatsapp', whatsappService);
 mountRoute('/api/v1/advanced-voice', advancedVoiceAI);
 mountRoute('/api/v1/offline-payment', offlinePaymentService);
 mountRoute('/api/v1/advanced-ai', advancedAIService);
@@ -274,6 +430,7 @@ mountRoute('/api/v1/omnichannel-ai', omnichannelAIService);
 mountRoute('/api/v1/food-safety', foodSafetyService);
 mountRoute('/api/v1/shelf-life', shelfLifeService);
 mountRoute('/api/v1/institutional-procurement', institutionalProcurementService);
+mountRoute('/api/v1/mill-fpo', millCircuitService);
 mountRoute('/api/v1/digital-product-passport', digitalProductPassportService);
 mountRoute('/api/v1/recipe-intelligence', recipeIntelligenceService);
 mountRoute('/api/v1/forms', formService);
@@ -310,6 +467,32 @@ for (const moduleName of generatedModuleNames) {
 
 // Enhancement routes
 app.use('/api/v1/marketplace', marketplaceEnhancements);
+app.use('/api/v1/ecommerce', ecommerceRoutes);
+app.use('/api/v1/ecommerce-integration', ecommerceIntegrationRoutes);
+app.use('/api/v1/ecommerce-ai', ecommerceAIRoutes);
+app.use('/api/v1/ecommerce-erp', ecommerceERPRoutes);
+app.use('/api/v1/ecommerce-business', ecommerceBusinessSalesRoutes);
+app.use('/api/v1/ecommerce-marketing', ecommerceMarketingRoutes);
+app.use('/api/v1/nutrient-value', nutrientValueSalesRoutes);
+app.use('/api/v1/nervous', nervousSystemRoutes);
+// Bulk Order Service - Bulk/wholesale orders for marketplace
+const bulkOrderRoutes = require('./routes/bulkOrderRoutes');
+app.use('/api/v1/bulk-orders', bulkOrderRoutes);
+// Complete ERP Integration - Comprehensive ERP integration with all modules
+const completeERPIntegrationRoutes = require('./routes/completeERPIntegrationRoutes');
+app.use('/api/v1/complete-erp-integration', completeERPIntegrationRoutes);
+// Complete AI Integration - Comprehensive AI integration with all modules
+const completeAIIntegrationRoutes = require('./routes/completeAIIntegrationRoutes');
+app.use('/api/v1/complete-ai-integration', completeAIIntegrationRoutes);
+// Comprehensive ERP - Oracle/SAP standards complete ERP system
+const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes');
+app.use('/api/v1/comprehensive-erp', comprehensiveERPRoutes);
+// AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face)
+const aiBackboneRoutes = require('./routes/aiBackboneRoutes');
+app.use('/api/v1/ai-backbone', aiBackboneRoutes);
+// Farmer Training - Agricultural training and FOLU compliance
+const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes');
+app.use('/api/v1/training', farmerTrainingRoutes);
 app.use('/api/v1/insurance', insuranceEnhancements);
 app.use('/api/v1/farmer-portal', farmerPortalEnhancements);
 app.use('/api/v1/governance', governanceModule);
@@ -324,23 +507,122 @@ app.use('/api/v1/logistics-ops', logisticsOpsRoutes);
 // Newly created routes covering previously-orphaned services
 app.use('/api/v1/farmers', farmerRoutes);
 app.use('/api/v1/admin/audit', auditRoutes);
+// M121 Dairy Management + M112 Fertilizer Inventory — see dairyRoutes.js /
+// fertilizerRoutes.js. Frontend already calls these exact paths
+// (dairyAPI / fertilizerAPI in frontend/src/services/api.js); this is the
+// first time either has had a real backend.
+app.use('/api/v1/dairy', dairyRoutes);
+app.use('/api/v1/fertilizer', fertilizerRoutes);
+// M123-M127 Livestock Management — Poultry, Goat, Sheep, Pig, Animal Health
+app.use('/api/v1/poultry', poultryRoutes);
+app.use('/api/v1/goat', goatRoutes);
+app.use('/api/v1/sheep', sheepRoutes);
+app.use('/api/v1/pig', pigRoutes);
+app.use('/api/v1/animal-health', animalHealthRoutes);
+// Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993)
+app.use('/api/v1/enterprise', enterpriseControlRoutes);
+// Unified Ledger with Economy Segmentation (migration 998) - One Ledger + 9 Economies
+app.use('/api/v1/unified-ledger', unifiedLedgerRoutes);
+// Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
+villageProfileService.setupRoutes(app);
+// Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
+procurementSubscriptionService.setupRoutes(app);
+// Buying Club Service (REOS Missing Layer 1.10-1.11 - Group Buying / Community Buying)
+buyingClubService.setupRoutes(app);
+// Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table)
+ruralEnterpriseService.setupRoutes(app);
+// Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table)
+renewableEnergyService.setupRoutes(app);
+// Household Economy Service (REOS Rural Life OS - household_economy table)
+householdEconomyService.setupRoutes(app);
+// Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table)
+sharedInfrastructureService.setupRoutes(app);
+// Machinery Access Service (REOS Rural Life OS - machinery_access table)
+machineryAccessService.setupRoutes(app);
+// Rural Finance Service (REOS Rural Life OS - rural_finance table)
+ruralFinanceService.setupRoutes(app);
+// AI Advisory Service (REOS Rural Life OS - ai_advisories table)
+aiAdvisoryService.setupRoutes(app);
+// Market Access Service (REOS Rural Life OS - market_access table)
+marketAccessService.setupRoutes(app);
+// Market Intelligence Service (REOS Rural Life OS - market_intelligence table)
+marketIntelligenceService.setupRoutes(app);
+// Mobility Rides Service (REOS Rural Life OS - mobility_rides table)
+mobilityRidesService.setupRoutes(app);
 // Vendor-facing routes (corporate buyers, logistics providers, processors, retailers)
 const vendorRoutes = require('./routes/vendorRoutes');
 app.use('/api/v1/vendors', vendorRoutes);
+// HR Module with AI Integration - Complete AI-powered HR management
+const hrRoutes = require('./routes/hrRoutes');
+app.use('/api/v1/hr', hrRoutes);
 
 // Economic Layer routes (scaffolded)
 app.use('/api/v1/revenue', revenueRoutes);
 app.use('/api/v1/pricing', riskPricingRoutes);
 app.use('/api/v1/finance', recoveredFinanceRoutes);
 app.use('/api/v1/weather', weatherRoutes);
+app.use('/api/v1/climate-advisory', climateAdvisoryRoutes);
 app.use('/api/v1/compliance', complianceRoutes);
 app.use('/api/v1/rfq', rfqRoutes);
 app.use('/api/v1/energy', energyRoutes);
 app.use('/api/v1/market-data', marketDataRoutes);
 app.use('/api/v1/folu', foluRoutes);
+app.use('/api/v1/geofencing', geofencingRoutes);
 app.use('/api/v1/experience', experienceRoutes);
 app.use('/api/v1/demand', demandRoutes);
 app.use('/api/v1/costs', costRoutes);
+// AF-AA / AF-CO — see require comments above.
+app.use('/api/v1/erp/assets', assetAccountingRoutes);
+app.use('/api/v1/erp/controlling', costControlRoutes);
+app.use('/api/v1/erp/projects', projectSystemsRoutes);
+app.use('/api/v1/cold-storage', coldStorageRoutes);
+app.use('/api/v1/dpr', dprGenerationRoutes);
+app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
+// Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
+app.use('/api/v1/wikipedia', wikipediaRoutes);
+// Vision + OCR (real sharp / tesseract.js dispatch, see routes/visionRoutes.js).
+app.use('/api/v1/vision', visionRoutes);
+// AI Gateway - Real AI Backbone System
+app.use('/api/v1/ai-gateway', aiGatewayRoutes);
+// AI Agent - Agentic AI Capabilities
+app.use('/api/v1/ai-agent', aiAgentRoutes);
+// AI Brain - Cognitive Processing Layer
+app.use('/api/v1/ai-brain', aiBrainRoutes);
+// AI Self-Healing - Autonomous Error Recovery Layer
+app.use('/api/v1/ai-self-healing', aiSelfHealingRoutes);
+// AI Operation Intelligence - Real-Time Optimization Layer
+app.use('/api/v1/ai-operation-intelligence', aiOperationIntelligenceRoutes);
+// SAP Module Architecture - Independent Module Architecture
+app.use('/api/v1/sap-module-architecture', sapModuleArchitectureRoutes);
+// Cloud Management - Multi-Cloud Deployment
+app.use('/api/v1/cloud-management', cloudManagementRoutes);
+// Server Management - Infrastructure Provisioning and Monitoring
+app.use('/api/v1/server-management', serverManagementRoutes);
+// Database Management - Distributed Database Operations
+app.use('/api/v1/database-management', databaseManagementRoutes);
+// Public Domain Data Extraction - Data Extraction and Subsidy Management
+app.use('/api/v1/public-domain-data-extraction', publicDomainDataExtractionRoutes);
+// Research and Development - R&D Management with AI Integration
+app.use('/api/v1/research-and-development', researchAndDevelopmentRoutes);
+// Module Support Infrastructure - Module Management with AI Integration
+app.use('/api/v1/module-support-infrastructure', moduleSupportInfrastructureRoutes);
+// Startup Environment - Startup Management with AI Integration
+app.use('/api/v1/startup-environment', startupEnvironmentRoutes);
+// Information Sharing - Document and Knowledge Sharing with AI Integration
+app.use('/api/v1/information-sharing', informationSharingRoutes);
+// Community - Community Management with AI Integration
+app.use('/api/v1/community', communityRoutes);
+// Knowledge - Knowledge Management with AI Integration
+app.use('/api/v1/knowledge', knowledgeRoutes);
+// Company lookup — resolves accounting UI gap
+app.use('/api/v1/companies', companyRoutes);
+// Platform Foundation - AI Enhanced Platform Foundation (D01)
+app.use('/api/v1/platform-core', platformCoreRoutes);
+app.use('/api/v1/platform-configuration', platformConfigurationRoutes);
+app.use('/api/v1/tenant-management', tenantManagementRoutes);
+app.use('/api/v1/organization-management', organizationManagementRoutes);
+app.use('/api/v1/system-administration', systemAdministrationRoutes);
+// Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already mounted above.
 
 // Services that self-register their routes directly on `app`
 dynamicPricingService.setupRoutes(app);
@@ -409,6 +691,14 @@ function initializeDecisionLayer() {
   // which is why the AI learning loop measured 0%% in every audit. One wire.
   require('./core/outcomeSink').install();
 
+  // Enterprise Memory: records a case entry the moment TEMPERATURE_BREACH /
+  // RECALL_ISSUED / FRAUD_SUSPECTED fires, then best-effort links it to the
+  // ai_outcomes row the effectors above write for the same signal. See
+  // services/enterpriseMemoryService.js's module header for why this is a
+  // read-only subscriber (signalBus/effectors/outcomeSink are untouched) and
+  // why the link is best-effort rather than transactional.
+  enterpriseMemoryService.installSignalHooks();
+
   // Autonomous learning cycle. Resolves predictions against ground truth the
   // platform already holds and re-derives every agent's calibration gate, with
   // no human in the path. Seven of the eight prediction types close themselves
@@ -440,6 +730,40 @@ function initializeDecisionLayer() {
 }
 
 initializeDecisionLayer();
+
+// Initialize AFRERA Nervous System - Enterprise Route Control
+const { initializeNervousSystem, startSensorDataCollection } = require('./core/nervousSystem');
+initializeNervousSystem();
+startSensorDataCollection();
+
+// Initialize backup and disaster recovery service
+backupService.initialize().catch(error => {
+  logger.warn('Backup service initialization failed', { error: error.message });
+});
+
+// Initialize analytics and monitoring service
+analyticsMonitoringService.initialize().catch(error => {
+  logger.warn('Analytics monitoring service initialization failed', { error: error.message });
+});
+
+// Initialize AI Agentic Companion service
+aiAgenticCompanionService.initialize().catch(error => {
+  logger.warn('AI Agentic Companion service initialization failed', { error: error.message });
+});
+
+// Initialize Digital Twin service
+digitalTwinService.initialize().catch(error => {
+  logger.warn('Digital Twin service initialization failed', { error: error.message });
+});
+
+// Setup analytics monitoring routes
+analyticsMonitoringService.setupRoutes(app);
+
+// Setup AI Agentic Companion routes
+aiAgenticCompanionService.setupRoutes(app);
+
+// Setup Digital Twin routes
+digitalTwinService.setupRoutes(app);
 
 // Observability for the decision layer.
 // ERP agent catalogue and evaluation.

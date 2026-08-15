@@ -171,30 +171,33 @@ router.put('/session/:id/close', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateFinanceCopilotResponse(message, context, session) {
-  // Mock implementation - in production, this would use RAG with financial data
-  const responses = {
-    'default': {
-      content: `I can help you with financial analysis, budget planning, cash flow management, and financial reporting. What specific financial task would you like assistance with?`,
-      metadata: {
-        capabilities: ['financial_analysis', 'budget_planning', 'cash_flow', 'reporting'],
-        confidence: 0.95
-      }
-    },
-    'cash flow': {
-      content: `Based on your current cash flow data, I recommend:\n1. Improve accounts receivable collection\n2. Negotiate better payment terms with suppliers\n3. Maintain a minimum cash buffer of 3 months operating expenses\n\nWould you like me to generate a detailed cash flow forecast?`,
-      metadata: {
-        capabilities: ['cash_flow_analysis'],
-        confidence: 0.88,
-        suggestions: ['ar_improvement', 'payment_terms', 'cash_buffer']
-      }
-    }
-  };
+  const lowerMessage = (message || '').toLowerCase();
+  const userId = session?.user_id;
 
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes('cash flow')) {
-    return responses['cash flow'];
+  if (lowerMessage.includes('cash flow') && userId) {
+    try {
+      const result = await pool.query(
+        `SELECT SUM(amount) AS total, AVG(amount) AS avg_amount, COUNT(*) AS txn_count
+           FROM financial_transactions
+          WHERE user_id = $1 AND transaction_date > NOW() - INTERVAL '90 days'`,
+        [userId]
+      );
+      const row = result.rows[0];
+      if (row && Number(row.txn_count) > 0) {
+        return {
+          content: `Based on your last 90 days of recorded transactions: total ₹${Number(row.total).toFixed(2)} across ${row.txn_count} transactions, averaging ₹${Number(row.avg_amount).toFixed(2)} per transaction. Ask me for a specific date range for a detailed breakdown.`,
+          metadata: { capabilities: ['cash_flow_analysis'], source: 'financial_transactions', matched_on_real_data: true },
+        };
+      }
+    } catch (error) {
+      logger.warn('Finance copilot cash-flow lookup failed', { error: error.message });
+    }
   }
-  return responses['default'];
+
+  return {
+    content: `I can help you with financial analysis, budget planning, and cash flow, based on your actual recorded transactions. Ask about "cash flow" for a real summary of your last 90 days, or use /finance/analytics for a fuller report. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    metadata: { capabilities: ['financial_analysis', 'cash_flow'], source: userId ? 'financial_transactions' : 'none', matched_on_real_data: false },
+  };
 }
 
 /**
@@ -229,53 +232,56 @@ router.get('/finance/analytics', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateLogisticsCopilotResponse(message, context, session) {
-  const responses = {
-    'default': {
-      content: `I can assist with route optimization, fleet management, shipment tracking, and logistics cost analysis. What logistics challenge can I help you solve?`,
-      metadata: {
-        capabilities: ['route_optimization', 'fleet_management', 'tracking', 'cost_analysis'],
-        confidence: 0.94
-      }
-    },
-    'route': {
-      content: `I've analyzed your current routes and identified optimization opportunities:\n1. Route A-B-C can be optimized to save 15% fuel\n2. Consolidating shipments on Route X-Y can reduce costs by 22%\n3. Alternative routing via highway network can reduce transit time by 2 hours\n\nShall I generate detailed route optimization plans?`,
-      metadata: {
-        capabilities: ['route_optimization'],
-        confidence: 0.91,
-        optimization_potential: '15-22%'
-      }
-    }
-  };
+  const lowerMessage = (message || '').toLowerCase();
 
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes('route') || lowerMessage.includes('optimization')) {
-    return responses['route'];
+  if (lowerMessage.includes('route') || lowerMessage.includes('shipment') || lowerMessage.includes('freight')) {
+    try {
+      const result = await pool.query(
+        `SELECT origin_address, destination_address, weight_kg, estimated_cost, actual_cost, status
+           FROM shipments
+          ORDER BY created_at DESC
+          LIMIT 5`
+      );
+      if (result.rows.length > 0) {
+        const lines = result.rows.map((r) => `${r.origin_address} -> ${r.destination_address}: ${r.status}, est. ₹${r.estimated_cost ?? 'n/a'}${r.actual_cost ? ` (actual ₹${r.actual_cost})` : ''}`).join('\n');
+        return {
+          content: `Your 5 most recent shipments:\n${lines}`,
+          metadata: { capabilities: ['tracking'], source: 'shipments', matched_on_real_data: true },
+        };
+      }
+    } catch (error) {
+      logger.warn('Logistics copilot shipment lookup failed', { error: error.message });
+    }
   }
-  return responses['default'];
+
+  return {
+    content: `I can look up your real recent shipments — ask about "route" or "shipment" for a live status summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    metadata: { capabilities: ['tracking'], source: 'none', matched_on_real_data: false },
+  };
 }
 
 /**
- * Logistics copilot specific endpoints
+ * Logistics copilot specific endpoints.
+ * FIXED 2026-08-15: previously queried a `logistics_routes` table that does
+ * not exist anywhere in the schema — every call threw "relation does not
+ * exist". Rewritten against the real `shipments` table.
  */
 router.get('/logistics/routes', authMiddleware, async (req, res) => {
   try {
-    const { origin, destination, cargo_type } = req.query;
+    const { origin, destination } = req.query;
 
-    // Mock route optimization
-    const routes = await pool.query(`
-      SELECT * FROM logistics_routes
-      WHERE origin ILIKE $1 AND destination ILIKE $2
-      LIMIT 5
-    `, [`%${origin}%`, `%${destination}%`]);
+    const routes = await pool.query(
+      `SELECT id, shipment_number, origin_address, destination_address, weight_kg,
+              estimated_cost, actual_cost, estimated_transit_days, status
+         FROM shipments
+        WHERE ($1::text IS NULL OR origin_address ILIKE $1)
+          AND ($2::text IS NULL OR destination_address ILIKE $2)
+        ORDER BY created_at DESC
+        LIMIT 5`,
+      [origin ? `%${origin}%` : null, destination ? `%${destination}%` : null]
+    );
 
-    res.json({
-      routes: routes.rows,
-      optimization_suggestions: [
-        'Consider consolidated shipping for cost savings',
-        'Off-peak delivery timing can reduce costs by 15%',
-        'Alternative routes available via highway network'
-      ]
-    });
+    res.json({ routes: routes.rows });
   } catch (error) {
     logger.error('Get logistics routes error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'Failed to get logistics routes' });
@@ -287,53 +293,63 @@ router.get('/logistics/routes', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateWarehouseCopilotResponse(message, context, session) {
-  const responses = {
-    'default': {
-      content: `I can help with inventory management, warehouse layout optimization, stock level forecasting, and picking efficiency. What warehouse operation needs assistance?`,
-      metadata: {
-        capabilities: ['inventory_management', 'layout_optimization', 'forecasting', 'picking_efficiency'],
-        confidence: 0.93
-      }
-    },
-    'inventory': {
-      content: `Current inventory analysis shows:\n1. Fast-moving items: 23% of SKUs, 78% of volume\n2. Slow-moving items: 45% of SKUs, 12% of volume\n3. Obsolete stock: 8% of total inventory value\n\nRecommendations:\n- Implement ABC analysis for better stock control\n- Consider clearance sale for slow-moving items\n- Review safety stock levels for high-value items`,
-      metadata: {
-        capabilities: ['inventory_analysis'],
-        confidence: 0.89,
-        actionable_insights: true
-      }
-    }
-  };
+  const lowerMessage = (message || '').toLowerCase();
+  const warehouseId = context?.warehouse_id;
 
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes('inventory') || lowerMessage.includes('stock')) {
-    return responses['inventory'];
+  if ((lowerMessage.includes('inventory') || lowerMessage.includes('stock')) && warehouseId) {
+    try {
+      const result = await pool.query(
+        `SELECT p.name, wi.quantity, wi.zone, wi.expiry_date
+           FROM warehouse_inventory wi
+           JOIN products p ON p.id = wi.product_id
+          WHERE wi.warehouse_id = $1
+          ORDER BY wi.quantity ASC
+          LIMIT 5`,
+        [warehouseId]
+      );
+      if (result.rows.length > 0) {
+        const lowest = result.rows.map((r) => `${r.name}: ${r.quantity} units (zone ${r.zone || 'unassigned'})`).join('\n');
+        return {
+          content: `Lowest-quantity items in this warehouse right now:\n${lowest}`,
+          metadata: { capabilities: ['inventory_analysis'], source: 'warehouse_inventory', matched_on_real_data: true },
+        };
+      }
+    } catch (error) {
+      logger.warn('Warehouse copilot inventory lookup failed', { error: error.message });
+    }
   }
-  return responses['default'];
+
+  return {
+    content: `I can help with real recorded inventory levels for a specific warehouse — ask about "inventory" or "stock" with a warehouse_id in context for a live low-stock summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    metadata: { capabilities: ['inventory_management'], source: warehouseId ? 'warehouse_inventory' : 'none', matched_on_real_data: false },
+  };
 }
 
 /**
- * Warehouse copilot specific endpoints
+ * Warehouse copilot specific endpoints.
+ * FIXED 2026-08-15: previously selected product_name/category/current_stock/
+ * reorder_level/stock_status/turnover_rate — none of which exist on the real
+ * warehouse_inventory table (013_logistics_enhancements.sql: quantity, zone,
+ * location, expiry_date, batch_number, quality_grade). Every call to this
+ * endpoint threw "column does not exist". Rewritten against the real schema,
+ * joined to products for name/category.
  */
 router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
   try {
-    const { warehouse_id, category } = req.query;
+    const { warehouse_id, category_id } = req.query;
+    if (!warehouse_id) return res.status(400).json({ error: 'warehouse_id is required' });
 
-    const inventory = await pool.query(`
-      SELECT 
-        product_id,
-        product_name,
-        category,
-        current_stock,
-        reorder_level,
-        stock_status,
-        last_restocked,
-        turnover_rate
-      FROM warehouse_inventory
-      WHERE warehouse_id = $1
-        AND ($2::text IS NULL OR category = $2)
-      ORDER BY turnover_rate DESC
-    `, [warehouse_id, category]);
+    const inventory = await pool.query(
+      `SELECT wi.product_id, p.name AS product_name, p.category_id,
+              wi.quantity, wi.zone, wi.location, wi.expiry_date, wi.batch_number,
+              wi.quality_grade, wi.last_counted
+         FROM warehouse_inventory wi
+         JOIN products p ON p.id = wi.product_id
+        WHERE wi.warehouse_id = $1
+          AND ($2::integer IS NULL OR p.category_id = $2)
+        ORDER BY wi.quantity ASC`,
+      [warehouse_id, category_id || null]
+    );
 
     res.json(inventory.rows);
   } catch (error) {
@@ -347,49 +363,56 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateInsuranceCopilotResponse(message, context, session) {
-  const responses = {
-    'default': {
-      content: `I can assist with policy analysis, claims processing, risk assessment, premium optimization, and compliance management. What insurance matter can I help with?`,
-      metadata: {
-        capabilities: ['policy_analysis', 'claims', 'risk_assessment', 'premium_optimization', 'compliance'],
-        confidence: 0.96
-      }
-    },
-    'claim': {
-      content: `For your claim inquiry, I can help with:\n1. Claim status tracking and updates\n2. Document requirements verification\n3. Coverage analysis under your policy\n4. Estimated processing timeline\n\nPlease provide your claim number or policy details for specific assistance.`,
-      metadata: {
-        capabilities: ['claims_assistance'],
-        confidence: 0.92,
-        next_steps: ['claim_number', 'policy_details']
+  const lowerMessage = (message || '').toLowerCase();
+  const userId = session?.user_id;
+
+  if (lowerMessage.includes('claim') || lowerMessage.includes('policy') || lowerMessage.includes('coverage')) {
+    if (userId) {
+      try {
+        const result = await pool.query(
+          `SELECT policy_number, coverage_amount, premium_amount, policy_end_date, status
+             FROM policies
+            WHERE user_id = $1
+            ORDER BY policy_end_date ASC
+            LIMIT 5`,
+          [userId]
+        );
+        if (result.rows.length > 0) {
+          const lines = result.rows.map((p) => `${p.policy_number}: ${p.status}, coverage ₹${p.coverage_amount}, expires ${new Date(p.policy_end_date).toLocaleDateString('en-IN')}`).join('\n');
+          return {
+            content: `Your recorded policies:\n${lines}`,
+            metadata: { capabilities: ['policy_analysis'], source: 'policies', matched_on_real_data: true },
+          };
+        }
+      } catch (error) {
+        logger.warn('Insurance copilot policy lookup failed', { error: error.message });
       }
     }
-  };
-
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes('claim')) {
-    return responses['claim'];
   }
-  return responses['default'];
+
+  return {
+    content: `I can look up your real recorded policies — ask about "claim", "policy", or "coverage" for a live summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    metadata: { capabilities: ['policy_analysis'], source: userId ? 'policies' : 'none', matched_on_real_data: false },
+  };
 }
 
 /**
- * Insurance copilot specific endpoints
+ * Insurance copilot specific endpoints.
+ * FIXED 2026-08-15: previously queried a nonexistent `insurance_policies`
+ * table with columns (policy_id, policy_type, premium, risk_score) that
+ * don't exist anywhere in the schema. Rewritten against the real `policies`
+ * table (000_base_schema.sql).
  */
 router.get('/insurance/policies', authMiddleware, async (req, res) => {
   try {
-    const policies = await pool.query(`
-      SELECT 
-        policy_id,
-        policy_type,
-        coverage_amount,
-        premium,
-        status,
-        renewal_date,
-        risk_score
-      FROM insurance_policies
-      WHERE user_id = $1
-      ORDER BY renewal_date ASC
-    `, [req.user.id]);
+    const policies = await pool.query(
+      `SELECT id, policy_number, coverage_amount, premium_amount,
+              policy_start_date, policy_end_date, status, insurer_name
+         FROM policies
+        WHERE user_id = $1
+        ORDER BY policy_end_date ASC`,
+      [req.user.id]
+    );
 
     res.json(policies.rows);
   } catch (error) {
@@ -402,30 +425,81 @@ router.get('/insurance/policies', authMiddleware, async (req, res) => {
 // NUTRITION COPILOT (CAP-228)
 // ============================================================================
 
+/**
+ * Live interactive AI dietitian / natural-therapist copilot.
+ *
+ * Replaced a fabricated version of this function (static canned text,
+ * hardcoded `confidence: 0.91/0.95` regardless of input) with one grounded
+ * in real data: wellness_natural_practices (evidence-labeled traditional/
+ * natural remedies, e.g. the NE forest-honey entry — see
+ * 9999_zz_product_media_ai_schema.sql) and food_composition/nutrition data
+ * already real in nutritionIntelligenceService.js. No LLM is configured in
+ * this environment, so this is keyword-matched against real rows, not
+ * generative — and it says so, rather than pretending otherwise.
+ */
 async function generateNutritionCopilotResponse(message, context, session) {
-  const responses = {
-    'default': {
-      content: `I can help with nutritional analysis, meal planning, dietary recommendations, allergen management, and health-focused food selection. What nutrition guidance do you need?`,
-      metadata: {
-        capabilities: ['nutritional_analysis', 'meal_planning', 'dietary_recommendations', 'allergen_management'],
-        confidence: 0.95
-      }
-    },
-    'meal': {
-      content: `Based on your nutritional profile and preferences, I recommend:\n\nBreakfast: High-protein options with complex carbohydrates\nLunch: Balanced meal with vegetables and lean protein\nDinner: Light meal with essential nutrients\n\nSnacks: Nutrient-dense options between meals\n\nWould you like detailed recipes and shopping lists for these meals?`,
-      metadata: {
-        capabilities: ['meal_planning'],
-        confidence: 0.91,
-        personalized: true
-      }
-    }
-  };
+  const nutritionIntelligenceService = require('./nutritionIntelligenceService');
+  const lowerMessage = (message || '').toLowerCase();
+  const words = lowerMessage.split(/[^a-z0-9]+/).filter((w) => w.length > 3);
 
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes('meal') || lowerMessage.includes('diet') || lowerMessage.includes('food')) {
-    return responses['meal'];
+  // 1. Natural-therapy / traditional-remedy match (real DB, real evidence labels)
+  for (const word of words) {
+    try {
+      const { practices, disclaimer } = await nutritionIntelligenceService.getWellnessPractices({ tag: word });
+      if (practices.length > 0) {
+        const p = practices[0];
+        return {
+          content: `${p.common_name || p.practice_name}: ${p.traditional_use}\n\nEvidence level: ${p.evidence_level.replace(/_/g, ' ')}.${p.requires_consultation ? ' Please consult a qualified practitioner before use.' : ''}${p.contraindications ? `\n\nContraindications: ${p.contraindications}` : ''}\n\n${disclaimer}`,
+          metadata: {
+            source: 'wellness_natural_practices',
+            practice_id: p.id,
+            evidence_level: p.evidence_level,
+            requires_consultation: p.requires_consultation,
+            matched_on_real_data: true,
+          },
+        };
+      }
+    } catch (error) {
+      logger.warn('Nutrition copilot wellness lookup failed', { word, error: error.message });
+    }
   }
-  return responses['default'];
+
+  // 2. Real food-nutrition search (calorie/diet/meal-type questions)
+  if (lowerMessage.includes('meal') || lowerMessage.includes('diet') || lowerMessage.includes('food') || lowerMessage.includes('nutrition')) {
+    try {
+      const matches = await nutritionIntelligenceService.searchFoodProfiles(words[0] || '', null);
+      if (matches && matches.length > 0) {
+        const top = matches.slice(0, 3).map((f) => f.food_name || f.name).filter(Boolean).join(', ');
+        return {
+          content: `Based on recorded nutrition data, relevant foods include: ${top}. Ask about a specific food by name for its real nutrient breakdown, or ask me to compare two products.`,
+          metadata: { source: 'food_composition', matched_on_real_data: true, matchCount: matches.length },
+        };
+      }
+    } catch (error) {
+      logger.warn('Nutrition copilot food search failed', { error: error.message });
+    }
+  }
+
+  // 3. Real Wikipedia reference lookup — genuine external source with
+  // citation, tried only after internal (higher-trust) sources found nothing.
+  try {
+    const wikipediaService = require('./wikipediaService');
+    const wiki = await wikipediaService.lookup(message);
+    if (wiki) {
+      return {
+        content: `${wiki.extract}\n\n(Source: Wikipedia — ${wiki.sourceUrl}. This is a general reference, not agronomic or medical advice specific to your situation.)`,
+        metadata: { source: 'wikipedia', sourceUrl: wiki.sourceUrl, matched_on_real_data: true },
+      };
+    }
+  } catch (error) {
+    logger.warn('Nutrition copilot Wikipedia fallback failed', { error: error.message });
+  }
+
+  // Honest fallback — no fabricated confidence score, no canned advice.
+  return {
+    content: `I can look up real, evidence-labeled traditional/natural remedies (try naming an ingredient, e.g. "honey"), real nutrient data for a specific food, or a general Wikipedia reference. I don't have a general-purpose AI model configured in this environment, so I can only answer from what's actually recorded in the database or cited from a real external source.`,
+    metadata: { source: 'none', matched_on_real_data: false },
+  };
 }
 
 /**
@@ -485,53 +559,59 @@ function generateNutritionRecommendations(foods) {
 // ============================================================================
 
 async function generateMarketplaceCopilotResponse(message, context, session) {
-  const responses = {
-    'default': {
-      content: `I can assist with market analysis, pricing strategies, product recommendations, seller optimization, and buyer guidance. What marketplace aspect would you like help with?`,
-      metadata: {
-        capabilities: ['market_analysis', 'pricing_strategy', 'product_recommendations', 'seller_optimization', 'buyer_guidance'],
-        confidence: 0.94
-      }
-    },
-    'pricing': {
-      content: `Market pricing analysis for your products:\n1. Current market price range: ₹X - ₹Y per unit\n2. Competitive positioning: Your prices are 12% below market average\n3. Demand elasticity: Price-sensitive category with optimal price point at ₹Z\n4. Seasonal trends: Prices typically increase by 15-20% during peak season\n\nRecommendations:\n- Consider dynamic pricing based on demand\n- Bundle complementary products for value perception\n- Implement promotional pricing during off-peak periods`,
-      metadata: {
-        capabilities: ['pricing_analysis'],
-        confidence: 0.90,
-        data_driven: true
-      }
-    }
-  };
+  const lowerMessage = (message || '').toLowerCase();
+  const categoryId = context?.category_id;
 
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('market')) {
-    return responses['pricing'];
+  if ((lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('market')) && categoryId) {
+    try {
+      const result = await pool.query(
+        `SELECT avg_price, min_price, max_price, listing_count, record_date
+           FROM market_price_history
+          WHERE category_id = $1
+          ORDER BY record_date DESC
+          LIMIT 1`,
+        [categoryId]
+      );
+      if (result.rows.length > 0) {
+        const r = result.rows[0];
+        return {
+          content: `Most recent recorded market pricing for this category (as of ${new Date(r.record_date).toLocaleDateString('en-IN')}): average ₹${r.avg_price}, range ₹${r.min_price}-₹${r.max_price}, across ${r.listing_count} listings.`,
+          metadata: { capabilities: ['pricing_analysis'], source: 'market_price_history', matched_on_real_data: true },
+        };
+      }
+    } catch (error) {
+      logger.warn('Marketplace copilot pricing lookup failed', { error: error.message });
+    }
   }
-  return responses['default'];
+
+  return {
+    content: `I can look up real recorded market pricing for a category — ask about "price" or "market" with a category_id in context for a live summary. I don't have a general-purpose AI model configured here, so I only answer from what's actually recorded.`,
+    metadata: { capabilities: ['pricing_analysis'], source: categoryId ? 'market_price_history' : 'none', matched_on_real_data: false },
+  };
 }
 
 /**
- * Marketplace copilot specific endpoints
+ * Marketplace copilot specific endpoints.
+ * FIXED 2026-08-15: previously queried a nonexistent `marketplace_analytics`
+ * table with columns (product_category, seller_id, trend_direction,
+ * growth_rate) that don't exist anywhere in the schema. Rewritten against
+ * the real `market_price_history` table (3100_ecommerce_tables.sql), which
+ * is keyed by category_id/state_id, not free-text category/region.
  */
 router.get('/marketplace/trends', authMiddleware, async (req, res) => {
   try {
-    const { category, region, time_period } = req.query;
+    const { category_id, state_id, days } = req.query;
+    if (!category_id) return res.status(400).json({ error: 'category_id is required' });
 
-    const trends = await pool.query(`
-      SELECT 
-        product_category,
-        region,
-        AVG(price) as avg_price,
-        AVG(quantity_sold) as avg_volume,
-        COUNT(DISTINCT seller_id) as seller_count,
-        trend_direction,
-        growth_rate
-      FROM marketplace_analytics
-      WHERE product_category = $1
-        AND region = $2
-        AND date >= NOW() - INTERVAL $3
-      GROUP BY product_category, region, trend_direction, growth_rate
-    `, [category, region, time_period || '30 days']);
+    const trends = await pool.query(
+      `SELECT category_id, state_id, avg_price, min_price, max_price, listing_count, record_date
+         FROM market_price_history
+        WHERE category_id = $1
+          AND ($2::integer IS NULL OR state_id = $2)
+          AND record_date >= CURRENT_DATE - ($3 || ' days')::interval
+        ORDER BY record_date DESC`,
+      [category_id, state_id || null, days || '30']
+    );
 
     res.json(trends.rows);
   } catch (error) {
@@ -549,7 +629,6 @@ async function generateGenericCopilotResponse(message, context, session) {
     content: `I'm your AI copilot assistant. I can help you with various tasks across the platform. Please let me know what specific assistance you need, and I'll connect you with the right specialized copilot.`,
     metadata: {
       capabilities: ['general_assistance'],
-      confidence: 0.85,
       available_copilots: ['finance', 'logistics', 'warehouse', 'insurance', 'nutrition', 'marketplace']
     }
   };
@@ -587,5 +666,9 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
+  // Exported (additive only, no logic changed) so services/whatsappService.js
+  // can reuse the existing generic-copilot template response for default
+  // farmer queries instead of duplicating it.
+  generateCopilotResponse
 };
