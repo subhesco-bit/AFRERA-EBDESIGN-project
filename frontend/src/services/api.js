@@ -1271,6 +1271,17 @@ export const farmerPortalAPI = {
   syncGovernmentLandRecords: () => api.post('/farmer-portal/land-records/sync-government'),
 }
 
+/** Farmer wallet — real, DB-backed, transactional (see services/farmerService.js). */
+export const walletAPI = {
+  getWallet: () => api.get('/farmer-portal/wallet'),
+  getBalance: () => api.get('/farmer-portal/wallet/balance'),
+  getTransactions: (params) => api.get('/farmer-portal/wallet/transactions', { params }),
+  deposit: (data) => api.post('/farmer-portal/wallet/deposit', data),
+  withdraw: (data) => api.post('/farmer-portal/wallet/withdraw', data),
+  transfer: (data) => api.post('/farmer-portal/wallet/transfer', data),
+  linkBank: (data) => api.post('/farmer-portal/wallet/link-bank', data),
+}
+
 /** Food intelligence recalls (components/FoodIntelligence/FoodSafetyDashboard.jsx). */
 export const foodIntelligenceAPI = {
   getActiveRecalls: () => api.get('/food-intelligence/food-recalls/active'),

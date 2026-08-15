@@ -450,9 +450,22 @@ async function getSeasonalityFactors(category) {
   return {};
 }
 
+// FIXED 2026-08-15: previously fabricated a fake escrow_id and reported
+// the full order value as "held" — no funds were ever moved anywhere.
+// This is financially dangerous: a buyer/farmer relying on this response
+// would believe money was actually secured in escrow when it was not.
+// This whole service persists orders in memory only (no DB — see the
+// flagged follow-up task to rebuild it on real tables), so a real
+// wallet-backed hold can't be wired correctly until that exists. Honestly
+// reports non-implementation instead of fabricating a success response.
 async function setupEscrow(order) {
-  // Set up escrow
-  return { escrow_id: 'ESC-' + Date.now(), amount: order.price_offered * order.quantity_required };
+  logger.warn('setupEscrow called but no real escrow mechanism is implemented — no funds were moved', { orderId: order.order_id });
+  return {
+    escrow_id: null,
+    amount: null,
+    status: 'not_implemented',
+    reason: 'No real escrow fund-holding is implemented. This order\'s escrow_required flag could not be honored — do not treat this order as having secured funds.',
+  };
 }
 
 async function getPreSeasonOrder(orderId) {
@@ -500,9 +513,12 @@ async function getRiskTolerance(buyerId) {
   return {};
 }
 
+// FIXED 2026-08-15: previously returned {} silently — callers destructuring
+// an escrow_id or amount off this got `undefined` with no indication
+// nothing real happened. See setupEscrow() above for the full reasoning.
 async function setupContractEscrow(agreementData) {
-  // Set up contract escrow
-  return {};
+  logger.warn('setupContractEscrow called but no real escrow mechanism is implemented — no funds were moved');
+  return { escrow_id: null, amount: null, status: 'not_implemented', reason: 'No real escrow fund-holding is implemented for contract farming agreements.' };
 }
 
 async function getLegalRequirements() {
@@ -540,9 +556,13 @@ async function getWeatherData(contractId, date) {
   return {};
 }
 
+// FIXED 2026-08-15: previously logged "Escrow payment released" as if a
+// real payment had moved — nothing was ever escrowed in the first place
+// (see setupEscrow/setupContractEscrow above), so this was reporting a
+// fabricated success for a transaction that never existed.
 async function releaseEscrowPayment(contractId, milestoneId) {
-  // Release escrow payment
-  logger.info(`Escrow payment released for contract ${contractId}, milestone ${milestoneId}`);
+  logger.warn('releaseEscrowPayment called but no real escrow mechanism is implemented — no funds were released', { contractId, milestoneId });
+  return { status: 'not_implemented', reason: 'No real escrow fund-holding exists for this contract, so there is nothing to release.' };
 }
 
 async function notifyStakeholders(contract, milestone) {
