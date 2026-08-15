@@ -11,7 +11,7 @@ const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');
 
 // Village Management Routes
-router.post('/villages', adminMiddleware, async (req, res) => {
+router.post('/villages', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const village = await governanceService.createVillage(req.body);
     res.json({ success: true, data: village });
@@ -39,7 +39,7 @@ router.get('/villages/:villageId', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/villages/:villageId', adminMiddleware, async (req, res) => {
+router.put('/villages/:villageId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { villageId } = req.params;
     const village = await governanceService.updateVillage(villageId, req.body);
@@ -50,7 +50,7 @@ router.put('/villages/:villageId', adminMiddleware, async (req, res) => {
 });
 
 // Panchayat Integration Routes
-router.post('/panchayats', adminMiddleware, async (req, res) => {
+router.post('/panchayats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const panchayat = await governanceService.createPanchayat(req.body);
     res.json({ success: true, data: panchayat });
@@ -78,7 +78,7 @@ router.get('/panchayats/:panchayatId', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/panchayats/:panchayatId/schemes', adminMiddleware, async (req, res) => {
+router.post('/panchayats/:panchayatId/schemes', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { panchayatId } = req.params;
     const scheme = await governanceService.addPanchayatScheme(panchayatId, req.body);
@@ -137,7 +137,7 @@ router.post('/csr-projects/:projectId/contributions', authRateLimit, authMiddlew
   }
 });
 
-router.get('/csr/statistics', adminMiddleware, async (req, res) => {
+router.get('/csr/statistics', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const stats = await governanceService.getCSRStatistics(req.query);
     res.json({ success: true, data: stats });
@@ -175,7 +175,7 @@ router.get('/compliance-reports/:reportId', authMiddleware, async (req, res) => 
   }
 });
 
-router.put('/compliance-reports/:reportId/review', adminMiddleware, async (req, res) => {
+router.put('/compliance-reports/:reportId/review', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { reportId } = req.params;
     const report = await governanceService.reviewComplianceReport(reportId, req.user.id, req.body);
@@ -185,7 +185,7 @@ router.put('/compliance-reports/:reportId/review', adminMiddleware, async (req, 
   }
 });
 
-router.get('/compliance/statistics', adminMiddleware, async (req, res) => {
+router.get('/compliance/statistics', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const stats = await governanceService.getComplianceStatistics(req.query);
     res.json({ success: true, data: stats });
@@ -194,8 +194,27 @@ router.get('/compliance/statistics', adminMiddleware, async (req, res) => {
   }
 });
 
+// Platform intermediary-compliance readiness (FSSAI/Grievance/Nodal/GSTIN)
+router.get('/compliance/gaps', authMiddleware, async (req, res) => {
+  try {
+    const data = await governanceService.complianceGaps();
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/compliance/ready', authMiddleware, async (req, res) => {
+  try {
+    const isReady = await governanceService.complianceReady();
+    res.json({ success: true, data: { isReady } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Cooperative Management Routes
-router.post('/cooperatives', adminMiddleware, async (req, res) => {
+router.post('/cooperatives', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const cooperative = await governanceService.createCooperative(req.body);
     res.json({ success: true, data: cooperative });

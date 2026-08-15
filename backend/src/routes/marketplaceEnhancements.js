@@ -25,7 +25,7 @@ router.post('/gst/calculate/order/:orderId', authMiddleware, async (req, res) =>
 
 router.post('/gst/calculate/product', authMiddleware, async (req, res) => {
   try {
-    const gstCalculation = gstService.calculateProductGST(req.body);
+    const gstCalculation = await gstService.calculateProductGST(req.body);
     res.json({ success: true, data: gstCalculation });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -122,7 +122,7 @@ router.delete('/reviews/:reviewId', authRateLimit, authMiddleware, async (req, r
   }
 });
 
-router.put('/reviews/:reviewId/moderate', adminMiddleware, async (req, res) => {
+router.put('/reviews/:reviewId/moderate', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
     const { status } = req.body;
@@ -187,7 +187,7 @@ router.get('/bulk-orders', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/bulk-orders/:orderId/status', adminMiddleware, async (req, res) => {
+router.put('/bulk-orders/:orderId/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status, notes } = req.body;
@@ -198,7 +198,7 @@ router.put('/bulk-orders/:orderId/status', adminMiddleware, async (req, res) => 
   }
 });
 
-router.post('/bulk-orders/:orderId/quotation', adminMiddleware, async (req, res) => {
+router.post('/bulk-orders/:orderId/quotation', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { orderId } = req.params;
     const quotation = await bulkOrderService.createQuotation(orderId, req.body);
@@ -229,7 +229,7 @@ router.post('/quotations/:quotationId/reject', authMiddleware, async (req, res) 
   }
 });
 
-router.get('/bulk-orders/stats', adminMiddleware, async (req, res) => {
+router.get('/bulk-orders/stats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const stats = await bulkOrderService.getBulkOrderStats(req.query);
     res.json({ success: true, data: stats });

@@ -11,7 +11,7 @@ const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');
 
 // Fleet Management Routes
-router.post('/fleet', adminMiddleware, async (req, res) => {
+router.post('/fleet', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const vehicle = await logisticsEnhancementService.addVehicle(req.body);
     res.json({ success: true, data: vehicle });
@@ -29,6 +29,18 @@ router.get('/fleet', authMiddleware, async (req, res) => {
   }
 });
 
+// Real "due for service" list — placed ahead of /fleet/:vehicleId so
+// "maintenance-due" is never swallowed as a vehicleId.
+router.get('/fleet/maintenance-due', authMiddleware, async (req, res) => {
+  try {
+    const dueSoonWithinDays = req.query.dueSoonWithinDays ? parseInt(req.query.dueSoonWithinDays, 10) : undefined;
+    const result = await logisticsEnhancementService.getMaintenanceDueList({ dueSoonWithinDays });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 router.get('/fleet/:vehicleId', authMiddleware, async (req, res) => {
   try {
     const { vehicleId } = req.params;
@@ -39,7 +51,7 @@ router.get('/fleet/:vehicleId', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/fleet/:vehicleId', adminMiddleware, async (req, res) => {
+router.put('/fleet/:vehicleId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { vehicleId } = req.params;
     const vehicle = await logisticsEnhancementService.updateVehicle(vehicleId, req.body);
@@ -49,7 +61,7 @@ router.put('/fleet/:vehicleId', adminMiddleware, async (req, res) => {
   }
 });
 
-router.post('/fleet/:vehicleId/maintenance', adminMiddleware, async (req, res) => {
+router.post('/fleet/:vehicleId/maintenance', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { vehicleId } = req.params;
     const maintenance = await logisticsEnhancementService.scheduleMaintenance(vehicleId, req.body);
@@ -90,7 +102,7 @@ router.get('/shipments/:shipmentId/live-tracking', authMiddleware, async (req, r
   }
 });
 
-router.post('/shipments/:shipmentId/geofence', adminMiddleware, async (req, res) => {
+router.post('/shipments/:shipmentId/geofence', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { shipmentId } = req.params;
     const geofence = await logisticsEnhancementService.setGeofence(shipmentId, req.body);
@@ -121,7 +133,7 @@ router.get('/shipments/:shipmentId/temperature', authMiddleware, async (req, res
   }
 });
 
-router.post('/shipments/:shipmentId/temperature-alerts', adminMiddleware, async (req, res) => {
+router.post('/shipments/:shipmentId/temperature-alerts', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { shipmentId } = req.params;
     const alert = await logisticsEnhancementService.setTemperatureAlert(shipmentId, req.body);
@@ -142,7 +154,7 @@ router.get('/shipments/:shipmentId/temperature-alerts', authMiddleware, async (r
 });
 
 // Warehouse Integration Routes
-router.post('/warehouses', adminMiddleware, async (req, res) => {
+router.post('/warehouses', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const warehouse = await logisticsEnhancementService.createWarehouse(req.body);
     res.json({ success: true, data: warehouse });
@@ -200,7 +212,7 @@ router.post('/warehouses/:warehouseId/shipments', authRateLimit, adminMiddleware
   }
 });
 
-router.get('/statistics', adminMiddleware, async (req, res) => {
+router.get('/statistics', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const stats = await logisticsEnhancementService.getLogisticsStatistics(req.query);
     res.json({ success: true, data: stats });

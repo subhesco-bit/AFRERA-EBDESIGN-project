@@ -159,7 +159,7 @@ router.post('/policies/:policyId/documents', authMiddleware, async (req, res) =>
 });
 
 // Fraud Detection Routes
-router.post('/claims/:claimId/fraud-analysis', adminMiddleware, async (req, res) => {
+router.post('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { claimId } = req.params;
     const analysis = await insuranceFraudDetectionService.analyzeClaimForFraud(claimId);
@@ -179,7 +179,7 @@ router.get('/claims/:claimId/fraud-analysis', authMiddleware, async (req, res) =
   }
 });
 
-router.get('/fraud/statistics', adminMiddleware, async (req, res) => {
+router.get('/fraud/statistics', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const stats = await insuranceFraudDetectionService.getFraudStatistics(req.query);
     res.json({ success: true, data: stats });
