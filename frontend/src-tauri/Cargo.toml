@@ -1,0 +1,88 @@
+[package]
+name = "afrera"
+version = "1.0.0"
+description = "AFRERA Agricultural Platform desktop shell"
+authors = ["AFRERA"]
+license = ""
+repository = ""
+edition = "2021"
+rust-version = "1.60"
+build = "build.rs"
+
+[build-dependencies]
+tauri-build = { version = "1", features = [] }
+
+[dependencies]
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+# Feature list mirrors tauri.conf.json's `tauri.allowlist` exactly (least
+# privilege — do not add "api-all" or any "<module>-all" flag not already
+# implied below without a matching allowlist change in tauri.conf.json).
+#
+#   allowlist key                              -> cargo feature(s)
+#   shell.open                                  -> shell-open
+#   window.close/hide/show/maximize/minimize/
+#     unmaximize/unminimize/startDragging/
+#     setDecorations/setAlwaysOnTop             -> window-*
+#   notification.all                            -> notification-all
+#   fs.readFile/writeFile/readDir/createDir/
+#     removeDir/copyFile/removeFile/exists      -> fs-*
+#   fs.moveFile                                 -> fs-rename-file (closest
+#     real Tauri v1 capability; NOTE: "moveFile" is not an actual Tauri v1
+#     fs allowlist key -- the real key is "renameFile". This looks like a
+#     pre-existing typo in tauri.conf.json's fs allowlist, left as-is here
+#     per instructions not to touch the allowlist section; flagged for a
+#     follow-up fix to the config itself.)
+#   path.all                                    -> path-all
+#   http.request                                -> http-all (only feature
+#     the http module exposes; there is no finer-grained "http-request")
+#   dialog.open/save/message/ask/confirm        -> dialog-*
+#   clipboard.readText/writeText                -> clipboard-*
+#   os.platform/version/arch/type                -> os-all (single feature
+#     covers the whole os module, same as http)
+#   systemTray config present                    -> system-tray
+tauri = { version = "1", features = [
+  "clipboard-read-text",
+  "clipboard-write-text",
+  "dialog-ask",
+  "dialog-confirm",
+  "dialog-message",
+  "dialog-open",
+  "dialog-save",
+  "fs-copy-file",
+  "fs-create-dir",
+  "fs-exists",
+  "fs-read-dir",
+  "fs-read-file",
+  "fs-remove-dir",
+  "fs-remove-file",
+  "fs-rename-file",
+  "fs-write-file",
+  "http-all",
+  "notification-all",
+  "os-all",
+  "path-all",
+  "shell-open",
+  "system-tray",
+  "window-close",
+  "window-hide",
+  "window-maximize",
+  "window-minimize",
+  "window-set-always-on-top",
+  "window-set-decorations",
+  "window-show",
+  "window-start-dragging",
+  "window-unmaximize",
+  "window-unminimize",
+] }
+
+[features]
+# this feature is used for production builds where `devPath` points to the
+# filesystem and the built-in dev server is not used
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
