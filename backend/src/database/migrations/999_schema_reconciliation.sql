@@ -82,15 +82,15 @@ ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMP;
 ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS resolved_by INTEGER;
 ALTER TABLE temperature_alerts ADD COLUMN IF NOT EXISTS triggered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
--- tender_bids (winning definition: migrations/023_engineering_schema.sql)
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS bid_security_provided BOOLEAN;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS documents_submitted JSONB;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS financial_proposal JSONB;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS proposed_delivery_schedule JSONB;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS proposed_payment_terms JSONB;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS supplier_id INTEGER;
-ALTER TABLE tender_bids ADD COLUMN IF NOT EXISTS technical_proposal JSONB;
+-- tender_bids: entry removed 2026-08-10. This block used to bolt 030's
+-- columns onto 023_engineering_schema.sql's incompatible "winning" table
+-- (wrong types, a NOT NULL bidder_name the real INSERT never supplies, and a
+-- tender_id FK pointed at the wrong parent table) — it silenced the "column
+-- does not exist" symptom without fixing the underlying type/constraint
+-- mismatch. 023 now creates its dead table as `engineering_tender_bids`
+-- instead, so 030's own CREATE TABLE wins cleanly and no bridge is needed.
+-- See migrations/999_zz_tender_bids_collision_repair.sql for databases where
+-- 023 already ran under the old name before this fix landed.
 
 -- vehicle_maintenance (winning definition: migrations/013_logistics_enhancements.sql)
 ALTER TABLE vehicle_maintenance ADD COLUMN IF NOT EXISTS actual_date DATE;

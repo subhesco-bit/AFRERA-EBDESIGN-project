@@ -588,58 +588,48 @@ CREATE INDEX IF NOT EXISTS idx_digital_twin_data_sensor_time ON digital_twin_dat
 -- COMPLIANCE RECORDS
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS compliance_records (
+-- Renamed from `compliance_records` 2026-08-10: that name collided with the
+-- real, active compliance_records table in 000_base_schema.sql (which always
+-- won, since 000 runs first). This file previously papered over the collision
+-- by ALTERing its extra columns onto the real table — harmless (nothing
+-- queries compliance_records under this Engineering-OS shape) but pointless
+-- clutter on a live table. Renamed for consistency with the tender_bids fix
+-- above rather than leaving the same landmine for a future consumer.
+CREATE TABLE IF NOT EXISTS engineering_compliance_records (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES engineering_projects(id) ON DELETE CASCADE,
-  
+
   -- Standard Information
   standard_code VARCHAR(50) NOT NULL,
   standard_name VARCHAR(255) NOT NULL,
   standard_category VARCHAR(100), -- building, structural, electrical, fire, environmental
-  
+
   -- Compliance Status
   compliance_status VARCHAR(50) NOT NULL, -- compliant, non_compliant, partial, pending
   compliance_score DECIMAL, -- 0-100
-  
+
   -- Gap Analysis
   gap_analysis JSONB, -- [{requirement, status, gap, recommendation}]
   required_actions TEXT,
-  
+
   -- Verification
   verified_by UUID REFERENCES users(id) ON DELETE SET NULL,
   verified_at TIMESTAMP,
   verification_notes TEXT,
-  
+
   -- Documents
   compliance_documents JSONB, -- [{document_id, document_name, url}]
-  
+
   -- Metadata
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Reconciliation 2026-08-04: compliance_records is also defined in an earlier migration,
--- so the CREATE TABLE above is a no-op and this file's extra columns were
--- silently lost — surfacing later as "column ... does not exist" on its
--- indexes. These ALTERs make this file's expected shape real either way.
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS compliance_documents JSONB;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS compliance_score DECIMAL;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS compliance_status VARCHAR(50);
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS gap_analysis JSONB;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS project_id UUID;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS required_actions TEXT;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS standard_category VARCHAR(100);
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS standard_code VARCHAR(50);
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS standard_name VARCHAR(255);
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS verification_notes TEXT;
-ALTER TABLE compliance_records ADD COLUMN IF NOT EXISTS verified_at TIMESTAMP;
-
--- Indexes for compliance_records
-CREATE INDEX IF NOT EXISTS idx_compliance_records_project ON compliance_records(project_id);
-CREATE INDEX IF NOT EXISTS idx_compliance_records_code ON compliance_records(standard_code);
-CREATE INDEX IF NOT EXISTS idx_compliance_records_status ON compliance_records(compliance_status);
-CREATE INDEX IF NOT EXISTS idx_compliance_records_category ON compliance_records(standard_category);
+-- Indexes for engineering_compliance_records
+CREATE INDEX IF NOT EXISTS idx_engineering_compliance_records_project ON engineering_compliance_records(project_id);
+CREATE INDEX IF NOT EXISTS idx_engineering_compliance_records_code ON engineering_compliance_records(standard_code);
+CREATE INDEX IF NOT EXISTS idx_engineering_compliance_records_status ON engineering_compliance_records(compliance_status);
+CREATE INDEX IF NOT EXISTS idx_engineering_compliance_records_category ON engineering_compliance_records(standard_category);
 
 -- ============================================================================
 -- DPR DOCUMENTS
@@ -726,44 +716,52 @@ CREATE INDEX IF NOT EXISTS idx_tender_documents_deadline ON tender_documents(bid
 -- TENDER BIDS
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS tender_bids (
+-- Renamed from `tender_bids` 2026-08-10: that name collided with the real,
+-- mounted institutional-procurement tender_bids table in
+-- 030_institutional_procurement_schema.sql. Because this file runs first and
+-- both used CREATE TABLE IF NOT EXISTS, this dead, unwired Engineering-OS
+-- table was winning and silently shadowing 030's incompatible shape, breaking
+-- institutionalProcurementService.js's bid-submission INSERT at runtime. See
+-- migrations/999_zz_tender_bids_collision_repair.sql for the companion fix on
+-- any database where 023 already ran and created the table under the old name.
+CREATE TABLE IF NOT EXISTS engineering_tender_bids (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tender_id UUID NOT NULL REFERENCES tender_documents(id) ON DELETE CASCADE,
-  
+
   -- Bidder Information
   bidder_id UUID REFERENCES users(id) ON DELETE SET NULL,
   bidder_name VARCHAR(255) NOT NULL,
   bidder_company VARCHAR(255),
-  
+
   -- Bid Details
   bid_amount DECIMAL NOT NULL,
   bid_security_amount DECIMAL,
   technical_score DECIMAL,
   commercial_score DECIMAL,
   total_score DECIMAL,
-  
+
   -- Status
   status VARCHAR(50) DEFAULT 'submitted', -- submitted, qualified, disqualified, awarded, rejected
   submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
+
   -- Evaluation
   evaluated_by UUID REFERENCES users(id) ON DELETE SET NULL,
   evaluated_at TIMESTAMP,
   evaluation_notes TEXT,
-  
+
   -- Documents
   bid_documents JSONB, -- [{document_name, url}]
-  
+
   -- Metadata
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for tender_bids
-CREATE INDEX IF NOT EXISTS idx_tender_bids_tender ON tender_bids(tender_id);
-CREATE INDEX IF NOT EXISTS idx_tender_bids_bidder ON tender_bids(bidder_id);
-CREATE INDEX IF NOT EXISTS idx_tender_bids_status ON tender_bids(status);
-CREATE INDEX IF NOT EXISTS idx_tender_bids_score ON tender_bids(total_score DESC);
+-- Indexes for engineering_tender_bids
+CREATE INDEX IF NOT EXISTS idx_engineering_tender_bids_tender ON engineering_tender_bids(tender_id);
+CREATE INDEX IF NOT EXISTS idx_engineering_tender_bids_bidder ON engineering_tender_bids(bidder_id);
+CREATE INDEX IF NOT EXISTS idx_engineering_tender_bids_status ON engineering_tender_bids(status);
+CREATE INDEX IF NOT EXISTS idx_engineering_tender_bids_score ON engineering_tender_bids(total_score DESC);
 
 -- ============================================================================
 -- CONSTRUCTION PROGRESS
@@ -928,60 +926,48 @@ CREATE INDEX IF NOT EXISTS idx_facility_operations_date ON facility_operations(o
 -- MAINTENANCE RECORDS
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS maintenance_records (
+-- Renamed from `maintenance_records` 2026-08-10: same collision pattern as
+-- compliance_records above (real winning table in 000_base_schema.sql, this
+-- file's extra columns previously bolted on via ALTER instead of colliding).
+-- Renamed for consistency rather than leaving the landmine in place.
+CREATE TABLE IF NOT EXISTS engineering_maintenance_records (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES engineering_projects(id) ON DELETE CASCADE,
-  
+
   -- Maintenance Information
   maintenance_type VARCHAR(50) NOT NULL, -- preventive, corrective, predictive
   equipment_id VARCHAR(100),
   equipment_name VARCHAR(255),
-  
+
   -- Scheduling
   scheduled_date DATE,
   completed_date DATE,
   priority VARCHAR(20) DEFAULT 'normal', -- low, normal, high, urgent
-  
+
   -- Details
   description TEXT NOT NULL,
   work_performed TEXT,
   parts_used JSONB, -- [{part, quantity, cost}]
   labor_hours DECIMAL,
   cost DECIMAL,
-  
+
   -- Status
   status VARCHAR(50) DEFAULT 'scheduled', -- scheduled, in_progress, completed, cancelled
-  
+
   -- Personnel
   assigned_to UUID REFERENCES users(id) ON DELETE SET NULL,
   completed_by UUID REFERENCES users(id) ON DELETE SET NULL,
-  
+
   -- Metadata
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Reconciliation 2026-08-04: maintenance_records is also defined in an earlier migration,
--- so the CREATE TABLE above is a no-op and this file's extra columns were
--- silently lost — surfacing later as "column ... does not exist" on its
--- indexes. These ALTERs make this file's expected shape real either way.
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS assigned_to UUID;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS completed_by UUID;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS description TEXT;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS equipment_id VARCHAR(100);
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS equipment_name VARCHAR(255);
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS labor_hours DECIMAL;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS parts_used JSONB;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS priority VARCHAR(20);
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS project_id UUID;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
-ALTER TABLE maintenance_records ADD COLUMN IF NOT EXISTS work_performed TEXT;
-
--- Indexes for maintenance_records
-CREATE INDEX IF NOT EXISTS idx_maintenance_records_project ON maintenance_records(project_id);
-CREATE INDEX IF NOT EXISTS idx_maintenance_records_type ON maintenance_records(maintenance_type);
-CREATE INDEX IF NOT EXISTS idx_maintenance_records_status ON maintenance_records(status);
-CREATE INDEX IF NOT EXISTS idx_maintenance_records_scheduled ON maintenance_records(scheduled_date);
+-- Indexes for engineering_maintenance_records
+CREATE INDEX IF NOT EXISTS idx_engineering_maintenance_records_project ON engineering_maintenance_records(project_id);
+CREATE INDEX IF NOT EXISTS idx_engineering_maintenance_records_type ON engineering_maintenance_records(maintenance_type);
+CREATE INDEX IF NOT EXISTS idx_engineering_maintenance_records_status ON engineering_maintenance_records(status);
+CREATE INDEX IF NOT EXISTS idx_engineering_maintenance_records_scheduled ON engineering_maintenance_records(scheduled_date);
 
 -- ============================================================================
 -- VENDORS (Engineering Specific)
@@ -1122,8 +1108,8 @@ DROP TRIGGER IF EXISTS update_digital_twin_sensors_updated_at ON digital_twin_se
 CREATE TRIGGER update_digital_twin_sensors_updated_at BEFORE UPDATE ON digital_twin_sensors
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS update_compliance_records_updated_at ON compliance_records;
-CREATE TRIGGER update_compliance_records_updated_at BEFORE UPDATE ON compliance_records
+DROP TRIGGER IF EXISTS update_engineering_compliance_records_updated_at ON engineering_compliance_records;
+CREATE TRIGGER update_engineering_compliance_records_updated_at BEFORE UPDATE ON engineering_compliance_records
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS update_dpr_documents_updated_at ON dpr_documents;
@@ -1134,8 +1120,8 @@ DROP TRIGGER IF EXISTS update_tender_documents_updated_at ON tender_documents;
 CREATE TRIGGER update_tender_documents_updated_at BEFORE UPDATE ON tender_documents
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS update_tender_bids_updated_at ON tender_bids;
-CREATE TRIGGER update_tender_bids_updated_at BEFORE UPDATE ON tender_bids
+DROP TRIGGER IF EXISTS update_engineering_tender_bids_updated_at ON engineering_tender_bids;
+CREATE TRIGGER update_engineering_tender_bids_updated_at BEFORE UPDATE ON engineering_tender_bids
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS update_quality_checks_updated_at ON quality_checks;
@@ -1146,8 +1132,8 @@ DROP TRIGGER IF EXISTS update_drone_surveys_updated_at ON drone_surveys;
 CREATE TRIGGER update_drone_surveys_updated_at BEFORE UPDATE ON drone_surveys
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS update_maintenance_records_updated_at ON maintenance_records;
-CREATE TRIGGER update_maintenance_records_updated_at BEFORE UPDATE ON maintenance_records
+DROP TRIGGER IF EXISTS update_engineering_maintenance_records_updated_at ON engineering_maintenance_records;
+CREATE TRIGGER update_engineering_maintenance_records_updated_at BEFORE UPDATE ON engineering_maintenance_records
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 DROP TRIGGER IF EXISTS update_vendors_updated_at ON vendors;

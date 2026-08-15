@@ -29,6 +29,19 @@
 -- Deliberately NOT guessed at here: a wrong expression index silently fails to
 -- be used rather than erroring, which is worse than no index.
 --
+-- DECISION (2026-08-15, explicit authorization given): do not mass-migrate
+-- the 10 existing JSONB-location tables in one pass - each has a different
+-- payload shape and a different set of callers, and a wrong blind migration
+-- here risks silently breaking real location data across logistics,
+-- geofencing, and farmer-profile services simultaneously. Instead: (1) every
+-- NEW table going forward must use typed latitude/longitude DECIMAL columns,
+-- never a JSONB blob, per this file's own finding; (2) normalise the 10
+-- existing tables one at a time, each as its own reviewed migration with its
+-- own real-data verification, starting with whichever table's radius queries
+-- are actually measured as slow in production - not guessed at here without
+-- that measurement. Real PostGIS (`CREATE EXTENSION postgis`) remains the
+-- longer-term target once typed columns exist to migrate from.
+--
 -- UPGRADE PATH (preferred where PostGIS is available):
 --     CREATE EXTENSION IF NOT EXISTS postgis;
 --     ALTER TABLE <t> ADD COLUMN geog geography(Point,4326)

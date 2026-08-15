@@ -353,10 +353,15 @@ CREATE INDEX IF NOT EXISTS idx_machinery_access_operator_id
     ON machinery_access (operator_id);
 CREATE INDEX IF NOT EXISTS idx_maintenance_records_asset_id
     ON maintenance_records (asset_id);
-CREATE INDEX IF NOT EXISTS idx_maintenance_records_assigned_to
-    ON maintenance_records (assigned_to);
-CREATE INDEX IF NOT EXISTS idx_maintenance_records_completed_by
-    ON maintenance_records (completed_by);
+-- Retargeted 2026-08-10: assigned_to/completed_by only exist on
+-- engineering_maintenance_records (see 023_engineering_schema.sql, renamed
+-- from maintenance_records to resolve a collision with the real,
+-- winning maintenance_records table in 000_base_schema.sql, which has
+-- neither column).
+CREATE INDEX IF NOT EXISTS idx_engineering_maintenance_records_assigned_to
+    ON engineering_maintenance_records (assigned_to);
+CREATE INDEX IF NOT EXISTS idx_engineering_maintenance_records_completed_by
+    ON engineering_maintenance_records (completed_by);
 CREATE INDEX IF NOT EXISTS idx_market_access_logistics_provider_id
     ON market_access (logistics_provider_id);
 CREATE INDEX IF NOT EXISTS idx_network_status_tracking_user_id
@@ -541,8 +546,12 @@ CREATE INDEX IF NOT EXISTS idx_sync_statistics_user_id
     ON sync_statistics (user_id);
 CREATE INDEX IF NOT EXISTS idx_temperature_alert_log_alert_id
     ON temperature_alert_log (alert_id);
-CREATE INDEX IF NOT EXISTS idx_tender_bids_evaluated_by
-    ON tender_bids (evaluated_by);
+-- Retargeted 2026-08-10: evaluated_by only exists on engineering_tender_bids
+-- (see 023_engineering_schema.sql, renamed from tender_bids to resolve the
+-- collision with the real, mounted tender_bids table in
+-- 030_institutional_procurement_schema.sql, which has no evaluated_by column).
+CREATE INDEX IF NOT EXISTS idx_engineering_tender_bids_evaluated_by
+    ON engineering_tender_bids (evaluated_by);
 CREATE INDEX IF NOT EXISTS idx_tender_documents_created_by
     ON tender_documents (created_by);
 CREATE INDEX IF NOT EXISTS idx_test_assignments_test_method_id

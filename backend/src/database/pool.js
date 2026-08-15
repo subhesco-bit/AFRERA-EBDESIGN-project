@@ -292,6 +292,47 @@ function storeFor(table) {
   return testStores[table];
 }
 
+function applyWhereFilter(rows, queryText, params) {
+  const whereMatch = String(queryText).match(/\bwhere\b([\s\S]*?)(?:\border\s+by\b|\blimit\b|\boffset\b|;|$)/i);
+  if (!whereMatch) return rows;
+
+  const clauses = whereMatch[1].split(/\s+and\s+/i);
+  let filtered = rows;
+
+  for (const clause of clauses) {
+    const trimmed = clause.trim();
+    if (!trimmed) continue;
+
+    const match = trimmed.match(/([a-z_][a-z0-9_]*)\s*=\s*(\$\d+|true|false|null|'([^']*)'|"([^"]*)")/i);
+    if (!match) continue;
+
+    const column = (match[1] || '').toLowerCase();
+    const rawValue = match[2];
+    let expected;
+
+    if (/^\$\d+$/i.test(rawValue)) {
+      const idx = Number(rawValue.replace(/\$/, '')) - 1;
+      expected = params && params[idx] !== undefined ? params[idx] : undefined;
+    } else if (/^true$/i.test(rawValue)) {
+      expected = true;
+    } else if (/^false$/i.test(rawValue)) {
+      expected = false;
+    } else if (/^null$/i.test(rawValue)) {
+      expected = null;
+    } else {
+      expected = match[3] !== undefined ? match[3] : match[4];
+    }
+
+    filtered = filtered.filter((row) => {
+      const actual = row[column];
+      if (actual === undefined && expected === null) return true;
+      return String(actual ?? '') === String(expected ?? '');
+    });
+  }
+
+  return filtered;
+}
+
 function makeTestPool() {
   return {
     async query(text, params) {
@@ -2169,13 +2210,31 @@ function makeTestPool() {
         }
       }
 
+      if (t.includes('from organic_standards')) {
+        testStores.organic_standards = testStores.organic_standards || new Map();
+        if (testStores.organic_standards.size === 0) {
+          const defaultStandards = [
+            { id: 1, code: 'NOP', name: 'National Organic Program', is_active: true },
+            { id: 2, code: 'EU-ORG', name: 'EU Organic', is_active: true },
+            { id: 3, code: 'USDA', name: 'USDA Organic', is_active: true }
+          ];
+          for (const row of defaultStandards) {
+            testStores.organic_standards.set(row.id, row);
+          }
+        }
+      }
+
       // SELECT * FROM <table> with no dedicated handler: serve whatever the
       // generic INSERT handler stored, so a write followed by a read is
       // consistent within a test.
       const from = (text || '').match(/\bfrom\s+"?([a-z_][a-z0-9_]*)"?/i);
       if (from && /^\s*select/i.test(text || '')) {
-        const store = testStores[from[1].toLowerCase()];
-        if (store) return { rows: Array.from(store.values()) };
+        const table = from[1].toLowerCase();
+        const store = testStores[table];
+        if (store) {
+          const rows = Array.from(store.values());
+          return { rows: applyWhereFilter(rows, text, params) };
+        }
       }
 
       return { rows: [], rowCount: 0 };
