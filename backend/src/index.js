@@ -224,6 +224,12 @@ const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
 const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes');
 const wikipediaRoutes = require('./routes/wikipediaRoutes');
+// Found built but with zero HTTP exposure (2026-08-15 junk/orphan sweep) —
+// see each route file's header comment for what was verified before wiring.
+const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes');
+const farmerHealthRoutes = require('./routes/farmerHealthRoutes');
+const foodRoutes = require('./routes/foodRoutes');
+const iotSensorService = require('./services/iotSensorService');
 // Vision (sharp) + OCR (tesseract.js) — real image-quality/metadata/
 // thumbnail and text-extraction dispatch behind core/aiOrchestrator.js's
 // vision_engine / ocr_engine, which were "missing" before 2026-08-09.
@@ -580,6 +586,16 @@ app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
 // Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
 app.use('/api/v1/wikipedia', wikipediaRoutes);
+app.use('/api/v1/agri-intelligence', agriculturalIntelligenceRoutes);
+// farmerHealthRoutes has real welfare-program/health-summary endpoints not
+// covered by the generic M029 CRUD scaffold at /api/v1/modules/m029 — kept
+// distinct rather than merged to avoid touching the generated scaffold.
+app.use('/api/v1/farmer-health', farmerHealthRoutes);
+app.use('/api/v1/food', foodRoutes);
+// iotSensorService.setupRoutes registers full paths directly on `app`
+// (not a sub-router) — see services/iotSensorService.js line ~600.
+iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
+iotSensorService.setupRoutes(app);
 // Vision + OCR (real sharp / tesseract.js dispatch, see routes/visionRoutes.js).
 app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
