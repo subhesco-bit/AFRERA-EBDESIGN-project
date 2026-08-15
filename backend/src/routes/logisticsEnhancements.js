@@ -182,7 +182,7 @@ router.get('/warehouses/:warehouseId', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/warehouses/:warehouseId/inventory', authRateLimit, adminMiddleware, async (req, res) => {
+router.post('/warehouses/:warehouseId/inventory', authRateLimit, authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { warehouseId } = req.params;
     const inventory = await logisticsEnhancementService.addInventory(warehouseId, req.body);
@@ -202,7 +202,7 @@ router.get('/warehouses/:warehouseId/inventory', authMiddleware, async (req, res
   }
 });
 
-router.post('/warehouses/:warehouseId/shipments', authRateLimit, adminMiddleware, async (req, res) => {
+router.post('/warehouses/:warehouseId/shipments', authRateLimit, authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { warehouseId } = req.params;
     const shipment = await logisticsEnhancementService.processWarehouseShipment(warehouseId, req.body);
