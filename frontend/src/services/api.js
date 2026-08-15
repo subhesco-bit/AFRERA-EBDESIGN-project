@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+// API_BASE_URL defaults to localhost for development
+// Production should set VITE_API_URL environment variable
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1'
 
 // Create axios instance
@@ -2942,6 +2944,15 @@ export const aiBackboneAPI = {
   getAIIntegrationStatus: (params) => api.get('/complete-ai-integration/status', { params }),
   forceSyncAllAIIntegrations: (data) => api.post('/complete-ai-integration/force-sync', data),
   getAIModelInfo: () => api.get('/complete-ai-integration/model-info'),
+}
+
+export const custodyAPI = {
+  appendEvent: (data) => api.post('/custody/events', data),
+  getChain: (shipmentId, verify = true) => api.get(`/custody/chain/${shipmentId}`, { params: { verify } }),
+  issueSettlementInstruction: (data) => api.post('/custody/settlement/instructions', data),
+  confirmSettlementExecution: (instructionId) => api.post(`/custody/settlement/${instructionId}/confirm`),
+  getSettlementInstruction: (instructionId) => api.get(`/custody/settlement/${instructionId}`),
+  getStateMachine: () => api.get('/custody/state-machine'),
 }
 
 export default api
