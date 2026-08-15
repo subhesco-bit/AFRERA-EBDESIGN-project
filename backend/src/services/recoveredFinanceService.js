@@ -289,6 +289,19 @@ async function issueEnwr({ bookingId, facilityId, farmerId, commodity, quantityQ
   };
 }
 
+/**
+ * Real eNWR receipts for a farmer — added 2026-08-15 as part of the "Bank
+ * Passport" gap fix. issueEnwr() existed with zero way to list what had
+ * been issued; a lender-facing passport view is meaningless without this.
+ */
+async function listMyEnwrReceipts(farmerId) {
+  const { rows } = await pool.query(
+    `SELECT * FROM enwr_receipts WHERE farmer_id = $1 ORDER BY issued_at DESC`,
+    [farmerId]
+  );
+  return rows.map((r) => ({ ...r, max_collateral_inr: Number(r.max_collateral_inr) }));
+}
+
 // ---------------------------------------------------------------------------
 // Freight
 // ---------------------------------------------------------------------------
@@ -418,6 +431,7 @@ module.exports = {
   appendLedgerEntry, trialBalance, verifyLedger,
   matchSchemes,
   issueEnwr,
+  listMyEnwrReceipts,
   freightRate,
   equipmentSubsidy, recordRiskEvent, partyRisk, certExpiryAlerts,
 };

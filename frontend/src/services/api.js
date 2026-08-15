@@ -234,6 +234,7 @@ export const financeAPI = {
   verifyLedger: () => api.get('/finance/ledger/verify'),
   matchSchemes: (params) => api.get('/finance/schemes/match', { params }),
   issueEnwr: (body) => api.post('/finance/enwr/issue', body),
+  getMyEnwrReceipts: () => api.get('/finance/enwr/my-receipts'),
   freightRate: (params) => api.get('/finance/freight/rate', { params }),
   equipmentSubsidy: (params) => api.get('/finance/subsidy/equipment', { params }),
   recordRiskEvent: (body) => api.post('/finance/risk/event', body),

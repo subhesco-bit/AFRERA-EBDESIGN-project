@@ -276,6 +276,12 @@ function Header() {
                   >
                     Wallet
                   </Link>
+                  <Link
+                    to="/bank-passport"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Bank Passport
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2"

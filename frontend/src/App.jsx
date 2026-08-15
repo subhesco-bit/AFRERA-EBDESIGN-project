@@ -33,6 +33,7 @@ import DashboardPage from './pages/DashboardPage'
 // Real, transactional wallet backend (services/farmerService.js) existed
 // with complete routes but no frontend page anywhere in the app.
 import WalletPage from './pages/WalletPage'
+import BankPassportPage from './pages/BankPassportPage'
 // Four public "farmer doors" + central hub, recovered 2026-08-07. Built in an
 // earlier session but never mounted (same class of bug as the "14 built
 // pages" and FPODashboardPage below). Fixes the V43 login-wall problem: every
@@ -482,6 +483,14 @@ function App() {
           element={
             <ProtectedRoute>
               <WalletPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bank-passport"
+          element={
+            <ProtectedRoute>
+              <BankPassportPage />
             </ProtectedRoute>
           }
         />

@@ -14,54 +14,46 @@ const express = require('express');
 const router = express.Router();
 const fin = require('../services/recoveredFinanceService');
 const { authMiddleware } = require('../middleware/auth');
+const { resolveFarmerId } = require('../middleware/resolveFarmerId');
 
 function fail(res, error) {
   const bad = /required|must|Unknown|No GST rule|differ/i.test(error.message);
   res.status(bad ? 400 : 500).json({ success: false, error: error.message });
 }
 
-// ---- GST -------------------------------------------------------------------
+// ---- GST (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -
+//
+// fin.gstFor()/buildInvoice() were a second, independent GST-rate authority
+// alongside the canonical, HSN-driven gstService.resolveGSTRate(), which also
+// handles the branded/unbranded staple-tax split these two functions do not.
+// No frontend caller was found for either route. Deprecated rather than
+// deleted — recoveredFinanceService.gstFor()/buildInvoice() themselves are
+// untouched so this is reversible if something unknown depended on them.
 
-router.get('/gst/classify', async (req, res) => {
-  try {
-    const { category, branded } = req.query;
-    if (!category) throw new Error('category is required');
-    res.json({ success: true, data: await fin.gstFor(category, branded !== 'false') });
-  } catch (e) { fail(res, e); }
-});
+function deprecatedFinance(canonicalPath) {
+  return (req, res) => res.status(410).json({
+    success: false,
+    error: 'This endpoint is deprecated: it was a duplicate financial authority found by a cross-module integrity audit, with no confirmed frontend caller.',
+    canonical: canonicalPath,
+    deprecatedOn: '2026-08-15',
+    reference: "AFRERA_CLAUDE_BUILD_DIRECTIVE.md, Part 3C",
+  });
+}
 
-router.post('/gst/invoice', authMiddleware, async (req, res) => {
-  try {
-    if (!req.body?.items?.length) throw new Error('items are required');
-    res.json({ success: true, data: await fin.buildInvoice(req.body) });
-  } catch (e) { fail(res, e); }
-});
+router.get('/gst/classify', deprecatedFinance('/api/v1/gst (gstService.resolveGSTRate)'));
+router.post('/gst/invoice', authMiddleware, deprecatedFinance('/api/v1/gst (gstService.generateGSTInvoice)'));
 
-// ---- Ledger ----------------------------------------------------------------
+// ---- Ledger (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -
+//
+// fin.appendLedgerEntry()/trialBalance()/verifyLedger() posted to a second,
+// fully disconnected hash-chained ledger (gl_ledger_chain) alongside the
+// canonical journal_entries/journal_lines ledger that GST, AF-AA, AF-CO and
+// AF-PS all actually post to. No frontend caller was found. Deprecated
+// rather than deleted for the same reversibility reason as above.
 
-router.post('/ledger/entry', authMiddleware, async (req, res) => {
-  try {
-    const b = req.body || {};
-    for (const k of ['debitAccount', 'creditAccount', 'amount', 'narration']) {
-      if (!b[k]) throw new Error(`${k} is required`);
-    }
-    const entry = await fin.appendLedgerEntry({ ...b, recordedBy: req.user?.id });
-    res.json({ success: true, data: entry });
-  } catch (e) { fail(res, e); }
-});
-
-router.get('/ledger/trial-balance', authMiddleware, async (req, res) => {
-  try { res.json({ success: true, data: await fin.trialBalance() }); } catch (e) { fail(res, e); }
-});
-
-/**
- * Chain integrity. Returns 200 with ok:false when the chain is broken rather
- * than an error status — a detected break is a successful check, and a 5xx
- * would let monitoring treat tamper-evidence firing as an outage to be ignored.
- */
-router.get('/ledger/verify', authMiddleware, async (req, res) => {
-  try { res.json({ success: true, data: await fin.verifyLedger() }); } catch (e) { fail(res, e); }
-});
+router.post('/ledger/entry', authMiddleware, deprecatedFinance('/api/v1/ledger (the canonical journal_entries/journal_lines ledger)'));
+router.get('/ledger/trial-balance', authMiddleware, deprecatedFinance('/api/v1/ledger/trial-balance'));
+router.get('/ledger/verify', authMiddleware, deprecatedFinance('/api/v1/ledger/verify'));
 
 // ---- Schemes ---------------------------------------------------------------
 
@@ -78,6 +70,14 @@ router.get('/schemes/match', async (req, res) => {
 router.post('/enwr/issue', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await fin.issueEnwr({ ...req.body, issuedBy: req.user?.id }) });
+  } catch (e) { fail(res, e); }
+});
+
+// "Bank Passport" — added 2026-08-15. issueEnwr() had no way to list what
+// had been issued; a lender-facing evidence view needs this to exist at all.
+router.get('/enwr/my-receipts', authMiddleware, resolveFarmerId, async (req, res) => {
+  try {
+    res.json({ success: true, data: await fin.listMyEnwrReceipts(req.farmerId) });
   } catch (e) { fail(res, e); }
 });
 
