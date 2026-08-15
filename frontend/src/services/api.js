@@ -106,6 +106,20 @@ export const farmersAPI = {
   getFPOs: (filters) => api.get('/farmers/fpos/list', { params: filters }),
 }
 
+/**
+ * Seed Vault — real backend added 2026-08-15. SeedVaultPage.jsx previously
+ * called farmersAPI.getSeedVault/getSeedCategories/deleteSeed, none of
+ * which existed anywhere (a live, fully broken page).
+ */
+export const seedVaultAPI = {
+  getSeeds: () => api.get('/seed-vault'),
+  getCategories: () => api.get('/seed-vault/categories'),
+  addSeed: (data) => api.post('/seed-vault', data),
+  updateSeed: (id, data) => api.put(`/seed-vault/${id}`, data),
+  recordUsage: (id, amountUsed) => api.post(`/seed-vault/${id}/record-usage`, { amountUsed }),
+  deleteSeed: (id) => api.delete(`/seed-vault/${id}`),
+}
+
 // Financial API
 export const financialAPI = {
   applyForLoan: (data) => api.post('/financial/loans', data),

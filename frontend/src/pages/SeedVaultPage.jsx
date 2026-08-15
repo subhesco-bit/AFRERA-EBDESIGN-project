@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
+import { seedVaultAPI } from '../services/api'
 import { Package, Search, Plus, Edit, Trash2, Thermometer, Droplets, Sprout, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -9,28 +9,55 @@ function SeedVaultPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedSeed, setSelectedSeed] = useState(null)
+  const [newSeed, setNewSeed] = useState({
+    name: '', variety: '', category: '', quantity: '', unit: 'kg',
+    purchaseDate: '', minStock: '', supplier: '',
+  })
   const queryClient = useQueryClient()
 
-  const { data: seeds } = useQuery('seed-vault', () =>
-    farmersAPI.getSeedVault('current-farmer-id')
-  )
+  const { data: seeds } = useQuery({
+    queryKey: ['seed-vault'],
+    queryFn: async () => (await seedVaultAPI.getSeeds()).data.data,
+  })
 
-  const { data: categories } = useQuery('seed-categories', () =>
-    farmersAPI.getSeedCategories()
-  )
+  const { data: categories } = useQuery({
+    queryKey: ['seed-categories'],
+    queryFn: async () => (await seedVaultAPI.getCategories()).data.data,
+  })
 
-  const deleteSeedMutation = useMutation(
-    (seedId) => farmersAPI.deleteSeed(seedId),
-    {
-      onSuccess: () => {
-        toast.success('Seed removed from vault')
-        queryClient.invalidateQueries('seed-vault')
-      },
-      onError: () => {
-        toast.error('Failed to remove seed')
-      }
+  const addSeedMutation = useMutation({
+    mutationFn: (data) => seedVaultAPI.addSeed(data),
+    onSuccess: () => {
+      toast.success('Seed added to vault')
+      queryClient.invalidateQueries({ queryKey: ['seed-vault'] })
+      queryClient.invalidateQueries({ queryKey: ['seed-categories'] })
+      setShowAddModal(false)
+      setNewSeed({ name: '', variety: '', category: '', quantity: '', unit: 'kg', purchaseDate: '', minStock: '', supplier: '' })
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to add seed')
+    },
+  })
+
+  const deleteSeedMutation = useMutation({
+    mutationFn: (seedId) => seedVaultAPI.deleteSeed(seedId),
+    onSuccess: () => {
+      toast.success('Seed removed from vault')
+      queryClient.invalidateQueries({ queryKey: ['seed-vault'] })
+    },
+    onError: () => {
+      toast.error('Failed to remove seed')
+    },
+  })
+
+  const handleAddSeedSubmit = (e) => {
+    e.preventDefault()
+    if (!newSeed.name || !newSeed.category || newSeed.quantity === '') {
+      toast.error('Seed name, category, and quantity are required')
+      return
     }
-  )
+    addSeedMutation.mutate(newSeed)
+  }
 
   const filteredSeeds = seeds?.filter(seed =>
     seed.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -223,7 +250,7 @@ function SeedVaultPage() {
                 </button>
               </div>
 
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleAddSeedSubmit}>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -231,8 +258,11 @@ function SeedVaultPage() {
                     </label>
                     <input
                       type="text"
+                      value={newSeed.name}
+                      onChange={(e) => setNewSeed({ ...newSeed, name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="e.g., Rice, Wheat"
+                      required
                     />
                   </div>
                   <div>
@@ -241,6 +271,8 @@ function SeedVaultPage() {
                     </label>
                     <input
                       type="text"
+                      value={newSeed.variety}
+                      onChange={(e) => setNewSeed({ ...newSeed, variety: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="e.g., Basmati, Sharbati"
                     />
@@ -251,12 +283,20 @@ function SeedVaultPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Category *
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="">Select category</option>
+                  <input
+                    type="text"
+                    list="seed-category-options"
+                    value={newSeed.category}
+                    onChange={(e) => setNewSeed({ ...newSeed, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="e.g., Cereal, Pulse, Vegetable"
+                    required
+                  />
+                  <datalist id="seed-category-options">
                     {categories?.map((cat) => (
-                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      <option key={cat.id} value={cat.name} />
                     ))}
-                  </select>
+                  </datalist>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -266,15 +306,23 @@ function SeedVaultPage() {
                     </label>
                     <input
                       type="number"
+                      min="0"
+                      value={newSeed.quantity}
+                      onChange={(e) => setNewSeed({ ...newSeed, quantity: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="0"
+                      required
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Unit *
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <select
+                      value={newSeed.unit}
+                      onChange={(e) => setNewSeed({ ...newSeed, unit: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    >
                       <option value="kg">Kg</option>
                       <option value="g">Grams</option>
                       <option value="quintal">Quintal</option>
@@ -285,10 +333,12 @@ function SeedVaultPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Purchase Date *
+                      Purchase Date
                     </label>
                     <input
                       type="date"
+                      value={newSeed.purchaseDate}
+                      onChange={(e) => setNewSeed({ ...newSeed, purchaseDate: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
@@ -298,6 +348,9 @@ function SeedVaultPage() {
                     </label>
                     <input
                       type="number"
+                      min="0"
+                      value={newSeed.minStock}
+                      onChange={(e) => setNewSeed({ ...newSeed, minStock: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="Alert when below"
                     />
@@ -310,6 +363,8 @@ function SeedVaultPage() {
                   </label>
                   <input
                     type="text"
+                    value={newSeed.supplier}
+                    onChange={(e) => setNewSeed({ ...newSeed, supplier: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="Supplier name"
                   />
@@ -325,9 +380,10 @@ function SeedVaultPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    disabled={addSeedMutation.isPending}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
                   >
-                    Add Seeds
+                    {addSeedMutation.isPending ? 'Adding...' : 'Add Seeds'}
                   </button>
                 </div>
               </form>
