@@ -179,12 +179,6 @@ const aiSelfHealingService = require('./services/aiSelfHealingService');
 const aiOperationIntelligenceService = require('./services/aiOperationIntelligenceService');
 // SAP Module Architecture Service - Independent Module Architecture
 const sapModuleArchitectureService = require('./services/sapModuleArchitectureService');
-// Cloud Management Service - Multi-Cloud Deployment
-const cloudManagementService = require('./services/cloudManagementService');
-// Server Management Service - Infrastructure Provisioning and Monitoring
-const serverManagementService = require('./services/serverManagementService');
-// Database Management Service - Distributed Database Operations
-const databaseManagementService = require('./services/databaseManagementService');
 // Advance Rate Pricing — forward curves, basis, commitment advice.
 // Recovered from afrera_platform_v44.html (migration 051).
 const riskPricingRoutes = require('./routes/riskPricingRoutes');
@@ -262,20 +256,8 @@ const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes');
 const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes');
 // SAP Module Architecture Routes - Independent Module Architecture
 const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes');
-// Cloud Management Routes - Multi-Cloud Deployment
-const cloudManagementRoutes = require('./routes/cloudManagementRoutes');
-// Server Management Routes - Infrastructure Provisioning and Monitoring
-const serverManagementRoutes = require('./routes/serverManagementRoutes');
-// Database Management Routes - Distributed Database Operations
-const databaseManagementRoutes = require('./routes/databaseManagementRoutes');
-// Public Domain Data Extraction Routes - Data Extraction and Subsidy Management
-const publicDomainDataExtractionRoutes = require('./routes/publicDomainDataExtractionRoutes');
 // Research and Development Routes - R&D Management with AI Integration
 const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes');
-// Module Support Infrastructure Routes - Module Management with AI Integration
-const moduleSupportInfrastructureRoutes = require('./routes/moduleSupportInfrastructureRoutes');
-// Startup Environment Routes - Startup Management with AI Integration
-const startupEnvironmentRoutes = require('./routes/startupEnvironmentRoutes');
 // Information Sharing Routes - Document and Knowledge Sharing with AI Integration
 const informationSharingRoutes = require('./routes/informationSharingRoutes');
 // Community Routes - Community Management with AI Integration
@@ -639,20 +621,8 @@ app.use('/api/v1/ai-self-healing', aiSelfHealingRoutes);
 app.use('/api/v1/ai-operation-intelligence', aiOperationIntelligenceRoutes);
 // SAP Module Architecture - Independent Module Architecture
 app.use('/api/v1/sap-module-architecture', sapModuleArchitectureRoutes);
-// Cloud Management - Multi-Cloud Deployment
-app.use('/api/v1/cloud-management', cloudManagementRoutes);
-// Server Management - Infrastructure Provisioning and Monitoring
-app.use('/api/v1/server-management', serverManagementRoutes);
-// Database Management - Distributed Database Operations
-app.use('/api/v1/database-management', databaseManagementRoutes);
-// Public Domain Data Extraction - Data Extraction and Subsidy Management
-app.use('/api/v1/public-domain-data-extraction', publicDomainDataExtractionRoutes);
 // Research and Development - R&D Management with AI Integration
 app.use('/api/v1/research-and-development', researchAndDevelopmentRoutes);
-// Module Support Infrastructure - Module Management with AI Integration
-app.use('/api/v1/module-support-infrastructure', moduleSupportInfrastructureRoutes);
-// Startup Environment - Startup Management with AI Integration
-app.use('/api/v1/startup-environment', startupEnvironmentRoutes);
 // Information Sharing - Document and Knowledge Sharing with AI Integration
 app.use('/api/v1/information-sharing', informationSharingRoutes);
 // Community - Community Management with AI Integration
