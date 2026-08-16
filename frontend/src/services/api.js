@@ -220,6 +220,15 @@ export const varietyDirectoryAPI = {
   createListing: (id, data) => api.post(`/variety-directory/${id}/create-listing`, data),
 }
 
+// Crop Value-Compound Research — AI-assisted, human-reviewed published
+// reference data. See backend/src/services/cropValueResearchService.js.
+export const cropValueResearchAPI = {
+  getProviderStatus: () => api.get('/crop-value-research/status'),
+  research: (varietyName, compoundKey) => api.post('/crop-value-research/research', { variety_name: varietyName, compound_key: compoundKey }),
+  getPending: () => api.get('/crop-value-research/pending'),
+  review: (id, approve) => api.post(`/crop-value-research/pending/${id}/review`, { approve }),
+}
+
 export const defenseFitnessPrepAPI = {
   getCategories: () => api.get('/defense-fitness-prep/categories'),
   getStandards: (category, gender) => api.get(`/defense-fitness-prep/standards/${category}`, { params: { gender } }),

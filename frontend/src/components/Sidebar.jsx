@@ -15,6 +15,7 @@ const SIDEBAR_ITEMS = [
   { to: '/wearables', label: 'Wearables' },
   { to: '/defense-fitness-prep', label: 'Defense Fitness Prep' },
   { to: '/admin-dashboard', label: 'Admin' },
+  { to: '/admin/crop-value-review', label: 'Crop Value Review' },
 ]
 
 export default function Sidebar() {

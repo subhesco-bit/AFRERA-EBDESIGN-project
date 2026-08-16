@@ -105,6 +105,7 @@ const FitbitCallbackPage = lazy(() => import('../pages/FitbitCallbackPage'))
 const DefenseFitnessPrepPage = lazy(() => import('../pages/DefenseFitnessPrepPage'))
 const SellerProductFormPage = lazy(() => import('../pages/SellerProductFormPage'))
 const VarietyDirectoryPage = lazy(() => import('../pages/VarietyDirectoryPage'))
+const CropValueReviewPage = lazy(() => import('../pages/CropValueReviewPage'))
 const PoultryManagementPage = lazy(() => import('../pages/PoultryManagementPage'))
 const GoatFarmingPage = lazy(() => import('../pages/GoatFarmingPage'))
 const SheepFarmingPage = lazy(() => import('../pages/SheepFarmingPage'))
@@ -582,6 +583,15 @@ export const adminRoutes = [
     title: 'FPO Dashboard - AFRERA',
     description: 'Farmer Producer Organization dashboard',
     keywords: 'FPO, dashboard, organization',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/admin/crop-value-review',
+    component: CropValueReviewPage,
+    title: 'Crop Value Review - AFRERA',
+    description: 'Review AI-suggested crop value-compound reference data before publication',
+    keywords: 'admin, crop, nutrient, review, ai',
     transition: 'fade',
     role: 'admin'
   }
