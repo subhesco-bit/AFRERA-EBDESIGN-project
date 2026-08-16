@@ -1,0 +1,2997 @@
+[
+  {
+    "key": "POST /api/v1/insurance/calculate/:param",
+    "path": "/api/v1/insurance/calculate/:param",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/analytics/overview",
+    "path": "/api/v1/analytics/overview",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/analytics/insights",
+    "path": "/api/v1/analytics/insights",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/analytics/platform-stats",
+    "path": "/api/v1/analytics/platform-stats",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/poultry/flocks/:param/vaccination-alerts",
+    "path": "/api/v1/poultry/flocks/:param/vaccination-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/goat/breeding/:param/kidding-outcome",
+    "path": "/api/v1/goat/breeding/:param/kidding-outcome",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/goat/herd/:param/breeding-alerts",
+    "path": "/api/v1/goat/herd/:param/breeding-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/goat/herd/:param/vaccination-alerts",
+    "path": "/api/v1/goat/herd/:param/vaccination-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/sheep/breeding/:param/lambing-outcome",
+    "path": "/api/v1/sheep/breeding/:param/lambing-outcome",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/sheep/flock/:param/breeding-alerts",
+    "path": "/api/v1/sheep/flock/:param/breeding-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/sheep/flock/:param/vaccination-alerts",
+    "path": "/api/v1/sheep/flock/:param/vaccination-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/sheep/flock/:param/shearing-alerts",
+    "path": "/api/v1/sheep/flock/:param/shearing-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/pig/breeding/:param/farrowing-outcome",
+    "path": "/api/v1/pig/breeding/:param/farrowing-outcome",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/pig/herd/:param/breeding-alerts",
+    "path": "/api/v1/pig/herd/:param/breeding-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/pig/herd/:param/vaccination-alerts",
+    "path": "/api/v1/pig/herd/:param/vaccination-alerts",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/pig/herd/:param/fcr",
+    "path": "/api/v1/pig/herd/:param/fcr",
+    "method": "GET"
+  },
+  {
+    "key": "DELETE /api/v1/animal-health/examinations/:param",
+    "path": "/api/v1/animal-health/examinations/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "PUT /api/v1/animal-health/treatments/:param",
+    "path": "/api/v1/animal-health/treatments/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/animal-health/treatments/:param",
+    "path": "/api/v1/animal-health/treatments/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "DELETE /api/v1/animal-health/outbreaks/:param",
+    "path": "/api/v1/animal-health/outbreaks/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "DELETE /api/v1/animal-health/quarantines/:param",
+    "path": "/api/v1/animal-health/quarantines/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/rfq/cost-centres/:param/pnl",
+    "path": "/api/v1/rfq/cost-centres/:param/pnl",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/rfq/rfq/:param/qc-holds",
+    "path": "/api/v1/rfq/rfq/:param/qc-holds",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/cost/breakup",
+    "path": "/api/v1/cost/breakup",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/cost/corridor-model",
+    "path": "/api/v1/cost/corridor-model",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/energy/consumption",
+    "path": "/api/v1/energy/consumption",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/energy/consumption",
+    "path": "/api/v1/energy/consumption",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/energy/solar",
+    "path": "/api/v1/energy/solar",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/energy/overview",
+    "path": "/api/v1/energy/overview",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/demand/history/:param",
+    "path": "/api/v1/demand/history/:param",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/demand/plan/:param",
+    "path": "/api/v1/demand/plan/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/training/programs",
+    "path": "/api/v1/training/programs",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/costs/landed/:param",
+    "path": "/api/v1/costs/landed/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/costs/calculate",
+    "path": "/api/v1/costs/calculate",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/costs/breakdown/:param",
+    "path": "/api/v1/costs/breakdown/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/vision/process",
+    "path": "/api/v1/vision/process",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/vision/detect",
+    "path": "/api/v1/vision/detect",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/vendors/buyers/:param/profile",
+    "path": "/api/v1/vendors/buyers/:param/profile",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/vendors/buyers/:param/credit-status",
+    "path": "/api/v1/vendors/buyers/:param/credit-status",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/vendors/buyers/:param/orders",
+    "path": "/api/v1/vendors/buyers/:param/orders",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/vendors/buyers/orders",
+    "path": "/api/v1/vendors/buyers/orders",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/vendors/logistics/cold-chain/nodes",
+    "path": "/api/v1/vendors/logistics/cold-chain/nodes",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/banker/portfolio",
+    "path": "/api/v1/banker/portfolio",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/banker/risk-dashboard",
+    "path": "/api/v1/banker/risk-dashboard",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/ca/audit-stats",
+    "path": "/api/v1/ca/audit-stats",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/fpo/stats",
+    "path": "/api/v1/fpo/stats",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/government/scheme-analytics",
+    "path": "/api/v1/government/scheme-analytics",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/government/compliance-status",
+    "path": "/api/v1/government/compliance-status",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/research/stats",
+    "path": "/api/v1/research/stats",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/subsidy/stats",
+    "path": "/api/v1/subsidy/stats",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/subsidy/pending",
+    "path": "/api/v1/subsidy/pending",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/sowing/records",
+    "path": "/api/v1/sowing/records",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/sowing/records/:param",
+    "path": "/api/v1/sowing/records/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/sowing/records",
+    "path": "/api/v1/sowing/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/sowing/records/:param",
+    "path": "/api/v1/sowing/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/sowing/records/:param",
+    "path": "/api/v1/sowing/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/land/parcels",
+    "path": "/api/v1/land/parcels",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/land/parcels/:param",
+    "path": "/api/v1/land/parcels/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/land/parcels",
+    "path": "/api/v1/land/parcels",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/land/parcels/:param",
+    "path": "/api/v1/land/parcels/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/land/parcels/:param",
+    "path": "/api/v1/land/parcels/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/labour/workers",
+    "path": "/api/v1/labour/workers",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/labour/workers",
+    "path": "/api/v1/labour/workers",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/labour/workers/:param",
+    "path": "/api/v1/labour/workers/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/labour/attendance",
+    "path": "/api/v1/labour/attendance",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/labour/attendance",
+    "path": "/api/v1/labour/attendance",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/labour/payments",
+    "path": "/api/v1/labour/payments",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/labour/payments",
+    "path": "/api/v1/labour/payments",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/irrigation/schedules",
+    "path": "/api/v1/irrigation/schedules",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/irrigation/schedules",
+    "path": "/api/v1/irrigation/schedules",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/irrigation/schedules/:param",
+    "path": "/api/v1/irrigation/schedules/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/irrigation/schedules/:param",
+    "path": "/api/v1/irrigation/schedules/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/irrigation/water-sources",
+    "path": "/api/v1/irrigation/water-sources",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/irrigation/water-sources",
+    "path": "/api/v1/irrigation/water-sources",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/irrigation/logs",
+    "path": "/api/v1/irrigation/logs",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/irrigation/logs",
+    "path": "/api/v1/irrigation/logs",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/villages",
+    "path": "/api/v1/villages",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/villages/:param",
+    "path": "/api/v1/villages/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/villages",
+    "path": "/api/v1/villages",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/villages/:param",
+    "path": "/api/v1/villages/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/villages/:param",
+    "path": "/api/v1/villages/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farmer-kyc/applications",
+    "path": "/api/v1/farmer-kyc/applications",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/farmer-kyc/applications/:param",
+    "path": "/api/v1/farmer-kyc/applications/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farmer-kyc/applications",
+    "path": "/api/v1/farmer-kyc/applications",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farmer-kyc/applications/:param/verify",
+    "path": "/api/v1/farmer-kyc/applications/:param/verify",
+    "method": "PUT"
+  },
+  {
+    "key": "PUT /api/v1/farmer-kyc/applications/:param/reject",
+    "path": "/api/v1/farmer-kyc/applications/:param/reject",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/orchards",
+    "path": "/api/v1/orchards",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/orchards",
+    "path": "/api/v1/orchards",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/orchards/:param",
+    "path": "/api/v1/orchards/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/orchards/:param",
+    "path": "/api/v1/orchards/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/orchards/:param/harvest-log",
+    "path": "/api/v1/orchards/:param/harvest-log",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/orchards/:param/harvest-log",
+    "path": "/api/v1/orchards/:param/harvest-log",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/farm-costing/records",
+    "path": "/api/v1/farm-costing/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farm-costing/records",
+    "path": "/api/v1/farm-costing/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farm-costing/records/:param",
+    "path": "/api/v1/farm-costing/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farm-costing/records/:param",
+    "path": "/api/v1/farm-costing/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farm-costing/summary",
+    "path": "/api/v1/farm-costing/summary",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/ponds",
+    "path": "/api/v1/ponds",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/ponds",
+    "path": "/api/v1/ponds",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/ponds/:param",
+    "path": "/api/v1/ponds/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/ponds/:param",
+    "path": "/api/v1/ponds/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/ponds/:param/water-quality-logs",
+    "path": "/api/v1/ponds/:param/water-quality-logs",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/ponds/:param/water-quality-logs",
+    "path": "/api/v1/ponds/:param/water-quality-logs",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/ponds/:param/harvest-log",
+    "path": "/api/v1/ponds/:param/harvest-log",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/ponds/:param/harvest-log",
+    "path": "/api/v1/ponds/:param/harvest-log",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/machinery/tractors",
+    "path": "/api/v1/machinery/tractors",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/machinery/tractors",
+    "path": "/api/v1/machinery/tractors",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/machinery/tractors/:param",
+    "path": "/api/v1/machinery/tractors/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/machinery/tractors/:param",
+    "path": "/api/v1/machinery/tractors/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/machinery/bookings",
+    "path": "/api/v1/machinery/bookings",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/machinery/bookings",
+    "path": "/api/v1/machinery/bookings",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/machinery/bookings/:param",
+    "path": "/api/v1/machinery/bookings/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/authorization/roles",
+    "path": "/api/v1/authorization/roles",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/authorization/roles/:param/permissions",
+    "path": "/api/v1/authorization/roles/:param/permissions",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/authorization/roles/:param/permissions",
+    "path": "/api/v1/authorization/roles/:param/permissions",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/authorization/users",
+    "path": "/api/v1/authorization/users",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/authorization/users/:param/role",
+    "path": "/api/v1/authorization/users/:param/role",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/authorization/audit-log",
+    "path": "/api/v1/authorization/audit-log",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/shg/groups",
+    "path": "/api/v1/shg/groups",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/shg/groups/:param",
+    "path": "/api/v1/shg/groups/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/shg/groups",
+    "path": "/api/v1/shg/groups",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/shg/groups/:param",
+    "path": "/api/v1/shg/groups/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/shg/groups/:param/members",
+    "path": "/api/v1/shg/groups/:param/members",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/shg/groups/:param/members",
+    "path": "/api/v1/shg/groups/:param/members",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/shg/groups/:param/savings",
+    "path": "/api/v1/shg/groups/:param/savings",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/shg/groups/:param/savings",
+    "path": "/api/v1/shg/groups/:param/savings",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/farmer-profiles",
+    "path": "/api/v1/farmer-profiles",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/farmer-profiles/:param",
+    "path": "/api/v1/farmer-profiles/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farmer-profiles",
+    "path": "/api/v1/farmer-profiles",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farmer-profiles/:param",
+    "path": "/api/v1/farmer-profiles/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farmer-profiles/:param",
+    "path": "/api/v1/farmer-profiles/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farmer-family/members",
+    "path": "/api/v1/farmer-family/members",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farmer-family/members",
+    "path": "/api/v1/farmer-family/members",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farmer-family/members/:param",
+    "path": "/api/v1/farmer-family/members/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farmer-family/members/:param",
+    "path": "/api/v1/farmer-family/members/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farmer-verification/requests",
+    "path": "/api/v1/farmer-verification/requests",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/farmer-verification/requests/:param",
+    "path": "/api/v1/farmer-verification/requests/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farmer-verification/requests",
+    "path": "/api/v1/farmer-verification/requests",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farmer-verification/requests/:param/verify",
+    "path": "/api/v1/farmer-verification/requests/:param/verify",
+    "method": "PUT"
+  },
+  {
+    "key": "PUT /api/v1/farmer-verification/requests/:param/reject",
+    "path": "/api/v1/farmer-verification/requests/:param/reject",
+    "method": "PUT"
+  },
+  {
+    "key": "GET /api/v1/farmer-skills",
+    "path": "/api/v1/farmer-skills",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farmer-skills",
+    "path": "/api/v1/farmer-skills",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farmer-skills/:param",
+    "path": "/api/v1/farmer-skills/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farmer-skills/:param",
+    "path": "/api/v1/farmer-skills/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farmer-welfare/records",
+    "path": "/api/v1/farmer-welfare/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farmer-welfare/records",
+    "path": "/api/v1/farmer-welfare/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farmer-welfare/records/:param",
+    "path": "/api/v1/farmer-welfare/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farmer-welfare/records/:param",
+    "path": "/api/v1/farmer-welfare/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/crop-calendar/entries",
+    "path": "/api/v1/crop-calendar/entries",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/crop-calendar/entries",
+    "path": "/api/v1/crop-calendar/entries",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/crop-calendar/entries/:param",
+    "path": "/api/v1/crop-calendar/entries/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/crop-calendar/entries/:param",
+    "path": "/api/v1/crop-calendar/entries/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/modules/m069",
+    "path": "/api/v1/modules/m069",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m069",
+    "path": "/api/v1/modules/m069",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/modules/m069/:param",
+    "path": "/api/v1/modules/m069/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/modules/m069/:param",
+    "path": "/api/v1/modules/m069/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/crop-registration/crops",
+    "path": "/api/v1/crop-registration/crops",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/crop-registration/crops/:param",
+    "path": "/api/v1/crop-registration/crops/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/crop-registration/crops",
+    "path": "/api/v1/crop-registration/crops",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/crop-registration/crops/:param",
+    "path": "/api/v1/crop-registration/crops/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/crop-registration/crops/:param",
+    "path": "/api/v1/crop-registration/crops/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/crop-varieties",
+    "path": "/api/v1/crop-varieties",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/crop-varieties",
+    "path": "/api/v1/crop-varieties",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/crop-varieties/:param",
+    "path": "/api/v1/crop-varieties/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/crop-varieties/:param",
+    "path": "/api/v1/crop-varieties/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/seed-planning/plans",
+    "path": "/api/v1/seed-planning/plans",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/seed-planning/plans",
+    "path": "/api/v1/seed-planning/plans",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/seed-planning/plans/:param",
+    "path": "/api/v1/seed-planning/plans/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/seed-planning/plans/:param",
+    "path": "/api/v1/seed-planning/plans/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/nurseries",
+    "path": "/api/v1/nurseries",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/nurseries",
+    "path": "/api/v1/nurseries",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/nurseries/:param",
+    "path": "/api/v1/nurseries/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/nurseries/:param",
+    "path": "/api/v1/nurseries/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/crop-monitoring/observations",
+    "path": "/api/v1/crop-monitoring/observations",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/crop-monitoring/observations",
+    "path": "/api/v1/crop-monitoring/observations",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/crop-monitoring/observations/:param",
+    "path": "/api/v1/crop-monitoring/observations/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/crop-monitoring/observations/:param",
+    "path": "/api/v1/crop-monitoring/observations/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/land-leases",
+    "path": "/api/v1/land-leases",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/land-leases",
+    "path": "/api/v1/land-leases",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/land-leases/:param",
+    "path": "/api/v1/land-leases/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/land-leases/:param",
+    "path": "/api/v1/land-leases/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/gis-land-mapping/parcels",
+    "path": "/api/v1/gis-land-mapping/parcels",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/gis-land-mapping/parcels",
+    "path": "/api/v1/gis-land-mapping/parcels",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/gis-land-mapping/parcels/:param",
+    "path": "/api/v1/gis-land-mapping/parcels/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/gis-land-mapping/parcels/:param",
+    "path": "/api/v1/gis-land-mapping/parcels/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/soil-mapping/zones",
+    "path": "/api/v1/soil-mapping/zones",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/soil-mapping/zones",
+    "path": "/api/v1/soil-mapping/zones",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/soil-mapping/zones/:param",
+    "path": "/api/v1/soil-mapping/zones/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/soil-mapping/zones/:param",
+    "path": "/api/v1/soil-mapping/zones/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/water-resource-mapping/resources",
+    "path": "/api/v1/water-resource-mapping/resources",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/water-resource-mapping/resources",
+    "path": "/api/v1/water-resource-mapping/resources",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/water-resource-mapping/resources/:param",
+    "path": "/api/v1/water-resource-mapping/resources/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/water-resource-mapping/resources/:param",
+    "path": "/api/v1/water-resource-mapping/resources/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/geo-boundaries",
+    "path": "/api/v1/geo-boundaries",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/geo-boundaries",
+    "path": "/api/v1/geo-boundaries",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/geo-boundaries/:param",
+    "path": "/api/v1/geo-boundaries/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/geo-boundaries/:param",
+    "path": "/api/v1/geo-boundaries/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/land-surveys",
+    "path": "/api/v1/land-surveys",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/land-surveys",
+    "path": "/api/v1/land-surveys",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/land-surveys/:param",
+    "path": "/api/v1/land-surveys/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/land-surveys/:param",
+    "path": "/api/v1/land-surveys/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fpo-registration/registrations",
+    "path": "/api/v1/fpo-registration/registrations",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fpo-registration/registrations",
+    "path": "/api/v1/fpo-registration/registrations",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fpo-registration/registrations/:param",
+    "path": "/api/v1/fpo-registration/registrations/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fpo-registration/registrations/:param",
+    "path": "/api/v1/fpo-registration/registrations/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fpo-governance/meetings",
+    "path": "/api/v1/fpo-governance/meetings",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fpo-governance/meetings",
+    "path": "/api/v1/fpo-governance/meetings",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fpo-governance/meetings/:param",
+    "path": "/api/v1/fpo-governance/meetings/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fpo-governance/meetings/:param",
+    "path": "/api/v1/fpo-governance/meetings/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/modules/m055",
+    "path": "/api/v1/modules/m055",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m055",
+    "path": "/api/v1/modules/m055",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/modules/m055/:param",
+    "path": "/api/v1/modules/m055/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/modules/m055/:param",
+    "path": "/api/v1/modules/m055/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/modules/m056",
+    "path": "/api/v1/modules/m056",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m056",
+    "path": "/api/v1/modules/m056",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/modules/m056/:param",
+    "path": "/api/v1/modules/m056/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/modules/m056/:param",
+    "path": "/api/v1/modules/m056/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fpo-marketing/campaigns",
+    "path": "/api/v1/fpo-marketing/campaigns",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fpo-marketing/campaigns",
+    "path": "/api/v1/fpo-marketing/campaigns",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fpo-marketing/campaigns/:param",
+    "path": "/api/v1/fpo-marketing/campaigns/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fpo-marketing/campaigns/:param",
+    "path": "/api/v1/fpo-marketing/campaigns/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fpo-compliance/filings",
+    "path": "/api/v1/fpo-compliance/filings",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fpo-compliance/filings",
+    "path": "/api/v1/fpo-compliance/filings",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fpo-compliance/filings/:param",
+    "path": "/api/v1/fpo-compliance/filings/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fpo-compliance/filings/:param",
+    "path": "/api/v1/fpo-compliance/filings/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/biofertilizers",
+    "path": "/api/v1/biofertilizers",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/biofertilizers",
+    "path": "/api/v1/biofertilizers",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/biofertilizers/:param",
+    "path": "/api/v1/biofertilizers/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/biofertilizers/:param",
+    "path": "/api/v1/biofertilizers/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/pesticide-inventory",
+    "path": "/api/v1/pesticide-inventory",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/pesticide-inventory",
+    "path": "/api/v1/pesticide-inventory",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/pesticide-inventory/:param",
+    "path": "/api/v1/pesticide-inventory/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/pesticide-inventory/:param",
+    "path": "/api/v1/pesticide-inventory/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/bio-pesticides",
+    "path": "/api/v1/bio-pesticides",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/bio-pesticides",
+    "path": "/api/v1/bio-pesticides",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/bio-pesticides/:param",
+    "path": "/api/v1/bio-pesticides/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/bio-pesticides/:param",
+    "path": "/api/v1/bio-pesticides/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/micronutrients",
+    "path": "/api/v1/micronutrients",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/micronutrients",
+    "path": "/api/v1/micronutrients",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/micronutrients/:param",
+    "path": "/api/v1/micronutrients/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/micronutrients/:param",
+    "path": "/api/v1/micronutrients/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/organic-inputs",
+    "path": "/api/v1/organic-inputs",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/organic-inputs",
+    "path": "/api/v1/organic-inputs",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/organic-inputs/:param",
+    "path": "/api/v1/organic-inputs/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/organic-inputs/:param",
+    "path": "/api/v1/organic-inputs/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/input-procurement/orders",
+    "path": "/api/v1/input-procurement/orders",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/input-procurement/orders",
+    "path": "/api/v1/input-procurement/orders",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/input-procurement/orders/:param",
+    "path": "/api/v1/input-procurement/orders/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/input-procurement/orders/:param",
+    "path": "/api/v1/input-procurement/orders/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/input-distribution/records",
+    "path": "/api/v1/input-distribution/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/input-distribution/records",
+    "path": "/api/v1/input-distribution/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/input-distribution/records/:param",
+    "path": "/api/v1/input-distribution/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/input-distribution/records/:param",
+    "path": "/api/v1/input-distribution/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/input-traceability/records",
+    "path": "/api/v1/input-traceability/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/input-traceability/records",
+    "path": "/api/v1/input-traceability/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/input-traceability/records/:param",
+    "path": "/api/v1/input-traceability/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/input-traceability/records/:param",
+    "path": "/api/v1/input-traceability/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/cattle-registry/animals",
+    "path": "/api/v1/cattle-registry/animals",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/cattle-registry/animals",
+    "path": "/api/v1/cattle-registry/animals",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/cattle-registry/animals/:param",
+    "path": "/api/v1/cattle-registry/animals/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/cattle-registry/animals/:param",
+    "path": "/api/v1/cattle-registry/animals/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/poultry/batches",
+    "path": "/api/v1/poultry/batches",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/poultry/batches",
+    "path": "/api/v1/poultry/batches",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/poultry/batches/:param",
+    "path": "/api/v1/poultry/batches/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/poultry/batches/:param",
+    "path": "/api/v1/poultry/batches/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/goat-farming/animals",
+    "path": "/api/v1/goat-farming/animals",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/goat-farming/animals",
+    "path": "/api/v1/goat-farming/animals",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/goat-farming/animals/:param",
+    "path": "/api/v1/goat-farming/animals/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/goat-farming/animals/:param",
+    "path": "/api/v1/goat-farming/animals/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/sheep-farming/animals",
+    "path": "/api/v1/sheep-farming/animals",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/sheep-farming/animals",
+    "path": "/api/v1/sheep-farming/animals",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/sheep-farming/animals/:param",
+    "path": "/api/v1/sheep-farming/animals/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/sheep-farming/animals/:param",
+    "path": "/api/v1/sheep-farming/animals/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/pig-farming/animals",
+    "path": "/api/v1/pig-farming/animals",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/pig-farming/animals",
+    "path": "/api/v1/pig-farming/animals",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/pig-farming/animals/:param",
+    "path": "/api/v1/pig-farming/animals/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/pig-farming/animals/:param",
+    "path": "/api/v1/pig-farming/animals/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/pricing/records",
+    "path": "/api/v1/pricing/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/pricing/records",
+    "path": "/api/v1/pricing/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/pricing/records/:param",
+    "path": "/api/v1/pricing/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/pricing/records/:param",
+    "path": "/api/v1/pricing/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/breeding/records",
+    "path": "/api/v1/breeding/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/breeding/records",
+    "path": "/api/v1/breeding/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/breeding/records/:param",
+    "path": "/api/v1/breeding/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/breeding/records/:param",
+    "path": "/api/v1/breeding/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/livestock-analytics/records",
+    "path": "/api/v1/livestock-analytics/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/livestock-analytics/records",
+    "path": "/api/v1/livestock-analytics/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/livestock-analytics/records/:param",
+    "path": "/api/v1/livestock-analytics/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/livestock-analytics/records/:param",
+    "path": "/api/v1/livestock-analytics/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/blocks",
+    "path": "/api/v1/blocks",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/blocks",
+    "path": "/api/v1/blocks",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/blocks/:param",
+    "path": "/api/v1/blocks/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/blocks/:param",
+    "path": "/api/v1/blocks/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/districts",
+    "path": "/api/v1/districts",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/districts",
+    "path": "/api/v1/districts",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/districts/:param",
+    "path": "/api/v1/districts/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/districts/:param",
+    "path": "/api/v1/districts/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/states",
+    "path": "/api/v1/states",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/states",
+    "path": "/api/v1/states",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/states/:param",
+    "path": "/api/v1/states/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/states/:param",
+    "path": "/api/v1/states/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/producer-groups",
+    "path": "/api/v1/producer-groups",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/producer-groups",
+    "path": "/api/v1/producer-groups",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/producer-groups/:param",
+    "path": "/api/v1/producer-groups/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/producer-groups/:param",
+    "path": "/api/v1/producer-groups/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/community-assets",
+    "path": "/api/v1/community-assets",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/community-assets",
+    "path": "/api/v1/community-assets",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/community-assets/:param",
+    "path": "/api/v1/community-assets/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/community-assets/:param",
+    "path": "/api/v1/community-assets/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/rural-development/projects",
+    "path": "/api/v1/rural-development/projects",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/rural-development/projects",
+    "path": "/api/v1/rural-development/projects",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/rural-development/projects/:param",
+    "path": "/api/v1/rural-development/projects/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/rural-development/projects/:param",
+    "path": "/api/v1/rural-development/projects/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/soil-health/cards",
+    "path": "/api/v1/soil-health/cards",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/soil-health/cards",
+    "path": "/api/v1/soil-health/cards",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/soil-health/cards/:param",
+    "path": "/api/v1/soil-health/cards/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/soil-health/cards/:param",
+    "path": "/api/v1/soil-health/cards/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/nutrient-management/plans",
+    "path": "/api/v1/nutrient-management/plans",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/nutrient-management/plans",
+    "path": "/api/v1/nutrient-management/plans",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/nutrient-management/plans/:param",
+    "path": "/api/v1/nutrient-management/plans/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/nutrient-management/plans/:param",
+    "path": "/api/v1/nutrient-management/plans/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fertility-management/records",
+    "path": "/api/v1/fertility-management/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fertility-management/records",
+    "path": "/api/v1/fertility-management/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fertility-management/records/:param",
+    "path": "/api/v1/fertility-management/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fertility-management/records/:param",
+    "path": "/api/v1/fertility-management/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/water-budgeting/budgets",
+    "path": "/api/v1/water-budgeting/budgets",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/water-budgeting/budgets",
+    "path": "/api/v1/water-budgeting/budgets",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/water-budgeting/budgets/:param",
+    "path": "/api/v1/water-budgeting/budgets/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/water-budgeting/budgets/:param",
+    "path": "/api/v1/water-budgeting/budgets/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/water-quality/readings",
+    "path": "/api/v1/water-quality/readings",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/water-quality/readings",
+    "path": "/api/v1/water-quality/readings",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/water-quality/readings/:param",
+    "path": "/api/v1/water-quality/readings/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/water-quality/readings/:param",
+    "path": "/api/v1/water-quality/readings/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/rainwater-harvesting/structures",
+    "path": "/api/v1/rainwater-harvesting/structures",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/rainwater-harvesting/structures",
+    "path": "/api/v1/rainwater-harvesting/structures",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/rainwater-harvesting/structures/:param",
+    "path": "/api/v1/rainwater-harvesting/structures/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/rainwater-harvesting/structures/:param",
+    "path": "/api/v1/rainwater-harvesting/structures/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/watersheds",
+    "path": "/api/v1/watersheds",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/watersheds",
+    "path": "/api/v1/watersheds",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/watersheds/:param",
+    "path": "/api/v1/watersheds/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/watersheds/:param",
+    "path": "/api/v1/watersheds/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/water-analytics/records",
+    "path": "/api/v1/water-analytics/records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/water-analytics/records",
+    "path": "/api/v1/water-analytics/records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/water-analytics/records/:param",
+    "path": "/api/v1/water-analytics/records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/water-analytics/records/:param",
+    "path": "/api/v1/water-analytics/records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/drought-monitoring",
+    "path": "/api/v1/drought-monitoring",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/drought-monitoring",
+    "path": "/api/v1/drought-monitoring",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/drought-monitoring/:param",
+    "path": "/api/v1/drought-monitoring/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/drought-monitoring/:param",
+    "path": "/api/v1/drought-monitoring/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/flood-monitoring",
+    "path": "/api/v1/flood-monitoring",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/flood-monitoring",
+    "path": "/api/v1/flood-monitoring",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/flood-monitoring/:param",
+    "path": "/api/v1/flood-monitoring/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/flood-monitoring/:param",
+    "path": "/api/v1/flood-monitoring/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/disease-forecasting",
+    "path": "/api/v1/disease-forecasting",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/disease-forecasting",
+    "path": "/api/v1/disease-forecasting",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/disease-forecasting/:param",
+    "path": "/api/v1/disease-forecasting/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/disease-forecasting/:param",
+    "path": "/api/v1/disease-forecasting/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/climate-risk",
+    "path": "/api/v1/climate-risk",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/climate-risk",
+    "path": "/api/v1/climate-risk",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/climate-risk/:param",
+    "path": "/api/v1/climate-risk/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/climate-risk/:param",
+    "path": "/api/v1/climate-risk/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/agro-meteorology",
+    "path": "/api/v1/agro-meteorology",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/agro-meteorology",
+    "path": "/api/v1/agro-meteorology",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/agro-meteorology/:param",
+    "path": "/api/v1/agro-meteorology/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/agro-meteorology/:param",
+    "path": "/api/v1/agro-meteorology/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farm-activities",
+    "path": "/api/v1/farm-activities",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farm-activities",
+    "path": "/api/v1/farm-activities",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farm-activities/:param",
+    "path": "/api/v1/farm-activities/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farm-activities/:param",
+    "path": "/api/v1/farm-activities/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farm-tasks",
+    "path": "/api/v1/farm-tasks",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farm-tasks",
+    "path": "/api/v1/farm-tasks",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farm-tasks/:param",
+    "path": "/api/v1/farm-tasks/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farm-tasks/:param",
+    "path": "/api/v1/farm-tasks/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/contractors",
+    "path": "/api/v1/contractors",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/contractors",
+    "path": "/api/v1/contractors",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/contractors/:param",
+    "path": "/api/v1/contractors/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/contractors/:param",
+    "path": "/api/v1/contractors/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/machinery-operations",
+    "path": "/api/v1/machinery-operations",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/machinery-operations",
+    "path": "/api/v1/machinery-operations",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/machinery-operations/:param",
+    "path": "/api/v1/machinery-operations/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/machinery-operations/:param",
+    "path": "/api/v1/machinery-operations/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/equipment-scheduling",
+    "path": "/api/v1/equipment-scheduling",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/equipment-scheduling",
+    "path": "/api/v1/equipment-scheduling",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/equipment-scheduling/:param",
+    "path": "/api/v1/equipment-scheduling/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/equipment-scheduling/:param",
+    "path": "/api/v1/equipment-scheduling/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/input-consumption",
+    "path": "/api/v1/input-consumption",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/input-consumption",
+    "path": "/api/v1/input-consumption",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/input-consumption/:param",
+    "path": "/api/v1/input-consumption/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/input-consumption/:param",
+    "path": "/api/v1/input-consumption/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farm-productivity",
+    "path": "/api/v1/farm-productivity",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farm-productivity",
+    "path": "/api/v1/farm-productivity",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farm-productivity/:param",
+    "path": "/api/v1/farm-productivity/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farm-productivity/:param",
+    "path": "/api/v1/farm-productivity/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/farm-operations-dashboard",
+    "path": "/api/v1/farm-operations-dashboard",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/farm-operations-dashboard",
+    "path": "/api/v1/farm-operations-dashboard",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/farm-operations-dashboard/:param",
+    "path": "/api/v1/farm-operations-dashboard/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/farm-operations-dashboard/:param",
+    "path": "/api/v1/farm-operations-dashboard/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/machinery-implements",
+    "path": "/api/v1/machinery-implements",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/machinery-implements",
+    "path": "/api/v1/machinery-implements",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/machinery-implements/:param",
+    "path": "/api/v1/machinery-implements/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/machinery-implements/:param",
+    "path": "/api/v1/machinery-implements/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/equipment-inventory",
+    "path": "/api/v1/equipment-inventory",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/equipment-inventory",
+    "path": "/api/v1/equipment-inventory",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/equipment-inventory/:param",
+    "path": "/api/v1/equipment-inventory/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/equipment-inventory/:param",
+    "path": "/api/v1/equipment-inventory/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/equipment-rental",
+    "path": "/api/v1/equipment-rental",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/equipment-rental",
+    "path": "/api/v1/equipment-rental",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/equipment-rental/:param",
+    "path": "/api/v1/equipment-rental/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/equipment-rental/:param",
+    "path": "/api/v1/equipment-rental/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/preventive-maintenance",
+    "path": "/api/v1/preventive-maintenance",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/preventive-maintenance",
+    "path": "/api/v1/preventive-maintenance",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/preventive-maintenance/:param",
+    "path": "/api/v1/preventive-maintenance/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/preventive-maintenance/:param",
+    "path": "/api/v1/preventive-maintenance/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/breakdown-maintenance",
+    "path": "/api/v1/breakdown-maintenance",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/breakdown-maintenance",
+    "path": "/api/v1/breakdown-maintenance",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/breakdown-maintenance/:param",
+    "path": "/api/v1/breakdown-maintenance/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/breakdown-maintenance/:param",
+    "path": "/api/v1/breakdown-maintenance/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fuel-management",
+    "path": "/api/v1/fuel-management",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fuel-management",
+    "path": "/api/v1/fuel-management",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fuel-management/:param",
+    "path": "/api/v1/fuel-management/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fuel-management/:param",
+    "path": "/api/v1/fuel-management/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/spare-parts",
+    "path": "/api/v1/spare-parts",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/spare-parts",
+    "path": "/api/v1/spare-parts",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/spare-parts/:param",
+    "path": "/api/v1/spare-parts/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/spare-parts/:param",
+    "path": "/api/v1/spare-parts/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/asset-lifecycle",
+    "path": "/api/v1/asset-lifecycle",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/asset-lifecycle",
+    "path": "/api/v1/asset-lifecycle",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/asset-lifecycle/:param",
+    "path": "/api/v1/asset-lifecycle/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/asset-lifecycle/:param",
+    "path": "/api/v1/asset-lifecycle/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/vegetable-production",
+    "path": "/api/v1/vegetable-production",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/vegetable-production",
+    "path": "/api/v1/vegetable-production",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/vegetable-production/:param",
+    "path": "/api/v1/vegetable-production/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/vegetable-production/:param",
+    "path": "/api/v1/vegetable-production/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/floriculture",
+    "path": "/api/v1/floriculture",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/floriculture",
+    "path": "/api/v1/floriculture",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/floriculture/:param",
+    "path": "/api/v1/floriculture/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/floriculture/:param",
+    "path": "/api/v1/floriculture/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/greenhouse-registry",
+    "path": "/api/v1/greenhouse-registry",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/greenhouse-registry",
+    "path": "/api/v1/greenhouse-registry",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/greenhouse-registry/:param",
+    "path": "/api/v1/greenhouse-registry/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/greenhouse-registry/:param",
+    "path": "/api/v1/greenhouse-registry/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/polyhouse-management",
+    "path": "/api/v1/polyhouse-management",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/polyhouse-management",
+    "path": "/api/v1/polyhouse-management",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/polyhouse-management/:param",
+    "path": "/api/v1/polyhouse-management/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/polyhouse-management/:param",
+    "path": "/api/v1/polyhouse-management/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/hydroponics",
+    "path": "/api/v1/hydroponics",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/hydroponics",
+    "path": "/api/v1/hydroponics",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/hydroponics/:param",
+    "path": "/api/v1/hydroponics/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/hydroponics/:param",
+    "path": "/api/v1/hydroponics/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/aeroponics",
+    "path": "/api/v1/aeroponics",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/aeroponics",
+    "path": "/api/v1/aeroponics",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/aeroponics/:param",
+    "path": "/api/v1/aeroponics/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/aeroponics/:param",
+    "path": "/api/v1/aeroponics/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/precision-horticulture",
+    "path": "/api/v1/precision-horticulture",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/precision-horticulture",
+    "path": "/api/v1/precision-horticulture",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/precision-horticulture/:param",
+    "path": "/api/v1/precision-horticulture/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/precision-horticulture/:param",
+    "path": "/api/v1/precision-horticulture/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/modules/m006/settings",
+    "path": "/api/v1/modules/m006/settings",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m006/settings/:param",
+    "path": "/api/v1/modules/m006/settings/:param",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/modules/m006/settings/:param",
+    "path": "/api/v1/modules/m006/settings/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "POST /api/v1/modules/m006/audit",
+    "path": "/api/v1/modules/m006/audit",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m006/analytics",
+    "path": "/api/v1/modules/m006/analytics",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m006/anomalies",
+    "path": "/api/v1/modules/m006/anomalies",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m006/predictive-maintenance",
+    "path": "/api/v1/modules/m006/predictive-maintenance",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/roles",
+    "path": "/api/v1/modules/m007/roles",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/roles/:param",
+    "path": "/api/v1/modules/m007/roles/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m007/roles",
+    "path": "/api/v1/modules/m007/roles",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/modules/m007/roles/:param",
+    "path": "/api/v1/modules/m007/roles/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/modules/m007/roles/:param",
+    "path": "/api/v1/modules/m007/roles/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/permissions",
+    "path": "/api/v1/modules/m007/permissions",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m007/permissions",
+    "path": "/api/v1/modules/m007/permissions",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/modules/m007/assign-role",
+    "path": "/api/v1/modules/m007/assign-role",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/modules/m007/remove-role",
+    "path": "/api/v1/modules/m007/remove-role",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/users/:param/roles",
+    "path": "/api/v1/modules/m007/users/:param/roles",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/users/:param/permissions",
+    "path": "/api/v1/modules/m007/users/:param/permissions",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/users/:param/recommend-role",
+    "path": "/api/v1/modules/m007/users/:param/recommend-role",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/permission-matrix",
+    "path": "/api/v1/modules/m007/permission-matrix",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m007/role-hierarchy",
+    "path": "/api/v1/modules/m007/role-hierarchy",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m008/logs",
+    "path": "/api/v1/modules/m008/logs",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/logs",
+    "path": "/api/v1/modules/m008/logs",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/logs/:param",
+    "path": "/api/v1/modules/m008/logs/:param",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/logs/:param/verify",
+    "path": "/api/v1/modules/m008/logs/:param/verify",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m008/compliance-rules",
+    "path": "/api/v1/modules/m008/compliance-rules",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/compliance-rules",
+    "path": "/api/v1/modules/m008/compliance-rules",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/users/:param/compliance",
+    "path": "/api/v1/modules/m008/users/:param/compliance",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/reports/compliance",
+    "path": "/api/v1/modules/m008/reports/compliance",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m008/anomalies",
+    "path": "/api/v1/modules/m008/anomalies",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m009/events",
+    "path": "/api/v1/modules/m009/events",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m009/events",
+    "path": "/api/v1/modules/m009/events",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m009/ip-list",
+    "path": "/api/v1/modules/m009/ip-list",
+    "method": "POST"
+  },
+  {
+    "key": "DELETE /api/v1/modules/m009/ip-list",
+    "path": "/api/v1/modules/m009/ip-list",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/modules/m009/ip-list/:param",
+    "path": "/api/v1/modules/m009/ip-list/:param",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m009/ip-list/check",
+    "path": "/api/v1/modules/m009/ip-list/check",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/modules/m009/rate-limit/check",
+    "path": "/api/v1/modules/m009/rate-limit/check",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m009/threats/detect",
+    "path": "/api/v1/modules/m009/threats/detect",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m009/users/:param/security-score",
+    "path": "/api/v1/modules/m009/users/:param/security-score",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m009/policies",
+    "path": "/api/v1/modules/m009/policies",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/modules/m009/policies/evaluate",
+    "path": "/api/v1/modules/m009/policies/evaluate",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/modules/m010/notifications",
+    "path": "/api/v1/modules/m010/notifications",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m010/notifications",
+    "path": "/api/v1/modules/m010/notifications",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/modules/m010/notifications/:param",
+    "path": "/api/v1/modules/m010/notifications/:param",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/modules/m010/notifications/:param/read",
+    "path": "/api/v1/modules/m010/notifications/:param/read",
+    "method": "PUT"
+  },
+  {
+    "key": "PUT /api/v1/modules/m010/notifications/read-all",
+    "path": "/api/v1/modules/m010/notifications/read-all",
+    "method": "PUT"
+  },
+  {
+    "key": "POST /api/v1/modules/m010/notifications/:param/deliver",
+    "path": "/api/v1/modules/m010/notifications/:param/deliver",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m010/preferences/:param",
+    "path": "/api/v1/modules/m010/preferences/:param",
+    "method": "GET"
+  },
+  {
+    "key": "PUT /api/v1/modules/m010/preferences",
+    "path": "/api/v1/modules/m010/preferences",
+    "method": "PUT"
+  },
+  {
+    "key": "POST /api/v1/modules/m010/templates",
+    "path": "/api/v1/modules/m010/templates",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m010/templates",
+    "path": "/api/v1/modules/m010/templates",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/modules/m010/templates/render",
+    "path": "/api/v1/modules/m010/templates/render",
+    "method": "POST"
+  },
+  {
+    "key": "POST /api/v1/modules/m010/batch",
+    "path": "/api/v1/modules/m010/batch",
+    "method": "POST"
+  },
+  {
+    "key": "GET /api/v1/modules/m010/analytics",
+    "path": "/api/v1/modules/m010/analytics",
+    "method": "GET"
+  },
+  {
+    "key": "GET /api/v1/protected-cultivation",
+    "path": "/api/v1/protected-cultivation",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/protected-cultivation",
+    "path": "/api/v1/protected-cultivation",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/protected-cultivation/:param",
+    "path": "/api/v1/protected-cultivation/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/protected-cultivation/:param",
+    "path": "/api/v1/protected-cultivation/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/horticulture-analytics",
+    "path": "/api/v1/horticulture-analytics",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/horticulture-analytics",
+    "path": "/api/v1/horticulture-analytics",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/horticulture-analytics/:param",
+    "path": "/api/v1/horticulture-analytics/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/horticulture-analytics/:param",
+    "path": "/api/v1/horticulture-analytics/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/biofloc-farms",
+    "path": "/api/v1/biofloc-farms",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/biofloc-farms",
+    "path": "/api/v1/biofloc-farms",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/biofloc-farms/:param",
+    "path": "/api/v1/biofloc-farms/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/biofloc-farms/:param",
+    "path": "/api/v1/biofloc-farms/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/hatchery-management",
+    "path": "/api/v1/hatchery-management",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/hatchery-management",
+    "path": "/api/v1/hatchery-management",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/hatchery-management/:param",
+    "path": "/api/v1/hatchery-management/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/hatchery-management/:param",
+    "path": "/api/v1/hatchery-management/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fish-feed",
+    "path": "/api/v1/fish-feed",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fish-feed",
+    "path": "/api/v1/fish-feed",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fish-feed/:param",
+    "path": "/api/v1/fish-feed/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fish-feed/:param",
+    "path": "/api/v1/fish-feed/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fisheries-water-quality",
+    "path": "/api/v1/fisheries-water-quality",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fisheries-water-quality",
+    "path": "/api/v1/fisheries-water-quality",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fisheries-water-quality/:param",
+    "path": "/api/v1/fisheries-water-quality/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fisheries-water-quality/:param",
+    "path": "/api/v1/fisheries-water-quality/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fish-health",
+    "path": "/api/v1/fish-health",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fish-health",
+    "path": "/api/v1/fish-health",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fish-health/:param",
+    "path": "/api/v1/fish-health/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fish-health/:param",
+    "path": "/api/v1/fish-health/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fisheries-harvest",
+    "path": "/api/v1/fisheries-harvest",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fisheries-harvest",
+    "path": "/api/v1/fisheries-harvest",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fisheries-harvest/:param",
+    "path": "/api/v1/fisheries-harvest/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fisheries-harvest/:param",
+    "path": "/api/v1/fisheries-harvest/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/fish-processing",
+    "path": "/api/v1/fish-processing",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/fish-processing",
+    "path": "/api/v1/fish-processing",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/fish-processing/:param",
+    "path": "/api/v1/fish-processing/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/fish-processing/:param",
+    "path": "/api/v1/fish-processing/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/cold-fish-chain",
+    "path": "/api/v1/cold-fish-chain",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/cold-fish-chain",
+    "path": "/api/v1/cold-fish-chain",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/cold-fish-chain/:param",
+    "path": "/api/v1/cold-fish-chain/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/cold-fish-chain/:param",
+    "path": "/api/v1/cold-fish-chain/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/aquaculture-analytics",
+    "path": "/api/v1/aquaculture-analytics",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/aquaculture-analytics",
+    "path": "/api/v1/aquaculture-analytics",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/aquaculture-analytics/:param",
+    "path": "/api/v1/aquaculture-analytics/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/aquaculture-analytics/:param",
+    "path": "/api/v1/aquaculture-analytics/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/roles",
+    "path": "/api/v1/roles",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/roles",
+    "path": "/api/v1/roles",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/roles/:param",
+    "path": "/api/v1/roles/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/roles/:param",
+    "path": "/api/v1/roles/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/permissions",
+    "path": "/api/v1/permissions",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/permissions",
+    "path": "/api/v1/permissions",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/permissions/:param",
+    "path": "/api/v1/permissions/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/permissions/:param",
+    "path": "/api/v1/permissions/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/sso-providers",
+    "path": "/api/v1/sso-providers",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/sso-providers",
+    "path": "/api/v1/sso-providers",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/sso-providers/:param",
+    "path": "/api/v1/sso-providers/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/sso-providers/:param",
+    "path": "/api/v1/sso-providers/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/mfa-devices",
+    "path": "/api/v1/mfa-devices",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/mfa-devices",
+    "path": "/api/v1/mfa-devices",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/mfa-devices/:param",
+    "path": "/api/v1/mfa-devices/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/mfa-devices/:param",
+    "path": "/api/v1/mfa-devices/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/digital-identities",
+    "path": "/api/v1/digital-identities",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/digital-identities",
+    "path": "/api/v1/digital-identities",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/digital-identities/:param",
+    "path": "/api/v1/digital-identities/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/digital-identities/:param",
+    "path": "/api/v1/digital-identities/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/consent-records",
+    "path": "/api/v1/consent-records",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/consent-records",
+    "path": "/api/v1/consent-records",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/consent-records/:param",
+    "path": "/api/v1/consent-records/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/consent-records/:param",
+    "path": "/api/v1/consent-records/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/sessions",
+    "path": "/api/v1/sessions",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/sessions",
+    "path": "/api/v1/sessions",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/sessions/:param",
+    "path": "/api/v1/sessions/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/sessions/:param",
+    "path": "/api/v1/sessions/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/environments",
+    "path": "/api/v1/environments",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/environments",
+    "path": "/api/v1/environments",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/environments/:param",
+    "path": "/api/v1/environments/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/environments/:param",
+    "path": "/api/v1/environments/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/feature-flags",
+    "path": "/api/v1/feature-flags",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/feature-flags",
+    "path": "/api/v1/feature-flags",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/feature-flags/:param",
+    "path": "/api/v1/feature-flags/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/feature-flags/:param",
+    "path": "/api/v1/feature-flags/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/timezones",
+    "path": "/api/v1/timezones",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/timezones",
+    "path": "/api/v1/timezones",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/timezones/:param",
+    "path": "/api/v1/timezones/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/timezones/:param",
+    "path": "/api/v1/timezones/:param",
+    "method": "DELETE"
+  },
+  {
+    "key": "GET /api/v1/master-config",
+    "path": "/api/v1/master-config",
+    "method": "GET"
+  },
+  {
+    "key": "POST /api/v1/master-config",
+    "path": "/api/v1/master-config",
+    "method": "POST"
+  },
+  {
+    "key": "PUT /api/v1/master-config/:param",
+    "path": "/api/v1/master-config/:param",
+    "method": "PUT"
+  },
+  {
+    "key": "DELETE /api/v1/master-config/:param",
+    "path": "/api/v1/master-config/:param",
+    "method": "DELETE"
+  }
+]
