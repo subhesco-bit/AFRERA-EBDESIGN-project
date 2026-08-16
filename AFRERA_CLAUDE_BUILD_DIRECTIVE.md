@@ -258,6 +258,33 @@ Adopt only where a measurable benefit exists (§1.2).
 
 ---
 
+## PART 3A — REOS / REVENUE OPERATING SYSTEM RECONCILIATION
+
+A separate strategic proposal — REOS (Rural Economic Operating System), three documents written 2026-07-28, plus a 9-layer restatement in `DOCUMENTATION/Volume_13_Rural_Economic_Operating_System.md` — was never reconciled against this directive or the M0XX catalogue until now. Full reconciliation: `REOS_MODULE_CATALOGUE_RECONCILIATION.md` (grep-verified against real code, not REOS's own self-reported completion percentages, which were wrong in both directions).
+
+**Verdict on 39 reconciled top-level REOS items:** 9 MAPS TO EXISTING (already built under a different name — e.g. `costService.js`, `revenueService.js`, `demandService.js` mounted at `/api/v1/{costs,revenue,demand}` are REOS's "Cost Breakup Engine," "Revenue Decision Engine," and "Demand Intelligence Platform"), 17 PARTIAL (extend a real, mounted service — never rebuild), 12 GENUINELY NEW, 1 pure re-framing checklist with no distinct capability.
+
+**Highest-leverage single fix found:** `backend/src/services/sharedInfraService.js` (605 lines, real business logic, mounted at boot) is a pure mock — every write path ends in the literal comment `// In production, save to database` (lines 55, 171, 427, 446, 476), with **zero** `pool.query` calls anywhere in the file. A real, matching table (`shared_infrastructure_access`, migration `041_rural_life_os_schema.sql`) sits unused right next to it. Wire the existing logic to the existing table — this is not a new module, it is finishing one that's already 90% written.
+
+**Other unwired-table opportunities** (real schema, zero service/route references — confirmed via grep): `village_profiles` (052, even seeded), `procurement_subscriptions` and `buying_clubs` (042). Write a service against the existing table before proposing new schema for any of these — same rule as §0.4's pre-build gate.
+
+**New M1XX modules recommended** (full reasoning in the reconciliation doc §5): Household Budget & Consumption Optimisation and LPG/Electricity/Water Household Cost Tracking (the one genuinely new **domain** — "Household Economy" — since none of the 16 existing domains model the farm family as a consumer rather than a producer), RWA/Society Commerce (extend FPO domain), Contract Farming Lifecycle (extend FPO/Operations), Buyer Intelligence (extend Operations/Marketplace-adjacent), District Cost-of-Living Database (extend Operations, wire `village_profiles`). **Not recommended, with reasons stated**: Village Digital Twin, AI Crop Portfolio, B2B Marketplace as a platform distinct from Institutional Procurement, AI Project Recommendation Engine (duplicates `core/mcda.js`) — each fails the §1.2 measurable-benefit test as currently justified.
+
+**Standing rule from this reconciliation:** before building anything REOS-shaped, check `REOS_MODULE_CATALOGUE_RECONCILIATION.md` §3 first. A document written without reading the codebase (REOS's own `Volume_13A` integration doc never cites one file:line) is not evidence of what's missing — only a grep is.
+
+---
+
+## PART 3B — FINANCIAL SERVICES PLATFORM RECONCILIATION
+
+`AFRERA_FINANCIAL_SERVICES_PLATFORM_SPECIFICATION.md` and its module-implementation doc (from the earlier 16-document specification set, see `EARLIER_SPECIFICATION_SET_STATUS.md`) proposed KYC, escrow, cross-border payments (SWIFT/RTGS), connected banking, and a "Fraud Detection ML Model." A quality review found the spec used real regulatory vocabulary but shipped almost no code behind it — KYC/AML/SWIFT/RTGS/escrow together had 2 incidental grep hits across a 3282-line implementation doc — and the one thing that was built, "Fraud Detection ML," was not ML at all: hardcoded heuristic weights (0.3/0.25/0.2/0.25) with no tuning methodology, mislabeled.
+
+**Disposition:**
+- **KYC, AML, SWIFT/cross-border, RTGS, escrow — explicitly out of scope for this codebase to build unsupervised.** These require real regulatory/compliance expertise this repository cannot fabricate. Do not attempt them without a named compliance owner reviewing the result.
+- **Credit/risk scoring — the genuinely buildable, safe piece — is done.** `backend/src/services/financialService.js` now has `getBuyerCreditEligibility()` (real B2B credit-term gating: net0/net30/net60 by turnover + vintage, against real `buyers` columns) and `farmerCreditRiskScore()` (a real MCDA-based 0-100 score via `core/mcda.js`, using FDI score, loan/EMI repayment history, settled-payment history, and order track record — each signal labeled `real` or `assumed` for confidence weighting). Both are wired into the outcome-resolution loop (`core/outcomeResolver.js`/`outcomeSink.js`): predictions are logged and scored against real repayment behavior 180 days out, so the score's own accuracy becomes measurable rather than a number nobody checks. This is the standard "ML" claims must meet in this codebase — if it isn't in the outcome loop, don't call it learned.
+- **Never label a static weighted-rule engine "ML."** Call it a rule engine or a weighted score. The original spec's mislabeling is exactly the failure mode §1.2 and Standing Rule 10 exist to catch.
+
+---
+
 ## PART 4 — PUBLIC DATA INTELLIGENCE PLATFORM (FOUNDATION LAYER)
 
 This is **not** data mining and **not** hacking. It is lawful collection of public-domain data, AI extraction, enrichment, classification, and business-rule filtering.
@@ -582,4 +609,24 @@ Corrected six times: "78 dropped columns" (wrong 3× — 190→78→15→2, comm
 9. **Never collect data that is not lawfully public** (§4.1).
 10. **Report an analogy that adds no engineering value as exactly that** (§1.2). Saying "this does not help" is a correct deliverable.
 11. **Foundation defects outrank new features.** Phase 1 blocks everything.
+
+## Part 3C — Ledger Architecture Decision (resolves the "one ledger vs. 9 economies" contradiction)
+
+`AFRERA_INTEGRATED_PLATFORM_ARCHITECTURE.md` states the canonical philosophy explicitly: "one identity, one ledger, one ERP, one AI engine, one logistics engine, one finance engine, one workflow, one event model." The intended and correct architecture is a single hash-chained double-entry ledger (`journal_entries`/`journal_lines`, migration 990-series, exposed at `LedgerPage.jsx`), which GST invoicing, AF-AA (asset accounting), AF-CO (cost control), and AF-PS (project systems) all post to via `withTransaction`.
+
+**Correction (2026-08-11, cross-module integrity audit):** a second, live, fully disconnected ledger was found and was NOT caught when this section was first written — `recoveredFinanceService.appendLedgerEntry()` posts to its own hash-chained `gl_ledger_chain` table, with its own `trialBalance()`/`verifyLedger()` reads, mounted at `/api/v1/finance/ledger/*`. It has a `journalEntryId` param that appears intended to link back to the canonical ledger but nothing populates it, meaning `/api/v1/finance/ledger/trial-balance` today silently reports a balance blind to every real GST/asset/cost-control posting. No frontend caller was found for either the `/finance/ledger/*` routes or `recoveredFinanceService.gstFor()` (a second, independent GST-rate authority in the same file) — but per this directive's own caution about hard-to-reverse financial-data decisions, reconciling or deprecating a live, hash-chained ledger is being held for an explicit human decision rather than executed autonomously. See `RESEARCH_CORPUS_RECONCILIATION.md` and the cross-module integrity audit's report for full evidence. **The "one ledger" rule below stands as the target state — it is not yet true today.**
+
+**Second correction (2026-08-15):** a third ledger-adjacent system was found live and mounted at `/api/v1/unified-ledger` — `backend/src/services/unifiedLedgerService.js`, whose own docstring explicitly implements "9 distinct economic zones" with "economy-aware transaction routing" and "cross-economy reconciliation" — the literal interpretation this directive rejects above. It also imports from a second, disconnected `utils/signalBus.js` (a duplicate of `core/signalBus.js` with the same export shape but separate state), so nothing it emits reaches the real reflex/decision engine.
+
+**Decision (2026-08-15, explicit authorization given):** all financial-authority forks resolved the same way — deprecated in place (HTTP 410 with a `canonical` pointer), never deleted, so every decision is reversible if something unknown depended on a route:
+1. `unifiedLedgerService`'s entire route surface (`routes/unifiedLedgerRoutes.js`) — deprecated via one blanket middleware.
+2. `recoveredFinanceService.gstFor()`/`buildInvoice()` (`routes/recoveredFinanceRoutes.js`'s `/gst/*`) — deprecated, points to `gstService.resolveGSTRate()`/`generateGSTInvoice()`. The file's unrelated real capabilities (`/schemes/*`, `/enwr/*`, `/freight/*`, `/subsidy/*`, `/risk/*`) were left untouched — they are not part of this fork.
+3. `recoveredFinanceService.appendLedgerEntry()`/`trialBalance()`/`verifyLedger()` (`routes/recoveredFinanceRoutes.js`'s `/ledger/*`) — deprecated, points to the canonical `/api/v1/ledger`.
+4. `aiService.assessCreditRisk()` and `advancedAIService.advancedAssessCreditRisk()` — not deprecated but delegated: their routes now call `financialService.farmerCreditRiskScore()` directly and return its real result, so the API contract stays live for any unknown caller while the underlying computation is no longer duplicated.
+
+The "one ledger" rule is now true in practice, not just in target-state documentation — verified by a clean backend boot after these changes.
+
+The apparent contradiction — REOS's "9 economies" framing — is resolved, not live tension. `REOS_MODULE_CATALOGUE_RECONCILIATION.md` §"REOS is not a single coherent proposal" already found that REOS/ROS/Rural-Life-OS are three overlapping documents plus a 9-layer restatement in Volume_13, all written the same day, describing the same handful of ideas 3-4 times under different names ("economies", "platforms", "layers"). None of those documents specify a second ledger, a second chart of accounts, or a second transaction log — they are a **conceptual/domain taxonomy** for organizing and reporting on capabilities (Household Economy, Village Shared Economy, Pre-Season Economy, etc.), not an architectural instruction to fragment the financial system.
+
+**Decision:** the "9 economies" (and every other REOS restatement of the same idea — "10 Strategic Platforms," "46 platforms/layers") are non-binding reporting/domain groupings. Where a REOS "economy" needs to show up as a distinct financial view, it is implemented as a **cost-center or dimension tag on the one real ledger** (the same pattern already used by AF-CO's cost centers/profit centers) — never as a separate ledger, separate journal, or separate chart of accounts. This directive's Part 0-3B language takes precedence over any REOS document where the two conflict, per the existing precedence rule established for the Financial Services Platform reconciliation (Part 3B).
 12. **Every claim in a PR must name the file and line that proves it.**

@@ -1,68 +1,21 @@
-# afrera-mobile README
+# afrera-mobile — superseded
 
-# AFRERA Mobile Application
+This module is **not the mobile app**. It is an empty scaffold (no source
+code, generic boilerplate README claiming React Native + Expo) left over
+from an early architecture sketch. It was never implemented and should not
+be used as a starting point.
 
-The AFRERA Mobile Application is designed for field operations, providing farmers and field agents with tools to manage their activities efficiently. This application supports various functionalities such as farmer registration, farm visits, geo-tagging, and more.
+The real AFRERA mobile experience is a **PWA built into `frontend/`** — not
+a separate React Native/Expo codebase. See:
 
-## Features
+- `frontend/public/manifest.webmanifest` — the web app manifest (installable,
+  icons, shortcuts)
+- `frontend/public/sw.js` — the service worker (offline caching, background
+  sync)
+- `MOBILE_DESKTOP_APPLICATION_STRATEGY.md` (repo root) — why PWA was chosen
+  over React Native/Expo, and the full investigation/decision record
 
-- **Farmer Registration**: Easily register new farmers into the system.
-- **Farm Visits**: Log visits to farms and record observations.
-- **Geo-tagging**: Capture GPS coordinates for accurate location tracking.
-- **Camera Integration**: Take photos and upload documents directly from the app.
-- **Offline Synchronization**: Continue working without an internet connection and sync data when online.
-- **Notifications**: Receive alerts and updates relevant to field operations.
-- **AI Assistant**: Access AI-driven insights and recommendations.
-- **Marketplace Orders**: Manage orders and transactions through the marketplace.
-- **Expense Capture**: Record expenses related to farm operations.
-- **Inspection Checklists**: Use checklists for inspections and assessments.
-
-## Technology Stack
-
-- **Framework**: React Native
-- **Language**: TypeScript
-- **Development Tool**: Expo
-
-## Setup Instructions
-
-1. **Clone the Repository**:
-   ```
-   git clone https://github.com/yourusername/afrera-mobile.git
-   ```
-
-2. **Navigate to the Project Directory**:
-   ```
-   cd afrera-mobile
-   ```
-
-3. **Install Dependencies**:
-   ```
-   npm install
-   ```
-
-4. **Run the Application**:
-   ```
-   npm start
-   ```
-
-5. **Open in Expo Go**: Scan the QR code with the Expo Go app to view the application on your mobile device.
-
-## Contribution Guidelines
-
-Contributions are welcome! Please follow these steps to contribute:
-
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them.
-4. Push to your forked repository.
-5. Create a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
----
-
-This README provides an overview of the AFRERA Mobile Application, its features, setup instructions, and contribution guidelines. For more detailed documentation, please refer to the main project documentation.
-
-*verified by vibecheck*
+Do not scaffold a new React Native or Expo app here. If a hardware capability
+genuinely can't be reached from the PWA (e.g. background geofencing, NFC),
+the strategy doc's Phase 3 covers wrapping the same `frontend/` build with
+Capacitor instead of forking the UI into a second codebase.
