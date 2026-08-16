@@ -222,6 +222,14 @@ export const varietyDirectoryAPI = {
 
 // Crop Value-Compound Research — AI-assisted, human-reviewed published
 // reference data. See backend/src/services/cropValueResearchService.js.
+// Platform Telemetry API — real system/business metrics (admin-only).
+// See backend/src/services/platformTelemetryService.js for what is and is
+// not honestly computable (no request-logging store exists in this codebase).
+export const platformTelemetryAPI = {
+  getStatus: () => api.get('/platform-telemetry/status'),
+  getAnalytics: () => api.get('/platform-telemetry/analytics'),
+}
+
 export const cropValueResearchAPI = {
   getProviderStatus: () => api.get('/crop-value-research/status'),
   research: (varietyName, compoundKey) => api.post('/crop-value-research/research', { variety_name: varietyName, compound_key: compoundKey }),

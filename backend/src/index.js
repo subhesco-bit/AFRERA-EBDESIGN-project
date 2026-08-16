@@ -506,6 +506,9 @@ app.use('/api/v1/defense-fitness-prep', defenseFitnessPrepRoutes);
 // Crop Value-Compound Research - AI-assisted, human-reviewed published reference data
 const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes');
 app.use('/api/v1/crop-value-research', cropValueResearchRoutes);
+// Platform Telemetry - real system/business metrics for admin dashboard
+const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes');
+app.use('/api/v1/platform-telemetry', platformTelemetryRoutes);
 // Farmer Training - Agricultural training and FOLU compliance
 const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes');
 app.use('/api/v1/training', farmerTrainingRoutes);

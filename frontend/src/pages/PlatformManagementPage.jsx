@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import Dashboard from '../components/ui/Dashboard';
 import AIInsightsPanel from '../components/ui/AIInsightsPanel';
 import { Card, Button, Select, SearchInput, DataTable, Modal, Tabs } from '../components/ui/common';
-import { aiBackboneAPI } from '../services/api';
+import { aiBackboneAPI, platformTelemetryAPI } from '../services/api';
 
 const PlatformManagementPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -101,41 +101,19 @@ const PlatformManagementPage = () => {
     }
   };
 
+  // Real system/business metrics (backend/src/services/platformTelemetryService.js).
+  // This used to be a hardcoded mock object claiming 15,420 users and a 1.25M
+  // request count that never happened. There is no request-logging/APM store
+  // anywhere in this codebase, so total_requests/error_rate/growth trends and
+  // per-service latency are honestly absent below rather than invented.
   const fetchPlatformStatus = async () => {
-    // Mock data - replace with actual API call
-    return {
-      status: 'operational',
-      uptime: 86400,
-      version: '1.0.0',
-      environment: 'production',
-      system_metrics: {
-        cpu_usage: 78,
-        memory_usage: 65,
-        uptime: 86400
-      },
-      services: {
-        ai_gateway: { status: 'healthy', latency: 45 },
-        analytics: { status: 'healthy', latency: 38 },
-        monitoring: { status: 'healthy', latency: 52 }
-      }
-    };
+    const res = await platformTelemetryAPI.getStatus();
+    return res.data?.data;
   };
 
   const fetchPlatformAnalytics = async () => {
-    // Mock data - replace with actual API call
-    return {
-      summary: {
-        total_users: 15420,
-        active_users: 8934,
-        total_requests: 1250000,
-        error_rate: 0.02
-      },
-      trends: {
-        user_growth: 15,
-        request_growth: 22,
-        performance_trend: 'improving'
-      }
-    };
+    const res = await platformTelemetryAPI.getAnalytics();
+    return res.data?.data;
   };
 
   const handleOptimization = async () => {
@@ -152,60 +130,58 @@ const PlatformManagementPage = () => {
     }
   };
 
+  // Every value below is real (DB counts or process/os readings) — no
+  // change/trend field is shown unless this session actually computed one,
+  // since there is no historical metrics store to derive a real trend from.
+  const serviceHealthEntries = Object.entries(platformStatus?.services || {});
+  const healthyServiceCount = serviceHealthEntries.filter(([, s]) => s.healthy).length;
+
   const dashboardWidgets = [
     {
       id: 'users',
       title: 'Total Users',
       type: 'metric',
-      prefix: '',
-      suffix: '',
-      value: analyticsData?.summary?.total_users || 0,
-      change: analyticsData?.trends?.user_growth || 0,
-      description: 'Active platform users'
+      value: analyticsData?.total_users ?? 0,
+      description: 'Real count from the users table'
     },
     {
-      id: 'requests',
-      title: 'Total Requests',
+      id: 'active-users',
+      title: 'Active Users (30d)',
       type: 'metric',
-      prefix: '',
-      suffix: '',
-      value: analyticsData?.summary?.total_requests || 0,
-      change: analyticsData?.trends?.request_growth || 0,
-      description: 'API requests this period'
+      value: analyticsData?.active_users_30d ?? 0,
+      description: 'Logged in within the last 30 days'
     },
     {
-      id: 'performance',
-      title: 'Performance Score',
+      id: 'orders',
+      title: 'Total Orders',
+      type: 'metric',
+      value: analyticsData?.total_orders ?? 0,
+      description: 'Real count from the orders table'
+    },
+    {
+      id: 'memory',
+      title: 'Memory Used',
       type: 'gauge',
-      value: platformStatus?.system_metrics?.cpu_usage || 0,
+      value: platformStatus?.system_metrics?.system?.memory_used_pct ?? 0,
       unit: '%',
-      description: 'Overall system performance'
+      description: `${platformStatus?.system_metrics?.system?.memory_total_mb ?? '—'} MB total (real OS reading)`
     },
     {
       id: 'services',
       title: 'Service Health',
-      type: 'chart',
-      description: 'Service availability and performance'
-    },
-    {
-      id: 'errors',
-      title: 'Error Rate',
       type: 'metric',
-      prefix: '',
-      suffix: '%',
-      value: (analyticsData?.summary?.error_rate || 0) * 100,
-      change: -5,
-      description: 'Platform error rate'
+      value: serviceHealthEntries.length > 0 ? `${healthyServiceCount}/${serviceHealthEntries.length}` : '—',
+      description: 'Real DB/provider-connectivity checks, not simulated latency'
     },
     {
       id: 'uptime',
-      title: 'System Uptime',
+      title: 'Process Uptime',
       type: 'metric',
-      prefix: '',
-      suffix: '%',
-      value: 99.9,
-      change: 0.1,
-      description: 'Platform availability'
+      value: platformStatus?.system_metrics?.process?.uptime_seconds
+        ? Math.floor(platformStatus.system_metrics.process.uptime_seconds / 3600)
+        : 0,
+      suffix: 'h',
+      description: 'Real backend process uptime'
     }
   ];
 
@@ -266,16 +242,24 @@ const PlatformManagementPage = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Uptime</span>
-                      <span className="font-medium">{Math.floor(platformStatus.uptime / 3600)}h</span>
+                      <span className="font-medium">{Math.floor((platformStatus.system_metrics?.process?.uptime_seconds || 0) / 3600)}h</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Version</span>
-                      <span className="font-medium">{platformStatus.version}</span>
+                      <span className="text-gray-600">Node Version</span>
+                      <span className="font-medium">{platformStatus.system_metrics?.process?.node_version}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Environment</span>
-                      <span className="font-medium">{platformStatus.environment}</span>
+                      <span className="font-medium">{platformStatus.system_metrics?.process?.env}</span>
                     </div>
+                    {serviceHealthEntries.map(([name, s]) => (
+                      <div key={name} className="flex justify-between items-center">
+                        <span className="text-gray-600 capitalize">{name.replace(/_/g, ' ')}</span>
+                        <span className={`px-2 py-1 rounded text-xs ${s.healthy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {s.healthy ? 'healthy' : 'unhealthy'}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </Card>
@@ -323,16 +307,13 @@ const PlatformManagementPage = () => {
         size="lg"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
-            This will run AI-powered optimization across all platform services.
-            The process may take several minutes to complete.
-          </p>
-          
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h4 className="font-medium text-yellow-800 mb-2">⚠️ Warning</h4>
+            <h4 className="font-medium text-yellow-800 mb-2">Not yet implemented</h4>
             <p className="text-sm text-yellow-700">
-              Optimization may temporarily affect service availability.
-              Ensure you have a backup before proceeding.
+              There is no automated optimization action wired to the backend yet — this
+              button previously closed the dialog as if something had run, with no real
+              effect. Nothing will happen if you continue; this is left honestly disabled
+              until a real optimization action exists to call.
             </p>
           </div>
 
@@ -341,13 +322,7 @@ const PlatformManagementPage = () => {
               variant="outline"
               onClick={() => setShowOptimizationModal(false)}
             >
-              Cancel
-            </Button>
-            <Button onClick={() => {
-              // Run optimization logic
-              setShowOptimizationModal(false);
-            }}>
-              Start Optimization
+              Close
             </Button>
           </div>
         </div>
