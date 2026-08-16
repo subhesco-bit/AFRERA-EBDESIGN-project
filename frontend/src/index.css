@@ -73,6 +73,25 @@
     --data-real: 142 70% 40%;
     --data-estimated: 38 92% 50%;
     --data-assumed: 215 16% 55%;
+
+    /* -------------------------------------------------------------------
+     * Stacking-order scale
+     *
+     * Before this, 46 of ~49 z-index declarations across the app were the
+     * literal value 50 - the sticky header, modal dialogs, toast
+     * notifications, dropdowns, and a floating chat widget all fighting
+     * for the same layer. That meant a toast fired while a dialog was open
+     * could render BEHIND the dialog's backdrop depending on DOM order -
+     * exactly the kind of bug that only shows up intermittently in real
+     * use. Ordered low-to-high by how much it should be willing to cover:
+     * ----------------------------------------------------------------- */
+    --z-sticky: 20;    /* persistent chrome: header, mobile bottom bar */
+    --z-dropdown: 30;  /* select menus, the language selector */
+    --z-popover: 40;   /* floating widgets layered over page content (chat/voice launcher) */
+    --z-modal: 50;     /* dialogs and full-page blocking overlays (loading, forms) */
+    --z-toast: 60;     /* transient notifications - must outrank an open modal, since a
+                           toast is often reporting the result of an action taken in one */
+    --z-skiplink: 100; /* accessibility skip-to-content link; always wins */
   }
 
   .dark {

@@ -94,6 +94,17 @@ export default {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      // Semantic stacking-order scale (see src/index.css for the incident
+      // this replaces: nearly everything was z-50). Use z-sticky / z-dropdown /
+      // z-popover / z-modal / z-toast / z-skiplink instead of a raw number.
+      zIndex: {
+        sticky: 'var(--z-sticky)',
+        dropdown: 'var(--z-dropdown)',
+        popover: 'var(--z-popover)',
+        modal: 'var(--z-modal)',
+        toast: 'var(--z-toast)',
+        skiplink: 'var(--z-skiplink)',
+      },
       keyframes: {
         'accordion-down': {
           from: { height: '0' },

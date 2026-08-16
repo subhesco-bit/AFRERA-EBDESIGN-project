@@ -4,7 +4,7 @@ import './styles.css';
 export default function M085Page(){
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  useEffect(()=>{ setLoading(true); fetch(/api/v1/).then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
+  useEffect(()=>{ setLoading(true); fetch('/api/v1/').then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
   return (<div className='module-M085 p-4'>
     <h1>M085 Module</h1>
     {loading? <div>Loading…</div> : (

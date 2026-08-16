@@ -196,7 +196,7 @@ function ToastContainer({ position = 'top-right' }) {
   return (
     <div
       className={cn(
-        'fixed z-50 flex flex-col gap-2 max-w-sm w-full',
+        'fixed z-toast flex flex-col gap-2 max-w-sm w-full',
         positionClasses[position] || positionClasses['top-right']
       )}
       role="region"

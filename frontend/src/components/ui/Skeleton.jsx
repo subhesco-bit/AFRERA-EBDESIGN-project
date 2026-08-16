@@ -257,7 +257,7 @@ function LoadingOverlay({ message = 'Loading...', className, ...props }) {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-gray-900/80',
+        'fixed inset-0 z-modal flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-gray-900/80',
         className
       )}
       role="dialog"

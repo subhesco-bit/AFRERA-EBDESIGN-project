@@ -204,7 +204,7 @@ function App() {
                 {/* Module Routes (M001-M150) */}
                 {Array.from({ length: 150 }, (_, i) => {
                   const moduleNum = i + 1
-                  const ModulePage = lazy(() => import(`./modules/M${String(moduleNum).padStart(3, '0')}/M${String(moduleNum).padStart(3, '0')}Page`))
+                  const ModulePage = lazy(() => import(`./modules/M${String(moduleNum).padStart(3, '0')}/M${String(moduleNum).padStart(3, '0')}Page.jsx`))
                   return (
                     <Route
                       key={`/module/M${String(moduleNum).padStart(3, '0')}`}

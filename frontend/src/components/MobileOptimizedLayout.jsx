@@ -38,7 +38,7 @@ function MobileOptimizedLayout({ children, title, showBackButton = false, onBack
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-sticky">
         <div className="flex items-center justify-around py-2">
           <button className="flex flex-col items-center p-2 text-green-600">
             <Home className="w-6 h-6" />

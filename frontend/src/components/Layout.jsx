@@ -25,7 +25,7 @@ function Layout({ children }) {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-green-700 focus:px-4 focus:py-2 focus:rounded focus:shadow-lg"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-skiplink focus:bg-white focus:text-green-700 focus:px-4 focus:py-2 focus:rounded focus:shadow-lg"
       >
         Skip to main content
       </a>
@@ -42,17 +42,17 @@ function Layout({ children }) {
       {isAuthenticated && (
         <>
           {openWidget === 'chat' && (
-            <div className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[500px] shadow-2xl rounded-lg overflow-hidden">
+            <div className="fixed bottom-24 right-6 z-popover w-96 max-w-[calc(100vw-3rem)] h-[500px] shadow-2xl rounded-lg overflow-hidden">
               <ChatInterface />
             </div>
           )}
           {openWidget === 'voice' && (
-            <div className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] shadow-2xl rounded-lg overflow-hidden">
+            <div className="fixed bottom-24 right-6 z-popover w-96 max-w-[calc(100vw-3rem)] shadow-2xl rounded-lg overflow-hidden">
               <VoiceAssistant />
             </div>
           )}
 
-          <div className="fixed bottom-20 lg:bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+          <div className="fixed bottom-20 lg:bottom-6 right-6 z-popover flex flex-col items-end gap-3">
             <button
               onClick={() => setOpenWidget(openWidget === 'voice' ? null : 'voice')}
               aria-label={openWidget === 'voice' ? 'Close voice assistant' : 'Open voice assistant'}
