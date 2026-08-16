@@ -52,6 +52,25 @@ Full raw lists: `docs/registry/_orphan_backend_routes.json`, `docs/registry/_orp
 
 **Read of this pattern**: most of these are secondary/admin CRUD operations (update, delete, moderate, detailed-status variants) on domains where the *primary* read/create operations **are** wired into a page — e.g. `communityRoutes.js`'s create/list endpoints have a frontend caller, but its moderate/report/archive endpoints don't. This matches how `CommunityManagementPage.jsx` and similar pages were built: core flow first, admin/secondary operations scaffolded but not yet given UI controls. Confirming this holds for all ~1,000 entries individually is future work.
 
+## Top-offender spot check (2026-08-16) — answers "next step #1" for 8 of the 17 files
+
+Checked each top-offender file's underlying service for its real data-storage mechanism
+(`getPostgreSQL()` / real DB queries vs. an in-memory `new Map()` that resets on every
+server restart and was never real to begin with):
+
+| File | Backing | Verdict |
+|---|---|---|
+| `databaseManagementRoutes.js` → `databaseManagementService.js` | `new Map()` only | **Speculative dead scaffolding.** A fake self-service DB-provisioning API (create clusters, shards, replication, backups) with no connection to any real infrastructure — AFRERA runs one Postgres instance via `getPostgreSQL()`, not a fleet of provisioned databases. Not a UI gap; nothing real exists to build a UI for. |
+| `serverManagementRoutes.js` → `serverManagementService.js` | `new Map()` only | Same pattern — fake server/load-balancer fleet management, unrelated to how this app actually runs. |
+| `cloudManagementRoutes.js` → `cloudManagementService.js` | `new Map()` only | Same pattern — fake cloud-provider/cost/deployment management. |
+| `moduleSupportInfrastructureRoutes.js` → `moduleSupportInfrastructureService.js` | `new Map()` only | Same pattern — fake internal module/service registry. |
+| `startupEnvironmentRoutes.js` → `startupEnvironmentService.js` | `new Map()` only | Same pattern, and thematically unrelated to AFRERA entirely — a fake "startup incubation/mentorship/funding" tracker. Generic SaaS-platform boilerplate, not this product. |
+| `publicDomainDataExtractionRoutes.js` → `publicDomainDataExtractionService.js` | `new Map()` only | Same pattern — a fake government-subsidy/eligibility data-extraction pipeline; no real source ever wired in. |
+| `enterpriseControlRoutes.js` → `enterpriseControlService.js` | **Real** — `getPostgreSQL()`, real queries | Confirms the doc's original hypothesis for this file: real backend, `EnterpriseControlPage.jsx` already covers the primary flows (built earlier this session), remaining orphan routes are genuinely secondary admin operations without UI yet. |
+| `communityRoutes.js` → `communityService.js` (mounted at `/api/v1/community`) | `new Map()` only | **Corrected from an earlier draft of this row, which wrongly assumed `CommunityManagementPage.jsx` calls this service.** It does not: that page calls a separate `/community-assets` path (`communityAssetAPI` in `frontend/src/services/api.js`, M049 "Community Asset"), which has no backend route mounted anywhere — but this is NOT a hidden bug: the page's own source (`CommunityManagementPage.jsx` lines 34/301) already says plainly *"Backend endpoint /community-assets has not been built yet — this tab is wired and ready to work once it is"* and shows that note to the admin instead of silently 404ing. Real remaining work is building that backend (real CRUD for community-owned shared assets — livestock, equipment, land — tied to a village/cooperative), not fixing a deception. `communityRoutes.js`'s own endpoints (`/members`, `/threads`, `/posts`, `/groups`, `/events`, `/moderation`) are a separate, actual orphan: in-memory-only AND zero frontend caller. |
+
+**Read of the batch**: 6 of the 8 checked files are not "admin UI not built yet" at all — they're fully fake, ungrounded scaffolding (likely a generic "enterprise platform" template applied without regard to what this product is) that a UI would have nothing real to manage. Deleting them (routes, controllers, services) is the honest fix, not building screens for them — pending explicit confirmation before removing anything, per this session's standing rule on destructive changes. `communityService.js`'s in-memory persistence is a separate, real bug: whatever page(s) call it need `communityService.js` rewritten against real tables before that data can be trusted. The remaining 9 top-offender files (`digitalProductPassportService.js`, `logisticsEnhancementRoutes.js`, `researchAndDevelopmentRoutes.js`, `informationSharingRoutes.js`, `knowledgeRoutes.js`, `foodSafetyService.js`, `governanceModule.js`, `sapModuleArchitectureRoutes.js`, `indigenousKnowledgeService.js`) have not been checked yet — do not assume either verdict for them without doing the same real/fake check first.
+
 ## Next steps (not completed here — scope is real work, not a quick pass)
 
 1. For each top-offender file: confirm whether its orphan routes are (a) genuinely-needed admin UI that hasn't been built yet, or (b) speculative scaffolding that should be removed.
