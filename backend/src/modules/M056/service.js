@@ -1,40 +1,95 @@
-﻿// Service for M056 Module (M056)
+/**
+ * Payment Processing Service (M056)
+ * Payment processing with AI-powered fraud detection and risk assessment
+ */
+
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { aiAPI } = require('../../services/aiService');
+const pool = require('../../database/pool');
 
-const tableName = '_items';
+async function createPayment(paymentData) {
+  try {
+    const { order_id, amount, payment_method, payment_details } = paymentData;
+    const payment = {
+      payment_id: generateId(),
+      order_id,
+      amount,
+      payment_method,
+      payment_status: 'processing',
+      created_at: new Date().toISOString()
+    };
 
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(SELECT COUNT(*) FROM );
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(SELECT * FROM  ORDER BY created_at DESC LIMIT  OFFSET , [limit, offset]);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    const aiRequest = {
+      task: 'payment_risk_assessment',
+      parameters: { payment_data: paymentData, order_data: await getOrderData(order_id) }
+    };
+    payment.risk_assessment = await aiAPI.generateRecommendation(aiRequest);
+
+    const result = await pool.query(
+      `INSERT INTO payments (payment_id, order_id, amount, payment_method, payment_status, payment_details, risk_assessment, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [payment.payment_id, payment.order_id, payment.amount, payment.payment_method, payment.payment_status, JSON.stringify(payment_details), JSON.stringify(payment.risk_assessment), payment.created_at]
+    );
+
+    logger.info(`Payment created: ${payment.payment_id}`);
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error creating payment', { error: error.message });
+    throw new Error('Failed to create payment');
+  }
 }
 
-async function getItem(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(SELECT * FROM  WHERE id = , [id]);
-  return res.rows[0] || null;
+async function getPayment(paymentId) {
+  try {
+    const res = await pool.query('SELECT * FROM payments WHERE payment_id = $1', [paymentId]);
+    return res.rows[0] || null;
+  } catch (error) {
+    logger.error('Error getting payment', { error: error.message });
+    throw new Error('Failed to get payment');
+  }
 }
 
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(INSERT INTO  (data, created_at) VALUES (, NOW()) RETURNING *, [payload]);
-  return res.rows[0];
+async function updatePaymentStatus(paymentId, status) {
+  try {
+    const res = await pool.query('UPDATE payments SET payment_status = $1, updated_at = NOW() WHERE payment_id = $2 RETURNING *', [status, paymentId]);
+    return res.rows[0] || null;
+  } catch (error) {
+    logger.error('Error updating payment status', { error: error.message });
+    throw new Error('Failed to update payment status');
+  }
 }
 
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(UPDATE  SET data = , updated_at = NOW() WHERE id =  RETURNING *, [payload, id]);
-  return res.rows[0] || null;
+async function refundPayment(paymentId, amount, reason) {
+  try {
+    const refund = {
+      refund_id: generateId(),
+      payment_id: paymentId,
+      amount,
+      reason,
+      status: 'processing',
+      created_at: new Date().toISOString()
+    };
+
+    const result = await pool.query(
+      `INSERT INTO refunds (refund_id, payment_id, amount, reason, status, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [refund.refund_id, refund.payment_id, refund.amount, refund.reason, refund.status, refund.created_at]
+    );
+
+    await updatePaymentStatus(paymentId, 'refunded');
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error processing refund', { error: error.message });
+    throw new Error('Failed to process refund');
+  }
 }
 
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(DELETE FROM  WHERE id =  RETURNING id, [id]);
-  return !!res.rows[0];
+function generateId() {
+  return `PAY-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem };
+async function getOrderData(orderId) {
+  const res = await pool.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
+  return res.rows[0] || {};
+}
+
+module.exports = { createPayment, getPayment, updatePaymentStatus, refundPayment };

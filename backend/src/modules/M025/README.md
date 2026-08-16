@@ -1,1 +1,12 @@
-﻿# M025 - M025 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M025_generated.sql\n
+﻿# M025 - Farmer Subsidies
+
+Domain: Farmer
+Status: FULLY IMPLEMENTED
+
+This module provides comprehensive Farmer Subsidies capabilities:
+- Government subsidy scheme management
+- Subsidy application processing
+- AI-powered eligibility prediction
+- Document verification and tracking
+- Disbursement management
+- Subsidy recommendations for farmers

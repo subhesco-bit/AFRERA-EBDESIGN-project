@@ -773,6 +773,141 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
   }
 });
 
+// ============================================================================
+// MAP-PROTECTED CONTRACT OFFERS (v44 feature 7)
+//
+// farmer_contract_readiness (054_v8_v9_commerce_recovery.sql) has stored
+// map_price_inr_per_kg — the farmer's own floor price — with zero consumers
+// (grep -r contract_readiness backend/src/services matched nothing before
+// this). This is the consumer: an institution submits an offer, it is
+// checked against the farmer's floor before it is ever persisted, and a
+// below-floor offer is rejected without ever being written to
+// contract_offers (migration 9995_scheme_verification_map_protection.sql) —
+// so nothing exists for the farmer to see, matching the prototype's "offers
+// below it are auto-rejected before they reach you". The floor price itself
+// is never returned in any response body here, so a buyer polling this
+// endpoint's responses cannot infer it either.
+// ============================================================================
+
+function generateOfferNumber() {
+  return `OFR-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+}
+
+/**
+ * Submit a contract offer. Institution-side: authenticated, but the caller
+ * never learns the farmer's floor — only whether the offer cleared it.
+ */
+router.post('/contract-offers', authRateLimit, authMiddleware, async (req, res) => {
+  try {
+    const {
+      farmer_id, crop, institution_id, offered_price_inr_per_kg, quantity_kg,
+      delivery_schedule, payment_terms, special_conditions
+    } = req.body;
+
+    if (!farmer_id || !crop || !offered_price_inr_per_kg || !quantity_kg) {
+      return res.status(400).json({ error: 'farmer_id, crop, offered_price_inr_per_kg and quantity_kg are required' });
+    }
+
+    const readiness = await pool.query(
+      `SELECT map_price_inr_per_kg FROM farmer_contract_readiness
+       WHERE farmer_id = $1 AND crop = $2`,
+      [farmer_id, crop]
+    );
+
+    const mapPrice = readiness.rows[0] ? readiness.rows[0].map_price_inr_per_kg : null;
+
+    if (mapPrice !== null && Number(offered_price_inr_per_kg) < Number(mapPrice)) {
+      // Below the farmer's floor: rejected before it reaches them. No row is
+      // written, and the response does not disclose the floor value — only
+      // that this particular offer did not clear it.
+      logger.info(`Contract offer below MAP rejected for farmer ${farmer_id}/${crop}`);
+      return res.status(422).json({
+        error: 'Offer rejected: below the farmer\'s protected floor price. It was not delivered to the farmer.',
+        status: 'rejected_below_map'
+      });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO contract_offers
+        (offer_number, farmer_id, crop, institution_id, offered_price_inr_per_kg,
+         quantity_kg, delivery_schedule, payment_terms, special_conditions, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending_farmer_review')
+       RETURNING id, offer_number, farmer_id, crop, institution_id,
+                 offered_price_inr_per_kg, quantity_kg, status, created_at`,
+      [
+        generateOfferNumber(), farmer_id, crop, institution_id || null,
+        offered_price_inr_per_kg, quantity_kg,
+        JSON.stringify(delivery_schedule || null), JSON.stringify(payment_terms || null),
+        JSON.stringify(special_conditions || null)
+      ]
+    );
+
+    logger.info(`Contract offer created: ${result.rows[0].offer_number}`);
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    logger.error('Create contract offer error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Failed to create contract offer' });
+  }
+});
+
+/**
+ * Farmer-side listing: only offers that already cleared their floor exist
+ * to be listed, so the MAP price never appears in this response either.
+ */
+router.get('/contract-offers', authMiddleware, async (req, res) => {
+  try {
+    const { farmer_id, crop, status } = req.query;
+    const conditions = [];
+    const params = [];
+
+    if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
+    if (crop) { params.push(crop); conditions.push(`crop = $${params.length}`); }
+    if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const result = await pool.query(
+      `SELECT id, offer_number, farmer_id, crop, institution_id, offered_price_inr_per_kg,
+              quantity_kg, delivery_schedule, payment_terms, special_conditions, status,
+              created_at, updated_at
+       FROM contract_offers ${where}
+       ORDER BY created_at DESC`,
+      params
+    );
+    res.json(result.rows);
+  } catch (error) {
+    logger.error('List contract offers error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Failed to list contract offers' });
+  }
+});
+
+/**
+ * Farmer accepts/declines/withdraws an offer they already received.
+ */
+router.put('/contract-offers/:id', authMiddleware, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['accepted', 'declined', 'withdrawn'].includes(status)) {
+      return res.status(400).json({ error: 'status must be one of accepted, declined, withdrawn' });
+    }
+
+    const result = await pool.query(
+      `UPDATE contract_offers SET status = $1, updated_at = NOW()
+       WHERE id = $2
+       RETURNING id, offer_number, farmer_id, crop, status, updated_at`,
+      [status, req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Contract offer not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    logger.error('Update contract offer error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Failed to update contract offer' });
+  }
+});
+
 // Health check
 function isHealthy() {
   return true;

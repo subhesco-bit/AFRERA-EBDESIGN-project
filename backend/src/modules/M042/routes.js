@@ -1,14 +1,11 @@
-﻿const express = require('express');
+﻿// Express routes for Equipment Inventory (M042)
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('community_manager','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('community_manager','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('community_manager','admin'), controller.remove);
+router.post('/equipment', controller.createEquipment);
+router.post('/equipment/:equipmentId/usage', controller.recordEquipmentUsage);
+router.get('/owners/:ownerId/equipment', controller.getEquipmentByOwner);
+router.get('/maintenance/predictions', controller.getMaintenancePredictions);
 
 module.exports = router;
-

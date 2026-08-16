@@ -7,6 +7,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
+const { NUTRITION_WELLNESS_DISCLAIMER } = require('../utils/disclaimers');
 
 const router = express.Router();
 
@@ -619,6 +620,252 @@ router.get('/dietary-profiles', async (req, res) => {
   }
 });
 
+/**
+ * Get a single dietary profile by id. The `dietary_profiles` table is
+ * shared with consumerHealthService (same physical table, two migrations
+ * converged their columns onto it — see 020_consumer_health_schema.sql and
+ * 036_nutrition_intelligence_schema.sql), so a row may carry a user's own
+ * targets (user_id, profile_type, daily_calorie_target) and/or catalog
+ * fields (name, target_audience, preferred_foods, avoid_nutrients).
+ */
+async function getDietaryProfileById(dietaryProfileId) {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM dietary_profiles WHERE id = $1',
+      [dietaryProfileId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Dietary profile not found');
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Get dietary profile by id error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+// ============================================================================
+// PERSONALIZED PRODUCT RECOMMENDATIONS
+// ============================================================================
+//
+// Extends dietary_profiles + food_nutrition_profiles + product nutrition
+// scoring to recommend real marketplace products. Queries live product data
+// (products, product_nutrition, product_nutrition_scores) — never
+// fabricates a recommendation. Also surfaces a small set of nutrition-
+// adjacent wellness practices (wellness_natural_practices), each carrying
+// its evidence_level and requires_consultation flag directly on the row, as
+// required by this codebase's existing natural-therapy evidence discipline
+// (AFRERA_CLAUDE_BUILD_DIRECTIVE.md PART 5.8). This is reference/education
+// content only — it does not diagnose, interpret symptoms, or read lab
+// results.
+
+/**
+ * Build a personalized set of product recommendations for a user's dietary
+ * profile, optionally biased toward a calorie target (e.g. from the BMR/TDEE
+ * estimator in consumerHealthService), and persist it to the existing
+ * (previously unused) nutrition_recommendations table.
+ */
+async function getPersonalizedProductRecommendations(userId, dietaryProfileId, options = {}) {
+  try {
+    const profile = await getDietaryProfileById(dietaryProfileId);
+
+    const preferredFoods = Array.isArray(profile.preferred_foods) && profile.preferred_foods.length > 0
+      ? profile.preferred_foods
+      : null;
+
+    const effectiveCalorieTarget = options.targetCalories != null
+      ? Number(options.targetCalories)
+      : (profile.daily_calorie_target || null);
+
+    // Rough per-serving ceiling so a single recommended product doesn't blow
+    // past a whole day's calorie target (roughly one meal's worth).
+    const perServingCeiling = effectiveCalorieTarget ? effectiveCalorieTarget / 3 : null;
+
+    const resultLimit = Math.min(Math.max(parseInt(options.limit, 10) || 10, 1), 50);
+
+    const productResult = await pool.query(
+      `WITH latest_nutrition AS (
+         SELECT DISTINCT ON (product_id) product_id, nutrition_profile_id, nutrition_data,
+                calories_per_serving, serving_size_g
+         FROM product_nutrition
+         ORDER BY product_id, created_at DESC
+       ),
+       latest_score AS (
+         SELECT DISTINCT ON (product_id) product_id, overall_score, grade
+         FROM product_nutrition_scores
+         ORDER BY product_id, calculated_at DESC
+       )
+       SELECT p.id, p.name, p.base_price, p.tags,
+              fnp.food_group, fnp.food_name,
+              ln.calories_per_serving, ln.serving_size_g, ln.nutrition_data,
+              ls.overall_score, ls.grade
+       FROM products p
+       JOIN latest_nutrition ln ON ln.product_id = p.id
+       LEFT JOIN food_nutrition_profiles fnp ON fnp.id = ln.nutrition_profile_id
+       LEFT JOIN latest_score ls ON ls.product_id = p.id
+       WHERE p.is_active = true
+         AND ($1::text[] IS NULL OR fnp.food_group = ANY($1::text[]))
+         AND ($2::numeric IS NULL OR ln.calories_per_serving IS NULL OR ln.calories_per_serving <= $2)
+       ORDER BY ls.overall_score DESC NULLS LAST, p.name
+       LIMIT $3`,
+      [preferredFoods, perServingCeiling, resultLimit]
+    );
+
+    const wellnessResult = await pool.query(
+      `SELECT id, practice_name, category, common_name, evidence_level,
+              requires_consultation, traditional_use, contraindications
+       FROM wellness_natural_practices
+       WHERE ($1::text[] IS NULL OR related_product_tags && $1::text[])
+       ORDER BY practice_name
+       LIMIT 5`,
+      [preferredFoods]
+    );
+
+    const saveResult = await pool.query(
+      `INSERT INTO nutrition_recommendations
+         (user_id, dietary_profile_id, recommended_products, daily_nutrition_targets, meal_plan_suggestions, expires_at)
+       VALUES ($1, $2, $3, $4, $5, NOW() + INTERVAL '30 days')
+       RETURNING id, generated_at, expires_at`,
+      [
+        userId,
+        dietaryProfileId,
+        JSON.stringify(productResult.rows),
+        JSON.stringify({ calorie_target_kcal_per_day: effectiveCalorieTarget }),
+        JSON.stringify(wellnessResult.rows)
+      ]
+    );
+
+    return {
+      id: saveResult.rows[0].id,
+      dietary_profile_id: dietaryProfileId,
+      calorie_target_kcal_per_day: effectiveCalorieTarget,
+      recommended_products: productResult.rows,
+      wellness_suggestions: wellnessResult.rows,
+      generated_at: saveResult.rows[0].generated_at,
+      expires_at: saveResult.rows[0].expires_at,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get personalized product recommendations error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to generate personalized product recommendations
+ */
+router.post('/recommendations', authMiddleware, async (req, res) => {
+  try {
+    const { dietary_profile_id, target_calories, limit } = req.body || {};
+    if (!dietary_profile_id) {
+      return res.status(400).json({
+        error: 'dietary_profile_id is required',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      });
+    }
+
+    const result = await getPersonalizedProductRecommendations(req.user.id, dietary_profile_id, {
+      targetCalories: target_calories,
+      limit
+    });
+    res.json(result);
+  } catch (error) {
+    logger.error('Generate recommendations API error', { error: error.message, stack: error.stack });
+    res.status(500).json({
+      error: 'Failed to generate personalized recommendations',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    });
+  }
+});
+
+/**
+ * API endpoint to fetch the caller's most recent saved recommendation set
+ */
+router.get('/recommendations', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM nutrition_recommendations
+       WHERE user_id = $1
+       ORDER BY generated_at DESC
+       LIMIT 1`,
+      [req.user.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: 'No recommendations found',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      });
+    }
+
+    res.json({ ...result.rows[0], disclaimer: NUTRITION_WELLNESS_DISCLAIMER });
+  } catch (error) {
+    logger.error('Get recommendations API error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Failed to get recommendations' });
+  }
+});
+
+// ============================================================================
+// WELLNESS / NATURAL PRACTICES (reference & education only)
+// ============================================================================
+//
+// Out of scope by design: no diagnosis, no symptom checking, no lab-report
+// interpretation. Every row carries evidence_level and requires_consultation
+// directly, so any caller rendering this data has no way to drop those
+// fields without deliberately discarding them.
+
+/**
+ * Get wellness/natural practices, optionally filtered by category or a
+ * related product tag.
+ */
+async function getWellnessPractices(filters = {}) {
+  try {
+    const { category, tag } = filters;
+    let query = `SELECT id, practice_name, category, common_name, botanical_name,
+                        traditional_use, related_product_tags, evidence_level,
+                        requires_consultation, contraindications, source_reference
+                 FROM wellness_natural_practices WHERE 1=1`;
+    const params = [];
+
+    if (category) {
+      params.push(category);
+      query += ` AND category = $${params.length}`;
+    }
+
+    if (tag) {
+      params.push(tag);
+      query += ` AND $${params.length} = ANY(related_product_tags)`;
+    }
+
+    query += ' ORDER BY practice_name';
+
+    const result = await pool.query(query, params);
+    return {
+      practices: result.rows,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get wellness practices error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to get wellness/natural practices
+ */
+router.get('/wellness-practices', async (req, res) => {
+  try {
+    const { category, tag } = req.query;
+    const result = await getWellnessPractices({ category, tag });
+    res.json(result);
+  } catch (error) {
+    logger.error('Get wellness practices API error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Failed to get wellness practices' });
+  }
+});
+
 // ============================================================================
 // HEALTH CHECK
 // ============================================================================
@@ -639,5 +886,8 @@ module.exports = {
   calculateNutritionPricing,
   compareProductsNutrition,
   getDietaryProfiles,
+  getDietaryProfileById,
+  getPersonalizedProductRecommendations,
+  getWellnessPractices,
   isHealthy
 };

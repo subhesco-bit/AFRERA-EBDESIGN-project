@@ -1,14 +1,13 @@
 ﻿const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
+const { authMiddleware, requireRole } = require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('agronomist','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('agronomist','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('agronomist','admin'), controller.remove);
+router.post('/herds', authMiddleware, requireRole('admin'), controller.registerGoatHerd);
+router.get('/herds', authMiddleware, controller.listGoatHerds);
+router.get('/herds/:herdId', authMiddleware, controller.getGoatHerd);
+router.put('/herds/:herdId', authMiddleware, requireRole('admin'), controller.updateGoatHerd);
+router.get('/herds/:herdId/analysis', authMiddleware, controller.analyzeGoatProduction);
+router.get('/analytics', authMiddleware, requireRole('admin'), controller.getGoatAnalytics);
 
 module.exports = router;
-

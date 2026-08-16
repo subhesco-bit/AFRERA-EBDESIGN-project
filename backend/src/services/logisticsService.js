@@ -6,6 +6,7 @@
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
 const { authMiddleware } = require('../middleware/auth');
+const decisionSupportService = require('./decisionSupportService');
 
 /**
  * Create shipment
@@ -432,6 +433,81 @@ async function getShipmentModes() {
 }
 
 /**
+ * ecoLogisticsMiles wrapper — ESG/logistics lane-scoring, real data.
+ *
+ * Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #3). The
+ * prototype scored a chosen lane against an in-memory TM_LANES array; the
+ * real corridors are freight_lanes (992_v42_recovered_intelligence.sql) —
+ * the same table allocScore (dynamicPricingService.js) already queries for
+ * distance lookups. The scoring itself is NOT reimplemented here: it is
+ * called straight from decisionSupportService.ecoLogisticsMiles(ctx, lanes),
+ * which already accepts real ctx/lanes as parameters (same call-through
+ * pattern as corpCreditEligible in financialService.js), so the thresholds
+ * (score 95 at <=15% over the shortest lane, floor of 10, the "% longer ->
+ * penalty" formula) can never drift out of sync with the client-supplied
+ * /api/v1/decision-support/eco-logistics-miles endpoint.
+ *
+ * Accepts either a freight_lanes.lane_code directly (the real-data analog
+ * of the original TM_LANES 'k' key), or a shipment id whose origin/
+ * destination address is matched to a freight_lanes row via the same
+ * ILIKE origin/destination matching allocScore uses for its distance
+ * lookup. If neither resolves to a specific lane, decisionSupportService's
+ * own fallback (first lane on record, or a "not found" 50-score when no
+ * lanes exist at all) preserves the original TM_LANES.find(...) ||
+ * TM_LANES[0] behaviour exactly.
+ */
+async function getEcoLogisticsScore({ laneCode, shipmentId } = {}) {
+  const pg = getPostgreSQL();
+
+  const { rows: laneRows } = await pg.query(
+    `SELECT lane_code, origin, destination, distance_km
+       FROM freight_lanes
+      WHERE is_active = TRUE
+      ORDER BY lane_code`
+  );
+  const lanes = laneRows.map((r) => ({
+    k: r.lane_code,
+    o: r.origin,
+    d: r.destination,
+    km: Number(r.distance_km)
+  }));
+
+  let resolvedLaneCode = laneCode || null;
+
+  if (!resolvedLaneCode && shipmentId) {
+    const { rows: shipmentRows } = await pg.query(
+      'SELECT origin_address, destination_address FROM shipments WHERE id = $1',
+      [shipmentId]
+    );
+    if (!shipmentRows.length) {
+      throw new Error('Shipment not found');
+    }
+    const shipment = shipmentRows[0];
+
+    const { rows: matchRows } = await pg.query(
+      `SELECT lane_code FROM freight_lanes
+        WHERE is_active = TRUE
+          AND (origin ILIKE '%' || $1 || '%' OR $1 ILIKE '%' || origin || '%')
+          AND (destination ILIKE '%' || $2 || '%' OR $2 ILIKE '%' || destination || '%')
+        LIMIT 1`,
+      [shipment.origin_address, shipment.destination_address]
+    );
+    resolvedLaneCode = matchRows.length ? matchRows[0].lane_code : null;
+  }
+
+  const ctx = { kind: 'booking', lane: resolvedLaneCode };
+  const result = decisionSupportService.ecoLogisticsMiles(ctx, lanes);
+
+  return {
+    ...result,
+    laneCode: resolvedLaneCode,
+    shipmentId: shipmentId || null,
+    laneMatched: !!resolvedLaneCode,
+    availableLanes: lanes.length
+  };
+}
+
+/**
  * Helper function to generate shipment number
  */
 function generateShipmentNumber() {
@@ -581,6 +657,30 @@ router.get('/modes', async (req, res) => {
   }
 });
 
+// ESG/logistics lane score for a real freight lane (see getEcoLogisticsScore above)
+router.get('/lanes/:laneCode/eco-score', async (req, res) => {
+  try {
+    const result = await getEcoLogisticsScore({ laneCode: req.params.laneCode });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ESG/logistics lane score for a real shipment, matched to its freight lane
+router.get('/shipments/:id/eco-score', async (req, res) => {
+  try {
+    const result = await getEcoLogisticsScore({ shipmentId: req.params.id });
+    res.json(result);
+  } catch (error) {
+    if (error.message === 'Shipment not found') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
 module.exports = {
   router,
   createShipment,
@@ -593,5 +693,6 @@ module.exports = {
   getVehicles,
   registerDriver,
   getDrivers,
-  getShipmentModes
+  getShipmentModes,
+  getEcoLogisticsScore
 };

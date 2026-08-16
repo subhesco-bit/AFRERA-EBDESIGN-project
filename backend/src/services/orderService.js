@@ -17,6 +17,16 @@ async function getCart(userId) {
   try {
     const pg = getPostgreSQL();
     
+    // Validate database connection
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+    
+    // Validate user ID
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+    
     const query = `
       SELECT c.*, p.name as product_name, p.base_price, p.images, p.slug,
              u.symbol as unit_symbol

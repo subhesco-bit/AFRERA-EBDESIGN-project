@@ -24,7 +24,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         name, district, state, population, households,
         JSON.stringify(coordinates), JSON.stringify(demographics)
       ]);
@@ -57,7 +57,7 @@ class GovernanceService {
 
       query += ' ORDER BY name ASC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting villages', { error: error.message, stack: error.stack });
@@ -68,7 +68,7 @@ class GovernanceService {
   async getVillage(villageId) {
     try {
       const query = 'SELECT * FROM villages WHERE id = $1';
-      const result = await this.pool.query(query, [villageId]);
+      const result = await pool.query(query, [villageId]);
 
       if (result.rows.length === 0) {
         throw new Error('Village not found');
@@ -98,7 +98,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         updateData.name,
         updateData.district,
         updateData.state,
@@ -132,7 +132,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         name, district, state, block,
         JSON.stringify(villages),
         JSON.stringify(contactInfo),
@@ -167,7 +167,7 @@ class GovernanceService {
 
       query += ' ORDER BY name ASC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting panchayats', { error: error.message, stack: error.stack });
@@ -178,7 +178,7 @@ class GovernanceService {
   async getPanchayat(panchayatId) {
     try {
       const query = 'SELECT * FROM panchayats WHERE id = $1';
-      const result = await this.pool.query(query, [panchayatId]);
+      const result = await pool.query(query, [panchayatId]);
 
       if (result.rows.length === 0) {
         throw new Error('Panchayat not found');
@@ -202,7 +202,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         panchayatId, name, description, budget, startDate, endDate,
         JSON.stringify(targetBeneficiaries)
       ]);
@@ -227,7 +227,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         name, description, organization, budget, startDate, endDate, location,
         JSON.stringify(impactAreas)
       ]);
@@ -260,7 +260,7 @@ class GovernanceService {
 
       query += ' ORDER BY created_at DESC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting CSR projects', { error: error.message, stack: error.stack });
@@ -271,7 +271,7 @@ class GovernanceService {
   async getCSRProject(projectId) {
     try {
       const query = 'SELECT * FROM csr_projects WHERE id = $1';
-      const result = await this.pool.query(query, [projectId]);
+      const result = await pool.query(query, [projectId]);
 
       if (result.rows.length === 0) {
         throw new Error('CSR project not found');
@@ -299,7 +299,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         updateData.name,
         updateData.description,
         updateData.budget,
@@ -330,7 +330,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [projectId, userId, amount, type, description]);
+      const result = await pool.query(query, [projectId, userId, amount, type, description]);
 
       logger.info(`CSR contribution added to project ${projectId}`);
       return result.rows[0];
@@ -354,7 +354,7 @@ class GovernanceService {
         WHERE 1=1
       `;
 
-      const result = await this.pool.query(query);
+      const result = await pool.query(query);
       return result.rows[0];
     } catch (error) {
       logger.error('Error getting CSR statistics', { error: error.message, stack: error.stack });
@@ -374,7 +374,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         type, entity, entity_id, period,
         JSON.stringify(findings),
         JSON.stringify(recommendations),
@@ -409,7 +409,7 @@ class GovernanceService {
 
       query += ' ORDER BY created_at DESC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting compliance reports', { error: error.message, stack: error.stack });
@@ -420,7 +420,7 @@ class GovernanceService {
   async getComplianceReport(reportId) {
     try {
       const query = 'SELECT * FROM compliance_reports WHERE id = $1';
-      const result = await this.pool.query(query, [reportId]);
+      const result = await pool.query(query, [reportId]);
 
       if (result.rows.length === 0) {
         throw new Error('Compliance report not found');
@@ -449,7 +449,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         approved ? 'approved' : 'rejected',
         reviewerId,
         comments,
@@ -482,12 +482,63 @@ class GovernanceService {
         ORDER BY total_reports DESC
       `;
 
-      const result = await this.pool.query(query);
+      const result = await pool.query(query);
       return result.rows;
     } catch (error) {
       logger.error('Error getting compliance statistics', { error: error.message, stack: error.stack });
       throw error;
     }
+  }
+
+  /**
+   * complianceGaps / complianceReady — platform intermediary-compliance
+   * readiness (FSSAI licence, Grievance Officer, Nodal Officer under IT
+   * Rules 2021, GSTIN).
+   *
+   * Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #8). The
+   * original read an in-memory COMPLIANCE_RECORD object describing the
+   * platform itself — a different concept from compliance_reports above,
+   * which tracks per-village/CSR compliance reports. No table covered the
+   * platform's own record, so migration 061 added a single-row
+   * platform_compliance_record table. Same 6 required fields, same
+   * "missing = filter of blank/whitespace values" logic.
+   */
+  async complianceGaps() {
+    try {
+      const { rows } = await pool.query(
+        'SELECT * FROM platform_compliance_record WHERE id = 1'
+      );
+      const record = rows[0] || {};
+
+      const need = [
+        ['fssai_licence', 'FSSAI licence number'],
+        ['grievance_officer', 'Grievance Officer name'],
+        ['grievance_email', 'Grievance Officer e-mail'],
+        ['grievance_phone', 'Grievance Officer phone'],
+        ['nodal_officer', 'Nodal Officer (IT Rules 2021)'],
+        ['gstin', 'GSTIN']
+      ];
+
+      const missing = need
+        .filter(([field]) => !String(record[field] || '').trim())
+        .map(([, label]) => label);
+
+      return {
+        missing,
+        totalRequired: need.length,
+        completed: need.length - missing.length,
+        isReady: missing.length === 0,
+        checkedAt: new Date().toISOString()
+      };
+    } catch (error) {
+      logger.error('Error checking compliance gaps', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  async complianceReady() {
+    const gaps = await this.complianceGaps();
+    return gaps.isReady;
   }
 
   // Cooperative Management
@@ -502,7 +553,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         name, type, district, state, registrationNumber,
         JSON.stringify(members), JSON.stringify(bylaws)
       ]);
@@ -535,7 +586,7 @@ class GovernanceService {
 
       query += ' ORDER BY name ASC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting cooperatives', { error: error.message, stack: error.stack });
@@ -554,7 +605,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         cooperativeId, userId, role, shareHolding, joiningDate
       ]);
 

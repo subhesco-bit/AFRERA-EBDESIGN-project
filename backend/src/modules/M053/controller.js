@@ -1,11 +1,85 @@
-﻿// Controller for M053 Module (M053)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Order Management (M053)
+ * Handles HTTP requests for order operations
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const orderService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const createOrder = async (req, res) => {
+  try {
+    const order = await orderService.createOrder(req.body);
+    res.status(201).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const listOrders = async (req, res) => {
+  try {
+    const orders = await orderService.listOrders(req.query);
+    res.status(200).json({ success: true, data: orders });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getOrder = async (req, res) => {
+  try {
+    const order = await orderService.getOrder(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const order = await orderService.updateOrderStatus(req.params.id, req.body.status, req.body.notes);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const cancelOrder = async (req, res) => {
+  try {
+    const order = await orderService.cancelOrder(req.params.id, req.body.reason);
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const processPayment = async (req, res) => {
+  try {
+    const payment = await orderService.processPayment(req.params.id, req.body);
+    res.status(201).json({ success: true, data: payment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const trackOrder = async (req, res) => {
+  try {
+    const tracking = await orderService.trackOrder(req.params.id);
+    res.status(200).json({ success: true, data: tracking });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  createOrder,
+  listOrders,
+  getOrder,
+  updateOrderStatus,
+  cancelOrder,
+  processPayment,
+  trackOrder
+};

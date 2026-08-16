@@ -14,6 +14,19 @@ const router = express.Router();
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../database/pool');
 
+// database/pool.js's in-memory test pool only recognises statements it has a
+// handler for; an INSERT ... RETURNING * this file sends that the mock
+// parser doesn't match falls through to `{ rows: [] }`. The functions below
+// compensate by synthesizing the row that would have been returned. That
+// compensation must never fire against a real PostgreSQL connection — a
+// successful INSERT ... RETURNING * there always yields a row, so an empty
+// result means something is actually wrong and should surface as an error,
+// not a fabricated success. isTestMode() is the gate that keeps the two
+// apart.
+function isTestMode() {
+  return process.env.NODE_ENV === 'test' || process.env.USE_TEST_DB === 'true';
+}
+
 // ============================================================================
 // FOOD ITEMS
 // ============================================================================
@@ -66,8 +79,11 @@ async function createFoodItem(data) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Create food item failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `food-${Date.now()}`,
         name: name || 'Test Food',
@@ -212,8 +228,12 @@ async function createQualityAssessment(data) {
       ]
     );
 
-    // If DB didn't return a row (test-mode mismatch), construct fallback and persist
+    // If DB didn't return a row (test-mode mismatch), construct fallback and
+    // persist — test-mode only; see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Create quality assessment failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `fq-fallback-${Date.now()}`,
         food_item_id,
@@ -337,8 +357,11 @@ async function recordContaminantTest(data) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Record contaminant test failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `ct-${Date.now()}`,
         food_item_id,
@@ -476,8 +499,11 @@ async function createFreshnessAssessment(data) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Create freshness assessment failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `fr-${Date.now()}`,
         food_item_id,
@@ -554,8 +580,11 @@ async function createFoodRecall(data) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Create food recall failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `recall-${Date.now()}`,
         food_item_id,
@@ -661,8 +690,11 @@ async function recordFoodIntelligence(foodItemId, metrics) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Record food intelligence failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `fia-${Date.now()}`,
         food_item_id: foodItemId,

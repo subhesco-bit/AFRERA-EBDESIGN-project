@@ -1,11 +1,48 @@
-﻿// Controller for M042 Module (M042)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Equipment Inventory (M042)
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const equipmentInventoryService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const createEquipment = async (req, res) => {
+  try {
+    const equipment = await equipmentInventoryService.createEquipment(req.body);
+    res.status(201).json({ success: true, data: equipment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const recordEquipmentUsage = async (req, res) => {
+  try {
+    const usage = await equipmentInventoryService.recordEquipmentUsage(req.params.equipmentId, req.body);
+    res.status(201).json({ success: true, data: usage });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getEquipmentByOwner = async (req, res) => {
+  try {
+    const equipment = await equipmentInventoryService.getEquipmentByOwner(req.params.ownerId);
+    res.status(200).json({ success: true, data: equipment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getMaintenancePredictions = async (req, res) => {
+  try {
+    const predictions = await equipmentInventoryService.getMaintenancePredictions(req.query.category);
+    res.status(200).json({ success: true, data: predictions });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  createEquipment,
+  recordEquipmentUsage,
+  getEquipmentByOwner,
+  getMaintenancePredictions
+};

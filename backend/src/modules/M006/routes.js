@@ -11,5 +11,10 @@ router.put('/settings/:name', authMiddleware, requireRole('admin'), controller.u
 // Audit ingestion (authenticated services/users)
 router.post('/audit', authMiddleware, requireRole('admin'), controller.ingestAudit);
 
+// AI-powered analytics (admin only)
+router.get('/analytics', authMiddleware, requireRole('admin'), controller.getSystemAnalytics);
+router.get('/anomalies', authMiddleware, requireRole('admin'), controller.detectAnomalies);
+router.get('/predictive-maintenance', authMiddleware, requireRole('admin'), controller.getPredictiveMaintenance);
+
 module.exports = router;
 

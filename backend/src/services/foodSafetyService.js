@@ -9,6 +9,7 @@ const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
 const { authRateLimit } = require('../middleware/rateLimiter');
+const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -358,6 +359,26 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
     );
 
     logger.info(`Food safety recall created: ${result.rows[0].id}`);
+
+    // AFFERENT WIRING: core/effectors.js already has a 'recall.notification'
+    // reaction on SIGNAL.RECALL_ISSUED (notify every downstream holder, notify
+    // the regulator, suspend listings) and services/enterpriseMemoryService.js
+    // already records a case entry for it — both have been unreachable
+    // because this route never called emitSignal() after actually creating the
+    // recall. Emitted AFTER the insert with the persisted row's own batch
+    // number, so the signal reflects a durable recall, not a request in flight.
+    signalBus.emitSignal(
+      SIGNAL.RECALL_ISSUED,
+      {
+        batchId: result.rows[0].batch_number ?? null,
+        productId: result.rows[0].product_id ?? null,
+        recallType: result.rows[0].recall_type ?? null,
+        recallReason: result.rows[0].recall_reason ?? null,
+        riskLevel: result.rows[0].risk_level ?? null
+      },
+      { severity: SEVERITY.EMERGENCY, source: 'foodSafetyService.createRecall' }
+    );
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     logger.error('Create recall record error', { error: error.message, stack: error.stack });

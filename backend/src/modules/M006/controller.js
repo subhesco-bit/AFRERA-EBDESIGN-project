@@ -1,4 +1,4 @@
-﻿// Controller for System Administration (M006)
+﻿// Controller for System Administration (M006) - AI Enhanced
 const service = require('./service');
 const { logger } = require('../../utils/logger');
 
@@ -48,5 +48,44 @@ async function ingestAudit(req, res) {
   }
 }
 
-module.exports = { listSettings, getSetting, upsertSetting, ingestAudit };
+// AI-powered analytics endpoints
+async function getSystemAnalytics(req, res) {
+  try {
+    const analytics = await service.getSystemAnalytics();
+    res.json({ success: true, data: analytics });
+  } catch (error) {
+    logger.error('getSystemAnalytics error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function detectAnomalies(req, res) {
+  try {
+    const anomalies = await service.detectAnomalies();
+    res.json({ success: true, data: anomalies });
+  } catch (error) {
+    logger.error('detectAnomalies error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getPredictiveMaintenance(req, res) {
+  try {
+    const maintenance = await service.getPredictiveMaintenance();
+    res.json({ success: true, data: maintenance });
+  } catch (error) {
+    logger.error('getPredictiveMaintenance error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+module.exports = { 
+  listSettings, 
+  getSetting, 
+  upsertSetting, 
+  ingestAudit,
+  getSystemAnalytics,
+  detectAnomalies,
+  getPredictiveMaintenance
+};
 

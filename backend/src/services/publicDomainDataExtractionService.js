@@ -52,7 +52,8 @@ class PublicDomainDataExtractionService {
       rateLimit: 1000,
       lastSync: null,
       status: 'active',
-      categories: ['federal', 'state', 'local']
+      categories: ['federal', 'state', 'local'],
+      notes: 'External documentation: https://api.data.gov'
     });
 
     this.dataSources.set('myscheme', {
@@ -64,40 +65,42 @@ class PublicDomainDataExtractionService {
       apiKey: null,
       rateLimit: 100,
       lastSync: null,
-      status: 'active',
-      categories: ['subsidies', 'schemes', 'welfare']
+      status: 'unverified',
+      categories: ['subsidy', 'scheme'],
+      notes: 'External endpoint: https://myscheme.gov.in - requires verification'
     });
 
     this.dataSources.set('opensubsidies', {
       id: 'opensubsidies',
-      name: 'OpenSubsidies',
-      type: 'agricultural',
-      country: 'US',
+      name: 'Open Subsidies',
+      type: 'government',
+      country: 'India',
       baseUrl: 'https://www.opensubsidies.org',
       apiKey: null,
-      rateLimit: 500,
+      rateLimit: 100,
       lastSync: null,
       status: 'active',
-      categories: ['farm-subsidies', 'agriculture']
+      categories: ['subsidy', 'scheme'],
+      notes: 'External endpoint: https://www.opensubsidies.org - requires verification, External documentation: https://www.opensubsidies.org/about'
     });
 
     this.dataSources.set('farmsubsidy', {
       id: 'farmsubsidy',
-      name: 'FarmSubsidy.org',
-      type: 'agricultural',
-      country: 'EU',
+      name: 'Farm Subsidy',
+      type: 'government',
+      country: 'India',
       baseUrl: 'https://farmsubsidy.org',
       apiKey: null,
-      rateLimit: 200,
+      rateLimit: 100,
       lastSync: null,
       status: 'active',
-      categories: ['cap-subsidies', 'eu-agriculture']
+      categories: ['subsidies', 'schemes', 'welfare'],
+      notes: 'External endpoint: https://farmsubsidy.org - requires verification, External documentation: https://farmsubsidy.org/about'
     });
 
-    // Research institutions
     this.dataSources.set('crossref', {
       id: 'crossref',
-      name: 'Crossref',
+      name: 'CrossRef',
       type: 'research',
       country: 'International',
       baseUrl: 'https://api.crossref.org',
@@ -105,7 +108,8 @@ class PublicDomainDataExtractionService {
       rateLimit: 50,
       lastSync: null,
       status: 'active',
-      categories: ['publications', 'metadata', 'scholarly']
+      categories: ['publications', 'metadata', 'scholarly'],
+      notes: 'External documentation: https://api.crossref.org, https://www.crossref.org/documentation/'
     });
 
     this.dataSources.set('core', {
@@ -118,7 +122,8 @@ class PublicDomainDataExtractionService {
       rateLimit: 10,
       lastSync: null,
       status: 'active',
-      categories: ['open-access', 'research-papers']
+      categories: ['open-access', 'research-papers'],
+      notes: 'External documentation: https://core.ac.uk, https://core.ac.uk/docs/'
     });
 
     // Defense organizations
@@ -132,7 +137,8 @@ class PublicDomainDataExtractionService {
       rateLimit: 100,
       lastSync: null,
       status: 'active',
-      categories: ['acquisition', 'legal', 'programs']
+      categories: ['acquisition', 'legal', 'programs'],
+      notes: 'External documentation: https://data.defense.gov'
     });
   }
 

@@ -1,11 +1,112 @@
-﻿// Controller for M084 Module (M084)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Trend Analysis (M084)
+ * Handles HTTP requests for trend analysis operations
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const trendService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const createTrendDefinition = async (req, res) => {
+  try {
+    const trend = await trendService.createTrendDefinition(req.body);
+    res.status(201).json({ success: true, data: trend });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const addDataPoint = async (req, res) => {
+  try {
+    const dataPoint = await trendService.addDataPoint(req.params.id, req.body);
+    res.status(201).json({ success: true, data: dataPoint });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getTrendDataPoints = async (req, res) => {
+  try {
+    const dataPoints = await trendService.getTrendDataPoints(req.params.id, req.query);
+    res.status(200).json({ success: true, data: dataPoints });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const analyzeTrend = async (req, res) => {
+  try {
+    const { trend_id, analysis_type, period_start, period_end } = req.body;
+    const analysis = await trendService.analyzeTrend(trend_id, analysis_type, period_start, period_end);
+    res.status(201).json({ success: true, data: analysis });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const generateTrendForecast = async (req, res) => {
+  try {
+    const { trend_id, forecast_type, forecast_horizon } = req.body;
+    const forecast = await trendService.generateTrendForecast(trend_id, forecast_type, forecast_horizon);
+    res.status(201).json({ success: true, data: forecast });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const detectSeasonality = async (req, res) => {
+  try {
+    const seasonality = await trendService.detectSeasonality(req.params.id);
+    res.status(201).json({ success: true, data: seasonality });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const calculateCorrelation = async (req, res) => {
+  try {
+    const { trend_id, correlated_metric } = req.body;
+    const correlation = await trendService.calculateCorrelation(trend_id, correlated_metric);
+    res.status(201).json({ success: true, data: correlation });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const detectBreakpoints = async (req, res) => {
+  try {
+    const breakpoints = await trendService.detectBreakpoints(req.params.id);
+    res.status(201).json({ success: true, data: breakpoints });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const createTrendAlert = async (req, res) => {
+  try {
+    const alert = await trendService.createTrendAlert(req.body);
+    res.status(201).json({ success: true, data: alert });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getTrendAlerts = async (req, res) => {
+  try {
+    const alerts = await trendService.getTrendAlerts(req.params.id, req.query);
+    res.status(200).json({ success: true, data: alerts });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  createTrendDefinition,
+  addDataPoint,
+  getTrendDataPoints,
+  analyzeTrend,
+  generateTrendForecast,
+  detectSeasonality,
+  calculateCorrelation,
+  detectBreakpoints,
+  createTrendAlert,
+  getTrendAlerts
+};

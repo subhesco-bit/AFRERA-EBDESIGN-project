@@ -378,7 +378,7 @@ async function resolveExperience({ userId, viewportWidthPx, prefersReducedMotion
   }
 
   const [themeRows, tokens, motion, bp] = await Promise.all([
-    pool.query('SELECT * FROM ui_themes WHERE theme_key = $1', [themeKey]),
+    await pool.query('SELECT * FROM ui_themes WHERE theme_key = $1', [themeKey]),
     getTokens(themeKey),
     getMotion({ reducedMotion: reducedMotion || Boolean(prefs?.screen_reader_in_use) }),
     breakpointFor(viewportWidthPx ?? 375),

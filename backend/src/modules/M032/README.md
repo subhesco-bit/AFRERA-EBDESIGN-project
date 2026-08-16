@@ -1,1 +1,12 @@
-﻿# M032 - M032 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M032_generated.sql\n
+﻿# M032 - Soil Analysis
+
+Domain: Crop Management
+Status: FULLY IMPLEMENTED
+
+This module provides comprehensive Soil Analysis capabilities:
+- Soil sample collection and testing
+- Comprehensive nutrient analysis
+- AI-powered soil health assessment
+- Soil health reports and recommendations
+- Nutrient deficiency identification
+- Crop suitability recommendations

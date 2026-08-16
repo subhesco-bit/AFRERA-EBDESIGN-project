@@ -1,1 +1,12 @@
-﻿# M031 - M031 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M031_generated.sql\n
+﻿# M031 - Land Registry
+
+Domain: Crop Management
+Status: FULLY IMPLEMENTED
+
+This module provides comprehensive Land Registry capabilities:
+- Land parcel registration and management
+- AI-powered land valuation
+- Land ownership transfer tracking
+- Land records and history
+- Land analytics and insights
+- Geospatial data integration

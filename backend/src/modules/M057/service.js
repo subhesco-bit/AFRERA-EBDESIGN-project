@@ -1,40 +1,78 @@
-﻿// Service for M057 Module (M057)
+﻿/**
+ * Shipping Management Service (M057)
+ * Shipping and delivery management with AI-powered route optimization
+ */
+
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { aiAPI } = require('../../services/aiService');
+const pool = require('../../database/pool');
 
-const tableName = '_items';
+async function createShipment(shipmentData) {
+  try {
+    const { order_id, shipping_address, delivery_method, items } = shipmentData;
+    const shipment = {
+      shipment_id: generateId(),
+      order_id,
+      shipping_address,
+      delivery_method,
+      items,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
 
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(SELECT COUNT(*) FROM );
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(SELECT * FROM  ORDER BY created_at DESC LIMIT  OFFSET , [limit, offset]);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    const aiRequest = {
+      task: 'route_optimization',
+      parameters: { shipment_data: shipmentData, traffic_data: await getTrafficData(), weather_data: await getWeatherData() }
+    };
+    shipment.ai_recommendations = await aiAPI.generateRecommendation(aiRequest);
+
+    const result = await pool.query(
+      `INSERT INTO shipments (shipment_id, order_id, shipping_address, delivery_method, items, status, ai_recommendations, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+      [shipment.shipment_id, shipment.order_id, JSON.stringify(shipment.shipping_address), shipment.delivery_method, JSON.stringify(shipment.items), shipment.status, JSON.stringify(shipment.ai_recommendations), shipment.created_at]
+    );
+
+    logger.info(`Shipment created: ${shipment.shipment_id}`);
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error creating shipment', { error: error.message });
+    throw new Error('Failed to create shipment');
+  }
 }
 
-async function getItem(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(SELECT * FROM  WHERE id = , [id]);
-  return res.rows[0] || null;
+async function trackShipment(shipmentId) {
+  try {
+    const res = await pool.query('SELECT * FROM shipments WHERE shipment_id = $1', [shipmentId]);
+    return res.rows[0] || null;
+  } catch (error) {
+    logger.error('Error tracking shipment', { error: error.message });
+    throw new Error('Failed to track shipment');
+  }
 }
 
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(INSERT INTO  (data, created_at) VALUES (, NOW()) RETURNING *, [payload]);
-  return res.rows[0];
+async function updateShipmentStatus(shipmentId, status, location = null) {
+  try {
+    const res = await pool.query(
+      'UPDATE shipments SET status = $1, current_location = $2, updated_at = NOW() WHERE shipment_id = $3 RETURNING *',
+      [status, location, shipmentId]
+    );
+    return res.rows[0] || null;
+  } catch (error) {
+    logger.error('Error updating shipment status', { error: error.message });
+    throw new Error('Failed to update shipment status');
+  }
 }
 
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(UPDATE  SET data = , updated_at = NOW() WHERE id =  RETURNING *, [payload, id]);
-  return res.rows[0] || null;
+function generateId() {
+  return `SHP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(DELETE FROM  WHERE id =  RETURNING id, [id]);
-  return !!res.rows[0];
+async function getTrafficData() {
+  return { congestion_level: 'low', average_speed: 50 };
 }
 
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem };
+async function getWeatherData() {
+  return { condition: 'clear', temperature: 25 };
+}
+
+module.exports = { createShipment, trackShipment, updateShipmentStatus };

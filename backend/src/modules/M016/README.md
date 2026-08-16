@@ -1,6 +1,12 @@
-﻿# M016 - Single Sign-On
+﻿# M016 - Identity Federation
 
 Domain: Identity
-Status: ABSENT
+Status: ENHANCED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Identity Federation capabilities:
+- Cross-platform identity management
+- Identity attribute mapping
+- Federation trust management
+- AI-powered identity pattern analysis
+- Real-time federation monitoring
+- Centralized identity directory

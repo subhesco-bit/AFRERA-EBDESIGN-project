@@ -1,14 +1,12 @@
-﻿const express = require('express');
+﻿// Express routes for Farmer Groups (M024)
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('farmer','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('farmer','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('farmer','admin'), controller.remove);
+router.post('/groups', controller.createFarmerGroup);
+router.post('/groups/:groupId/members', controller.addGroupMember);
+router.post('/groups/:groupId/meetings', controller.recordGroupMeeting);
+router.post('/groups/:groupId/transactions', controller.recordGroupTransaction);
+router.get('/groups/:groupId/analytics', controller.getGroupAnalytics);
 
 module.exports = router;
-

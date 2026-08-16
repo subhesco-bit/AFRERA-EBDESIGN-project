@@ -1,14 +1,23 @@
 ﻿const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
+const { authMiddleware, requireRole } = require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('community_manager','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('community_manager','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('community_manager','admin'), controller.remove);
+// Crop Registration CRUD
+router.post('/registrations', authMiddleware, controller.registerCrop);
+router.get('/registrations', authMiddleware, controller.listCropRegistrations);
+router.get('/registrations/:registrationId', authMiddleware, controller.getCropRegistration);
+router.put('/registrations/:registrationId', authMiddleware, controller.updateCropRegistration);
+router.delete('/registrations/:registrationId', authMiddleware, requireRole('admin'), controller.deleteCropRegistration);
+
+// AI-powered recommendations
+router.get('/farmers/:farmerId/recommend', authMiddleware, controller.recommendCrops);
+
+// Yield estimation
+router.post('/registrations/:registrationId/estimate-yield', authMiddleware, controller.estimateYield);
+
+// Analytics
+router.get('/registrations/analytics', authMiddleware, requireRole('admin'), controller.getCropAnalytics);
 
 module.exports = router;
 

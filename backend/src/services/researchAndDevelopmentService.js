@@ -101,7 +101,7 @@ class ResearchAndDevelopmentService {
       deadline: '2025-06-30',
       eligibility: ['agriculture-technology', 'plant-health'],
       status: 'open',
-      applicationUrl: 'https://example.com/apply',
+      applicationUrl: '/grants/apply/fund-001',
       createdAt: '2024-01-01T00:00:00Z'
     });
   }

@@ -152,7 +152,7 @@ router.get('/iot-devices', authMiddleware, async (req, res) => {
 async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength) {
   try {
     const result = await pool.query(
-      `UPDATE iot_devices 
+      `UPDATE iot_devices
        SET status = $1, battery_level = $2, signal_strength = $3, last_seen = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
        WHERE id = $4
        RETURNING *`,
@@ -163,7 +163,28 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
       throw new Error('Device not found');
     }
 
-    return result.rows[0];
+    const device = result.rows[0];
+
+    // AFFERENT WIRING: decisionEngine.js already has a dedicated correlation
+    // rule ('iot.sensor_reliability_degradation') that watches for repeated
+    // SENSOR_OFFLINE signals on the same asset — it has been unreachable dead
+    // code because nothing ever called emitSignal() when a device's status was
+    // actually persisted as offline. Emitted AFTER the update so the signal
+    // reflects a durable state change, not a request in flight.
+    if (device.status === 'offline') {
+      signalBus.emitSignal(
+        SIGNAL.SENSOR_OFFLINE,
+        {
+          deviceId: device.id,
+          deviceType: device.device_type ?? null,
+          locationId: device.location_id ?? null,
+          lastSeen: device.last_seen
+        },
+        { severity: SEVERITY.WARNING, source: 'iotIntegrationService.updateDeviceStatus', entityId: device.id }
+      );
+    }
+
+    return device;
   } catch (error) {
     logger.error('Update device status error', { error: error.message, stack: error.stack });
     throw error;

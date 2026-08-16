@@ -6,6 +6,7 @@ const { logger } = require('../utils/logger');
 const { aiAPI } = require('./aiService');
 const { socketServer } = require('../websocket');
 const { authMiddleware } = require('../middleware/auth');
+const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 
 /**
  * Submit insurance claim with AI validation
@@ -79,6 +80,25 @@ async function submitInsuranceClaim(claimData) {
       status: claim.status,
       message: 'Your insurance claim has been submitted successfully'
     });
+
+    // AFFERENT WIRING: core/effectors.js already has a 'claim.intake' reaction
+    // on SIGNAL.CLAIM_SUBMITTED whose whole purpose is to attach any logged
+    // temperature-breach/shipment/quality evidence to a claim automatically —
+    // it has never fired because nothing ever called emitSignal() here. Fired
+    // after the claim object is fully built (real claim_id/claim_number), not
+    // before, so a failed build cannot announce a claim that does not exist.
+    signalBus.emitSignal(
+      SIGNAL.CLAIM_SUBMITTED,
+      {
+        claimId: claim.claim_id,
+        claimNumber: claim.claim_number,
+        policyId: policy_id,
+        claimType: claim_type,
+        estimatedLoss: estimated_loss,
+        fraudProbability: aiResponse.fraud_probability ?? null
+      },
+      { severity: SEVERITY.NOTICE, source: 'insuranceClaimsService.submitInsuranceClaim', entityId: farmer_id }
+    );
 
     logger.info(`Insurance claim submitted: ${claim.claim_id}`);
     return claim;

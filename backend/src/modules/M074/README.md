@@ -1,6 +1,12 @@
-﻿# M074 - Fertility Management
+﻿# M074 - Sheep Management
 
-Domain: Soil
-Status: ABSENT
+Domain: Livestock
+Status: ENHANCED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Sheep Management capabilities:
+- AI-powered sheep flock management and analytics
+- Wool and meat production tracking
+- Breeding cycle optimization
+- Health monitoring with AI recommendations
+- Feed optimization for sheep
+- Signal bus integration for cross-module communication

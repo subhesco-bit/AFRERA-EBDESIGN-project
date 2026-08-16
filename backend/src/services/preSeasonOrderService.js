@@ -7,6 +7,7 @@ const { logger } = require('../utils/logger');
 const { aiAPI } = require('./aiService');
 const { socketServer } = require('../websocket');
 const { authMiddleware } = require('../middleware/auth');
+const { createEscrowTransaction } = require('./escrowService');
 
 /**
  * Create pre-season order
@@ -452,20 +453,41 @@ async function getSeasonalityFactors(category) {
 
 // FIXED 2026-08-15: previously fabricated a fake escrow_id and reported
 // the full order value as "held" — no funds were ever moved anywhere.
-// This is financially dangerous: a buyer/farmer relying on this response
-// would believe money was actually secured in escrow when it was not.
-// This whole service persists orders in memory only (no DB — see the
-// flagged follow-up task to rebuild it on real tables), so a real
-// wallet-backed hold can't be wired correctly until that exists. Honestly
-// reports non-implementation instead of fabricating a success response.
+// Setup real escrow transaction for order
 async function setupEscrow(order) {
-  logger.warn('setupEscrow called but no real escrow mechanism is implemented — no funds were moved', { orderId: order.order_id });
-  return {
-    escrow_id: null,
-    amount: null,
-    status: 'not_implemented',
-    reason: 'No real escrow fund-holding is implemented. This order\'s escrow_required flag could not be honored — do not treat this order as having secured funds.',
-  };
+  try {
+    const escrowData = {
+      order_id: order.order_id,
+      buyer_id: order.buyer_id,
+      farmer_id: null, // Will be set when bid is selected
+      amount: order.price_offered * order.quantity_required,
+      currency: 'INR',
+      payment_reference: `PRESEASON-${order.order_id}`,
+      release_conditions: [
+        { type: 'delivery_confirmed' },
+        { type: 'quality_verified' }
+      ]
+    };
+
+    const escrow = await createEscrowTransaction(escrowData);
+    logger.info(`Escrow setup successful for order ${order.order_id}`, { escrow_id: escrow.escrow_id });
+    
+    return {
+      escrow_id: escrow.escrow_id,
+      amount: escrow.amount,
+      status: escrow.status,
+      created_at: escrow.created_at
+    };
+  } catch (error) {
+    logger.error('Failed to setup escrow for order', { error: error.message, order_id: order.order_id });
+    // Return not_implemented status if escrow setup fails, allowing order to proceed without escrow
+    return {
+      escrow_id: null,
+      amount: null,
+      status: 'setup_failed',
+      reason: `Escrow setup failed: ${error.message}. Order proceeds without escrow protection.`,
+    };
+  }
 }
 
 async function getPreSeasonOrder(orderId) {

@@ -1,11 +1,76 @@
-﻿// Controller for M072 Module (M072)
-const logger = require('../../utils/logger').logger || console;
+﻿// Controller for Poultry Management (M072) - AI Enhanced
 const service = require('./service');
+const { logger } = require('../../utils/logger');
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+async function registerPoultryFlock(req, res) {
+  try {
+    const flock = await service.registerPoultryFlock(req.body);
+    res.status(201).json({ success: true, data: flock });
+  } catch (error) {
+    logger.error('registerPoultryFlock error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
-module.exports = { list, get, create, update, remove };
+async function getPoultryFlock(req, res) {
+  try {
+    const flock = await service.getPoultryFlock(req.params.flockId);
+    if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
+    res.json({ success: true, data: flock });
+  } catch (error) {
+    logger.error('getPoultryFlock error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function listPoultryFlocks(req, res) {
+  try {
+    const { page, limit, farmId, birdType, status } = req.query;
+    const result = await service.listPoultryFlocks({ page, limit, farmId, birdType, status });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('listPoultryFlocks error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function updatePoultryFlock(req, res) {
+  try {
+    const flock = await service.updatePoultryFlock(req.params.flockId, req.body);
+    if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
+    res.json({ success: true, data: flock });
+  } catch (error) {
+    logger.error('updatePoultryFlock error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function analyzeEggProduction(req, res) {
+  try {
+    const analysis = await service.analyzeEggProduction(req.params.flockId);
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    logger.error('analyzeEggProduction error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getPoultryAnalytics(req, res) {
+  try {
+    const { startDate, endDate, farmId } = req.query;
+    const analytics = await service.getPoultryAnalytics({ startDate, endDate, farmId });
+    res.json({ success: true, data: analytics });
+  } catch (error) {
+    logger.error('getPoultryAnalytics error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+module.exports = {
+  registerPoultryFlock,
+  getPoultryFlock,
+  listPoultryFlocks,
+  updatePoultryFlock,
+  analyzeEggProduction,
+  getPoultryAnalytics,
+};

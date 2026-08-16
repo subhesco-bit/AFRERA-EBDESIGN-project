@@ -24,7 +24,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         type, registrationNumber, capacity, make, model, year, driverId,
         JSON.stringify(features)
       ]);
@@ -57,7 +57,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY created_at DESC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting fleet', { error: error.message, stack: error.stack });
@@ -68,7 +68,7 @@ class LogisticsEnhancementService {
   async getVehicle(vehicleId) {
     try {
       const query = 'SELECT * FROM fleet_vehicles WHERE id = $1';
-      const result = await this.pool.query(query, [vehicleId]);
+      const result = await pool.query(query, [vehicleId]);
 
       if (result.rows.length === 0) {
         throw new Error('Vehicle not found');
@@ -96,7 +96,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         updateData.status,
         updateData.driverId,
         updateData.currentLocation ? JSON.stringify(updateData.currentLocation) : null,
@@ -127,7 +127,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         vehicleId, type, scheduledDate, description, estimatedCost, priority
       ]);
 
@@ -135,6 +135,115 @@ class LogisticsEnhancementService {
       return result.rows[0];
     } catch (error) {
       logger.error('Error scheduling maintenance', { error: error.message, stack: error.stack });
+      throw error;
+    }
+  }
+
+  /**
+   * getMaintenanceDueList — real "due for service" list for the fleet
+   * (M105 Fleet Management, Machinery domain; the one tab in
+   * MachineryManagementPage.jsx with a genuine backend — see that file's
+   * header comment).
+   *
+   * Two real, independent signals off fleet_vehicles / vehicle_maintenance
+   * (034_logistics_enhancement_schema.sql), no fabricated data:
+   *
+   *   1. Calendar-based: fleet_vehicles.next_maintenance_date, when it was
+   *      actually set via scheduleMaintenance()/updateVehicle() — compared
+   *      against today, no assumption needed.
+   *   2. Open work orders: vehicle_maintenance rows with status still
+   *      'scheduled' whose scheduled_date has passed — an overdue booking,
+   *      not a prediction.
+   *
+   * A vehicle with neither a next_maintenance_date nor any maintenance
+   * history is reported separately as "no maintenance schedule on record"
+   * rather than silently omitted or given a guessed due date — matching how
+   * getActiveDrivers() above reports `stale` instead of hiding a lost ping.
+   *
+   * dueSoonWithinDays is not stored anywhere in the schema, so it is a
+   * named, labelled ASSUMED_* constant (financialService.farmerCreditRiskScore()
+   * real/assumed convention), overridable per call.
+   */
+  async getMaintenanceDueList({ dueSoonWithinDays = 14 } = {}) {
+    const ASSUMED_DUE_SOON_WINDOW_DAYS = dueSoonWithinDays;
+    try {
+      const { rows: vehicles } = await pool.query(
+        `SELECT id, type, registration_number, status, mileage,
+                last_maintenance_date, next_maintenance_date
+           FROM fleet_vehicles
+          WHERE status != 'retired'
+          ORDER BY registration_number`
+      );
+
+      const { rows: openWork } = await pool.query(
+        `SELECT vehicle_id, id, type, scheduled_date, priority, description
+           FROM vehicle_maintenance
+          WHERE status = 'scheduled'
+          ORDER BY scheduled_date`
+      );
+      const openWorkByVehicle = new Map();
+      for (const w of openWork) {
+        if (!openWorkByVehicle.has(w.vehicle_id)) openWorkByVehicle.set(w.vehicle_id, []);
+        openWorkByVehicle.get(w.vehicle_id).push(w);
+      }
+
+      const today = new Date();
+      const msPerDay = 24 * 60 * 60 * 1000;
+      const daysBetween = (from, to) => Math.round((to.getTime() - from.getTime()) / msPerDay);
+
+      const results = vehicles.map((v) => {
+        const openOrders = (openWorkByVehicle.get(v.id) || []).map((w) => {
+          const scheduled = new Date(w.scheduled_date);
+          const daysUntil = daysBetween(today, scheduled);
+          return {
+            maintenanceId: w.id,
+            type: w.type,
+            scheduledDate: w.scheduled_date,
+            priority: w.priority,
+            description: w.description,
+            daysUntilScheduled: daysUntil,
+            overdue: daysUntil < 0,
+          };
+        });
+
+        let calendarStatus = 'no_schedule';
+        let daysUntilNext = null;
+        if (v.next_maintenance_date) {
+          daysUntilNext = daysBetween(today, new Date(v.next_maintenance_date));
+          if (daysUntilNext < 0) calendarStatus = 'overdue';
+          else if (daysUntilNext <= ASSUMED_DUE_SOON_WINDOW_DAYS) calendarStatus = 'due_soon';
+          else calendarStatus = 'scheduled';
+        }
+
+        const overdueWorkOrders = openOrders.filter((o) => o.overdue).length;
+        const dueForService = calendarStatus === 'overdue' || calendarStatus === 'due_soon' || overdueWorkOrders > 0;
+
+        return {
+          vehicleId: v.id,
+          type: v.type,
+          registrationNumber: v.registration_number,
+          status: v.status,
+          mileage: v.mileage !== null ? Number(v.mileage) : null,
+          lastMaintenanceDate: v.last_maintenance_date,
+          nextMaintenanceDate: v.next_maintenance_date,
+          calendarStatus,
+          daysUntilNextMaintenance: daysUntilNext,
+          openWorkOrders: openOrders,
+          overdueWorkOrders,
+          dueForService,
+        };
+      });
+
+      return {
+        generatedAt: new Date().toISOString(),
+        dueSoonWithinDays: ASSUMED_DUE_SOON_WINDOW_DAYS,
+        dueSoonWindowQuality: 'assumed — not stored in the schema',
+        vehicles: results,
+        dueForServiceCount: results.filter((r) => r.dueForService).length,
+        noScheduleCount: results.filter((r) => r.calendarStatus === 'no_schedule' && r.openWorkOrders.length === 0).length,
+      };
+    } catch (error) {
+      logger.error('Error computing fleet maintenance due list', { error: error.message, stack: error.stack });
       throw error;
     }
   }
@@ -151,12 +260,12 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         shipmentId, latitude, longitude, speed, heading, timestamp, status
       ]);
 
       // Update shipment current location
-      await this.pool.query(
+      await pool.query(
         'UPDATE shipments SET current_location = $1, updated_at = NOW() WHERE id = $2',
         [JSON.stringify({ latitude, longitude }), shipmentId]
       );
@@ -178,7 +287,7 @@ class LogisticsEnhancementService {
         LIMIT 100
       `;
 
-      const result = await this.pool.query(query, [shipmentId]);
+      const result = await pool.query(query, [shipmentId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting tracking', { error: error.message, stack: error.stack });
@@ -201,7 +310,7 @@ class LogisticsEnhancementService {
         LIMIT 1
       `;
 
-      const result = await this.pool.query(query, [shipmentId]);
+      const result = await pool.query(query, [shipmentId]);
 
       if (result.rows.length === 0) {
         throw new Error('No tracking data available');
@@ -231,7 +340,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         shipmentId, type, radius, JSON.stringify(coordinates), alertEnabled
       ]);
 
@@ -255,7 +364,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         shipmentId, sensorId, temperature, humidity, timestamp, zone
       ]);
 
@@ -294,7 +403,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY timestamp DESC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting temperature data', { error: error.message, stack: error.stack });
@@ -321,7 +430,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         shipmentId, minTemp, maxTemp, minHumidity, maxHumidity,
         JSON.stringify(alertChannels)
       ]);
@@ -341,7 +450,7 @@ class LogisticsEnhancementService {
         WHERE shipment_id = $1
       `;
 
-      const result = await this.pool.query(query, [shipmentId]);
+      const result = await pool.query(query, [shipmentId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting temperature alerts', { error: error.message, stack: error.stack });
@@ -375,7 +484,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [shipmentId, alert.id, currentTemp]);
+      const result = await pool.query(query, [shipmentId, alert.id, currentTemp]);
 
       logger.warn(`Temperature alert triggered for shipment ${shipmentId}: ${currentTemp}°C`);
       return result.rows[0];
@@ -397,7 +506,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         name, JSON.stringify(location), type, capacity,
         JSON.stringify(zones), JSON.stringify(features)
       ]);
@@ -430,7 +539,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY name ASC';
 
-      const result = await this.pool.query(query, params);
+      const result = await pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting warehouses', { error: error.message, stack: error.stack });
@@ -441,7 +550,7 @@ class LogisticsEnhancementService {
   async getWarehouse(warehouseId) {
     try {
       const query = 'SELECT * FROM warehouses WHERE id = $1';
-      const result = await this.pool.query(query, [warehouseId]);
+      const result = await pool.query(query, [warehouseId]);
 
       if (result.rows.length === 0) {
         throw new Error('Warehouse not found');
@@ -469,7 +578,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         warehouseId, productId, quantity, zone, location, expiryDate
       ]);
 
@@ -494,7 +603,7 @@ class LogisticsEnhancementService {
         ORDER BY wi.zone, wi.location
       `;
 
-      const result = await this.pool.query(query, [warehouseId]);
+      const result = await pool.query(query, [warehouseId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting warehouse inventory', { error: error.message, stack: error.stack });
@@ -513,7 +622,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      const result = await pool.query(query, [
         warehouseId, type, JSON.stringify(items), referenceId
       ]);
 
@@ -550,7 +659,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [quantity, warehouseId, productId]);
+      const result = await pool.query(query, [quantity, warehouseId, productId]);
 
       if (result.rows.length === 0) {
         throw new Error('Inventory not found');
@@ -577,7 +686,7 @@ class LogisticsEnhancementService {
            WHERE tr.timestamp > NOW() - INTERVAL '24 hours') as temperature_violation_rate
       `;
 
-      const result = await this.pool.query(query);
+      const result = await pool.query(query);
       return result.rows[0];
     } catch (error) {
       logger.error('Error getting logistics statistics', { error: error.message, stack: error.stack });
@@ -610,7 +719,7 @@ class LogisticsEnhancementService {
       throw new Error('Coordinates out of range');
     }
     try {
-      const { rows } = await this.pool.query(
+      const { rows } = await pool.query(
         `INSERT INTO driver_location
            (driver_id, shipment_id, latitude, longitude, speed_kmph,
             heading_deg, accuracy_m, battery_pct, recorded_at)
@@ -636,7 +745,7 @@ class LogisticsEnhancementService {
    */
   async getActiveDrivers({ staleAfterMinutes = 30 } = {}) {
     try {
-      const { rows } = await this.pool.query(
+      const { rows } = await pool.query(
         `SELECT DISTINCT ON (driver_id)
                 driver_id, shipment_id, latitude, longitude, speed_kmph,
                 heading_deg, battery_pct, recorded_at,
@@ -668,12 +777,12 @@ class LogisticsEnhancementService {
   async getShipmentTrail(shipmentId) {
     try {
       const [driver, consignment] = await Promise.all([
-        this.pool.query(
+        pool.query(
           `SELECT latitude, longitude, speed_kmph, recorded_at
              FROM driver_location WHERE shipment_id = $1 ORDER BY recorded_at`,
           [shipmentId]
         ),
-        this.pool.query(
+        pool.query(
           `SELECT * FROM shipment_tracking WHERE shipment_id = $1 ORDER BY created_at`,
           [shipmentId]
         ),

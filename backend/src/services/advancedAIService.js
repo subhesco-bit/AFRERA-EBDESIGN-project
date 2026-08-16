@@ -252,44 +252,102 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
     `;
     
     const marketData = await pg.query(marketQuery, [productId]);
-    
+
+    // Daily price/demand series so the RL model can actually estimate real
+    // elasticity. Without this, currentState never carried price_history/
+    // demand_history and loadRLModel() always fell into its "insufficient
+    // data, hold price" branch — an honest result, but one that could never
+    // become anything else. This closes that gap with real order history,
+    // not a fabricated series.
+    const priceHistoryQuery = `
+      SELECT
+        DATE_TRUNC('day', order_date) as date,
+        SUM(quantity) as demand,
+        AVG(price) as avg_price
+      FROM order_items oi
+      WHERE oi.product_id = $1
+        AND oi.order_date >= NOW() - INTERVAL '90 days'
+      GROUP BY DATE_TRUNC('day', order_date)
+      ORDER BY date ASC
+    `;
+    const priceHistoryData = await pg.query(priceHistoryQuery, [productId]);
+    const priceHistory = column(priceHistoryData.rows, 'avg_price');
+    const demandHistory = column(priceHistoryData.rows, 'demand');
+
     // Get real-time factors
     const realTimeFactors = await getRealTimePricingFactors(productId, context);
-    
+
     // Load reinforcement learning model
     const rlModel = await loadRLModel('price_optimization');
-    
+
     // Get current state
     const currentState = {
       current_price: currentPrice,
       market_data: marketData.rows[0],
+      price_history: priceHistory,
+      demand_history: demandHistory,
       real_time_factors: realTimeFactors,
       inventory_level: context.inventory_level || await getInventoryLevel(productId),
       time_of_day: new Date().getHours(),
       day_of_week: new Date().getDay(),
       season: getCurrentSeason()
     };
-    
+
     // Get optimal action from RL model
     const optimalAction = await rlModel.getAction(currentState);
-    
-    // Calculate expected outcomes
-    const expectedOutcomes = await simulatePriceOutcomes(currentState, optimalAction);
-    
+
+    // Calculate expected outcomes.
+    // simulatePriceOutcomes() takes 4 numeric args (currentPrice, proposedPrice,
+    // elasticity, baselineDemand) - it does not take the currentState/optimalAction
+    // objects themselves (that silently produced NaN economics). Pull the real
+    // numbers out of them instead. elasticity/confidence on optimalAction are only
+    // set when the RL model had >=3 paired price/demand points to correlate (see
+    // loadRLModel); otherwise it holds price steady, so an elasticity of 0 here
+    // correctly yields a flat (no-change) simulation instead of NaN.
+    const elasticity = Number.isFinite(optimalAction.elasticity) ? optimalAction.elasticity : 0;
+    // Real recent demand: prefer the actual daily series just fetched (more
+    // representative than a single 3-month count) and fall back to
+    // transaction_count if the series is empty.
+    const baselineDemand = demandHistory.length
+      ? stats.mean(demandHistory)
+      : Number(marketData.rows[0]?.transaction_count) || 0;
+    const expectedOutcomes = simulatePriceOutcomes(currentPrice, optimalAction.price, elasticity, baselineDemand);
+
+    // Price volatility level for risk analysis, derived from the same real
+    // daily series (falls back to the single-query estimate when history is
+    // too thin for calculateVolatility() to use).
+    const priceVolatility = priceHistoryData.rows.length
+      ? calculateVolatility(priceHistoryData.rows)
+      : (() => {
+          const avgMarketPrice = Number(marketData.rows[0]?.avg_market_price) || 0;
+          const priceCV = avgMarketPrice ? (Number(marketData.rows[0].price_stddev) || 0) / avgMarketPrice : 0;
+          return { coefficient_of_variation: priceCV, level: priceCV > 0.5 ? 'high' : priceCV > 0.2 ? 'moderate' : 'low' };
+        })();
+
+    // Risk analysis (must be computed before pricing strategy, which reads it -
+    // previously risk was computed after strategy and passed marketData.rows[0]
+    // instead of the simulated outcome, so risk.level was always undefined and
+    // strategy never saw the real risk assessment)
+    const riskAnalysis = analyzePricingRisk(expectedOutcomes, priceVolatility);
+
     // Generate pricing strategy
-    const pricingStrategy = generatePricingStrategy(optimalAction, expectedOutcomes, marketData.rows[0]);
-    
-    // Risk analysis
-    const riskAnalysis = await analyzePricingRisk(optimalAction, marketData.rows[0]);
-    
-    logger.info(`Advanced price optimization for product ${productId}: ₹${optimalAction.price} (confidence: 91%)`);
-    
+    const pricingStrategy = generatePricingStrategy(optimalAction, expectedOutcomes, riskAnalysis);
+
+    // Confidence reflects how much real price/demand history backed the
+    // elasticity estimate this recommendation rests on (0 = insufficient
+    // history, held price; approaches 1 = strong, well-supported correlation) -
+    // the same real/estimated/assumed data-quality-driven approach as
+    // core/mcda.js's DATA_QUALITY_WEIGHT, not a fixed, fabricated number.
+    const confidence = optimalAction.confidence ?? 0;
+
+    logger.info(`Advanced price optimization for product ${productId}: ₹${optimalAction.price} (confidence: ${(confidence * 100).toFixed(0)}%)`);
+
     return {
       product_id: productId,
       current_price: currentPrice,
       optimal_price: optimalAction.price,
       price_change: ((optimalAction.price - currentPrice) / currentPrice * 100).toFixed(2),
-      confidence: 0.91,
+      confidence,
       pricing_strategy: pricingStrategy,
       market_analysis: {
         current: marketData.rows[0],
@@ -1444,11 +1502,17 @@ router.post('/optimize-price', authMiddleware, async (req, res) => {
  * POST /api/v1/advanced-ai/assess-credit-risk
  * Advanced credit risk assessment
  */
+// DEPRECATED 2026-08-15 — advancedAssessCreditRisk() was a third,
+// independent credit-scoring implementation ("transparent weighted
+// ensemble") alongside the canonical, MCDA-based
+// financialService.farmerCreditRiskScore(). No frontend caller was found.
+// Delegated rather than deleted. See AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C.
 router.post('/assess-credit-risk', authMiddleware, async (req, res) => {
   try {
-    const { farmer_id, include_explanations } = req.body;
-    const result = await advancedAssessCreditRisk(farmer_id, include_explanations);
-    res.json(result);
+    const { farmer_id } = req.body;
+    const financialService = require('./financialService');
+    const result = await financialService.farmerCreditRiskScore(farmer_id);
+    res.json({ ...result, delegatedFrom: 'advancedAIService.advancedAssessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
   } catch (error) {
     logger.error('Advanced credit risk assessment API error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'Failed to assess credit risk' });

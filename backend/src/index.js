@@ -48,6 +48,12 @@ const smsAuthService = require('./services/smsAuthService');
 // smsAuthService's mock-mode-when-unconfigured pattern. See service header.
 const whatsappService = require('./services/whatsappService');
 const advancedVoiceAI = require('./services/advancedVoiceAI');
+// Escrow service for secure fund holding in transactions
+const escrowService = require('./services/escrowService');
+// Custody event service - chain tracking and settlement instructions
+const custodyEventRoutes = require('./services/custodyEventRoutes');
+// Health check routes for monitoring
+const healthRoutes = require('./routes/healthRoutes');
 const offlinePaymentService = require('./services/offlinePaymentService');
 const advancedAIService = require('./services/advancedAIService');
 const offlineSyncService = require('./services/offlineSyncService');
@@ -298,10 +304,19 @@ const erpAgents = require('./core/erpAgents');
 
 // Import middleware
 const { errorHandler } = require('./middleware/errorHandler');
-const { rateLimiter } = require('./middleware/rateLimiter');
+const { rateLimiters } = require('./middleware/rateLimit');
+const { responseFormatter } = require('./middleware/responseFormatter');
+const { requestLogger, errorLogger } = require('./middleware/requestLogger');
+const { validateBody, validateQuery, validateParams } = require('./middleware/validation');
 const { authMiddleware } = require('./middleware/auth');
-const { validateBody } = require('./middleware/inputValidation');
+const { validateBody: validateBodyOld } = require('./middleware/inputValidation');
+const { requestId } = require('./middleware/requestId');
+const { securityHeaders, productionSecurityHeaders } = require('./middleware/securityHeaders');
+const { routeMonitoring, criticalRouteMonitoring, healthCheckMonitoring } = require('./middleware/routeMonitoring');
 const { logger } = require('./utils/logger');
+
+// Database Enhancements Integration
+const { initializeDatabaseEnhancements, shutdownDatabaseEnhancements, getDatabaseEnhancements } = require('./database/database_enhancements');
 
 // Initialize Express app
 const app = express();
@@ -315,24 +330,33 @@ const io = new Server(httpServer, {
 
 // Security middleware
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: ["'self'"]
-    }
-  },
-  crossOriginEmbedderPolicy: false
+  contentSecurityPolicy: false // Disable default CSP, use our custom securityHeaders
 }));
 
-// CORS configuration
+// Enterprise-grade security headers (replaces default helmet CSP)
+app.use(process.env.NODE_ENV === 'production' ? productionSecurityHeaders() : securityHeaders());
+
+// CORS configuration - Production-ready with environment-based origins
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [process.env.FRONTEND_URL || 'http://localhost:3000'];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS policy: Origin not allowed'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['X-Total-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset', 'X-Request-ID', 'X-Correlation-ID'],
+  maxAge: 86400 // 24 hours
 }));
 
 // General middleware
@@ -341,60 +365,24 @@ app.use(morgan('combined', { stream: { write: message => logger.info(message.tri
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Rate limiting
-app.use('/api/', rateLimiter);
+// Request ID middleware for distributed tracing (must come before other middleware)
+app.use(requestId);
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  const connection = require('./database/connection');
-  const redis = require('./cache/redis');
+// Route monitoring middleware
+app.use(routeMonitoring);
 
-  const healthChecks = {
-    auth: typeof authService.isHealthy === 'function' ? authService.isHealthy() : { status: 'ok' },
-    database: typeof connection.isHealthy === 'function' ? connection.isHealthy() : { status: 'unknown' },
-    redis: typeof redis.isHealthy === 'function' ? redis.isHealthy() : { status: 'disabled' },
-    ai: typeof aiService.isHealthy === 'function' ? aiService.isHealthy() : { status: 'ok' }
-  };
+// Request/response logging
+app.use(requestLogger);
 
-  // Add optional services if they exist
-  if (typeof indigenousKnowledgeService !== 'undefined') {
-    healthChecks.indigenous_knowledge = typeof indigenousKnowledgeService.isHealthy === 'function' ? indigenousKnowledgeService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof biodiversityService !== 'undefined') {
-    healthChecks.biodiversity = typeof biodiversityService.isHealthy === 'function' ? biodiversityService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof aiCopilotService !== 'undefined') {
-    healthChecks.ai_copilot = typeof aiCopilotService.isHealthy === 'function' ? aiCopilotService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof omnichannelAIService !== 'undefined') {
-    healthChecks.omnichannel_ai = typeof omnichannelAIService.isHealthy === 'function' ? omnichannelAIService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof foodSafetyService !== 'undefined') {
-    healthChecks.food_safety = typeof foodSafetyService.isHealthy === 'function' ? foodSafetyService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof shelfLifeService !== 'undefined') {
-    healthChecks.shelf_life = typeof shelfLifeService.isHealthy === 'function' ? shelfLifeService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof institutionalProcurementService !== 'undefined') {
-    healthChecks.institutional_procurement = typeof institutionalProcurementService.isHealthy === 'function' ? institutionalProcurementService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof millCircuitService !== 'undefined') {
-    healthChecks.mill_circuit = typeof millCircuitService.isHealthy === 'function' ? millCircuitService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof digitalProductPassportService !== 'undefined') {
-    healthChecks.digital_product_passport = typeof digitalProductPassportService.isHealthy === 'function' ? digitalProductPassportService.isHealthy() : { status: 'ok' };
-  }
-  if (typeof recipeIntelligenceService !== 'undefined') {
-    healthChecks.recipe_intelligence = typeof recipeIntelligenceService.isHealthy === 'function' ? recipeIntelligenceService.isHealthy() : { status: 'ok' };
-  }
+// Response formatting
+app.use(responseFormatter);
 
-  res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    services: healthChecks
-  });
-});
+// Rate limiting (use new middleware)
+app.use('/api/v1/auth', rateLimiters.auth);
+app.use('/api/v1/', rateLimiters.api);
+
+// Error logger middleware (must be before error handler)
+app.use(errorLogger);
 
 // API Routes
 const mountRoute = (pathPrefix, serviceModule) => {
@@ -407,14 +395,14 @@ const mountRoute = (pathPrefix, serviceModule) => {
   return false;
 };
 
-mountRoute('/api/v1/auth', authService);
+app.use('/api/v1/auth', criticalRouteMonitoring, authService.router);
 mountRoute('/api/v1/products', productService);
-mountRoute('/api/v1/orders', orderService);
+app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 // NOTE: farmerService and gstService export plain functions, not a .router,
 // so mountRoute() silently no-ops for them (see farmerRoutes/gstRoutes mounts below).
-mountRoute('/api/v1/financial', financialService);
-mountRoute('/api/v1/logistics', logisticsService);
-mountRoute('/api/v1/insurance', insuranceService);
+app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
+app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
+app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
 mountRoute('/api/v1/ai', aiService);
 mountRoute('/api/v1/erp', erpService);
 mountRoute('/api/v1/multilingual', multilingualService);
@@ -472,7 +460,7 @@ mountRoute('/api/v1/admin', adminModule);
 const generatedModuleRoot = path.join(__dirname, 'modules');
 const generatedModuleNames = fs.readdirSync(generatedModuleRoot)
   .filter(name => /^M\d{3}$/.test(name))
-  .sort();
+  .sort(); // Note: Synchronous I/O at module load is acceptable for one-time initialization
 
 for (const moduleName of generatedModuleNames) {
   const resolvedModule = require(path.join(generatedModuleRoot, moduleName));
@@ -594,6 +582,12 @@ app.use('/api/v1/erp/projects', projectSystemsRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
+// Escrow service - secure fund holding for transactions
+escrowService.setupRoutes(app);
+// Custody event service - chain tracking and settlement instructions
+custodyEventRoutes.setupRoutes(app);
+// Health check endpoints for monitoring with specialized monitoring
+app.use('/health', healthCheckMonitoring, healthRoutes);
 // Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
 app.use('/api/v1/wikipedia', wikipediaRoutes);
 app.use('/api/v1/agri-intelligence', agriculturalIntelligenceRoutes);
@@ -671,7 +665,10 @@ sharedInfraService.setupRoutes(app);
 soilTestingService.setupRoutes(app);
 subsidyService.setupRoutes(app);
 
-// GraphQL endpoint (if using GraphQL)
+// GraphQL endpoint — disabled by default (ENABLE_GRAPHQL unset). Never actually
+// built: no schema file exists under src/graphql/ and express-graphql isn't in
+// package.json, so this throws MODULE_NOT_FOUND if ever enabled. Left as a
+// clearly-failing stub rather than silently no-op-ing.
 if (process.env.ENABLE_GRAPHQL === 'true') {
   const { graphqlHTTP } = require('express-graphql');
   const schema = require('./graphql/schema');
@@ -741,15 +738,16 @@ function initializeDecisionLayer() {
   // this way; only conflict-route risk is marked human_only, because rerouting a
   // truck means the original road was never driven and no data can say what
   // would have happened on it.
+  let learningTimer = null;
   if (process.env.NODE_ENV !== 'test' && process.env.AI_LEARNING_CYCLE !== 'off') {
     const resolver = require('./core/outcomeResolver');
     const everyMinutes = Number(process.env.AI_LEARNING_CYCLE_MINUTES || 60);
-    const timer = setInterval(() => {
+    learningTimer = setInterval(() => {
       resolver.runCycle().catch((error) => {
         logger.warn('learning cycle skipped', { error: error.message });
       });
     }, everyMinutes * 60 * 1000);
-    timer.unref();   // never hold the process open for this
+    learningTimer.unref();   // never hold the process open for this
     logger.info('autonomous learning cycle scheduled', { everyMinutes });
   }
 
@@ -758,6 +756,7 @@ function initializeDecisionLayer() {
   // with no in-process scheduling — real and working, but only ever ran
   // manually. Same disable/interval-override convention as the learning
   // cycle above.
+  let mandiTimer = null;
   if (process.env.NODE_ENV !== 'test' && process.env.MANDI_PRICE_REFRESH !== 'off') {
     const mandiJob = require('./jobs/loadMandiPrices');
     const everyHours = Number(process.env.MANDI_PRICE_REFRESH_HOURS || 24);
@@ -768,7 +767,7 @@ function initializeDecisionLayer() {
         logger.warn('mandi price refresh failed', { error: error.message });
       });
     };
-    const mandiTimer = setInterval(runMandiRefresh, everyHours * 60 * 60 * 1000);
+    mandiTimer = setInterval(runMandiRefresh, everyHours * 60 * 60 * 1000);
     mandiTimer.unref();
     logger.info('Agmarknet mandi price refresh scheduled', { everyHours });
   }
@@ -866,30 +865,101 @@ app.use((req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-function startServer() {
+async function startServer() {
+  try {
+    // Initialize Database Enhancements
+    logger.info('Initializing database enhancements...');
+    await initializeDatabaseEnhancements({
+      enableAdvancedPooling: true,
+      enableCaching: true,
+      enableTransactions: true,
+      enableMonitoring: true,
+      enableSecurity: true,
+      enableBackup: process.env.NODE_ENV === 'production',
+      enableOptimization: true,
+      environment: process.env.NODE_ENV || 'development',
+      poolConfig: {
+        min: parseInt(process.env.DATABASE_POOL_MIN) || 10,
+        max: parseInt(process.env.DATABASE_POOL_MAX) || 20,
+        idleTimeoutMillis: parseInt(process.env.DATABASE_POOL_IDLE_TIMEOUT) || 30000
+      },
+      cacheConfig: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT) || 6379,
+        password: process.env.REDIS_PASSWORD,
+        defaultTTL: 3600
+      },
+      monitoringConfig: {
+        slowQueryThreshold: 1000,
+        enableAlerting: true
+      },
+      securityConfig: {
+        enableColumnEncryption: true,
+        encryptionKey: process.env.ENCRYPTION_KEY,
+        enableRowLevelSecurity: true,
+        enableAuditLogging: true
+      },
+      backupConfig: {
+        backupInterval: 86400000,
+        retentionDays: parseInt(process.env.BACKUP_RETENTION_DAYS) || 30,
+        enableCloudStorage: !!process.env.AWS_S3_BUCKET,
+        enableEncryption: true
+      }
+    });
+    logger.info('Database enhancements initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize database enhancements', { error: error.message });
+    logger.warn('Continuing without database enhancements...');
+  }
+
   const PORT = process.env.PORT || 3001;
-  httpServer.listen(PORT, () => {
+  httpServer.listen(PORT, async () => {
     logger.info(`AFRERA Backend Server running on port ${PORT}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.info(`API Gateway: http://localhost:${PORT}/api/v1`);
+    
+    // Log database enhancements status
+    try {
+      const enhancements = getDatabaseEnhancements();
+      const health = await enhancements.getHealthStatus();
+      logger.info('Database enhancements health status', { healthy: health.healthy });
+    } catch (error) {
+      logger.warn('Could not get database enhancements health status');
+    }
   });
 
   // Graceful shutdown
-  process.on('SIGTERM', () => {
-    logger.info('SIGTERM signal received: closing HTTP server');
+  const gracefulShutdown = async (signal) => {
+    logger.info(`${signal} signal received: starting graceful shutdown`);
+    
+    // Clear timers
+    if (learningTimer) clearInterval(learningTimer);
+    if (mandiTimer) clearInterval(mandiTimer);
+    
+    // Shutdown database enhancements
+    try {
+      logger.info('Shutting down database enhancements...');
+      await shutdownDatabaseEnhancements();
+      logger.info('Database enhancements shutdown complete');
+    } catch (error) {
+      logger.error('Error shutting down database enhancements', { error: error.message });
+    }
+    
+    // Close HTTP server
     httpServer.close(() => {
       logger.info('HTTP server closed');
       process.exit(0);
     });
-  });
+    
+    // Force exit after timeout
+    setTimeout(() => {
+      logger.error('Forced shutdown after timeout');
+      process.exit(1);
+    }, 30000);
+  };
 
-  process.on('SIGINT', () => {
-    logger.info('SIGINT signal received: closing HTTP server');
-    httpServer.close(() => {
-      logger.info('HTTP server closed');
-      process.exit(0);
-    });
-  });
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 if (require.main === module) {
@@ -897,3 +967,4 @@ if (require.main === module) {
 }
 
 module.exports = { app, io };
+

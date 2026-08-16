@@ -1,14 +1,24 @@
 ﻿const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
+const { authMiddleware, requireRole } = require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('community_manager','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('community_manager','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('community_manager','admin'), controller.remove);
+// Seed Planning CRUD
+router.post('/plans', authMiddleware, controller.createSeedPlan);
+router.get('/plans', authMiddleware, controller.listSeedPlans);
+router.get('/plans/:planId', authMiddleware, controller.getSeedPlan);
+router.put('/plans/:planId', authMiddleware, controller.updateSeedPlan);
+router.delete('/plans/:planId', authMiddleware, requireRole('admin'), controller.deleteSeedPlan);
+
+// AI-powered calculation
+router.post('/calculate-requirements', authMiddleware, controller.calculateSeedRequirements);
+
+// Supplier management
+router.post('/suppliers', authMiddleware, requireRole('admin'), controller.addSeedSupplier);
+router.get('/suppliers', authMiddleware, controller.listSeedSuppliers);
+
+// Analytics
+router.get('/plans/analytics', authMiddleware, requireRole('admin'), controller.getSeedAnalytics);
 
 module.exports = router;
 

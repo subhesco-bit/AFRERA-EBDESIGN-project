@@ -1,6 +1,12 @@
-﻿# M075 - Irrigation Management
+﻿# M075 - Pig Management
 
-Domain: Water
-Status: ABSENT
+Domain: Livestock
+Status: ENHANCED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Pig Management capabilities:
+- AI-powered pig herd management and analytics
+- Meat production tracking and optimization
+- Breeding cycle optimization
+- Health monitoring with AI recommendations
+- Feed optimization for pigs
+- Signal bus integration for cross-module communication

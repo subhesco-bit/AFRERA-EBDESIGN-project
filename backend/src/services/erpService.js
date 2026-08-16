@@ -7,6 +7,7 @@
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
 const { authMiddleware } = require('../middleware/auth');
+const { AppError } = require('../middleware/errorHandler');
 
 // ERP configuration
 const ERP_CONFIG = {
@@ -784,38 +785,38 @@ function mapAssetTypeToClass(type) {
 }
 
 /**
- * ERP-specific sync functions (mock implementations)
+ * ERP-specific sync functions
+ *
+ * No SAP or Oracle connector is installed in this project (verified against
+ * package.json: no node-rfc / SAP Cloud SDK / oracledb dependency exists),
+ * and initializeSAP()/initializeOracle() above never open a real connection
+ * — they only log. These two functions used to return a fabricated
+ * mockResponses[objectType] (e.g. `MAT-<timestamp>`) as if the sync had
+ * actually succeeded, and callers (syncProductToERP, syncOrderToERP, etc.)
+ * persisted that fake id into erp_reference / erp_synced_at columns,
+ * making a never-attempted sync indistinguishable from a real one.
+ *
+ * Fail closed instead: until a real connector is wired up, every call
+ * throws a typed, caught error so callers — and their `erp_sync_logs`
+ * entries — see an honest 'failed' / ERP_INTEGRATION_NOT_CONFIGURED rather
+ * than a fake success.
  */
 async function syncToSAP(objectType, data) {
-  // In production, use SAP RFC calls or SAP Cloud SDK
-  logger.info(`Syncing ${objectType} to SAP`);
-  
-  // Simulate SAP response
-  const mockResponses = {
-    MATERIAL: { materialId: `MAT-${Date.now()}` },
-    SALES_ORDER: { orderId: `SO-${Date.now()}` },
-    VENDOR: { vendorId: `VEND-${Date.now()}` },
-    FINANCIAL_TRANSACTION: { transactionId: `TXN-${Date.now()}` },
-    ASSET: { assetId: `AST-${Date.now()}` }
-  };
-  
-  return mockResponses[objectType] || { id: `SAP-${Date.now()}` };
+  logger.warn(`syncToSAP(${objectType}) called but no SAP connector (RFC SDK / SAP Cloud SDK) is configured in this deployment; refusing to fabricate a success response`, { objectType });
+  throw new AppError(
+    `SAP integration is not configured: no SAP connector is installed, so "${objectType}" was never sent to SAP`,
+    501,
+    'ERP_INTEGRATION_NOT_CONFIGURED'
+  );
 }
 
 async function syncToOracle(objectType, data) {
-  // In production, use Oracle E-Business Suite API
-  logger.info(`Syncing ${objectType} to Oracle`);
-  
-  // Simulate Oracle response
-  const mockResponses = {
-    ITEM: { itemId: `ITM-${Date.now()}` },
-    ORDER: { orderId: `ORD-${Date.now()}` },
-    SUPPLIER: { supplierId: `SUP-${Date.now()}` },
-    PAYMENT: { paymentId: `PAY-${Date.now()}` },
-    FIXED_ASSET: { assetId: `FAS-${Date.now()}` }
-  };
-  
-  return mockResponses[objectType] || { id: `ORCL-${Date.now()}` };
+  logger.warn(`syncToOracle(${objectType}) called but no Oracle connector (Oracle E-Business Suite API / oracledb) is configured in this deployment; refusing to fabricate a success response`, { objectType });
+  throw new AppError(
+    `Oracle integration is not configured: no Oracle connector is installed, so "${objectType}" was never sent to Oracle`,
+    501,
+    'ERP_INTEGRATION_NOT_CONFIGURED'
+  );
 }
 
 async function syncToCustomERP(objectType, data) {

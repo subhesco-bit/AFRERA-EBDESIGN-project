@@ -1,14 +1,9 @@
-﻿const express = require('express');
+﻿// Express routes for Soil Analysis (M032)
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('agronomist','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('agronomist','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('agronomist','admin'), controller.remove);
+router.post('/samples', controller.createSoilSample);
+router.get('/farmers/:farmerId/parcels/:parcelId/recommendations', controller.getSoilRecommendations);
 
 module.exports = router;
-

@@ -1,1 +1,13 @@
-﻿# M012 - M012 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M012_generated.sql\n
+﻿# M012 - Authentication
+
+Domain: Identity
+Status: ENHANCED
+
+This module provides comprehensive authentication with AI-powered security features:
+- Multi-factor authentication (MFA)
+- Biometric authentication support
+- Session management
+- Token-based authentication
+- AI-powered fraud detection
+- Real-time threat monitoring
+- Device fingerprinting

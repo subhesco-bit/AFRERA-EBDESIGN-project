@@ -1,1 +1,12 @@
-﻿# M030 - M030 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M030_generated.sql\n
+﻿# M030 - Farmer Advisory
+
+Domain: Farmer
+Status: ENHANCED
+
+This module provides comprehensive Farmer Advisory capabilities:
+- AI-powered agricultural recommendations
+- Real-time crop advisory based on weather and soil data
+- Pest and disease alerts
+- Market price intelligence
+- Government scheme recommendations
+- IoT sensor integration for field monitoring

@@ -1,11 +1,103 @@
-﻿// Controller for M071 Module (M071)
-const logger = require('../../utils/logger').logger || console;
+﻿// Controller for Dairy Management (M071) - AI Enhanced
 const service = require('./service');
+const { logger } = require('../../utils/logger');
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+// Dairy herd CRUD
+async function registerDairyHerd(req, res) {
+  try {
+    const herd = await service.registerDairyHerd(req.body);
+    res.status(201).json({ success: true, data: herd });
+  } catch (error) {
+    logger.error('registerDairyHerd error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
-module.exports = { list, get, create, update, remove };
+async function getDairyHerd(req, res) {
+  try {
+    const herd = await service.getDairyHerd(req.params.herdId);
+    if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
+    res.json({ success: true, data: herd });
+  } catch (error) {
+    logger.error('getDairyHerd error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function listDairyHerds(req, res) {
+  try {
+    const { page, limit, farmId, breed, status } = req.query;
+    const result = await service.listDairyHerds({ page, limit, farmId, breed, status });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('listDairyHerds error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function updateDairyHerd(req, res) {
+  try {
+    const herd = await service.updateDairyHerd(req.params.herdId, req.body);
+    if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
+    res.json({ success: true, data: herd });
+  } catch (error) {
+    logger.error('updateDairyHerd error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// AI-powered analysis
+async function analyzeMilkProduction(req, res) {
+  try {
+    const analysis = await service.analyzeMilkProduction(req.params.herdId);
+    res.json({ success: true, data: analysis });
+  } catch (error) {
+    logger.error('analyzeMilkProduction error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Milk quality
+async function recordMilkQuality(req, res) {
+  try {
+    const quality = await service.recordMilkQuality(req.body);
+    res.status(201).json({ success: true, data: quality });
+  } catch (error) {
+    logger.error('recordMilkQuality error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getMilkQualityHistory(req, res) {
+  try {
+    const { herdId, startDate, endDate, limit } = req.query;
+    const history = await service.getMilkQualityHistory(herdId, { startDate, endDate, limit });
+    res.json({ success: true, data: history });
+  } catch (error) {
+    logger.error('getMilkQualityHistory error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Analytics
+async function getDairyAnalytics(req, res) {
+  try {
+    const { startDate, endDate, farmId } = req.query;
+    const analytics = await service.getDairyAnalytics({ startDate, endDate, farmId });
+    res.json({ success: true, data: analytics });
+  } catch (error) {
+    logger.error('getDairyAnalytics error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+module.exports = {
+  registerDairyHerd,
+  getDairyHerd,
+  listDairyHerds,
+  updateDairyHerd,
+  analyzeMilkProduction,
+  recordMilkQuality,
+  getMilkQualityHistory,
+  getDairyAnalytics,
+};

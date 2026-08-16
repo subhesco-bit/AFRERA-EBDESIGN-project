@@ -1,7 +1,7 @@
 ﻿const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
+const { authMiddleware, requireRole } = require('../../middleware/auth');
 
 // Public get/list endpoints, protected writes by default
 router.get('/', controller.list);

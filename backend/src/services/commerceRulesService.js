@@ -21,6 +21,7 @@
 const express = require('express');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
+const pool = require('../database/pool');
 
 const router = express.Router();
 
@@ -239,6 +240,76 @@ function listServiceablePincodes() {
 }
 
 // ---------------------------------------------------------------------------
+// 5. harvestPoints / harvestTier — buyer loyalty economics.
+//
+// Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #4) — a
+// separate tier ladder from loyaltyRedemption above (that one converts
+// ALREADY-HELD points to wallet credit; this one computes how many points a
+// buyer has EARNED from real activity). Original read DataStore.records
+// client-side; counts here come from real orders and procurement_
+// subscriptions (042_rural_procurement_logistics_mobility_schema.sql,
+// confirmed to exist but unwired until now — subscriptions hang off
+// rural_economic_units, joined back to the buyer's user id).
+//
+// Gift orders are always 0: `orders` (000_base_schema.sql) has no
+// is_gift/order_type column and no other table records gift orders, so
+// there is nothing real to query. The 40-pt weight stays wired for when
+// gift ordering is modelled, rather than silently dropped.
+// ---------------------------------------------------------------------------
+
+const HS_TIERS = [
+  ['\u{1F331}', 'Seed', 0],
+  ['\u{1F33F}', 'Sprout', 100],
+  ['\u{1F333}', 'Sapling', 300],
+  ['\u{1F3D4}️', 'Grove', 600],
+  ['\u{1F451}', 'Forest Patron', 1000]
+];
+
+function harvestTier(points) {
+  let t = HS_TIERS[0];
+  for (const x of HS_TIERS) {
+    if (points >= x[2]) t = x;
+  }
+  return t;
+}
+
+async function harvestPoints(userId) {
+  if (!userId) throw new Error('userId is required');
+
+  const { rows: orderRows } = await pool.query(
+    'SELECT COUNT(*)::int AS n FROM orders WHERE user_id = $1',
+    [userId]
+  );
+  const { rows: subRows } = await pool.query(
+    `SELECT COUNT(*)::int AS n
+       FROM procurement_subscriptions ps
+       JOIN rural_economic_units reu ON reu.id = ps.reu_id
+      WHERE reu.user_id = $1 AND ps.status = 'active'`,
+    [userId]
+  );
+
+  const orders = orderRows[0].n;
+  const subs = subRows[0].n;
+  const gifts = 0; // no gift-order concept in this schema yet — see note above
+
+  const totalPoints = orders * 50 + subs * 120 + gifts * 40;
+  const tier = harvestTier(totalPoints);
+  const idx = HS_TIERS.indexOf(tier);
+  const next = HS_TIERS[idx + 1] || null;
+
+  return {
+    userId,
+    totalPoints,
+    currentTier: { emoji: tier[0], name: tier[1], threshold: tier[2] },
+    nextTier: next
+      ? { emoji: next[0], name: next[1], threshold: next[2], pointsNeeded: next[2] - totalPoints }
+      : null,
+    breakdown: { orders: orders * 50, subscriptions: subs * 120, gifts: gifts * 40 },
+    counts: { orders, subscriptions: subs, giftOrders: gifts }
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Routes
 // ---------------------------------------------------------------------------
 
@@ -257,8 +328,18 @@ router.post('/subscription-plan', handle(subscriptionPlan));
 router.post('/price-freeze', authMiddleware, handle(priceFreeze));
 router.post('/loyalty-redemption', authMiddleware, handle(loyaltyRedemption));
 
+router.get('/harvest-points/:userId', authMiddleware, async (req, res) => {
+  try {
+    const data = await harvestPoints(req.params.userId);
+    res.json({ success: true, data });
+  } catch (error) {
+    logger.error('harvestPoints error', { error: error.message, stack: error.stack });
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 function isHealthy() {
-  return { status: 'ok', rules: 4, priceFreezeMinutes: PRICE_FREEZE_MS / 60000 };
+  return { status: 'ok', rules: 5, priceFreezeMinutes: PRICE_FREEZE_MS / 60000 };
 }
 
 module.exports = {
@@ -269,6 +350,9 @@ module.exports = {
   subscriptionPlan,
   deliveryZone,
   listServiceablePincodes,
+  harvestPoints,
+  harvestTier,
+  HS_TIERS,
   PRICE_FREEZE_MS,
   LOYALTY_MIN_REDEEM
 };

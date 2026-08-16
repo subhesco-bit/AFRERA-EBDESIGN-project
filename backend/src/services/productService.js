@@ -6,6 +6,7 @@
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
 const { authMiddleware } = require('../middleware/auth');
+const productMediaAIService = require('./productMediaAIService');
 
 /**
  * Get all products with filtering and pagination
@@ -13,6 +14,11 @@ const { authMiddleware } = require('../middleware/auth');
 async function getProducts(filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
+    
+    // Validate database connection
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
     
     const {
       category_id,
@@ -31,6 +37,11 @@ async function getProducts(filters = {}, pagination = {}) {
       sort_by = 'created_at',
       sort_order = 'DESC'
     } = pagination;
+    
+    // Validate pagination parameters
+    if (page < 1 || limit < 1 || limit > 100) {
+      throw new Error('Invalid pagination parameters');
+    }
     
     const offset = (page - 1) * limit;
     
@@ -134,6 +145,16 @@ async function getProductById(productId) {
   try {
     const pg = getPostgreSQL();
     
+    // Validate database connection
+    if (!pg) {
+      throw new Error('Database connection not available');
+    }
+    
+    // Validate product ID
+    if (!productId) {
+      throw new Error('Product ID is required');
+    }
+    
     const query = `
       SELECT p.*, c.name as category_name, s.name as state_name, u.symbol as unit_symbol,
              (SELECT json_agg(json_build_object('id', id, 'type', certification_type, 'certificate_number', certificate_number, 'expiry_date', expiry_date))
@@ -205,10 +226,21 @@ async function createProduct(productData) {
     ];
     
     const result = await pg.query(query, values);
-    
-    logger.info(`Product created: ${result.rows[0].name} (${result.rows[0].id})`);
-    
-    return result.rows[0];
+    const product = result.rows[0];
+
+    logger.info(`Product created: ${product.name} (${product.id})`);
+
+    // Best-effort AI image generation when the product was created with no
+    // images — never blocks or fails product creation. Its real outcome
+    // (including "not_configured", if no provider key is set) is recorded
+    // honestly on the row by requestProductImageGeneration itself.
+    if (!productData.images || productData.images.length === 0) {
+      productMediaAIService
+        .requestProductImageGeneration(product.id, `${product.name}${productData.description ? ' — ' + productData.description : ''}`)
+        .catch((error) => logger.warn('Product image generation request failed', { productId: product.id, error: error.message }));
+    }
+
+    return product;
   } catch (error) {
     logger.error('Error creating product', { error: error.message, stack: error.stack });
     throw error;
@@ -527,9 +559,44 @@ router.get('/search', async (req, res) => {
     if (!searchTerm) {
       return res.status(400).json({ error: 'Search term required' });
     }
-    
+
     const products = await searchProducts(searchTerm);
     res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Trigger (or retry) AI image generation for a product
+router.post('/:id/generate-image', authMiddleware, async (req, res) => {
+  try {
+    const product = await getProductById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    const result = await productMediaAIService.requestProductImageGeneration(
+      req.params.id,
+      `${product.name}${product.description ? ' — ' + product.description : ''}`
+    );
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Real, computed nutrient-comparison video script (no external AI required)
+router.get('/:id/video-script', async (req, res) => {
+  try {
+    const script = await productMediaAIService.buildNutrientComparisonScript(req.params.id);
+    res.json(script);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Trigger (or retry) AI video rendering from the real script above
+router.post('/:id/generate-video', authMiddleware, async (req, res) => {
+  try {
+    const result = await productMediaAIService.requestProductVideoGeneration(req.params.id);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

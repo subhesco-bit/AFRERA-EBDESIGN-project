@@ -1,4 +1,5 @@
 const winston = require('winston');
+const auditService = require('../services/auditService');
 
 // Compliance logger
 const complianceLogger = winston.createLogger({
@@ -112,11 +113,18 @@ const rightToBeForgotten = async (req, res, next) => {
       timestamp: new Date().toISOString()
     });
 
-    // In production, this would trigger:
+    // Not implemented. Deliberately do NOT report success: no deletion has
+    // happened. A real implementation would need to:
     // 1. Delete user data from primary database
     // 2. Delete user data from backups
     // 3. Delete user data from logs
     // 4. Notify third parties of data deletion
+    return res.status(501).json({
+      implemented: false,
+      error: 'Not Implemented',
+      message: 'Right to be forgotten (GDPR Article 17) deletion is not yet implemented. No data was deleted.',
+      code: 'GDPR_DELETION_NOT_IMPLEMENTED'
+    });
   }
 
   next();
@@ -131,10 +139,17 @@ const dataPortability = (req, res, next) => {
       timestamp: new Date().toISOString()
     });
 
-    // In production, this would:
+    // Not implemented. Deliberately do NOT report success: no export was
+    // produced. A real implementation would need to:
     // 1. Collect all user data
     // 2. Format in standard format (JSON, CSV)
     // 3. Provide download link
+    return res.status(501).json({
+      implemented: false,
+      error: 'Not Implemented',
+      message: 'Data portability (GDPR Article 20) export is not yet implemented. No data was exported.',
+      code: 'GDPR_EXPORT_NOT_IMPLEMENTED'
+    });
   }
 
   next();
@@ -177,21 +192,56 @@ const generateComplianceReport = async (startDate, endDate) => {
       end: endDate
     },
     metrics: {
-      totalRequests: 0,
-      dataAccessRequests: 0,
-      dataDeletionRequests: 0,
-      consentDenials: 0,
-      complianceViolations: 0
+      // totalRequests is computed below from the real audit_logs table.
+      // The other metrics have no underlying data source anywhere in this
+      // codebase today (see notes) and must NOT be reported as 0, which
+      // would misrepresent "never measured" as "measured, zero incidents".
+      totalRequests: null,
+      dataAccessRequests: null,
+      dataDeletionRequests: null,
+      consentDenials: null,
+      complianceViolations: null
     },
     violations: [],
-    recommendations: []
+    recommendations: [],
+    notes: []
   };
 
-  // In production, this would:
-  // 1. Query compliance logs
-  // 2. Calculate metrics
-  // 3. Identify violations
-  // 4. Generate recommendations
+  // totalRequests: real count of audited events in the period, sourced from
+  // the audit_logs table via auditService's shared pool (see auditService.js).
+  try {
+    const params = [];
+    let query = 'SELECT COUNT(*)::int AS count FROM audit_logs WHERE 1=1';
+
+    if (startDate) {
+      params.push(startDate);
+      query += ` AND created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate);
+      query += ` AND created_at <= $${params.length}`;
+    }
+
+    const result = await auditService.pool.query(query, params);
+    report.metrics.totalRequests = result.rows[0] ? result.rows[0].count : 0;
+  } catch (error) {
+    complianceLogger.error('Failed to compute totalRequests from audit_logs', {
+      error: error.message
+    });
+    report.metrics.totalRequests = null;
+    report.notes.push('totalRequests: query against audit_logs failed; not tracked for this report.');
+  }
+
+  // dataAccessRequests, dataDeletionRequests, consentDenials, and
+  // complianceViolations are NOT tracked anywhere: rightToBeForgotten,
+  // dataPortability, and consentManagement only write to complianceLogger
+  // (a file/console log), never to a queryable store, and there is no
+  // compliance-violation detector anywhere in this codebase. Reporting them
+  // as 0 would be a fabricated "no incidents" claim, so they stay null.
+  report.notes.push(
+    'dataAccessRequests, dataDeletionRequests, consentDenials, and complianceViolations are not tracked by any data source yet (not implemented).'
+  );
 
   return report;
 };
@@ -203,7 +253,7 @@ const complianceCheck = (req, res, next) => {
     'X-Compliance-Status': 'compliant',
     'X-Data-Residency': 'India',
     'X-Encryption': 'AES-256',
-    'X-Privacy-Policy': 'https://afrera.com/privacy'
+    'X-Privacy-Policy': '/privacy'
   };
 
   Object.entries(complianceHeaders).forEach(([key, value]) => {

@@ -7,6 +7,9 @@ const { logger } = require('../utils/logger');
 const { withTransaction } = require('../core/withTransaction');
 const { getPostgreSQL } = require('../database/connection');
 const { authMiddleware } = require('../middleware/auth');
+const decisionSupportService = require('./decisionSupportService');
+const { mcda } = require('../core/mcda');
+const outcomeSink = require('../core/outcomeSink');
 
 /**
  * Apply for loan
@@ -453,6 +456,217 @@ async function generateCreditScore(farmerId) {
 }
 
 /**
+ * corpCreditEligible — B2B corporate credit gating.
+ *
+ * Ported from the v42 prototype (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md
+ * #1). The original took turnoverCr/vintageYrs as plain arguments; this is
+ * that gap closed with a real lookup — `buyers` (041_rural_life_os_schema.sql)
+ * records buyer identity but had no turnover or vintage columns, so
+ * migration 061 added `annual_turnover_cr` and `business_established_year`.
+ * The gating thresholds themselves are NOT reimplemented here: they are
+ * called straight from decisionSupportService.corpCreditEligible() so the
+ * two callers (this real-data path, and the existing client-supplied
+ * /api/v1/decision-support/corp-credit-eligible endpoint) can never drift
+ * out of sync on the ₹5Cr/3yr and ₹1Cr/1yr thresholds.
+ */
+async function getBuyerCreditEligibility(buyerId) {
+  try {
+    const pg = getPostgreSQL();
+
+    const { rows } = await pg.query(
+      `SELECT id, name, buyer_type, annual_turnover_cr, business_established_year
+         FROM buyers WHERE id = $1`,
+      [buyerId]
+    );
+
+    if (rows.length === 0) {
+      throw new Error('Buyer not found');
+    }
+
+    const buyer = rows[0];
+    const turnoverCr = buyer.annual_turnover_cr !== null ? Number(buyer.annual_turnover_cr) : 0;
+    const vintageYrs = buyer.business_established_year
+      ? new Date().getFullYear() - buyer.business_established_year
+      : 0;
+
+    const eligibility = decisionSupportService.corpCreditEligible(turnoverCr, vintageYrs);
+
+    return {
+      buyerId: buyer.id,
+      buyerName: buyer.name,
+      buyerType: buyer.buyer_type,
+      turnoverCr,
+      vintageYrs,
+      // A buyer with neither field on record is being scored as a brand-new
+      // net0 account by default (correct fallback), but that is different
+      // from an account genuinely verified as new — flag which one this is.
+      dataComplete: buyer.annual_turnover_cr !== null && buyer.business_established_year !== null,
+      ...eligibility
+    };
+  } catch (error) {
+    logger.error('Error computing buyer credit eligibility', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * farmerCreditRiskScore — farmer-side credit-risk SCORE (0-100), NOT a binary
+ * eligible/not-eligible gate like getBuyerCreditEligibility above.
+ *
+ * Routed through core/mcda.js's weighted-criteria framework rather than a
+ * bespoke weighted sum — matching how allocScore (dynamicPricingService.js)
+ * scores order-to-farmer lot allocation. generateCreditScore() above (the
+ * existing farmer credit score) predates this pattern and is left as-is; this
+ * is a separate, additive score, not a replacement.
+ *
+ * Real signals only, no invented columns:
+ *   - FDI score              farmers.fdi_score / fdi_last_calculated
+ *   - Loan/advance repayment loans + emi_schedule (on-time vs overdue vs defaulted)
+ *   - Payment history        farmer_revenue (real settled transactions, trailing 12mo)
+ *   - Order track record     farmers.fulfilled_orders / farmers.disputes
+ *
+ * The result is logged via core/outcomeSink.recordPrediction() against
+ * prediction_type 'farmer_credit_risk' (resolution rule in migration 063,
+ * resolved by core/outcomeResolver.js against real emi_schedule repayment
+ * behaviour after the fact) — so this score's own accuracy becomes
+ * measurable over time instead of being a number nobody ever checks.
+ */
+async function farmerCreditRiskScore(farmerId, opts = {}) {
+  try {
+    const pg = getPostgreSQL();
+    const actorId = opts.actorId || 'financialService:farmerCreditRiskScore';
+
+    const { rows: farmerRows } = await pg.query(
+      `SELECT fdi_score, fdi_last_calculated, fulfilled_orders, disputes
+         FROM farmers WHERE id = $1`,
+      [farmerId]
+    );
+    if (farmerRows.length === 0) {
+      throw new Error('Farmer not found');
+    }
+    const farmer = farmerRows[0];
+
+    // Loan/advance repayment: EMIs actually due so far, on-time vs overdue,
+    // plus any loan that has genuinely defaulted.
+    const { rows: emiRows } = await pg.query(
+      `SELECT
+          COUNT(*) FILTER (WHERE e.due_date <= CURRENT_DATE)::int AS due_count,
+          COUNT(*) FILTER (
+            WHERE e.due_date <= CURRENT_DATE AND e.status = 'paid'
+              AND e.paid_date IS NOT NULL AND e.paid_date::date <= e.due_date
+          )::int AS on_time_count,
+          COUNT(*) FILTER (WHERE l.status = 'defaulted')::int AS defaulted_loans
+         FROM loans l
+         LEFT JOIN emi_schedule e ON e.loan_id = l.id
+        WHERE l.farmer_id = $1`,
+      [farmerId]
+    );
+    const emi = emiRows[0] || {};
+
+    // Payment history: real settled farmer_revenue transactions, trailing 12mo.
+    const { rows: revRows } = await pg.query(
+      `SELECT
+          COUNT(*)::int AS total_count,
+          COUNT(*) FILTER (WHERE payment_status = 'received')::int AS received_count,
+          COUNT(*) FILTER (WHERE payment_status IN ('disputed', 'written_off'))::int AS bad_count
+         FROM farmer_revenue
+        WHERE farmer_id = $1 AND received_on >= CURRENT_DATE - INTERVAL '12 months'`,
+      [farmerId]
+    );
+    const rev = revRows[0] || {};
+
+    // ---- Criterion: FDI score ----------------------------------------------
+    const fdiScore = farmer.fdi_score !== null && farmer.fdi_score !== undefined ? Number(farmer.fdi_score) : 50;
+    const fdiQuality = farmer.fdi_last_calculated ? 'real' : 'assumed';
+
+    // ---- Criterion: loan/advance repayment ---------------------------------
+    const dueCount = Number(emi.due_count || 0);
+    const defaultedLoans = Number(emi.defaulted_loans || 0);
+    let repayScore;
+    let repayQuality;
+    if (dueCount === 0 && defaultedLoans === 0) {
+      repayScore = 50; // no repayment history yet — neutral, not penalised
+      repayQuality = 'assumed';
+    } else {
+      const onTimePct = dueCount > 0 ? (Number(emi.on_time_count || 0) / dueCount) * 100 : 100;
+      repayScore = Math.max(0, onTimePct - defaultedLoans * 40);
+      repayQuality = 'real';
+    }
+
+    // ---- Criterion: payment history (farmer_revenue) -----------------------
+    const totalRev = Number(rev.total_count || 0);
+    let payScore;
+    let payQuality;
+    if (totalRev === 0) {
+      payScore = 50; // no settled transactions on record yet — neutral
+      payQuality = 'assumed';
+    } else {
+      const receivedPct = (Number(rev.received_count || 0) / totalRev) * 100;
+      const badPenalty = (Number(rev.bad_count || 0) / totalRev) * 100;
+      payScore = Math.max(0, Math.min(100, receivedPct - badPenalty));
+      payQuality = 'real';
+    }
+
+    // ---- Criterion: order fulfilment track record --------------------------
+    const fulfilled = Number(farmer.fulfilled_orders || 0);
+    const disputes = Number(farmer.disputes || 0);
+    let trackScore;
+    let trackQuality;
+    if (fulfilled === 0) {
+      trackScore = 50; // no order history yet — neutral, not penalised
+      trackQuality = 'assumed';
+    } else {
+      const disputeRate = disputes / fulfilled;
+      // Rewards a longer clean track record (capped) and penalises disputes.
+      trackScore = Math.max(0, Math.min(100, 70 - disputeRate * 200 + Math.min(fulfilled, 20) * 1.5));
+      trackQuality = 'real';
+    }
+
+    const criteria = [
+      { name: 'FDI score', weight: 0.30, score: Math.max(0, Math.min(100, fdiScore)), dataQuality: fdiQuality },
+      { name: 'Loan/advance repayment history', weight: 0.30, score: repayScore, dataQuality: repayQuality },
+      { name: 'Payment history (settled transactions)', weight: 0.25, score: payScore, dataQuality: payQuality },
+      { name: 'Order fulfilment track record', weight: 0.15, score: trackScore, dataQuality: trackQuality },
+    ];
+
+    const result = mcda(criteria);
+    const riskBand = result.total >= 70 ? 'low_risk' : result.total >= 45 ? 'medium_risk' : 'high_risk';
+
+    // Log the prediction so its accuracy is measurable later. Never blocks or
+    // fails this response — recordPrediction swallows and logs its own errors.
+    const realCount = criteria.filter((c) => c.dataQuality === 'real').length;
+    const inputQuality = realCount === criteria.length ? 'real' : realCount === 0 ? 'assumed' : 'estimated';
+    const predictionId = await outcomeSink.recordPrediction({
+      actorId,
+      predictionType: 'farmer_credit_risk',
+      subjectType: 'farmer',
+      subjectId: farmerId,
+      predictedValue: result.total,
+      predictedLabel: riskBand,
+      statedConfidence: result.confidence,
+      inputQuality,
+      horizonDays: 180,
+      resolvesOn: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
+    });
+
+    return {
+      farmerId,
+      score: result.total,
+      riskBand,
+      verdict: result.verdict,
+      confidence: result.confidence,
+      confidenceLabel: result.confidenceLabel,
+      mostSensitiveTo: result.mostSensitiveTo,
+      criteria: result.criteria,
+      predictionId,
+    };
+  } catch (error) {
+    logger.error('Error computing farmer credit risk score', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
  * Helper functions
  */
 function generateLoanNumber() {
@@ -552,6 +766,28 @@ router.get('/credit-score/:farmerId', async (req, res) => {
   }
 });
 
+// Corporate (B2B) buyer credit eligibility — NET0/NET30/NET60 gating
+router.get('/buyers/:buyerId/credit-eligibility', authMiddleware, async (req, res) => {
+  try {
+    const eligibility = await getBuyerCreditEligibility(req.params.buyerId);
+    res.json(eligibility);
+  } catch (error) {
+    res.status(error.message === 'Buyer not found' ? 404 : 500).json({ error: error.message });
+  }
+});
+
+// Farmer-side credit-risk SCORE (0-100, MCDA-based) — distinct from
+// /credit-score/:farmerId above, which is the pre-existing bespoke score.
+router.get('/credit-risk-score/:farmerId', authMiddleware, async (req, res) => {
+  try {
+    const actorId = req.user?.id ? `user:${req.user.id}` : undefined;
+    const result = await farmerCreditRiskScore(req.params.farmerId, { actorId });
+    res.json(result);
+  } catch (error) {
+    res.status(error.message === 'Farmer not found' ? 404 : 500).json({ error: error.message });
+  }
+});
+
 module.exports = {
   router,
   applyForLoan,
@@ -562,5 +798,7 @@ module.exports = {
   getEMISchedule,
   payEMI,
   getCreditScore,
-  generateCreditScore
+  generateCreditScore,
+  getBuyerCreditEligibility,
+  farmerCreditRiskScore
 };

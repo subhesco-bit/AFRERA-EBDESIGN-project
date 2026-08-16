@@ -1,6 +1,12 @@
-﻿# M014 - Role Management
+﻿# M014 - Single Sign-On
 
 Domain: Identity
-Status: PARTIAL
+Status: ENHANCED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Single Sign-On (SSO) capabilities:
+- OAuth2/OIDC provider integration
+- SAML support
+- Enterprise identity provider (IdP) integration
+- Token mapping and user provisioning
+- AI-powered SSO pattern analysis
+- Real-time SSO health monitoring

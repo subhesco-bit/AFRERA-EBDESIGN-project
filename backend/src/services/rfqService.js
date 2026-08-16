@@ -10,12 +10,13 @@
 
 const crypto = require('crypto');
 const pool = require('../database/pool');
+const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 
 /** Stable pseudonym per bidder per RFQ. Same bidder, same handle, no identity. */
 function handleFor(rfqId, bidderId) {
   const h = crypto.createHash('sha256').update(`${rfqId}:${bidderId}`).digest('hex');
   return `Bidder-${h.slice(0, 6).toUpperCase()}`;
-}
+  }
 
 async function createRfq(r) {
   const rfqNo = `RFQ-${Date.now().toString(36).toUpperCase()}`;
@@ -154,6 +155,28 @@ async function raiseQcHold(h) {
     [h.lotCode, h.holdReason, h.labReportRef ?? null, h.failedParameter ?? null,
       h.observedValue ?? null, h.permittedLimit ?? null]
   );
+
+  // AFFERENT WIRING: core/effectors.js already has a 'quality.failure_response'
+  // reaction on SIGNAL.QUALITY_FAILED (quarantine the lot, trace downstream
+  // consignees, assess recall) and core/decisionEngine.js already has a
+  // 'quality.failure_with_distribution' rule that escalates a failure on an
+  // already-shipped lot — both have been unreachable because a QC hold, which
+  // IS a failed quality test blocking a lot from dispatch, never called
+  // emitSignal(). Emitted AFTER the insert with the persisted row's own
+  // fields, so the signal reflects a durable hold, not a request in flight.
+  signalBus.emitSignal(
+    SIGNAL.QUALITY_FAILED,
+    {
+      lotId: rows[0].lot_code ?? null,
+      holdReason: rows[0].hold_reason ?? null,
+      failedParameter: rows[0].failed_parameter ?? null,
+      observedValue: rows[0].observed_value ?? null,
+      permittedLimit: rows[0].permitted_limit ?? null,
+      labReportRef: rows[0].lab_report_ref ?? null
+    },
+    { severity: SEVERITY.CRITICAL, source: 'rfqService.raiseQcHold', entityId: rows[0].lot_code ?? null }
+  );
+
   return { ...rows[0], note: 'Lot is blocked from dispatch. Release requires a named QC '
     + 'manager and a signature.' };
 }

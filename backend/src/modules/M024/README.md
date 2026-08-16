@@ -1,1 +1,12 @@
-﻿# M024 - M024 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M024_generated.sql\n
+﻿# M024 - Farmer Groups
+
+Domain: Farmer
+Status: FULLY IMPLEMENTED
+
+This module provides comprehensive Farmer Groups capabilities:
+- Farmer producer groups and cooperatives management
+- Group membership and role management
+- Group meeting scheduling and minutes
+- Financial transaction tracking
+- AI-powered group health analysis
+- Group analytics and insights

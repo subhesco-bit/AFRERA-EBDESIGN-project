@@ -6,6 +6,7 @@
 const { logger } = require('../utils/logger');
 const { aiAPI } = require('./aiService');
 const { authMiddleware } = require('../middleware/auth');
+const { mcda } = require('../core/mcda');
 
 /**
  * Calculate dynamic price based on local market conditions
@@ -631,6 +632,363 @@ async function lotsNeedingAttention({ withinDays = 7 } = {}) {
   };
 }
 
+// ===========================================================================
+// floorBenchmark — peer floor-price aggregate for farmers setting MAP-A.
+//
+// Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #2). The
+// prototype read an in-memory CATALOG array; the real peer data is
+// farmer_listings (991_aeos_folu_ne_policy.sql) — one row per farmer's
+// active listing, each carrying its own floor_price_per_kg — joined to
+// crops for the category/name match. Same >=2-datapoint privacy threshold,
+// same min/max/avg shape as the original.
+//
+// NOTE: a parallel V44 task added MAP-protection (farmer_contract_readiness
+// / contract_offers, 9995_scheme_verification_map_protection.sql) — a
+// buyer-side "offers below your MAP are auto-rejected" feature. This is a
+// different, farmer-side function (peer benchmarking to help SET a floor)
+// and is implemented independently, per instruction.
+// ===========================================================================
+async function floorBenchmark(categoryOrName) {
+  const q = (categoryOrName || '').trim();
+  if (!q) {
+    return { min: null, max: null, avg: null, count: 0, note: 'No category provided' };
+  }
+
+  const { rows } = await ymPool.query(
+    `SELECT fl.floor_price_per_kg
+       FROM farmer_listings fl
+       LEFT JOIN crops c ON c.id = fl.crop_id
+      WHERE fl.status = 'open'
+        AND fl.floor_price_per_kg IS NOT NULL
+        AND (c.category ILIKE '%' || $1 || '%'
+             OR c.common_name ILIKE '%' || $1 || '%'
+             OR fl.title ILIKE '%' || $1 || '%')`,
+    [q]
+  );
+  const vals = rows.map((r) => Number(r.floor_price_per_kg));
+
+  if (vals.length < 2) {
+    return {
+      min: vals.length ? vals[0] : null,
+      max: vals.length ? vals[0] : null,
+      avg: vals.length ? vals[0] : null,
+      count: vals.length,
+      note: 'not enough data - need at least 2 peer farmers'
+    };
+  }
+
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const avg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+
+  return { min, max, avg, count: vals.length, note: 'sufficient data' };
+}
+
+// ===========================================================================
+// allocScore — order-to-farmer lot allocation scoring.
+//
+// Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #5). Original
+// weights preserved exactly (FDI 30% / quality grade 20% / distance 20% /
+// price headroom 15% / freshness 15%), but per instruction this is routed
+// through core/mcda.js's mcda() rather than reimplemented as a bespoke
+// weighted sum. Each criterion below is expressed as a 0-100 score against
+// that same weight FRACTION so contribution = weight*score reproduces the
+// original's pre-scaled point values exactly (e.g. quality grade A: original
+// gradePts=20 at weight 20% <-> score=100 here, since 0.20*100=20).
+//
+// DEVIATION: mcda() rounds each criterion's contribution to 1 decimal and
+// sums those (core/mcda.js:83), where the original rounded only the final
+// integer total. Totals can therefore differ by up to ~0.4 from the
+// original bespoke arithmetic — an acceptable, expected cost of reusing the
+// shared framework instead of a parallel implementation.
+//
+// Real data: pricing_lots (059_yield_management_pricing.sql) for the lot
+// itself (farmer_id, list/floor price), farmers for FDI, crops for
+// perishability (crop_key -> crop_code), freight_lanes
+// (992_v42_recovered_intelligence.sql) for distance. REGION_DIST's implicit
+// 1500km fallback is preserved when no lane record matches.
+// ===========================================================================
+async function allocScore(lotCode, dest) {
+  const { rows: lots } = await ymPool.query(
+    'SELECT * FROM pricing_lots WHERE lot_code = $1', [lotCode]
+  );
+  if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
+  const lot = lots[0];
+
+  const { rows: farmerRows } = await ymPool.query(
+    `SELECT f.fdi_score, f.fdi_grade, a.state AS region
+       FROM farmers f
+       LEFT JOIN addresses a ON a.id = f.farm_location_id
+      WHERE f.id = $1`,
+    [lot.farmer_id]
+  );
+  const farmer = farmerRows[0] || {};
+  const fdiScore = farmer.fdi_score !== null && farmer.fdi_score !== undefined ? Number(farmer.fdi_score) : 50;
+  const fdiGrade = farmer.fdi_grade || 'C';
+
+  const { rows: cropRows } = await ymPool.query(
+    'SELECT is_perishable FROM crops WHERE crop_code = $1', [lot.crop_key]
+  );
+  const perish = cropRows.length ? !!cropRows[0].is_perishable : true;
+
+  const grade = lot.current_quality_score !== null && Number(lot.current_quality_score) >= 80 ? 'A' : 'B';
+
+  let dist = 1500; // matches the original REGION_DIST[..][dest] || 1500 fallback
+  let distQuality = 'assumed';
+  if (farmer.region && dest) {
+    const { rows: laneRows } = await ymPool.query(
+      `SELECT distance_km FROM freight_lanes
+        WHERE (origin ILIKE $1 AND destination ILIKE $2)
+           OR (origin ILIKE $2 AND destination ILIKE $1)
+        LIMIT 1`,
+      [farmer.region, dest]
+    );
+    if (laneRows.length) { dist = Number(laneRows[0].distance_km); distQuality = 'real'; }
+  }
+
+  const adv = Number(lot.list_price_inr_per_kg);
+  const floor = Number(lot.farmer_floor_inr_per_kg);
+  const margin = adv ? (adv - floor) / adv : 0;
+
+  const criteria = [
+    {
+      name: `FDI grade ${fdiGrade}`, weight: 0.30,
+      score: Math.max(0, Math.min(100, fdiScore)),
+      dataQuality: farmer.fdi_score !== null && farmer.fdi_score !== undefined ? 'real' : 'assumed'
+    },
+    {
+      name: `Quality grade ${grade}`, weight: 0.20,
+      score: grade === 'A' ? 100 : 60,
+      dataQuality: lot.current_quality_score !== null ? 'real' : 'assumed'
+    },
+    {
+      name: `${dist} km to destination`, weight: 0.20,
+      score: Math.max(0, Math.min(100, 100 - (dist / 2400) * 100)),
+      dataQuality: distQuality
+    },
+    {
+      name: 'Price headroom above farmer floor', weight: 0.15,
+      score: Math.max(0, Math.min(100, margin * (25 / 0.15))),
+      dataQuality: 'real'
+    },
+    {
+      name: `Freshness: ${perish ? 'perishable' : 'durable'}`, weight: 0.15,
+      score: perish ? 100 : (10 / 0.15),
+      dataQuality: cropRows.length ? 'real' : 'assumed'
+    },
+  ];
+
+  const result = mcda(criteria);
+
+  return {
+    lotCode,
+    dest: dest || null,
+    distanceKm: dist,
+    total: result.total,
+    verdict: result.verdict,
+    confidence: result.confidence,
+    confidenceLabel: result.confidenceLabel,
+    parts: result.criteria,
+    mostSensitiveTo: result.mostSensitiveTo,
+    fdi: { score: fdiScore, grade: fdiGrade },
+  };
+}
+
+// ===========================================================================
+// festivalPricingAdjustment — seasonal/festival demand premium for
+// gift-relevant produce (honey, spices, GI-tagged fruit hampers — see
+// catalogIntelligenceService.js's SEASONALITY notes, e.g. "Persimmon ...
+// gifting/hamper · Oct-Dec").
+//
+// GAP THIS FILLS — REOS_MODULE_CATALOGUE_RECONCILIATION.md §3.1:
+//   "Direct Consumer Commerce (D2C) — subscription baskets, corporate/
+//   festival gifting, AI nutrition recommendation" is rated PARTIAL:
+//   catalogIntelligenceService.js and this file exist, but neither adjusts
+//   a price for a festival. "Festival Marketplace / Corporate Gift
+//   Marketplace" is separately rated GENUINELY NEW, with the explicit
+//   recommendation to fold it into the D2C extension rather than stand up
+//   a parallel module. This function is that extension, placed in the
+//   service that already owns pricing — see the yield-management header
+//   above this one: two pricing services would eventually quote two
+//   different prices for the same lot.
+//
+//   catalogIntelligenceService.js's SEASONALITY is availability (what can be
+//   sold this month); omnichannelAIService.js is channel plumbing (web/
+//   WhatsApp/SMS delivery), not pricing at all. Neither overlaps with a
+//   festival-demand price adjustment, which is why this is a genuine gap
+//   rather than a duplicate of either file.
+//
+// WHAT THIS DOES NOT DO: it never discounts. Festival demand only raises
+// price, layered ON TOP of whatever priceForLot() already quotes today — so
+// an expiring, half-sold lot is not pushed to a festival premium it cannot
+// justify; priceForLot's own markdown still applies underneath.
+//
+// COST-BLIND-FLOOR BUG AVOIDANCE: the known-bad pattern (see this feature's
+// spec) is a function that fetches cost/floor data and then never uses it,
+// substituting a hardcoded fraction of price instead — and chaining
+// functions that disagree on object vs. primitive return shape, producing
+// silent NaN. Neither happens here: the floor below is the REAL
+// farmer_floor_inr_per_kg fetched from pricing_lots (the same column
+// priceForLot() itself enforces), every intermediate value is a named
+// number (never an implicit object-to-number coercion), and the result is
+// asserted against that floor and against non-finite arithmetic before it
+// is ever returned — see "SAFETY CHECK" below.
+// ===========================================================================
+
+const INR_ROUND = (n) => Math.round(n * 100) / 100;
+
+// Static reference data — NOT an AI service, NOT fabricated. Gregorian
+// festivals recur on a fixed month/day and are exact. Lunisolar festivals
+// shift year to year; their dates are populated per-year below and are
+// deliberately left absent for years not populated rather than guessed, so
+// this table degrades to "no uplift" instead of a wrong date. Verify against
+// an official Panchang/government holiday calendar before extending `years`.
+const FESTIVAL_CALENDAR = [
+  { name: 'Makar Sankranti / Pongal', dateBasis: 'fixed', month: 1, day: 14,
+    categories: ['spice', 'horticulture'], keywords: ['honey', 'turmeric', 'rice'],
+    upliftPct: 12, windowDays: 5 },
+  { name: 'Holi', dateBasis: 'lunisolar_estimated', years: { 2026: { month: 3, day: 4 } },
+    categories: ['spice'], keywords: [], upliftPct: 8, windowDays: 4 },
+  { name: 'Raksha Bandhan', dateBasis: 'lunisolar_estimated', years: { 2026: { month: 8, day: 28 } },
+    categories: ['horticulture'], keywords: ['honey', 'gift', 'hamper'], upliftPct: 15, windowDays: 6 },
+  { name: 'Independence Day gifting', dateBasis: 'fixed', month: 8, day: 15,
+    categories: [], keywords: ['honey', 'hamper'], upliftPct: 6, windowDays: 3 },
+  { name: 'Durga Puja / Navratri', dateBasis: 'lunisolar_estimated', years: { 2026: { month: 10, day: 20 } },
+    categories: ['horticulture', 'spice'], keywords: ['honey'], upliftPct: 18, windowDays: 9 },
+  { name: 'Diwali', dateBasis: 'lunisolar_estimated', years: { 2026: { month: 11, day: 8 } },
+    categories: ['horticulture', 'spice'], keywords: ['honey', 'hamper', 'gift', 'dry fruit'],
+    upliftPct: 25, windowDays: 10 },
+  { name: 'Christmas / New Year hampers', dateBasis: 'fixed', month: 12, day: 25,
+    categories: ['horticulture'], keywords: ['hamper', 'gift', 'honey'], upliftPct: 15, windowDays: 10 },
+];
+
+/** Resolve a festival's calendar date for a given year, or null if unknown. */
+function resolveFestivalDate(fest, year) {
+  if (fest.dateBasis === 'fixed') return new Date(Date.UTC(year, fest.month - 1, fest.day));
+  const y = fest.years && fest.years[year];
+  if (!y) return null; // no reference date on file for this year — do not guess
+  return new Date(Date.UTC(year, y.month - 1, y.day));
+}
+
+/** Whether a lot's crop category/name is the kind of thing bought as a festival gift. */
+function categoryMatchesFestival(fest, { category, commonName }) {
+  const cat = (category || '').toLowerCase();
+  const name = (commonName || '').toLowerCase();
+  if (fest.categories.some((c) => cat.includes(c))) return true;
+  if (fest.keywords.some((k) => name.includes(k))) return true;
+  return false;
+}
+
+/**
+ * Festival-demand price adjustment for one lot, as of a given date (default
+ * today). Layers a bounded, decaying uplift on top of priceForLot()'s
+ * yield-managed price; never produces a price below the farmer's real floor.
+ */
+async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
+  const when = asOfDate ? new Date(asOfDate) : new Date();
+  if (Number.isNaN(when.getTime())) throw new Error(`Invalid asOfDate "${asOfDate}"`);
+
+  // Start from the yield-management price, which already applies markdown
+  // rules and the farmer-floor guard. Festival pricing is a premium layered
+  // on top of that, not a competing calculation reading the lot fresh.
+  const base = await priceForLot(lotCode);
+
+  const { rows: lots } = await ymPool.query(
+    'SELECT crop_key, farmer_floor_inr_per_kg FROM pricing_lots WHERE lot_code = $1', [lotCode]
+  );
+  if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
+  const floor = Number(lots[0].farmer_floor_inr_per_kg);
+
+  let category = null;
+  let commonName = null;
+  if (lots[0].crop_key) {
+    const { rows: cropRows } = await ymPool.query(
+      'SELECT category, common_name FROM crops WHERE crop_code = $1', [lots[0].crop_key]
+    );
+    if (cropRows.length) {
+      category = cropRows[0].category;
+      commonName = cropRows[0].common_name;
+    }
+  }
+
+  const year = when.getUTCFullYear();
+  const matches = [];
+  for (const fest of FESTIVAL_CALENDAR) {
+    const festDate = resolveFestivalDate(fest, year);
+    if (!festDate) continue;
+    const daysDiff = Math.round((when.getTime() - festDate.getTime()) / 86400000);
+    if (Math.abs(daysDiff) > fest.windowDays) continue;
+    if (!categoryMatchesFestival(fest, { category, commonName })) continue;
+
+    // 1.0 on the festival day itself, tapering toward 0 at the edge of the
+    // demand window — a plain, explainable curve rather than a hidden model.
+    const decay = 1 - Math.abs(daysDiff) / (fest.windowDays + 1);
+    matches.push({
+      name: fest.name,
+      dateBasis: fest.dateBasis,
+      festivalDate: festDate.toISOString().slice(0, 10),
+      daysFromFestival: daysDiff,
+      fullUpliftPct: fest.upliftPct,
+      effectiveUpliftPct: Math.round(fest.upliftPct * decay * 100) / 100,
+    });
+  }
+
+  // Overlapping festival windows do not stack multiplicatively — that would
+  // not be an explainable number to show a buyer or a farmer. Take the
+  // single strongest applicable uplift.
+  const strongest = matches.sort((a, b) => b.effectiveUpliftPct - a.effectiveUpliftPct)[0] || null;
+  const upliftPct = strongest ? strongest.effectiveUpliftPct : 0;
+
+  const preFestivalPrice = Number(base.priceInrPerKg);
+  const rawFestivalPrice = preFestivalPrice * (1 + upliftPct / 100);
+
+  // --- SAFETY CHECK --------------------------------------------------------
+  // The bug class this guards against: a downstream calculation trusting
+  // upstream arithmetic or return shape without checking it, producing a
+  // silent NaN or an unprofitable price. Both are checked explicitly here,
+  // against the REAL floor fetched two lines above — not a hardcoded
+  // fraction of price.
+  if (!Number.isFinite(rawFestivalPrice)) {
+    throw new Error(
+      `Festival pricing for lot ${lotCode} produced a non-finite price `
+      + `(base=${preFestivalPrice}, upliftPct=${upliftPct}). Refusing to quote it.`
+    );
+  }
+  let festivalPrice = INR_ROUND(rawFestivalPrice);
+  let floorEnforced = false;
+  if (festivalPrice < floor) {
+    // Should be geometrically impossible — upliftPct is always >= 0 and
+    // preFestivalPrice already respects the floor via priceForLot() — but
+    // asserted rather than trusted: no sub-cost price leaves this function
+    // silently, matching the correctness bar for every price-computing
+    // function in this service.
+    logger.error('Festival pricing computed below farmer floor — clamping', {
+      lotCode, computed: festivalPrice, floor
+    });
+    festivalPrice = floor;
+    floorEnforced = true;
+  }
+
+  return {
+    lotCode,
+    asOf: when.toISOString().slice(0, 10),
+    preFestivalPriceInrPerKg: preFestivalPrice,
+    farmerFloorInrPerKg: floor,
+    applicableFestival: strongest ? strongest.name : null,
+    upliftPct,
+    priceInrPerKg: festivalPrice,
+    floorEnforced,
+    consideredFestivals: matches,
+    note: strongest
+      ? `${strongest.name} demand window (${strongest.daysFromFestival >= 0 ? '+' : ''}`
+        + `${strongest.daysFromFestival}d from festival date) applied a ${upliftPct}% uplift `
+        + 'over the yield-managed price.'
+        + (base.floorApplied ? ' The underlying yield-managed price was already floor-capped; '
+          + 'the uplift is computed on that floor price, not list price.' : '')
+      : 'No festival demand window applies to this product/category right now.',
+  };
+}
+
 function setupRoutes(app) {
   app.post('/api/v1/pricing/local-market', authMiddleware, async (req, res) => {
     try {
@@ -677,6 +1035,37 @@ function setupRoutes(app) {
       res.status(500).json({ success: false, error: error.message });
     }
   });
+
+  // Peer floor-price benchmark — real farmer_listings data (see floorBenchmark above)
+  app.get('/api/v1/pricing/floor-benchmark', async (req, res) => {
+    try {
+      const result = await floorBenchmark(req.query.category || req.query.q);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Order-to-farmer lot allocation score — real pricing_lots/mcda() data (see allocScore above)
+  app.get('/api/v1/pricing/lots/:lotCode/alloc-score', authMiddleware, async (req, res) => {
+    try {
+      const result = await allocScore(req.params.lotCode, req.query.dest);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(error.message.includes('not found') ? 404 : 500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Festival-demand price adjustment for a lot — see festivalPricingAdjustment above.
+  // ?asOf=YYYY-MM-DD to price as of a specific date; defaults to today.
+  app.get('/api/v1/pricing/lots/:lotCode/festival-price', async (req, res) => {
+    try {
+      const result = await festivalPricingAdjustment(req.params.lotCode, { asOfDate: req.query.asOf });
+      res.json({ success: true, data: result });
+    } catch (error) {
+      res.status(error.message.includes('not found') ? 404 : 500).json({ success: false, error: error.message });
+    }
+  });
 }
 
 module.exports = {
@@ -687,6 +1076,9 @@ module.exports = {
   bookingCurve,
   recordBookingPoint,
   lotsNeedingAttention,
+  floorBenchmark,
+  allocScore,
+  festivalPricingAdjustment,
   calculateNutrientBasedPricing,
   optimizeFarmerSelection,
   getPriceAlerts,

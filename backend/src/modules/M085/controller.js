@@ -1,11 +1,91 @@
-﻿// Controller for M085 Module (M085)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Comparative Analytics (M085)
+ * Handles HTTP requests for comparative analytics operations
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const comparisonService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const createComparisonGroup = async (req, res) => {
+  try {
+    const group = await comparisonService.createComparisonGroup(req.body);
+    res.status(201).json({ success: true, data: group });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const createComparisonConfig = async (req, res) => {
+  try {
+    const config = await comparisonService.createComparisonConfig(req.body);
+    res.status(201).json({ success: true, data: config });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const runComparison = async (req, res) => {
+  try {
+    const { config_id, comparison_date, period_start, period_end } = req.body;
+    const result = await comparisonService.runComparison(config_id, comparison_date, period_start, period_end);
+    res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const addBenchmark = async (req, res) => {
+  try {
+    const benchmark = await comparisonService.addBenchmark(req.body);
+    res.status(201).json({ success: true, data: benchmark });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getBenchmarks = async (req, res) => {
+  try {
+    const benchmarks = await comparisonService.getBenchmarks(req.params.id);
+    res.status(200).json({ success: true, data: benchmarks });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const createComparisonAlert = async (req, res) => {
+  try {
+    const alert = await comparisonService.createComparisonAlert(req.body);
+    res.status(201).json({ success: true, data: alert });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getComparisonAlerts = async (req, res) => {
+  try {
+    const alerts = await comparisonService.getComparisonAlerts(req.params.id, req.query);
+    res.status(200).json({ success: true, data: alerts });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const createSnapshot = async (req, res) => {
+  try {
+    const { config_id, snapshot_name, comparison_date, created_by } = req.body;
+    const snapshot = await comparisonService.createSnapshot(config_id, snapshot_name, comparison_date, created_by);
+    res.status(201).json({ success: true, data: snapshot });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  createComparisonGroup,
+  createComparisonConfig,
+  runComparison,
+  addBenchmark,
+  getBenchmarks,
+  createComparisonAlert,
+  getComparisonAlerts,
+  createSnapshot
+};

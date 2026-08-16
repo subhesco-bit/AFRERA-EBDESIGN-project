@@ -1,14 +1,10 @@
-﻿const express = require('express');
+﻿// Express routes for Farmer Subsidies (M025)
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('farmer','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('farmer','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('farmer','admin'), controller.remove);
+router.post('/schemes', controller.createSubsidyScheme);
+router.post('/schemes/:schemeId/apply', controller.applyForSubsidy);
+router.get('/farmers/:farmerId/recommendations', controller.getRecommendedSubsidies);
 
 module.exports = router;
-

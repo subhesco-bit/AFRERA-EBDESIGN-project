@@ -6,6 +6,7 @@
 const { logger } = require('../utils/logger');
 const { aiAPI } = require('./aiService');
 const { authMiddleware } = require('../middleware/auth');
+const { getPostgreSQL } = require('../database/connection');
 
 /**
  * Submit soil sample for testing
@@ -499,6 +500,65 @@ async function getOrganicAmendments(state, cropType) {
   return [];
 }
 
+/**
+ * compostPlan wrapper — circular-economy organic-input planning, real data.
+ *
+ * Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #6). The
+ * prototype scaled a hardcoded COMPOST_RATES object (Vermicompost/Farmyard
+ * Manure/Neem Cake/Bone Meal/Rock Phosphate) by acreage and a soil-condition
+ * multiplier. Real per-acre base rates are organic_input_rates
+ * (992_v42_recovered_intelligence.sql) — decisionSupportService.compostPlan()
+ * hardcodes its COMPOST_RATES internally with no way to inject real rates,
+ * and per instruction decisionSupportService.js is not touched, so the rate
+ * lookup happens here directly rather than through that function. What is
+ * NOT allowed to drift — the soil-condition multiplier logic — is
+ * reproduced verbatim from the original/decisionSupportService copy: same
+ * three conditions, same 1.15 / 1.0 / 0.85 multipliers, same
+ * round-to-2-decimals arithmetic. Only the source of the base per-acre
+ * quantities changes (real organic_input_rates rows instead of the mock
+ * COMPOST_RATES list), which is why the returned item set differs from the
+ * original five (Vermicompost/Neem cake/Jeevamrut/Biopesticide, per the
+ * actual seeded rows) — same shape, same math, real inventory.
+ */
+async function getOrganicInputPlan(crop, acres, soilCond) {
+  const SOIL_ADJUST = {
+    'Looks tired / low yield': { mult: 1.15, note: 'Slightly higher organic matter dressing' },
+    'Normal / average': { mult: 1.0, note: 'Standard base dressing' },
+    'Recently fallow / rested': { mult: 0.85, note: 'Lower dressing — residual fertility likely still present' }
+  };
+
+  const acreage = Number(acres) || 0;
+  const soilAdjustment = SOIL_ADJUST[soilCond] || SOIL_ADJUST['Normal / average'];
+  const mult = soilAdjustment.mult;
+
+  try {
+    const pg = getPostgreSQL();
+    const { rows } = await pg.query(
+      'SELECT input_name, quantity, unit, agronomic_role, basis FROM organic_input_rates ORDER BY input_name'
+    );
+
+    const plan = rows.map((r) => ({
+      name: r.input_name,
+      qty: Math.round(Number(r.quantity) * acreage * mult * 100) / 100,
+      unit: r.unit,
+      role: r.agronomic_role,
+      basis: r.basis
+    }));
+
+    return {
+      crop: crop || null,
+      acres: acreage,
+      soilCond: soilCond || 'Normal / average',
+      soilAdjustmentNote: soilAdjustment.note,
+      multiplier: mult,
+      plan
+    };
+  } catch (error) {
+    logger.error('Error building organic input plan', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
 async function getBiofertilizers(cropType) {
   // Get biofertilizers
   return [];
@@ -599,6 +659,17 @@ function setupRoutes(app) {
       res.status(500).json({ success: false, error: error.message });
     }
   });
+
+  // Circular-economy organic-input plan — real organic_input_rates data (see getOrganicInputPlan above)
+  app.get('/api/v1/soil-testing/organic-input-plan', async (req, res) => {
+    try {
+      const { crop, acres, soil_condition: soilCondition } = req.query;
+      const plan = await getOrganicInputPlan(crop, acres, soilCondition);
+      res.json({ success: true, data: plan });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 }
 
 module.exports = {
@@ -608,5 +679,6 @@ module.exports = {
   trackSoilSample,
   getSoilHealthCard,
   getIntegratedNutrientManagementPlan,
+  getOrganicInputPlan,
   setupRoutes
 };

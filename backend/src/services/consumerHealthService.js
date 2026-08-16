@@ -7,6 +7,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
+const { NUTRITION_WELLNESS_DISCLAIMER } = require('../utils/disclaimers');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -722,6 +723,150 @@ router.get('/bmi', authMiddleware, async (req, res) => {
 });
 
 // ============================================================================
+// BMR / TDEE ESTIMATION (Mifflin-St Jeor)
+// ============================================================================
+//
+// Pure energy-expenditure estimate. This is the standard, published
+// Mifflin-St Jeor equation (Mifflin MD et al., "A new predictive equation
+// for resting energy expenditure in healthy individuals", Am J Clin Nutr,
+// 1990) — a population-level formula, not a personalized medical
+// calculation. It is scoped strictly to that: an estimate of resting/total
+// energy expenditure, never a health claim beyond that scope.
+
+const ACTIVITY_MULTIPLIERS = {
+  sedentary: 1.2,
+  light: 1.375,
+  moderate: 1.55,
+  active: 1.725,
+  very_active: 1.9
+};
+
+/**
+ * Compute age in whole years from a date of birth.
+ */
+function calculateAgeYears(dateOfBirth) {
+  if (!dateOfBirth) return null;
+  const dob = new Date(dateOfBirth);
+  if (isNaN(dob.getTime())) return null;
+
+  const now = new Date();
+  let age = now.getFullYear() - dob.getFullYear();
+  const monthDiff = now.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) {
+    age -= 1;
+  }
+  return age;
+}
+
+/**
+ * Pure Mifflin-St Jeor BMR/TDEE calculation. No DB access, no side effects.
+ *
+ * @param {Object} params
+ * @param {number} params.ageYears
+ * @param {string} params.sex - 'male' | 'female' | anything else (see note below)
+ * @param {number} params.weightKg
+ * @param {number} params.heightCm
+ * @param {string} [params.activityLevel] - one of ACTIVITY_MULTIPLIERS keys
+ */
+function calculateMifflinStJeorBMRTDEE({ ageYears, sex, weightKg, heightCm, activityLevel }) {
+  const age = Number(ageYears);
+  const weight = Number(weightKg);
+  const height = Number(heightCm);
+
+  if (!age || age <= 0 || !weight || weight <= 0 || !height || height <= 0) {
+    throw new Error('age, weight_kg, and height_cm are required and must be positive numbers to estimate BMR/TDEE');
+  }
+
+  const normalizedSex = String(sex || '').toLowerCase();
+  const base = (10 * weight) + (6.25 * height) - (5 * age);
+
+  let bmr;
+  let sexTermUsed;
+  if (normalizedSex === 'male' || normalizedSex === 'm') {
+    bmr = base + 5;
+    sexTermUsed = 'male';
+  } else if (normalizedSex === 'female' || normalizedSex === 'f') {
+    bmr = base - 161;
+    sexTermUsed = 'female';
+  } else {
+    // The Mifflin-St Jeor equation only publishes male/female sex terms
+    // (+5 / -161). There is no validated third term, so when sex is
+    // unspecified or non-binary we average the two published constants as a
+    // documented approximation — this is explicitly NOT a clinically
+    // validated value, and is labelled as such in the response.
+    bmr = base + ((5 + -161) / 2);
+    sexTermUsed = 'unspecified_averaged';
+  }
+
+  const normalizedActivity = String(activityLevel || 'sedentary').toLowerCase();
+  const knownActivity = Object.prototype.hasOwnProperty.call(ACTIVITY_MULTIPLIERS, normalizedActivity);
+  const multiplier = knownActivity ? ACTIVITY_MULTIPLIERS[normalizedActivity] : ACTIVITY_MULTIPLIERS.sedentary;
+  const tdee = bmr * multiplier;
+
+  return {
+    bmr_kcal_per_day: Math.round(bmr),
+    tdee_kcal_per_day: Math.round(tdee),
+    activity_level: knownActivity ? normalizedActivity : 'sedentary',
+    activity_multiplier: multiplier,
+    sex_term_used: sexTermUsed,
+    formula: 'Mifflin-St Jeor (1990)',
+    estimate_only: true
+  };
+}
+
+/**
+ * BMR/TDEE for a user: explicit body overrides win, otherwise falls back to
+ * their stored health profile (age derived from date_of_birth, sex from
+ * gender, activity_level as stored). Throws if required inputs are missing
+ * from both sources — never fabricates a value.
+ */
+async function calculateBMRTDEE(userId, overrides = {}) {
+  let profile = null;
+  try {
+    profile = await getHealthProfile(userId);
+  } catch (e) {
+    profile = null;
+  }
+
+  const weightKg = overrides.weight_kg != null ? overrides.weight_kg : (profile && profile.weight_kg);
+  const heightCm = overrides.height_cm != null ? overrides.height_cm : (profile && profile.height_cm);
+  const sex = overrides.sex != null ? overrides.sex : (profile && profile.gender);
+  const activityLevel = overrides.activity_level != null ? overrides.activity_level : (profile && profile.activity_level);
+  const ageYears = overrides.age != null ? overrides.age : calculateAgeYears(profile && profile.date_of_birth);
+
+  const calc = calculateMifflinStJeorBMRTDEE({ ageYears, sex, weightKg, heightCm, activityLevel });
+
+  return {
+    ...calc,
+    inputs: {
+      age: ageYears != null ? Number(ageYears) : null,
+      sex: sex || null,
+      weight_kg: weightKg != null ? Number(weightKg) : null,
+      height_cm: heightCm != null ? Number(heightCm) : null
+    },
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+  };
+}
+
+/**
+ * API endpoint to calculate BMR/TDEE. Accepts optional body overrides
+ * ({ age, sex, weight_kg, height_cm, activity_level }); anything omitted
+ * falls back to the caller's stored health profile.
+ */
+router.post('/bmr-tdee', authMiddleware, async (req, res) => {
+  try {
+    const result = await calculateBMRTDEE(req.user.id, req.body || {});
+    res.json(result);
+  } catch (error) {
+    logger.error('Calculate BMR/TDEE API error', { error: error.message, stack: error.stack });
+    res.status(400).json({
+      error: error.message || 'Failed to calculate BMR/TDEE',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    });
+  }
+});
+
+// ============================================================================
 // HEALTH CHECK
 // ============================================================================
 
@@ -745,5 +890,8 @@ module.exports = {
   logFoodConsumption,
   getHealthAnalytics,
   calculateBMI,
+  calculateAgeYears,
+  calculateMifflinStJeorBMRTDEE,
+  calculateBMRTDEE,
   isHealthy
 };

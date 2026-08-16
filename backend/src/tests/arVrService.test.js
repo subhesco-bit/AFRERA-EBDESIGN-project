@@ -43,8 +43,8 @@ describe('AR/VR Experience Service', () => {
           description: 'Interactive 3D product visualization',
           target_entity_id: 'product-001',
           target_entity_type: 'product',
-          thumbnail_url: 'https://example.com/thumbnail.jpg',
-          experience_data: { model_url: 'https://example.com/model.glb' },
+          thumbnail_url: '/assets/models/thumbnail.jpg',
+          experience_data: { model_url: '/assets/models/test-model.glb' },
           platform_requirements: { mobile: true, webgl: true }
         })
         .expect(201);
@@ -103,9 +103,9 @@ describe('AR/VR Experience Service', () => {
           asset_name: 'Product Model',
           asset_type: 'model',
           asset_format: 'glb',
-          file_url: 'https://example.com/model.glb',
+          file_url: '/assets/models/test-model.glb',
           file_size_bytes: 5242880,
-          thumbnail_url: 'https://example.com/thumb.jpg',
+          thumbnail_url: '/assets/models/thumbnail.jpg',
           metadata: { vertices: 10000, faces: 20000 }
         })
         .expect(201);

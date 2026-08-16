@@ -1,11 +1,65 @@
-﻿// Controller for M055 Module (M055)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Pricing Management (M055)
+ * Handles HTTP requests for pricing operations
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const pricingService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const create = async (req, res) => {
+  try {
+    const rule = await pricingService.createPricingRule(req.body);
+    res.status(201).json({ success: true, data: rule });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const list = async (req, res) => {
+  try {
+    const rules = await pricingService.listPricingRules(req.query);
+    res.status(200).json({ success: true, data: rules });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const get = async (req, res) => {
+  try {
+    const price = await pricingService.calculateDynamicPrice(req.params.id, req.body);
+    res.status(200).json({ success: true, data: price });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const update = async (req, res) => {
+  try {
+    const rule = await pricingService.updatePricingRule(req.params.id, req.body);
+    if (!rule) {
+      return res.status(404).json({ success: false, error: 'Pricing rule not found' });
+    }
+    res.status(200).json({ success: true, data: rule });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const remove = async (req, res) => {
+  try {
+    const deleted = await pricingService.deletePricingRule(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Pricing rule not found' });
+    }
+    res.status(200).json({ success: true, message: 'Pricing rule deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  create,
+  list,
+  get,
+  update,
+  remove
+};

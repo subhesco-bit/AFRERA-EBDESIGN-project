@@ -66,5 +66,58 @@ async function remove(req, res) {
   }
 }
 
-module.exports = { list, get, create, update, remove };
+// AI-powered analytics endpoints
+async function getUserAnalytics(req, res) {
+  try {
+    const analytics = await service.getUserAnalytics(req.params.userId);
+    res.json({ success: true, data: analytics });
+  } catch (error) {
+    logger.error('getUserAnalytics error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getUserActivity(req, res) {
+  try {
+    const { limit } = req.query;
+    const activity = await service.getUserActivity(req.params.userId, { limit });
+    res.json({ success: true, data: activity });
+  } catch (error) {
+    logger.error('getUserActivity error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getUserEngagementScore(req, res) {
+  try {
+    const score = await service.getUserEngagementScore(req.params.userId);
+    res.json({ success: true, data: score });
+  } catch (error) {
+    logger.error('getUserEngagementScore error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getUserBehaviorProfile(req, res) {
+  try {
+    const profile = await service.getUserBehaviorProfile(req.params.userId);
+    res.json({ success: true, data: profile });
+  } catch (error) {
+    logger.error('getUserBehaviorProfile error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function bulkCreateUsers(req, res) {
+  try {
+    const { users } = req.body;
+    const result = await service.bulkCreateUsers(users);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('bulkCreateUsers error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+module.exports = { list, get, create, update, remove, getUserAnalytics, getUserActivity, getUserEngagementScore, getUserBehaviorProfile, bulkCreateUsers };
 

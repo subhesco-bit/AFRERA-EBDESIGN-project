@@ -17,6 +17,22 @@ const migrationsDir = path.join(__dirname, 'migrations');
 async function runMigrations() {
   try {
     logger.info('Starting database migrations...');
+    logger.info(`Database URL: ${process.env.DATABASE_URL ? 'configured' : 'NOT CONFIGURED'}`);
+
+    // Test database connection first
+    try {
+      await pool.query('SELECT NOW()');
+      logger.info('Database connection successful');
+    } catch (connError) {
+      logger.error('Database connection failed', { error: connError.message });
+      logger.error('Please ensure:');
+      logger.error('1. PostgreSQL is running');
+      logger.error('2. DATABASE_URL is set in .env file');
+      logger.error('3. Database exists and is accessible');
+      logger.error('');
+      logger.error('To set up database, run: node scripts/setup_database.ps1');
+      throw new Error('Database connection failed. Please check your DATABASE_URL configuration.');
+    }
 
     // Create migrations table if not exists
     await pool.query(`
@@ -55,32 +71,56 @@ async function runMigrations() {
       const migrationPath = path.join(migrationsDir, file);
       const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
+      // Helper function to run migration with recording in single transaction
+      async function runMigrationWithRecording(sql) {
+        const client = await pool.connect();
+        try {
+          await client.query('BEGIN');
+          await client.query(sql);
+          await client.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [file]);
+          await client.query('COMMIT');
+        } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+        } finally {
+          client.release();
+        }
+      }
+
       // Attempt to run the migration; on failure try an automated repair then archive
+      let migrationSuccess = false;
+      let firstError = null;
+
       try {
-        await pool.query(migrationSQL);
-        await pool.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [file]);
+        await runMigrationWithRecording(migrationSQL);
         logger.info(`Migration completed: ${file}`);
-        continue;
+        migrationSuccess = true;
       } catch (error) {
+        firstError = error;
         logger.warn(`Migration ${file} failed on first attempt: ${error.message}`);
       }
 
-      // Try automated repair heuristics
-      const repairedSQL = tryAutoRepair(migrationSQL);
-      if (repairedSQL && repairedSQL !== migrationSQL) {
-        logger.info(`Attempting automated repair for ${file}`);
-        try {
-          await pool.query(repairedSQL);
-          await pool.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [file]);
-          logger.info(`Migration completed after automated repair: ${file}`);
-          // Save repaired version for audit
-          fs.writeFileSync(path.join(repairsDir, `repaired_${file}`), repairedSQL, 'utf8');
-          continue;
-        } catch (err2) {
-          logger.warn(`Automated repair also failed for ${file}: ${err2.message}`);
+      if (!migrationSuccess) {
+        // Try automated repair heuristics
+        const repairedSQL = tryAutoRepair(migrationSQL);
+        if (repairedSQL && repairedSQL !== migrationSQL) {
+          logger.info(`Attempting automated repair for ${file}`);
+          try {
+            await runMigrationWithRecording(repairedSQL);
+            logger.info(`Migration completed after automated repair: ${file}`);
+            // Save repaired version for audit
+            fs.writeFileSync(path.join(repairsDir, `repaired_${file}`), repairedSQL, 'utf8');
+            migrationSuccess = true;
+          } catch (err2) {
+            logger.warn(`Automated repair also failed for ${file}: ${err2.message}`);
+          }
+        } else {
+          logger.info(`No automated repair available for ${file}`);
         }
-      } else {
-        logger.info(`No automated repair available for ${file}`);
+      }
+
+      if (migrationSuccess) {
+        continue;
       }
 
       // Archive the failing migration and create a repair template for manual rewrite
@@ -102,7 +142,11 @@ async function runMigrations() {
     logger.error('Migration error', { error: error.message, stack: error.stack });
     process.exit(1);
   } finally {
-    await pool.end();
+    try {
+      await pool.end();
+    } catch (poolError) {
+      logger.error('Error closing database pool', { error: poolError.message });
+    }
   }
 }
 
@@ -115,18 +159,18 @@ function tryAutoRepair(sql) {
   let modified = sql;
 
   // Add IF NOT EXISTS to CREATE TABLE if missing
-  modified = modified.replace(/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?([\w\.\"]+)/gi, (m, ifExists, name) => {
+  modified = modified.replace(/CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?([\w.]+)/gi, (m, ifExists) => {
     if (ifExists) return m; // already has IF NOT EXISTS
     return m.replace(/CREATE\s+TABLE\s+/i, 'CREATE TABLE IF NOT EXISTS ');
   });
 
   // Add IF NOT EXISTS to ALTER TABLE ... ADD COLUMN
-  modified = modified.replace(/ALTER\s+TABLE\s+([\w\.\"]+)\s+ADD\s+COLUMN\s+/gi, (m) => {
+  modified = modified.replace(/ALTER\s+TABLE\s+([\w.]+)\s+ADD\s+COLUMN\s+/gi, (m) => {
     return m.replace(/ADD\s+COLUMN\s+/i, 'ADD COLUMN IF NOT EXISTS ');
   });
 
   // Ensure INSERT ... ON CONFLICT DO NOTHING for idempotent seeds
-  modified = modified.replace(/INSERT\s+INTO\s+([\w\.\"\_]+)\s+\(([^)]+)\)\s+VALUES\s*\(([^;]+)\);/gi, (m, table, cols, vals) => {
+  modified = modified.replace(/INSERT\s+INTO\s+([\w._]+)\s+\(([^)]+)\)\s+VALUES\s*\(([^;]+)\);/gi, (m) => {
     if (/ON\s+CONFLICT/i.test(m)) return m; // already has conflict handling
     return m.replace(/;?\s*$/,' ON CONFLICT DO NOTHING;');
   });
@@ -145,16 +189,21 @@ async function rollbackMigration(filename) {
 
     logger.info(`Rollback completed: ${filename}`);
   } catch (error) {
+    // eslint-disable-next-line no-process-exit
     logger.error('Rollback error', { error: error.message, stack: error.stack });
-    await pool.end();
     process.exit(1);
   } finally {
-    await pool.end();
+    try {
+      await pool.end();
+    } catch (poolError) {
+      logger.error('Error closing database pool', { error: poolError.message });
+    }
   }
 }
 
 async function showMigrationStatus() {
   try {
+    // Synchronous readdir is acceptable for CLI tool one-time execution
     const migrationFiles = fs.readdirSync(migrationsDir)
       .filter(file => file.endsWith('.sql'))
       .sort();
@@ -176,11 +225,15 @@ async function showMigrationStatus() {
     statusLines.push('==================\n');
     console.log(statusLines.join('\n'));
   } catch (error) {
+    // eslint-disable-next-line no-process-exit
     logger.error('Error showing migration status', { error: error.message, stack: error.stack });
-    await pool.end();
     process.exit(1);
   } finally {
-    await pool.end();
+    try {
+      await pool.end();
+    } catch (poolError) {
+      logger.error('Error closing database pool', { error: poolError.message });
+    }
   }
 }
 
@@ -195,7 +248,7 @@ switch (command) {
     break;
   case 'down':
     if (!arg) {
-      console.error('Please specify migration filename to rollback');
+      ;
       process.exit(1);
     }
     rollbackMigration(arg);
@@ -204,7 +257,7 @@ switch (command) {
     showMigrationStatus();
     break;
   default:
-    console.log('Usage: node migrate.js [up|down|status] [filename]');
+    ;
     process.exit(1);
     break;
 }

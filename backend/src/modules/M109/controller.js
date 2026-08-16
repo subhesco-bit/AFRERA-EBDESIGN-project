@@ -1,3 +1,49 @@
-﻿// Controller for Spare Parts Management (M109)
-// Add route handlers here
-module.exports = { /* handlers */ };
+﻿/**
+ * Controller for Spare Parts Management (M109)
+ * Handles HTTP requests for spare parts management operations
+ */
+
+const partsService = require('./service');
+
+const registerSparePart = async (req, res) => {
+  try {
+    const part = await partsService.registerSparePart(req.body);
+    res.status(201).json({ success: true, data: part });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const recordPartConsumption = async (req, res) => {
+  try {
+    const consumption = await partsService.recordPartConsumption(req.body);
+    res.status(201).json({ success: true, data: consumption });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const trackInventoryStatus = async (req, res) => {
+  try {
+    const status = await partsService.trackInventoryStatus(req.params.id, req.query.period);
+    res.status(200).json({ success: true, data: status });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const generateInventoryReport = async (req, res) => {
+  try {
+    const report = await partsService.generateInventoryReport(req.params.farmerId, req.query.reportType);
+    res.status(200).json({ success: true, data: report });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  registerSparePart,
+  recordPartConsumption,
+  trackInventoryStatus,
+  generateInventoryReport
+};

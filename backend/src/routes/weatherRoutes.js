@@ -35,6 +35,12 @@ router.get('/pest-forecast', async (req, res) => {
 router.get('/forecast-accuracy', async (req, res) => {
   try { res.json({ success: true, data: await w.forecastAccuracy() }); } catch (e) { fail(res, e); }
 });
+// Real threshold-breach advisory candidates (SPI/SPEI drought-wet + trailing
+// heat-stress days) — see weatherService.getAdvisoryTriggers() for the basis
+// of each threshold.
+router.get('/advisory-triggers', async (req, res) => {
+  try { res.json({ success: true, data: await w.getAdvisoryTriggers(req.query) }); } catch (e) { fail(res, e); }
+});
 router.post('/observations', authMiddleware, async (req, res) => {
   try { res.json({ success: true, data: await w.recordObservation(req.body) }); } catch (e) { fail(res, e); }
 });

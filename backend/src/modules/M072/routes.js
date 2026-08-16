@@ -1,14 +1,13 @@
 ﻿const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
+const { authMiddleware, requireRole } = require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('agronomist','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('agronomist','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('agronomist','admin'), controller.remove);
+router.post('/flocks', authMiddleware, requireRole('admin'), controller.registerPoultryFlock);
+router.get('/flocks', authMiddleware, controller.listPoultryFlocks);
+router.get('/flocks/:flockId', authMiddleware, controller.getPoultryFlock);
+router.put('/flocks/:flockId', authMiddleware, requireRole('admin'), controller.updatePoultryFlock);
+router.get('/flocks/:flockId/analysis', authMiddleware, controller.analyzeEggProduction);
+router.get('/analytics', authMiddleware, requireRole('admin'), controller.getPoultryAnalytics);
 
 module.exports = router;
-

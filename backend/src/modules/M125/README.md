@@ -1,1 +1,6 @@
-﻿# M125 - M125 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M125_generated.sql\n
+﻿# M125 - Sheep Management
+
+Domain: Livestock
+Status: FULLY IMPLEMENTED
+
+This module provides comprehensive sheep farming, health monitoring, and production management.

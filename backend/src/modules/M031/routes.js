@@ -1,14 +1,11 @@
-﻿const express = require('express');
+﻿// Express routes for Land Registry (M031)
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('agronomist','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('agronomist','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('agronomist','admin'), controller.remove);
+router.post('/parcels', controller.createLandParcel);
+router.post('/parcels/:parcelId/transfer', controller.transferLandOwnership);
+router.get('/farmers/:farmerId/land', controller.getLandByFarmer);
+router.get('/analytics', controller.getLandAnalytics);
 
 module.exports = router;
-

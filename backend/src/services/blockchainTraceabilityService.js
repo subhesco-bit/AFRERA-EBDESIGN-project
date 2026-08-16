@@ -14,6 +14,19 @@ const router = express.Router();
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../database/pool');
 
+// database/pool.js's in-memory test pool only recognises statements it has a
+// handler for; an INSERT ... RETURNING * this file sends that the mock
+// parser doesn't match falls through to `{ rows: [] }`. The functions below
+// compensate by synthesizing the row that would have been returned. That
+// compensation must never fire against a real PostgreSQL connection — a
+// successful INSERT ... RETURNING * there always yields a row, so an empty
+// result means something is actually wrong and should surface as an error,
+// not a fabricated success. isTestMode() is the gate that keeps the two
+// apart.
+function isTestMode() {
+  return process.env.NODE_ENV === 'test' || process.env.USE_TEST_DB === 'true';
+}
+
 // ============================================================================
 // BLOCKCHAIN TRANSACTIONS
 // ============================================================================
@@ -61,7 +74,10 @@ async function recordBlockchainTransaction(data) {
       return result.rows[0];
     }
 
-    // Fallback for test-mode mock (shouldn't be reached with proper pool handling)
+    // Fallback for test-mode mock only — see isTestMode() note above.
+    if (!isTestMode()) {
+      throw new Error('Record blockchain transaction failed: database returned no row for INSERT ... RETURNING *');
+    }
     const fallback = {
       transaction_hash: transaction_hash || `0x${Math.random().toString(16).slice(2,66)}`,
       block_number: block_number || null,
@@ -189,8 +205,11 @@ async function recordTraceabilityEvent(data) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Record traceability event failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `te-${Date.now()}`,
         product_id,
@@ -328,8 +347,11 @@ async function recordChainOfCustody(data) {
       ]
     );
 
-    // Fallback for test-mode mock
+    // Fallback for test-mode mock only — see isTestMode() note above.
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Record chain of custody failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `coc-${Date.now()}`,
         product_id,
@@ -462,7 +484,10 @@ async function issueBlockchainCertificate(data) {
       return result.rows[0];
     }
 
-    // Fallback for test-mode mock (shouldn't be reached with proper pool handling)
+    // Fallback for test-mode mock only — see isTestMode() note above.
+    if (!isTestMode()) {
+      throw new Error('Issue blockchain certificate failed: database returned no row for INSERT ... RETURNING *');
+    }
     const fallback = {
       id: `cert-${Date.now()}`,
       certificate_type,
@@ -576,6 +601,9 @@ async function createVerificationRequest(data) {
     );
 
     if (!result || !result.rows || !result.rows[0]) {
+      if (!isTestMode()) {
+        throw new Error('Create verification request failed: database returned no row for INSERT ... RETURNING *');
+      }
       const fallback = {
         id: `vr-${Date.now()}`,
         product_id,
@@ -652,13 +680,18 @@ async function recordBlockchainAnalytics(metrics) {
 
     if (result && result.rows && result.rows[0]) return result.rows[0];
 
-    // Fallback: read from test-store
+    // Fallback: read from test-store (pool.getAllTestData itself is a no-op
+    // outside test mode, per database/pool.js, so this is already inert in
+    // production).
     if (typeof pool.getAllTestData === 'function') {
       const all = pool.getAllTestData('blockchain_analytics');
       if (Array.isArray(all) && all.length > 0) return all[all.length - 1];
     }
 
-    // Construct best-effort fallback
+    // Construct best-effort fallback — test-mode only; see isTestMode() note above.
+    if (!isTestMode()) {
+      throw new Error('Record blockchain analytics failed: database returned no row for INSERT ... RETURNING *');
+    }
     return {
       id: `ban-fallback-${Date.now()}`,
       date: new Date().toISOString().split('T')[0],

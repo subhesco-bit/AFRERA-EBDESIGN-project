@@ -109,9 +109,10 @@ async function authRateLimit(req, res, next) {
   }
 }
 
-module.exports = {
+module.exports = Object.assign(rateLimitMiddleware, {
   rateLimiter: rateLimitMiddleware,
   rateLimitMiddleware,
   strictRateLimit,
   authRateLimit
-};
+});
+module.exports.default = rateLimitMiddleware;

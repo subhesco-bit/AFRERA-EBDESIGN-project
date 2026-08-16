@@ -1,7 +1,11 @@
 ﻿// Express routes for Environment Management (M005)
 const express = require('express');
 const router = express.Router();
-// const controller = require('./controller');
+const controller = require('./controller');
 
-// Example: router.get('/', controller.list);
+router.post('/environments', controller.createEnvironment);
+router.get('/environments/:id', controller.getEnvironment);
+router.put('/environments/:id', controller.updateEnvironment);
+router.get('/environments', controller.listEnvironments);
+
 module.exports = router;

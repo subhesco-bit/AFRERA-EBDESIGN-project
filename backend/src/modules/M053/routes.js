@@ -1,14 +1,14 @@
-﻿const express = require('express');
+﻿// Express routes for Order Management (M053)
+const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
-const { authMiddleware , requireRole } require('../../middleware/auth');
 
-// Public get/list endpoints, protected writes by default
-router.get('/', controller.list);
-router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('fpo','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('fpo','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('fpo','admin'), controller.remove);
+router.post('/orders', controller.createOrder);
+router.get('/orders', controller.listOrders);
+router.get('/orders/:id', controller.getOrder);
+router.put('/orders/:id/status', controller.updateOrderStatus);
+router.post('/orders/:id/cancel', controller.cancelOrder);
+router.post('/orders/:id/payment', controller.processPayment);
+router.get('/orders/:id/tracking', controller.trackOrder);
 
 module.exports = router;
-

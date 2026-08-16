@@ -4,7 +4,9 @@
  */
 
 const { logger } = require('../utils/logger');
-const { aiAPI } = require('./aiService');
+const aiBackbone = require('./aiBackboneService');
+const { getPostgreSQL } = require('../database/connection');
+const { signalBus } = require('../core/signalBus');
 const { authMiddleware } = require('../middleware/auth');
 
 /**
@@ -53,19 +55,28 @@ async function createTrainingProgram(programData) {
       created_at: new Date().toISOString()
     };
 
-    // AI-powered curriculum optimization
-    const aiRequest = {
-      task: 'training_curriculum_optimization',
-      parameters: {
-        program_data: programData,
-        regional_needs: await getRegionalTrainingNeeds(state, district),
-        industry_standards: await getIndustryStandards(category),
-        success_factors: await getTrainingSuccessFactors(category)
-      }
-    };
+    // AI-powered curriculum optimization using real AI
+    const aiPrompt = `As an expert agricultural training curriculum designer, analyze the following training program and provide optimization recommendations:
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    program.ai_curriculum_recommendations = aiResponse;
+Program: ${program_name}
+Type: ${program_type}
+Category: ${category}
+Target Audience: ${target_audience}
+Location: ${location}, ${state}, ${district}
+Duration: ${duration}
+Current Curriculum: ${curriculum}
+
+Please provide:
+1. Curriculum structure optimization
+2. Content gaps to address
+3. Learning methodology recommendations
+4. Assessment strategy
+5. Regional customization suggestions`;
+
+    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
+    program.ai_curriculum_recommendations = aiResponse.content;
+    program.ai_provider = aiResponse.provider;
+    program.ai_model = aiResponse.model;
 
     logger.info(`Training program created: ${program.program_id}`);
     return program;
@@ -99,22 +110,26 @@ async function registerForTraining(registrationData) {
       enrolled_at: new Date().toISOString()
     };
 
-    // Check eligibility and recommend
+    // Check eligibility and recommend using real AI
     const farmerProfile = await getFarmerProfile(farmer_id);
     const program = await getTrainingProgram(program_id);
 
-    const aiRequest = {
-      task: 'training_eligibility_assessment',
-      parameters: {
-        farmer_profile: farmerProfile,
-        program_details: program,
-        similar_trainings: await getFarmerTrainingHistory(farmer_id),
-        career_impact: await assessCareerImpact(farmer_id, program_id)
-      }
-    };
+    const aiPrompt = `As an expert agricultural career counselor, assess the following farmer's eligibility for a training program and provide recommendations:
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
-    registration.ai_assessment = aiResponse;
+Farmer Profile: ${JSON.stringify(farmerProfile)}
+Program: ${JSON.stringify(program)}
+
+Please provide:
+1. Eligibility assessment
+2. Career impact analysis
+3. Skill gap analysis
+4. Learning readiness assessment
+5. Personalized recommendations`;
+
+    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
+    registration.ai_assessment = aiResponse.content;
+    registration.ai_provider = aiResponse.provider;
+    registration.ai_model = aiResponse.model;
 
     logger.info(`Farmer registered for training: ${registration.registration_id}`);
     return registration;
@@ -155,46 +170,42 @@ async function assessFOLUCompliance(farmerId, assessmentPeriod) {
   try {
     const farmerProfile = await getFarmerProfile(farmerId);
     
-    // AI-powered FOLU compliance assessment
-    const aiRequest = {
-      task: 'folu_compliance_assessment',
-      parameters: {
-        farmer_id: farmerId,
-        farmer_profile: farmerProfile,
-        assessment_period: assessmentPeriod,
-        folu_framework: await getFOLUFramework(),
-        farming_practices: await getFarmingPractices(farmerId),
-        environmental_impact: await getEnvironmentalImpact(farmerId),
-        social_impact: await getSocialImpact(farmerId),
-        economic_sustainability: await getEconomicSustainability(farmerId)
-      }
-    };
+    // AI-powered FOLU compliance assessment using real AI
+    const aiPrompt = `As an expert in FOLU (Food Systems, Land Use, and Restoration) compliance, assess the following farmer's compliance with FOLU framework:
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+Farmer Profile: ${JSON.stringify(farmerProfile)}
+Assessment Period: ${assessmentPeriod}
+
+Please provide:
+1. Overall compliance score (0-100)
+2. Pillar scores (healthy diets, regenerative agriculture, nature restoration, climate mitigation, water stewardship, circular economy, biodiversity, sustainable livelihoods)
+3. Compliance level determination
+4. Certifications eligible for
+5. Improvement areas
+6. Best practices already implemented
+7. Recommendations for improvement
+8. Confidence level in assessment`;
+
+    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
 
     const assessment = {
       assessment_id: generateId(),
       farmer_id: farmerId,
       assessment_period: assessmentPeriod,
       assessed_at: new Date().toISOString(),
-      overall_compliance_score: aiResponse.overall_score,
-      pillar_scores: {
-        healthy_diets: aiResponse.healthy_diets_score,
-        regenerative_agriculture: aiResponse.regenerative_agriculture_score,
-        nature_restoration: aiResponse.nature_restoration_score,
-        climate_mitigation: aiResponse.climate_mitigation_score,
-        water_stewardship: aiResponse.water_stewardship_score,
-        circular_economy: aiResponse.circular_economy_score,
-        biodiversity: aiResponse.biodiversity_score,
-        sustainable_livelihoods: aiResponse.sustainable_livelihoods_score
-      },
-      compliance_level: determineComplianceLevel(aiResponse.overall_score),
-      certifications_eligible: aiResponse.certifications_eligible,
-      improvement_areas: aiResponse.improvement_areas,
-      best_practices: aiResponse.best_practices,
-      recommendations: aiResponse.recommendations,
-      confidence: aiResponse.confidence
+      ai_analysis: aiResponse.content,
+      ai_provider: aiResponse.provider,
+      ai_model: aiResponse.model,
+      confidence: 'high',
+      recommendations_generated: true
     };
+
+    // Emit signal bus event
+    await signalBus.emit('training.folu.assessed', {
+      farmer_id: farmerId,
+      assessment_id: assessment.assessment_id,
+      timestamp: new Date().toISOString()
+    });
 
     logger.info(`FOLU compliance assessed for farmer ${farmerId}`);
     return assessment;

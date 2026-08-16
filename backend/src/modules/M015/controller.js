@@ -1,11 +1,244 @@
-﻿// Controller for M015 Module (M015)
-const logger = require('../../utils/logger').logger || console;
+﻿// Controller for Multi-Factor Authentication (M015) - AI Enhanced
 const service = require('./service');
+const { logger } = require('../../utils/logger');
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+// TOTP endpoints
+async function setupTOTP(req, res) {
+  try {
+    const userId = req.user?.id;
+    const result = await service.setupTOTP(userId);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('setupTOTP error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
 
-module.exports = { list, get, create, update, remove };
+async function verifyTOTP(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { token } = req.body;
+    const result = await service.verifyTOTP(userId, token);
+    
+    if (result.success) {
+      res.json({ success: true, data: result });
+    } else {
+      res.status(400).json({ success: false, error: result.error });
+    }
+  } catch (error) {
+    logger.error('verifyTOTP error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// SMS OTP endpoints
+async function sendSMSOTP(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { phoneNumber } = req.body;
+    const result = await service.sendSMSOTP(userId, phoneNumber);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('sendSMSOTP error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function verifySMSOTP(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { otp } = req.body;
+    const result = await service.verifySMSOTP(userId, otp);
+    
+    if (result.success) {
+      res.json({ success: true, data: result });
+    } else {
+      res.status(400).json({ success: false, error: result.error });
+    }
+  } catch (error) {
+    logger.error('verifySMSOTP error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Email OTP endpoints
+async function sendEmailOTP(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { email } = req.body;
+    const result = await service.sendEmailOTP(userId, email);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('sendEmailOTP error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function verifyEmailOTP(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { otp } = req.body;
+    const result = await service.verifyEmailOTP(userId, otp);
+    
+    if (result.success) {
+      res.json({ success: true, data: result });
+    } else {
+      res.status(400).json({ success: false, error: result.error });
+    }
+  } catch (error) {
+    logger.error('verifyEmailOTP error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Biometric endpoints
+async function registerBiometric(req, res) {
+  try {
+    const userId = req.user?.id;
+    const result = await service.registerBiometric(userId, req.body);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('registerBiometric error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function verifyBiometric(req, res) {
+  try {
+    const userId = req.user?.id;
+    const result = await service.verifyBiometric(userId, req.body);
+    
+    if (result.success) {
+      res.json({ success: true, data: result });
+    } else {
+      res.status(400).json({ success: false, error: result.error });
+    }
+  } catch (error) {
+    logger.error('verifyBiometric error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Device trust endpoints
+async function setDeviceTrust(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { deviceFingerprint, trustLevel } = req.body;
+    const result = await service.setDeviceTrust(userId, deviceFingerprint, trustLevel);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('setDeviceTrust error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function checkDeviceTrust(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { deviceFingerprint } = req.body;
+    const result = await service.checkDeviceTrust(userId, deviceFingerprint);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('checkDeviceTrust error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Recovery codes endpoints
+async function generateRecoveryCodes(req, res) {
+  try {
+    const userId = req.user?.id;
+    const result = await service.generateRecoveryCodes(userId);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('generateRecoveryCodes error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function verifyRecoveryCode(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { code } = req.body;
+    const result = await service.verifyRecoveryCode(userId, code);
+    
+    if (result.success) {
+      res.json({ success: true, data: result });
+    } else {
+      res.status(400).json({ success: false, error: result.error });
+    }
+  } catch (error) {
+    logger.error('verifyRecoveryCode error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// Status and management
+async function getMFAStatus(req, res) {
+  try {
+    const userId = req.params.userId || req.user?.id;
+    const status = await service.getMFAStatus(userId);
+    res.json({ success: true, data: status });
+  } catch (error) {
+    logger.error('getMFAStatus error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function disableMFA(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { method } = req.body;
+    const result = await service.disableMFA(userId, method);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('disableMFA error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// AI-powered fraud detection
+async function detectMFAFraud(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { method, context } = req.body;
+    const result = await service.detectMFAFraud(userId, method, context);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('detectMFAFraud error', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+module.exports = {
+  // TOTP
+  setupTOTP,
+  verifyTOTP,
+  
+  // SMS OTP
+  sendSMSOTP,
+  verifySMSOTP,
+  
+  // Email OTP
+  sendEmailOTP,
+  verifyEmailOTP,
+  
+  // Biometric
+  registerBiometric,
+  verifyBiometric,
+  
+  // Device trust
+  setDeviceTrust,
+  checkDeviceTrust,
+  
+  // Recovery codes
+  generateRecoveryCodes,
+  verifyRecoveryCode,
+  
+  // Status and management
+  getMFAStatus,
+  disableMFA,
+  
+  // AI-powered fraud detection
+  detectMFAFraud,
+};

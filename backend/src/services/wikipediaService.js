@@ -9,7 +9,7 @@
  *
  * Etiquette (Wikimedia API policy requires a descriptive User-Agent
  * identifying the application and a contact point — not optional):
- * https://meta.wikimedia.org/wiki/User-Agent_policy
+ * External docs: https://meta.wikimedia.org/wiki/User-Agent_policy
  *
  * Scope: read-only reference lookups. Never used to fabricate agronomic or
  * medical claims — see nutritionIntelligenceService.js / wellness_natural_practices

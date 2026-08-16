@@ -1,11 +1,58 @@
-﻿// Controller for M024 Module (M024)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Farmer Groups (M024)
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const farmerGroupsService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const createFarmerGroup = async (req, res) => {
+  try {
+    const group = await farmerGroupsService.createFarmerGroup(req.body);
+    res.status(201).json({ success: true, data: group });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const addGroupMember = async (req, res) => {
+  try {
+    const membership = await farmerGroupsService.addGroupMember(req.params.groupId, req.body.farmer_id, req.body);
+    res.status(201).json({ success: true, data: membership });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const recordGroupMeeting = async (req, res) => {
+  try {
+    const meeting = await farmerGroupsService.recordGroupMeeting(req.params.groupId, req.body);
+    res.status(201).json({ success: true, data: meeting });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const recordGroupTransaction = async (req, res) => {
+  try {
+    const transaction = await farmerGroupsService.recordGroupTransaction(req.params.groupId, req.body);
+    res.status(201).json({ success: true, data: transaction });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getGroupAnalytics = async (req, res) => {
+  try {
+    const analytics = await farmerGroupsService.getGroupAnalytics(req.params.groupId);
+    res.status(200).json({ success: true, data: analytics });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  createFarmerGroup,
+  addGroupMember,
+  recordGroupMeeting,
+  recordGroupTransaction,
+  getGroupAnalytics
+};

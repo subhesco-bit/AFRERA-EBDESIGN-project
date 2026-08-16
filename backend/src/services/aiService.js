@@ -141,7 +141,7 @@ async function optimizePrice(productId, currentPrice) {
     const priceElasticity = calculatePriceElasticity(productId);
     const revenueImpact = calculateRevenueImpact(currentPrice, optimalPrice, priceElasticity);
     
-    logger.info(`Price optimization for product ${productId}: ₹${optimalPrice} (current: ₹${currentPrice})`);
+    logger.info(`Price optimization for product ${productId}: â‚¹${optimalPrice} (current: â‚¹${currentPrice})`);
     
     return {
       product_id: productId,
@@ -618,11 +618,18 @@ router.post('/optimize/price', authMiddleware, async (req, res) => {
   }
 });
 
+// DEPRECATED 2026-08-15 â€” assessCreditRisk() was a second, independent
+// credit-scoring implementation alongside the canonical, MCDA-based
+// financialService.farmerCreditRiskScore() (the one actually wired into the
+// outcome-resolution loop). No frontend caller was found for this route.
+// Delegated rather than deleted â€” assessCreditRisk() itself is untouched.
+// See AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C for the reconciliation.
 router.post('/assess/credit-risk', authMiddleware, async (req, res) => {
   try {
     const { farmer_id } = req.body;
-    const result = await assessCreditRisk(farmer_id);
-    res.json(result);
+    const financialService = require('./financialService');
+    const result = await financialService.farmerCreditRiskScore(farmer_id);
+    res.json({ ...result, delegatedFrom: 'aiService.assessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -651,7 +658,53 @@ function isHealthy() {
   return true; // AI service health check
 }
 
+
+// ============================================================
+// CANONICAL AI COMPATIBILITY API
+// Provides the contract expected by platform services.
+// ============================================================
+async function generateRecommendation(request = {}) {
+  const {
+    task,
+    userId,
+    user_id,
+    context = {},
+    ...payload
+  } = request;
+
+  const effectiveUserId = userId || user_id || context.userId || context.user_id;
+
+  if (!task) {
+    throw new Error('AI recommendation task is required');
+  }
+
+  // Preserve the existing recommendation engine as the
+  // canonical fallback while the task adapters are expanded.
+  const result = await generateRecommendations(
+    effectiveUserId,
+    {
+      ...context,
+      ...payload,
+      task
+    }
+  );
+
+  return {
+    ...result,
+    task,
+    confidence: typeof result?.confidence === 'number' ? result.confidence : 0,
+    explanation: result?.explanation || null,
+    recommendations: Array.isArray(result?.recommendations)
+      ? result.recommendations
+      : []
+  };
+}
+
+const aiAPI = {
+  generateRecommendation
+};
 module.exports = {
+  aiAPI,
   router,
   predictDemand,
   optimizePrice,
@@ -660,3 +713,4 @@ module.exports = {
   generateRecommendations,
   isHealthy
 };
+

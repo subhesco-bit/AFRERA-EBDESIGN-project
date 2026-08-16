@@ -6,24 +6,49 @@
 const { verifyToken, hasPermission } = require('../services/authService');
 const { logger } = require('../utils/logger');
 
+// SKIP_AUTH (and the relaxed test-mode verification below) must never take
+// effect outside test/development. A production deployment that somehow has
+// SKIP_AUTH=true set must fail loudly at startup rather than silently ignore
+// the flag (which would be confusing) or silently honor it (which would be
+// an open auth bypass in production).
+if (process.env.SKIP_AUTH === 'true' && process.env.NODE_ENV === 'production') {
+  const message = 'FATAL: SKIP_AUTH=true is set while NODE_ENV=production. ' +
+    'Refusing to start with authentication bypassed in production. ' +
+    'Unset SKIP_AUTH or set NODE_ENV to "test"/"development".';
+  logger.error(message);
+  throw new Error(message);
+}
+
 /**
  * Authentication middleware - verifies JWT token
  */
 function authMiddleware(req, res, next) {
   try {
-    // If SKIP_AUTH is explicitly set, use a default test user (useful for dev/test)
+    const nodeEnv = process.env.NODE_ENV;
+    const skipAuthAllowedEnv = nodeEnv === 'test' || nodeEnv === 'development';
+
+    // If SKIP_AUTH is explicitly set, use a default test user (useful for
+    // dev/test only). Outside test/development this must never bypass auth,
+    // even silently — log it loudly and fall through to real verification.
     if (process.env.SKIP_AUTH === 'true') {
-      req.user = {
-        id: process.env.TEST_USER_ID || 'test-user',
-        email: process.env.TEST_USER_EMAIL || 'test@example.com',
-        role: 'consumer',
-        permissions: []
-      };
-      return next();
+      if (skipAuthAllowedEnv) {
+        req.user = {
+          id: process.env.TEST_USER_ID || 'test-user',
+          email: process.env.TEST_USER_EMAIL || 'test@example.com',
+          role: 'consumer',
+          permissions: []
+        };
+        return next();
+      }
+
+      logger.error(
+        'SKIP_AUTH=true was requested but ignored: NODE_ENV is not "test" or "development"',
+        { nodeEnv }
+      );
     }
 
     // In test mode require a token header but allow relaxed verification
-    if (process.env.NODE_ENV === 'test') {
+    if (nodeEnv === 'test') {
       const authHeader = req.headers.authorization;
       if (!authHeader) {
         return res.status(401).json({ 
@@ -206,10 +231,11 @@ function userRateLimit(limit = 100, windowMs = 60000) {
   };
 }
 
-module.exports = {
+module.exports = Object.assign(authMiddleware, {
   authMiddleware,
   requireRole,
   requirePermission,
   optionalAuth,
   userRateLimit
-};
+});
+module.exports.default = authMiddleware;

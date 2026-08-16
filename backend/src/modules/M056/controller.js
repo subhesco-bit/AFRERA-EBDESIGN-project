@@ -1,11 +1,44 @@
-﻿// Controller for M056 Module (M056)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Payment Processing (M056)
+ */
+const paymentService = require('./service');
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const create = async (req, res) => {
+  try {
+    const payment = await paymentService.createPayment(req.body);
+    res.status(201).json({ success: true, data: payment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 
-module.exports = { list, get, create, update, remove };
+const get = async (req, res) => {
+  try {
+    const payment = await paymentService.getPayment(req.params.id);
+    if (!payment) return res.status(404).json({ success: false, error: 'Payment not found' });
+    res.status(200).json({ success: true, data: payment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const updateStatus = async (req, res) => {
+  try {
+    const payment = await paymentService.updatePaymentStatus(req.params.id, req.body.status);
+    if (!payment) return res.status(404).json({ success: false, error: 'Payment not found' });
+    res.status(200).json({ success: true, data: payment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const refund = async (req, res) => {
+  try {
+    const refund = await paymentService.refundPayment(req.params.id, req.body.amount, req.body.reason);
+    res.status(201).json({ success: true, data: refund });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = { create, get, updateStatus, refund };

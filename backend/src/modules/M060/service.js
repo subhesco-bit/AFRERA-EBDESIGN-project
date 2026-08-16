@@ -1,40 +1,87 @@
-﻿// Service for M060 Module (M060)
+﻿/**
+ * Review Management Service (M060)
+ * Product reviews and ratings with AI-powered sentiment analysis
+ */
+
 const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { aiAPI } = require('../../services/aiService');
+const pool = require('../../database/pool');
 
-const tableName = '_items';
+async function createReview(reviewData) {
+  try {
+    const { product_id, user_id, rating, title, comment, images } = reviewData;
+    const review = {
+      review_id: generateId(),
+      product_id,
+      user_id,
+      rating,
+      title,
+      comment,
+      images,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
 
-async function listItems({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const offset = (page - 1) * limit;
-  const totalRes = await pg.query(SELECT COUNT(*) FROM );
-  const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query(SELECT * FROM  ORDER BY created_at DESC LIMIT  OFFSET , [limit, offset]);
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    const aiRequest = {
+      task: 'sentiment_analysis',
+      parameters: { review_data: reviewData, product_context: await getProductContext(product_id) }
+    };
+    review.ai_analysis = await aiAPI.generateRecommendation(aiRequest);
+
+    const result = await pool.query(
+      `INSERT INTO reviews (review_id, product_id, user_id, rating, title, comment, images, status, ai_analysis, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [review.review_id, review.product_id, review.user_id, review.rating, review.title, review.comment, JSON.stringify(review.images), review.status, JSON.stringify(review.ai_analysis), review.created_at]
+    );
+
+    logger.info(`Review created: ${review.review_id}`);
+    return result.rows[0];
+  } catch (error) {
+    logger.error('Error creating review', { error: error.message });
+    throw new Error('Failed to create review');
+  }
 }
 
-async function getItem(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(SELECT * FROM  WHERE id = , [id]);
-  return res.rows[0] || null;
+async function getReview(reviewId) {
+  try {
+    const res = await pool.query('SELECT * FROM reviews WHERE review_id = $1', [reviewId]);
+    return res.rows[0] || null;
+  } catch (error) {
+    logger.error('Error getting review', { error: error.message });
+    throw new Error('Failed to get review');
+  }
 }
 
-async function createItem(payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(INSERT INTO  (data, created_at) VALUES (, NOW()) RETURNING *, [payload]);
-  return res.rows[0];
+async function getProductReviews(productId, { page = 1, limit = 20 } = {}) {
+  try {
+    const offset = (page - 1) * limit;
+    const res = await pool.query(
+      'SELECT * FROM reviews WHERE product_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
+      [productId, 'approved', limit, offset]
+    );
+    return { items: res.rows, pagination: { page, limit, total: res.rows.length, totalPages: Math.ceil(res.rows.length / limit) } };
+  } catch (error) {
+    logger.error('Error getting product reviews', { error: error.message });
+    throw new Error('Failed to get product reviews');
+  }
 }
 
-async function updateItem(id, payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(UPDATE  SET data = , updated_at = NOW() WHERE id =  RETURNING *, [payload, id]);
-  return res.rows[0] || null;
+async function updateReviewStatus(reviewId, status) {
+  try {
+    const res = await pool.query('UPDATE reviews SET status = $1, updated_at = NOW() WHERE review_id = $2 RETURNING *', [status, reviewId]);
+    return res.rows[0] || null;
+  } catch (error) {
+    logger.error('Error updating review status', { error: error.message });
+    throw new Error('Failed to update review status');
+  }
 }
 
-async function deleteItem(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(DELETE FROM  WHERE id =  RETURNING id, [id]);
-  return !!res.rows[0];
+function generateId() {
+  return `REV-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-module.exports = { listItems, getItem, createItem, updateItem, deleteItem };
+async function getProductContext(productId) {
+  return { category: 'grains', average_rating: 4.2 };
+}
+
+module.exports = { createReview, getReview, getProductReviews, updateReviewStatus };

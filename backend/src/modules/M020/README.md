@@ -1,6 +1,12 @@
-﻿# M020 - Session Management
+﻿# M020 - Account Recovery
 
 Domain: Identity
-Status: PARTIAL
+Status: ENHANCED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Account Recovery capabilities:
+- Multi-channel password reset (email, SMS, security questions)
+- AI-powered fraud detection
+- Account lockout management
+- Recovery attempt tracking
+- Security challenge verification
+- Temporary password generation

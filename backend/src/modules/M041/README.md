@@ -1,6 +1,12 @@
 ﻿# M041 - Village Registry
 
-Domain: Community
-Status: PARTIAL
+Domain: Farm Equipment
+Status: FULLY IMPLEMENTED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Village Registry capabilities:
+- Village registration and management
+- Community resource tracking
+- AI-powered development index calculation
+- Infrastructure assessment
+- Agricultural potential analysis
+- Village analytics and insights

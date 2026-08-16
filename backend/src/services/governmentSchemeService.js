@@ -7,6 +7,171 @@ const { logger } = require('../utils/logger');
 const { aiAPI } = require('./aiService');
 const { socketServer } = require('../websocket');
 const { authMiddleware } = require('../middleware/auth');
+// Shared pool (2026-08-04 convention, see database/pool.js): the AI-matching
+// functions above never touched Postgres, but the scheme registry added in
+// migration 9995_scheme_verification_map_protection.sql does — every scheme
+// those functions return was AI-generated or hardcoded, with no stored
+// verification status/expiry anywhere (see that migration's header).
+const pool = require('../database/pool');
+
+/**
+ * List verified schemes from the registry table (government_schemes).
+ * Distinct from getApplicableSchemes() above: that is AI-matched discovery;
+ * this is the verified-status source of truth (active/conditional/expired,
+ * with expiry date and last-verified source) the v44 prototype's SCHEMES
+ * array named. Filters are all optional.
+ */
+async function listSchemeRegistry(filters = {}) {
+  const { status, category, state } = filters;
+  const conditions = [];
+  const params = [];
+
+  if (status) {
+    params.push(status);
+    conditions.push(`status = $${params.length}`);
+  }
+  if (category) {
+    params.push(category);
+    conditions.push(`category = $${params.length}`);
+  }
+  if (state) {
+    params.push(state);
+    conditions.push(`(applicable_states IS NULL OR $${params.length} = ANY(applicable_states))`);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const result = await pool.query(
+    `SELECT * FROM government_schemes ${where} ORDER BY status, name`,
+    params
+  );
+  return result.rows;
+}
+
+async function getSchemeByCode(code) {
+  const result = await pool.query('SELECT * FROM government_schemes WHERE code = $1', [code]);
+  if (result.rows.length === 0) {
+    throw new Error('Scheme not found');
+  }
+  return result.rows[0];
+}
+
+/**
+ * Update a scheme's verified status. This is the discipline the v44
+ * prototype's "Primary source verification only" note asks for: a status
+ * cannot move to 'expired' without an expiry_date (enforced by the
+ * expired_scheme_must_have_expiry_date CHECK constraint), and every update
+ * records verification_source + last_verified_at/by.
+ */
+async function updateSchemeRegistry(code, updates, verifiedBy) {
+  const {
+    status, expiry_date, verification_source, notes, effective_from, applicable_states
+  } = updates;
+
+  const result = await pool.query(
+    `UPDATE government_schemes SET
+       status = COALESCE($1, status),
+       expiry_date = COALESCE($2, expiry_date),
+       verification_source = COALESCE($3, verification_source),
+       notes = COALESCE($4, notes),
+       effective_from = COALESCE($5, effective_from),
+       applicable_states = COALESCE($6, applicable_states),
+       last_verified_at = CURRENT_TIMESTAMP,
+       last_verified_by = $7,
+       updated_at = CURRENT_TIMESTAMP
+     WHERE code = $8
+     RETURNING *`,
+    [status, expiry_date, verification_source, notes, effective_from, applicable_states, verifiedBy || null, code]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('Scheme not found');
+  }
+  return result.rows[0];
+}
+
+/**
+ * Schemes expiring within `days` days, plus anything already expired —
+ * the "automatic exclusion of lapsed schemes" the prototype called for
+ * (see AHIDF, expired 2026-03-31, excluded from live financing/insurance
+ * workflows per AdminDashboardPage.jsx / GovernmentDashboardPage.jsx).
+ */
+async function getExpiringSchemeRegistry(days = 30) {
+  const result = await pool.query(
+    `SELECT * FROM government_schemes
+     WHERE expiry_date IS NOT NULL
+       AND expiry_date <= CURRENT_DATE + ($1 || ' days')::INTERVAL
+     ORDER BY expiry_date`,
+    [days]
+  );
+  return result.rows;
+}
+
+/**
+ * schemeExpiryStatus — deadline exposure monitoring.
+ *
+ * Ported from v42 (docs/MISSING_BUSINESS_LOGIC_EXTRACTION.md #7). The
+ * original hardcoded a 4-row SCHEME_EXPIRY array (PM-FME/AIF/AHIDF/
+ * OPGREENS). That is superseded here by the real government_schemes
+ * registry added in 9995_scheme_verification_map_protection.sql for the
+ * parallel V44 scheme-verification task (checked first, per instruction,
+ * to avoid a competing table) — every scheme with a recorded expiry_date is
+ * classified, not just the original four. Same ACTIVE / EXPIRING SOON (<=60
+ * days) / LAPSED thresholds as the original.
+ */
+async function schemeExpiryStatus() {
+  const { rows } = await pool.query(
+    `SELECT code AS id, name AS label, expiry_date
+       FROM government_schemes
+      WHERE expiry_date IS NOT NULL
+      ORDER BY expiry_date ASC`
+  );
+
+  const now = Date.now();
+  return rows.map((s) => {
+    const days = Math.round((new Date(s.expiry_date) - now) / 86400000);
+    const state = days < 0 ? 'LAPSED' : days <= 60 ? 'EXPIRING SOON' : 'ACTIVE';
+    return {
+      id: s.id,
+      label: s.label,
+      expiry: s.expiry_date,
+      days,
+      state,
+      urgency: state === 'LAPSED' ? 'critical' : state === 'EXPIRING SOON' ? 'high' : 'low'
+    };
+  });
+}
+
+/**
+ * AI Scheme Checker (v44 feature 5) — deliberately grounded in the verified
+ * registry rather than a free-form AI call: it answers strictly from rows in
+ * government_schemes so an expired or unverified scheme can never be told to
+ * a farmer as eligible. category/state/status are simple, real SQL filters;
+ * "AI" here means query-time eligibility reasoning over verified data, not
+ * an LLM hallucinating scheme names.
+ */
+async function checkSchemeEligibility(params = {}) {
+  const { category, state, farm_size } = params;
+  const rows = await listSchemeRegistry({ category, state, status: undefined });
+  const eligible = rows.filter((s) => s.status !== 'expired');
+  const conditional = eligible.filter((s) => s.status === 'conditional');
+
+  return {
+    checked_at: new Date().toISOString(),
+    filters: { category, state, farm_size },
+    eligible_count: eligible.length,
+    eligible_schemes: eligible.map((s) => ({
+      code: s.code,
+      name: s.name,
+      ministry: s.ministry,
+      status: s.status,
+      relevance: s.relevance,
+      notes: s.notes
+    })),
+    reminder: conditional.length > 0
+      ? `${conditional.length} scheme(s) are conditional — confirm current-year allocation with the primary source before committing.`
+      : 'Confirm with the primary source before applying.'
+  };
+}
 
 /**
  * Get applicable government schemes for a user/location
@@ -689,6 +854,77 @@ function setupRoutes(app) {
       res.status(500).json({ success: false, error: error.message });
     }
   });
+
+  // -------------------------------------------------------------------
+  // Scheme registry (v44 feature 2) — backed by government_schemes,
+  // migration 9995_scheme_verification_map_protection.sql.
+  // -------------------------------------------------------------------
+
+  app.get('/api/v1/government/schemes/registry', async (req, res) => {
+    try {
+      const { status, category, state } = req.query;
+      const schemes = await listSchemeRegistry({ status, category, state });
+      res.json({ success: true, data: schemes, total: schemes.length });
+    } catch (error) {
+      logger.error('List scheme registry error', { error: error.message, stack: error.stack });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/v1/government/schemes/registry/expiring', async (req, res) => {
+    try {
+      const days = Number(req.query.days) || 30;
+      const schemes = await getExpiringSchemeRegistry(days);
+      res.json({ success: true, data: schemes, total: schemes.length });
+    } catch (error) {
+      logger.error('Get expiring schemes error', { error: error.message, stack: error.stack });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/v1/government/schemes/checker', async (req, res) => {
+    try {
+      const result = await checkSchemeEligibility(req.query);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('Scheme eligibility checker error', { error: error.message, stack: error.stack });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/v1/government/schemes/registry/:code', async (req, res) => {
+    try {
+      const scheme = await getSchemeByCode(req.params.code);
+      res.json({ success: true, data: scheme });
+    } catch (error) {
+      res.status(404).json({ success: false, error: error.message });
+    }
+  });
+
+  // Admin-only: mark a scheme conditional/expired, attach an expiry date and
+  // verification source. authMiddleware only (no separate admin role check
+  // exists for this service today) — matches the authorization level already
+  // used for /government/announcements above.
+  app.put('/api/v1/government/schemes/registry/:code', authMiddleware, async (req, res) => {
+    try {
+      const scheme = await updateSchemeRegistry(req.params.code, req.body, req.user && req.user.id);
+      logger.info(`Scheme registry updated: ${req.params.code} -> ${scheme.status}`);
+      res.json({ success: true, data: scheme });
+    } catch (error) {
+      logger.error('Update scheme registry error', { error: error.message, stack: error.stack });
+      res.status(error.message === 'Scheme not found' ? 404 : 500).json({ success: false, error: error.message });
+    }
+  });
+
+  app.get('/api/v1/government/schemes/expiry-status', authMiddleware, async (req, res) => {
+    try {
+      const data = await schemeExpiryStatus();
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('Scheme expiry status error', { error: error.message, stack: error.stack });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 }
 
 module.exports = {
@@ -701,5 +937,11 @@ module.exports = {
   submitCSRProposal,
   getLocalizedDefaultPage,
   trackSchemeApplication,
+  schemeExpiryStatus,
+  listSchemeRegistry,
+  getSchemeByCode,
+  updateSchemeRegistry,
+  getExpiringSchemeRegistry,
+  checkSchemeEligibility,
   setupRoutes
 };

@@ -33,7 +33,7 @@ router.post('/calculate/order/:orderId', authMiddleware, async (req, res) => {
  */
 router.post('/calculate/product', authMiddleware, async (req, res) => {
   try {
-    const result = gstService.calculateProductGST(req.body);
+    const result = await gstService.calculateProductGST(req.body);
     res.json(result);
   } catch (error) {
     logger.error('Calculate product GST API error', { error: error.message, stack: error.stack });

@@ -1,11 +1,184 @@
-﻿// Controller for M081 Module (M081)
-const logger = require('../../utils/logger').logger || console;
-const service = require('./service');
+﻿/**
+ * Controller for Data Visualization Dashboard (M081)
+ * Handles HTTP requests for dashboard operations
+ */
 
-async function list(req, res){ try{ const result = await service.listItems({ page: parseInt(req.query.page)||1, limit: parseInt(req.query.limit)||20 }); res.json({ success: true, data: result }); } catch(e){ logger.error('list error', e); res.status(500).json({ success:false, error: e.message }); } }
-async function get(req, res){ try{ const item = await service.getItem(req.params.id); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('get error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function create(req, res){ try{ const payload = req.body || {}; const item = await service.createItem(payload); res.status(201).json({ success:true, data:item }); }catch(e){ logger.error('create error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function update(req, res){ try{ const payload = req.body || {}; const item = await service.updateItem(req.params.id, payload); if(!item) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true, data:item }); }catch(e){ logger.error('update error', e); res.status(500).json({ success:false, error:e.message }); } }
-async function remove(req, res){ try{ const ok = await service.deleteItem(req.params.id); if(!ok) return res.status(404).json({ success:false, error:'Not found' }); res.json({ success:true }); }catch(e){ logger.error('delete error', e); res.status(500).json({ success:false, error:e.message }); } }
+const dashboardService = require('./service');
 
-module.exports = { list, get, create, update, remove };
+const createDashboard = async (req, res) => {
+  try {
+    const dashboard = await dashboardService.createDashboard(req.body);
+    res.status(201).json({ success: true, data: dashboard });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getDashboard = async (req, res) => {
+  try {
+    const dashboard = await dashboardService.getDashboard(req.params.id);
+    if (!dashboard) {
+      return res.status(404).json({ success: false, error: 'Dashboard not found' });
+    }
+    res.status(200).json({ success: true, data: dashboard });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const listDashboards = async (req, res) => {
+  try {
+    const dashboards = await dashboardService.listDashboards(req.query.user_id, req.query);
+    res.status(200).json({ success: true, data: dashboards });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const updateDashboard = async (req, res) => {
+  try {
+    const dashboard = await dashboardService.updateDashboard(req.params.id, req.body);
+    if (!dashboard) {
+      return res.status(404).json({ success: false, error: 'Dashboard not found' });
+    }
+    res.status(200).json({ success: true, data: dashboard });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const deleteDashboard = async (req, res) => {
+  try {
+    const dashboard = await dashboardService.deleteDashboard(req.params.id);
+    if (!dashboard) {
+      return res.status(404).json({ success: false, error: 'Dashboard not found' });
+    }
+    res.status(200).json({ success: true, message: 'Dashboard deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const addWidget = async (req, res) => {
+  try {
+    const widget = await dashboardService.addWidget(req.params.id, req.body);
+    res.status(201).json({ success: true, data: widget });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getDashboardWidgets = async (req, res) => {
+  try {
+    const widgets = await dashboardService.getDashboardWidgets(req.params.id);
+    res.status(200).json({ success: true, data: widgets });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const updateWidget = async (req, res) => {
+  try {
+    const widget = await dashboardService.updateWidget(req.params.widgetId, req.body);
+    if (!widget) {
+      return res.status(404).json({ success: false, error: 'Widget not found' });
+    }
+    res.status(200).json({ success: true, data: widget });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const deleteWidget = async (req, res) => {
+  try {
+    const widget = await dashboardService.deleteWidget(req.params.widgetId);
+    if (!widget) {
+      return res.status(404).json({ success: false, error: 'Widget not found' });
+    }
+    res.status(200).json({ success: true, message: 'Widget deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const addDataSource = async (req, res) => {
+  try {
+    const dataSource = await dashboardService.addDataSource(req.params.id, req.body);
+    res.status(201).json({ success: true, data: dataSource });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getDataSources = async (req, res) => {
+  try {
+    const dataSources = await dashboardService.getDataSources(req.params.id);
+    res.status(200).json({ success: true, data: dataSources });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const addFilter = async (req, res) => {
+  try {
+    const filter = await dashboardService.addFilter(req.params.id, req.body);
+    res.status(201).json({ success: true, data: filter });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getDashboardFilters = async (req, res) => {
+  try {
+    const filters = await dashboardService.getDashboardFilters(req.params.id);
+    res.status(200).json({ success: true, data: filters });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const createSnapshot = async (req, res) => {
+  try {
+    const snapshot = await dashboardService.createSnapshot(req.params.id, req.body);
+    res.status(201).json({ success: true, data: snapshot });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const shareDashboard = async (req, res) => {
+  try {
+    const share = await dashboardService.shareDashboard(req.params.id, req.body);
+    res.status(201).json({ success: true, data: share });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getDashboardAnalytics = async (req, res) => {
+  try {
+    const analytics = await dashboardService.getDashboardAnalytics(req.params.id);
+    res.status(200).json({ success: true, data: analytics });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = {
+  createDashboard,
+  getDashboard,
+  listDashboards,
+  updateDashboard,
+  deleteDashboard,
+  addWidget,
+  getDashboardWidgets,
+  updateWidget,
+  deleteWidget,
+  addDataSource,
+  getDataSources,
+  addFilter,
+  getDashboardFilters,
+  createSnapshot,
+  shareDashboard,
+  getDashboardAnalytics
+};

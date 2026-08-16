@@ -1,6 +1,12 @@
-﻿# M018 - Digital Identity
+﻿# M018 - Privacy Controls
 
 Domain: Identity
-Status: PARTIAL
+Status: ENHANCED
 
-This folder contains backend scaffolding for the module. Add controllers, services, routes, and SQL models as needed.
+This module provides comprehensive Privacy Controls capabilities:
+- Data access management
+- Privacy policy enforcement
+- Data masking and redaction
+- AI-powered privacy risk assessment
+- Privacy impact analysis
+- Automated privacy compliance
