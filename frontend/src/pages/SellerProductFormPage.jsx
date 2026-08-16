@@ -9,6 +9,7 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Textarea } from '../components/ui/textarea'
+import offlineQueue from '../services/offlineQueue'
 
 /**
  * Seller Product Creation — real gap confirmed this session: no page
@@ -54,10 +55,38 @@ export default function SellerProductFormPage() {
     queryFn: () => productsAPI.getStates().then((r) => r.data || []),
   })
 
+  const [queuedOffline, setQueuedOffline] = useState(false)
+
+  // Rural connectivity is unreliable — a seller filling this form in a low-
+  // signal area shouldn't lose their listing to a dropped connection. If
+  // the device is offline, or the request fails for a network reason (not
+  // a validation error from the server, which still surfaces normally),
+  // the submission is queued via services/offlineQueue.js and synced by
+  // the existing service-worker background sync once connectivity returns.
   const createMutation = useMutation({
-    mutationFn: (payload) => productsAPI.createProduct(payload),
-    onSuccess: (res) => navigate(`/products/${res.data.id}`),
-    onError: (err) => setFormError(err.response?.data?.error || err.message),
+    mutationFn: (payload) => {
+      if (!navigator.onLine) {
+        offlineQueue.add({ method: 'POST', url: '/products', data: payload })
+        return Promise.resolve({ queued: true })
+      }
+      return productsAPI.createProduct(payload)
+    },
+    onSuccess: (res) => {
+      if (res?.queued) {
+        setQueuedOffline(true)
+        return
+      }
+      navigate(`/products/${res.data.id}`)
+    },
+    onError: (err, payload) => {
+      const isNetworkError = !err.response
+      if (isNetworkError) {
+        offlineQueue.add({ method: 'POST', url: '/products', data: payload })
+        setQueuedOffline(true)
+        return
+      }
+      setFormError(err.response?.data?.error || err.message)
+    },
   })
 
   const update = (field) => (e) => {
@@ -183,8 +212,15 @@ export default function SellerProductFormPage() {
                 </div>
               )}
 
-              <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Saving…' : 'Create Product'}
+              {queuedOffline && (
+                <div role="status" className="rounded-md border border-border bg-muted/40 p-3 text-sm">
+                  No connection right now — this listing is saved on your device and will be
+                  created automatically once you're back online. You can close this page.
+                </div>
+              )}
+
+              <Button type="submit" disabled={createMutation.isPending || queuedOffline}>
+                {createMutation.isPending ? 'Saving…' : queuedOffline ? 'Queued for sync' : 'Create Product'}
               </Button>
             </form>
           </CardContent>
