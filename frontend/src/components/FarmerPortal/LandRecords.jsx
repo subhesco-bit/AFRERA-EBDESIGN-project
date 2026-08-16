@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
-import { MapPin, FileText, Sync, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { MapPin, FileText, RefreshCw, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { farmerPortalAPI } from '../../services/api';
 
 // FE-02 note: not resolved here. Every call in this component is either an
@@ -237,7 +237,7 @@ const LandRecords = ({ farmerId }) => {
         </Dialog>
 
         <Button variant="outline" onClick={syncWithGovernment} disabled={loading}>
-          <Sync className="w-4 h-4 mr-2" />
+          <RefreshCw className="w-4 h-4 mr-2" />
           Sync with Government
         </Button>
       </div>

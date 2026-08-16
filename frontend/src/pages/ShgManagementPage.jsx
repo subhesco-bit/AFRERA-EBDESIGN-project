@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { shgAPI } from '../services/api'
-import { HandHeart, Plus, X, Users2, IndianRupee, UserPlus } from 'lucide-react'
+import { HeartHandshake, Plus, X, Users2, IndianRupee, UserPlus } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const emptyGroup = { name: '', village: '', formation_date: '', focus_area: '' }
@@ -71,7 +71,7 @@ function ShgManagementPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
-            <HandHeart className="w-6 h-6 mr-2 text-rose-600" />
+            <HeartHandshake className="w-6 h-6 mr-2 text-rose-600" />
             SHG Management
           </h1>
           <p className="text-gray-600">Register self-help groups, track membership and group savings</p>

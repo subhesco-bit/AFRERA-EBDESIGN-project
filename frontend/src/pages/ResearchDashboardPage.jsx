@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { TrendingUp, FileText, Users, Database, Activity, BookOpen, Flask, BarChart3 } from 'lucide-react'
+import { TrendingUp, FileText, Users, Database, Activity, BookOpen, FlaskConical, BarChart3 } from 'lucide-react'
 import { researchAPI } from '../services/api'
 
 function ResearchDashboardPage() {
@@ -21,7 +21,7 @@ function ResearchDashboardPage() {
       <div className="flex space-x-2 mb-6 overflow-x-auto">
         {[
           { id: 'overview', label: 'Overview', icon: BarChart3 },
-          { id: 'trials', label: 'Field Trials', icon: Flask },
+          { id: 'trials', label: 'Field Trials', icon: FlaskConical },
           { id: 'data', label: 'Data Partnerships', icon: Database },
           { id: 'knowledge', label: 'Knowledge Base', icon: BookOpen },
           { id: 'analytics', label: 'Analytics', icon: TrendingUp },
@@ -49,7 +49,7 @@ function ResearchDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
-                <Flask className="w-8 h-8 text-teal-600" />
+                <FlaskConical className="w-8 h-8 text-teal-600" />
                 <span className="text-sm text-gray-500">Active</span>
               </div>
               <div className="text-3xl font-bold text-gray-900">
@@ -147,7 +147,7 @@ function ResearchDashboardPage() {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Field Trial Management</h3>
           <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 mb-6">
             <div className="flex items-start">
-              <Flask className="w-5 h-5 text-teal-600 mr-3 mt-0.5" />
+              <FlaskConical className="w-5 h-5 text-teal-600 mr-3 mt-0.5" />
               <div>
                 <div className="font-semibold text-gray-800">AI-Powered Trial Design</div>
                 <div className="text-sm text-gray-600">
