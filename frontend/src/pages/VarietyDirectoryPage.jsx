@@ -87,9 +87,10 @@ export default function VarietyDirectoryPage() {
         <div className="mb-3 flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search varieties…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+            <Input aria-label="Search varieties" placeholder="Search varieties…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
           </div>
           <select
+            aria-label="Filter by category"
             value={category} onChange={(e) => setCategory(e.target.value)}
             className="rounded-md border border-input bg-background px-2 py-1.5 text-sm"
           >

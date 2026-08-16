@@ -65,6 +65,7 @@ export default function DefenseFitnessPrepPage() {
       <Section title="Choose a standard">
         <div className="flex flex-wrap items-center gap-3">
           <select
+            aria-label="Force or category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="rounded-md border border-input bg-background px-2 py-1.5 text-sm"
@@ -75,6 +76,7 @@ export default function DefenseFitnessPrepPage() {
             ))}
           </select>
           <select
+            aria-label="Gender"
             value={gender}
             onChange={(e) => setGender(e.target.value)}
             className="rounded-md border border-input bg-background px-2 py-1.5 text-sm"
@@ -114,6 +116,7 @@ export default function DefenseFitnessPrepPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="number"
+                            aria-label={`Your ${componentLabel(row.test_component)} value, in ${row.unit}`}
                             placeholder={row.unit}
                             value={attemptValues[row.test_component] || ''}
                             onChange={(e) => setAttemptValues((prev) => ({ ...prev, [row.test_component]: e.target.value }))}
