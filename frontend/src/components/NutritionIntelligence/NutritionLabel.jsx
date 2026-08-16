@@ -13,6 +13,7 @@ import { nutritionAPI } from '../../services/api';
 const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutritionDataProp, scoreData: scoreDataProp }) => {
   const [nutritionData, setNutritionData] = useState(nutritionDataProp || null);
   const [scoreData, setScoreData] = useState(scoreDataProp || null);
+  const [valuePerNutrient, setValuePerNutrient] = useState(null);
   const [loading, setLoading] = useState(!nutritionDataProp);
   const [error, setError] = useState(null);
 
@@ -33,15 +34,19 @@ const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutr
     setError(null);
 
     try {
-      const [nutritionResponse, scoreResponse] = await Promise.all([
+      const [nutritionResponse, scoreResponse, valueResponse] = await Promise.all([
         nutritionAPI.getProductNutrition(productId),
-        nutritionAPI.getNutritionScore(productId).catch(() => null)
+        nutritionAPI.getNutritionScore(productId).catch(() => null),
+        nutritionAPI.getValuePerNutrient(productId).catch(() => null)
       ]);
 
       setNutritionData(nutritionResponse.data);
 
       if (scoreResponse) {
         setScoreData(scoreResponse.data);
+      }
+      if (valueResponse) {
+        setValuePerNutrient(valueResponse.data);
       }
     } catch (err) {
       setError(err.message);
@@ -111,6 +116,16 @@ const NutritionLabel = ({ productId, showComparison = false, nutritionData: nutr
         </div>
         <p className="text-xs text-gray-500 mt-1">Calories per serving</p>
       </div>
+
+      {/* Why this costs more — real per-100g comparison against category peers,
+          only shown when there is a genuine positive differentiator on
+          recorded data (never a guessed or generic "premium quality" line). */}
+      {valuePerNutrient?.leading_nutrient?.pct_vs_category > 0 && (
+        <div className="bg-green-50 border-y border-green-200 p-4">
+          <p className="text-sm font-semibold text-green-800 mb-1">Why this costs more</p>
+          <p className="text-sm text-green-700">{valuePerNutrient.explanation}</p>
+        </div>
+      )}
 
       {/* Nutrients */}
       <div className="p-4 space-y-3">

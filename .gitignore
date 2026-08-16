@@ -17,9 +17,3 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 .vibecheck/provenance/attestations.db
-
-# Disconnected 61MB nested git repo (own history, generic "erp-ai-suite"
-# name, empty backend/src) - looks like leftover project-genesis scaffolding
-# from 2026-08-04, not active work. Not deleted (real git history), just
-# stopped from showing up as untracked-noise / accidental-add risk.
-DI/

@@ -191,7 +191,7 @@ async function predictHarvestTiming(farmerId, cropData) {
       expected_yield: expectedYield,
       expected_quality: expectedQuality,
       predicted_market_price: marketPricePrediction,
-      confidence_score: 0.85,
+      confidence_score: calculateYieldConfidence(historicalHarvests.rows.length, { plant_health: growthStage }, weatherForecast),
       risk_factors: ['weather_uncertainty', 'pest_disease_risk'],
       ai_recommendations: [
         'Monitor for pest outbreaks',
@@ -251,7 +251,7 @@ async function optimizeFarmerResources(farmerId, resourceData) {
     
     // AI optimization algorithm
     const optimization = {
-      farmer_id,
+      farmer_id: farmerId,
       current_resources: currentResources.rows,
       planned_activities: plannedActivities.rows,
       optimization_strategy: 'efficiency_first',
@@ -291,7 +291,7 @@ async function optimizeFarmerResources(farmerId, resourceData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.farmer.resources.optimized', {
-      farmer_id,
+      farmer_id: farmerId,
       optimization,
       timestamp: new Date().toISOString()
     });
@@ -346,7 +346,7 @@ async function detectCropDisease(cropId, diseaseData) {
     
     // AI disease detection algorithm
     const detection = {
-      crop_id,
+      crop_id: cropId,
       detected_diseases: [],
       confidence_score: 0,
       risk_level: 'low',
@@ -380,7 +380,7 @@ async function detectCropDisease(cropId, diseaseData) {
     }
     
     // Generate recommended actions
-    if (etection.detected_diseases.length > 0) {
+    if (detection.detected_diseases.length > 0) {
       detection.recommended_actions = [
         'Isolate affected area',
         'Apply recommended treatment',
@@ -391,7 +391,7 @@ async function detectCropDisease(cropId, diseaseData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.crop.disease.detected', {
-      crop_id,
+      crop_id: cropId,
       detection,
       timestamp: new Date().toISOString()
     });
@@ -448,7 +448,7 @@ async function predictCropYield(cropId, yieldData) {
     
     // AI yield prediction algorithm
     const prediction = {
-      crop_id,
+      crop_id: cropId,
       predicted_yield: 0,
       confidence_score: 0,
       yield_per_hectare: 0,
@@ -475,7 +475,7 @@ async function predictCropYield(cropId, yieldData) {
     
     // Adjust based on weather forecast
     const weatherMultiplier = calculateWeatherMultiplier(weatherForecast);
-    prediction.yield_per_heature *= weatherMultiplier;
+    prediction.yield_per_hectare *= weatherMultiplier;
     
     // Calculate total yield
     const cropArea = yieldData.area_hectares || 1;
@@ -501,7 +501,7 @@ async function predictCropYield(cropId, yieldData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.crop.yield.predicted', {
-      crop_id,
+      crop_id: cropId,
       prediction,
       timestamp: new Date().toISOString()
     });
@@ -561,7 +561,7 @@ async function monitorLivestockHealth(livestockId, healthData) {
     
     // AI health monitoring algorithm
     const monitoring = {
-      livestock_id,
+      livestock_id: livestockId,
       current_health_status: 'healthy',
       health_trend: 'stable',
       risk_factors: [],
@@ -596,7 +596,7 @@ async function monitorLivestockHealth(livestockId, healthData) {
       
       if (currentHealth.feed_intake < 0.7) {
         monitoring.risk_factors.push('reduced_feed_intake');
-        monitoring.recommendations.push('Adjust feeding schedule');
+        monitoring.recommended_actions.push('Adjust feeding schedule');
       }
     }
     
@@ -608,7 +608,7 @@ async function monitorLivestockHealth(livestockId, healthData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.livestock.health.monitored', {
-      livestock_id,
+      livestock_id: livestockId,
       monitoring,
       timestamp: new Date().toISOString()
     });
@@ -629,7 +629,7 @@ async function monitorLivestockHealth(livestockId, healthData) {
  * AI-powered breeding recommendation for livestock
  */
 async function recommendLivestockBreeding(livestockId, breedingData) {
-  const pg = getPostgreSQL;
+  const pg = getPostgreSQL();
   
   try {
     // Get livestock inventory
@@ -663,7 +663,7 @@ async function recommendLivestockBreeding(livestockId, breedingData) {
     
     // AI breeding recommendation algorithm
     const recommendation = {
-      livestock_id,
+      livestock_id: livestockId,
       recommended_action: 'breed',
       confidence_score: 0,
       recommended_partners: [],
@@ -692,7 +692,7 @@ async function recommendLivestockBreeding(livestockId, breedingData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.livestock.breeding.recommended', {
-      livestock_id,
+      livestock_id: livestockId,
       recommendation,
       timestamp: new Date().toISOString()
     });
@@ -737,7 +737,7 @@ async function optimizeDairyProduction(dairyId, productionData) {
     
     // AI optimization algorithm
     const optimization = {
-      dairy_id,
+      dairy_id: dairyId,
       current_efficiency: 0,
       optimized_feed_mix: {},
       expected_milk_increase: 0,
@@ -769,7 +769,7 @@ async function optimizeDairyProduction(dairyId, productionData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.dairy.production.optimized', {
-      dairy_id,
+      dairy_id: dairyId,
       optimization,
       timestamp: new Date().toISOString()
     });
@@ -808,7 +808,7 @@ async function monitorPoultryHealth(poultryId, healthData) {
     
     // AI health monitoring algorithm
     const monitoring = {
-      poultry_id,
+      poultry_id: poultryId,
       current_health_status: 'healthy',
       health_trend: 'stable',
       mortality_alert: false,
@@ -839,7 +839,7 @@ async function monitorPoultryHealth(poultryId, healthData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.poultry.health.monitored', {
-      poultry_id,
+      poultry_id: poultryId,
       monitoring,
       timestamp: new Date().toISOString()
     });
@@ -880,7 +880,7 @@ async function optimizeGoatProduction(goatId, productionData) {
     
     // AI optimization algorithm
     const optimization = {
-      goat_id,
+      goat_id: goatId,
       optimized_production_mix: {},
       expected_increase: 0,
       efficiency_improvement: 0
@@ -894,7 +894,7 @@ async function optimizeGoatProduction(goatId, productionData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.goat.production.optimized', {
-      goat_id,
+      goat_id: goatId,
       optimization,
       timestamp: new Date().toISOString()
     });
@@ -935,7 +935,7 @@ async function optimizeSheepProduction(sheepId, productionData) {
     
     // AI optimization algorithm
     const optimization = {
-      sheep_id,
+      sheep_id: sheepId,
       optimized_production_mix: {},
       expected_wool_increase: 0,
       efficiency_improvement: 0
@@ -949,7 +949,7 @@ async function optimizeSheepProduction(sheepId, productionData) {
     
     // Emit signal bus event
     await signalBus.emit('ai.sheep.production.optimized', {
-      sheep_id,
+      sheep_id: sheepId,
       optimization,
       timestamp: new Date().toISOString()
     });
@@ -990,8 +990,8 @@ async function optimizePigProduction(pigId, productionData) {
     [pigId]);
     
     // AI optimization algorithm
+    const pig_id = pigId;
     const {
-      pig_id,
       optimized_feeding_schedule,
       expected_weight_gain,
       feed_cost_reduction,
@@ -1140,6 +1140,45 @@ function calculateExpectedQuality(cropData, weatherForecast) {
   if (weatherForecast.forecast === 'favorable') return 'grade_a';
   if (weatherForecast.forecast === 'moderate') return 'grade_b';
   return 'grade_c';
+}
+
+/** Same favorable/moderate/adverse scale used by calculateExpectedYield above, factored out
+ *  so predictCropYield can apply it after historical-average yield is already computed. */
+function calculateWeatherMultiplier(weatherForecast) {
+  if (weatherForecast?.forecast === 'favorable') return 1.1;
+  if (weatherForecast?.forecast === 'adverse') return 0.75;
+  return 0.9;
+}
+
+/** Quality grade from current plant health plus forecast — a stricter sibling of
+ *  calculateExpectedQuality, which only has forecast to go on. */
+function predictQualityGrade(currentCondition, weatherForecast) {
+  const health = currentCondition?.plant_health;
+  if (health === 'excellent' && weatherForecast?.forecast === 'favorable') return 'grade_a';
+  if (health === 'poor' || weatherForecast?.forecast === 'adverse') return 'grade_c';
+  return 'grade_b';
+}
+
+/** Real lookup against market_intelligence (same table recommendCropPlanning reads).
+ *  Returns null rather than a fabricated number when there is no priced data for
+ *  this crop — an absent price must never be silently rendered as a real one. */
+async function predictMarketPriceAtDate(cropType, targetDate) {
+  const pg = getPostgreSQL();
+  const result = await pg.query(
+    `SELECT market_price, demand_trend, seasonality FROM market_intelligence WHERE crop_type = $1 AND active = true LIMIT 1`,
+    [cropType]
+  );
+  if (result.rows.length === 0) {
+    return { crop_type: cropType, target_date: targetDate, price: null, basis: 'no market_intelligence record for this crop' };
+  }
+  const row = result.rows[0];
+  const trendMultiplier = row.demand_trend === 'rising' ? 1.05 : row.demand_trend === 'falling' ? 0.95 : 1.0;
+  return {
+    crop_type: cropType,
+    target_date: targetDate,
+    price: Number(row.market_price) * trendMultiplier,
+    basis: `current market_intelligence price adjusted for ${row.demand_trend || 'stable'} demand trend`,
+  };
 }
 
 function calculateYieldConfidence(historicalDataCount, currentCondition, weatherForecast) {

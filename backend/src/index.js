@@ -494,6 +494,18 @@ app.use('/api/v1/comprehensive-erp', comprehensiveERPRoutes);
 // AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face)
 const aiBackboneRoutes = require('./routes/aiBackboneRoutes');
 app.use('/api/v1/ai-backbone', aiBackboneRoutes);
+// Product Media AI - AI product-image generation, nutrient-comparison video generation
+const productMediaAIRoutes = require('./routes/productMediaAIRoutes');
+app.use('/api/v1/product-media-ai', productMediaAIRoutes);
+// Wearable Integration - Fitbit (real OAuth2 API), Apple Health / Samsung Health (device-push)
+const wearableIntegrationRoutes = require('./routes/wearableIntegrationRoutes');
+app.use('/api/v1/wearable-integration', wearableIntegrationRoutes);
+// Defense/Police/BSF Fitness Prep - self-prep comparison against real, cited published standards
+const defenseFitnessPrepRoutes = require('./routes/defenseFitnessPrepRoutes');
+app.use('/api/v1/defense-fitness-prep', defenseFitnessPrepRoutes);
+// Crop Value-Compound Research - AI-assisted, human-reviewed published reference data
+const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes');
+app.use('/api/v1/crop-value-research', cropValueResearchRoutes);
 // Farmer Training - Agricultural training and FOLU compliance
 const farmerTrainingRoutes = require('./routes/farmerTrainingRoutes');
 app.use('/api/v1/training', farmerTrainingRoutes);

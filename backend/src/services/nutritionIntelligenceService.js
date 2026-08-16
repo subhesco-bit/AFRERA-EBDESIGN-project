@@ -8,6 +8,7 @@ const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
 const { NUTRITION_WELLNESS_DISCLAIMER } = require('../utils/disclaimers');
+const aiBackboneService = require('./aiBackboneService');
 
 const router = express.Router();
 
@@ -527,6 +528,166 @@ router.post('/product-nutrition/:productId/pricing', authMiddleware, async (req,
 });
 
 // ============================================================================
+// VALUE-PER-NUTRIENT — "sell by nutrient, not by kg"
+// ============================================================================
+//
+// calculateNutritionPricing() above answers "how much extra can we charge
+// for a good grade" — a percentage bolted onto a per-kg price. This answers
+// a different, customer-facing question: "why does this cost more, in a
+// unit the buyer can actually judge?" It compares this product's real
+// nutrient density (per 100g, from product_nutrition) against the real
+// average of other products in the same category — never a single
+// hardcoded "category average," and never a claim when there is no peer
+// data to support it.
+
+// Generic macro/micronutrients apply to most food products, but the
+// compound that actually drives value varies by crop — a turmeric buyer
+// pays for curcumin %, not protein; a chilli buyer pays for capsaicin
+// (heat) or, for varieties like Kashmiri mirch, color at LOW heat, not
+// protein either. Rather than hardcode by category name (fragile — a
+// products.category_id doesn't reliably say "this is turmeric"), every key
+// below is checked against whatever the product's own nutrition_data JSONB
+// actually contains; unrecorded compounds are skipped, never guessed.
+// New specialty compounds can be added here as real lab data is captured —
+// this table is a lookup of what CAN be compared, not a claim that it is.
+const NUTRIENT_META = {
+  PRO: { label: 'Protein', unit: 'g' },
+  IRON: { label: 'Iron', unit: 'mg' },
+  VIT_C: { label: 'Vitamin C', unit: 'mg' },
+  VIT_A: { label: 'Vitamin A', unit: 'mcg' },
+  CAL: { label: 'Calcium', unit: 'mg' },
+  FIB: { label: 'Dietary Fiber', unit: 'g' },
+  // Specialty/spice value compounds
+  CURCUMIN_PCT: { label: 'Curcumin content', unit: '%' },       // turmeric
+  CAPSAICIN_SHU: { label: 'Pungency (Scoville)', unit: 'SHU' }, // chilli — heat-focused varieties (Dragon, Naga/Bhut Jolokia)
+  ASTA_COLOR: { label: 'Color value (ASTA)', unit: 'ASTA' },    // chilli — color-focused varieties (Kashmiri mirch: low heat, high color)
+  PIPERINE_PCT: { label: 'Piperine content', unit: '%' },       // black pepper
+  GINGEROL_PCT: { label: 'Gingerol content', unit: '%' },       // ginger
+  CATECHIN_PCT: { label: 'Catechin content', unit: '%' },       // tea
+};
+
+/**
+ * Nutrient amount per 100g of product, derived from a nutrition_data row's
+ * per-serving values and its own recorded serving_size_g — no unit is
+ * assumed beyond what the row itself states.
+ */
+function per100g(nutritionRow, nutrientKey) {
+  const amount = nutritionRow?.nutrition_data?.[nutrientKey];
+  const servingSize = nutritionRow?.serving_size_g;
+  if (amount == null || !servingSize) return null;
+  return (Number(amount) / Number(servingSize)) * 100;
+}
+
+async function calculateValuePerNutrient(productId) {
+  try {
+    const productResult = await pool.query(
+      `SELECT p.id, p.name, p.category_id, p.base_price, p.weight_per_unit, rvd.product_name AS variety_name
+       FROM products p
+       LEFT JOIN regional_variety_directory rvd ON rvd.id = p.variety_directory_id
+       WHERE p.id = $1`,
+      [productId]
+    );
+    if (productResult.rows.length === 0) throw new Error('Product not found');
+    const product = productResult.rows[0];
+
+    // Verified-only published reference ranges for the variety, if this
+    // product was created from one (variety_directory_id). Unverified
+    // AI-suggested rows (cropValueResearchService) are never read here —
+    // they must clear human review first.
+    let varietyReferences = [];
+    if (product.variety_name) {
+      const refResult = await pool.query(
+        `SELECT compound_key, typical_min, typical_max, unit, source_url
+         FROM crop_value_compound_reference
+         WHERE variety_name = $1 AND verified = TRUE`,
+        [product.variety_name]
+      );
+      varietyReferences = refResult.rows;
+    }
+
+    const nutritionRow = await getProductNutrition(productId);
+
+    const peersResult = await pool.query(
+      `SELECT DISTINCT ON (pn.product_id) pn.product_id, pn.nutrition_data, pn.serving_size_g
+       FROM product_nutrition pn
+       JOIN products p ON p.id = pn.product_id
+       WHERE p.category_id = $1 AND p.id != $2 AND p.is_active = true
+       ORDER BY pn.product_id, pn.created_at DESC`,
+      [product.category_id, productId]
+    );
+
+    const nutrientComparisons = [];
+    for (const [key, meta] of Object.entries(NUTRIENT_META)) {
+      const thisValue = per100g(nutritionRow, key);
+      if (thisValue == null) continue;
+
+      const peerValues = peersResult.rows
+        .map((p) => per100g(p, key))
+        .filter((v) => v != null);
+
+      if (peerValues.length === 0) {
+        nutrientComparisons.push({ nutrient: meta.label, unit: meta.unit, this_per_100g: thisValue, category_avg_per_100g: null, pct_vs_category: null, peers_compared: 0 });
+        continue;
+      }
+
+      const categoryAvg = peerValues.reduce((sum, v) => sum + v, 0) / peerValues.length;
+      const pctVsCategory = categoryAvg > 0 ? ((thisValue - categoryAvg) / categoryAvg) * 100 : null;
+
+      nutrientComparisons.push({
+        nutrient: meta.label,
+        unit: meta.unit,
+        this_per_100g: Math.round(thisValue * 100) / 100,
+        category_avg_per_100g: Math.round(categoryAvg * 100) / 100,
+        pct_vs_category: pctVsCategory === null ? null : Math.round(pctVsCategory * 10) / 10,
+        peers_compared: peerValues.length,
+      });
+    }
+
+    const withCategoryData = nutrientComparisons.filter((c) => c.pct_vs_category !== null);
+    const leadingNutrient = withCategoryData.length > 0
+      ? withCategoryData.reduce((best, c) => (c.pct_vs_category > best.pct_vs_category ? c : best))
+      : null;
+
+    let explanation;
+    if (!leadingNutrient) {
+      explanation = 'Not enough category peers with recorded nutrition data yet to show a real comparison.';
+    } else if (leadingNutrient.pct_vs_category > 0) {
+      explanation = `This product has ${leadingNutrient.pct_vs_category}% more ${leadingNutrient.nutrient.toLowerCase()} per 100g than the ${leadingNutrient.peers_compared}-product category average (${leadingNutrient.this_per_100g}${leadingNutrient.unit} vs ${leadingNutrient.category_avg_per_100g}${leadingNutrient.unit}) — the price reflects nutrition delivered, not just weight.`;
+    } else {
+      explanation = `On recorded nutrients, this product is not above the category average per 100g (closest: ${leadingNutrient.nutrient.toLowerCase()} at ${leadingNutrient.pct_vs_category}% vs average). Any price premium here would not be nutrition-justified.`;
+    }
+
+    return {
+      product_id: productId,
+      product_name: product.name,
+      base_price: product.base_price,
+      nutrient_comparisons: nutrientComparisons,
+      leading_nutrient: leadingNutrient,
+      explanation,
+      // Published, human-verified reference ranges for the variety — labelled
+      // distinctly from the per-batch comparisons above; a variety-typical
+      // range is not a claim about this specific seller's lot.
+      variety_published_references: product.variety_name
+        ? { variety_name: product.variety_name, ranges: varietyReferences }
+        : null,
+    };
+  } catch (error) {
+    logger.error('Calculate value-per-nutrient error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+router.get('/product-nutrition/:productId/value-per-nutrient', async (req, res) => {
+  try {
+    const result = await calculateValuePerNutrient(req.params.productId);
+    res.json(result);
+  } catch (error) {
+    logger.error('Value-per-nutrient API error', { error: error.message, stack: error.stack });
+    res.status(404).json({ error: error.message });
+  }
+});
+
+// ============================================================================
 // NUTRITION COMPARISON
 // ============================================================================
 
@@ -808,6 +969,110 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
 });
 
 // ============================================================================
+// DIET-BASED RECIPE GENERATION
+// ============================================================================
+//
+// The differentiator: not a static recipe database, but a real AI backbone
+// call (aiBackboneService.callAI, see aiBackboneRoutes/AIBackbonePage built
+// this session) grounded in the same real, live product/nutrition data
+// getPersonalizedProductRecommendations already queries — the AI is given
+// ONLY AFRERA's actual matching products as candidate ingredients and told
+// not to invent others. If no AI provider is configured, this returns an
+// honest ai_not_configured status rather than a fabricated fallback recipe.
+
+/**
+ * Generate a recipe grounded in a user's real dietary profile and real
+ * marketplace ingredient matches.
+ */
+async function generateDietBasedRecipe(userId, dietaryProfileId, options = {}) {
+  try {
+    const profile = await getDietaryProfileById(dietaryProfileId);
+    const recommendations = await getPersonalizedProductRecommendations(userId, dietaryProfileId, {
+      targetCalories: options.targetCalories,
+      limit: options.ingredientLimit || 8,
+    });
+
+    if (recommendations.recommended_products.length === 0) {
+      return {
+        status: 'no_ingredients',
+        message: 'No AFRERA products with recorded nutrition data match this dietary profile yet, so a recipe cannot be honestly generated from real ingredients.',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      };
+    }
+
+    const ingredientList = recommendations.recommended_products
+      .map((p) => `${p.name} (${p.food_group || 'uncategorized'}${p.calories_per_serving ? `, ${p.calories_per_serving} kcal/serving` : ''})`)
+      .join('; ');
+
+    const prompt = `You are a nutrition-focused recipe assistant for an Indian agri-marketplace. `
+      + `Using ONLY these real available ingredients: ${ingredientList}. `
+      + `${profile.name ? `Dietary profile: ${profile.name}. ` : ''}`
+      + `${profile.avoid_nutrients ? `Avoid: ${JSON.stringify(profile.avoid_nutrients)}. ` : ''}`
+      + `${recommendations.calorie_target_kcal_per_day ? `Target roughly ${recommendations.calorie_target_kcal_per_day} kcal/day for this meal's share. ` : ''}`
+      + `Suggest one practical recipe using a subset of these ingredients. Include: dish name, `
+      + `ingredient list with approximate quantities, preparation steps, and an approximate calorie `
+      + `estimate per serving. Do not invent ingredients outside the list given.`;
+
+    let aiResult;
+    try {
+      aiResult = await aiBackboneService.callAI(prompt, {
+        maxTokens: 800,
+        ...(options.provider ? { provider: options.provider } : {}),
+      });
+    } catch (aiError) {
+      return {
+        status: 'ai_not_configured',
+        message: aiError.message,
+        ingredients_considered: recommendations.recommended_products.map((p) => p.name),
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      };
+    }
+
+    return {
+      status: 'generated',
+      dietary_profile_id: dietaryProfileId,
+      recipe_text: aiResult.content,
+      ai_provider: aiResult.provider,
+      ai_model: aiResult.model,
+      ingredients_considered: recommendations.recommended_products.map((p) => p.name),
+      calorie_target_kcal_per_day: recommendations.calorie_target_kcal_per_day,
+      generated_at: new Date().toISOString(),
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+    };
+  } catch (error) {
+    logger.error('Generate diet-based recipe error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to generate a diet-based recipe
+ */
+router.post('/recipes', authMiddleware, async (req, res) => {
+  try {
+    const { dietary_profile_id, target_calories, provider } = req.body || {};
+    if (!dietary_profile_id) {
+      return res.status(400).json({
+        error: 'dietary_profile_id is required',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    const result = await generateDietBasedRecipe(req.user.id, dietary_profile_id, {
+      targetCalories: target_calories,
+      provider,
+    });
+    res.json(result);
+  } catch (error) {
+    logger.error('Generate diet-based recipe API error', { error: error.message, stack: error.stack });
+    res.status(500).json({
+      error: 'Failed to generate recipe',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+    });
+  }
+});
+
+// ============================================================================
 // WELLNESS / NATURAL PRACTICES (reference & education only)
 // ============================================================================
 //
@@ -884,10 +1149,12 @@ module.exports = {
   calculateProductNutritionScore,
   getProductNutritionScore,
   calculateNutritionPricing,
+  calculateValuePerNutrient,
   compareProductsNutrition,
   getDietaryProfiles,
   getDietaryProfileById,
   getPersonalizedProductRecommendations,
+  generateDietBasedRecipe,
   getWellnessPractices,
   isHealthy
 };

@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { productsAPI } from '../services/api'
 import { ShoppingCart, Star, Leaf, Award, Truck } from 'lucide-react'
+import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel'
 
 function ProductDetailPage() {
   const { id } = useParams()
@@ -120,20 +121,13 @@ function ProductDetailPage() {
             </div>
           )}
 
-          {/* Nutrition Data */}
-          {product.nutrition_data && Object.keys(product.nutrition_data).length > 0 && (
-            <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-2">Nutrition Information</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                {Object.entries(product.nutrition_data).map(([key, value]) => (
-                  <div key={key} className="flex justify-between">
-                    <span className="text-gray-600 capitalize">{key}:</span>
-                    <span className="text-gray-800">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Nutrition Data — real nutritionIntelligenceService data (grade, daily-value %,
+              verification method/confidence), not the flat product.nutrition_data blob.
+              NutritionLabel self-fetches by productId and renders its own honest
+              "not available" state when the product has no recorded nutrition data. */}
+          <div className="mb-6">
+            <NutritionLabel productId={product.id} showComparison />
+          </div>
 
           {/* Certifications */}
           {product.certifications && product.certifications.length > 0 && (

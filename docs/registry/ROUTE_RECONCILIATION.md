@@ -55,3 +55,28 @@ Full raw lists: `docs/registry/_orphan_backend_routes.json`, `docs/registry/_orp
 1. For each top-offender file: confirm whether its orphan routes are (a) genuinely-needed admin UI that hasn't been built yet, or (b) speculative scaffolding that should be removed.
 2. For the 599 frontend-orphan calls: confirm each is either (a) a genuine backend gap to fill, or (b) a frontend call to a renamed/removed path that needs updating. The `analyticsAPI` group above is the one confirmed case of (b)-adjacent (path exists correctly, service behind it doesn't).
 3. Extend the backend-route extractor to walk the M0XX dynamic-loader loop so those ~150 modules are included in a future pass.
+
+## Orphan services (not "route with no caller" — "service with no route at all")
+
+Everything above catches a route that exists but nothing calls it. It does **not** catch a
+service file that has no route/controller at all — that class of bug was found twice this
+session by hand (`productMediaAIService.js`: real, DB-backed AI image/video-script logic, zero
+route, zero controller, unreachable from any HTTP request until fixed 2026-08-16;
+`completeAIIntegrationService.js`: was mounted, but had ~20 `ReferenceError`-level crash bugs
+that would have surfaced the moment any of its 15 endpoints were actually called). Per explicit
+user feedback ("if you index all files with no connection you will not have to repeat or
+duplicate again and again"), this check is now a rerunnable script instead of manual grepping:
+
+```bash
+node scripts/find-orphan-services.js
+```
+
+**Result as of 2026-08-16** (172 service files scanned against the full `backend/src` tree):
+only `advancedServiceGenerator.js` is unreferenced, and that is correct — it is a dev-time
+code-generation template (returns service/route code as strings for scaffolding new modules),
+not a runtime capability, so it has no route by design. See the script's own header comment for
+what it does and does not prove (reference vs. full reachability from `index.js`).
+
+Re-run this after adding any new service file, and before assuming "the backend has N real
+capabilities" in any future audit — it is cheap and catches exactly the kind of gap that looks
+identical to a genuinely missing feature until you check.

@@ -408,41 +408,37 @@ exports.forceSyncAllAIIntegrations = async (req, res) => {
  */
 exports.getAIModelInfo = async (req, res) => {
   try {
+    // These are deterministic rule-based scoring functions (see
+    // completeAIIntegrationService.js), not trained/evaluated ML models —
+    // there is no held-out test set behind them, so "accuracy" is not a
+    // claim that can honestly be made. This describes what each function
+    // actually weighs, not a fabricated performance number.
     const modelInfo = {
-      models: {
+      capabilities: {
         crop_planning: {
-          version: '1.0.0',
-          accuracy: 0.85,
-          last_trained: '2026-08-01',
-          features: ['soil_suitability', 'market_conditions', 'historical_performance']
+          kind: 'rule-based scoring',
+          inputs: ['historical crop performance', 'field soil/irrigation suitability', 'market_intelligence demand/price'],
         },
         disease_detection: {
-          version: '1.0.0',
-          accuracy: 0.78,
-          last_trained: '2026-08-01',
-          features: ['symptom_analysis', 'environmental_factors', 'disease_database']
+          kind: 'symptom-match against crop_disease_database',
+          inputs: ['reported symptoms', 'crop_disease_database symptom/severity records'],
         },
         yield_prediction: {
-          version: '1.0.0',
-          accuracy: 0.82,
-          last_trained: '2026-08-01',
-          features: ['historical_yield', 'weather_forecast', 'crop_health']
+          kind: 'rule-based scoring',
+          inputs: ['historical yield records', 'current growth stage/plant health', 'weather forecast'],
         },
         livestock_health: {
-          version: '1.0.0',
-          accuracy: 0.80,
-          last_trained: '2026-08-01',
-          features: ['health_monitoring', 'behavior_analysis', 'environmental_conditions']
-        }
+          kind: 'threshold-based monitoring',
+          inputs: ['temperature/activity/feed-intake trend vs recorded history'],
+        },
       },
       system_status: 'operational',
-      compute_resources: 'available'
     };
-    
+
     res.status(200).json({
       success: true,
       data: modelInfo,
-      message: 'AI model information retrieved successfully'
+      message: 'AI capability information retrieved successfully'
     });
   } catch (error) {
     logger.error('Error getting AI model information', { error: error.message });

@@ -98,6 +98,13 @@ const FisheriesManagementPage = lazy(() => import('../pages/FisheriesManagementP
 const IdentityManagementPage = lazy(() => import('../pages/IdentityManagementPage'))
 const PlatformFoundationPage = lazy(() => import('../pages/PlatformFoundationPage'))
 const EnterpriseControlPage = lazy(() => import('../pages/EnterpriseControlPage'))
+const AIBackbonePage = lazy(() => import('../pages/AIBackbonePage'))
+const DietRecipesPage = lazy(() => import('../pages/DietRecipesPage'))
+const WearablesPage = lazy(() => import('../pages/WearablesPage'))
+const FitbitCallbackPage = lazy(() => import('../pages/FitbitCallbackPage'))
+const DefenseFitnessPrepPage = lazy(() => import('../pages/DefenseFitnessPrepPage'))
+const SellerProductFormPage = lazy(() => import('../pages/SellerProductFormPage'))
+const VarietyDirectoryPage = lazy(() => import('../pages/VarietyDirectoryPage'))
 const PoultryManagementPage = lazy(() => import('../pages/PoultryManagementPage'))
 const GoatFarmingPage = lazy(() => import('../pages/GoatFarmingPage'))
 const SheepFarmingPage = lazy(() => import('../pages/SheepFarmingPage'))
@@ -962,6 +969,62 @@ export const managementRoutes = [
     title: 'Enterprise Control - AFRERA',
     description: 'Enterprise control systems',
     keywords: 'enterprise, control, systems',
+    transition: 'fade'
+  },
+  {
+    path: '/ai-backbone',
+    component: AIBackbonePage,
+    title: 'AI Backbone - AFRERA',
+    description: 'Unified multi-provider AI integration: Claude, ChatGPT, Gemini, Azure OpenAI, Hugging Face',
+    keywords: 'ai, backbone, claude, chatgpt, gemini, azure, huggingface',
+    transition: 'fade'
+  },
+  {
+    path: '/diet-recipes',
+    component: DietRecipesPage,
+    title: 'Diet & Recipes - AFRERA',
+    description: 'AI-generated recipes grounded in real dietary profiles and real AFRERA products',
+    keywords: 'diet, recipes, nutrition, ai',
+    transition: 'fade'
+  },
+  {
+    path: '/wearables',
+    component: WearablesPage,
+    title: 'Wearables - AFRERA',
+    description: 'Fitbit, Apple Health, Samsung Health connection status and activity',
+    keywords: 'wearable, fitbit, apple health, samsung health, fitness',
+    transition: 'fade'
+  },
+  {
+    path: '/wearables/fitbit-callback',
+    component: FitbitCallbackPage,
+    title: 'Connecting Fitbit - AFRERA',
+    description: 'Fitbit OAuth callback',
+    keywords: 'fitbit, oauth, callback',
+    transition: 'fade'
+  },
+  {
+    path: '/defense-fitness-prep',
+    component: DefenseFitnessPrepPage,
+    title: 'Defense & Police Fitness Prep - AFRERA',
+    description: 'Self-prep comparison against real, cited published physical standards',
+    keywords: 'defense, police, bsf, fitness, recruitment, prep',
+    transition: 'fade'
+  },
+  {
+    path: '/sell/new-product',
+    component: SellerProductFormPage,
+    title: 'Add Product - AFRERA',
+    description: 'Create a new marketplace product listing',
+    keywords: 'sell, product, add, create, listing',
+    transition: 'fade'
+  },
+  {
+    path: '/variety-directory',
+    component: VarietyDirectoryPage,
+    title: 'Variety Directory - AFRERA',
+    description: '142 real, citation-backed NE India crop, livestock, and fisheries varieties',
+    keywords: 'variety, directory, north east, GI, biodiversity',
     transition: 'fade'
   },
   {

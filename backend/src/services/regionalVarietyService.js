@@ -13,6 +13,7 @@
 const { logger } = require('../utils/logger');
 const pool = require('../database/pool');
 const productMediaAIService = require('./productMediaAIService');
+const cropValueResearchService = require('./cropValueResearchService');
 
 class RegionalVarietyService {
   async list({ category, giStatus, state, search } = {}) {
@@ -96,6 +97,16 @@ class RegionalVarietyService {
       gi_certificate_number: variety.gi_application_no || null,
     });
     await pool.query('UPDATE products SET variety_directory_id = $1 WHERE id = $2', [varietyId, product.id]);
+
+    // Best-effort, non-blocking: "when a product is added, AI searches and
+    // adds/updates" the published value-compound reference data for this
+    // variety (see cropValueResearchService.js — writes land unverified,
+    // pending human review, and this never fails/delays listing creation).
+    cropValueResearchService
+      .researchOnProductAdded(variety.product_name, [
+        'CURCUMIN_PCT', 'CAPSAICIN_SHU', 'ASTA_COLOR', 'PIPERINE_PCT', 'GINGEROL_PCT', 'CATECHIN_PCT',
+      ])
+      .catch(() => {});
 
     logger.info('Product created from regional variety directory', { varietyId, productId: product.id });
     return { ...product, variety_directory_id: varietyId };

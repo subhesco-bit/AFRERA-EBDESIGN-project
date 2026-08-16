@@ -722,11 +722,18 @@ Please provide:
  * Get AI provider status
  */
 function getAIProviderStatus() {
+  const redactedProviders = Object.fromEntries(
+    Object.entries(AI_PROVIDERS).map(([name, config]) => {
+      const { apiKey, ...safeConfig } = config;
+      return [name, { ...safeConfig, configured: Boolean(apiKey) }];
+    })
+  );
+
   return {
-    providers: AI_PROVIDERS,
+    providers: redactedProviders,
     statistics: aiRequestTracker,
     availableProviders: Object.entries(AI_PROVIDERS)
-      .filter(([_, config]) => config.enabled)
+      .filter(([_, config]) => config.enabled && config.apiKey)
       .map(([name, _]) => name)
   };
 }

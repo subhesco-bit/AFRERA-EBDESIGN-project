@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import Dashboard from '../components/ui/Dashboard';
 import AIInsightsPanel from '../components/ui/AIInsightsPanel';
 import { Card, Button, Select, SearchInput, DataTable, Modal, Tabs } from '../components/ui/common';
+import { aiBackboneAPI } from '../services/api';
 
 const PlatformManagementPage = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -39,68 +40,64 @@ const PlatformManagementPage = () => {
   };
 
   const loadAIInsights = async () => {
+    // Real AI backbone provider status (backend/src/services/aiBackboneService.js) —
+    // this used to be a hardcoded array including a fabricated "Memory Leak
+    // Detected, 92% confidence" alarm with no telemetry behind it, which is
+    // actively misleading on an admin dashboard, not just a placeholder.
+    // Every insight below is derived from a real status response; there is
+    // no `confidence` field unless it is one this session actually computed.
     try {
-      // Mock AI insights - replace with actual API call
-      const insights = [
-        {
-          id: 'insight_1',
-          title: 'CPU Usage Optimization Opportunity',
-          description: 'Current CPU usage patterns suggest optimization potential through load balancing and caching improvements.',
+      const res = await aiBackboneAPI.getAIProviderStatus();
+      const status = res.data?.data;
+      const insights = [];
+      const now = new Date().toISOString();
+
+      const configuredCount = status?.availableProviders?.length || 0;
+      if (configuredCount === 0) {
+        insights.push({
+          id: 'ai-backbone-unconfigured',
+          title: 'No AI provider configured',
+          description: 'The AI backbone (Claude, ChatGPT, Gemini, Azure OpenAI, Hugging Face) has no provider API key set, so AI-assisted features that depend on it will fail.',
           severity: 'warning',
-          confidence: 0.85,
-          data: {
-            current_usage: 78,
-            projected_usage: 65,
-            potential_savings: 15
-          },
           recommendations: [
-            'Implement Redis caching for frequently accessed data',
-            'Optimize database queries with proper indexing',
-            'Consider horizontal scaling for peak hours'
+            'Set at least one provider key in backend/.env (see backend/.env.example)',
+            'Restart the backend after setting the key',
           ],
-          timestamp: new Date().toISOString()
-        },
-        {
-          id: 'insight_2',
-          title: 'Memory Leak Detected',
-          description: 'Memory usage patterns indicate potential memory leak in background processes.',
-          severity: 'critical',
-          confidence: 0.92,
+          timestamp: now,
+        });
+      } else {
+        const stats = status.statistics;
+        insights.push({
+          id: 'ai-backbone-status',
+          title: `${configuredCount} AI provider${configuredCount === 1 ? '' : 's'} configured`,
+          description: `${status.availableProviders.join(', ')} ready to serve requests via /api/v1/ai-backbone.`,
+          severity: 'success',
           data: {
-            current_usage: 89,
-            trend: 'increasing',
-            affected_processes: 3
+            total_requests_this_session: stats?.totalRequests ?? 0,
+            successful: stats?.successfulRequests ?? 0,
+            failed: stats?.failedRequests ?? 0,
           },
-          recommendations: [
-            'Investigate background process memory allocation',
-            'Implement memory monitoring and alerts',
-            'Restart affected services after investigation'
-          ],
-          timestamp: new Date().toISOString()
-        },
-        {
-          id: 'insight_3',
-          title: 'Database Performance Improvement',
-          description: 'Database query performance can be improved through indexing and query optimization.',
-          severity: 'info',
-          confidence: 0.78,
-          data: {
-            avg_query_time: 245,
-            target_query_time: 100,
-            slow_queries: 12
-          },
-          recommendations: [
-            'Add indexes to frequently queried columns',
-            'Optimize complex queries with proper joins',
-            'Implement query result caching'
-          ],
-          timestamp: new Date().toISOString()
-        }
-      ];
-      
+          timestamp: now,
+        });
+
+        Object.entries(stats?.providerStats || {}).forEach(([name, s]) => {
+          if (s.total > 0 && s.failed / s.total > 0.5) {
+            insights.push({
+              id: `ai-backbone-failures-${name}`,
+              title: `${name} is failing most requests`,
+              description: `${s.failed} of ${s.total} requests to ${name} failed this session — check the API key and quota.`,
+              severity: 'critical',
+              data: { total: s.total, failed: s.failed, succeeded: s.success },
+              timestamp: now,
+            });
+          }
+        });
+      }
+
       setAiInsights(insights);
     } catch (error) {
       console.error('Error loading AI insights:', error);
+      setAiInsights([]);
     }
   };
 

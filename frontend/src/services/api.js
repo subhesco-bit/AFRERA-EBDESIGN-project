@@ -178,6 +178,56 @@ export const aiAPI = {
   generateRecommendations: (data) => api.post('/ai/recommend', data),
 }
 
+// Product Media AI API — AI product-image generation, nutrient-comparison
+// video generation. See backend/src/services/productMediaAIService.js —
+// provider status is honestly not_configured until an image/video provider
+// key is set; buildVideoScript works today with no external AI dependency.
+export const productMediaAIAPI = {
+  getProviderStatus: () => api.get('/product-media-ai/status'),
+  generateImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
+  buildVideoScript: (productId) => api.post(`/product-media-ai/products/${productId}/video-script`),
+  generateVideo: (productId) => api.post(`/product-media-ai/products/${productId}/video`),
+}
+
+// Wearable Integration API — Fitbit (real OAuth2), Apple Health / Samsung
+// Health (device-push only, see wearableIntegrationService.js header for why).
+export const wearableAPI = {
+  getStatus: () => api.get('/wearable-integration/status'),
+  getFitbitAuthUrl: () => api.get('/wearable-integration/fitbit/auth-url'),
+  handleFitbitCallback: (code) => api.post('/wearable-integration/fitbit/callback', { code }),
+  syncFitbit: () => api.post('/wearable-integration/fitbit/sync'),
+  // Called by the mobile (Capacitor) client after reading local HealthKit /
+  // Samsung Health SDK data — the web app cannot call this meaningfully.
+  ingestDeviceActivity: (provider, activityDate, activity) =>
+    api.post('/wearable-integration/sync', { provider, activity_date: activityDate, activity }),
+  getRecentActivity: (days) => api.get('/wearable-integration/activity/recent', { params: { days } }),
+  disconnect: (provider) => api.delete(`/wearable-integration/${provider}`),
+}
+
+// Defense/Police/BSF Fitness Prep API — self-prep comparison against real,
+// cited published physical standards. No connection to any actual
+// recruitment system; see defenseFitnessPrepService.js header.
+// Regional Variety Directory — 142 real, citation-backed NE India crop/
+// livestock/fisheries varieties (see backend/src/database/migrations/
+// 9999_zzz_regional_variety_directory_schema.sql). Reference/education data,
+// deliberately separate from buyable `products` (no real farmer prices exist
+// for these) until a seller explicitly creates a real listing from one.
+export const varietyDirectoryAPI = {
+  list: (params) => api.get('/variety-directory', { params }),
+  getCategories: () => api.get('/variety-directory/categories'),
+  getById: (id) => api.get(`/variety-directory/${id}`),
+  requestImage: (id) => api.post(`/variety-directory/${id}/generate-image`),
+  createListing: (id, data) => api.post(`/variety-directory/${id}/create-listing`, data),
+}
+
+export const defenseFitnessPrepAPI = {
+  getCategories: () => api.get('/defense-fitness-prep/categories'),
+  getStandards: (category, gender) => api.get(`/defense-fitness-prep/standards/${category}`, { params: { gender } }),
+  recordAttempt: (category, testComponent, recordedValue, source) =>
+    api.post('/defense-fitness-prep/attempts', { category, test_component: testComponent, recorded_value: recordedValue, source }),
+  getReadiness: (category, gender) => api.get(`/defense-fitness-prep/readiness/${category}`, { params: { gender } }),
+}
+
 // Forms API
 export const formsAPI = {
   getForms: (params = {}) => api.get('/forms', { params }),
@@ -1357,6 +1407,21 @@ export const multilingualAPI = {
 export const nutritionAPI = {
   getProductNutrition: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}`),
   getNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
+  getDietaryProfiles: () => api.get('/nutrition-intelligence/dietary-profiles'),
+  getRecommendations: () => api.get('/nutrition-intelligence/recommendations'),
+  generateRecommendations: (dietaryProfileId, targetCalories, limit) =>
+    api.post('/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit }),
+  getWellnessPractices: (params) => api.get('/nutrition-intelligence/wellness-practices', { params }),
+  // AI-generated recipe grounded in real dietary profile + real matching AFRERA
+  // products — see nutritionIntelligenceService.generateDietBasedRecipe. Returns
+  // an honest status: 'generated' | 'ai_not_configured' | 'no_ingredients'.
+  generateRecipe: (dietaryProfileId, targetCalories, provider) =>
+    api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
+  // "Sell by nutrient, not by kg" — real per-100g comparison against category
+  // peers, picks whichever recorded compound (protein, curcumin, Scoville,
+  // ASTA color, etc.) actually differentiates this product. See
+  // nutritionIntelligenceService.calculateValuePerNutrient.
+  getValuePerNutrient: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
 }
 
 /** Organic traceability — farm registration, standards, consumer QR lookup. */
