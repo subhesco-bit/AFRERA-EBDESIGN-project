@@ -348,7 +348,7 @@ async function calculateClaimPayout(claimId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiResponse);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const payout = {
       claim_id: claimId,
