@@ -12,7 +12,7 @@ export default function M070Page() {
         This capability is implemented at <code>pages/HarvestScorePage.jsx</code>,
         not here.
       </p>
-      <Link to="/harvestscore" className="text-blue-600 underline">
+      <Link to="/harvest-score" className="text-blue-600 underline">
         Go to Harvest Score →
       </Link>
     </div>

@@ -16,6 +16,10 @@ const pool = require('../database/pool');
 
 // Test-mode fallbacks to avoid DB dependencies during unit tests
 if (process.env.NODE_ENV === 'test') {
+  // Deliberately reassigns the async function declarations below (hoisted
+  // with their full real bodies before this block runs) so tests get
+  // lightweight fakes instead of hitting a real DB - intentional, not a bug.
+  /* eslint-disable no-func-assign */
   // In-memory stores for test mode
   const _translationStore = new Map();
   const _userPreferences = new Map();
@@ -80,6 +84,7 @@ if (process.env.NODE_ENV === 'test') {
   };
 
   getTranslationMemoryStats = async () => ({ total_entries: 0, verified_entries: 0, auto_translated_entries: 0, avg_confidence: 0, total_usage: 0 });
+  /* eslint-enable no-func-assign */
 }
 
 // ============================================================================

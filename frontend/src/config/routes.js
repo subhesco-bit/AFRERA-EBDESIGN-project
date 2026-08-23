@@ -23,6 +23,7 @@ const MarketplacePage = lazy(() => import('../pages/MarketplacePage'))
 const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'))
 const CartPage = lazy(() => import('../pages/CartPage'))
 const CheckoutPage = lazy(() => import('../pages/CheckoutPage'))
+const OrderDetailPage = lazy(() => import('../pages/OrderDetailPage'))
 const LoginPage = lazy(() => import('../pages/LoginPage'))
 const RegisterPage = lazy(() => import('../pages/RegisterPage'))
 const FarmerPortalPage = lazy(() => import('../pages/FarmerPortalPage'))
@@ -280,6 +281,15 @@ export const protectedRoutes = [
     title: 'Checkout - AFRERA',
     description: 'Complete your purchase',
     keywords: 'checkout, payment, order',
+    transition: 'fade',
+    noIndex: true
+  },
+  {
+    path: '/orders/:id',
+    component: OrderDetailPage,
+    title: 'Order Details - AFRERA',
+    description: 'View your order confirmation and status',
+    keywords: 'order, confirmation, status',
     transition: 'fade',
     noIndex: true
   },

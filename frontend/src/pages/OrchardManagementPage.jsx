@@ -16,40 +16,38 @@ function OrchardManagementPage() {
   const [harvestTarget, setHarvestTarget] = useState(null)
   const [harvestForm, setHarvestForm] = useState({ date: '', quantity_kg: '', grade: 'A' })
 
-  const { data, isLoading, error } = useQuery(
-    'orchards',
-    async () => (await orchardAPI.getOrchards()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['orchards'],
+    queryFn: async () => (await orchardAPI.getOrchards()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? orchardAPI.updateOrchard(editingId, payload) : orchardAPI.createOrchard(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Orchard updated' : 'Orchard registered')
-        queryClient.invalidateQueries('orchards')
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save orchard'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? orchardAPI.updateOrchard(editingId, payload) : orchardAPI.createOrchard(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Orchard updated' : 'Orchard registered')
+      queryClient.invalidateQueries({ queryKey: ['orchards'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save orchard'),
+  })
 
-  const deleteMutation = useMutation((id) => orchardAPI.deleteOrchard(id), {
-    onSuccess: () => { toast.success('Orchard removed'); queryClient.invalidateQueries('orchards') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => orchardAPI.deleteOrchard(id),
+    onSuccess: () => { toast.success('Orchard removed'); queryClient.invalidateQueries({ queryKey: ['orchards'] }) },
     onError: () => toast.error('Failed to remove orchard'),
   })
 
-  const recordHarvestMutation = useMutation(
-    ({ id, payload }) => orchardAPI.recordHarvest(id, payload),
-    {
-      onSuccess: () => {
-        toast.success('Harvest recorded')
-        queryClient.invalidateQueries('orchards')
-        setHarvestTarget(null)
-        setHarvestForm({ date: '', quantity_kg: '', grade: 'A' })
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record harvest'),
-    }
-  )
+  const recordHarvestMutation = useMutation({
+    mutationFn: ({ id, payload }) => orchardAPI.recordHarvest(id, payload),
+    onSuccess: () => {
+      toast.success('Harvest recorded')
+      queryClient.invalidateQueries({ queryKey: ['orchards'] })
+      setHarvestTarget(null)
+      setHarvestForm({ date: '', quantity_kg: '', grade: 'A' })
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record harvest'),
+  })
 
   const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
 
@@ -199,8 +197,8 @@ function OrchardManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Register Orchard'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Register Orchard'}
                   </button>
                 </div>
               </form>
@@ -248,8 +246,8 @@ function OrchardManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setHarvestTarget(null)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={recordHarvestMutation.isLoading} className="px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition disabled:opacity-60">
-                    {recordHarvestMutation.isLoading ? 'Saving...' : 'Log Harvest'}
+                  <button type="submit" disabled={recordHarvestMutation.isPending} className="px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition disabled:opacity-60">
+                    {recordHarvestMutation.isPending ? 'Saving...' : 'Log Harvest'}
                   </button>
                 </div>
               </form>

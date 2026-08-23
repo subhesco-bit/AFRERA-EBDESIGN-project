@@ -5,6 +5,7 @@
 
 const { logger } = require('../utils/logger');
 const aiBackbone = require('./aiBackboneService');
+const { aiAPI } = require('./aiService');
 const { getPostgreSQL } = require('../database/connection');
 const { signalBus } = require('../core/signalBus');
 const { authMiddleware } = require('../middleware/auth');

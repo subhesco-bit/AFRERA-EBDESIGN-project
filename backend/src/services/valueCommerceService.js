@@ -11,6 +11,10 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
 if (process.env.NODE_ENV === 'test') {
+  // Deliberately reassigns the async function declarations below (hoisted
+  // with their full real bodies before this block runs) so tests get
+  // lightweight fakes instead of hitting a real DB - intentional, not a bug.
+  /* eslint-disable no-func-assign */
   const now = new Date();
   getValueFactors = async () => ([{ id: 'vf-1', name: 'nutrition', weight: 1.5 }]);
 
@@ -53,6 +57,7 @@ if (process.env.NODE_ENV === 'test') {
   getConsumerValuePreferences = async (userId) => ({ nutrition_importance: 1.0, quality_importance: 1.0 });
   generateValueRecommendations = async (userId) => ([]);
   getValueTiers = async () => ([{ id: 'tier-A', min_score: 85, name: 'A' }]);
+  /* eslint-enable no-func-assign */
 }
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
@@ -404,24 +409,28 @@ async function generateValueRecommendations(userId, limit = 10) {
       };
     });
 
-    // Save recommendations
-    for (const rec of recommendations) {
+    // Save recommendations — one bulk upsert via unnest() instead of one
+    // round-trip per row (all rows share the same shape and conflict target).
+    if (recommendations.length > 0) {
       await pool.query(
-        `INSERT INTO value_recommendations 
-         (user_id, product_id, recommendation_score, recommendation_reasons, 
+        `INSERT INTO value_recommendations
+         (user_id, product_id, recommendation_score, recommendation_reasons,
           value_match_score, price_value_ratio)
-         VALUES ($1, $2, $3, $4, $5, $6)
+         SELECT $1, product_id, recommendation_score, recommendation_reasons::jsonb,
+                value_match_score, price_value_ratio
+         FROM unnest($2::uuid[], $3::numeric[], $4::text[], $5::numeric[], $6::numeric[])
+           AS t(product_id, recommendation_score, recommendation_reasons, value_match_score, price_value_ratio)
          ON CONFLICT (user_id, product_id)
          DO UPDATE SET
            recommendation_score = EXCLUDED.recommendation_score,
            generated_at = CURRENT_TIMESTAMP`,
         [
           userId,
-          rec.product_id,
-          rec.recommendation_score,
-          JSON.stringify(rec.recommendation_reasons),
-          rec.value_match_score,
-          rec.price_value_ratio
+          recommendations.map((rec) => rec.product_id),
+          recommendations.map((rec) => rec.recommendation_score),
+          recommendations.map((rec) => JSON.stringify(rec.recommendation_reasons)),
+          recommendations.map((rec) => rec.value_match_score),
+          recommendations.map((rec) => rec.price_value_ratio)
         ]
       );
     }

@@ -206,7 +206,7 @@ async function generateRentalReport(ownerId, reportType) {
     const report = {
       report_id: generateId(),
       owner_id: ownerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       total_listings: await getTotalListings(ownerId),
       total_bookings: await getTotalBookings(ownerId),

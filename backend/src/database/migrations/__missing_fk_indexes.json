@@ -1,0 +1,174 @@
+[
+  {
+    "table": "user_profiles",
+    "column": "user_id"
+  },
+  {
+    "table": "user_roles",
+    "column": "user_id"
+  },
+  {
+    "table": "user_roles",
+    "column": "role_id"
+  },
+  {
+    "table": "user_roles",
+    "column": "assigned_by"
+  },
+  {
+    "table": "categories",
+    "column": "parent_id"
+  },
+  {
+    "table": "products",
+    "column": "unit_id"
+  },
+  {
+    "table": "products",
+    "column": "created_by"
+  },
+  {
+    "table": "cart",
+    "column": "user_id"
+  },
+  {
+    "table": "cart",
+    "column": "product_id"
+  },
+  {
+    "table": "payments",
+    "column": "order_id"
+  },
+  {
+    "table": "payments",
+    "column": "user_id"
+  },
+  {
+    "table": "fpos",
+    "column": "address_id"
+  },
+  {
+    "table": "farmers",
+    "column": "farm_location_id"
+  },
+  {
+    "table": "farmer_certifications",
+    "column": "farmer_id"
+  },
+  {
+    "table": "training_records",
+    "column": "farmer_id"
+  },
+  {
+    "table": "credit_scores",
+    "column": "farmer_id"
+  },
+  {
+    "table": "loans",
+    "column": "farmer_id"
+  },
+  {
+    "table": "emi_schedule",
+    "column": "loan_id"
+  },
+  {
+    "table": "advances",
+    "column": "farmer_id"
+  },
+  {
+    "table": "financial_transactions",
+    "column": "user_id"
+  },
+  {
+    "table": "policies",
+    "column": "user_id"
+  },
+  {
+    "table": "policies",
+    "column": "farmer_id"
+  },
+  {
+    "table": "policies",
+    "column": "product_id"
+  },
+  {
+    "table": "claims",
+    "column": "policy_id"
+  },
+  {
+    "table": "claims",
+    "column": "user_id"
+  },
+  {
+    "table": "shipments",
+    "column": "order_id"
+  },
+  {
+    "table": "shipments",
+    "column": "mode_id"
+  },
+  {
+    "table": "drivers",
+    "column": "assigned_vehicle_id"
+  },
+  {
+    "table": "contracts",
+    "column": "farmer_id"
+  },
+  {
+    "table": "contracts",
+    "column": "buyer_id"
+  },
+  {
+    "table": "contracts",
+    "column": "crop_id"
+  },
+  {
+    "table": "contract_milestones",
+    "column": "contract_id"
+  },
+  {
+    "table": "escrow_accounts",
+    "column": "contract_id"
+  },
+  {
+    "table": "assets",
+    "column": "type_id"
+  },
+  {
+    "table": "assets",
+    "column": "location_id"
+  },
+  {
+    "table": "assets",
+    "column": "responsible_user_id"
+  },
+  {
+    "table": "asset_bookings",
+    "column": "asset_id"
+  },
+  {
+    "table": "asset_bookings",
+    "column": "user_id"
+  },
+  {
+    "table": "maintenance_records",
+    "column": "asset_id"
+  },
+  {
+    "table": "subsidy_claims",
+    "column": "farmer_id"
+  },
+  {
+    "table": "subsidy_claims",
+    "column": "scheme_id"
+  },
+  {
+    "table": "compliance_records",
+    "column": "verified_by"
+  },
+  {
+    "table": "recommendations",
+    "column": "user_id"
+  }
+]

@@ -784,7 +784,7 @@ const salesDistribution = {
       await signalBus.emit('erp.sd.invoice.created', { invoice_number: header.invoice_number, timestamp: new Date().toISOString() });
       logger.info('Invoice created', { invoice_number: header.invoice_number });
       
-      return { ...header, total_amount };
+      return { ...header, total_amount: totalAmount };
     } catch (error) {
       logger.error('Error creating invoice', { error: error.message });
       throw error;
@@ -837,8 +837,8 @@ const productionPlanning = {
         [productionOrder]
       );
       
-      await signalBus.emit('erp.pp.po.released', { production_order, timestamp: new Date().toISOString() });
-      logger.info('Production order released', { production_order });
+      await signalBus.emit('erp.pp.po.released', { production_order: productionOrder, timestamp: new Date().toISOString() });
+      logger.info('Production order released', { production_order: productionOrder });
       
       return rows[0];
     } catch (error) {
@@ -869,8 +869,8 @@ const productionPlanning = {
         [actual_quantity, actual_start_date, actual_finish_date, confirmation_text, productionOrder]
       );
       
-      await signalBus.emit('erp.pp.po.confirmed', { production_order, timestamp: new Date().toISOString() });
-      logger.info('Production order confirmed', { production_order });
+      await signalBus.emit('erp.pp.po.confirmed', { production_order: productionOrder, timestamp: new Date().toISOString() });
+      logger.info('Production order confirmed', { production_order: productionOrder });
       
       return rows[0];
     } catch (error) {
@@ -1114,8 +1114,8 @@ const plantMaintenance = {
         [actual_finish_date, actual_work_hours, confirmation_text, technician, maintenanceOrder]
       );
       
-      await signalBus.emit('erp.pm.mo.completed', { maintenance_order, timestamp: new Date().toISOString() });
-      logger.info('Maintenance order completed', { maintenance_order });
+      await signalBus.emit('erp.pm.mo.completed', { maintenance_order: maintenanceOrder, timestamp: new Date().toISOString() });
+      logger.info('Maintenance order completed', { maintenance_order: maintenanceOrder });
       
       return rows[0];
     } catch (error) {

@@ -8,21 +8,26 @@ function DiscoverPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [selectedRegion, setSelectedRegion] = useState('all')
 
-  const { data: featuredProducts } = useQuery('featured-products', () =>
-    farmersAPI.getFeaturedProducts()
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: featuredProducts } = useQuery({
+    queryKey: ['featured-products'],
+    queryFn: () => farmersAPI.getFeaturedProducts().then(r => r.data),
+  })
 
-  const { data: trendingProducts } = useQuery('trending-products', () =>
-    farmersAPI.getTrendingProducts()
-  )
+  const { data: trendingProducts } = useQuery({
+    queryKey: ['trending-products'],
+    queryFn: () => farmersAPI.getTrendingProducts().then(r => r.data),
+  })
 
-  const { data: categories } = useQuery('discover-categories', () =>
-    farmersAPI.getDiscoverCategories()
-  )
+  const { data: categories } = useQuery({
+    queryKey: ['discover-categories'],
+    queryFn: () => farmersAPI.getDiscoverCategories().then(r => r.data),
+  })
 
-  const { data: regions } = useQuery('regions', () =>
-    farmersAPI.getRegions()
-  )
+  const { data: regions } = useQuery({
+    queryKey: ['regions'],
+    queryFn: () => farmersAPI.getRegions().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

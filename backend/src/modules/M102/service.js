@@ -222,7 +222,7 @@ async function generateImplementReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       implement_count: await getImplementCount(farmerId),
       type_distribution: await getTypeDistribution(farmerId),

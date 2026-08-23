@@ -19,7 +19,9 @@ function RegisterPage() {
     role: 'consumer',
   })
 
-  const registerMutation = useMutation(authAPI.register, {
+  // See LoginPage.jsx: v5 react-query object-syntax fix, same pattern.
+  const registerMutation = useMutation({
+    mutationFn: authAPI.register,
     onSuccess: (response) => {
       // See LoginPage.jsx: authAPI.register resolves to the raw axios
       // response, so the payload is under response.data.
@@ -184,10 +186,10 @@ function RegisterPage() {
 
             <button
               type="submit"
-              disabled={registerMutation.isLoading}
+              disabled={registerMutation.isPending}
               className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {registerMutation.isLoading ? (
+              {registerMutation.isPending ? (
                 <span className="animate-spin mr-2">⌛</span>
               ) : (
                 <UserPlus className="w-5 h-5 mr-2" />

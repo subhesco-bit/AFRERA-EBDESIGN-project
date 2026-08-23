@@ -115,21 +115,24 @@ async function applyDataMasking(data, maskingRules) {
         case 'full':
           maskedData[field] = maskChar.repeat(maskedData[field].length);
           break;
-        case 'partial':
+        case 'partial': {
           const value = maskedData[field].toString();
           if (value.length > visibleChars) {
             maskedData[field] = value.substring(0, visibleChars) + maskChar.repeat(value.length - visibleChars);
           }
           break;
-        case 'email':
+        }
+        case 'email': {
           const email = maskedData[field];
           const [local, domain] = email.split('@');
           maskedData[field] = local.substring(0, 2) + maskChar.repeat(local.length - 2) + '@' + domain;
           break;
-        case 'phone':
+        }
+        case 'phone': {
           const phone = maskedData[field];
           maskedData[field] = phone.substring(0, 3) + maskChar.repeat(phone.length - 3);
           break;
+        }
         case 'hash':
           maskedData[field] = crypto.createHash('sha256').update(maskedData[field]).digest('hex');
           break;

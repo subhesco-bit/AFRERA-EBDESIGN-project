@@ -402,9 +402,9 @@ const securityLogger = {
     }
     
     if (process.env.NODE_ENV === 'development') {
-      
+      console.warn('[security]', logData)
     }
-    
+
     // In production, send to security monitoring service
     // This could be sent to your backend or a security service like Sentry
   },

@@ -8,22 +8,26 @@ function PriceCheckPage() {
   const [selectedState, setSelectedState] = useState('all')
   const [selectedCategory, setSelectedCategory] = useState('all')
 
-  const { data: marketPrices } = useQuery(
-    ['market-prices', selectedState, selectedCategory],
-    () => farmersAPI.getMarketPrices(selectedState, selectedCategory)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: marketPrices } = useQuery({
+    queryKey: ['market-prices', selectedState, selectedCategory],
+    queryFn: () => farmersAPI.getMarketPrices(selectedState, selectedCategory).then(r => r.data),
+  })
 
-  const { data: priceTrends } = useQuery('price-trends', () =>
-    farmersAPI.getPriceTrends()
-  )
+  const { data: priceTrends } = useQuery({
+    queryKey: ['price-trends'],
+    queryFn: () => farmersAPI.getPriceTrends().then(r => r.data),
+  })
 
-  const { data: states } = useQuery('states', () =>
-    farmersAPI.getStates()
-  )
+  const { data: states } = useQuery({
+    queryKey: ['states'],
+    queryFn: () => farmersAPI.getStates().then(r => r.data),
+  })
 
-  const { data: categories } = useQuery('price-categories', () =>
-    farmersAPI.getPriceCategories()
-  )
+  const { data: categories } = useQuery({
+    queryKey: ['price-categories'],
+    queryFn: () => farmersAPI.getPriceCategories().then(r => r.data),
+  })
 
   const filteredPrices = marketPrices?.filter(price =>
     price.commodity.toLowerCase().includes(searchQuery.toLowerCase())

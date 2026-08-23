@@ -13,6 +13,7 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../database/pool');
+const { persistTestFallback } = require('../utils/testFallbackStore');
 
 // database/pool.js's in-memory test pool only recognises statements it has a
 // handler for; an INSERT ... RETURNING * this file sends that the mock
@@ -223,9 +224,7 @@ async function recordTraceabilityEvent(data) {
         ipfs_hash,
         is_verified: true
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('traceability_events', product_id, fallback, true);
-      }
+      persistTestFallback('traceability_events', product_id, fallback, true);
       return fallback;
     }
 
@@ -363,9 +362,7 @@ async function recordChainOfCustody(data) {
         transfer_document_url,
         is_verified: true
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('chain_of_custody', product_id, fallback, true);
-      }
+      persistTestFallback('chain_of_custody', product_id, fallback, true);
       return fallback;
     }
 
@@ -613,9 +610,7 @@ async function createVerificationRequest(data) {
         request_type,
         verification_status: 'pending'
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('verification_requests', product_id, fallback, true);
-      }
+      persistTestFallback('verification_requests', product_id, fallback, true);
       return fallback;
     }
 

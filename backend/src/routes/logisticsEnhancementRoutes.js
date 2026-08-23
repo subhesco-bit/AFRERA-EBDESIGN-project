@@ -5,7 +5,8 @@
 
 const express = require('express');
 const { logger } = require('../utils/logger');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
 const logisticsService = require('../services/logisticsEnhancementService');
 
 const router = express.Router();
@@ -64,7 +65,7 @@ router.get('/fleet/vehicles/:vehicleId', authMiddleware, async (req, res) => {
 /**
  * Update vehicle
  */
-router.put('/fleet/vehicles/:vehicleId', authMiddleware, async (req, res) => {
+router.put('/fleet/vehicles/:vehicleId', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
     const result = await logisticsService.updateVehicle(req.params.vehicleId, req.body);
     res.json(result);
@@ -363,7 +364,7 @@ router.get('/deliveries/schedule', authMiddleware, async (req, res) => {
 /**
  * Update delivery schedule
  */
-router.put('/deliveries/schedule/:scheduleId', authMiddleware, async (req, res) => {
+router.put('/deliveries/schedule/:scheduleId', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
     const result = await logisticsService.updateDeliverySchedule(req.params.scheduleId, req.body);
     res.json(result);
@@ -381,7 +382,7 @@ router.put('/deliveries/schedule/:scheduleId', authMiddleware, async (req, res) 
 
 router.post('/drivers/location', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsEnhancementService.recordDriverLocation(req.body);
+    const data = await logisticsService.recordDriverLocation(req.body);
     res.json({ success: true, data });
   } catch (error) {
     res.status(/Refusing|out of range/.test(error.message) ? 400 : 500)
@@ -391,7 +392,7 @@ router.post('/drivers/location', authMiddleware, async (req, res) => {
 
 router.get('/drivers/active', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsEnhancementService.getActiveDrivers(req.query);
+    const data = await logisticsService.getActiveDrivers(req.query);
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -400,7 +401,7 @@ router.get('/drivers/active', authMiddleware, async (req, res) => {
 
 router.get('/shipments/:id/trail', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsEnhancementService.getShipmentTrail(req.params.id);
+    const data = await logisticsService.getShipmentTrail(req.params.id);
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

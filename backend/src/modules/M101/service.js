@@ -220,7 +220,7 @@ async function generateTractorReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       tractor_count: await getTractorCount(farmerId),
       make_distribution: await getMakeDistribution(farmerId),

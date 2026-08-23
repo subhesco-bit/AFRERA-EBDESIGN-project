@@ -206,7 +206,7 @@ async function generateFleetReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       total_vehicles: await getTotalVehicles(farmerId),
       total_dispatches: await getTotalDispatches(farmerId),

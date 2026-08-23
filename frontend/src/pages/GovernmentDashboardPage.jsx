@@ -6,13 +6,16 @@ import { governmentAPI } from '../services/api'
 function GovernmentDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: schemeStats } = useQuery('government-schemes', () =>
-    governmentAPI.getSchemeAnalytics().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: schemeStats } = useQuery({
+    queryKey: ['government-schemes'],
+    queryFn: () => governmentAPI.getSchemeAnalytics().then(r => r.data),
+  })
 
-  const { data: complianceData } = useQuery('government-compliance', () =>
-    governmentAPI.getComplianceStatus().then(r => r.data)
-  )
+  const { data: complianceData } = useQuery({
+    queryKey: ['government-compliance'],
+    queryFn: () => governmentAPI.getComplianceStatus().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

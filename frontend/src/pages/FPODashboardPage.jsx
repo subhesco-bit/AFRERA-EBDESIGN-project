@@ -6,9 +6,11 @@ import { fpoAPI } from '../services/api'
 function FPODashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: fpoStats } = useQuery('fpo-stats', () =>
-    fpoAPI.getStats().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: fpoStats } = useQuery({
+    queryKey: ['fpo-stats'],
+    queryFn: () => fpoAPI.getStats().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

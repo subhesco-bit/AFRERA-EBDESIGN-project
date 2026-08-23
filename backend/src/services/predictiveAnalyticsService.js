@@ -16,6 +16,10 @@ const pool = require('../database/pool');
 
 // Test-mode stubs
 if (process.env.NODE_ENV === 'test') {
+  // Deliberately reassigns the async function declarations below (hoisted
+  // with their full real bodies before this block runs) so tests get
+  // lightweight fakes instead of hitting a real DB - intentional, not a bug.
+  /* eslint-disable no-func-assign */
   createPredictiveModel = async (data) => ({ id: `model-${Date.now()}`, ...data });
   getActiveModels = async () => ([]);
   createPrediction = async (data) => ({ id: `pred-${Date.now()}`, ...data });
@@ -23,6 +27,7 @@ if (process.env.NODE_ENV === 'test') {
   createPredictionAlert = async (data) => ({ id: `palert-${Date.now()}`, ...data });
   getUnacknowledgedAlerts = async () => ([]);
   recordPredictiveAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
+  /* eslint-enable no-func-assign */
 }
 
 // ============================================================================

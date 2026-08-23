@@ -1,17 +1,47 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingCart, User, Menu, Search, LogOut, ChevronDown, Sprout, DollarSign, Package, Building2, Shield, Landmark, Brain, Megaphone, Leaf } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import LanguageSelector from './Multilingual/LanguageSelector'
 
 function Header() {
   const { user, isAuthenticated, logout } = useAuthStore()
   const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState(null)
+  const dropdownRefs = useRef({})
 
   const handleLogout = () => {
     logout()
     navigate('/')
+  }
+
+  const toggleDropdown = (dropdownName) => {
+    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName)
+  }
+
+  const closeDropdown = () => {
+    setOpenDropdown(null)
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openDropdown && !dropdownRefs.current[openDropdown]?.contains(event.target)) {
+        closeDropdown()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [openDropdown])
+
+  const handleKeyDown = (event, dropdownName) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      toggleDropdown(dropdownName)
+    } else if (event.key === 'Escape') {
+      closeDropdown()
+    }
   }
 
   return (
@@ -29,87 +59,217 @@ function Header() {
           {/* Desktop Navigation */}
           <nav aria-label="Main" className="hidden md:flex items-center space-x-8">
             {/* Marketplace Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+            <div 
+              className="relative"
+              ref={(el) => dropdownRefs.current.marketplace = el}
+            >
+              <button 
+                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                aria-haspopup="true"
+                aria-expanded={openDropdown === 'marketplace'}
+                onClick={() => toggleDropdown('marketplace')}
+                onKeyDown={(e) => handleKeyDown(e, 'marketplace')}
+              >
                 <Package className="w-4 h-4" />
                 <span>Marketplace</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                <Link to="/marketplace" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Browse Products
-                </Link>
-                <Link to="/discover" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Discover
-                </Link>
-                <Link to="/pricecheck" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Price Check
-                </Link>
-                <Link to="/compare" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Compare Products
-                </Link>
-                <Link to="/preorder" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Pre-Orders
-                </Link>
-              </div>
+              {openDropdown === 'marketplace' && (
+                <div 
+                  className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  <Link 
+                    to="/marketplace" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Browse Products
+                  </Link>
+                  <Link 
+                    to="/discover" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Discover
+                  </Link>
+                  <Link 
+                    to="/price-check" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Price Check
+                  </Link>
+                  <Link 
+                    to="/compare" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Compare Products
+                  </Link>
+                  <Link 
+                    to="/pre-order" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Pre-Orders
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Farmer Portal Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+            <div 
+              className="relative"
+              ref={(el) => dropdownRefs.current.farmer = el}
+            >
+              <button 
+                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                aria-haspopup="true"
+                aria-expanded={openDropdown === 'farmer'}
+                onClick={() => toggleDropdown('farmer')}
+                onKeyDown={(e) => handleKeyDown(e, 'farmer')}
+              >
                 <Sprout className="w-4 h-4" />
                 <span>Farmer Portal</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                <Link to="/farmer-entrance" className="block px-4 py-2 text-green-700 font-medium hover:bg-gray-100 border-b border-gray-100 mb-1">
-                  Explore first — no sign-in
-                </Link>
-                <Link to="/farmerhome" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Farmer Home
-                </Link>
-                <Link to="/farmersell" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Sell Produce
-                </Link>
-                <Link to="/farmerfield" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  My Fields
-                </Link>
-                <Link to="/harvestplan" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Harvest Plan
-                </Link>
-                <Link to="/harvestscore" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Harvest Score
-                </Link>
-                <Link to="/whatgrow" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  What to Grow
-                </Link>
-                <Link to="/seedvault" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Seed Vault
-                </Link>
-                <Link to="/farmadvisor" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Farm Advisor
-                </Link>
-              </div>
+              {openDropdown === 'farmer' && (
+                <div 
+                  className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  <Link 
+                    to="/farmer-entrance" 
+                    className="block px-4 py-2 text-green-700 font-medium hover:bg-gray-100 border-b border-gray-100 mb-1 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Explore first — no sign-in
+                  </Link>
+                  <Link 
+                    to="/farmerhome" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Farmer Home
+                  </Link>
+                  <Link 
+                    to="/farmer-sell" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Sell Produce
+                  </Link>
+                  <Link 
+                    to="/farmer-field" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    My Fields
+                  </Link>
+                  <Link 
+                    to="/harvest-plan" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Harvest Plan
+                  </Link>
+                  <Link 
+                    to="/harvest-score" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Harvest Score
+                  </Link>
+                  <Link 
+                    to="/what-grow" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    What to Grow
+                  </Link>
+                  <Link 
+                    to="/seed-vault" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Seed Vault
+                  </Link>
+                  <Link 
+                    to="/farm-advisor" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Farm Advisor
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Pricing Tools Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+            <div 
+              className="relative"
+              ref={(el) => dropdownRefs.current.pricing = el}
+            >
+              <button 
+                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                aria-haspopup="true"
+                aria-expanded={openDropdown === 'pricing'}
+                onClick={() => toggleDropdown('pricing')}
+                onKeyDown={(e) => handleKeyDown(e, 'pricing')}
+              >
                 <DollarSign className="w-4 h-4" />
                 <span>Pricing</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                <Link to="/pricebuild" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Price Builder
-                </Link>
-                <Link to="/dynamicpricing" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Dynamic Pricing
-                </Link>
-                <Link to="/selltiming" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Sell Timing
-                </Link>
-              </div>
+              {openDropdown === 'pricing' && (
+                <div 
+                  className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  <Link 
+                    to="/price-build" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Price Builder
+                  </Link>
+                  <Link 
+                    to="/dynamic-pricing" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Dynamic Pricing
+                  </Link>
+                  <Link 
+                    to="/sell-timing" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Sell Timing
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Finance / ERP dropdown — ledger, compliance and procurement were
@@ -117,32 +277,77 @@ function Header() {
                 pattern this session keeps finding); the three ERP domains below
                 (asset accounting, cost control, project systems) are added here
                 for the same reason, rather than repeating the gap. */}
-            <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+            <div 
+              className="relative"
+              ref={(el) => dropdownRefs.current.finance = el}
+            >
+              <button 
+                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                aria-haspopup="true"
+                aria-expanded={openDropdown === 'finance'}
+                onClick={() => toggleDropdown('finance')}
+                onKeyDown={(e) => handleKeyDown(e, 'finance')}
+              >
                 <Landmark className="w-4 h-4" />
                 <span>Finance / ERP</span>
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                <Link to="/ledger" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  General Ledger
-                </Link>
-                <Link to="/compliance" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Tax Compliance
-                </Link>
-                <Link to="/procurement" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Procurement &amp; QC
-                </Link>
-                <Link to="/asset-accounting" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Asset Accounting
-                </Link>
-                <Link to="/cost-control" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Cost Control
-                </Link>
-                <Link to="/project-systems" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Project Systems
-                </Link>
-              </div>
+              {openDropdown === 'finance' && (
+                <div 
+                  className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                  role="menu"
+                  aria-orientation="vertical"
+                >
+                  <Link 
+                    to="/ledger" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    General Ledger
+                  </Link>
+                  <Link 
+                    to="/compliance" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Tax Compliance
+                  </Link>
+                  <Link 
+                    to="/procurement" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Procurement &amp; QC
+                  </Link>
+                  <Link 
+                    to="/asset-accounting" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Asset Accounting
+                  </Link>
+                  <Link 
+                    to="/cost-control" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Cost Control
+                  </Link>
+                  <Link 
+                    to="/project-systems" 
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    role="menuitem"
+                    onClick={closeDropdown}
+                  >
+                    Project Systems
+                  </Link>
+                </div>
+              )}
             </div>
 
             <Link to="/logistics" className="text-gray-700 hover:text-green-600 transition">
@@ -163,68 +368,153 @@ function Header() {
 
             {/* Vendor Portal Dropdown */}
             {isAuthenticated && (user?.role === 'corporate' || user?.role === 'logistics') && (
-              <div className="relative group">
-                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+              <div 
+                className="relative"
+                ref={(el) => dropdownRefs.current.vendor = el}
+              >
+                <button 
+                  className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  aria-haspopup="true"
+                  aria-expanded={openDropdown === 'vendor'}
+                  onClick={() => toggleDropdown('vendor')}
+                  onKeyDown={(e) => handleKeyDown(e, 'vendor')}
+                >
                   <Building2 className="w-4 h-4" />
                   <span>Vendor Portal</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
-                <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                  {user?.role === 'corporate' && (
-                    <Link to="/corporate-buyer" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                      Corporate Buyer
-                    </Link>
-                  )}
-                  {user?.role === 'logistics' && (
-                    <Link to="/logistics-provider" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                      Logistics Provider
-                    </Link>
-                  )}
-                </div>
+                {openDropdown === 'vendor' && (
+                  <div 
+                    className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                    role="menu"
+                    aria-orientation="vertical"
+                  >
+                    {user?.role === 'corporate' && (
+                      <Link 
+                        to="/corporate-buyer" 
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        role="menuitem"
+                        onClick={closeDropdown}
+                      >
+                        Corporate Buyer
+                      </Link>
+                    )}
+                    {user?.role === 'logistics' && (
+                      <Link 
+                        to="/logistics-provider" 
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        role="menuitem"
+                        onClick={closeDropdown}
+                      >
+                        Logistics Provider
+                      </Link>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
             {/* Admin Portal Dropdown */}
             {isAuthenticated && user?.role === 'admin' && (
-              <div className="relative group">
-                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+              <div 
+                className="relative"
+                ref={(el) => dropdownRefs.current.admin = el}
+              >
+                <button 
+                  className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  aria-haspopup="true"
+                  aria-expanded={openDropdown === 'admin'}
+                  onClick={() => toggleDropdown('admin')}
+                  onKeyDown={(e) => handleKeyDown(e, 'admin')}
+                >
                   <Shield className="w-4 h-4" />
                   <span>Admin</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
-                <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                  <Link to="/admin-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    Admin Dashboard
-                  </Link>
-                  <Link to="/ai-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    AI Dashboard
-                  </Link>
-                  <Link to="/erp-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    ERP Dashboard
-                  </Link>
-                  <Link to="/marketing-center" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    Marketing Center
-                  </Link>
-                </div>
+                {openDropdown === 'admin' && (
+                  <div 
+                    className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                    role="menu"
+                    aria-orientation="vertical"
+                  >
+                    <Link 
+                      to="/admin/settings" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      Admin Dashboard
+                    </Link>
+                    <Link 
+                      to="/ai-dashboard" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      AI Dashboard
+                    </Link>
+                    <Link 
+                      to="/erp-dashboard" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      ERP Dashboard
+                    </Link>
+                    <Link 
+                      to="/marketing-center" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      Marketing Center
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Enterprise Portal Dropdown */}
             {isAuthenticated && (
-              <div className="relative group">
-                <button className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition" aria-haspopup="true">
+              <div 
+                className="relative"
+                ref={(el) => dropdownRefs.current.enterprise = el}
+              >
+                <button 
+                  className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  aria-haspopup="true"
+                  aria-expanded={openDropdown === 'enterprise'}
+                  onClick={() => toggleDropdown('enterprise')}
+                  onKeyDown={(e) => handleKeyDown(e, 'enterprise')}
+                >
                   <Building2 className="w-4 h-4" />
                   <span>Enterprise</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
-                <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                  <Link to="/b2b-marketplace" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    B2B Marketplace
-                  </Link>
-                  <Link to="/nutrient-value-marketplace" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    Nutrient-Value Marketplace
-                  </Link>
-                </div>
+                {openDropdown === 'enterprise' && (
+                  <div 
+                    className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
+                    role="menu"
+                    aria-orientation="vertical"
+                  >
+                    <Link 
+                      to="/b2b-marketplace" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      B2B Marketplace
+                    </Link>
+                    <Link 
+                      to="/nutrient-marketplace" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      Nutrient-Value Marketplace
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </nav>
@@ -258,38 +548,64 @@ function Header() {
 
             {/* User Menu */}
             {isAuthenticated ? (
-              <div className="relative group">
-                <button className="flex items-center space-x-2 p-2 text-gray-700 hover:text-green-600 transition" aria-haspopup="true" aria-label={`User menu for ${user?.firstName || user?.email || 'account'}`}>
+              <div 
+                className="relative"
+                ref={(el) => dropdownRefs.current.user = el}
+              >
+                <button 
+                  className="flex items-center space-x-2 p-2 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  aria-haspopup="true"
+                  aria-expanded={openDropdown === 'user'}
+                  aria-label={`User menu for ${user?.firstName || user?.email || 'account'}`}
+                  onClick={() => toggleDropdown('user')}
+                  onKeyDown={(e) => handleKeyDown(e, 'user')}
+                >
                   <User className="w-6 h-6" />
                   <span className="hidden md:inline">{user?.firstName || user?.email}</span>
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
-                  <Link
-                    to="/dashboard"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                {openDropdown === 'user' && (
+                  <div 
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50"
+                    role="menu"
+                    aria-orientation="vertical"
                   >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/wallet"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Wallet
-                  </Link>
-                  <Link
-                    to="/bank-passport"
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Bank Passport
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/wallet"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      Wallet
+                    </Link>
+                    <Link
+                      to="/bank-passport"
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                      onClick={closeDropdown}
+                    >
+                      Bank Passport
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        closeDropdown()
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2 focus:bg-gray-100 focus:outline-none"
+                      role="menuitem"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex items-center space-x-2">
@@ -341,7 +657,7 @@ function Header() {
                 Discover
               </Link>
               <Link
-                to="/pricecheck"
+                to="/price-check"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -355,7 +671,7 @@ function Header() {
                 Compare Products
               </Link>
               <Link
-                to="/preorder"
+                to="/pre-order"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -378,49 +694,49 @@ function Header() {
                 Farmer Home
               </Link>
               <Link
-                to="/farmersell"
+                to="/farmer-sell"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sell Produce
               </Link>
               <Link
-                to="/farmerfield"
+                to="/farmer-field"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 My Fields
               </Link>
               <Link
-                to="/harvestplan"
+                to="/harvest-plan"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Harvest Plan
               </Link>
               <Link
-                to="/harvestscore"
+                to="/harvest-score"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Harvest Score
               </Link>
               <Link
-                to="/whatgrow"
+                to="/what-grow"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 What to Grow
               </Link>
               <Link
-                to="/seedvault"
+                to="/seed-vault"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Seed Vault
               </Link>
               <Link
-                to="/farmadvisor"
+                to="/farm-advisor"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -429,21 +745,21 @@ function Header() {
 
               <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Pricing Tools</div>
               <Link
-                to="/pricebuild"
+                to="/price-build"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Price Builder
               </Link>
               <Link
-                to="/dynamicpricing"
+                to="/dynamic-pricing"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dynamic Pricing
               </Link>
               <Link
-                to="/selltiming"
+                to="/sell-timing"
                 className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -561,7 +877,7 @@ function Header() {
                 <>
                   <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Admin Portal</div>
                   <Link
-                    to="/admin-dashboard"
+                    to="/admin/settings"
                     className="text-gray-700 hover:text-green-600 transition px-4 py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >

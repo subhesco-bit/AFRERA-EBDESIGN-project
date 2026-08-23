@@ -1,67 +1,8 @@
 ﻿// Controller for Authentication (M012) - AI Enhanced
+// login/register/refreshToken/logout wrappers were deleted here (2026-08-17)
+// alongside their service.js implementations - see service.js header comment.
 const service = require('./service');
 const { logger } = require('../../utils/logger');
-
-async function login(req, res) {
-  try {
-    const { email, password } = req.body;
-    const ipAddress = req.ip;
-    const userAgent = req.headers['user-agent'];
-    
-    const result = await service.login(email, password, ipAddress, userAgent);
-    
-    if (result.success) {
-      res.json({ success: true, data: result });
-    } else {
-      res.status(401).json({ success: false, error: result.error, requiresVerification: result.requiresVerification });
-    }
-  } catch (error) {
-    logger.error('login error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function register(req, res) {
-  try {
-    const result = await service.register(req.body);
-    
-    if (result.success) {
-      res.status(201).json({ success: true, data: result });
-    } else {
-      res.status(400).json({ success: false, error: result.error });
-    }
-  } catch (error) {
-    logger.error('register error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function refreshToken(req, res) {
-  try {
-    const { refreshToken } = req.body;
-    const result = await service.refreshToken(refreshToken);
-    
-    if (result.success) {
-      res.json({ success: true, data: result });
-    } else {
-      res.status(401).json({ success: false, error: result.error });
-    }
-  } catch (error) {
-    logger.error('refreshToken error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
-
-async function logout(req, res) {
-  try {
-    const userId = req.user?.id;
-    const result = await service.logout(userId);
-    res.json({ success: true, data: result });
-  } catch (error) {
-    logger.error('logout error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-}
 
 async function createSession(req, res) {
   try {
@@ -176,10 +117,6 @@ async function changePassword(req, res) {
 }
 
 module.exports = {
-  login,
-  register,
-  refreshToken,
-  logout,
   createSession,
   validateSession,
   invalidateSession,

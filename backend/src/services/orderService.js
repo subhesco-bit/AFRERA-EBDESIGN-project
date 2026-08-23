@@ -9,6 +9,7 @@ const { getPostgreSQL } = require('../database/connection');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
+const gstService = require('./gstService');
 
 /**
  * Get user's cart
@@ -207,25 +208,55 @@ async function createOrder(userId, orderData) {
   try {
     const pg = getPostgreSQL();
     
-    // Get cart items
+    // Get cart items — pulls the same HSN/branding columns gstService.calculateOrderGST
+    // uses, so tax can be computed for real per item instead of guessed as a flat rate.
     const cartQuery = `
-      SELECT c.*, p.base_price, p.name as product_name, p.slug
+      SELECT c.*, p.base_price, p.name as product_name, p.slug, p.stock_quantity,
+             p.hsn_code, p.gst_applicable, p.is_branded_packaged, p.registered_brand_name,
+             cat.name AS category_name
       FROM cart c
       JOIN products p ON c.product_id = p.id
+      LEFT JOIN categories cat ON cat.id = p.category_id
       WHERE c.user_id = $1
     `;
-    
+
     const cartResult = await pg.query(cartQuery, [userId]);
-    
+
     if (cartResult.rows.length === 0) {
       throw new Error('Cart is empty');
     }
-    
+
     const cartItems = cartResult.rows;
-    
-    // Calculate totals
+
+    // Real stock check — nothing here previously verified availability before
+    // creating an order, so two buyers could both "successfully" order the
+    // last unit of something.
+    const outOfStock = cartItems.filter((item) => item.stock_quantity != null && item.stock_quantity < item.quantity);
+    if (outOfStock.length > 0) {
+      const err = new Error(`Not enough stock for: ${outOfStock.map((i) => i.product_name).join(', ')}`);
+      err.code = 'insufficient_stock';
+      throw err;
+    }
+
+    // Calculate totals — real per-item GST via gstService (HSN + branding-aware),
+    // not a flat guessed rate. Falls back to 0 tax for an item only if gstService
+    // itself reports it isn't GST-applicable, matching its own real classification.
     const subtotal = cartItems.reduce((sum, item) => sum + (item.base_price * item.quantity), 0);
-    const taxAmount = Math.round(subtotal * 0.05); // 5% GST
+    let taxAmount = 0;
+    for (const item of cartItems) {
+      if (item.gst_applicable === false) continue;
+      const itemGST = await gstService.calculateProductGST({
+        id: item.product_id,
+        name: item.product_name,
+        price: item.base_price,
+        category_name: item.category_name,
+        hsn_code: item.hsn_code,
+        is_branded_packaged: item.is_branded_packaged,
+        registered_brand_name: item.registered_brand_name,
+      });
+      taxAmount += Number(itemGST.gstAmount) * item.quantity;
+    }
+    taxAmount = Math.round(taxAmount * 100) / 100;
     const shippingAmount = subtotal > 1500 ? 0 : 60;
     const discountAmount = orderData.coupon_code ? await calculateDiscount(orderData.coupon_code, subtotal) : 0;
     const totalAmount = subtotal + taxAmount + shippingAmount - discountAmount;
@@ -275,6 +306,23 @@ async function createOrder(userId, orderData) {
       order = orderResult.rows[0];
 
       for (const cartItem of cartItems) {
+        // Real, race-safe stock decrement: the pre-transaction check above
+        // catches the common case cheaply, but two concurrent checkouts can
+        // both pass it before either commits. This conditional UPDATE is the
+        // actual guard — it only succeeds if stock is still sufficient at
+        // the moment of the write, inside the same transaction as the order.
+        const stockResult = await client.query(
+          `UPDATE products SET stock_quantity = stock_quantity - $1
+           WHERE id = $2 AND (stock_quantity IS NULL OR stock_quantity >= $1)
+           RETURNING stock_quantity`,
+          [cartItem.quantity, cartItem.product_id]
+        );
+        if (stockResult.rows.length === 0) {
+          const err = new Error(`Not enough stock for ${cartItem.product_name}`);
+          err.code = 'insufficient_stock';
+          throw err;
+        }
+
         await client.query(
           `INSERT INTO order_items (order_id, product_id, product_name, product_sku,
                                     quantity, unit_price, total_price, attributes)
@@ -490,13 +538,20 @@ async function updateOrderStatus(orderId, status, notes = null) {
 /**
  * Process payment
  */
-async function processPayment(orderId, paymentData) {
+async function processPayment(orderId, paymentData, userId = null) {
   try {
     const pg = getPostgreSQL();
     
-    // Get order
-    const orderQuery = 'SELECT * FROM orders WHERE id = $1';
-    const orderResult = await pg.query(orderQuery, [orderId]);
+    // Get order with optional ownership check
+    let orderQuery = 'SELECT * FROM orders WHERE id = $1';
+    const queryParams = [orderId];
+    
+    if (userId) {
+      orderQuery += ' AND user_id = $2';
+      queryParams.push(userId);
+    }
+    
+    const orderResult = await pg.query(orderQuery, queryParams);
     
     if (orderResult.rows.length === 0) {
       throw new Error('Order not found');
@@ -785,7 +840,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // Admin-only: updateOrderStatus() takes an orderId with no ownership check, so
 // any authenticated user could otherwise change the status of ANY order
 // (including other customers' orders, e.g. marking them paid/delivered).
-router.put('/:id/status', adminMiddleware, async (req, res) => {
+router.put('/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { status, notes } = req.body;
     const order = await updateOrderStatus(req.params.id, status, notes);
@@ -795,16 +850,19 @@ router.put('/:id/status', adminMiddleware, async (req, res) => {
   }
 });
 
-// Process payment
-// TODO(ownership): processPayment() does not verify that req.user owns
-// :id, so an authenticated user can currently submit a payment against
-// another user's order. Pass req.user.id through and verify ownership.
+// Process payment — ownership enforced: only the order's owner or an admin
+// may submit a payment for it (was previously any authenticated user, any order).
 router.post('/:id/payment', authMiddleware, async (req, res) => {
   try {
-    const payment = await processPayment(req.params.id, req.body);
+    const isAdmin = req.user.role === 'admin';
+    const payment = await processPayment(req.params.id, req.body, isAdmin ? null : req.user.id);
     res.json(payment);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (error.message === 'Order not found') {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 });
 

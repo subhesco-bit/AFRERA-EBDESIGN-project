@@ -250,10 +250,19 @@ async function createProduct(productData) {
 /**
  * Update product
  */
-async function updateProduct(productId, productData) {
+async function updateProduct(productId, productData, ownerUserId = null) {
   try {
     const pg = getPostgreSQL();
-    
+
+    if (ownerUserId) {
+      const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
+      if (owned.rows.length === 0) {
+        // Deliberately the same error as "doesn't exist" — confirming that a
+        // product ID exists but belongs to someone else is its own leak.
+        throw new Error('Product not found');
+      }
+    }
+
     const query = `
       UPDATE products
       SET name = COALESCE($1, name),
@@ -333,17 +342,24 @@ async function updateProduct(productId, productData) {
 /**
  * Delete product (soft delete)
  */
-async function deleteProduct(productId) {
+async function deleteProduct(productId, ownerUserId = null) {
   try {
     const pg = getPostgreSQL();
-    
+
+    if (ownerUserId) {
+      const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
+      if (owned.rows.length === 0) {
+        throw new Error('Product not found');
+      }
+    }
+
     const query = `
       UPDATE products
       SET is_active = FALSE, updated_at = NOW()
       WHERE id = $1
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [productId]);
     
     if (result.rows.length === 0) {
@@ -504,10 +520,12 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
-// Update product
+// Update product — ownership enforced: only the product's creator or an
+// admin may edit it (was previously any authenticated user, any product).
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const product = await updateProduct(req.params.id, req.body);
+    const isAdmin = req.user.role === 'admin';
+    const product = await updateProduct(req.params.id, req.body, isAdmin ? null : req.user.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -518,10 +536,11 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Delete product
+// Delete product — same ownership rule as update.
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const product = await deleteProduct(req.params.id);
+    const isAdmin = req.user.role === 'admin';
+    const product = await deleteProduct(req.params.id, isAdmin ? null : req.user.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {

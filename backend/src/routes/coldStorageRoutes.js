@@ -7,7 +7,8 @@
 const express = require('express');
 const router = express.Router();
 const coldStorageService = require('../services/coldStorageService');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
 const { adminMiddleware } = require('../middleware/admin');
 
 // Facilities
@@ -77,7 +78,7 @@ router.get('/bookings', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/bookings/:bookingId/status', authMiddleware, async (req, res) => {
+router.put('/bookings/:bookingId/status', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
     const booking = await coldStorageService.updateBookingStatus(req.params.bookingId, req.body.status);
     res.json({ success: true, data: booking });

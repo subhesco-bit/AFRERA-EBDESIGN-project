@@ -13,6 +13,7 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../database/pool');
+const { persistTestFallback } = require('../utils/testFallbackStore');
 
 // ============================================================================
 // GI PRODUCTS
@@ -84,9 +85,7 @@ async function registerGIProduct(data) {
         status: 'registered'
       };
       // Persist into test store when available
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('gi_products', fallback.product_id, fallback);
-      }
+      persistTestFallback('gi_products', fallback.product_id, fallback);
       return fallback;
     }
 
@@ -198,9 +197,7 @@ async function registerGIProducer(data) {
         certification_status: 'active',
         registration_date: new Date().toISOString()
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('gi_producers', gi_product_id, fallback, true);
-      }
+      persistTestFallback('gi_producers', gi_product_id, fallback, true);
       return fallback;
     }
 
@@ -361,9 +358,7 @@ async function authenticateGIProduct(productId, batchNumber, producerId) {
         production_date: new Date().toISOString(),
         authentication_status: 'verified'
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('gi_authentication', authCode, fallback);
-      }
+      persistTestFallback('gi_authentication', authCode, fallback);
       return fallback;
     }
 
@@ -516,9 +511,7 @@ router.post('/gi-marketplace', authMiddleware, async (req, res) => {
     };
 
     // Persist into test store when available
-    if (typeof pool.setTestData === 'function') {
-      pool.setTestData('gi_marketplace', listing.id, listing);
-    }
+    persistTestFallback('gi_marketplace', listing.id, listing);
 
     res.status(201).json(listing);
   } catch (error) {

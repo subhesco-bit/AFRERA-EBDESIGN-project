@@ -7,7 +7,8 @@
 const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const { authRateLimit } = require('../middleware/rateLimiter');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 
@@ -389,7 +390,7 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update recall status
  */
-router.put('/recalls/:id/status', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, recovery_rate, closure_notes, closed_by } = req.body;
 
@@ -516,7 +517,7 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update CAPA status
  */
-router.put('/capa/:id/status', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
@@ -832,7 +833,7 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
 /**
  * Update corrective action status
  */
-router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 

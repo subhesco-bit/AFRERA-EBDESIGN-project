@@ -3,10 +3,16 @@
  * Provides rate limiting for API endpoints to prevent abuse
  */
 
-const { RateLimiterMemory, RateLimiterRedis } = require('rate-limiter-flexible');
+const { RateLimiterMemory } = require('rate-limiter-flexible');
 const { logger } = require('../utils/logger');
 
-// In-memory rate limiter (for development)
+// In-memory only - every limiter below is per-process. Behind more than one
+// backend instance (the normal production topology), each process tracks
+// its own counts, so the real per-client limit is (configured limit) x
+// (instance count), not the configured value. A Redis-backed limiter
+// (rate-limiter-flexible exports RateLimiterRedis for this) would fix it,
+// but nothing here establishes a Redis connection to hand it, so it isn't
+// wired - documenting the gap rather than importing a class nothing uses.
 const rateLimiter = new RateLimiterMemory({
   points: 100, // Number of requests
   duration: 60, // Per 60 seconds

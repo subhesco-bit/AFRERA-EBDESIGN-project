@@ -14,13 +14,16 @@ import {
 } from 'lucide-react'
 
 function FarmerHomePage() {
-  const { data: farmerData } = useQuery('farmer-dashboard', () =>
-    farmersAPI.getFarmerDashboard('current-farmer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: farmerData } = useQuery({
+    queryKey: ['farmer-dashboard'],
+    queryFn: () => farmersAPI.getFarmerDashboard('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: notifications } = useQuery('notifications', () =>
-    farmersAPI.getNotifications('current-farmer-id')
-  )
+  const { data: notifications } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => farmersAPI.getNotifications('current-farmer-id').then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -81,42 +84,42 @@ function FarmerHomePage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <Link
-          to="/farmersell"
+          to="/farmer-sell"
           className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition text-center"
         >
           <Store className="w-8 h-8 text-green-600 mx-auto mb-2" />
           <div className="font-semibold text-gray-800 text-sm">Sell Produce</div>
         </Link>
         <Link
-          to="/farmerfield"
+          to="/farmer-field"
           className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition text-center"
         >
           <Sprout className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
           <div className="font-semibold text-gray-800 text-sm">My Fields</div>
         </Link>
         <Link
-          to="/harvestplan"
+          to="/harvest-plan"
           className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition text-center"
         >
           <CloudSun className="w-8 h-8 text-blue-600 mx-auto mb-2" />
           <div className="font-semibold text-gray-800 text-sm">Harvest Plan</div>
         </Link>
         <Link
-          to="/harvestscore"
+          to="/harvest-score"
           className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition text-center"
         >
           <TrendingUp className="w-8 h-8 text-orange-600 mx-auto mb-2" />
           <div className="font-semibold text-gray-800 text-sm">Harvest Score</div>
         </Link>
         <Link
-          to="/whatgrow"
+          to="/what-grow"
           className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition text-center"
         >
           <Sprout className="w-8 h-8 text-lime-600 mx-auto mb-2" />
           <div className="font-semibold text-gray-800 text-sm">What to Grow</div>
         </Link>
         <Link
-          to="/seedvault"
+          to="/seed-vault"
           className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition text-center"
         >
           <Tractor className="w-8 h-8 text-amber-600 mx-auto mb-2" />
@@ -179,7 +182,7 @@ function FarmerHomePage() {
             Today's Market Prices
           </h2>
           <Link
-            to="/pricecheck"
+            to="/price-check"
             className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center"
           >
             View All

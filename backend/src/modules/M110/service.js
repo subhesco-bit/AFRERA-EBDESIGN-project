@@ -210,7 +210,7 @@ async function generateLifecycleReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       total_assets: await getTotalAssets(farmerId),
       total_book_value: await getTotalBookValue(farmerId),

@@ -16,46 +16,50 @@ function ShgManagementPage() {
   const [memberForm, setMemberForm] = useState(emptyMember)
   const [savingForm, setSavingForm] = useState(emptySaving)
 
-  const { data: groupsData, isLoading, error } = useQuery(
-    'shg-groups',
-    async () => (await shgAPI.getGroups()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: groupsData, isLoading, error } = useQuery({
+    queryKey: ['shg-groups'],
+    queryFn: async () => (await shgAPI.getGroups()).data?.data ?? [],
+  })
 
-  const { data: membersData, isLoading: membersLoading, error: membersError } = useQuery(
-    ['shg-members', selectedGroup?.id],
-    async () => (await shgAPI.getMembers(selectedGroup.id)).data?.data ?? [],
-    { enabled: !!selectedGroup }
-  )
+  const { data: membersData, isLoading: membersLoading, error: membersError } = useQuery({
+    queryKey: ['shg-members', selectedGroup?.id],
+    queryFn: async () => (await shgAPI.getMembers(selectedGroup.id)).data?.data ?? [],
+    enabled: !!selectedGroup,
+  })
 
-  const { data: savingsData, isLoading: savingsLoading, error: savingsError } = useQuery(
-    ['shg-savings', selectedGroup?.id],
-    async () => (await shgAPI.getSavings(selectedGroup.id)).data?.data ?? [],
-    { enabled: !!selectedGroup }
-  )
+  const { data: savingsData, isLoading: savingsLoading, error: savingsError } = useQuery({
+    queryKey: ['shg-savings', selectedGroup?.id],
+    queryFn: async () => (await shgAPI.getSavings(selectedGroup.id)).data?.data ?? [],
+    enabled: !!selectedGroup,
+  })
 
-  const createGroupMutation = useMutation((payload) => shgAPI.createGroup(payload), {
+  const createGroupMutation = useMutation({
+    mutationFn: (payload) => shgAPI.createGroup(payload),
     onSuccess: () => {
       toast.success('SHG registered')
-      queryClient.invalidateQueries('shg-groups')
+      queryClient.invalidateQueries({ queryKey: ['shg-groups'] })
       setShowForm(false)
       setForm(emptyGroup)
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to register group'),
   })
 
-  const addMemberMutation = useMutation((payload) => shgAPI.addMember(selectedGroup.id, payload), {
+  const addMemberMutation = useMutation({
+    mutationFn: (payload) => shgAPI.addMember(selectedGroup.id, payload),
     onSuccess: () => {
       toast.success('Member added')
-      queryClient.invalidateQueries(['shg-members', selectedGroup.id])
+      queryClient.invalidateQueries({ queryKey: ['shg-members', selectedGroup.id] })
       setMemberForm(emptyMember)
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to add member'),
   })
 
-  const recordSavingMutation = useMutation((payload) => shgAPI.recordSaving(selectedGroup.id, payload), {
+  const recordSavingMutation = useMutation({
+    mutationFn: (payload) => shgAPI.recordSaving(selectedGroup.id, payload),
     onSuccess: () => {
       toast.success('Savings entry recorded')
-      queryClient.invalidateQueries(['shg-savings', selectedGroup.id])
+      queryClient.invalidateQueries({ queryKey: ['shg-savings', selectedGroup.id] })
       setSavingForm(emptySaving)
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record entry'),
@@ -140,7 +144,7 @@ function ShgManagementPage() {
                 >
                   <input value={memberForm.name} onChange={(e) => setMemberForm({ ...memberForm, name: e.target.value })}
                     placeholder="Member name" className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500" />
-                  <button type="submit" disabled={addMemberMutation.isLoading} className="px-3 py-2 bg-rose-600 text-white rounded-lg text-sm hover:bg-rose-700 disabled:opacity-60">Add</button>
+                  <button type="submit" disabled={addMemberMutation.isPending} className="px-3 py-2 bg-rose-600 text-white rounded-lg text-sm hover:bg-rose-700 disabled:opacity-60">Add</button>
                 </form>
               </div>
 
@@ -174,8 +178,8 @@ function ShgManagementPage() {
                     <option value="deposit">Deposit</option>
                     <option value="withdrawal">Withdrawal</option>
                   </select>
-                  <button type="submit" disabled={recordSavingMutation.isLoading} className="col-span-3 px-3 py-2 bg-rose-600 text-white rounded-lg text-sm hover:bg-rose-700 disabled:opacity-60">
-                    {recordSavingMutation.isLoading ? 'Saving...' : 'Record Entry'}
+                  <button type="submit" disabled={recordSavingMutation.isPending} className="col-span-3 px-3 py-2 bg-rose-600 text-white rounded-lg text-sm hover:bg-rose-700 disabled:opacity-60">
+                    {recordSavingMutation.isPending ? 'Saving...' : 'Record Entry'}
                   </button>
                 </form>
               </div>
@@ -224,8 +228,8 @@ function ShgManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={createGroupMutation.isLoading} className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition disabled:opacity-60">
-                    {createGroupMutation.isLoading ? 'Saving...' : 'Register SHG'}
+                  <button type="submit" disabled={createGroupMutation.isPending} className="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition disabled:opacity-60">
+                    {createGroupMutation.isPending ? 'Saving...' : 'Register SHG'}
                   </button>
                 </div>
               </form>

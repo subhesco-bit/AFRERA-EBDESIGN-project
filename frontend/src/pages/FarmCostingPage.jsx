@@ -13,23 +13,26 @@ function FarmCostingPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(emptyForm)
 
-  const { data, isLoading, error } = useQuery(
-    'farm-costing-records',
-    async () => (await farmCostingAPI.getRecords()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['farm-costing-records'],
+    queryFn: async () => (await farmCostingAPI.getRecords()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation((payload) => farmCostingAPI.createRecord(payload), {
+  const saveMutation = useMutation({
+    mutationFn: (payload) => farmCostingAPI.createRecord(payload),
     onSuccess: () => {
       toast.success('Cost record added')
-      queryClient.invalidateQueries('farm-costing-records')
+      queryClient.invalidateQueries({ queryKey: ['farm-costing-records'] })
       setShowForm(false)
       setForm(emptyForm)
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save cost record'),
   })
 
-  const deleteMutation = useMutation((id) => farmCostingAPI.deleteRecord(id), {
-    onSuccess: () => { toast.success('Record removed'); queryClient.invalidateQueries('farm-costing-records') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => farmCostingAPI.deleteRecord(id),
+    onSuccess: () => { toast.success('Record removed'); queryClient.invalidateQueries({ queryKey: ['farm-costing-records'] }) },
     onError: () => toast.error('Failed to remove record'),
   })
 
@@ -195,8 +198,8 @@ function FarmCostingPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : 'Add Entry'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : 'Add Entry'}
                   </button>
                 </div>
               </form>

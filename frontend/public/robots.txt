@@ -1,0 +1,46 @@
+# robots.txt for AFRERA Platform
+# Allow crawling of public pages only
+
+User-agent: *
+Allow: /
+Allow: /marketplace
+Allow: /products
+Allow: /discover
+Allow: /farmer-entrance
+Allow: /pricing/forward
+Allow: /climate
+Allow: /corridor-economics
+Allow: /land-use
+Allow: /experience
+Allow: /pricecheck
+Allow: /pricebuild
+Allow: /dynamicpricing
+Allow: /selltiming
+Allow: /compare
+
+# Disallow authenticated routes and admin areas
+Disallow: /dashboard
+Disallow: /farmerhome
+Disallow: /farmer-sell
+Disallow: /logistics
+Disallow: /insurance
+Disallow: /forms
+Disallow: /analytics
+Disallow: /modules
+Disallow: /admin
+Disallow: /ai-dashboard
+Disallow: /erp-dashboard
+Disallow: /marketing-center
+Disallow: /wallet
+Disallow: /bank-passport
+Disallow: /corporate-buyer
+Disallow: /logistics-provider
+Disallow: /b2b-marketplace
+Disallow: /nutrient-marketplace
+
+# Disallow test and development areas
+Disallow: /test
+Disallow: /dev
+
+# Sitemap location
+Sitemap: https://afrera.platform/sitemap.xml

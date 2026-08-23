@@ -306,7 +306,7 @@ class GreenhouseManagementService {
       averageHumidity: allReadings.reduce((sum, r) => sum + r.humidity, 0) / allReadings.length,
       averageCO2: allReadings.reduce((sum, r) => sum + r.co2, 0) / allReadings.length,
       averageLightLevel: allReadings.reduce((sum, r) => sum + r.lightLevel, 0) / allReadings.length,
-      averageSoilMoisture: allReadings.reduce((sum, r) + sum + r.soilMoisture, 0) / allReadings.length
+      averageSoilMoisture: allReadings.reduce((sum, r) => sum + r.soilMoisture, 0) / allReadings.length
     };
   }
 

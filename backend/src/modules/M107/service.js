@@ -111,7 +111,7 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
 
     const repair = {
       repair_id: generateId(),
-      breakdown_id,
+      breakdown_id: breakdownId,
       technician_id,
       estimated_arrival,
       priority: priority || 'high',
@@ -205,7 +205,7 @@ async function generateBreakdownReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       total_breakdowns: await getTotalBreakdowns(farmerId),
       breakdown_by_type: await getBreakdownByType(farmerId),

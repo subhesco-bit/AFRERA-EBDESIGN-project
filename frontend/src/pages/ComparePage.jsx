@@ -6,13 +6,16 @@ import { Scale, Plus, X, CheckCircle, Star } from 'lucide-react'
 function ComparePage() {
   const [selectedProducts, setSelectedProducts] = useState([])
 
-  const { data: availableProducts } = useQuery('products-for-compare', () =>
-    farmersAPI.getProductsForCompare()
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: availableProducts } = useQuery({
+    queryKey: ['products-for-compare'],
+    queryFn: () => farmersAPI.getProductsForCompare().then(r => r.data),
+  })
 
-  const { data: marketData } = useQuery('market-data', () =>
-    farmersAPI.getMarketComparisonData()
-  )
+  const { data: marketData } = useQuery({
+    queryKey: ['market-data'],
+    queryFn: () => farmersAPI.getMarketComparisonData().then(r => r.data),
+  })
 
   const addToCompare = (product) => {
     if (selectedProducts.length < 4 && !selectedProducts.find(p => p.id === product.id)) {

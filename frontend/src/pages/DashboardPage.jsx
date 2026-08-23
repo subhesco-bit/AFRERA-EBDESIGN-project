@@ -6,24 +6,34 @@ import { ShoppingCart, Package, TrendingUp, DollarSign, Leaf, Award, Sparkles } 
 function DashboardPage() {
   const { user } = useAuthStore()
 
-  const { data: orders } = useQuery('user-orders', () =>
-    ordersAPI.getOrders({}, { page: 1, limit: 5 })
-  )
+  // Every query here used a v3/v4 signature (bare string key, or a 3-arg
+  // (key, fn, options) call) that @tanstack/react-query v5 (installed)
+  // does not support — the whole dashboard threw on render. Object form
+  // throughout, and `.then(r => r.data)` unwraps the axios response once
+  // per query so downstream reads (orders.orders, farmerData.fdi_score,
+  // etc.) don't need a second `.data` hop.
+  const { data: orders } = useQuery({
+    queryKey: ['user-orders'],
+    queryFn: () => ordersAPI.getOrders({}, { page: 1, limit: 5 }).then((r) => r.data),
+  })
 
-  const { data: creditScore } = useQuery(
-    ['credit-score', user?.id],
-    () => financialAPI.getCreditScore(user?.id),
-    { enabled: !!user?.id && user?.role === 'farmer' }
-  )
+  const { data: creditScore } = useQuery({
+    queryKey: ['credit-score', user?.id],
+    queryFn: () => financialAPI.getCreditScore(user?.id).then((r) => r.data),
+    enabled: !!user?.id && user?.role === 'farmer',
+  })
 
-  const { data: farmerData } = useQuery(
-    ['farmer', user?.id],
-    () => farmersAPI.getFarmer(user?.id),
-    { enabled: !!user?.id && user?.role === 'farmer' }
-  )
+  const { data: farmerData } = useQuery({
+    queryKey: ['farmer', user?.id],
+    queryFn: () => farmersAPI.getFarmer(user?.id).then((r) => r.data),
+    enabled: !!user?.id && user?.role === 'farmer',
+  })
 
-  const { data: analyticsData } = useQuery('dashboard-analytics', analyticsAPI.getOverview)
-  const analytics = analyticsData?.data?.analytics || {
+  const { data: analyticsData } = useQuery({
+    queryKey: ['dashboard-analytics'],
+    queryFn: () => analyticsAPI.getOverview().then((r) => r.data),
+  })
+  const analytics = analyticsData?.analytics || {
     totals: { forms: 0, submissions: 0, activeForms: 0, draftForms: 0, approvalReady: 0 },
     recommendations: []
   }

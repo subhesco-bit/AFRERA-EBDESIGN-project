@@ -1,1 +1,1 @@
-﻿import React from 'react'; export default function M099Component(){ return <div>M099 component</div>; }\n
+﻿import React from 'react'; export default function M099Component(){ return <div>M099 component</div>; }

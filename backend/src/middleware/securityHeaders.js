@@ -37,9 +37,12 @@ function generateNonce() {
  * Build Content Security Policy
  */
 function buildCSP(options = {}) {
+  // reportOnly was accepted here but never read - the actual
+  // enforce-vs-report-only switch happens one level up in securityHeaders(),
+  // via which header name it writes (Content-Security-Policy vs
+  // -Report-Only), not by changing anything buildCSP() produces.
   const {
     directives = {},
-    reportOnly = false,
     reportUri = null,
     nonce = null
   } = options;

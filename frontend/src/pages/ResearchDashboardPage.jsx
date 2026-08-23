@@ -6,9 +6,11 @@ import { researchAPI } from '../services/api'
 function ResearchDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: researchStats } = useQuery('research-stats', () =>
-    researchAPI.getStats().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: researchStats } = useQuery({
+    queryKey: ['research-stats'],
+    queryFn: () => researchAPI.getStats().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -27,30 +27,30 @@ function SowingManagementPage() {
   const [form, setForm] = useState(emptyForm)
   const [seasonFilter, setSeasonFilter] = useState('')
 
-  const { data, isLoading, error } = useQuery(
-    ['sowing-records', seasonFilter],
-    async () => {
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['sowing-records', seasonFilter],
+    queryFn: async () => {
       const res = await sowingAPI.getRecords(seasonFilter ? { season: seasonFilter } : {})
       return res.data?.data ?? []
-    }
-  )
+    },
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? sowingAPI.updateRecord(editingId, payload) : sowingAPI.createRecord(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Sowing record updated' : 'Sowing record added')
-        queryClient.invalidateQueries(['sowing-records'])
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save sowing record'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? sowingAPI.updateRecord(editingId, payload) : sowingAPI.createRecord(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Sowing record updated' : 'Sowing record added')
+      queryClient.invalidateQueries({ queryKey: ['sowing-records'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save sowing record'),
+  })
 
-  const deleteMutation = useMutation((id) => sowingAPI.deleteRecord(id), {
+  const deleteMutation = useMutation({
+    mutationFn: (id) => sowingAPI.deleteRecord(id),
     onSuccess: () => {
       toast.success('Sowing record deleted')
-      queryClient.invalidateQueries(['sowing-records'])
+      queryClient.invalidateQueries({ queryKey: ['sowing-records'] })
     },
     onError: () => toast.error('Failed to delete record'),
   })
@@ -278,9 +278,9 @@ function SowingManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading}
+                  <button type="submit" disabled={saveMutation.isPending}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Log Sowing'}
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Log Sowing'}
                   </button>
                 </div>
               </form>

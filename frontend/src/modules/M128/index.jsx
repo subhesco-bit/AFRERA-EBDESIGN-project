@@ -1,1 +1,1 @@
-﻿export { default as M128Page } from './M128Page';\n
+﻿export { default as M128Page } from './M128Page';

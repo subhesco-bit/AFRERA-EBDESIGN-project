@@ -13,17 +13,21 @@ import {
 } from 'lucide-react'
 
 function HarvestScorePage() {
-  const { data: harvestScore } = useQuery('harvest-score', () =>
-    farmersAPI.getHarvestScore('current-farmer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: harvestScore } = useQuery({
+    queryKey: ['harvest-score'],
+    queryFn: () => farmersAPI.getHarvestScore('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: scoreHistory } = useQuery('score-history', () =>
-    farmersAPI.getScoreHistory('current-farmer-id')
-  )
+  const { data: scoreHistory } = useQuery({
+    queryKey: ['score-history'],
+    queryFn: () => farmersAPI.getScoreHistory('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: benchmarks } = useQuery('benchmarks', () =>
-    farmersAPI.getBenchmarks('current-farmer-id')
-  )
+  const { data: benchmarks } = useQuery({
+    queryKey: ['benchmarks'],
+    queryFn: () => farmersAPI.getBenchmarks('current-farmer-id').then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

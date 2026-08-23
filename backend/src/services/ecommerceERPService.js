@@ -520,7 +520,7 @@ async function syncCustomerWithCRM(userId) {
     
     return {
       success: true,
-      customer_data
+      customer_data: customerData
     };
   } catch (error) {
     logger.error('Error syncing customer with CRM', { error: error.message, userId });

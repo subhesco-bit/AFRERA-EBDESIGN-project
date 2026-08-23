@@ -147,7 +147,7 @@ async function launchCampaign(campaignId) {
     
     return {
       success: true,
-      campaign_id
+      campaign_id: campaignId
     };
   } catch (error) {
     logger.error('Error launching campaign', { error: error.message, campaignId });
@@ -243,7 +243,7 @@ async function createSponsoredProduct(sellerId, productData) {
     
     const sponsoredProduct = {
       id: sponsoredId,
-      seller_id,
+      seller_id: sellerId,
       product_id,
       sponsor_tier,
       bid_amount,
@@ -269,7 +269,7 @@ async function createSponsoredProduct(sellerId, productData) {
     // Emit signal bus event
     await signalBus.emit('marketing.sponsored_product.created', {
       sponsored_id: sponsoredId,
-      seller_id,
+      seller_id: sellerId,
       product_id,
       sponsor_tier,
       timestamp: new Date().toISOString()
@@ -597,7 +597,7 @@ async function createCartRetargeting(userId, cartItems) {
     
     return {
       success: true,
-      campaign_id
+      campaign_id: campaignId
     };
   } catch (error) {
     logger.error('Error creating cart retargeting', { error: error.message });
@@ -635,9 +635,9 @@ async function createProductViewRetargeting(userId, productId) {
     
     const campaign = {
       id: campaignId,
-      user_id,
+      user_id: userId,
       campaign_type: 'product_view',
-      product_id,
+      product_id: productId,
       status: 'active',
       created_at: new Date().toISOString()
     };
@@ -652,7 +652,7 @@ async function createProductViewRetargeting(userId, productId) {
     
     return {
       success: true,
-      campaign_id
+      campaign_id: campaignId
     };
   } catch (error) {
     logger.error('Error creating product view retargeting', { error: error.message });

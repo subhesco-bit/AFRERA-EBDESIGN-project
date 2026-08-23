@@ -9,14 +9,18 @@ function WhatGrowPage() {
   const [selectedSoil, setSelectedSoil] = useState('')
   const [selectedCrop, setSelectedCrop] = useState(null)
 
-  const { data: cropSuggestions } = useQuery(
-    ['crop-suggestions', selectedSeason, selectedSoil],
-    () => farmersAPI.getCropSuggestions(selectedSeason, selectedSoil)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx); .then(r => r.data)
+  // unwraps the axios response so cropSuggestions is the real array
+  // (.filter below would otherwise call .filter on an axios response object).
+  const { data: cropSuggestions } = useQuery({
+    queryKey: ['crop-suggestions', selectedSeason, selectedSoil],
+    queryFn: () => farmersAPI.getCropSuggestions(selectedSeason, selectedSoil).then(r => r.data),
+  })
 
-  const { data: marketPrices } = useQuery('market-prices', () =>
-    farmersAPI.getMarketPrices()
-  )
+  const { data: marketPrices } = useQuery({
+    queryKey: ['market-prices'],
+    queryFn: () => farmersAPI.getMarketPrices().then(r => r.data),
+  })
 
   const filteredCrops = cropSuggestions?.filter(crop =>
     crop.name.toLowerCase().includes(searchQuery.toLowerCase())

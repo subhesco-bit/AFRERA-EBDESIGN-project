@@ -222,16 +222,20 @@ async function acknowledgeIncident(incidentId, acknowledgedBy) {
 }
 
 /**
- * Resolve incident
+ * Resolve incident. `wasFalsePositive` records whether the rule fired
+ * incorrectly, which is the only real input calculateFalsePositiveRate()
+ * has to work with - it is set explicitly by whoever resolves the incident,
+ * never inferred.
  */
 async function resolveIncident(incidentId, resolvedBy, resolutionDetails) {
   try {
+    const wasFalsePositive = Boolean(resolutionDetails && resolutionDetails.wasFalsePositive);
     const result = await pool.query(
-      `UPDATE alert_incidents 
-       SET status = $1, resolved_by = $2, resolved_at = $3 
-       WHERE incident_id = $4 
+      `UPDATE alert_incidents
+       SET status = $1, resolved_by = $2, resolved_at = $3, is_false_positive = $4
+       WHERE incident_id = $5
        RETURNING *`,
-      ['resolved', resolvedBy, new Date().toISOString(), incidentId]
+      ['resolved', resolvedBy, new Date().toISOString(), wasFalsePositive, incidentId]
     );
 
     // Log history
@@ -571,9 +575,16 @@ function calculateMeanTimeToResolve(incidents) {
   return times.reduce((a, b) => a + b, 0) / times.length;
 }
 
+/**
+ * Fraction of resolved incidents marked wasFalsePositive on resolution.
+ * `null`, not a made-up default, when nothing has been resolved yet - there
+ * is no honest rate to report from zero resolutions.
+ */
 function calculateFalsePositiveRate(incidents) {
-  // This would need additional metadata to calculate accurately
-  return 0.05; // Placeholder
+  const resolved = incidents.filter((i) => i.status === 'resolved');
+  if (resolved.length === 0) return null;
+  const falsePositives = resolved.filter((i) => i.is_false_positive === true).length;
+  return falsePositives / resolved.length;
 }
 
 module.exports = {

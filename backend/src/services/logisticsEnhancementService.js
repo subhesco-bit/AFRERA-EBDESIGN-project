@@ -24,7 +24,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         type, registrationNumber, capacity, make, model, year, driverId,
         JSON.stringify(features)
       ]);
@@ -57,7 +57,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY created_at DESC';
 
-      const result = await pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting fleet', { error: error.message, stack: error.stack });
@@ -68,7 +68,7 @@ class LogisticsEnhancementService {
   async getVehicle(vehicleId) {
     try {
       const query = 'SELECT * FROM fleet_vehicles WHERE id = $1';
-      const result = await pool.query(query, [vehicleId]);
+      const result = await this.pool.query(query, [vehicleId]);
 
       if (result.rows.length === 0) {
         throw new Error('Vehicle not found');
@@ -96,7 +96,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         updateData.status,
         updateData.driverId,
         updateData.currentLocation ? JSON.stringify(updateData.currentLocation) : null,
@@ -127,7 +127,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         vehicleId, type, scheduledDate, description, estimatedCost, priority
       ]);
 
@@ -167,7 +167,7 @@ class LogisticsEnhancementService {
   async getMaintenanceDueList({ dueSoonWithinDays = 14 } = {}) {
     const ASSUMED_DUE_SOON_WINDOW_DAYS = dueSoonWithinDays;
     try {
-      const { rows: vehicles } = await pool.query(
+      const { rows: vehicles } = await this.pool.query(
         `SELECT id, type, registration_number, status, mileage,
                 last_maintenance_date, next_maintenance_date
            FROM fleet_vehicles
@@ -175,7 +175,7 @@ class LogisticsEnhancementService {
           ORDER BY registration_number`
       );
 
-      const { rows: openWork } = await pool.query(
+      const { rows: openWork } = await this.pool.query(
         `SELECT vehicle_id, id, type, scheduled_date, priority, description
            FROM vehicle_maintenance
           WHERE status = 'scheduled'
@@ -260,12 +260,12 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         shipmentId, latitude, longitude, speed, heading, timestamp, status
       ]);
 
       // Update shipment current location
-      await pool.query(
+      await this.pool.query(
         'UPDATE shipments SET current_location = $1, updated_at = NOW() WHERE id = $2',
         [JSON.stringify({ latitude, longitude }), shipmentId]
       );
@@ -287,7 +287,7 @@ class LogisticsEnhancementService {
         LIMIT 100
       `;
 
-      const result = await pool.query(query, [shipmentId]);
+      const result = await this.pool.query(query, [shipmentId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting tracking', { error: error.message, stack: error.stack });
@@ -310,7 +310,7 @@ class LogisticsEnhancementService {
         LIMIT 1
       `;
 
-      const result = await pool.query(query, [shipmentId]);
+      const result = await this.pool.query(query, [shipmentId]);
 
       if (result.rows.length === 0) {
         throw new Error('No tracking data available');
@@ -340,7 +340,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         shipmentId, type, radius, JSON.stringify(coordinates), alertEnabled
       ]);
 
@@ -364,7 +364,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         shipmentId, sensorId, temperature, humidity, timestamp, zone
       ]);
 
@@ -403,7 +403,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY timestamp DESC';
 
-      const result = await pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting temperature data', { error: error.message, stack: error.stack });
@@ -430,7 +430,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         shipmentId, minTemp, maxTemp, minHumidity, maxHumidity,
         JSON.stringify(alertChannels)
       ]);
@@ -450,7 +450,7 @@ class LogisticsEnhancementService {
         WHERE shipment_id = $1
       `;
 
-      const result = await pool.query(query, [shipmentId]);
+      const result = await this.pool.query(query, [shipmentId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting temperature alerts', { error: error.message, stack: error.stack });
@@ -484,7 +484,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [shipmentId, alert.id, currentTemp]);
+      const result = await this.pool.query(query, [shipmentId, alert.id, currentTemp]);
 
       logger.warn(`Temperature alert triggered for shipment ${shipmentId}: ${currentTemp}°C`);
       return result.rows[0];
@@ -506,7 +506,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         name, JSON.stringify(location), type, capacity,
         JSON.stringify(zones), JSON.stringify(features)
       ]);
@@ -539,7 +539,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY name ASC';
 
-      const result = await pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting warehouses', { error: error.message, stack: error.stack });
@@ -550,7 +550,7 @@ class LogisticsEnhancementService {
   async getWarehouse(warehouseId) {
     try {
       const query = 'SELECT * FROM warehouses WHERE id = $1';
-      const result = await pool.query(query, [warehouseId]);
+      const result = await this.pool.query(query, [warehouseId]);
 
       if (result.rows.length === 0) {
         throw new Error('Warehouse not found');
@@ -578,7 +578,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         warehouseId, productId, quantity, zone, location, expiryDate
       ]);
 
@@ -603,7 +603,7 @@ class LogisticsEnhancementService {
         ORDER BY wi.zone, wi.location
       `;
 
-      const result = await pool.query(query, [warehouseId]);
+      const result = await this.pool.query(query, [warehouseId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting warehouse inventory', { error: error.message, stack: error.stack });
@@ -622,7 +622,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [
+      const result = await this.pool.query(query, [
         warehouseId, type, JSON.stringify(items), referenceId
       ]);
 
@@ -659,7 +659,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await pool.query(query, [quantity, warehouseId, productId]);
+      const result = await this.pool.query(query, [quantity, warehouseId, productId]);
 
       if (result.rows.length === 0) {
         throw new Error('Inventory not found');
@@ -686,7 +686,7 @@ class LogisticsEnhancementService {
            WHERE tr.timestamp > NOW() - INTERVAL '24 hours') as temperature_violation_rate
       `;
 
-      const result = await pool.query(query);
+      const result = await this.pool.query(query);
       return result.rows[0];
     } catch (error) {
       logger.error('Error getting logistics statistics', { error: error.message, stack: error.stack });
@@ -719,7 +719,7 @@ class LogisticsEnhancementService {
       throw new Error('Coordinates out of range');
     }
     try {
-      const { rows } = await pool.query(
+      const { rows } = await this.pool.query(
         `INSERT INTO driver_location
            (driver_id, shipment_id, latitude, longitude, speed_kmph,
             heading_deg, accuracy_m, battery_pct, recorded_at)
@@ -745,7 +745,7 @@ class LogisticsEnhancementService {
    */
   async getActiveDrivers({ staleAfterMinutes = 30 } = {}) {
     try {
-      const { rows } = await pool.query(
+      const { rows } = await this.pool.query(
         `SELECT DISTINCT ON (driver_id)
                 driver_id, shipment_id, latitude, longitude, speed_kmph,
                 heading_deg, battery_pct, recorded_at,
@@ -777,12 +777,12 @@ class LogisticsEnhancementService {
   async getShipmentTrail(shipmentId) {
     try {
       const [driver, consignment] = await Promise.all([
-        pool.query(
+        this.pool.query(
           `SELECT latitude, longitude, speed_kmph, recorded_at
              FROM driver_location WHERE shipment_id = $1 ORDER BY recorded_at`,
           [shipmentId]
         ),
-        pool.query(
+        this.pool.query(
           `SELECT * FROM shipment_tracking WHERE shipment_id = $1 ORDER BY created_at`,
           [shipmentId]
         ),

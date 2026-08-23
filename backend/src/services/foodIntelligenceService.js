@@ -13,6 +13,7 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../database/pool');
+const { persistTestFallback } = require('../utils/testFallbackStore');
 
 // database/pool.js's in-memory test pool only recognises statements it has a
 // handler for; an INSERT ... RETURNING * this file sends that the mock
@@ -102,9 +103,7 @@ async function createFoodItem(data) {
         storage_conditions: storage_conditions || {},
         allergens: allergens || []
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('food_items', fallback.id, fallback);
-      }
+      persistTestFallback('food_items', fallback.id, fallback);
       return fallback;
     }
 
@@ -246,9 +245,7 @@ async function createQualityAssessment(data) {
         compliance_status: 'compliant',
         recommendations
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('food_quality_assessments', food_item_id, fallback, true);
-      }
+      persistTestFallback('food_quality_assessments', food_item_id, fallback, true);
       return fallback;
     }
 
@@ -374,9 +371,7 @@ async function recordContaminantTest(data) {
         result_status: resultStatus,
         test_method
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('food_contaminant_tests', food_item_id, fallback, true);
-      }
+      persistTestFallback('food_contaminant_tests', food_item_id, fallback, true);
       return fallback;
     }
 
@@ -514,9 +509,7 @@ async function createFreshnessAssessment(data) {
         estimated_remaining_days: remainingDays,
         storage_recommendations
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('food_freshness_assessments', food_item_id, fallback, true);
-      }
+      persistTestFallback('food_freshness_assessments', food_item_id, fallback, true);
       return fallback;
     }
 
@@ -598,9 +591,7 @@ async function createFoodRecall(data) {
         recalling_firm,
         recall_status: 'active'
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('food_recalls', fallback.id, fallback);
-      }
+      persistTestFallback('food_recalls', fallback.id, fallback);
       return fallback;
     }
 
@@ -708,9 +699,7 @@ async function recordFoodIntelligence(foodItemId, metrics) {
         demand_index: metrics.demand_index || 0,
         supply_index: metrics.supply_index || 0
       };
-      if (typeof pool.setTestData === 'function') {
-        pool.setTestData('food_intelligence_analytics', foodItemId, fallback);
-      }
+      persistTestFallback('food_intelligence_analytics', foodItemId, fallback);
       return fallback;
     }
 

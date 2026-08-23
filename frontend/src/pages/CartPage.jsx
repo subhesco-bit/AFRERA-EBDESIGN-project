@@ -1,38 +1,42 @@
+import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ordersAPI } from '../services/api'
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 function CartPage() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const { data: cartData, isLoading, error } = useQuery('cart', ordersAPI.getCart)
+  // v5 react-query object syntax (see LoginPage.jsx) — was the tuple form,
+  // which throws in the installed v5. .then(r => r.data) unwraps the axios
+  // response once here, so cartData below is the real payload directly.
+  const { data: cartData, isLoading, error } = useQuery({
+    queryKey: ['cart'],
+    queryFn: () => ordersAPI.getCart().then((r) => r.data),
+  })
 
-  const updateQuantityMutation = useMutation(
-    ({ id, quantity }) => ordersAPI.updateCartItem(id, { quantity }),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('cart')
-        toast.success('Cart updated')
-      },
-      onError: (error) => {
-        toast.error(error.response?.data?.error || 'Failed to update cart')
-      },
-    }
-  )
+  const updateQuantityMutation = useMutation({
+    mutationFn: ({ id, quantity }) => ordersAPI.updateCartItem(id, { quantity }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+      toast.success('Cart updated')
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to update cart')
+    },
+  })
 
-  const removeMutation = useMutation(
-    (id) => ordersAPI.removeFromCart(id),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('cart')
-        toast.success('Item removed from cart')
-      },
-      onError: (error) => {
-        toast.error(error.response?.data?.error || 'Failed to remove item')
-      },
-    }
-  )
+  const removeMutation = useMutation({
+    mutationFn: (id) => ordersAPI.removeFromCart(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+      toast.success('Item removed from cart')
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || 'Failed to remove item')
+    },
+  })
 
   if (isLoading) {
     return (
@@ -57,11 +61,7 @@ function CartPage() {
     )
   }
 
-  // cartData is the raw axios response; the backend payload
-  // ({ items, total_items, total_amount }) lives under .data. Reading
-  // items/total_amount straight off the response left `items` undefined, so
-  // the `items.length` check below crashed the page as soon as the cart loaded.
-  const { items = [], total_amount = 0 } = cartData?.data || {}
+  const { items = [], total_amount = 0 } = cartData || {}
 
   if (items.length === 0) {
     return (
@@ -69,7 +69,10 @@ function CartPage() {
         <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-4" />
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">Your cart is empty</h2>
         <p className="text-gray-600 mb-6">Add some products to get started</p>
-        <button className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+        <button
+          onClick={() => navigate('/marketplace')}
+          className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
+        >
           Browse Marketplace
         </button>
       </div>
@@ -114,7 +117,7 @@ function CartPage() {
                           quantity: Math.max(1, item.quantity - 1),
                         })
                       }
-                      disabled={updateQuantityMutation.isLoading}
+                      disabled={updateQuantityMutation.isPending}
                       className="w-8 h-8 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                     >
                       <Minus className="w-4 h-4" />
@@ -127,7 +130,7 @@ function CartPage() {
                           quantity: item.quantity + 1,
                         })
                       }
-                      disabled={updateQuantityMutation.isLoading}
+                      disabled={updateQuantityMutation.isPending}
                       className="w-8 h-8 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                     >
                       <Plus className="w-4 h-4" />
@@ -147,7 +150,7 @@ function CartPage() {
 
               <button
                 onClick={() => removeMutation.mutate(item.id)}
-                disabled={removeMutation.isLoading}
+                disabled={removeMutation.isPending}
                 className="self-start p-2 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50"
               >
                 <Trash2 className="w-5 h-5" />
@@ -167,29 +170,34 @@ function CartPage() {
                 <span>₹{total_amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
-                <span>Tax (5%)</span>
-                <span>₹{(total_amount * 0.05).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
                 <span>Shipping</span>
                 <span>{total_amount > 1500 ? 'FREE' : '₹60.00'}</span>
               </div>
+              <p className="text-xs text-gray-500">
+                GST is calculated per item at checkout (varies by product) — not included in this subtotal.
+              </p>
             </div>
 
             <div className="border-t pt-4 mb-6">
               <div className="flex justify-between text-lg font-semibold text-gray-800">
-                <span>Total</span>
+                <span>Subtotal + shipping</span>
                 <span>
-                  ₹{(total_amount + total_amount * 0.05 + (total_amount > 1500 ? 0 : 60)).toFixed(2)}
+                  ₹{(total_amount + (total_amount > 1500 ? 0 : 60)).toFixed(2)}
                 </span>
               </div>
             </div>
 
-            <button className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition mb-3">
+            <button
+              onClick={() => navigate('/checkout')}
+              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition mb-3"
+            >
               Proceed to Checkout
             </button>
 
-            <button className="w-full px-6 py-3 border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition">
+            <button
+              onClick={() => navigate('/marketplace')}
+              className="w-full px-6 py-3 border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition"
+            >
               Continue Shopping
             </button>
           </div>

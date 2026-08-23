@@ -9,36 +9,38 @@ function LogisticsProviderPage() {
   const [showBookingModal, setShowBookingModal] = useState(false)
   const queryClient = useQueryClient()
 
-  const { data: providerProfile } = useQuery('logistics-profile', () =>
-    vendorsAPI.getLogisticsProfile('current-provider-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: providerProfile } = useQuery({
+    queryKey: ['logistics-profile'],
+    queryFn: () => vendorsAPI.getLogisticsProfile('current-provider-id').then(r => r.data),
+  })
 
-  const { data: activeShipments } = useQuery('active-shipments', () =>
-    vendorsAPI.getActiveShipments('current-provider-id')
-  )
+  const { data: activeShipments } = useQuery({
+    queryKey: ['active-shipments'],
+    queryFn: () => vendorsAPI.getActiveShipments('current-provider-id').then(r => r.data),
+  })
 
-  const { data: coldChainNodes } = useQuery('coldchain-nodes', () =>
-    vendorsAPI.getColdChainNodes()
-  )
+  const { data: coldChainNodes } = useQuery({
+    queryKey: ['coldchain-nodes'],
+    queryFn: () => vendorsAPI.getColdChainNodes().then(r => r.data),
+  })
 
-  const { data: returnTrucks } = useQuery('return-trucks', () =>
-    vendorsAPI.getReturnTruckOpportunities()
-  )
-// eslint-disable-next-line no-unused-vars
+  const { data: returnTrucks } = useQuery({
+    queryKey: ['return-trucks'],
+    queryFn: () => vendorsAPI.getReturnTruckOpportunities().then(r => r.data),
+  })
 
-  const createBookingMutation = useMutation(
-    (data) => vendorsAPI.createLogisticsBooking(data),
-    {
-      onSuccess: () => {
-        toast.success('Booking created successfully')
-        queryClient.invalidateQueries('active-shipments')
-        setShowBookingModal(false)
-      },
-      onError: () => {
-        toast.error('Failed to create booking')
-      }
-    }
-  )
+  const createBookingMutation = useMutation({
+    mutationFn: (data) => vendorsAPI.createLogisticsBooking(data),
+    onSuccess: () => {
+      toast.success('Booking created successfully')
+      queryClient.invalidateQueries({ queryKey: ['active-shipments'] })
+      setShowBookingModal(false)
+    },
+    onError: () => {
+      toast.error('Failed to create booking')
+    },
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

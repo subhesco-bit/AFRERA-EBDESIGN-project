@@ -6,7 +6,8 @@
 const express = require('express');
 const router = express.Router();
 const governanceService = require('../services/governanceService');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PROCUREMENT_ROLES } = require('../middleware/roleGroups');
 const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');
 
@@ -117,7 +118,7 @@ router.get('/csr-projects/:projectId', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/csr-projects/:projectId', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/csr-projects/:projectId', authRateLimit, authMiddleware, requireRole(...PROCUREMENT_ROLES), async (req, res) => {
   try {
     const { projectId } = req.params;
     const project = await governanceService.updateCSRProject(projectId, req.body);

@@ -26,8 +26,8 @@ class PlatformDetector {
    * @returns {Object} Platform information
    */
   static detectPlatform() {
-    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const platform = typeof navigator !== 'undefined' ? navigator.platform : '';
+    const userAgent = typeof globalThis.navigator !== 'undefined' ? globalThis.navigator.userAgent : '';
+    const platform = typeof globalThis.navigator !== 'undefined' ? globalThis.navigator.platform : '';
 
     // Mobile detection
     if (/android/i.test(userAgent)) {

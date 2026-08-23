@@ -110,7 +110,9 @@ router.get('/policies', authMiddleware, async (req, res) => {
 router.put('/policies/:policyId/renew', authRateLimit, authMiddleware, async (req, res) => {
   try {
     const { policyId } = req.params;
-    const policy = await insurancePolicyIssuanceService.renewPolicy(policyId, req.body);
+    const policy = await insurancePolicyIssuanceService.renewPolicy(
+      policyId, req.body, req.user.id, req.user.role === 'admin'
+    );
     res.json({ success: true, data: policy });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

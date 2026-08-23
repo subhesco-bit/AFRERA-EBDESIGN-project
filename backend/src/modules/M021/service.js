@@ -276,7 +276,7 @@ async function verifyFarmer(farmerId, verificationData) {
   return { success: true, message: 'Verification submitted for review' };
 }
 
-async function approveFarmerVerification(farmerId, approvedBy, notes) {
+async function approveFarmerVerification(farmerId, approved, approvedBy, notes) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   

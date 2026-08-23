@@ -8,7 +8,8 @@
 const express = require('express');
 const router = express.Router();
 const dairyService = require('../services/dairyService');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { logger } = require('../utils/logger');
 
@@ -30,7 +31,7 @@ router.post('/animals', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/animals/:id', authMiddleware, async (req, res) => {
+router.put('/animals/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const animal = await dairyService.updateAnimal(req.params.id, req.body);
     if (!animal) return res.status(404).json({ success: false, error: 'Not found' });
@@ -40,7 +41,7 @@ router.put('/animals/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/animals/:id', authMiddleware, async (req, res) => {
+router.delete('/animals/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const ok = await dairyService.deleteAnimal(req.params.id);
     if (!ok) return res.status(404).json({ success: false, error: 'Not found' });

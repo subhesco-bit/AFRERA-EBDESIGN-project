@@ -317,11 +317,15 @@ class InsurancePolicyIssuanceService {
   /**
    * Renew policy
    */
-  async renewPolicy(policyId, renewalData) {
+  async renewPolicy(policyId, renewalData, userId = null, isAdmin = false) {
     const { endDate, premiumAmount, paymentReference } = renewalData;
 
     try {
-      const policy = await this.getPolicy(policyId, null, true);
+      // Was `getPolicy(policyId, null, true)` — the admin bypass — so any
+      // logged-in account could renew (and reprice) another user's policy by
+      // id. Scoped to the policyholder unless the caller really is an admin,
+      // matching cancelPolicy's existing behaviour.
+      const policy = await this.getPolicy(policyId, userId, isAdmin);
 
       if (policy.status !== 'active') {
         throw new Error('Only active policies can be renewed');

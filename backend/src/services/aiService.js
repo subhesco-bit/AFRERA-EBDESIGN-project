@@ -618,11 +618,11 @@ router.post('/optimize/price', authMiddleware, async (req, res) => {
   }
 });
 
-// DEPRECATED 2026-08-15 â€” assessCreditRisk() was a second, independent
+// DEPRECATED 2026-08-15 — assessCreditRisk() was a second, independent
 // credit-scoring implementation alongside the canonical, MCDA-based
 // financialService.farmerCreditRiskScore() (the one actually wired into the
 // outcome-resolution loop). No frontend caller was found for this route.
-// Delegated rather than deleted â€” assessCreditRisk() itself is untouched.
+// Delegated rather than deleted — assessCreditRisk() itself is untouched.
 // See AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C for the reconciliation.
 router.post('/assess/credit-risk', authMiddleware, async (req, res) => {
   try {

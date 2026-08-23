@@ -201,7 +201,7 @@ async function lockAccount(userId, reason, duration = 15) {
     entityId: userId
   });
   
-  return { success: true, lockedUntil };
+  return { success: true, lockedUntil: lockUntil };
 }
 
 async function unlockAccount(userId) {

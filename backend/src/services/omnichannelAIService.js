@@ -8,7 +8,8 @@
 const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -745,7 +746,7 @@ router.get('/config/:channel_type', authMiddleware, async (req, res) => {
 /**
  * Update channel configuration
  */
-router.put('/config/:channel_type', authMiddleware, async (req, res) => {
+router.put('/config/:channel_type', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { capabilities, settings, enabled } = req.body;
 

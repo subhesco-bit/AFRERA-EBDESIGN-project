@@ -662,7 +662,7 @@ async function predictSales(categoryId = null, periodDays = 30) {
     
     return {
       success: true,
-      category_id,
+      category_id: categoryId,
       forecast_method: 'time_series_trend',
       historical_data_points: historical.rows.length,
       trend,
@@ -845,7 +845,7 @@ async function analyzeMarketBasket(categoryId = null) {
     
     return {
       success: true,
-      category_id,
+      category_id: categoryId,
       recommendations
     };
   } catch (error) {

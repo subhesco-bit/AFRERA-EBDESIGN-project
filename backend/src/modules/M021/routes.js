@@ -2,6 +2,7 @@
 const router = express.Router();
 const controller = require('./controller');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { FARM_OPERATIONS_ROLES } = require('../../middleware/roleGroups');
 
 // Farmer CRUD
 router.post('/farmers', authMiddleware, requireRole('admin'), controller.registerFarmer);
@@ -18,7 +19,7 @@ router.post('/farmers/:farmerId/verify/approve', authMiddleware, requireRole('ad
 
 // Onboarding
 router.post('/farmers/:farmerId/onboarding', authMiddleware, controller.initiateOnboarding);
-router.put('/farmers/:farmerId/onboarding/progress', authMiddleware, controller.updateOnboardingProgress);
+router.put('/farmers/:farmerId/onboarding/progress', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), controller.updateOnboardingProgress);
 
 // Analytics
 router.get('/farmers/analytics', authMiddleware, requireRole('admin'), controller.getFarmerAnalytics);

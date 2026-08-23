@@ -27,28 +27,28 @@ function LandRegistryPage() {
   const [form, setForm] = useState(emptyForm)
   const [search, setSearch] = useState('')
 
-  const { data, isLoading, error } = useQuery(
-    ['land-parcels', search],
-    async () => {
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['land-parcels', search],
+    queryFn: async () => {
       const res = await landAPI.getParcels(search ? { search } : {})
       return res.data?.data ?? []
-    }
-  )
+    },
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? landAPI.updateParcel(editingId, payload) : landAPI.createParcel(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Parcel updated' : 'Parcel registered')
-        queryClient.invalidateQueries(['land-parcels'])
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save parcel'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? landAPI.updateParcel(editingId, payload) : landAPI.createParcel(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Parcel updated' : 'Parcel registered')
+      queryClient.invalidateQueries({ queryKey: ['land-parcels'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save parcel'),
+  })
 
-  const deleteMutation = useMutation((id) => landAPI.deleteParcel(id), {
-    onSuccess: () => { toast.success('Parcel removed'); queryClient.invalidateQueries(['land-parcels']) },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => landAPI.deleteParcel(id),
+    onSuccess: () => { toast.success('Parcel removed'); queryClient.invalidateQueries({ queryKey: ['land-parcels'] }) },
     onError: () => toast.error('Failed to remove parcel'),
   })
 
@@ -264,9 +264,9 @@ function LandRegistryPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading}
+                  <button type="submit" disabled={saveMutation.isPending}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Register Parcel'}
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Register Parcel'}
                   </button>
                 </div>
               </form>

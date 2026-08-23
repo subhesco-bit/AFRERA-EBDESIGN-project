@@ -22,35 +22,34 @@ function AuthorizationPage() {
   const [tab, setTab] = useState('roles')
   const [selectedRole, setSelectedRole] = useState(null)
 
-  const { data: rolesData, isLoading: rolesLoading, error: rolesError } = useQuery(
-    'authorization-roles',
-    async () => {
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: rolesData, isLoading: rolesLoading, error: rolesError } = useQuery({
+    queryKey: ['authorization-roles'],
+    queryFn: async () => {
       const res = await authorizationAPI.getRoles()
       return res.data?.data ?? []
     },
-    { retry: false }
-  )
+    retry: false,
+  })
 
-  const { data: usersData, isLoading: usersLoading, error: usersError } = useQuery(
-    'authorization-users',
-    async () => (await authorizationAPI.getUsers()).data?.data ?? []
-  )
+  const { data: usersData, isLoading: usersLoading, error: usersError } = useQuery({
+    queryKey: ['authorization-users'],
+    queryFn: async () => (await authorizationAPI.getUsers()).data?.data ?? [],
+  })
 
-  const { data: auditData, isLoading: auditLoading, error: auditError } = useQuery(
-    'authorization-audit-log',
-    async () => (await authorizationAPI.getAuditLog()).data?.data ?? []
-  )
+  const { data: auditData, isLoading: auditLoading, error: auditError } = useQuery({
+    queryKey: ['authorization-audit-log'],
+    queryFn: async () => (await authorizationAPI.getAuditLog()).data?.data ?? [],
+  })
 
-  const updateRoleMutation = useMutation(
-    ({ userId, role }) => authorizationAPI.updateUserRole(userId, { role }),
-    {
-      onSuccess: () => {
-        toast.success('Role updated')
-        queryClient.invalidateQueries('authorization-users')
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to update role'),
-    }
-  )
+  const updateRoleMutation = useMutation({
+    mutationFn: ({ userId, role }) => authorizationAPI.updateUserRole(userId, { role }),
+    onSuccess: () => {
+      toast.success('Role updated')
+      queryClient.invalidateQueries({ queryKey: ['authorization-users'] })
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to update role'),
+  })
 
   // If the backend has no /authorization/roles route yet, fall back to the
   // role catalogue mirrored from authService.js so the permission matrix is

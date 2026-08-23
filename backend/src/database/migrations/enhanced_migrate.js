@@ -514,42 +514,44 @@ if (require.main === module) {
     case 'migrate':
     case undefined:
       system.runMigrations().catch(error => {
-        ;
+        logger.error('Migration run failed', { error: error.message, stack: error.stack });
         process.exit(1);
       });
       break;
     case 'down':
     case 'rollback':
       system.rollback().catch(error => {
-        ;
+        logger.error('Rollback failed', { error: error.message, stack: error.stack });
         process.exit(1);
       });
       break;
     case 'status':
       system.status().catch(error => {
-        ;
+        logger.error('Status check failed', { error: error.message, stack: error.stack });
         process.exit(1);
       });
       break;
-    case 'create':
+    case 'create': {
       const name = args[1];
       const description = args[2] || '';
       if (!name) {
-        ;
+        logger.error('Usage: node enhanced_migrate.js create <name> [description]');
         process.exit(1);
       }
       system.createMigration(name, description);
       break;
+    }
     default:
-      ;
-      ;
-      ;
-      ;
-      ;
-      ;
-      ;
-      ;
-      ;
+      logger.error(`Unknown command: ${command}`);
+      logger.error('Usage: node enhanced_migrate.js <command> [options]');
+      logger.error('Commands:');
+      logger.error('  up | migrate          Run all pending migrations');
+      logger.error('  down | rollback        Roll back the last migration');
+      logger.error('  status                 Show migration status');
+      logger.error('  create <name> [desc]   Scaffold a new migration file');
+      logger.error('Options:');
+      logger.error('  --dry-run              Preview migrations without executing');
+      logger.error('  --force                Bypass dependency/checksum validation warnings');
       process.exit(1);
   }
 }

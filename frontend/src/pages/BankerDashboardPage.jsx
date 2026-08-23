@@ -6,13 +6,16 @@ import { bankerAPI } from '../services/api'
 function BankerDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: portfolioStats } = useQuery('banker-portfolio', () =>
-    bankerAPI.getPortfolio().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: portfolioStats } = useQuery({
+    queryKey: ['banker-portfolio'],
+    queryFn: () => bankerAPI.getPortfolio().then(r => r.data),
+  })
 
-  const { data: riskDashboard } = useQuery('banker-risk', () =>
-    bankerAPI.getRiskDashboard().then(r => r.data)
-  )
+  const { data: riskDashboard } = useQuery({
+    queryKey: ['banker-risk'],
+    queryFn: () => bankerAPI.getRiskDashboard().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

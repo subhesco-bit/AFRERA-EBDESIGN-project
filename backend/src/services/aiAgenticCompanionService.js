@@ -508,7 +508,7 @@ class AIAgenticCompanionService {
     );
 
     return {
-      optimization_opportunities,
+      optimization_opportunities: optimizationOpportunities,
       total_potential_savings: totalSavings,
       roi_percentage: (totalSavings / revenue) * 100,
       implementation_priority: this.prioritizeOptimizations(optimizationOpportunities)

@@ -89,7 +89,7 @@ const dataMinimization = (req, res, next) => {
 
     const minimized = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key) && allowedFields.includes(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key) && allowedFields.includes(key)) {
         minimized[key] = obj[key];
       }
     }

@@ -313,6 +313,40 @@ async function optimizeFarmerResources(farmerId, resourceData) {
 // ============================================================================
 
 /**
+ * Symptom overlap ratio between a reported symptom list and a candidate
+ * disease's known symptom list (Jaccard similarity, case/whitespace
+ * normalized). Was called but never defined anywhere in this file -
+ * detectCropDisease() below threw ReferenceError on every call. This is a
+ * plain set-overlap score, not a trained classifier; there is no ML model
+ * or labeled training data backing "AI-powered" here.
+ *
+ * NOTE: detectCropDisease() also queries crop_health_monitoring and
+ * crop_disease_database, neither of which exists in any migration - fixing
+ * this function makes the ReferenceError go away, but the query above it
+ * will still fail against a real database until those tables are added.
+ * That's a separate, larger gap (new schema + seed data) out of scope here.
+ */
+function calculateSymptomMatch(reportedSymptoms, knownSymptoms) {
+  const normalize = (list) => new Set(
+    (Array.isArray(list) ? list : [])
+      .filter((s) => typeof s === 'string' && s.trim())
+      .map((s) => s.trim().toLowerCase())
+  );
+
+  const reported = normalize(reportedSymptoms);
+  const known = normalize(knownSymptoms);
+  if (reported.size === 0 || known.size === 0) return 0;
+
+  let intersectionSize = 0;
+  for (const symptom of reported) {
+    if (known.has(symptom)) intersectionSize++;
+  }
+  const unionSize = new Set([...reported, ...known]).size;
+
+  return unionSize === 0 ? 0 : intersectionSize / unionSize;
+}
+
+/**
  * AI-powered disease detection for crops
  */
 async function detectCropDisease(cropId, diseaseData) {

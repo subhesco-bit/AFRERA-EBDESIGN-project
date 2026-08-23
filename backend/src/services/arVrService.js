@@ -13,6 +13,8 @@ const router = express.Router();
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../database/pool');
+const { persistTestFallback } = require('../utils/testFallbackStore');
+const { requireResourceOwner } = require('../middleware/ownership');
 
 // ============================================================================
 // AR/VR EXPERIENCES
@@ -76,7 +78,7 @@ async function createExperience(data) {
       created_at: new Date().toISOString()
     };
     // Persist fallback into test-store so subsequent operations (publish, interaction points) can find it
-    try { pool.setTestData && pool.setTestData('arvr_experiences', fallback.id, fallback); } catch (e) {}
+    persistTestFallback('arvr_experiences', fallback.id, fallback);
     return fallback;
   } catch (error) {
     logger.error('Create experience error', { error: error.message, stack: error.stack });
@@ -163,7 +165,7 @@ async function publishExperience(experienceId) {
 
     // Defensive fallback for test-mode: construct a minimal published experience
     const fallback = { id: experienceId, is_published: true, updated_at: new Date().toISOString() };
-    try { pool.setTestData && pool.setTestData('arvr_experiences', fallback.id, fallback); } catch (e) {}
+    persistTestFallback('arvr_experiences', fallback.id, fallback);
     return fallback;
   } catch (error) {
     logger.error('Publish experience error', { error: error.message, stack: error.stack });
@@ -174,7 +176,11 @@ async function publishExperience(experienceId) {
 /**
  * API endpoint to publish experience
  */
-router.patch('/experiences/:experienceId/publish', authMiddleware, async (req, res) => {
+// ar_vr_experiences.created_by is the owner; without this guard any
+// logged-in account could publish another creator's draft experience.
+router.patch('/experiences/:experienceId/publish', authMiddleware,
+  requireResourceOwner({ table: 'ar_vr_experiences', idParam: 'experienceId', ownerColumn: 'created_by' }),
+  async (req, res) => {
   try {
     const result = await publishExperience(req.params.experienceId);
     res.json(result);
@@ -225,7 +231,7 @@ async function createAsset(data) {
 
     // Fallback: echo back asset
     const fallbackAsset = { id: `asset-${Date.now()}`, asset_name: asset_name || 'asset', asset_type: asset_type || 'model', asset_format: asset_format || null, file_url: file_url || null, file_size_bytes: file_size_bytes || null, thumbnail_url: thumbnail_url || null, metadata: metadata || {} };
-    try { pool.setTestData && pool.setTestData('arvr_assets', fallbackAsset.id, fallbackAsset); } catch (e) {}
+    persistTestFallback('arvr_assets', fallbackAsset.id, fallbackAsset);
     return fallbackAsset;
   } catch (error) {
     logger.error('Create asset error', { error: error.message, stack: error.stack });
@@ -325,7 +331,7 @@ async function createInteractionPoint(data) {
     if (result && result.rows && result.rows[0]) return result.rows[0];
 
     const fallback = { id: `ip-${Date.now()}`, experience_id, point_name: point_name || 'Point', point_type: point_type || 'hotspot', position_x: position_x || 0, position_y: position_y || 0, position_z: position_z || 0, interaction_data: interaction_data || {} };
-    try { pool.setTestData && pool.setTestData('arvr_interaction_points', fallback.experience_id, fallback, true); } catch (e) {}
+    persistTestFallback('arvr_interaction_points', fallback.experience_id, fallback, true);
     return fallback;
   } catch (error) {
     logger.error('Create interaction point error', { error: error.message, stack: error.stack });
@@ -405,7 +411,7 @@ async function createSession(data) {
     if (result && result.rows && result.rows[0]) return result.rows[0];
 
     const fallback = { id: `sess-${Date.now()}`, session_id: `sess-${Date.now()}`, user_id: user_id || 'test-user', experience_id: experience_id || null, session_type: session_type || 'ar', device_type: device_type || 'mobile', session_data: session_data || {}, started_at: new Date().toISOString(), ended_at: null };
-    try { pool.setTestData && pool.setTestData('arvr_sessions', fallback.id, fallback); } catch (e) {}
+    persistTestFallback('arvr_sessions', fallback.id, fallback);
     return fallback;
   } catch (error) {
     logger.error('Create session error', { error: error.message, stack: error.stack });
@@ -450,7 +456,7 @@ async function endSession(sessionId, interactionCount) {
 
     // Defensive fallback for test-mode: return a constructed ended session
     const fallback = { id: sessionId, session_id: sessionId, ended_at: new Date().toISOString(), duration_seconds: 0, interaction_count: interactionCount };
-    try { pool.setTestData && pool.setTestData('arvr_sessions', fallback.id, fallback); } catch (e) {}
+    persistTestFallback('arvr_sessions', fallback.id, fallback);
     return fallback;
   } catch (error) {
     logger.error('End session error', { error: error.message, stack: error.stack });
@@ -461,7 +467,11 @@ async function endSession(sessionId, interactionCount) {
 /**
  * API endpoint to end session
  */
-router.patch('/sessions/:sessionId/end', authMiddleware, async (req, res) => {
+// ar_vr_sessions.user_id is the owner; :sessionId alone let any account
+// end another user's session and overwrite its interaction count.
+router.patch('/sessions/:sessionId/end', authMiddleware,
+  requireResourceOwner({ table: 'ar_vr_sessions', idParam: 'sessionId', ownerColumn: 'user_id' }),
+  async (req, res) => {
   try {
     const { interaction_count } = req.body;
     const result = await endSession(req.params.sessionId, interaction_count);
@@ -510,7 +520,7 @@ async function recordArVrAnalytics(metrics) {
       avg_duration: metrics && metrics.avg_duration ? Number(metrics.avg_duration) : 0,
       total_interactions: metrics && metrics.total_interactions ? Number(metrics.total_interactions) : 0
     };
-    try { pool.setTestData && pool.setTestData('arvr_analytics', `arva-${Date.now()}`, fallback, true); } catch (e) {}
+    persistTestFallback('arvr_analytics', `arva-${Date.now()}`, fallback, true);
     return fallback;
   } catch (error) {
     logger.error('Record AR/VR analytics error', { error: error.message, stack: error.stack });

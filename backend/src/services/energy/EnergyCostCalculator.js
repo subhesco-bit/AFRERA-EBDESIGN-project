@@ -127,7 +127,7 @@ class EnergyCostCalculator {
 
     // Biomass & Biogas assessment
     if (biomassAvailable) {
-      biomassPotential = Math.min(20, (agricultureArea * 0.5));
+      biomassPotential = Math.min(20, (agriculturalArea * 0.5));
     }
     if (biogasAvailable) {
       biogasPotential = Math.min(15, (villagePopulation * 0.05));

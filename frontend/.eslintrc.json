@@ -14,7 +14,8 @@
   },
   "extends": ["eslint:recommended"],
   "globals": {
-    "React": "readonly"
+    "React": "readonly",
+    "process": "readonly"
   },
   "rules": {
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^React$" }],
@@ -23,5 +24,11 @@
     "prefer-const": "warn",
     "eqeqeq": ["warn", "smart"]
   },
-  "ignorePatterns": ["node_modules/", "dist/", "coverage/"]
+  "ignorePatterns": ["node_modules/", "dist/", "coverage/"],
+  "overrides": [
+    {
+      "files": ["src/test/**/*.{js,jsx}", "**/*.test.{js,jsx}"],
+      "env": { "jest": true, "node": true }
+    }
+  ]
 }

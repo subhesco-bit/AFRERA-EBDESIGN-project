@@ -169,20 +169,35 @@ function requestLogger(req, res, next) {
   // Capture response
   const originalSend = res.send;
   const originalJson = res.json;
-  const originalEnd = res.end;
-  
-  let responseData = null;
+
   let responseSize = 0;
-  
+
   res.send = function(data) {
-    responseData = data;
-    responseSize = Buffer.byteLength(data);
+    // Buffer.byteLength() only accepts a string/Buffer/TypedArray - res.send()
+    // is also legally called with an object, a number, or no argument at
+    // all (Express stringifies/JSON-encodes those itself), all of which
+    // used to throw here and crash the request before it ever reached the
+    // route handler's real response.
+    if (typeof data === 'string' || Buffer.isBuffer(data)) {
+      responseSize = Buffer.byteLength(data);
+    } else if (data !== undefined && data !== null) {
+      try {
+        responseSize = Buffer.byteLength(JSON.stringify(data));
+      } catch {
+        responseSize = 0;
+      }
+    } else {
+      responseSize = 0;
+    }
     return originalSend.call(this, data);
   };
   
   res.json = function(data) {
-    responseData = data;
-    responseSize = Buffer.byteLength(JSON.stringify(data));
+    // res.json() with no argument (or undefined) is valid and JSON.stringify
+    // returns `undefined` (not a string) for it, which Buffer.byteLength
+    // used to throw on.
+    const serialized = JSON.stringify(data);
+    responseSize = typeof serialized === 'string' ? Buffer.byteLength(serialized) : 0;
     return originalJson.call(this, data);
   };
   

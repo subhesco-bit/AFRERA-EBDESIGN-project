@@ -139,7 +139,6 @@ async function callClaudeAI(prompt, options = {}) {
         usage: data.usage,
         finishReason: data.stop_reason
       };
-      break;
     } catch (error) {
       aiRequestTracker.failedRequests++;
       aiRequestTracker.providerStats.claude.failed++;
@@ -221,7 +220,6 @@ async function callOpenAI(prompt, options = {}) {
       usage: data.usage,
       finishReason: data.choices[0].finish_reason
     };
-    break;
   } catch (error) {
     aiRequestTracker.failedRequests++;
     aiRequestTracker.providerStats.openai.failed++;
@@ -307,7 +305,6 @@ async function callGeminiAI(prompt, options = {}) {
       usage: data.usageMetadata,
       finishReason: data.candidates[0].finishReason
     };
-    break;
   } catch (error) {
     aiRequestTracker.failedRequests++;
     aiRequestTracker.providerStats.gemini.failed++;
@@ -446,7 +443,6 @@ async function callHuggingFace(prompt, options = {}) {
       usage: null,
       finishReason: 'stop'
     };
-    break;
   } catch (error) {
     aiRequestTracker.failedRequests++;
     aiRequestTracker.providerStats.huggingface.failed++;
@@ -483,7 +479,7 @@ async function callAI(prompt, options = {}) {
       return await callAzureOpenAI(prompt, options);
     case 'huggingface':
       return await callHuggingFace(prompt, options);
-    default:
+    default: {
       // Try providers in order of preference
       const providers = ['claude', 'openai', 'gemini', 'azure', 'huggingface'];
       for (const p of providers) {
@@ -497,6 +493,7 @@ async function callAI(prompt, options = {}) {
         }
       }
       throw new Error('No AI provider is available or configured');
+    }
   }
 }
 

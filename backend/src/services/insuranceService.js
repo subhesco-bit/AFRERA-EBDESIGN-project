@@ -5,7 +5,8 @@
 
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 
 /**
  * Create insurance policy
@@ -610,7 +611,7 @@ router.get('/claims', async (req, res) => {
 });
 
 // Process claim
-router.put('/claims/:id/process', authMiddleware, async (req, res) => {
+router.put('/claims/:id/process', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const claim = await processClaim(req.params.id, req.body);
     res.json(claim);

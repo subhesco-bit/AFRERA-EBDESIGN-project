@@ -310,7 +310,7 @@ async function generateLandInsights(district, landType) {
     task: 'land_analytics_insights',
     parameters: {
       district,
-      land_type,
+      land_type: landType,
       market_data: await getMarketTrends(landType),
       ownership_data: await getOwnershipDistribution(district)
     }

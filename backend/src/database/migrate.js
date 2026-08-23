@@ -14,6 +14,26 @@ const pool = new Pool({
 
 const migrationsDir = path.join(__dirname, 'migrations');
 
+// Was declared inside the for-loop body below (a function declaration
+// re-created on every iteration - harmless here since it was redefined
+// identically each time, but non-standard block-scoped function
+// declarations behave inconsistently across engines/modes). Hoisted out and
+// takes the filename explicitly instead of closing over the loop's `file`.
+async function runMigrationWithRecording(sql, filename) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(sql);
+    await client.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [filename]);
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 async function runMigrations() {
   try {
     logger.info('Starting database migrations...');
@@ -71,28 +91,12 @@ async function runMigrations() {
       const migrationPath = path.join(migrationsDir, file);
       const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
 
-      // Helper function to run migration with recording in single transaction
-      async function runMigrationWithRecording(sql) {
-        const client = await pool.connect();
-        try {
-          await client.query('BEGIN');
-          await client.query(sql);
-          await client.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [file]);
-          await client.query('COMMIT');
-        } catch (error) {
-          await client.query('ROLLBACK');
-          throw error;
-        } finally {
-          client.release();
-        }
-      }
-
       // Attempt to run the migration; on failure try an automated repair then archive
       let migrationSuccess = false;
       let firstError = null;
 
       try {
-        await runMigrationWithRecording(migrationSQL);
+        await runMigrationWithRecording(migrationSQL, file);
         logger.info(`Migration completed: ${file}`);
         migrationSuccess = true;
       } catch (error) {
@@ -106,7 +110,7 @@ async function runMigrations() {
         if (repairedSQL && repairedSQL !== migrationSQL) {
           logger.info(`Attempting automated repair for ${file}`);
           try {
-            await runMigrationWithRecording(repairedSQL);
+            await runMigrationWithRecording(repairedSQL, file);
             logger.info(`Migration completed after automated repair: ${file}`);
             // Save repaired version for audit
             fs.writeFileSync(path.join(repairsDir, `repaired_${file}`), repairedSQL, 'utf8');
@@ -248,7 +252,7 @@ switch (command) {
     break;
   case 'down':
     if (!arg) {
-      ;
+      console.error('Usage: node migrate.js down <filename>');
       process.exit(1);
     }
     rollbackMigration(arg);
@@ -257,7 +261,7 @@ switch (command) {
     showMigrationStatus();
     break;
   default:
-    ;
+    console.error(`Unknown command: ${command}. Usage: node migrate.js [up|down <filename>|status]`);
     process.exit(1);
     break;
 }

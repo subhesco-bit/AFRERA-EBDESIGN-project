@@ -10,7 +10,7 @@
  * - Accessibility support
  */
 
-import { Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 
 import { useLocation } from 'react-router-dom'
 import { LoadingSpinner, PageSkeleton, CardSkeleton } from './ui/Skeleton'

@@ -160,19 +160,26 @@ async function processSyncQueue(userId) {
       );
     }
 
-    // Bulk update failed items
+    // Bulk update failed items — each row needs a different retry_count/
+    // backoff/error_message, so a single WHERE id = ANY() won't do; join
+    // against a VALUES list instead of one UPDATE per row.
     if (failedIds.length > 0) {
-      for (const failed of failedIds) {
-        await pool.query(
-          `UPDATE sync_queue 
-           SET status = 'failed', 
-               retry_count = $1, 
-               next_retry_at = NOW() + INTERVAL '1 second' * $2,
-               error_message = $3
-           WHERE id = $4`,
-          [failed.retryCount, failed.backoffTime, failed.errorMessage, failed.id]
-        );
-      }
+      const rows = failedIds.map((f, i) => {
+        const base = i * 4;
+        return `($${base + 1}::int, $${base + 2}::int, $${base + 3}::numeric, $${base + 4}::text)`;
+      }).join(', ');
+      const params = failedIds.flatMap((f) => [f.id, f.retryCount, f.backoffTime, f.errorMessage]);
+
+      await pool.query(
+        `UPDATE sync_queue AS sq
+         SET status = 'failed',
+             retry_count = v.retry_count,
+             next_retry_at = NOW() + INTERVAL '1 second' * v.backoff,
+             error_message = v.error_message
+         FROM (VALUES ${rows}) AS v(id, retry_count, backoff, error_message)
+         WHERE sq.id = v.id`,
+        params
+      );
     }
 
     return {
@@ -228,7 +235,7 @@ async function processSyncItem(syncItem) {
 async function syncOrder(orderData, operation) {
   try {
     switch (operation) {
-      case 'create':
+      case 'create': {
         const createQuery = `
           INSERT INTO orders (id, user_id, total_amount, status, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6)
@@ -244,8 +251,9 @@ async function syncOrder(orderData, operation) {
           orderData.created_at
         ]);
         break;
+      }
 
-      case 'update':
+      case 'update': {
         const updateQuery = `
           UPDATE orders
           SET total_amount = $2, status = $3, metadata = $4, updated_at = NOW()
@@ -259,6 +267,7 @@ async function syncOrder(orderData, operation) {
           JSON.stringify(orderData.metadata || {})
         ]);
         break;
+      }
 
       case 'delete':
         await pool.query('DELETE FROM orders WHERE id = $1', [orderData.id]);
@@ -278,7 +287,7 @@ async function syncOrder(orderData, operation) {
 async function syncProduct(productData, operation) {
   try {
     switch (operation) {
-      case 'create':
+      case 'create': {
         const createQuery = `
           INSERT INTO products (id, name, category, price, stock, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -295,8 +304,9 @@ async function syncProduct(productData, operation) {
           productData.created_at
         ]);
         break;
+      }
 
-      case 'update':
+      case 'update': {
         const updateQuery = `
           UPDATE products
           SET name = $2, category = $3, price = $4, stock = $5, metadata = $6, updated_at = NOW()
@@ -312,6 +322,7 @@ async function syncProduct(productData, operation) {
           JSON.stringify(productData.metadata || {})
         ]);
         break;
+      }
 
       case 'delete':
         await pool.query('DELETE FROM products WHERE id = $1', [productData.id]);
@@ -331,7 +342,7 @@ async function syncProduct(productData, operation) {
 async function syncUserProfile(profileData, operation) {
   try {
     switch (operation) {
-      case 'update':
+      case 'update': {
         const updateQuery = `
           UPDATE user_profiles
           SET first_name = $2, last_name = $3, phone = $4, address = $5, preferences = $6, updated_at = NOW()
@@ -347,6 +358,7 @@ async function syncUserProfile(profileData, operation) {
           JSON.stringify(profileData.preferences || {})
         ]);
         break;
+      }
     }
 
     return { success: true, message: 'User profile synced successfully' };
@@ -362,7 +374,7 @@ async function syncUserProfile(profileData, operation) {
 async function syncInventory(inventoryData, operation) {
   try {
     switch (operation) {
-      case 'update':
+      case 'update': {
         const updateQuery = `
           UPDATE inventory
           SET quantity = $2, location = $3, metadata = $4, updated_at = NOW()
@@ -377,6 +389,7 @@ async function syncInventory(inventoryData, operation) {
           inventoryData.warehouse_id
         ]);
         break;
+      }
     }
 
     return { success: true, message: 'Inventory synced successfully' };
@@ -392,7 +405,7 @@ async function syncInventory(inventoryData, operation) {
 async function syncPayment(paymentData, operation) {
   try {
     switch (operation) {
-      case 'create':
+      case 'create': {
         const createQuery = `
           INSERT INTO transactions (transaction_id, user_id, type, amount, status, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -409,8 +422,9 @@ async function syncPayment(paymentData, operation) {
           paymentData.created_at
         ]);
         break;
+      }
 
-      case 'update':
+      case 'update': {
         const updateQuery = `
           UPDATE transactions
           SET status = $2, metadata = $3, updated_at = NOW()
@@ -423,6 +437,7 @@ async function syncPayment(paymentData, operation) {
           JSON.stringify(paymentData.metadata || {})
         ]);
         break;
+      }
     }
 
     return { success: true, message: 'Payment synced successfully' };
@@ -619,7 +634,7 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
     const timestamp = lastSyncTimestamp || await getLastSuccessfulSync(userId);
 
     switch (entityType) {
-      case 'products':
+      case 'products': {
         const productsQuery = `
           SELECT * FROM products
           WHERE updated_at > $1 OR $1 IS NULL
@@ -628,8 +643,9 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
         `;
         const productsResult = await pool.query(productsQuery, [timestamp]);
         return productsResult.rows;
+      }
 
-      case 'orders':
+      case 'orders': {
         const ordersQuery = `
           SELECT * FROM orders
           WHERE user_id = $1
@@ -639,8 +655,9 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
         `;
         const ordersResult = await pool.query(ordersQuery, [userId, timestamp]);
         return ordersResult.rows;
+      }
 
-      case 'user_profile':
+      case 'user_profile': {
         const profileQuery = `
           SELECT up.*, u.email, u.phone
           FROM user_profiles up
@@ -649,6 +666,7 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
         `;
         const profileResult = await pool.query(profileQuery, [userId]);
         return profileResult.rows[0];
+      }
 
       default:
         throw new Error('Unsupported entity type');

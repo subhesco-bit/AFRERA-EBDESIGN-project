@@ -16,30 +16,30 @@ function IrrigationManagementPage() {
   const [form, setForm] = useState(emptySchedule)
   const [tab, setTab] = useState('schedules')
 
-  const { data: schedulesData, isLoading, error } = useQuery(
-    'irrigation-schedules',
-    async () => (await irrigationAPI.getSchedules()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: schedulesData, isLoading, error } = useQuery({
+    queryKey: ['irrigation-schedules'],
+    queryFn: async () => (await irrigationAPI.getSchedules()).data?.data ?? [],
+  })
 
-  const { data: sourcesData, isLoading: sourcesLoading, error: sourcesError } = useQuery(
-    'irrigation-water-sources',
-    async () => (await irrigationAPI.getWaterSources()).data?.data ?? []
-  )
+  const { data: sourcesData, isLoading: sourcesLoading, error: sourcesError } = useQuery({
+    queryKey: ['irrigation-water-sources'],
+    queryFn: async () => (await irrigationAPI.getWaterSources()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? irrigationAPI.updateSchedule(editingId, payload) : irrigationAPI.createSchedule(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Schedule updated' : 'Schedule created')
-        queryClient.invalidateQueries('irrigation-schedules')
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save schedule'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? irrigationAPI.updateSchedule(editingId, payload) : irrigationAPI.createSchedule(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Schedule updated' : 'Schedule created')
+      queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save schedule'),
+  })
 
-  const deleteMutation = useMutation((id) => irrigationAPI.deleteSchedule(id), {
-    onSuccess: () => { toast.success('Schedule removed'); queryClient.invalidateQueries('irrigation-schedules') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => irrigationAPI.deleteSchedule(id),
+    onSuccess: () => { toast.success('Schedule removed'); queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] }) },
     onError: () => toast.error('Failed to remove schedule'),
   })
 
@@ -234,8 +234,8 @@ function IrrigationManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Create Schedule'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Create Schedule'}
                   </button>
                 </div>
               </form>

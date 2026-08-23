@@ -15,7 +15,12 @@ function LoginPage() {
     password: '',
   })
 
-  const loginMutation = useMutation(authAPI.login, {
+  // NOTE: @tanstack/react-query v5 (installed) removed the `useMutation(fn, opts)`
+  // shorthand — the object form below is the only supported signature. This was
+  // silently broken (login itself would throw on render), and `isLoading` was
+  // renamed to `isPending` for mutations specifically in v5.
+  const loginMutation = useMutation({
+    mutationFn: authAPI.login,
     onSuccess: (response) => {
       // authAPI.login resolves to the raw axios response; the actual payload
       // (user/accessToken/refreshToken) is in response.data, not on response
@@ -107,10 +112,10 @@ function LoginPage() {
 
             <button
               type="submit"
-              disabled={loginMutation.isLoading}
+              disabled={loginMutation.isPending}
               className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {loginMutation.isLoading ? (
+              {loginMutation.isPending ? (
                 <span className="animate-spin mr-2">⌛</span>
               ) : (
                 <LogIn className="w-5 h-5 mr-2" />

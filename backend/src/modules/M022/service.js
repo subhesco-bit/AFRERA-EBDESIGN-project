@@ -259,7 +259,7 @@ async function addContactInfo(profileId, contactData) {
 
     const contact = {
       contact_id: generateId(),
-      profile_id,
+      profile_id: profileId,
       phone,
       alternate_phone,
       email,
@@ -314,7 +314,7 @@ async function addHouseholdMember(profileId, memberData) {
 
     const member = {
       household_id: generateId(),
-      profile_id,
+      profile_id: profileId,
       member_name,
       relationship,
       age,
@@ -363,7 +363,7 @@ async function addSkill(profileId, skillData) {
 
     const skill = {
       skill_id: generateId(),
-      profile_id,
+      profile_id: profileId,
       skill_name,
       skill_category,
       proficiency_level,

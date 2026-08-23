@@ -265,8 +265,6 @@ function createRateLimiter(options = {}) {
     strategy = RateLimitStrategy.SLIDING_WINDOW,
     message = 'Too many requests, please try again later',
     keyGenerator = (req) => req.ip,
-    skipFailedRequests = true,
-    skipSuccessfulRequests = false,
     whitelist = [],
     blacklist = [],
     store = memoryStore
@@ -332,15 +330,6 @@ function createRateLimiter(options = {}) {
         limit: result.limit,
         remaining: result.remaining
       });
-    }
-
-    // Track successful/failed requests if configured
-    if (!skipSuccessfulRequests && res.statusCode < 400) {
-      // Track successful request
-    }
-    
-    if (!skipFailedRequests && res.statusCode >= 400) {
-      // Track failed request
     }
 
     next();

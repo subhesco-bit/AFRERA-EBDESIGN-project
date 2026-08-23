@@ -315,15 +315,15 @@ async function approveNutrientVerification(verificationId, approvedBy, notes) {
     await signalBus.emit('nutrient.verification.approved', {
       verification_id: verificationId,
       product_id: verificationData.product_id,
-      approved_by,
+      approved_by: approvedBy,
       timestamp: new Date().toISOString()
     });
-    
+
     logger.info('Nutrient verification approved', { verificationId });
-    
+
     return {
       success: true,
-      verification_id,
+      verification_id: verificationId,
       product_id: verificationData.product_id
     };
   } catch (error) {
@@ -395,7 +395,7 @@ async function createNutrientValueListing(sellerId, listingData) {
     // Emit signal bus event
     await signalBus.emit('nutrient.listing.created', {
       listing_id: listingId,
-      seller_id,
+      seller_id: sellerId,
       nutrient_tier,
       nutrient_density_score: listing.nutrient_density_score,
       timestamp: new Date().toISOString()
@@ -487,7 +487,7 @@ async function assignNutrientTier(productId, manualOverride = null) {
       product_id: productId,
       tier,
       badge,
-      nutrient_density_score,
+      nutrient_density_score: nutrientDensityScore,
       timestamp: new Date().toISOString()
     });
     
@@ -499,7 +499,7 @@ async function assignNutrientTier(productId, manualOverride = null) {
       tier,
       badge,
       description,
-      nutrient_density_score
+      nutrient_density_score: nutrientDensityScore
     };
   } catch (error) {
     logger.error('Error assigning nutrient tier', { error: error.message, productId });
@@ -744,7 +744,7 @@ async function calculateNutrientBasedCommission(orderId) {
     
     return {
       success: true,
-      commission_id,
+      commission_id: commissionId,
       order_id: orderId,
       commission_breakdown: commissionBreakdown,
       total_commission: Math.round(totalCommission * 100) / 100,

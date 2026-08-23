@@ -115,7 +115,7 @@ const logisticsEnhancements = require('./routes/logisticsEnhancements');
 const advancedFeatures = require('./routes/advancedFeatures');
 const enterpriseAIRoutes = require('./routes/enterpriseAIRoutes');
 const gstRoutes = require('./routes/gstRoutes');
-const logisticsOpsRoutes = require('./routes/logisticsEnhancementRoutes');
+// REMOVED: logisticsOpsRoutes - was imported from logisticsEnhancementRoutes but route removed to prevent crash
 const farmerRoutes = require('./routes/farmerRoutes');
 const auditRoutes = require('./routes/auditRoutes');
 // M121 Dairy Management + M112 Fertilizer Inventory (Livestock / Input
@@ -131,8 +131,14 @@ const pigRoutes = require('./routes/pigRoutes');
 const animalHealthRoutes = require('./routes/animalHealthRoutes');
 // Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993)
 const enterpriseControlRoutes = require('./routes/enterpriseControlRoutes');
-// Unified Ledger with Economy Segmentation (migration 998) - One Ledger + 9 Economies
-const unifiedLedgerRoutes = require('./routes/unifiedLedgerRoutes');
+// unifiedLedgerRoutes/unifiedLedgerService (migration 998, "One Ledger + 9
+// Economies") were deleted here (2026-08-17): the build directive explicitly
+// rejects a separate ledger per economy in favor of the canonical
+// journal_entries/journal_lines ledger tagged by cost center, this service
+// wrote through a signalBus instance disconnected from the real reflex
+// engine, and the route was already fully blocked. See
+// AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C. UnifiedLedgerPage.jsx now points
+// users at the real /ledger page instead of calling this.
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
 const villageProfileService = require('./services/villageProfileService');
 // Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
@@ -184,6 +190,101 @@ const sapModuleArchitectureService = require('./services/sapModuleArchitectureSe
 const riskPricingRoutes = require('./routes/riskPricingRoutes');
 // GST, hash-chained ledger, scheme matching, eNWR, freight, risk (migration 053).
 const recoveredFinanceRoutes = require('./routes/recoveredFinanceRoutes');
+// REMOVED: Climate monitoring routes - droughtMonitoringRoutes, floodMonitoringRoutes, diseaseForecastingRoutes, climateRiskRoutes, agroMeteorologyRoutes (missing files - would crash app)
+// Farm activities/tasks/contractors/machinery ops/equipment scheduling/input
+// consumption/productivity/ops dashboard CRUD - same "shipped frontend form,
+// no backend" gap as the climate batch above (2026-08-17).
+const {
+  farmActivityRoutes, farmTaskRoutes, contractorRoutes, machineryOperationsRoutes,
+  equipmentSchedulingRoutes, inputConsumptionRoutes, farmProductivityRoutes,
+  farmOperationsDashboardRoutes,
+} = require('./routes/operationsManagementRoutes');
+// Water budgeting/quality/rainwater-harvesting-structures/watersheds/analytics
+// CRUD - same gap as the batches above (2026-08-17). Distinct from
+// backend/src/modules/M078's rainwater_harvesting_systems engineering API -
+// see waterManagementService.js.
+const {
+  waterBudgetingRoutes, waterQualityRoutes, rainwaterHarvestingRoutes,
+  watershedManagementRoutes, waterAnalyticsRoutes,
+} = require('./routes/waterManagementRoutes');
+// Soil health cards/nutrient plans/fertility records CRUD - same gap as the
+// batches above (2026-08-17). M072 Soil Testing is real and untouched.
+const {
+  soilHealthRoutes, nutrientManagementRoutes, fertilityManagementRoutes,
+} = require('./routes/soilManagementRoutes');
+// Block/district/state/producer-group/community-asset/rural-development CRUD
+// - same gap as the batches above (2026-08-17). Panchayat/Cooperative are
+// real via /api/v1/governance and untouched.
+const {
+  blockManagementRoutes, districtManagementRoutes, stateManagementRoutes,
+  producerGroupRoutes, communityAssetRoutes, ruralDevelopmentRoutes,
+} = require('./routes/communityManagementRoutes');
+// Biofertilizer/pesticide/bio-pesticide/micronutrient/organic-input/
+// input-procurement/input-distribution/input-traceability CRUD - same gap
+// as the batches above (2026-08-17).
+const {
+  biofertilizerRoutes, pesticideInventoryRoutes, bioPesticideRoutes, micronutrientRoutes,
+  organicInputRoutes, inputProcurementRoutes, inputDistributionRoutes, inputTraceabilityRoutes,
+} = require('./routes/inputSupplyManagementRoutes');
+// Cattle registry/feed/analytics CRUD (2026-08-17). Poultry/Goat/Sheep/Pig
+// and Breeding deliberately excluded - see livestockManagementService.js
+// header for why (real backends already exist at different paths, or need
+// investigation before building). M127 Animal Health is real and untouched
+// (frontend caller was fixed instead - see LivestockManagementPage.jsx).
+const {
+  cattleRegistryRoutes, feedManagementRoutes, livestockAnalyticsRoutes,
+} = require('./routes/livestockManagementRoutes');
+// Farmer family CRUD (2026-08-17).
+const farmerFamilyRoutes = require('./routes/farmerFamilyRoutes');
+// Land lease/GIS mapping/soil mapping/water resource mapping/geo boundary/
+// survey CRUD - same gap as the batches above (2026-08-17).
+const {
+  landLeaseRoutes, gisLandMappingRoutes, soilMappingRoutes,
+  waterResourceMappingRoutes, geoBoundaryRoutes, surveyManagementRoutes,
+} = require('./routes/landManagementRoutes');
+// Crop registration/variety/seed-planning/nursery/sowing/monitoring CRUD -
+// same gap as the batches above (2026-08-17).
+const {
+  cropRegistrationRoutes, cropVarietyRoutes, seedPlanningRoutes,
+  nurseryManagementRoutes, sowingManagementRoutes, cropMonitoringRoutes,
+} = require('./routes/cropManagementRoutes');
+// Preventive maintenance CRUD (2026-08-17). The other 7
+// MachineryManagementPage.jsx tabs (implements/inventory/rental/breakdown/
+// fuel/parts/lifecycle) are deliberately not built - see
+// preventiveMaintenanceService.js for why (real, differently-shaped
+// backends already exist for those at modules M102/M103/M104/M107/M108/
+// M109/M110).
+const preventiveMaintenanceRoutes = require('./routes/preventiveMaintenanceRoutes');
+// Vegetable/floriculture/polyhouse/hydroponics/aeroponics/precision-horticulture/
+// protected-cultivation/horticulture-analytics CRUD - same gap as the
+// batches above (2026-08-17). M144 Greenhouse is real and untouched.
+const {
+  vegetableProductionRoutes, floricultureRoutes, polyhouseManagementRoutes,
+  hydroponicsRoutes, aeroponicsRoutes, precisionHorticultureRoutes,
+  protectedCultivationRoutes, horticultureAnalyticsRoutes,
+} = require('./routes/horticultureManagementRoutes');
+// Drought/flood/disease-forecast/climate-risk/agro-meteorology CRUD - same
+// gap as the batches above (2026-08-21). Real ClimateMonitoringPage.jsx
+// tabs shipped with a working form and an honest "backend not built yet"
+// note; service/routes already existed but were never mounted.
+const {
+  droughtMonitoringRoutes, floodMonitoringRoutes, diseaseForecastingRoutes,
+  climateRiskRoutes, agroMeteorologyRoutes,
+} = require('./routes/climateMonitoringRoutes');
+// Biofloc/hatchery/fish-feed/fisheries-water-quality/fish-health/
+// fisheries-harvest/fish-processing/cold-fish-chain/aquaculture-analytics
+// CRUD - same gap as the batches above (2026-08-21). Pond Management
+// (M132) already has a real, incompatibly-shaped backend and is untouched
+// - see fisheriesManagementService.js.
+const {
+  biofloccFarmRoutes, hatcheryManagementRoutes, fishFeedRoutes,
+  fisheriesWaterQualityRoutes, fishHealthRoutes, fisheriesHarvestRoutes,
+  fishProcessingRoutes, coldFishChainRoutes, aquacultureAnalyticsRoutes,
+} = require('./routes/fisheriesManagementRoutes');
+// Role management (M014) — real service, real frontend caller
+// (frontend/src/services/api.js getRoles/createRole/updateRole/deleteRole
+// against /roles), but no backend anywhere until now (2026-08-21).
+const roleManagementRoutes = require('./routes/roleManagementRoutes');
 // Domain D14 Climate & Weather (057) — was completely empty before today.
 const weatherRoutes = require('./routes/weatherRoutes');
 // M083 Climate Advisory (Operations wave 2) — CRUD for agromet_advisories,
@@ -261,7 +362,6 @@ const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRou
 // Information Sharing Routes - Document and Knowledge Sharing with AI Integration
 const informationSharingRoutes = require('./routes/informationSharingRoutes');
 // Community Routes - Community Management with AI Integration
-const communityRoutes = require('./routes/communityRoutes');
 // Knowledge Routes - Knowledge Management with AI Integration
 const knowledgeRoutes = require('./routes/knowledgeRoutes');
 // Company lookup — resolves accounting UI gap for companyId/fiscalYear/chart-of-accounts
@@ -309,6 +409,14 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
+
+// Trust proxy configuration for rate limiting security
+// Rate limiters key on req.ip, which is attacker-controlled via X-Forwarded-For
+// behind a reverse proxy without this setting. TRUST_PROXY_HOPS configures how
+// many proxy layers to trust (default: 1 for a single load balancer).
+const trustProxyHops = process.env.TRUST_PROXY_HOPS ? parseInt(process.env.TRUST_PROXY_HOPS, 10) : 1;
+app.set('trust proxy', trustProxyHops);
+logger.info(`Trust proxy configured: ${trustProxyHops} hop(s)`);
 
 // Security middleware
 app.use(helmet({
@@ -433,6 +541,7 @@ mountRoute('/api/v1/control', enterpriseControlService);
 mountRoute('/api/v1/intel', v42IntelligenceService);
 mountRoute('/api/v1/value', farmerValueService);
 mountRoute('/api/v1/merchandising', merchandisingService);
+mountRoute('/api/v1/engineering', require('./routes/engineeringProjectRoutes'));
 // Mount User Management (M011)
 mountRoute('/api/v1/users', userModule);
 // Mount System Administration (M006)
@@ -503,7 +612,8 @@ app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
 
 // Routes that existed but were never mounted anywhere
 app.use('/api/v1/gst', gstRoutes);
-app.use('/api/v1/logistics-ops', logisticsOpsRoutes);
+// REMOVED: logisticsOpsRoutes - missing file, will crash app
+// app.use('/api/v1/logistics-ops', logisticsOpsRoutes);
 
 // Newly created routes covering previously-orphaned services
 app.use('/api/v1/farmers', farmerRoutes);
@@ -522,8 +632,6 @@ app.use('/api/v1/pig', pigRoutes);
 app.use('/api/v1/animal-health', animalHealthRoutes);
 // Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993)
 app.use('/api/v1/enterprise', enterpriseControlRoutes);
-// Unified Ledger with Economy Segmentation (migration 998) - One Ledger + 9 Economies
-app.use('/api/v1/unified-ledger', unifiedLedgerRoutes);
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
 villageProfileService.setupRoutes(app);
 // Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
@@ -557,10 +665,88 @@ app.use('/api/v1/vendors', vendorRoutes);
 const hrRoutes = require('./routes/hrRoutes');
 app.use('/api/v1/hr', hrRoutes);
 
-// Economic Layer routes (scaffolded)
+// Economic Layer routes (scaffolded) - RESTORED: These routes ARE exported from existing aggregate files
 app.use('/api/v1/revenue', revenueRoutes);
 app.use('/api/v1/pricing', riskPricingRoutes);
 app.use('/api/v1/finance', recoveredFinanceRoutes);
+// Climate monitoring routes - REMOVED: droughtMonitoringRoutes, floodMonitoringRoutes, diseaseForecastingRoutes, climateRiskRoutes, agroMeteorologyRoutes (missing files)
+// Farm operations routes - RESTORED: Exported from operationsManagementRoutes.js
+app.use('/api/v1/farm-activities', farmActivityRoutes);
+app.use('/api/v1/farm-tasks', farmTaskRoutes);
+app.use('/api/v1/contractors', contractorRoutes);
+app.use('/api/v1/machinery-operations', machineryOperationsRoutes);
+app.use('/api/v1/equipment-scheduling', equipmentSchedulingRoutes);
+app.use('/api/v1/input-consumption', inputConsumptionRoutes);
+app.use('/api/v1/farm-productivity', farmProductivityRoutes);
+app.use('/api/v1/farm-operations-dashboard', farmOperationsDashboardRoutes);
+// Water management routes - RESTORED: Exported from waterManagementRoutes.js
+app.use('/api/v1/water-budgeting/budgets', waterBudgetingRoutes);
+app.use('/api/v1/water-quality/readings', waterQualityRoutes);
+app.use('/api/v1/rainwater-harvesting/structures', rainwaterHarvestingRoutes);
+app.use('/api/v1/watersheds', watershedManagementRoutes);
+app.use('/api/v1/water-analytics/records', waterAnalyticsRoutes);
+// Soil management routes - RESTORED: Exported from soilManagementRoutes.js
+app.use('/api/v1/soil-health/cards', soilHealthRoutes);
+app.use('/api/v1/nutrient-management/plans', nutrientManagementRoutes);
+app.use('/api/v1/fertility-management/records', fertilityManagementRoutes);
+// Community management routes - RESTORED: Exported from communityManagementRoutes.js
+app.use('/api/v1/blocks', blockManagementRoutes);
+app.use('/api/v1/districts', districtManagementRoutes);
+app.use('/api/v1/states', stateManagementRoutes);
+app.use('/api/v1/producer-groups', producerGroupRoutes);
+app.use('/api/v1/community-assets', communityAssetRoutes);
+app.use('/api/v1/rural-development/projects', ruralDevelopmentRoutes);
+// Input supply routes - RESTORED: Exported from inputSupplyManagementRoutes.js
+app.use('/api/v1/biofertilizers', biofertilizerRoutes);
+app.use('/api/v1/pesticide-inventory', pesticideInventoryRoutes);
+app.use('/api/v1/bio-pesticides', bioPesticideRoutes);
+app.use('/api/v1/micronutrients', micronutrientRoutes);
+app.use('/api/v1/organic-inputs', organicInputRoutes);
+app.use('/api/v1/input-procurement/orders', inputProcurementRoutes);
+app.use('/api/v1/input-distribution/records', inputDistributionRoutes);
+app.use('/api/v1/input-traceability/records', inputTraceabilityRoutes);
+// Livestock routes - RESTORED: Exported from livestockManagementRoutes.js
+app.use('/api/v1/cattle-registry/animals', cattleRegistryRoutes);
+app.use('/api/v1/livestock-feed/records', feedManagementRoutes);
+app.use('/api/v1/livestock-analytics/records', livestockAnalyticsRoutes);
+// Other routes - RESTORED: Exported from existing files
+app.use('/api/v1/farmer-family/members', farmerFamilyRoutes);
+app.use('/api/v1/land-leases', landLeaseRoutes);
+app.use('/api/v1/gis-land-mapping/parcels', gisLandMappingRoutes);
+app.use('/api/v1/soil-mapping/zones', soilMappingRoutes);
+app.use('/api/v1/water-resource-mapping/resources', waterResourceMappingRoutes);
+app.use('/api/v1/geo-boundaries', geoBoundaryRoutes);
+app.use('/api/v1/land-surveys', surveyManagementRoutes);
+app.use('/api/v1/crop-registration/crops', cropRegistrationRoutes);
+app.use('/api/v1/crop-varieties', cropVarietyRoutes);
+app.use('/api/v1/seed-planning/plans', seedPlanningRoutes);
+app.use('/api/v1/nurseries', nurseryManagementRoutes);
+app.use('/api/v1/sowing/records', sowingManagementRoutes);
+app.use('/api/v1/crop-monitoring/observations', cropMonitoringRoutes);
+app.use('/api/v1/preventive-maintenance', preventiveMaintenanceRoutes);
+app.use('/api/v1/vegetable-production', vegetableProductionRoutes);
+app.use('/api/v1/floriculture', floricultureRoutes);
+app.use('/api/v1/polyhouse-management', polyhouseManagementRoutes);
+app.use('/api/v1/hydroponics', hydroponicsRoutes);
+app.use('/api/v1/aeroponics', aeroponicsRoutes);
+app.use('/api/v1/precision-horticulture', precisionHorticultureRoutes);
+app.use('/api/v1/protected-cultivation', protectedCultivationRoutes);
+app.use('/api/v1/horticulture-analytics', horticultureAnalyticsRoutes);
+app.use('/api/v1/drought-monitoring', droughtMonitoringRoutes);
+app.use('/api/v1/flood-monitoring', floodMonitoringRoutes);
+app.use('/api/v1/disease-forecasting', diseaseForecastingRoutes);
+app.use('/api/v1/climate-risk', climateRiskRoutes);
+app.use('/api/v1/agro-meteorology', agroMeteorologyRoutes);
+app.use('/api/v1/biofloc-farms', biofloccFarmRoutes);
+app.use('/api/v1/hatchery-management', hatcheryManagementRoutes);
+app.use('/api/v1/fish-feed', fishFeedRoutes);
+app.use('/api/v1/fisheries-water-quality', fisheriesWaterQualityRoutes);
+app.use('/api/v1/fish-health', fishHealthRoutes);
+app.use('/api/v1/fisheries-harvest', fisheriesHarvestRoutes);
+app.use('/api/v1/fish-processing', fishProcessingRoutes);
+app.use('/api/v1/cold-fish-chain', coldFishChainRoutes);
+app.use('/api/v1/aquaculture-analytics', aquacultureAnalyticsRoutes);
+app.use('/api/v1/roles', roleManagementRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/climate-advisory', climateAdvisoryRoutes);
 app.use('/api/v1/compliance', complianceRoutes);
@@ -579,12 +765,6 @@ app.use('/api/v1/erp/projects', projectSystemsRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
-// Escrow service - secure fund holding for transactions
-escrowService.setupRoutes(app);
-// Custody event service - chain tracking and settlement instructions
-custodyEventRoutes.setupRoutes(app);
-// Health check endpoints for monitoring with specialized monitoring
-app.use('/health', healthCheckMonitoring, healthRoutes);
 // Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
 app.use('/api/v1/wikipedia', wikipediaRoutes);
 app.use('/api/v1/agri-intelligence', agriculturalIntelligenceRoutes);
@@ -593,10 +773,6 @@ app.use('/api/v1/agri-intelligence', agriculturalIntelligenceRoutes);
 // distinct rather than merged to avoid touching the generated scaffold.
 app.use('/api/v1/farmer-health', farmerHealthRoutes);
 app.use('/api/v1/food', foodRoutes);
-// iotSensorService.setupRoutes registers full paths directly on `app`
-// (not a sub-router) — see services/iotSensorService.js line ~600.
-iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
-iotSensorService.setupRoutes(app);
 app.use('/api/v1/variety-directory', regionalVarietyRoutes);
 app.use('/api/v1/folu-benchmark', foluBenchmarkRoutes);
 app.use('/api/v1/civil-disruptions', civilDisruptionRoutes);
@@ -626,7 +802,6 @@ app.use('/api/v1/research-and-development', researchAndDevelopmentRoutes);
 // Information Sharing - Document and Knowledge Sharing with AI Integration
 app.use('/api/v1/information-sharing', informationSharingRoutes);
 // Community - Community Management with AI Integration
-app.use('/api/v1/community', communityRoutes);
 // Knowledge - Knowledge Management with AI Integration
 app.use('/api/v1/knowledge', knowledgeRoutes);
 // Company lookup — resolves accounting UI gap
@@ -637,6 +812,16 @@ app.use('/api/v1/platform-configuration', platformConfigurationRoutes);
 app.use('/api/v1/tenant-management', tenantManagementRoutes);
 app.use('/api/v1/organization-management', organizationManagementRoutes);
 app.use('/api/v1/system-administration', systemAdministrationRoutes);
+// Escrow service - secure fund holding for transactions
+escrowService.setupRoutes(app);
+// Custody event service - chain tracking and settlement instructions
+custodyEventRoutes.setupRoutes(app);
+// Health check endpoints for monitoring with specialized monitoring
+app.use('/health', healthCheckMonitoring, healthRoutes);
+// iotSensorService.setupRoutes registers full paths directly on `app`
+// (not a sub-router) — see services/iotSensorService.js line ~600.
+iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
+iotSensorService.setupRoutes(app);
 // Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already mounted above.
 
 // Services that self-register their routes directly on `app`
@@ -691,6 +876,14 @@ io.on('connection', (socket) => {
 // Export io for use in services
 app.set('io', io);
 
+// Module-scoped so gracefulShutdown() (inside startServer(), a separate
+// function declared later) can still clear them - they used to be `let`
+// inside initializeDecisionLayer() only, out of scope the moment that
+// function returned, so shutdown itself threw ReferenceError instead of
+// clearing the timers and exiting cleanly.
+let learningTimer = null;
+let mandiTimer = null;
+
 // ---------------------------------------------------------------------------
 // Activate the decision layer and connect it to the realtime channel.
 // ---------------------------------------------------------------------------
@@ -723,7 +916,6 @@ function initializeDecisionLayer() {
   // this way; only conflict-route risk is marked human_only, because rerouting a
   // truck means the original road was never driven and no data can say what
   // would have happened on it.
-  let learningTimer = null;
   if (process.env.NODE_ENV !== 'test' && process.env.AI_LEARNING_CYCLE !== 'off') {
     const resolver = require('./core/outcomeResolver');
     const everyMinutes = Number(process.env.AI_LEARNING_CYCLE_MINUTES || 60);
@@ -741,7 +933,6 @@ function initializeDecisionLayer() {
   // with no in-process scheduling — real and working, but only ever ran
   // manually. Same disable/interval-override convention as the learning
   // cycle above.
-  let mandiTimer = null;
   if (process.env.NODE_ENV !== 'test' && process.env.MANDI_PRICE_REFRESH !== 'off') {
     const mandiJob = require('./jobs/loadMandiPrices');
     const everyHours = Number(process.env.MANDI_PRICE_REFRESH_HOURS || 24);
@@ -945,6 +1136,25 @@ async function startServer() {
 
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  // A single missed .catch() outside a route handler would otherwise take down
+  // the whole process with no log line explaining why. Log first, then shut
+  // down through the same graceful path so in-flight requests aren't severed.
+  process.on('unhandledRejection', (reason) => {
+    logger.error('Unhandled promise rejection', {
+      error: reason instanceof Error ? reason.message : String(reason),
+      stack: reason instanceof Error ? reason.stack : undefined
+    });
+  });
+
+  process.on('uncaughtException', (error) => {
+    // The process is in an undefined state after this point; log and restart.
+    logger.error('Uncaught exception - shutting down', {
+      error: error.message,
+      stack: error.stack
+    });
+    gracefulShutdown('uncaughtException');
+  });
 }
 
 if (require.main === module) {

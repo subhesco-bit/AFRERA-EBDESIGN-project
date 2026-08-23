@@ -11,7 +11,8 @@
 const express = require('express');
 const router = express.Router();
 const weatherService = require('../services/weatherService');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 
 router.get('/advisories', async (req, res) => {
   try {
@@ -41,7 +42,7 @@ router.post('/advisories', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/advisories/:id', authMiddleware, async (req, res) => {
+router.put('/advisories/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const advisory = await weatherService.updateAdvisory(req.params.id, req.body);
     if (!advisory) return res.status(404).json({ success: false, error: 'Not found' });

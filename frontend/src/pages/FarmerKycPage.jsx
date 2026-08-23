@@ -30,28 +30,32 @@ function FarmerKycPage() {
   const [form, setForm] = useState(emptyForm)
   const [statusFilter, setStatusFilter] = useState('')
 
-  const { data, isLoading, error } = useQuery(
-    ['kyc-applications', statusFilter],
-    async () => (await kycAPI.getApplications(statusFilter ? { status: statusFilter } : {})).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['kyc-applications', statusFilter],
+    queryFn: async () => (await kycAPI.getApplications(statusFilter ? { status: statusFilter } : {})).data?.data ?? [],
+  })
 
-  const submitMutation = useMutation((payload) => kycAPI.submitApplication(payload), {
+  const submitMutation = useMutation({
+    mutationFn: (payload) => kycAPI.submitApplication(payload),
     onSuccess: () => {
       toast.success('KYC application submitted')
-      queryClient.invalidateQueries(['kyc-applications'])
+      queryClient.invalidateQueries({ queryKey: ['kyc-applications'] })
       setShowForm(false)
       setForm(emptyForm)
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to submit application'),
   })
 
-  const verifyMutation = useMutation(({ id, notes }) => kycAPI.verifyApplication(id, { notes }), {
-    onSuccess: () => { toast.success('Application verified'); queryClient.invalidateQueries(['kyc-applications']) },
+  const verifyMutation = useMutation({
+    mutationFn: ({ id, notes }) => kycAPI.verifyApplication(id, { notes }),
+    onSuccess: () => { toast.success('Application verified'); queryClient.invalidateQueries({ queryKey: ['kyc-applications'] }) },
     onError: () => toast.error('Failed to verify application'),
   })
 
-  const rejectMutation = useMutation(({ id, reason }) => kycAPI.rejectApplication(id, { reason }), {
-    onSuccess: () => { toast.success('Application rejected'); queryClient.invalidateQueries(['kyc-applications']) },
+  const rejectMutation = useMutation({
+    mutationFn: ({ id, reason }) => kycAPI.rejectApplication(id, { reason }),
+    onSuccess: () => { toast.success('Application rejected'); queryClient.invalidateQueries({ queryKey: ['kyc-applications'] }) },
     onError: () => toast.error('Failed to reject application'),
   })
 
@@ -205,8 +209,8 @@ function FarmerKycPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={submitMutation.isLoading} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition disabled:opacity-60">
-                    {submitMutation.isLoading ? 'Submitting...' : 'Submit Application'}
+                  <button type="submit" disabled={submitMutation.isPending} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition disabled:opacity-60">
+                    {submitMutation.isPending ? 'Submitting...' : 'Submit Application'}
                   </button>
                 </div>
               </form>

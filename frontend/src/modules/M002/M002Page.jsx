@@ -12,7 +12,7 @@ export default function M002Page() {
         This capability is implemented at <code>pages/AdminDashboardPage.jsx</code>
         {' '}(Settings → "Platform Configuration"), not here.
       </p>
-      <Link to="/admin-dashboard" className="text-blue-600 underline">
+      <Link to="/admin/settings" className="text-blue-600 underline">
         Go to the Admin Dashboard →
       </Link>
     </div>

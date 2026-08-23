@@ -19,22 +19,22 @@ function FarmerFieldPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const queryClient = useQueryClient()
 
-  const { data: fields } = useQuery('farmer-fields', () =>
-    farmersAPI.getFields('current-farmer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: fields } = useQuery({
+    queryKey: ['farmer-fields'],
+    queryFn: () => farmersAPI.getFields('current-farmer-id').then(r => r.data),
+  })
 
-  const deleteFieldMutation = useMutation(
-    (fieldId) => farmersAPI.deleteField(fieldId),
-    {
-      onSuccess: () => {
-        toast.success('Field deleted successfully')
-        queryClient.invalidateQueries('farmer-fields')
-      },
-      onError: () => {
-        toast.error('Failed to delete field')
-      }
-    }
-  )
+  const deleteFieldMutation = useMutation({
+    mutationFn: (fieldId) => farmersAPI.deleteField(fieldId),
+    onSuccess: () => {
+      toast.success('Field deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['farmer-fields'] })
+    },
+    onError: () => {
+      toast.error('Failed to delete field')
+    },
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -5,7 +5,8 @@
 
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
 const decisionSupportService = require('./decisionSupportService');
 
 /**
@@ -568,7 +569,7 @@ router.get('/shipments', async (req, res) => {
 });
 
 // Update shipment status
-router.put('/shipments/:id/status', authMiddleware, async (req, res) => {
+router.put('/shipments/:id/status', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
     const { status, notes } = req.body;
     const shipment = await updateShipmentStatus(req.params.id, status, notes);

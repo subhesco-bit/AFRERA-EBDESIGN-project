@@ -1,1 +1,1 @@
-﻿export { default as M060Page } from './M060Page';\n
+﻿export { default as M060Page } from './M060Page';

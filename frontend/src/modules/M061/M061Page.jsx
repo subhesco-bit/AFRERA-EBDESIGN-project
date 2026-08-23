@@ -12,7 +12,7 @@ export default function M061Page() {
         This capability is implemented at <code>pages/WhatGrowPage.jsx</code>,
         not here.
       </p>
-      <Link to="/whatgrow" className="text-blue-600 underline">
+      <Link to="/what-grow" className="text-blue-600 underline">
         Go to What To Grow →
       </Link>
     </div>

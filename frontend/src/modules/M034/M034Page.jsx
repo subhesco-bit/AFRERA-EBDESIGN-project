@@ -12,7 +12,7 @@ export default function M034Page() {
         This capability is implemented at <code>pages/FarmerFieldPage.jsx</code>
         {' '}("My Fields"), not here.
       </p>
-      <Link to="/farmerfield" className="text-blue-600 underline">
+      <Link to="/farmer-field" className="text-blue-600 underline">
         Go to My Fields →
       </Link>
     </div>

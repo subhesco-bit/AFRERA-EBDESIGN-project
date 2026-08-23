@@ -99,7 +99,6 @@ const testStores = {
   crop_plans: new Map(),
   farmer_wallets: new Map(),
   food_nutrition_profiles: new Map(),
-  product_nutrition: new Map(),
   nutrition_scores: new Map(),
   nutrition_pricing_rules: new Map(),
   laboratories: new Map(),
@@ -2011,7 +2010,7 @@ function makeTestPool() {
         const premiumMultiplier = 1 + ((nutritionScore - 70) / 100) * 0.3;
         const finalPrice = Math.round(basePrice * premiumMultiplier);
         
-        return { rows: [{ base_price: basePrice, final_price, nutrition_score: nutritionScore, premium_multiplier: premiumMultiplier }] };
+        return { rows: [{ base_price: basePrice, final_price: finalPrice, nutrition_score: nutritionScore, premium_multiplier: premiumMultiplier }] };
       }
 
       // Nutrition comparison fallback
@@ -2293,7 +2292,7 @@ function resolve() {
 
 function setTestData(table, key, value, append = false) {
   if (!(process.env.NODE_ENV === 'test' || process.env.USE_TEST_DB === 'true')) return false;
-  if (!testStores.hasOwnProperty(table)) return false;
+  if (!Object.prototype.hasOwnProperty.call(testStores, table)) return false;
 
   if (append) {
     const arr = testStores[table].get(key) || [];
@@ -2309,13 +2308,13 @@ function setTestData(table, key, value, append = false) {
 
 function getTestData(table, key) {
   if (!(process.env.NODE_ENV === 'test' || process.env.USE_TEST_DB === 'true')) return null;
-  if (!testStores.hasOwnProperty(table)) return null;
+  if (!Object.prototype.hasOwnProperty.call(testStores, table)) return null;
   return testStores[table].get(key) || null;
 }
 
 function getAllTestData(table) {
   if (!(process.env.NODE_ENV === 'test' || process.env.USE_TEST_DB === 'true')) return [];
-  if (!testStores.hasOwnProperty(table)) return [];
+  if (!Object.prototype.hasOwnProperty.call(testStores, table)) return [];
   return Array.from(testStores[table].values());
 }
 

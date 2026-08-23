@@ -212,7 +212,7 @@ async function generatePoultryReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       flock_count: await getFlockCount(farmerId),
       breed_distribution: await getBreedDistribution(farmerId),

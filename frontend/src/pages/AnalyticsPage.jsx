@@ -5,9 +5,15 @@ import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { TrendingUp, Sparkles, ClipboardCheck, Workflow } from 'lucide-react'
 
 function AnalyticsPage() {
-  const { data, isLoading, error } = useQuery('analytics-overview', analyticsAPI.getOverview)
+  // v5 react-query object syntax (see LoginPage.jsx); .then(r => r.data)
+  // unwraps once here, so `data` below is the real payload, not a second
+  // .data hop away from it.
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['analytics-overview'],
+    queryFn: () => analyticsAPI.getOverview().then(r => r.data),
+  })
 
-  const metrics = useMemo(() => data?.data?.analytics || {
+  const metrics = useMemo(() => data?.analytics || {
     totals: {
       forms: 0,
       submissions: 0,

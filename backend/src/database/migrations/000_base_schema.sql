@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
 
 CREATE TABLE IF NOT EXISTS user_profiles (
     user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
@@ -92,6 +94,8 @@ CREATE TABLE IF NOT EXISTS addresses (
 );
 
 CREATE INDEX IF NOT EXISTS idx_addresses_user_id ON addresses(user_id);
+CREATE INDEX IF NOT EXISTS idx_addresses_user_id_city ON addresses(user_id, city);
+CREATE INDEX IF NOT EXISTS idx_addresses_user_id_state ON addresses(user_id, state);
 
 CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
@@ -191,6 +195,8 @@ CREATE TABLE IF NOT EXISTS product_variants (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_product_variants_product_id ON product_variants(product_id);
+
 CREATE TABLE IF NOT EXISTS certifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES products(id) ON DELETE CASCADE,
@@ -204,6 +210,8 @@ CREATE TABLE IF NOT EXISTS certifications (
     verified_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_certifications_product_id ON certifications(product_id);
 
 -- ============================================================================
 -- ORDERS & COMMERCE
@@ -237,6 +245,10 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_shipping_address_id ON orders(shipping_address_id);
+CREATE INDEX IF NOT EXISTS idx_orders_billing_address_id ON orders(billing_address_id);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 
 CREATE TABLE IF NOT EXISTS order_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -254,6 +266,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_product ON order_items(order_id, product_id);
 
 CREATE TABLE IF NOT EXISTS cart (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -265,6 +278,10 @@ CREATE TABLE IF NOT EXISTS cart (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, product_id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_cart_user_id ON cart(user_id);
+CREATE INDEX IF NOT EXISTS idx_cart_product_id ON cart(product_id);
+CREATE INDEX IF NOT EXISTS idx_cart_user_product ON cart(user_id, product_id);
 
 CREATE TABLE IF NOT EXISTS payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -283,6 +300,11 @@ CREATE TABLE IF NOT EXISTS payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
+CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(payment_status);
+CREATE INDEX IF NOT EXISTS idx_payments_transaction_id ON payments(transaction_id);
+
 CREATE TABLE IF NOT EXISTS coupons (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code VARCHAR(50) UNIQUE NOT NULL,
@@ -299,6 +321,10 @@ CREATE TABLE IF NOT EXISTS coupons (
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code);
+CREATE INDEX IF NOT EXISTS idx_coupons_active ON coupons(is_active);
+CREATE INDEX IF NOT EXISTS idx_coupons_validity ON coupons(valid_from, valid_until);
 
 -- ============================================================================
 -- FARMERS & FPOs
@@ -327,6 +353,10 @@ CREATE TABLE IF NOT EXISTS fpos (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_fpos_registration_number ON fpos(registration_number);
+CREATE INDEX IF NOT EXISTS idx_fpos_address_id ON fpos(address_id);
+CREATE INDEX IF NOT EXISTS idx_fpos_status ON fpos(status);
 
 CREATE TABLE IF NOT EXISTS farmers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -357,6 +387,9 @@ CREATE TABLE IF NOT EXISTS farmers (
 
 CREATE INDEX IF NOT EXISTS idx_farmers_user_id ON farmers(user_id);
 CREATE INDEX IF NOT EXISTS idx_farmers_fpo_id ON farmers(fpo_id);
+CREATE INDEX IF NOT EXISTS idx_farmers_farm_location_id ON farmers(farm_location_id);
+CREATE INDEX IF NOT EXISTS idx_farmers_status ON farmers(status);
+CREATE INDEX IF NOT EXISTS idx_farmers_farmer_id ON farmers(farmer_id);
 
 CREATE TABLE IF NOT EXISTS farmer_certifications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -372,6 +405,9 @@ CREATE TABLE IF NOT EXISTS farmer_certifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_farmer_certifications_farmer_id ON farmer_certifications(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_farmer_certifications_type ON farmer_certifications(certification_type);
+
 CREATE TABLE IF NOT EXISTS training_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     farmer_id UUID REFERENCES farmers(id) ON DELETE CASCADE,
@@ -382,6 +418,9 @@ CREATE TABLE IF NOT EXISTS training_records (
     certificate_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_training_records_farmer_id ON training_records(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_training_records_type ON training_records(training_type);
 
 -- ============================================================================
 -- FINANCIAL
@@ -397,6 +436,9 @@ CREATE TABLE IF NOT EXISTS credit_scores (
     valid_until TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_credit_scores_farmer_id ON credit_scores(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_credit_scores_calculated_at ON credit_scores(calculated_at);
 
 CREATE TABLE IF NOT EXISTS loans (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -420,6 +462,10 @@ CREATE TABLE IF NOT EXISTS loans (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_loans_farmer_id ON loans(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status);
+CREATE INDEX IF NOT EXISTS idx_loans_loan_number ON loans(loan_number);
+
 CREATE TABLE IF NOT EXISTS emi_schedule (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     loan_id UUID REFERENCES loans(id) ON DELETE CASCADE,
@@ -433,6 +479,10 @@ CREATE TABLE IF NOT EXISTS emi_schedule (
     paid_amount DECIMAL(12, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_emi_schedule_loan_id ON emi_schedule(loan_id);
+CREATE INDEX IF NOT EXISTS idx_emi_schedule_due_date ON emi_schedule(due_date);
+CREATE INDEX IF NOT EXISTS idx_emi_schedule_status ON emi_schedule(status);
 
 CREATE TABLE IF NOT EXISTS advances (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -452,6 +502,10 @@ CREATE TABLE IF NOT EXISTS advances (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_advances_farmer_id ON advances(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_advances_contract_id ON advances(contract_id);
+CREATE INDEX IF NOT EXISTS idx_advances_status ON advances(tranche_status);
+
 CREATE TABLE IF NOT EXISTS financial_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     transaction_number VARCHAR(50) UNIQUE NOT NULL,
@@ -468,6 +522,11 @@ CREATE TABLE IF NOT EXISTS financial_transactions (
     erp_synced_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_financial_transactions_user_id ON financial_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_financial_transactions_type ON financial_transactions(type);
+CREATE INDEX IF NOT EXISTS idx_financial_transactions_status ON financial_transactions(status);
+CREATE INDEX IF NOT EXISTS idx_financial_transactions_date ON financial_transactions(transaction_date);
 
 -- ============================================================================
 -- INSURANCE

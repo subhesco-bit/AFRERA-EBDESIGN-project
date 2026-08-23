@@ -201,8 +201,20 @@ class ErrorHandler {
    * Handle different types of errors with severity levels
    */
   static handleError(error, req, res, next) {
-    const handler = new ErrorHandler();
-    return handler.processError(error, req, res, next);
+    // Was `new ErrorHandler()` per call - every error handled spun up a
+    // fresh ErrorAggregator with its own setInterval that was never
+    // cleared (a timer leak on every request that errors), and threw away
+    // the previous instance's error-count Map, so aggregation always
+    // restarted from 0 - the "alert after N similar errors" threshold
+    // could never fire. One shared instance for the process instead.
+    return ErrorHandler.sharedInstance().processError(error, req, res, next);
+  }
+
+  static sharedInstance() {
+    if (!ErrorHandler._instance) {
+      ErrorHandler._instance = new ErrorHandler();
+    }
+    return ErrorHandler._instance;
   }
 
   /**

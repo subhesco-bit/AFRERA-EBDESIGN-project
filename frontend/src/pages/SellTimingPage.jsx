@@ -7,18 +7,21 @@ function SellTimingPage() {
   const [selectedCrop, setSelectedCrop] = useState('')
   const [timeframe, setTimeframe] = useState('30')
 
-  const { data: timingRecommendations } = useQuery(
-    ['timing-recommendations', selectedCrop],
-    () => farmersAPI.getTimingRecommendations(selectedCrop)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: timingRecommendations } = useQuery({
+    queryKey: ['timing-recommendations', selectedCrop],
+    queryFn: () => farmersAPI.getTimingRecommendations(selectedCrop).then(r => r.data),
+  })
 
-  const { data: priceSeasonality } = useQuery('price-seasonality', () =>
-    farmersAPI.getPriceSeasonality()
-  )
+  const { data: priceSeasonality } = useQuery({
+    queryKey: ['price-seasonality'],
+    queryFn: () => farmersAPI.getPriceSeasonality().then(r => r.data),
+  })
 
-  const { data: marketEvents } = useQuery('market-events', () =>
-    farmersAPI.getMarketEvents()
-  )
+  const { data: marketEvents } = useQuery({
+    queryKey: ['market-events'],
+    queryFn: () => farmersAPI.getMarketEvents().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

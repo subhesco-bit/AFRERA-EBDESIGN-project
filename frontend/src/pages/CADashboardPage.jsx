@@ -6,9 +6,11 @@ import { caAPI } from '../services/api'
 function CADashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: auditStats } = useQuery('ca-audit', () =>
-    caAPI.getAuditStats().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: auditStats } = useQuery({
+    queryKey: ['ca-audit'],
+    queryFn: () => caAPI.getAuditStats().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

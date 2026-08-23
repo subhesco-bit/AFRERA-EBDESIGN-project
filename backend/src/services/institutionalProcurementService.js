@@ -7,7 +7,8 @@
 const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PROCUREMENT_ROLES } = require('../middleware/roleGroups');
 const { authRateLimit } = require('../middleware/rateLimiter');
 
 const router = express.Router();
@@ -883,7 +884,7 @@ router.get('/contract-offers', authMiddleware, async (req, res) => {
 /**
  * Farmer accepts/declines/withdraws an offer they already received.
  */
-router.put('/contract-offers/:id', authMiddleware, async (req, res) => {
+router.put('/contract-offers/:id', authMiddleware, requireRole(...PROCUREMENT_ROLES), async (req, res) => {
   try {
     const { status } = req.body;
     if (!['accepted', 'declined', 'withdrawn'].includes(status)) {

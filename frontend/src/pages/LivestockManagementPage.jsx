@@ -10,6 +10,7 @@ import {
   animalHealthAPI,
   breedingManagementAPI,
   livestockAnalyticsAPI,
+  feedManagementAPI,
 } from '../services/api'
 import ResourceManager from '../components/common/ResourceManager'
 
@@ -50,6 +51,7 @@ const GOAT_BREEDS = ['Black Bengal', 'Beetal', 'Jamunapari', 'Sirohi', 'Local/In
 const SHEEP_BREEDS = ['Deccani', 'Nellore', 'Marwari', 'Local/Indigenous', 'Other']
 const PIG_BREEDS = ['Large White Yorkshire', 'Landrace', 'Hampshire', 'Local/Indigenous', 'Other']
 const HEALTH_TYPES = ['Vaccination', 'Deworming', 'Treatment', 'Checkup', 'Disease Outbreak']
+const HEALTH_STATUSES = ['Healthy', 'Under Observation', 'Sick', 'Critical', 'Recovered']
 const FEED_TYPES = ['Concentrate', 'Green Fodder', 'Dry Fodder', 'Mineral Mixture', 'Silage']
 const BREEDING_METHODS = ['Natural', 'Artificial Insemination', 'Embryo Transfer']
 const ANALYTICS_CATEGORIES = ['Herd Growth', 'Mortality Rate', 'Productivity', 'Cost per Animal', 'Revenue']
@@ -277,34 +279,38 @@ function LivestockManagementPage() {
           accent="rose"
           queryKey="animal-health"
           idField="id"
-          list={(params) => animalHealthAPI.getRecords(params)}
-          create={(data) => animalHealthAPI.createRecord(data)}
-          update={(id, data) => animalHealthAPI.updateRecord(id, data)}
-          remove={(id) => animalHealthAPI.deleteRecord(id)}
+          list={(params) => animalHealthAPI.listExaminations(params)}
+          create={(data) => animalHealthAPI.createExamination(data)}
+          update={(id, data) => animalHealthAPI.updateExamination(id, data)}
           searchPlaceholder="Search by animal tag or diagnosis..."
           emptyMessage="No health records yet."
           newLabel="Add Health Record"
-          backendNote="Backend endpoint /animal-health/records has not been built yet — this tab is wired and ready to work once it is."
-          initialForm={{ animal_tag: '', record_type: 'Vaccination', diagnosis: '', vet_name: '', record_date: '', notes: '' }}
-          requiredFields={['animal_tag', 'record_type']}
+          backendNote="Backed by the real /animal-health/examinations endpoint (M127) - fixed 2026-08-17. This tab previously called animalHealthAPI.getRecords()/.createRecord() (methods that don't exist on the real export) with a form shaped nothing like the real animal_health_examinations table, so it would have thrown on open and every create would have 400'd on the required fields below even once the method names were fixed. Both are now aligned to the real schema. There is no delete route for examinations yet, so this tab is create + list + update only."
+          initialForm={{ animal_type: 'Cattle', animal_id: '', examination_date: '', examination_type: 'Checkup', health_status: 'Healthy', body_temperature_c: '', heart_rate_bpm: '', respiratory_rate_bpm: '', findings: '', examiner_name: '', notes: '' }}
+          requiredFields={['animal_type', 'animal_id', 'examination_date', 'examination_type', 'health_status']}
           columns={[
-            { key: 'animal_tag', label: 'Animal Tag' },
-            { key: 'record_type', label: 'Type' },
-            { key: 'diagnosis', label: 'Diagnosis' },
-            { key: 'vet_name', label: 'Vet' },
-            { key: 'record_date', label: 'Date' },
+            { key: 'animal_type', label: 'Species' },
+            { key: 'animal_id', label: 'Animal ID/Tag' },
+            { key: 'examination_type', label: 'Type' },
+            { key: 'health_status', label: 'Health Status' },
+            { key: 'examination_date', label: 'Date' },
           ]}
           fields={[
-            { name: 'animal_tag', label: 'Animal tag number', required: true },
-            { name: 'record_type', label: 'Record type', type: 'select', options: HEALTH_TYPES },
-            { name: 'diagnosis', label: 'Diagnosis / condition' },
-            { name: 'vet_name', label: 'Veterinarian name' },
-            { name: 'record_date', label: 'Record date', type: 'date' },
+            { name: 'animal_type', label: 'Species', type: 'select', options: ['Cattle', 'Poultry', 'Goat', 'Sheep', 'Pig'], required: true },
+            { name: 'animal_id', label: 'Animal ID / tag number', required: true },
+            { name: 'examination_date', label: 'Examination date', type: 'date', required: true },
+            { name: 'examination_type', label: 'Examination type', type: 'select', options: HEALTH_TYPES, required: true },
+            { name: 'health_status', label: 'Health status', type: 'select', options: HEALTH_STATUSES, required: true },
+            { name: 'body_temperature_c', label: 'Body temperature (°C)', type: 'number', step: '0.1' },
+            { name: 'heart_rate_bpm', label: 'Heart rate (bpm)', type: 'number' },
+            { name: 'respiratory_rate_bpm', label: 'Respiratory rate (bpm)', type: 'number' },
+            { name: 'examiner_name', label: 'Examiner / vet name' },
+            { name: 'findings', label: 'Findings', type: 'textarea', span: 2 },
             { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
           ]}
           stats={(items) => [
             { label: 'Health records', value: items.length },
-            { label: 'Vaccinations', value: items.filter((i) => i.record_type === 'Vaccination').length },
+            { label: 'Critical', value: items.filter((i) => i.health_status === 'Critical').length },
           ]}
         />
       )}

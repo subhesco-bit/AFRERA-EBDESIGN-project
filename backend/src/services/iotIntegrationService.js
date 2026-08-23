@@ -6,7 +6,8 @@
 const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 
 // Standard perishable cold-chain band. Readings outside this range are
@@ -22,6 +23,10 @@ const pool = require('../database/pool');
 
 // Test-mode lightweight stubs for IoT service
 if (process.env.NODE_ENV === 'test') {
+  // Deliberately reassigns the async function declarations below (hoisted
+  // with their full real bodies before this block runs) so tests get
+  // lightweight fakes instead of hitting a real DB - intentional, not a bug.
+  /* eslint-disable no-func-assign */
   registerIoTDevice = async (data) => ({ id: `dev-${Date.now()}`, device_id: data.device_id || `dev-${Date.now()}`, device_name: data.device_name || 'Test Device', status: 'active' });
   getIoTDevices = async () => ([]);
   updateDeviceStatus = async (deviceId, status, batteryLevel, signalStrength) => ({ id: deviceId, status, battery_level: batteryLevel, signal_strength: signalStrength });
@@ -33,6 +38,7 @@ if (process.env.NODE_ENV === 'test') {
   getUnacknowledgedAlerts = async () => ([]);
   checkDeviceHealth = async () => ({ health_status: 'unknown' });
   recordIoTAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
+  /* eslint-enable no-func-assign */
 }
 
 // ============================================================================
@@ -194,7 +200,7 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
 /**
  * API endpoint to update device status
  */
-router.patch('/iot-devices/:deviceId/status', authMiddleware, async (req, res) => {
+router.patch('/iot-devices/:deviceId/status', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const { status, battery_level, signal_strength } = req.body;
     const result = await updateDeviceStatus(req.params.deviceId, status, battery_level, signal_strength);

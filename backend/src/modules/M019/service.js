@@ -127,7 +127,7 @@ async function suggestProfileCompletion(userId) {
   }
   
   const suggestions = [];
-  const completionScore = 100;
+  let completionScore = 100;
   
   // Check for missing fields
   if (!profile.first_name) {
@@ -192,7 +192,7 @@ async function linkSocialAccount(userId, platform, accountData) {
   const socialLinks = profile.social_links || {};
   socialLinks[platform] = accountData;
   
-  await updateProfile(userId, { social_links });
+  await updateProfile(userId, { social_links: socialLinks });
   
   // Emit signal
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {

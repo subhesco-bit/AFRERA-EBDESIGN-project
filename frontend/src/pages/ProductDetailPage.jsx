@@ -7,10 +7,11 @@ import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel'
 function ProductDetailPage() {
   const { id } = useParams()
 
-  const { data: product, isLoading, error } = useQuery(
-    ['product', id],
-    () => productsAPI.getProduct(id)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ['product', id],
+    queryFn: async () => (await productsAPI.getProduct(id)).data,
+  })
 
   if (isLoading) {
     return (

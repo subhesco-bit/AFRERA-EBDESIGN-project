@@ -18,37 +18,38 @@ function TractorManagementPage() {
   const [bookingForm, setBookingForm] = useState(emptyBooking)
   const [tab, setTab] = useState('fleet')
 
-  const { data: fleetData, isLoading, error } = useQuery(
-    'machinery-tractors',
-    async () => (await machineryAPI.getTractors()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: fleetData, isLoading, error } = useQuery({
+    queryKey: ['machinery-tractors'],
+    queryFn: async () => (await machineryAPI.getTractors()).data?.data ?? [],
+  })
 
-  const { data: bookingsData, isLoading: bookingsLoading, error: bookingsError } = useQuery(
-    'machinery-bookings',
-    async () => (await machineryAPI.getBookings()).data?.data ?? []
-  )
+  const { data: bookingsData, isLoading: bookingsLoading, error: bookingsError } = useQuery({
+    queryKey: ['machinery-bookings'],
+    queryFn: async () => (await machineryAPI.getBookings()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? machineryAPI.updateTractor(editingId, payload) : machineryAPI.createTractor(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Tractor updated' : 'Tractor registered')
-        queryClient.invalidateQueries('machinery-tractors')
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save tractor'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? machineryAPI.updateTractor(editingId, payload) : machineryAPI.createTractor(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Tractor updated' : 'Tractor registered')
+      queryClient.invalidateQueries({ queryKey: ['machinery-tractors'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save tractor'),
+  })
 
-  const deleteMutation = useMutation((id) => machineryAPI.deleteTractor(id), {
-    onSuccess: () => { toast.success('Tractor removed'); queryClient.invalidateQueries('machinery-tractors') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => machineryAPI.deleteTractor(id),
+    onSuccess: () => { toast.success('Tractor removed'); queryClient.invalidateQueries({ queryKey: ['machinery-tractors'] }) },
     onError: () => toast.error('Failed to remove tractor'),
   })
 
-  const bookMutation = useMutation((payload) => machineryAPI.createBooking(payload), {
+  const bookMutation = useMutation({
+    mutationFn: (payload) => machineryAPI.createBooking(payload),
     onSuccess: () => {
       toast.success('Booking created')
-      queryClient.invalidateQueries('machinery-bookings')
+      queryClient.invalidateQueries({ queryKey: ['machinery-bookings'] })
       setShowBooking(false)
       setBookingForm(emptyBooking)
     },
@@ -263,8 +264,8 @@ function TractorManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Register Tractor'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Register Tractor'}
                   </button>
                 </div>
               </form>
@@ -321,8 +322,8 @@ function TractorManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setShowBooking(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={bookMutation.isLoading} className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:opacity-60">
-                    {bookMutation.isLoading ? 'Booking...' : 'Create Booking'}
+                  <button type="submit" disabled={bookMutation.isPending} className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition disabled:opacity-60">
+                    {bookMutation.isPending ? 'Booking...' : 'Create Booking'}
                   </button>
                 </div>
               </form>

@@ -5,7 +5,8 @@
 
 const express = require('express');
 const { logger } = require('../utils/logger');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const GSTService = require('../services/gstService');
 
 const router = express.Router();
@@ -78,7 +79,7 @@ router.post('/invoice/:orderId', authMiddleware, async (req, res) => {
 /**
  * Update order with GST details
  */
-router.put('/order/:orderId/gst', authMiddleware, async (req, res) => {
+router.put('/order/:orderId/gst', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const result = await gstService.updateOrderGST(req.params.orderId, req.body);
     res.json(result);
@@ -189,7 +190,7 @@ router.post('/rates', authMiddleware, async (req, res) => {
 /**
  * Deactivate GST rate
  */
-router.delete('/rates/:category', authMiddleware, async (req, res) => {
+router.delete('/rates/:category', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const pool = gstService.pool;
     const result = await pool.query(
@@ -301,7 +302,7 @@ router.get('/returns', authMiddleware, async (req, res) => {
 /**
  * Update GST return status
  */
-router.put('/returns/:returnId/status', authMiddleware, async (req, res) => {
+router.put('/returns/:returnId/status', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { returnStatus, acknowledgmentNumber, filedBy } = req.body;
 
@@ -419,7 +420,7 @@ router.get('/payments', authMiddleware, async (req, res) => {
 /**
  * Update GST payment status
  */
-router.put('/payments/:paymentId/status', authMiddleware, async (req, res) => {
+router.put('/payments/:paymentId/status', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { paymentStatus, challanNumber, bankName, branchName } = req.body;
 

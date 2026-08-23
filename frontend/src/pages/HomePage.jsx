@@ -108,29 +108,34 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* What AFRERA connects — no invented figures. The platform has no
+          public, unauthenticated stats endpoint yet (real counts exist only
+          behind the admin-only /platform-telemetry route). Rather than ship
+          placeholder numbers as if they were real traction, this section
+          describes scope honestly until a real public metrics endpoint
+          backs it. */}
       <section className="py-16 bg-green-600 text-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
               <Users className="w-12 h-12 mx-auto mb-2" />
-              <div className="text-3xl font-bold">5,000+</div>
-              <div className="text-green-100">Farmers</div>
+              <div className="text-lg font-semibold">Farmers</div>
+              <div className="text-green-100 text-sm">Direct marketplace access</div>
             </div>
             <div className="text-center">
               <Award className="w-12 h-12 mx-auto mb-2" />
-              <div className="text-3xl font-bold">500+</div>
-              <div className="text-green-100">GI Products</div>
+              <div className="text-lg font-semibold">GI Products</div>
+              <div className="text-green-100 text-sm">Geographical-indication tagged</div>
             </div>
             <div className="text-center">
               <TrendingUp className="w-12 h-12 mx-auto mb-2" />
-              <div className="text-3xl font-bold">₹50Cr+</div>
-              <div className="text-green-100">Transactions</div>
+              <div className="text-lg font-semibold">Transparent Pricing</div>
+              <div className="text-green-100 text-sm">GST computed per item at checkout</div>
             </div>
             <div className="text-center">
               <Shield className="w-12 h-12 mx-auto mb-2" />
-              <div className="text-3xl font-bold">8</div>
-              <div className="text-green-100">States Covered</div>
+              <div className="text-lg font-semibold">Northeast India</div>
+              <div className="text-green-100 text-sm">Focus region</div>
             </div>
           </div>
         </div>

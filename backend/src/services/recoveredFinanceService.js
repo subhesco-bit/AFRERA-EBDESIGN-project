@@ -4,7 +4,6 @@
  * Each function below existed only as browser JavaScript with its reference
  * data hard-coded. Verified absent from this backend before porting.
  *
- *   gstFor / buildInvoice   GST classification and invoice assembly
  *   trialBalance            derived from the ledger, not a stored figure
  *   verifyLedger            hash-chain integrity over the GL
  *   matchSchemes            government scheme eligibility scoring
@@ -13,158 +12,29 @@
  *   equipmentSubsidy        indicative subsidy bands
  *   partyRisk               counterparty risk from recorded events
  *
+ * gstFor()/buildInvoice()/appendLedgerEntry() were deleted here (2026-08-17):
+ * gstFor/buildInvoice were a second, independent GST-rate authority alongside
+ * the canonical gstService.resolveGSTRate(), and appendLedgerEntry() was the
+ * write path into a second, disconnected hash-chained ledger (gl_ledger_chain)
+ * alongside the canonical journal_entries/journal_lines ledger — a real
+ * double-booking risk. None had a live caller (see routes.js). trialBalance()
+ * and verifyLedger() below still read gl_ledger_chain — that data stays valid
+ * without new writes, and verifyLedger()'s tamper-evidence check has no
+ * equivalent elsewhere in the codebase, so those two were kept.
+ *
  * Backed by migration 053.
  */
 
 'use strict';
 
-const crypto = require('crypto');
 const pool = require('../database/pool');
 const { logger } = require('../utils/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
 // ---------------------------------------------------------------------------
-// GST
-// ---------------------------------------------------------------------------
-
-/**
- * Classify a product category to an HSN code and GST rate.
- *
- * The branded/unbranded split is not a detail: fresh produce is nil-rated only
- * when it is NOT put up in a unit container under a registered brand. Get that
- * wrong and an invoice is either short-paying tax or over-charging a farmer.
- */
-async function gstFor(category, branded = true) {
-  const { rows } = await pool.query(
-    `SELECT * FROM gst_category_rules
-      WHERE effective_to IS NULL
-        AND $1 ~* match_pattern
-        AND (requires_unbranded = FALSE OR $2 = FALSE)
-      ORDER BY priority
-      LIMIT 1`,
-    [String(category || ''), Boolean(branded)]
-  );
-  if (!rows.length) {
-    throw new Error(`No GST rule matched category "${category}" — the fallback rule is missing`);
-  }
-  const r = rows[0];
-  return {
-    hsn: r.hsn_code,
-    rate: Number(r.gst_rate),
-    description: r.description,
-    isFallback: r.priority >= 999,
-    notificationRef: r.notification_ref,
-  };
-}
-
-/**
- * Build a GST invoice.
- *
- * Two rules carried over from v42 that are easy to get wrong:
- *
- *   Inter-state vs intra-state decides IGST against CGST+SGST. It is one
- *   comparison and getting it backwards makes every invoice wrong in a way
- *   the totals will not reveal, because the total is identical either way.
- *
- *   CGST and SGST must sum EXACTLY to the total tax. Rounding each to half
- *   independently loses a paisa on odd amounts, so one half is rounded and the
- *   other is the remainder.
- */
-async function buildInvoice(order) {
-  const items = [];
-  for (const it of order.items || []) {
-    const g = await gstFor(it.category, it.branded !== false);
-    const taxable = r2((it.qty || 1) * (it.price || 0));
-    const tax = r2(taxable * g.rate / 100);
-    items.push({
-      name: it.name, hsn: g.hsn, qty: it.qty || 1, price: it.price || 0,
-      taxableValue: taxable, gstRate: g.rate, taxAmount: tax,
-      rateIsFallback: g.isFallback,
-    });
-  }
-
-  const interState = String(order.fromState || '') !== String(order.toState || '');
-  const taxable = r2(items.reduce((s, i) => s + i.taxableValue, 0));
-  const tax = r2(items.reduce((s, i) => s + i.taxAmount, 0));
-  const cgst = interState ? 0 : r2(Math.round(tax * 50) / 100);
-  const sgst = interState ? 0 : r2(tax - cgst);
-  const total = r2(taxable + tax);
-
-  return {
-    invoiceDate: new Date().toISOString().slice(0, 10),
-    items,
-    taxableValue: taxable,
-    totalTax: tax,
-    cgst, sgst,
-    igst: interState ? tax : 0,
-    total,
-    supplyType: interState ? 'inter-state' : 'intra-state',
-    fromState: order.fromState, toState: order.toState,
-    // E-way bill threshold. Consignment value above Rs 50,000 moving between
-    // states requires one; below it, generally not.
-    ewayBillRequired: interState && total > 50000,
-    ewayBillNote: interState && total > 50000
-      ? 'Consignment exceeds Rs 50,000 inter-state — an e-way bill is required before movement.'
-      : null,
-    caveat: items.some((i) => i.rateIsFallback)
-      ? 'One or more line items fell through to the default rate. Verify the HSN before filing.'
-      : null,
-  };
-}
-
-// ---------------------------------------------------------------------------
 // Ledger
 // ---------------------------------------------------------------------------
-
-/**
- * Append a hash-chained ledger entry.
- *
- * Each entry's hash covers the previous hash, so altering any historical row
- * breaks every link after it. That is the whole tamper-evidence property, and
- * it only holds if entries are appended in sequence — hence the row lock.
- */
-async function appendLedgerEntry({ debitAccount, creditAccount, amount, narration, journalEntryId, recordedBy }) {
-  if (debitAccount === creditAccount) {
-    throw new Error('Debit and credit accounts must differ — an entry to and from the same '
-                  + 'account moves nothing and still balances');
-  }
-  if (!(amount > 0)) throw new Error('Ledger amount must be positive');
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    // Serialise appenders. Two concurrent writers computing prev_hash from the
-    // same tail would fork the chain, and the fork would look like tampering.
-    await client.query('LOCK TABLE gl_ledger_chain IN SHARE ROW EXCLUSIVE MODE');
-
-    const { rows: tail } = await client.query(
-      'SELECT entry_hash, sequence_no FROM gl_ledger_chain ORDER BY sequence_no DESC LIMIT 1'
-    );
-    const prevHash = tail.length ? tail[0].entry_hash : 'genesis';
-    const seq = tail.length ? Number(tail[0].sequence_no) + 1 : 1;
-    const entryRef = `GL-${Date.now().toString(36).toUpperCase()}-${seq}`;
-
-    const payload = [prevHash, seq, debitAccount, creditAccount, r2(amount), narration].join('|');
-    const entryHash = crypto.createHash('sha256').update(payload).digest('hex');
-
-    const { rows } = await client.query(
-      `INSERT INTO gl_ledger_chain
-         (entry_ref, journal_entry_id, debit_account, credit_account, amount,
-          narration, prev_hash, entry_hash, sequence_no, recorded_by)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
-      [entryRef, journalEntryId ?? null, debitAccount, creditAccount, r2(amount),
-        narration, prevHash, entryHash, seq, recordedBy ?? null]
-    );
-    await client.query('COMMIT');
-    return rows[0];
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
-  }
-}
 
 /** Trial balance, computed from the ledger so it cannot disagree with it. */
 async function trialBalance() {
@@ -427,8 +297,7 @@ async function certExpiryAlerts(days = 120) {
 }
 
 module.exports = {
-  gstFor, buildInvoice,
-  appendLedgerEntry, trialBalance, verifyLedger,
+  trialBalance, verifyLedger,
   matchSchemes,
   issueEnwr,
   listMyEnwrReceipts,

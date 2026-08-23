@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { productsAPI } from '../services/api'
 import { Filter, ShoppingCart, Star } from 'lucide-react'
 import { ordersAPI } from '../services/api'
@@ -21,14 +21,15 @@ function MarketplacePage() {
     limit: 24,
   })
 
-  const { data, isLoading, error } = useQuery(
-    ['products', filters, pagination],
-    async () => {
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products', filters, pagination],
+    queryFn: async () => {
       const res = await productsAPI.getProducts(filters, pagination)
       return res.data || res
     },
-    { keepPreviousData: true }
-  )
+    placeholderData: keepPreviousData,
+  })
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }))

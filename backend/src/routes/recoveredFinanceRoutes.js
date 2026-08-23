@@ -21,39 +21,43 @@ function fail(res, error) {
   res.status(bad ? 400 : 500).json({ success: false, error: error.message });
 }
 
-// ---- GST (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -
+// ---- GST -----------------------------------------------------------------
 //
-// fin.gstFor()/buildInvoice() were a second, independent GST-rate authority
-// alongside the canonical, HSN-driven gstService.resolveGSTRate(), which also
-// handles the branded/unbranded staple-tax split these two functions do not.
-// No frontend caller was found for either route. Deprecated rather than
-// deleted — recoveredFinanceService.gstFor()/buildInvoice() themselves are
-// untouched so this is reversible if something unknown depended on them.
+// gstFor()/buildInvoice()/classify/invoice routes were deleted here
+// (2026-08-17), not just blocked: they were a second, independent GST-rate
+// authority alongside the canonical, HSN-driven gstService.resolveGSTRate(),
+// which also handles the branded/unbranded staple-tax split these did not.
+// No frontend caller ever called them (api.js defined classifyGst/buildInvoice
+// wrappers but no page invoked them). Use /api/v1/gst instead.
 
-function deprecatedFinance(canonicalPath) {
-  return (req, res) => res.status(410).json({
-    success: false,
-    error: 'This endpoint is deprecated: it was a duplicate financial authority found by a cross-module integrity audit, with no confirmed frontend caller.',
-    canonical: canonicalPath,
-    deprecatedOn: '2026-08-15',
-    reference: "AFRERA_CLAUDE_BUILD_DIRECTIVE.md, Part 3C",
-  });
-}
-
-router.get('/gst/classify', deprecatedFinance('/api/v1/gst (gstService.resolveGSTRate)'));
-router.post('/gst/invoice', authMiddleware, deprecatedFinance('/api/v1/gst (gstService.generateGSTInvoice)'));
-
-// ---- Ledger (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -
+// ---- Ledger ----------------------------------------------------------------
 //
-// fin.appendLedgerEntry()/trialBalance()/verifyLedger() posted to a second,
-// fully disconnected hash-chained ledger (gl_ledger_chain) alongside the
-// canonical journal_entries/journal_lines ledger that GST, AF-AA, AF-CO and
-// AF-PS all actually post to. No frontend caller was found. Deprecated
-// rather than deleted for the same reversibility reason as above.
-
-router.post('/ledger/entry', authMiddleware, deprecatedFinance('/api/v1/ledger (the canonical journal_entries/journal_lines ledger)'));
-router.get('/ledger/trial-balance', authMiddleware, deprecatedFinance('/api/v1/ledger/trial-balance'));
-router.get('/ledger/verify', authMiddleware, deprecatedFinance('/api/v1/ledger/verify'));
+// POST /ledger/entry (appendLedgerEntry()) was deleted here (2026-08-17): it
+// wrote into a second, fully disconnected hash-chained ledger
+// (gl_ledger_chain) alongside the canonical journal_entries/journal_lines
+// ledger that GST, AF-AA, AF-CO and AF-PS all actually post to - a real
+// double-booking risk, and it had no live caller.
+//
+// trialBalance() and verifyLedger() below are different and were kept: they
+// are read-only, they compute directly off gl_ledger_chain (view
+// v_ledger_trial_balance / a dedicated integrity check over the hash chain),
+// and - critically - verifyLedger()'s tamper-evidence check has NO
+// equivalent anywhere else in the codebase (neither journal_entries/
+// journal_lines nor the separate unified_ledger table have a hash-chain
+// integrity concept at all). LedgerPage.jsx calls both
+// (financeAPI.trialBalance()/verifyLedger()) - deleting the dangerous write
+// path does not affect them, since gl_ledger_chain's existing rows stay
+// queryable without new appends.
+router.get('/ledger/trial-balance', authMiddleware, async (req, res) => {
+  try {
+    res.json({ success: true, data: await fin.trialBalance() });
+  } catch (e) { fail(res, e); }
+});
+router.get('/ledger/verify', authMiddleware, async (req, res) => {
+  try {
+    res.json({ success: true, data: await fin.verifyLedger() });
+  } catch (e) { fail(res, e); }
+});
 
 // ---- Schemes ---------------------------------------------------------------
 

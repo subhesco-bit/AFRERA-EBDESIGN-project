@@ -7,13 +7,16 @@ function SubsidyManagementPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [selectedScheme, setSelectedScheme] = useState(null)
 
-  const { data: subsidyStats } = useQuery('subsidy-stats', () =>
-    subsidyAPI.getStats().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: subsidyStats } = useQuery({
+    queryKey: ['subsidy-stats'],
+    queryFn: () => subsidyAPI.getStats().then(r => r.data),
+  })
 
-  const { data: pendingDisbursements } = useQuery('pending-disbursements', () =>
-    subsidyAPI.getPending().then(r => r.data)
-  )
+  const { data: pendingDisbursements } = useQuery({
+    queryKey: ['pending-disbursements'],
+    queryFn: () => subsidyAPI.getPending().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

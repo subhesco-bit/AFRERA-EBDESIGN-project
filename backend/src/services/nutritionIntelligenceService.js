@@ -14,6 +14,10 @@ const router = express.Router();
 
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
 if (process.env.NODE_ENV === 'test') {
+  // Deliberately reassigns the async function declarations below (hoisted
+  // with their full real bodies before this block runs) so tests get
+  // lightweight fakes instead of hitting a real DB - intentional, not a bug.
+  /* eslint-disable no-func-assign */
   const now = new Date();
   getNutrients = async () => ([{ id: 'NUT-1', symbol: 'PRO', name: 'Protein', unit: 'g' }]);
 
@@ -71,6 +75,7 @@ if (process.env.NODE_ENV === 'test') {
   };
 
   getDietaryProfiles = async () => ([{ id: 'dp-1', name: 'Vegan' }]);
+  /* eslint-enable no-func-assign */
 }
 
 // Shared pool (2026-08-04): this service previously built its own Pool.

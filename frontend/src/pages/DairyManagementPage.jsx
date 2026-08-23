@@ -17,37 +17,38 @@ function DairyManagementPage() {
   const [milkForm, setMilkForm] = useState({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
   const [tab, setTab] = useState('animals')
 
-  const { data: animalsData, isLoading, error } = useQuery(
-    'dairy-animals',
-    async () => (await dairyAPI.getAnimals()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: animalsData, isLoading, error } = useQuery({
+    queryKey: ['dairy-animals'],
+    queryFn: async () => (await dairyAPI.getAnimals()).data?.data ?? [],
+  })
 
-  const { data: milkData, isLoading: milkLoading, error: milkError } = useQuery(
-    'dairy-milk-records',
-    async () => (await dairyAPI.getMilkRecords()).data?.data ?? []
-  )
+  const { data: milkData, isLoading: milkLoading, error: milkError } = useQuery({
+    queryKey: ['dairy-milk-records'],
+    queryFn: async () => (await dairyAPI.getMilkRecords()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? dairyAPI.updateAnimal(editingId, payload) : dairyAPI.createAnimal(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Animal updated' : 'Animal registered')
-        queryClient.invalidateQueries('dairy-animals')
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save animal'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? dairyAPI.updateAnimal(editingId, payload) : dairyAPI.createAnimal(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Animal updated' : 'Animal registered')
+      queryClient.invalidateQueries({ queryKey: ['dairy-animals'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save animal'),
+  })
 
-  const deleteMutation = useMutation((id) => dairyAPI.deleteAnimal(id), {
-    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries('dairy-animals') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => dairyAPI.deleteAnimal(id),
+    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['dairy-animals'] }) },
     onError: () => toast.error('Failed to remove animal'),
   })
 
-  const recordMilkMutation = useMutation((payload) => dairyAPI.recordMilk(payload), {
+  const recordMilkMutation = useMutation({
+    mutationFn: (payload) => dairyAPI.recordMilk(payload),
     onSuccess: () => {
       toast.success('Milk record added')
-      queryClient.invalidateQueries('dairy-milk-records')
+      queryClient.invalidateQueries({ queryKey: ['dairy-milk-records'] })
       setMilkForm({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record milk yield'),
@@ -187,9 +188,9 @@ function DairyManagementPage() {
                 <input type="number" step="0.1" value={milkForm.quantity_liters} onChange={(e) => setMilkForm({ ...milkForm, quantity_liters: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
               </div>
-              <button type="submit" disabled={recordMilkMutation.isLoading}
+              <button type="submit" disabled={recordMilkMutation.isPending}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-60">
-                {recordMilkMutation.isLoading ? 'Saving...' : 'Record'}
+                {recordMilkMutation.isPending ? 'Saving...' : 'Record'}
               </button>
             </form>
           </div>
@@ -273,8 +274,8 @@ function DairyManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Register Animal'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Register Animal'}
                   </button>
                 </div>
               </form>

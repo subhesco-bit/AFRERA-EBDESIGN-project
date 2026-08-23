@@ -17,7 +17,6 @@
 'use strict';
 
 const { logger } = require('../utils/logger');
-const crypto = require('crypto');
 
 /**
  * Validation error class with detailed field-level errors
@@ -87,20 +86,23 @@ function coerceType(value, targetType) {
   switch (targetType) {
     case 'string':
       return String(value);
-    case 'number':
+    case 'number': {
       const num = Number(value);
       return isNaN(num) ? value : num;
+    }
     case 'boolean':
       if (typeof value === 'boolean') return value;
       if (value === 'true' || value === 1) return true;
       if (value === 'false' || value === 0) return false;
       return Boolean(value);
-    case 'integer':
+    case 'integer': {
       const int = parseInt(value, 10);
       return isNaN(int) ? value : int;
-    case 'float':
+    }
+    case 'float': {
       const float = parseFloat(value);
       return isNaN(float) ? value : float;
+    }
     case 'date':
       return new Date(value);
     case 'array':
@@ -270,7 +272,9 @@ function validateField(field, value, rules, data, path = '') {
         constraint: rules.maxItems
       });
     }
-    if (rules.uniqueItems && new Set(value).size !== value.length) {
+    // new Set(value) dedupes by reference, so it never caught duplicate
+    // objects/arrays (only primitives) - compare by serialized value instead.
+    if (rules.uniqueItems && new Set(value.map((item) => JSON.stringify(item))).size !== value.length) {
       errors.push({
         field: fieldPath,
         message: rules.uniqueItemsMessage || `${field} must contain unique items`,

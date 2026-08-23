@@ -18,26 +18,27 @@ function PriceBuildPage() {
   const [profitMargin, setProfitMargin] = useState(20)
   const queryClient = useQueryClient()
 
-  const { data: benchmarkPrices } = useQuery('benchmark-prices', () =>
-    farmersAPI.getBenchmarkPrices()
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: benchmarkPrices } = useQuery({
+    queryKey: ['benchmark-prices'],
+    queryFn: () => farmersAPI.getBenchmarkPrices().then(r => r.data),
+  })
 
-  const { data: marketConditions } = useQuery('market-conditions', () =>
-    farmersAPI.getMarketConditions()
-  )
+  const { data: marketConditions } = useQuery({
+    queryKey: ['market-conditions'],
+    queryFn: () => farmersAPI.getMarketConditions().then(r => r.data),
+  })
 
-  const savePricingMutation = useMutation(
-    (data) => farmersAPI.savePricingModel(data),
-    {
-      onSuccess: () => {
-        toast.success('Pricing model saved successfully')
-        queryClient.invalidateQueries('pricing-models')
-      },
-      onError: () => {
-        toast.error('Failed to save pricing model')
-      }
-    }
-  )
+  const savePricingMutation = useMutation({
+    mutationFn: (data) => farmersAPI.savePricingModel(data),
+    onSuccess: () => {
+      toast.success('Pricing model saved successfully')
+      queryClient.invalidateQueries({ queryKey: ['pricing-models'] })
+    },
+    onError: () => {
+      toast.error('Failed to save pricing model')
+    },
+  })
 
   const totalCosts = Object.values(costs).reduce((sum, val) => sum + Number(val), 0)
   const costPerUnit = expectedYield ? totalCosts / Number(expectedYield) : 0

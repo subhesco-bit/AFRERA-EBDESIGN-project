@@ -9,32 +9,33 @@ function CorporateBuyerPage() {
   const [showOrderModal, setShowOrderModal] = useState(false)
   const queryClient = useQueryClient()
 
-  const { data: buyerProfile } = useQuery('buyer-profile', () =>
-    vendorsAPI.getBuyerProfile('current-buyer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: buyerProfile } = useQuery({
+    queryKey: ['buyer-profile'],
+    queryFn: () => vendorsAPI.getBuyerProfile('current-buyer-id').then(r => r.data),
+  })
 
-  const { data: creditStatus } = useQuery('credit-status', () =>
-    vendorsAPI.getCreditStatus('current-buyer-id')
-  )
+  const { data: creditStatus } = useQuery({
+    queryKey: ['credit-status'],
+    queryFn: () => vendorsAPI.getCreditStatus('current-buyer-id').then(r => r.data),
+  })
 
-  const { data: activeOrders } = useQuery('active-orders', () =>
-    vendorsAPI.getActiveOrders('current-buyer-id')
-  )
-// eslint-disable-next-line no-unused-vars
+  const { data: activeOrders } = useQuery({
+    queryKey: ['active-orders'],
+    queryFn: () => vendorsAPI.getActiveOrders('current-buyer-id').then(r => r.data),
+  })
 
-  const createOrderMutation = useMutation(
-    (data) => vendorsAPI.createCorporateOrder(data),
-    {
-      onSuccess: () => {
-        toast.success('Order created successfully')
-        queryClient.invalidateQueries('active-orders')
-        setShowOrderModal(false)
-      },
-      onError: () => {
-        toast.error('Failed to create order')
-      }
-    }
-  )
+  const createOrderMutation = useMutation({
+    mutationFn: (data) => vendorsAPI.createCorporateOrder(data),
+    onSuccess: () => {
+      toast.success('Order created successfully')
+      queryClient.invalidateQueries({ queryKey: ['active-orders'] })
+      setShowOrderModal(false)
+    },
+    onError: () => {
+      toast.error('Failed to create order')
+    },
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

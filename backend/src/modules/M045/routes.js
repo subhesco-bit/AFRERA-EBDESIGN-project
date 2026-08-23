@@ -2,12 +2,13 @@
 const router = express.Router();
 const controller = require('./controller');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { FARM_OPERATIONS_ROLES } = require('../../middleware/roleGroups');
 
 // Seed Planning CRUD
 router.post('/plans', authMiddleware, controller.createSeedPlan);
 router.get('/plans', authMiddleware, controller.listSeedPlans);
 router.get('/plans/:planId', authMiddleware, controller.getSeedPlan);
-router.put('/plans/:planId', authMiddleware, controller.updateSeedPlan);
+router.put('/plans/:planId', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), controller.updateSeedPlan);
 router.delete('/plans/:planId', authMiddleware, requireRole('admin'), controller.deleteSeedPlan);
 
 // AI-powered calculation

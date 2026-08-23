@@ -13,6 +13,12 @@
 --   2. fk_account FK to a table named accounts, which doesn't exist anywhere in
 --      this schema (unifiedLedgerService.js uses account_id as a free-form label,
 --      not a chart-of-accounts foreign key) - dropped the constraint.
+--
+-- unifiedLedgerService.js and unifiedLedgerRoutes.js were deleted 2026-08-17
+-- (rejected "9 economies" architecture - see AFRERA_CLAUDE_BUILD_DIRECTIVE.md
+-- Part 3C). Left as CREATE TABLE IF NOT EXISTS rather than reverted: dropping
+-- tables that may already exist in a deployed environment is a data-loss risk
+-- disproportionate to tables nothing writes to anymore.
 
 -- Unified Ledger Table (Single Source of Truth)
 CREATE TABLE IF NOT EXISTS unified_ledger (

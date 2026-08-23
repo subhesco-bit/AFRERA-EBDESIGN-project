@@ -311,9 +311,9 @@ async function submitAssessment(assessmentId, farmerId, answers) {
 
     const result = {
       result_id: generateId(),
-      assessment_id,
+      assessment_id: assessmentId,
       enrollment_id: enrollment.enrollment_id,
-      farmer_id,
+      farmer_id: farmerId,
       score,
       total_score: assessmentData.total_marks,
       percentage,

@@ -19,37 +19,38 @@ function FarmerSellPage() {
 
   const queryClient = useQueryClient()
 
-  const { data: categories } = useQuery('categories', () =>
-    farmersAPI.getCategories()
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => farmersAPI.getCategories().then(r => r.data),
+  })
 
-  const { data: farmerProfile } = useQuery('farmer-profile', () =>
-    farmersAPI.getFarmer('current-farmer-id')
-  )
+  const { data: farmerProfile } = useQuery({
+    queryKey: ['farmer-profile'],
+    queryFn: () => farmersAPI.getFarmer('current-farmer-id').then(r => r.data),
+  })
 
-  const sellMutation = useMutation(
-    (data) => farmersAPI.createListing(data),
-    {
-      onSuccess: () => {
-        toast.success('Listing created successfully!')
-        queryClient.invalidateQueries('farmer-listings')
-        setFormData({
-          product_name: '',
-          category: '',
-          quantity: '',
-          unit: 'kg',
-          expected_price: '',
-          harvest_date: '',
-          location: farmerProfile?.location || '',
-          description: '',
-          certifications: []
-        })
-      },
-      onError: (error) => {
-        toast.error(error.message || 'Failed to create listing')
-      }
-    }
-  )
+  const sellMutation = useMutation({
+    mutationFn: (data) => farmersAPI.createListing(data),
+    onSuccess: () => {
+      toast.success('Listing created successfully!')
+      queryClient.invalidateQueries({ queryKey: ['farmer-listings'] })
+      setFormData({
+        product_name: '',
+        category: '',
+        quantity: '',
+        unit: 'kg',
+        expected_price: '',
+        harvest_date: '',
+        location: farmerProfile?.location || '',
+        description: '',
+        certifications: []
+      })
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to create listing')
+    },
+  })
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -264,10 +265,10 @@ function FarmerSellPage() {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={sellMutation.isLoading}
+              disabled={sellMutation.isPending}
               className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
-              {sellMutation.isLoading ? (
+              {sellMutation.isPending ? (
                 <>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Creating Listing...

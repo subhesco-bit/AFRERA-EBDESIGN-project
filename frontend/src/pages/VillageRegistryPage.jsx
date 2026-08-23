@@ -13,25 +13,25 @@ function VillageRegistryPage() {
   const [form, setForm] = useState(emptyForm)
   const [search, setSearch] = useState('')
 
-  const { data, isLoading, error } = useQuery(
-    ['villages', search],
-    async () => (await villageAPI.getVillages(search ? { search } : {})).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['villages', search],
+    queryFn: async () => (await villageAPI.getVillages(search ? { search } : {})).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? villageAPI.updateVillage(editingId, payload) : villageAPI.createVillage(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Village updated' : 'Village registered')
-        queryClient.invalidateQueries(['villages'])
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save village'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? villageAPI.updateVillage(editingId, payload) : villageAPI.createVillage(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Village updated' : 'Village registered')
+      queryClient.invalidateQueries({ queryKey: ['villages'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save village'),
+  })
 
-  const deleteMutation = useMutation((id) => villageAPI.deleteVillage(id), {
-    onSuccess: () => { toast.success('Village removed'); queryClient.invalidateQueries(['villages']) },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => villageAPI.deleteVillage(id),
+    onSuccess: () => { toast.success('Village removed'); queryClient.invalidateQueries({ queryKey: ['villages'] }) },
     onError: () => toast.error('Failed to remove village'),
   })
 
@@ -192,8 +192,8 @@ function VillageRegistryPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Register Village'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Register Village'}
                   </button>
                 </div>
               </form>

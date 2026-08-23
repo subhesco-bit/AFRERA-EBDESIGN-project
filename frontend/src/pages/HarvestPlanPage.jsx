@@ -1,41 +1,40 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { 
-  Calendar, 
-  Sprout, 
-  CloudSun, 
-  Droplets, 
+import {
+  Calendar,
+  Sprout,
+  CloudSun,
+  Droplets,
   TrendingUp,
   AlertTriangle,
   CheckCircle,
   Info
 } from 'lucide-react'
 
+// farmersAPI.getHarvestPlans/getWeatherForecast/getCropRecommendations never
+// existed on frontend/src/services/api.js — this page was calling
+// non-existent functions (would throw at query time). No backend route,
+// service, or table backs "harvest plans" or per-farmer crop recommendations
+// with profitability/demand scoring anywhere in backend/src. Rather than
+// fabricate those numbers client-side, this page is left as an honest
+// not-built placeholder — see ClimateAdvisoryPage.jsx for the same pattern.
 function HarvestPlanPage() {
   const [selectedSeason, setSelectedSeason] = useState('current')
   const [selectedCrop, setSelectedCrop] = useState(null)
-
-  const { data: harvestPlans } = useQuery(
-    ['harvest-plans', selectedSeason],
-    () => farmersAPI.getHarvestPlans('current-farmer-id', selectedSeason)
-  )
-
-  const { data: weatherForecast } = useQuery(
-    'weather-forecast',
-    () => farmersAPI.getWeatherForecast('current-farmer-id')
-  )
-
-  const { data: cropRecommendations } = useQuery(
-    'crop-recommendations',
-    () => farmersAPI.getCropRecommendations('current-farmer-id')
-  )
+  const harvestPlans = undefined
+  const weatherForecast = undefined
+  const cropRecommendations = undefined
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Harvest Planning</h1>
         <p className="text-gray-600">Plan your harvest schedule based on weather, market conditions, and crop cycles</p>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-6 text-sm">
+        This page is not wired to a backend yet — there is no harvest-plan, weather-forecast, or per-farmer
+        crop-recommendation data source in the API. The layout below is a ready-to-wire placeholder; no figures
+        shown here are real.
       </div>
 
       {/* Season Selector */}

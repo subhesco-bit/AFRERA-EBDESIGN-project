@@ -277,8 +277,15 @@ class PlatformCoreService {
    */
   async checkRedis() {
     try {
-      // Mock Redis check - implement actual Redis check
-      return { status: 'healthy' };
+      // Was a hardcoded 'healthy' regardless of whether Redis existed - a
+      // real client wrapper (cache/redis.js) with its own isHealthy() was
+      // sitting unused, required from nowhere in the app. Required lazily
+      // here (not at module top-level) so this file doesn't attempt a
+      // Redis connection on every boot just because it can report on one.
+      const redisCache = require('../cache/redis');
+      return redisCache.isHealthy()
+        ? { status: 'healthy' }
+        : { status: 'unavailable', note: 'Redis not connected - caching layer is not wired into the running app' };
     } catch (error) {
       return { status: 'unhealthy', error: error.message };
     }

@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 const STORE_PATH = path.join(__dirname, '..', 'database', 'form_store.json');
@@ -385,7 +385,11 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', authMiddleware, async (req, res) => {
+// form_definitions has no per-user ownership column (it's a shared
+// config/workflow object, not user-owned content like a product), so the
+// IDOR fix here is a role gate rather than an ownership check: any
+// authenticated user could previously edit or delete any form definition.
+router.put('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
     const form = await updateForm(req.params.id, req.body);
     res.json(form);
@@ -394,7 +398,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/:id', authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
     const result = await deleteForm(req.params.id);
     res.json(result);

@@ -13,28 +13,30 @@ function ClimateAdvisoryPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(emptyForm)
 
-  const { data: advisoriesData, isLoading, error } = useQuery(
-    'climate-advisories',
-    async () => (await climateAdvisoryAPI.getAdvisories()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: advisoriesData, isLoading, error } = useQuery({
+    queryKey: ['climate-advisories'],
+    queryFn: async () => (await climateAdvisoryAPI.getAdvisories()).data?.data ?? [],
+  })
 
   // These already have real backend support (migration 057_climate_weather_d14.sql,
   // routes in weatherRoutes.js) — surfaced alongside advisories for context.
-  const { data: alertsData } = useQuery(
-    'climate-active-alerts',
-    async () => (await weatherAPI.activeAlerts()).data?.data ?? [],
-    { retry: false }
-  )
-  const { data: pestData } = useQuery(
-    'climate-pest-forecast',
-    async () => (await weatherAPI.pestForecast({})).data?.data ?? [],
-    { retry: false }
-  )
+  const { data: alertsData } = useQuery({
+    queryKey: ['climate-active-alerts'],
+    queryFn: async () => (await weatherAPI.activeAlerts()).data?.data ?? [],
+    retry: false,
+  })
+  const { data: pestData } = useQuery({
+    queryKey: ['climate-pest-forecast'],
+    queryFn: async () => (await weatherAPI.pestForecast({})).data?.data ?? [],
+    retry: false,
+  })
 
-  const createMutation = useMutation((payload) => climateAdvisoryAPI.createAdvisory(payload), {
+  const createMutation = useMutation({
+    mutationFn: (payload) => climateAdvisoryAPI.createAdvisory(payload),
     onSuccess: () => {
       toast.success('Advisory published')
-      queryClient.invalidateQueries('climate-advisories')
+      queryClient.invalidateQueries({ queryKey: ['climate-advisories'] })
       setShowForm(false)
       setForm(emptyForm)
     },
@@ -149,8 +151,8 @@ function ClimateAdvisoryPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={createMutation.isLoading} className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition disabled:opacity-60">
-                    {createMutation.isLoading ? 'Publishing...' : 'Publish'}
+                  <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition disabled:opacity-60">
+                    {createMutation.isPending ? 'Publishing...' : 'Publish'}
                   </button>
                 </div>
               </form>

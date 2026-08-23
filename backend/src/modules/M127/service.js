@@ -186,8 +186,8 @@ async function monitorHerdHealth(farmerId, animalType) {
   try {
     const monitoring = {
       monitoring_id: generateId(),
-      farmer_id,
-      animal_type,
+      farmer_id: farmerId,
+      animal_type: animalType,
       timestamp: new Date().toISOString(),
       overall_health_score: await calculateHerdHealthScore(farmerId, animalType),
       disease_outbreaks: await detectDiseaseOutbreaks(farmerId, animalType),
@@ -210,8 +210,8 @@ async function generateHealthReport(farmerId, reportType) {
   try {
     const report = {
       report_id: generateId(),
-      farmer_id,
-      report_type,
+      farmer_id: farmerId,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       total_animals: await getTotalAnimals(farmerId),
       health_summary: await getHealthSummary(farmerId),

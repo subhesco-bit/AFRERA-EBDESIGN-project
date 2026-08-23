@@ -28,6 +28,7 @@ function successResponse(data = null, message = 'Success', statusCode = 200, met
     metadata: {
       timestamp: new Date().toISOString(),
       requestId: metadata.requestId,
+      statusCode,
       version: metadata.version || '1.0.0',
       ...metadata
     }
@@ -45,6 +46,7 @@ function errorResponse(message = 'An error occurred', statusCode = 500, details 
     metadata: {
       timestamp: new Date().toISOString(),
       requestId: metadata.requestId,
+      statusCode,
       version: metadata.version || '1.0.0',
       ...metadata
     }
@@ -131,18 +133,26 @@ function responseFormatter(req, res, next) {
   };
 
   // Add helper methods to response object
+  //
+  // res.json(body, code) is not a real Express signature - res.json() only
+  // ever takes the body, so every `originalJson.call(this, response, XXX)`
+  // below silently dropped the status code and returned default 200 no
+  // matter which helper (badRequest, notFound, serverError, ...) was
+  // called. res.status(code) must be set explicitly before writing the
+  // body - applies to every helper here, including the success ones.
   res.success = (data, message, metadata = {}) => {
     const response = successResponse(data, message, 200, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
     });
-    
+
     // Add ETag header for caching
     if (data && typeof data === 'object') {
       res.setHeader('ETag', generateETag(data));
     }
-    
+
+    res.status(200);
     return originalJson.call(this, response);
   };
 
@@ -152,11 +162,12 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    
+
     if (data && typeof data === 'object') {
       res.setHeader('ETag', generateETag(data));
     }
-    
+
+    res.status(201);
     return originalJson.call(this, response);
   };
 
@@ -166,6 +177,7 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
+    res.status(202);
     return originalJson.call(this, response);
   };
 
@@ -179,7 +191,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 400);
+    res.status(400);
+    return originalJson.call(this, response);
   };
 
   res.unauthorized = (message, metadata = {}) => {
@@ -188,7 +201,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 401);
+    res.status(401);
+    return originalJson.call(this, response);
   };
 
   res.forbidden = (message, metadata = {}) => {
@@ -197,7 +211,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 403);
+    res.status(403);
+    return originalJson.call(this, response);
   };
 
   res.notFound = (message, metadata = {}) => {
@@ -206,7 +221,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 404);
+    res.status(404);
+    return originalJson.call(this, response);
   };
 
   res.conflict = (message, details, metadata = {}) => {
@@ -215,7 +231,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 409);
+    res.status(409);
+    return originalJson.call(this, response);
   };
 
   res.unprocessableEntity = (message, details, metadata = {}) => {
@@ -224,7 +241,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 422);
+    res.status(422);
+    return originalJson.call(this, response);
   };
 
   res.tooManyRequests = (message, retryAfter, metadata = {}) => {
@@ -236,7 +254,8 @@ function responseFormatter(req, res, next) {
     if (retryAfter) {
       res.setHeader('Retry-After', retryAfter);
     }
-    return originalJson.call(this, response, 429);
+    res.status(429);
+    return originalJson.call(this, response);
   };
 
   res.serverError = (message, details, metadata = {}) => {
@@ -245,7 +264,8 @@ function responseFormatter(req, res, next) {
       duration: Date.now() - startTime,
       ...metadata
     });
-    return originalJson.call(this, response, 500);
+    res.status(500);
+    return originalJson.call(this, response);
   };
 
   res.serviceUnavailable = (message, retryAfter, metadata = {}) => {
@@ -257,7 +277,8 @@ function responseFormatter(req, res, next) {
     if (retryAfter) {
       res.setHeader('Retry-After', retryAfter);
     }
-    return originalJson.call(this, response, 503);
+    res.status(503);
+    return originalJson.call(this, response);
   };
 
   res.paginated = (data, pagination, message, metadata = {}) => {

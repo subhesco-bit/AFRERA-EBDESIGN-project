@@ -9,28 +9,28 @@ function PreOrderPage() {
   const [showOrderModal, setShowOrderModal] = useState(false)
   const queryClient = useQueryClient()
 
-  const { data: preOrders } = useQuery('pre-orders', () =>
-    farmersAPI.getPreOrders('current-farmer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: preOrders } = useQuery({
+    queryKey: ['pre-orders'],
+    queryFn: () => farmersAPI.getPreOrders('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: availableProducts } = useQuery('preorder-products', () =>
-    farmersAPI.getPreOrderProducts()
-  )
-// eslint-disable-next-line no-unused-vars
+  const { data: availableProducts } = useQuery({
+    queryKey: ['preorder-products'],
+    queryFn: () => farmersAPI.getPreOrderProducts().then(r => r.data),
+  })
 
-  const createPreOrderMutation = useMutation(
-    (data) => farmersAPI.createPreOrder(data),
-    {
-      onSuccess: () => {
-        toast.success('Pre-order created successfully!')
-        queryClient.invalidateQueries('pre-orders')
-        setShowOrderModal(false)
-      },
-      onError: () => {
-        toast.error('Failed to create pre-order')
-      }
-    }
-  )
+  const createPreOrderMutation = useMutation({
+    mutationFn: (data) => farmersAPI.createPreOrder(data),
+    onSuccess: () => {
+      toast.success('Pre-order created successfully!')
+      queryClient.invalidateQueries({ queryKey: ['pre-orders'] })
+      setShowOrderModal(false)
+    },
+    onError: () => {
+      toast.error('Failed to create pre-order')
+    },
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

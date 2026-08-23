@@ -8,7 +8,8 @@
 const express = require('express');
 const router = express.Router();
 const fertilizerInventoryService = require('../services/fertilizerInventoryService');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 
 router.get('/inventory', async (req, res) => {
   try {
@@ -28,7 +29,7 @@ router.post('/inventory', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/inventory/:id', authMiddleware, async (req, res) => {
+router.put('/inventory/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const item = await fertilizerInventoryService.updateInventoryItem(req.params.id, req.body);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
@@ -38,7 +39,7 @@ router.put('/inventory/:id', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/inventory/:id', authMiddleware, async (req, res) => {
+router.delete('/inventory/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const ok = await fertilizerInventoryService.deleteInventoryItem(req.params.id);
     if (!ok) return res.status(404).json({ success: false, error: 'Not found' });

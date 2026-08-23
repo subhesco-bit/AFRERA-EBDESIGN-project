@@ -16,6 +16,10 @@ const pool = require('../database/pool');
 
 // Lightweight test-mode implementations to avoid DB during unit tests
 if (process.env.NODE_ENV === 'test') {
+  // Deliberately reassigns the async function declarations below (hoisted
+  // with their full real bodies before this block runs) so tests get
+  // lightweight fakes instead of hitting a real DB - intentional, not a bug.
+  /* eslint-disable no-func-assign */
   createKnowledgeNode = async (data) => ({ id: `node-${Date.now()}`, ...data });
   searchKnowledgeNodes = async () => ([]);
   createRelationship = async (data) => ({ id: `rel-${Date.now()}`, ...data });
@@ -28,6 +32,7 @@ if (process.env.NODE_ENV === 'test') {
     result: []
   });
   recordKnowledgeAnalytics = async (metrics) => ({ date: new Date().toISOString(), ...metrics });
+  /* eslint-enable no-func-assign */
 }
 
 // ============================================================================

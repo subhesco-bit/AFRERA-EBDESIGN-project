@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ordersAPI } from '../services/api'
 import { MapPin, CreditCard, Truck } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 function CheckoutPage() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [step, setStep] = useState(1)
   const [shippingAddress, setShippingAddress] = useState({
@@ -15,13 +17,22 @@ function CheckoutPage() {
   })
   const [paymentMethod, setPaymentMethod] = useState('cod')
 
-  const { data: cartData } = useQuery('cart', ordersAPI.getCart)
+  // NOTE: this page was calling useQuery/useMutation with the removed v3/v4
+  // tuple signature (`useQuery('cart', fn)`) against an installed v5
+  // @tanstack/react-query, which only supports the object form — the page
+  // threw on render. Also `ordersAPI.getCart()` returns the axios response
+  // object, not the cart directly; `.then(r => r.data)` was missing.
+  const { data: cartData } = useQuery({
+    queryKey: ['cart'],
+    queryFn: () => ordersAPI.getCart().then((r) => r.data),
+  })
 
-  const createOrderMutation = useMutation(ordersAPI.createOrder, {
-    onSuccess: (data) => {
+  const createOrderMutation = useMutation({
+    mutationFn: ordersAPI.createOrder,
+    onSuccess: (res) => {
       toast.success('Order created successfully')
-      queryClient.invalidateQueries('cart')
-      // Navigate to order confirmation or payment
+      queryClient.invalidateQueries({ queryKey: ['cart'] })
+      navigate(`/orders/${res.data.id}`)
     },
     onError: (error) => {
       toast.error(error.response?.data?.error || 'Failed to create order')
@@ -185,10 +196,10 @@ function CheckoutPage() {
               {step === 2 && (
                 <button
                   type="submit"
-                  disabled={createOrderMutation.isLoading}
+                  disabled={createOrderMutation.isPending}
                   className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50"
                 >
-                  {createOrderMutation.isLoading ? 'Processing...' : 'Place Order'}
+                  {createOrderMutation.isPending ? 'Processing...' : 'Place Order'}
                 </button>
               )}
             </form>
@@ -227,17 +238,13 @@ function CheckoutPage() {
                 <span>₹{total_amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Tax (5%)</span>
-                <span>₹{(total_amount * 0.05).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm text-gray-600">
                 <span>Shipping</span>
                 <span>{total_amount > 1500 ? 'FREE' : '₹60.00'}</span>
               </div>
-              <div className="border-t pt-2 flex justify-between text-lg font-semibold text-gray-800">
-                <span>Total</span>
-                <span>₹{(total_amount + total_amount * 0.05 + (total_amount > 1500 ? 0 : 60)).toFixed(2)}</span>
-              </div>
+              <p className="text-xs text-gray-500 pt-1">
+                GST is calculated per item (varies by product/HSN code) and shown on your order
+                confirmation — not included in this subtotal preview.
+              </p>
             </div>
 
             <div className="mt-4 flex items-start gap-2 text-sm text-gray-600">

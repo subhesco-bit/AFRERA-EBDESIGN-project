@@ -16,40 +16,38 @@ function PondManagementPage() {
   const [wqTarget, setWqTarget] = useState(null)
   const [wqForm, setWqForm] = useState({ date: '', ph: '', dissolved_oxygen: '', temperature_c: '' })
 
-  const { data, isLoading, error } = useQuery(
-    'ponds',
-    async () => (await pondAPI.getPonds()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['ponds'],
+    queryFn: async () => (await pondAPI.getPonds()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? pondAPI.updatePond(editingId, payload) : pondAPI.createPond(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Pond updated' : 'Pond registered')
-        queryClient.invalidateQueries('ponds')
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save pond'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? pondAPI.updatePond(editingId, payload) : pondAPI.createPond(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Pond updated' : 'Pond registered')
+      queryClient.invalidateQueries({ queryKey: ['ponds'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save pond'),
+  })
 
-  const deleteMutation = useMutation((id) => pondAPI.deletePond(id), {
-    onSuccess: () => { toast.success('Pond removed'); queryClient.invalidateQueries('ponds') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => pondAPI.deletePond(id),
+    onSuccess: () => { toast.success('Pond removed'); queryClient.invalidateQueries({ queryKey: ['ponds'] }) },
     onError: () => toast.error('Failed to remove pond'),
   })
 
-  const recordWqMutation = useMutation(
-    ({ id, payload }) => pondAPI.recordWaterQuality(id, payload),
-    {
-      onSuccess: () => {
-        toast.success('Water quality logged')
-        queryClient.invalidateQueries('ponds')
-        setWqTarget(null)
-        setWqForm({ date: '', ph: '', dissolved_oxygen: '', temperature_c: '' })
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to log water quality'),
-    }
-  )
+  const recordWqMutation = useMutation({
+    mutationFn: ({ id, payload }) => pondAPI.recordWaterQuality(id, payload),
+    onSuccess: () => {
+      toast.success('Water quality logged')
+      queryClient.invalidateQueries({ queryKey: ['ponds'] })
+      setWqTarget(null)
+      setWqForm({ date: '', ph: '', dissolved_oxygen: '', temperature_c: '' })
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to log water quality'),
+  })
 
   const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
 
@@ -198,8 +196,8 @@ function PondManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Register Pond'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Register Pond'}
                   </button>
                 </div>
               </form>
@@ -256,8 +254,8 @@ function PondManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setWqTarget(null)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={recordWqMutation.isLoading} className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-60">
-                    {recordWqMutation.isLoading ? 'Saving...' : 'Log Reading'}
+                  <button type="submit" disabled={recordWqMutation.isPending} className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-60">
+                    {recordWqMutation.isPending ? 'Saving...' : 'Log Reading'}
                   </button>
                 </div>
               </form>

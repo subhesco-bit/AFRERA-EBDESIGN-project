@@ -15,13 +15,16 @@ function FarmAdvisorPage() {
   const [inputMessage, setInputMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
 
-  const { data: advisoryContext } = useQuery('advisory-context', () =>
-    farmersAPI.getAdvisoryContext('current-farmer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: advisoryContext } = useQuery({
+    queryKey: ['advisory-context'],
+    queryFn: () => farmersAPI.getAdvisoryContext('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: quickQuestions } = useQuery('quick-questions', () =>
-    farmersAPI.getQuickQuestions()
-  )
+  const { data: quickQuestions } = useQuery({
+    queryKey: ['quick-questions'],
+    queryFn: () => farmersAPI.getQuickQuestions().then(r => r.data),
+  })
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return

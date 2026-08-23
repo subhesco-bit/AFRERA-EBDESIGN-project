@@ -6,17 +6,22 @@ import { analyticsAPI, adminAPI, systemAPI } from '../services/api'
 function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
 
-  const { data: platformStats } = useQuery('platform-stats', () =>
-    analyticsAPI.getPlatformStats().then(r => r.data)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx) — bare string-key form
+  // is removed in the installed v5; this page threw on render.
+  const { data: platformStats } = useQuery({
+    queryKey: ['platform-stats'],
+    queryFn: () => analyticsAPI.getPlatformStats().then(r => r.data),
+  })
 
-  const { data: recentActivity } = useQuery('recent-activity', () =>
-    adminAPI.getRecentAudit().then(r => r.data)
-  )
+  const { data: recentActivity } = useQuery({
+    queryKey: ['recent-activity'],
+    queryFn: () => adminAPI.getRecentAudit().then(r => r.data),
+  })
 
-  const { data: systemHealth } = useQuery('system-health', () =>
-    systemAPI.getHealth().then(r => r.data)
-  )
+  const { data: systemHealth } = useQuery({
+    queryKey: ['system-health'],
+    queryFn: () => systemAPI.getHealth().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

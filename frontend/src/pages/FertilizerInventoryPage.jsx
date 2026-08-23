@@ -17,40 +17,38 @@ function FertilizerInventoryPage() {
   const [issueTarget, setIssueTarget] = useState(null)
   const [issueForm, setIssueForm] = useState({ quantity: '', issued_to: '', purpose: '' })
 
-  const { data, isLoading, error } = useQuery(
-    'fertilizer-inventory',
-    async () => (await fertilizerAPI.getInventory()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['fertilizer-inventory'],
+    queryFn: async () => (await fertilizerAPI.getInventory()).data?.data ?? [],
+  })
 
-  const saveMutation = useMutation(
-    (payload) => (editingId ? fertilizerAPI.updateInventoryItem(editingId, payload) : fertilizerAPI.createInventoryItem(payload)),
-    {
-      onSuccess: () => {
-        toast.success(editingId ? 'Item updated' : 'Item added to inventory')
-        queryClient.invalidateQueries('fertilizer-inventory')
-        closeForm()
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save item'),
-    }
-  )
+  const saveMutation = useMutation({
+    mutationFn: (payload) => (editingId ? fertilizerAPI.updateInventoryItem(editingId, payload) : fertilizerAPI.createInventoryItem(payload)),
+    onSuccess: () => {
+      toast.success(editingId ? 'Item updated' : 'Item added to inventory')
+      queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] })
+      closeForm()
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save item'),
+  })
 
-  const deleteMutation = useMutation((id) => fertilizerAPI.deleteInventoryItem(id), {
-    onSuccess: () => { toast.success('Item removed'); queryClient.invalidateQueries('fertilizer-inventory') },
+  const deleteMutation = useMutation({
+    mutationFn: (id) => fertilizerAPI.deleteInventoryItem(id),
+    onSuccess: () => { toast.success('Item removed'); queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] }) },
     onError: () => toast.error('Failed to remove item'),
   })
 
-  const issueMutation = useMutation(
-    ({ id, payload }) => fertilizerAPI.issueStock(id, payload),
-    {
-      onSuccess: () => {
-        toast.success('Stock issued')
-        queryClient.invalidateQueries('fertilizer-inventory')
-        setIssueTarget(null)
-        setIssueForm({ quantity: '', issued_to: '', purpose: '' })
-      },
-      onError: (err) => toast.error(err?.response?.data?.error || 'Failed to issue stock'),
-    }
-  )
+  const issueMutation = useMutation({
+    mutationFn: ({ id, payload }) => fertilizerAPI.issueStock(id, payload),
+    onSuccess: () => {
+      toast.success('Stock issued')
+      queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] })
+      setIssueTarget(null)
+      setIssueForm({ quantity: '', issued_to: '', purpose: '' })
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || 'Failed to issue stock'),
+  })
 
   const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyItem) }
 
@@ -204,8 +202,8 @@ function FertilizerInventoryPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={closeForm} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={saveMutation.isLoading} className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition disabled:opacity-60">
-                    {saveMutation.isLoading ? 'Saving...' : editingId ? 'Save Changes' : 'Add Item'}
+                  <button type="submit" disabled={saveMutation.isPending} className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition disabled:opacity-60">
+                    {saveMutation.isPending ? 'Saving...' : editingId ? 'Save Changes' : 'Add Item'}
                   </button>
                 </div>
               </form>
@@ -247,8 +245,8 @@ function FertilizerInventoryPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setIssueTarget(null)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={issueMutation.isLoading} className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition disabled:opacity-60">
-                    {issueMutation.isLoading ? 'Issuing...' : 'Issue Stock'}
+                  <button type="submit" disabled={issueMutation.isPending} className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition disabled:opacity-60">
+                    {issueMutation.isPending ? 'Issuing...' : 'Issue Stock'}
                   </button>
                 </div>
               </form>

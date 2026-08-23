@@ -4,17 +4,21 @@ import { Leaf, Award, TrendingUp, DollarSign, Package, MapPin } from 'lucide-rea
 import LandRecords from '../components/FarmerPortal/LandRecords'
 
 function FarmerPortalPage() {
-  const { data: farmerData } = useQuery('farmer-profile', () =>
-    farmersAPI.getFarmer('current-farmer-id')
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: farmerData } = useQuery({
+    queryKey: ['farmer-profile'],
+    queryFn: () => farmersAPI.getFarmer('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: fdiData } = useQuery('fdi', () =>
-    farmersAPI.calculateFDI('current-farmer-id')
-  )
+  const { data: fdiData } = useQuery({
+    queryKey: ['fdi'],
+    queryFn: () => farmersAPI.calculateFDI('current-farmer-id').then(r => r.data),
+  })
 
-  const { data: creditScore } = useQuery('credit-score', () =>
-    financialAPI.getCreditScore('current-farmer-id')
-  )
+  const { data: creditScore } = useQuery({
+    queryKey: ['credit-score'],
+    queryFn: () => financialAPI.getCreditScore('current-farmer-id').then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -20,6 +20,7 @@
 
 const pool = require('../database/pool');
 const { logger } = require('../utils/logger');
+const { withTransaction } = require('../core/withTransaction');
 
 // ASSUMED freight-rate slabs: rate per kg falls as truck fill % rises.
 // A deployment should replace these with real historical freight-cost
@@ -94,36 +95,57 @@ class FreightPoolingService {
 
   /** Joins a real shipment to a window, computing and locking in its rate at the fill % at time of joining. */
   async joinPoolWindow(windowId, shipmentId) {
-    const windowResult = await pool.query('SELECT * FROM freight_pool_windows WHERE id = $1', [windowId]);
-    if (windowResult.rows.length === 0) throw new Error('Freight pool window not found');
-    const window = windowResult.rows[0];
-    if (window.status !== 'open') throw new Error(`Cannot join a ${window.status} window`);
+    // The capacity check and the insert must be one atomic step. Read-check-
+    // insert on the pool means two concurrent joins both see the same "space
+    // remaining" snapshot and both commit, overfilling the truck — and the
+    // same shipment could be booked into two windows at once. Locking the
+    // window row serialises every join against that window; the shipment row
+    // lock stops the same shipment joining two windows concurrently. Same
+    // shape as coldStorageService.createBooking.
+    return withTransaction(async (client) => {
+      const windowResult = await client.query(
+        'SELECT * FROM freight_pool_windows WHERE id = $1 FOR UPDATE',
+        [windowId]
+      );
+      if (windowResult.rows.length === 0) throw new Error('Freight pool window not found');
+      const window = windowResult.rows[0];
+      if (window.status !== 'open') throw new Error(`Cannot join a ${window.status} window`);
 
-    const shipmentResult = await pool.query('SELECT * FROM shipments WHERE id = $1 AND status = $2', [shipmentId, 'pending']);
-    if (shipmentResult.rows.length === 0) throw new Error('Shipment not found or not pending');
-    const shipment = shipmentResult.rows[0];
+      const shipmentResult = await client.query(
+        'SELECT * FROM shipments WHERE id = $1 AND status = $2 FOR UPDATE',
+        [shipmentId, 'pending']
+      );
+      if (shipmentResult.rows.length === 0) throw new Error('Shipment not found or not pending');
+      const shipment = shipmentResult.rows[0];
 
-    const existingResult = await pool.query(
-      'SELECT COALESCE(SUM(weight_kg), 0) AS total FROM freight_pool_shipments WHERE window_id = $1',
-      [windowId]
-    );
-    const existingWeight = Number(existingResult.rows[0].total);
-    const newTotal = existingWeight + Number(shipment.weight_kg);
-    if (newTotal > Number(window.vehicle_capacity_kg)) {
-      throw new Error(`Adding this shipment (${shipment.weight_kg}kg) would exceed vehicle capacity (${window.vehicle_capacity_kg}kg); current pool weight is ${existingWeight}kg`);
-    }
+      const alreadyPooled = await client.query(
+        'SELECT 1 FROM freight_pool_shipments WHERE shipment_id = $1 LIMIT 1',
+        [shipmentId]
+      );
+      if (alreadyPooled.rows.length > 0) throw new Error('Shipment is already in a freight pool window');
 
-    const fillPctAfterJoin = (newTotal / Number(window.vehicle_capacity_kg)) * 100;
-    const ratePerKg = rateForFillPct(fillPctAfterJoin);
+      const existingResult = await client.query(
+        'SELECT COALESCE(SUM(weight_kg), 0) AS total FROM freight_pool_shipments WHERE window_id = $1',
+        [windowId]
+      );
+      const existingWeight = Number(existingResult.rows[0].total);
+      const newTotal = existingWeight + Number(shipment.weight_kg);
+      if (newTotal > Number(window.vehicle_capacity_kg)) {
+        throw new Error(`Adding this shipment (${shipment.weight_kg}kg) would exceed vehicle capacity (${window.vehicle_capacity_kg}kg); current pool weight is ${existingWeight}kg`);
+      }
 
-    const result = await pool.query(
-      `INSERT INTO freight_pool_shipments (window_id, shipment_id, weight_kg, rate_per_kg_inr)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [windowId, shipmentId, shipment.weight_kg, ratePerKg]
-    );
+      const fillPctAfterJoin = (newTotal / Number(window.vehicle_capacity_kg)) * 100;
+      const ratePerKg = rateForFillPct(fillPctAfterJoin);
 
-    logger.info('Shipment joined freight pool window', { windowId, shipmentId, fillPctAfterJoin: fillPctAfterJoin.toFixed(1) });
-    return result.rows[0];
+      const result = await client.query(
+        `INSERT INTO freight_pool_shipments (window_id, shipment_id, weight_kg, rate_per_kg_inr)
+         VALUES ($1, $2, $3, $4) RETURNING *`,
+        [windowId, shipmentId, shipment.weight_kg, ratePerKg]
+      );
+
+      logger.info('Shipment joined freight pool window', { windowId, shipmentId, fillPctAfterJoin: fillPctAfterJoin.toFixed(1) });
+      return result.rows[0];
+    }, { name: 'freightPooling.joinPoolWindow' });
   }
 
   async listOpenWindows() {

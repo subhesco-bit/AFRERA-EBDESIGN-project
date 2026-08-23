@@ -16,35 +16,38 @@ function LabourManagementPage() {
   const [form, setForm] = useState(emptyWorker)
   const [attendanceForm, setAttendanceForm] = useState({ worker_id: '', date: '', status: 'present', hours: '' })
 
-  const { data: workersData, isLoading: workersLoading, error: workersError } = useQuery(
-    'labour-workers',
-    async () => (await labourAPI.getWorkers()).data?.data ?? []
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: workersData, isLoading: workersLoading, error: workersError } = useQuery({
+    queryKey: ['labour-workers'],
+    queryFn: async () => (await labourAPI.getWorkers()).data?.data ?? [],
+  })
 
-  const { data: attendanceData, isLoading: attendanceLoading, error: attendanceError } = useQuery(
-    'labour-attendance',
-    async () => (await labourAPI.getAttendance()).data?.data ?? []
-  )
+  const { data: attendanceData, isLoading: attendanceLoading, error: attendanceError } = useQuery({
+    queryKey: ['labour-attendance'],
+    queryFn: async () => (await labourAPI.getAttendance()).data?.data ?? [],
+  })
 
-  const { data: paymentsData } = useQuery(
-    'labour-payments',
-    async () => (await labourAPI.getPayments()).data?.data ?? []
-  )
+  const { data: paymentsData } = useQuery({
+    queryKey: ['labour-payments'],
+    queryFn: async () => (await labourAPI.getPayments()).data?.data ?? [],
+  })
 
-  const createWorkerMutation = useMutation((payload) => labourAPI.createWorker(payload), {
+  const createWorkerMutation = useMutation({
+    mutationFn: (payload) => labourAPI.createWorker(payload),
     onSuccess: () => {
       toast.success('Worker added')
-      queryClient.invalidateQueries('labour-workers')
+      queryClient.invalidateQueries({ queryKey: ['labour-workers'] })
       setShowForm(false)
       setForm(emptyWorker)
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to add worker'),
   })
 
-  const recordAttendanceMutation = useMutation((payload) => labourAPI.recordAttendance(payload), {
+  const recordAttendanceMutation = useMutation({
+    mutationFn: (payload) => labourAPI.recordAttendance(payload),
     onSuccess: () => {
       toast.success('Attendance recorded')
-      queryClient.invalidateQueries('labour-attendance')
+      queryClient.invalidateQueries({ queryKey: ['labour-attendance'] })
       setAttendanceForm({ worker_id: '', date: '', status: 'present', hours: '' })
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record attendance'),
@@ -167,7 +170,7 @@ function LabourManagementPage() {
                   <option value="half_day">Half day</option>
                 </select>
               </div>
-              <button type="submit" disabled={recordAttendanceMutation.isLoading}
+              <button type="submit" disabled={recordAttendanceMutation.isPending}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60 flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4 mr-2" />Record
               </button>
@@ -257,8 +260,8 @@ function LabourManagementPage() {
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
                   <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">Cancel</button>
-                  <button type="submit" disabled={createWorkerMutation.isLoading} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60">
-                    {createWorkerMutation.isLoading ? 'Saving...' : 'Add Worker'}
+                  <button type="submit" disabled={createWorkerMutation.isPending} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60">
+                    {createWorkerMutation.isPending ? 'Saving...' : 'Add Worker'}
                   </button>
                 </div>
               </form>

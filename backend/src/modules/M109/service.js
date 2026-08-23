@@ -207,7 +207,7 @@ async function generateInventoryReport(farmerId, reportType) {
     const report = {
       report_id: generateId(),
       farmer_id: farmerId,
-      report_type,
+      report_type: reportType,
       generated_at: new Date().toISOString(),
       total_parts: await getTotalParts(farmerId),
       total_value: await getTotalInventoryValue(farmerId),

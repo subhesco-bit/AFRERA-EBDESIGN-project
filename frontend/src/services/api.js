@@ -294,11 +294,16 @@ export const pricingAPI = {
   recordBasis: (body) => api.post('/pricing/basis', body),
 }
 
-/** GST, hash-chained ledger, schemes, eNWR, freight, risk (053). */
+/**
+ * Hash-chained ledger (read-only), schemes, eNWR, freight, risk (053).
+ * classifyGst/buildInvoice/ledgerEntry were removed 2026-08-17: the backend
+ * routes they called were deleted as dangerous duplicates (see
+ * backend/src/routes/recoveredFinanceRoutes.js) and neither wrapper had a
+ * caller anywhere in this codebase. Use marketplaceAPI.calculateProductGST/
+ * calculateOrderGST for GST (the canonical gstService.resolveGSTRate() path)
+ * and financeAPI.trialBalance/verifyLedger for the ledger instead.
+ */
 export const financeAPI = {
-  classifyGst: (params) => api.get('/finance/gst/classify', { params }),
-  buildInvoice: (body) => api.post('/finance/gst/invoice', body),
-  ledgerEntry: (body) => api.post('/finance/ledger/entry', body),
   trialBalance: () => api.get('/finance/ledger/trial-balance'),
   verifyLedger: () => api.get('/finance/ledger/verify'),
   matchSchemes: (params) => api.get('/finance/schemes/match', { params }),
@@ -518,7 +523,9 @@ export const poultryAPI = {
   listVaccinations: (flockId, params) => api.get(`/poultry/flocks/${flockId}/vaccinations`, { params }),
   recordVaccination: (flockId, body) => api.post(`/poultry/flocks/${flockId}/vaccinations`, body),
   getFlockPerformance: (flockId) => api.get(`/poultry/flocks/${flockId}/performance`),
-  getVaccinationAlerts: (flockId) => api.get(`/poultry/flocks/${flockId}/vaccination-alerts`),
+  // Real backend route returns alerts across all active flocks, not per-flock
+  // (no callers ever pass a real flockId - it was always undefined on the wire).
+  getVaccinationAlerts: () => api.get('/poultry/vaccination-alerts'),
 }
 
 /** M124 Goat Farming — Livestock domain. */
@@ -537,8 +544,9 @@ export const goatAPI = {
   listVaccinations: (animalId, params) => api.get(`/goat/herd/${animalId}/vaccinations`, { params }),
   recordVaccination: (animalId, body) => api.post(`/goat/herd/${animalId}/vaccinations`, body),
   getHerdPerformance: (animalId) => api.get(`/goat/herd/${animalId}/performance`),
-  getBreedingAlerts: (animalId) => api.get(`/goat/herd/${animalId}/breeding-alerts`),
-  getVaccinationAlerts: (animalId) => api.get(`/goat/herd/${animalId}/vaccination-alerts`),
+  // Real backend routes return alerts across the whole herd, not per-animal.
+  getBreedingAlerts: () => api.get('/goat/breeding-alerts'),
+  getVaccinationAlerts: () => api.get('/goat/vaccination-alerts'),
 }
 
 /** M125 Sheep Farming — Livestock domain. */
@@ -557,9 +565,10 @@ export const sheepAPI = {
   listVaccinations: (animalId, params) => api.get(`/sheep/flock/${animalId}/vaccinations`, { params }),
   recordVaccination: (animalId, body) => api.post(`/sheep/flock/${animalId}/vaccinations`, body),
   getFlockPerformance: (animalId) => api.get(`/sheep/flock/${animalId}/performance`),
-  getBreedingAlerts: (animalId) => api.get(`/sheep/flock/${animalId}/breeding-alerts`),
-  getVaccinationAlerts: (animalId) => api.get(`/sheep/flock/${animalId}/vaccination-alerts`),
-  getShearingAlerts: (animalId) => api.get(`/sheep/flock/${animalId}/shearing-alerts`),
+  // Real backend routes return alerts across the whole flock, not per-animal.
+  getBreedingAlerts: () => api.get('/sheep/breeding-alerts'),
+  getVaccinationAlerts: () => api.get('/sheep/vaccination-alerts'),
+  getShearingAlerts: () => api.get('/sheep/shearing-alerts'),
 }
 
 /** M126 Pig Farming — Livestock domain. */
@@ -578,8 +587,9 @@ export const pigAPI = {
   listVaccinations: (animalId, params) => api.get(`/pig/herd/${animalId}/vaccinations`, { params }),
   recordVaccination: (animalId, body) => api.post(`/pig/herd/${animalId}/vaccinations`, body),
   getHerdPerformance: (animalId) => api.get(`/pig/herd/${animalId}/performance`),
-  getBreedingAlerts: (animalId) => api.get(`/pig/herd/${animalId}/breeding-alerts`),
-  getVaccinationAlerts: (animalId) => api.get(`/pig/herd/${animalId}/vaccination-alerts`),
+  // Real backend routes return alerts across the whole herd, not per-animal.
+  getBreedingAlerts: () => api.get('/pig/breeding-alerts'),
+  getVaccinationAlerts: () => api.get('/pig/vaccination-alerts'),
   getFeedConversionRatio: (animalId) => api.get(`/pig/herd/${animalId}/fcr`),
 }
 
@@ -1015,19 +1025,10 @@ export const visionAPI = {
   detectObjects: (body) => api.post('/vision/detect', body),
 }
 
-/** Unified Ledger with Economy Segmentation — One Ledger + 9 Economies */
-export const unifiedLedgerAPI = {
-  createEntry: (body) => api.post('/unified-ledger/entries', body),
-  createCrossEconomyTransfer: (body) => api.post('/unified-ledger/cross-economy-transfer', body),
-  getUnifiedBalance: (currency) => api.get('/unified-ledger/balance/unified', { params: { currency } }),
-  getEconomyBalance: (economy, currency) => api.get(`/unified-ledger/balance/economy/${economy}`, { params: { currency } }),
-  getAllEconomyBalances: (currency) => api.get('/unified-ledger/balance/all', { params: { currency } }),
-  reconcileCrossEconomy: () => api.post('/unified-ledger/reconcile'),
-  getTrialBalance: (filters) => api.get('/unified-ledger/trial-balance', { params: filters }),
-  getEconomies: () => api.get('/unified-ledger/economies'),
-  getEntries: (filters) => api.get('/unified-ledger/entries', { params: filters }),
-  getTransfers: (filters) => api.get('/unified-ledger/transfers', { params: filters }),
-}
+// unifiedLedgerAPI ("One Ledger + 9 Economies") was removed 2026-08-17: the
+// backend it called was deleted as a rejected architecture (see
+// backend/src/index.js). UnifiedLedgerPage.jsx now points to /ledger
+// (financeAPI.trialBalance/verifyLedger) instead.
 
 /** FOLU land use, carbon and NE organic schemes (991). */
 export const foluAPI = {
@@ -1215,10 +1216,11 @@ export const competitorAPI = {
 
 /** Vendor / buyer orchestration API used by the logistics and corporate buyer pages. */
 export const vendorsAPI = {
-  getBuyerProfile: (buyerId) => api.get(`/vendors/buyers/${buyerId}/profile`),
-  getCreditStatus: (buyerId) => api.get(`/vendors/buyers/${buyerId}/credit-status`),
-  getActiveOrders: (buyerId) => api.get(`/vendors/buyers/${buyerId}/orders`),
-  createCorporateOrder: (body) => api.post('/vendors/buyers/orders', body),
+  // Real backend routes are under /vendors/corporate/..., not /vendors/buyers/...
+  getBuyerProfile: (buyerId) => api.get(`/vendors/corporate/${buyerId}/profile`),
+  getCreditStatus: (buyerId) => api.get(`/vendors/corporate/${buyerId}/credit-status`),
+  getActiveOrders: (buyerId) => api.get(`/vendors/corporate/${buyerId}/orders`),
+  createCorporateOrder: (body) => api.post('/vendors/corporate/orders', body),
   getLogisticsProfile: (providerId) => api.get(`/vendors/logistics/${providerId}/profile`),
   getActiveShipments: (providerId) => api.get(`/vendors/logistics/${providerId}/shipments`),
   getColdChainNodes: () => api.get('/vendors/logistics/cold-chain/nodes'),
@@ -2051,6 +2053,16 @@ export const pigFarmingAPI = {
   createAnimal: (data) => api.post('/pig-farming/animals', data),
   updateAnimal: (id, data) => api.put(`/pig-farming/animals/${id}`, data),
   deleteAnimal: (id) => api.delete(`/pig-farming/animals/${id}`),
+}
+
+/** Livestock feed records — no backend route exists yet (LivestockManagementPage.jsx's
+ *  "feed" tab notes this explicitly), but the frontend referenced this group without
+ *  it ever being defined, throwing ReferenceError the moment that tab rendered. */
+export const feedManagementAPI = {
+  getRecords: (params) => api.get('/livestock-feed/records', { params }),
+  createRecord: (data) => api.post('/livestock-feed/records', data),
+  updateRecord: (id, data) => api.put(`/livestock-feed/records/${id}`, data),
+  deleteRecord: (id) => api.delete(`/livestock-feed/records/${id}`),
 }
 
 /** Yield management — lots, fare buckets, markdown, booking curve (059).

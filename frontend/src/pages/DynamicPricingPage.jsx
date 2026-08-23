@@ -7,18 +7,21 @@ function DynamicPricingPage() {
   const [selectedTimeframe, setSelectedTimeframe] = useState('7d')
   const [selectedCommodity, setSelectedCommodity] = useState('all')
 
-  const { data: priceDynamics } = useQuery(
-    ['price-dynamics', selectedTimeframe, selectedCommodity],
-    () => farmersAPI.getPriceDynamics(selectedTimeframe, selectedCommodity)
-  )
+  // v5 react-query object syntax (see LoginPage.jsx)
+  const { data: priceDynamics } = useQuery({
+    queryKey: ['price-dynamics', selectedTimeframe, selectedCommodity],
+    queryFn: () => farmersAPI.getPriceDynamics(selectedTimeframe, selectedCommodity).then(r => r.data),
+  })
 
-  const { data: demandForecast } = useQuery('demand-forecast', () =>
-    farmersAPI.getDemandForecast()
-  )
+  const { data: demandForecast } = useQuery({
+    queryKey: ['demand-forecast'],
+    queryFn: () => farmersAPI.getDemandForecast().then(r => r.data),
+  })
 
-  const { data: priceSignals } = useQuery('price-signals', () =>
-    farmersAPI.getPriceSignals()
-  )
+  const { data: priceSignals } = useQuery({
+    queryKey: ['price-signals'],
+    queryFn: () => farmersAPI.getPriceSignals().then(r => r.data),
+  })
 
   return (
     <div className="container mx-auto px-4 py-8">

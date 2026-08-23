@@ -158,7 +158,7 @@ async function submitQuotation(bulkOrderId, sellerId, quotationData) {
     const quotation = {
       id: quotationId,
       bulk_order_id: bulkOrderId,
-      seller_id,
+      seller_id: sellerId,
       quoted_price,
       available_quantity,
       unit,
@@ -189,7 +189,7 @@ async function submitQuotation(bulkOrderId, sellerId, quotationData) {
     await signalBus.emit('b2b.quotation.submitted', {
       quotation_id: quotationId,
       bulk_order_id: bulkOrderId,
-      seller_id,
+      seller_id: sellerId,
       quoted_price,
       timestamp: new Date().toISOString()
     });
@@ -274,7 +274,7 @@ async function acceptQuotation(quotationId, buyerId) {
       order_id: orderId,
       quotation_id: quotationId,
       bulk_order_id: qtData.bulk_order_id,
-      buyer_id,
+      buyer_id: buyerId,
       seller_id: qtData.seller_id,
       total_amount: order.total_amount,
       timestamp: new Date().toISOString()
@@ -323,7 +323,7 @@ async function createContractFarming(buyerId, contractData) {
     
     const contract = {
       id: contractId,
-      buyer_id,
+      buyer_id: buyerId,
       farmer_id,
       crop_type,
       variety,
@@ -345,15 +345,15 @@ async function createContractFarming(buyerId, contractData) {
       INSERT INTO contract_farming 
       (id, buyer_id, farmer_id, crop_type, variety, contract_quantity, unit, agreed_price, 
        contract_start_date, contract_end_date, quality_standards, delivery_schedule, payment_terms, milestone_payments, status, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
     `, [contractId, buyerId, farmer_id, crop_type, variety, contract_quantity, unit, agreed_price,
         contract_start_date, contract_end_date, JSON.stringify(quality_standards), JSON.stringify(delivery_schedule),
         payment_terms, JSON.stringify(milestone_payments), 'active']);
-    
+
     // Emit signal bus event
     await signalBus.emit('b2b.contract_farming.created', {
-      contract_id,
-      buyer_id,
+      contract_id: contractId,
+      buyer_id: buyerId,
       farmer_id,
       contract_value: contract_quantity * agreed_price,
       timestamp: new Date().toISOString()
@@ -392,7 +392,7 @@ async function recordContractMilestone(contractId, milestoneData) {
     
     const milestone = {
       id: milestoneId,
-      contract_id,
+      contract_id: contractId,
       milestone_name,
       milestone_date,
       quantity_delivered,

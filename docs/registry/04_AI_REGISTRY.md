@@ -1,6 +1,6 @@
 # AI Registry
 
-**Generated:** 2026-08-04 by `tools/engineering-registry.js`
+**Generated:** 2026-08-17 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
@@ -10,12 +10,12 @@
 
 - Agents: **15**
 - Domains: **13**
-- Signal types: **25**
+- Signal types: **48**
 - Correlation rules: **6**
 - MCDA framework: **present**
 - Propose-only (no self-execution): **enforced**
 - Outcome feedback loop: **MISSING — agents cannot learn**
-- Fabricated outputs (`Math.random()` in services): **34**
+- Fabricated outputs (`Math.random()` in services): **69**
 
 ## Agents
 
@@ -50,12 +50,35 @@
 - `TEMPERATURE_BREACH` → `iot.temperature.breach`
 - `SENSOR_OFFLINE` → `iot.sensor.offline`
 - `SHIPMENT_DELAYED` → `logistics.shipment.delayed`
+- `CIVIL_DISRUPTION_REPORTED` → `logistics.disruption.reported`
+- `CIVIL_DISRUPTION_RESOLVED` → `logistics.disruption.resolved`
+- `GEOFENCE_ENTERED` → `logistics.geofence.entered`
+- `GEOFENCE_EXITED` → `logistics.geofence.exited`
 - `QUALITY_FAILED` → `quality.test.failed`
 - `RECALL_ISSUED` → `quality.recall.issued`
 - `SHELF_LIFE_CRITICAL` → `quality.shelf_life.critical`
 - `SOIL_RESULT_READY` → `agronomy.soil.result_ready`
 - `CROP_DISEASE_DETECTED` → `agronomy.disease.detected`
 - `WEATHER_ALERT` → `agronomy.weather.alert`
+- `ANIMAL_HEALTH_CHECK` → `livestock.animal.health_check`
+- `ANIMAL_TREATMENT` → `livestock.animal.treatment`
+- `DISEASE_OUTBREAK` → `livestock.disease.outbreak`
+- `QUARANTINE_ESTABLISHED` → `livestock.quarantine.established`
+- `QUARANTINE_LIFTED` → `livestock.quarantine.lifted`
+- `MILK_PRODUCTION_RECORDED` → `livestock.milk.production_recorded`
+- `BREEDING_RECORDED` → `livestock.breeding.recorded`
+- `VACCINATION_ADMINISTERED` → `livestock.vaccination.administered`
+- `FEED_CONSUMPTION_RECORDED` → `livestock.feed.consumption_recorded`
+- `HERD_PERFORMANCE_UPDATED` → `livestock.herd.performance_updated`
+- `TENANT_CREATED` → `platform.tenant.created`
+- `TENANT_UPDATED` → `platform.tenant.updated`
+- `TENANT_DELETED` → `platform.tenant.deleted`
+- `ORGANIZATION_CREATED` → `platform.organization.created`
+- `ORGANIZATION_UPDATED` → `platform.organization.updated`
+- `CONFIGURATION_CHANGED` → `platform.configuration.changed`
+- `SYSTEM_HEALTH_CHANGED` → `platform.system.health_changed`
+- `CAPACITY_FORECAST_UPDATED` → `platform.capacity.forecast_updated`
+- `SECURITY_THREAT_DETECTED` → `platform.security.threat_detected`
 - `WORKFLOW_STARTED` → `control.workflow.started`
 - `WORKFLOW_SLA_BREACHED` → `control.workflow.sla_breached`
 - `LEAD_QUALIFIED` → `control.crm.lead_qualified`

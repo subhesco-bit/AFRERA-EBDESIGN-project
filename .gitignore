@@ -17,3 +17,5 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 .vibecheck/provenance/attestations.db
+auth_store.json
+backend/src/database/*.json
