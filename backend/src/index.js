@@ -204,6 +204,8 @@ const platformCoreRoutes = require('./routes/platformCoreRoutes');
 // Unified Claude AI Coordinator
 const claudeAICoordinator = require('./core/claudeAICoordinator');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
+const libraryRoutes = require('./routes/libraryRoutes');
+const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
 // SAP Module Architecture Service - Independent Module Architecture
 const sapModuleArchitectureService = require('./services/sapModuleArchitectureService');
 // Advance Rate Pricing — forward curves, basis, commitment advice.
@@ -556,6 +558,11 @@ mountRoute('/api/v1/mill-fpo', millCircuitService);
 mountRoute('/api/v1/digital-product-passport', digitalProductPassportService);
 mountRoute('/api/v1/recipe-intelligence', recipeIntelligenceService);
 mountRoute('/api/v1/forms', formService);
+// analyticsService exports plain aggregation functions, not a .router - it's an
+// internal library consumed directly by tenantManagement/systemAdministration/
+// platformConfiguration/organizationManagement/roleManagement/agriculturalIntelligence
+// services, not a REST endpoint. mountRoute() silently no-ops for it, same as
+// farmerService/gstService above.
 mountRoute('/api/v1/analytics', analyticsService);
 mountRoute('/api/v1/modules', moduleCatalogService);
 // decisionSupportService uses setupRoutes instead of mountRoute
@@ -569,7 +576,9 @@ mountRoute('/api/v1/control', enterpriseControlService);
 mountRoute('/api/v1/intel', v42IntelligenceService);
 mountRoute('/api/v1/value', farmerValueService);
 mountRoute('/api/v1/merchandising', merchandisingService);
-mountRoute('/api/v1/engineering', require('./routes/engineeringProjectRoutes'));
+// engineeringProjectRoutes exports the router directly (not { router }), so it
+// bypasses mountRoute()'s .router check - matches every other *Routes.js mount below.
+app.use('/api/v1/engineering', require('./routes/engineeringProjectRoutes'));
 // Mount User Management (M011)
 mountRoute('/api/v1/users', userModule);
 // Mount System Administration (M006)
@@ -640,6 +649,8 @@ app.use('/api/v1/mfa', mfaRoutes);
 app.use('/api/v1/privacy', gdprRoutes);
 app.use('/api/v1/platform', platformCoreRoutes);
 app.use('/api/v1/ai', unifiedAIRoutes);
+app.use('/api/v1/library', libraryRoutes);
+app.use('/api/v1/ai-collaboration', aiCollaborationRoutes);
 app.use('/api/v1/advanced', advancedFeatures);
 app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
 

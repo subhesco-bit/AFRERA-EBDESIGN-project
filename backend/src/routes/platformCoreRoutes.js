@@ -1,159 +1,122 @@
 /**
- * Platform Core Module Routes - AI Enhanced
- * 
- * Routes for platform core functionality with AI-powered capabilities:
- * - Platform health monitoring
- * - Auto-scaling recommendations
- * - Capacity planning
- * - Disaster recovery
- * - Performance monitoring
- * - Self-healing
- * - Configuration optimization
+ * M001 Platform Core Routes
+ * Platform configuration and core functionality endpoints
  */
 
 const express = require('express');
 const router = express.Router();
 const platformCoreService = require('../services/platformCoreService');
-const { authMiddleware, requireRole } = require('../middleware/auth');
-const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
-const { logger } = require('../utils/logger');
+const { authMiddleware } = require('../middleware/auth');
+const { adminMiddleware } = require('../middleware/admin');
 
-// Initialize platform core
-router.post('/initialize', authMiddleware, requireRole('admin'), async (req, res) => {
+/**
+ * GET /api/v1/platform/config
+ * Get platform configuration
+ */
+router.get('/config', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const result = await platformCoreService.initialize();
-    res.json(result);
+    const config = await platformCoreService.getPlatformConfig();
+    
+    res.json({
+      success: true,
+      data: config
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Get platform config error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get platform configuration'
+    });
   }
 });
 
-// Get platform health status
-router.get('/health', authMiddleware, async (req, res) => {
+/**
+ * PUT /api/v1/platform/config/:key
+ * Update platform configuration
+ */
+router.put('/config/:key', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { key } = req.params;
+    const { value } = req.body;
+    const updatedBy = req.user.id;
+    
+    const updatedConfig = await platformCoreService.updatePlatformConfig(key, value, updatedBy);
+    
+    res.json({
+      success: true,
+      data: updatedConfig,
+      message: 'Platform configuration updated successfully'
+    });
+  } catch (error) {
+    console.error('Update platform config error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update platform configuration'
+    });
+  }
+});
+
+/**
+ * GET /api/v1/platform/health
+ * Get platform health status
+ */
+router.get('/health', async (req, res) => {
   try {
     const health = await platformCoreService.getPlatformHealth();
-    res.json(health);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Get scaling recommendations
-router.get('/scaling/recommendations', authMiddleware, requireRole('admin', 'ops'), async (req, res) => {
-  try {
-    const recommendations = await platformCoreService.getScalingRecommendations();
-    res.json(recommendations);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Predict capacity needs
-router.get('/capacity/predict', authMiddleware, requireRole('admin', 'ops'), async (req, res) => {
-  try {
-    const { timeframe = '24h' } = req.query;
-    const prediction = await platformCoreService.predictCapacityNeeds(timeframe);
-    res.json(prediction);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Trigger disaster recovery
-router.post('/disaster-recovery', authMiddleware, requireRole('admin'), async (req, res) => {
-  try {
-    const result = await platformCoreService.triggerDisasterRecovery(req.body);
     
-    // Emit signal for disaster recovery
-    signalBus.emitSignal(SIGNAL.EMERGENCY_RAISED, {
-      incidentId: result.incidentId,
-      recoveryStatus: result.status,
-      recoveryTime: result.recoveryTime,
-      dataLoss: result.dataLoss
-    }, {
-      severity: SEVERITY.CRITICAL,
-      source: 'platform_core_routes',
-      entityId: result.incidentId
+    const statusCode = health.status === 'healthy' ? 200 : 503;
+    res.status(statusCode).json({
+      success: health.status === 'healthy',
+      data: health
     });
-    
-    res.json(result);
   } catch (error) {
-    logger.error('platformCoreRoutes:disasterRecovery', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Monitor performance
-router.get('/performance/monitor', authMiddleware, requireRole('admin', 'ops'), async (req, res) => {
-  try {
-    const monitoring = await platformCoreService.monitorPerformance();
-    res.json(monitoring);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Trigger self-healing
-router.post('/self-healing', authMiddleware, requireRole("admin"), async (req, res) => {
-  try {
-    const result = await platformCoreService.triggerSelfHealing(req.body);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Get optimized configuration
-router.get('/configuration/optimized', authMiddleware, requireRole("admin"), async (req, res) => {
-  try {
-    const optimization = await platformCoreService.getOptimizedConfiguration();
-    res.json(optimization);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Apply configuration changes
-router.post('/configuration/apply', authMiddleware, requireRole("admin"), async (req, res) => {
-  try {
-    const result = await platformCoreService.applyOptimizedConfiguration(req.body);
-    
-    // Emit signal for configuration change
-    signalBus.emitSignal(SIGNAL.CONFIGURATION_CHANGED, {
-      configId: result.configId,
-      changes: req.body,
-      appliedBy: 'admin',
-      monitoringStatus: result.monitoring
-    }, {
-      severity: SEVERITY.NOTICE,
-      source: 'platform_core_routes',
-      entityId: result.configId
+    console.error('Get platform health error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get platform health'
     });
+  }
+});
+
+/**
+ * GET /api/v1/platform/stats
+ * Get platform statistics
+ */
+router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const stats = await platformCoreService.getPlatformStats();
     
-    res.json(result);
+    res.json({
+      success: true,
+      data: stats
+    });
   } catch (error) {
-    logger.error('platformCoreRoutes:applyConfiguration', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Get platform stats error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get platform statistics'
+    });
   }
 });
 
-// Get performance metrics
-router.get('/metrics', authMiddleware, async (req, res) => {
+/**
+ * GET /api/v1/platform/optimizations
+ * Get AI-powered platform optimization recommendations
+ */
+router.get('/optimizations', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const metrics = await platformCoreService.collectPerformanceMetrics();
-    res.json({ metrics });
+    const optimizations = await platformCoreService.getPlatformOptimizations();
+    
+    res.json({
+      success: true,
+      data: optimizations
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Get system state
-router.get('/state', authMiddleware, requireRole("admin"), async (req, res) => {
-  try {
-    const state = await platformCoreService.getSystemState();
-    res.json(state);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Get platform optimizations error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get platform optimizations'
+    });
   }
 });
 
