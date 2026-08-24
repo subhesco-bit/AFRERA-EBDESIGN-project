@@ -2023,36 +2023,53 @@ export const cattleRegistryAPI = {
 }
 
 /** M123 — Poultry Management (Livestock). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /poultry/batches. The real
+// backend (poultryService.js/poultryRoutes.js, migration 067) is a flock
+// registry at /poultry/flocks - see LivestockManagementPage.jsx's 'poultry'
+// tab, rewired to match its real field names (flock_code/flock_type/etc).
 export const poultryManagementAPI = {
-  getBatches: (params) => api.get('/poultry/batches', { params }),
-  createBatch: (data) => api.post('/poultry/batches', data),
-  updateBatch: (id, data) => api.put(`/poultry/batches/${id}`, data),
-  deleteBatch: (id) => api.delete(`/poultry/batches/${id}`),
+  getBatches: (params) => api.get('/poultry/flocks', { params }),
+  createBatch: (data) => api.post('/poultry/flocks', data),
+  updateBatch: (id, data) => api.put(`/poultry/flocks/${id}`, data),
+  deleteBatch: (id) => api.delete(`/poultry/flocks/${id}`),
 }
 
 /** M124 — Goat Farming Management (Livestock). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /goat-farming/animals. The real
+// backend (goatService.js/goatRoutes.js, migration 068) is a herd registry
+// at /goat/herd - see LivestockManagementPage.jsx's 'goat' tab, rewired to
+// match its real field names (tag_id/sex/dob/etc).
 export const goatFarmingAPI = {
-  getAnimals: (params) => api.get('/goat-farming/animals', { params }),
-  createAnimal: (data) => api.post('/goat-farming/animals', data),
-  updateAnimal: (id, data) => api.put(`/goat-farming/animals/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/goat-farming/animals/${id}`),
+  getAnimals: (params) => api.get('/goat/herd', { params }),
+  createAnimal: (data) => api.post('/goat/herd', data),
+  updateAnimal: (id, data) => api.put(`/goat/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`/goat/herd/${id}`),
 }
 
 /** M125 — Sheep Farming Management (Livestock). ABSENT — no trace of this
  *  capability anywhere in the codebase. */
+// Fixed 2026-08-24: was calling nonexistent /sheep-farming/animals (and the
+// page comment's "catalogued ABSENT" claim was wrong). The real backend
+// (sheepService.js/sheepRoutes.js, migration 069) is a flock registry at
+// /sheep/flock - see LivestockManagementPage.jsx's 'sheep' tab, rewired to
+// match its real field names (tag_id/sex/dob/wool_type/etc).
 export const sheepFarmingAPI = {
-  getAnimals: (params) => api.get('/sheep-farming/animals', { params }),
-  createAnimal: (data) => api.post('/sheep-farming/animals', data),
-  updateAnimal: (id, data) => api.put(`/sheep-farming/animals/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/sheep-farming/animals/${id}`),
+  getAnimals: (params) => api.get('/sheep/flock', { params }),
+  createAnimal: (data) => api.post('/sheep/flock', data),
+  updateAnimal: (id, data) => api.put(`/sheep/flock/${id}`, data),
+  deleteAnimal: (id) => api.delete(`/sheep/flock/${id}`),
 }
 
 /** M126 — Pig Farming Management (Livestock). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /pig-farming/animals. The real
+// backend (pigService.js/pigRoutes.js, migration 070) is a herd registry
+// at /pig/herd - see LivestockManagementPage.jsx's 'pig' tab, rewired to
+// match its real field names (tag_id/sex/dob/pen_id/etc).
 export const pigFarmingAPI = {
-  getAnimals: (params) => api.get('/pig-farming/animals', { params }),
-  createAnimal: (data) => api.post('/pig-farming/animals', data),
-  updateAnimal: (id, data) => api.put(`/pig-farming/animals/${id}`, data),
-  deleteAnimal: (id) => api.delete(`/pig-farming/animals/${id}`),
+  getAnimals: (params) => api.get('/pig/herd', { params }),
+  createAnimal: (data) => api.post('/pig/herd', data),
+  updateAnimal: (id, data) => api.put(`/pig/herd/${id}`, data),
+  deleteAnimal: (id) => api.delete(`/pig/herd/${id}`),
 }
 
 /** Livestock feed records — no backend route exists yet (LivestockManagementPage.jsx's
@@ -2075,12 +2092,12 @@ export const yieldManagementAPI = {
 }
 
 /** M129 — Breeding Management (Livestock). No backend route found. */
-export const breedingManagementAPI = {
-  getRecords: (params) => api.get('/breeding/records', { params }),
-  createRecord: (data) => api.post('/breeding/records', data),
-  updateRecord: (id, data) => api.put(`/breeding/records/${id}`, data),
-  deleteRecord: (id) => api.delete(`/breeding/records/${id}`),
-}
+// breedingManagementAPI removed 2026-08-24: the generic cross-species
+// "breeding/records" tab it backed was retired (see
+// LivestockManagementPage.jsx) - goat/sheep/pig already track breeding for
+// real via their own herd/flock endpoints, and cattle/poultry have no
+// breeding backend at all. A generic table here would have forked from the
+// real per-species data for 3 of 5 species.
 
 /** M130 — Livestock Analytics (Livestock). No backend route found. */
 export const livestockAnalyticsAPI = {

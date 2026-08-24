@@ -281,6 +281,12 @@ const {
   fisheriesWaterQualityRoutes, fishHealthRoutes, fisheriesHarvestRoutes,
   fishProcessingRoutes, coldFishChainRoutes, aquacultureAnalyticsRoutes,
 } = require('./routes/fisheriesManagementRoutes');
+// Permission/SSO/MFA/digital-identity/consent CRUD + a real admin view over
+// M012's sessions table (2026-08-21). M014 Role Management already real.
+const {
+  permissionManagementRoutes, ssoRoutes, mfaManagementRoutes,
+  digitalIdentityRoutes, consentManagementRoutes, sessionManagementRoutes,
+} = require('./routes/identityManagementRoutes');
 // Role management (M014) — real service, real frontend caller
 // (frontend/src/services/api.js getRoles/createRole/updateRole/deleteRole
 // against /roles), but no backend anywhere until now (2026-08-21).
@@ -347,6 +353,8 @@ const equipmentExchangeRoutes = require('./routes/equipmentExchangeRoutes');
 const visionRoutes = require('./routes/visionRoutes');
 // AI Gateway Routes - Real AI Backbone System
 const aiGatewayRoutes = require('./routes/aiGatewayRoutes');
+// AI Intelligence Fabric - Professional AI module with unique IDs (EBD-MOD-00000001)
+const { initializeAI, handleAIRequest } = require('./core/ai/index');
 // AI Agent Routes - Agentic AI Capabilities
 const aiAgentRoutes = require('./routes/aiAgentRoutes');
 // AI Brain Routes - Cognitive Processing Layer
@@ -746,6 +754,12 @@ app.use('/api/v1/fisheries-harvest', fisheriesHarvestRoutes);
 app.use('/api/v1/fish-processing', fishProcessingRoutes);
 app.use('/api/v1/cold-fish-chain', coldFishChainRoutes);
 app.use('/api/v1/aquaculture-analytics', aquacultureAnalyticsRoutes);
+app.use('/api/v1/permissions', permissionManagementRoutes);
+app.use('/api/v1/sso-providers', ssoRoutes);
+app.use('/api/v1/mfa-devices', mfaManagementRoutes);
+app.use('/api/v1/digital-identities', digitalIdentityRoutes);
+app.use('/api/v1/consent-records', consentManagementRoutes);
+app.use('/api/v1/sessions', sessionManagementRoutes);
 app.use('/api/v1/roles', roleManagementRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/climate-advisory', climateAdvisoryRoutes);
@@ -787,6 +801,17 @@ app.use('/api/v1/equipment-exchange', equipmentExchangeRoutes);
 app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
 app.use('/api/v1/ai-gateway', aiGatewayRoutes);
+// AI Intelligence Fabric Routes (EBD-MOD-00000001)
+app.post('/api/v1/ai/orchestrate', handleAIRequest);
+app.post('/api/v1/ai/classify', handleAIRequest);
+app.get('/api/v1/ai/capabilities', (req, res) => {
+  const { getAIStatus } = require('./core/ai/index');
+  res.json({ success: true, data: getAIStatus() });
+});
+app.get('/api/v1/ai/audit', (req, res) => {
+  const { getAIStatus } = require('./core/ai/index');
+  res.json({ success: true, data: getAIStatus() });
+});
 // AI Agent - Agentic AI Capabilities
 app.use('/api/v1/ai-agent', aiAgentRoutes);
 // AI Brain - Cognitive Processing Layer
@@ -1089,6 +1114,16 @@ async function startServer() {
   }
 
   const PORT = process.env.PORT || 3001;
+  
+  // Initialize AI Intelligence Fabric (EBD-MOD-00000001)
+  try {
+    await initializeAI();
+    logger.info('AI Intelligence Fabric initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize AI Intelligence Fabric', { error: error.message });
+    logger.warn('Continuing without AI Intelligence Fabric...');
+  }
+  
   httpServer.listen(PORT, async () => {
     logger.info(`AFRERA Backend Server running on port ${PORT}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
