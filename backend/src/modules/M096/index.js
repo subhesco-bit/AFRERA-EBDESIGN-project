@@ -1,2 +1,2 @@
 ﻿// M096 - Equipment Scheduling
-module.exports = { controller: require('./controller'), service: require('./service') };
+module.exports = { controller: require('./controller'), service: require('./service'), router: require('./routes') };

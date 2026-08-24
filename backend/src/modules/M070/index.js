@@ -1,2 +1,2 @@
 ﻿// M070 - Yield Recording
-module.exports = { controller: require('./controller'), service: require('./service') };
+module.exports = { controller: require('./controller'), service: require('./service'), router: require('./routes') };

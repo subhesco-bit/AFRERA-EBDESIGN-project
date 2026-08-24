@@ -1,2 +1,2 @@
 ﻿// M008 - Localization Management
-module.exports = { controller: require('./controller'), service: require('./service') };
+module.exports = { controller: require('./controller'), service: require('./service'), router: require('./routes') };
