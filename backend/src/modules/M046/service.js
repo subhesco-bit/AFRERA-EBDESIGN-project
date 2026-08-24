@@ -12,10 +12,10 @@ async function createNursery(nurseryData) {
   const { farmerId, name, location, area, type, capacity, irrigationType, notes } = nurseryData;
 
   const res = await pg.query(
-    `INSERT INTO nurseries (farmer_id, name, location, area, type, capacity, irrigation_type, notes, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', NOW(), NOW())
+    `INSERT INTO nurseries (farmer_id, nursery_name, village, location, area, nursery_type, capacity, irrigation_type, notes, status, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'active', NOW(), NOW())
      RETURNING *`,
-    [farmerId, name, JSON.stringify(location), area, type, capacity, irrigationType, notes]
+    [farmerId, name, location?.village || location?.district || 'Unknown', JSON.stringify(location || null), area, type, capacity, irrigationType, notes]
   );
 
   // Emit signal for nursery creation
@@ -55,7 +55,7 @@ async function listNurseries({ page = 1, limit = 20, farmerId, type, status } = 
     params.push(farmerId);
   }
   if (type) {
-    query += ` AND type = $${paramIndex++}`;
+    query += ` AND nursery_type = $${paramIndex++}`;
     params.push(type);
   }
   if (status) {
@@ -81,18 +81,20 @@ async function updateNursery(nurseryId, updates) {
 
   const res = await pg.query(
     `UPDATE nurseries
-     SET name = COALESCE($1, name),
-         location = COALESCE($2, location),
-         area = COALESCE($3, area),
-         type = COALESCE($4, type),
-         capacity = COALESCE($5, capacity),
-         irrigation_type = COALESCE($6, irrigation_type),
-         notes = COALESCE($7, notes),
-         status = COALESCE($8, status),
+     SET nursery_name = COALESCE($1, nursery_name),
+         village = COALESCE($2, village),
+         location = COALESCE($3, location),
+         area = COALESCE($4, area),
+         nursery_type = COALESCE($5, nursery_type),
+         capacity = COALESCE($6, capacity),
+         irrigation_type = COALESCE($7, irrigation_type),
+         notes = COALESCE($8, notes),
+         status = COALESCE($9, status),
          updated_at = NOW()
-     WHERE id = $9
+     WHERE id = $10
      RETURNING *`,
-    [name, location ? JSON.stringify(location) : null, area, type, capacity, irrigationType, notes, status, nurseryId]
+    [name, location?.village || location?.district || null, location ? JSON.stringify(location) : null,
+      area, type, capacity, irrigationType, notes, status, nurseryId]
   );
 
   // Emit signal for nursery update
@@ -250,7 +252,7 @@ async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
 
   let query = `
     SELECT
-      type,
+      nursery_type AS type,
       COUNT(*) as count,
       SUM(capacity) as total_capacity,
       AVG(capacity) as avg_capacity
