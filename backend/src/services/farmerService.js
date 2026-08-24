@@ -273,34 +273,44 @@ async function getFarmerCertifications(farmerId) {
 async function getFPOs(filters = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     const { state, min_members } = filters;
-    
+
+    // fpos has no state column - it's on the joined address (fpos.address_id ->
+    // addresses.id). And min_members can't be a HAVING clause without a
+    // GROUP BY: with none, HAVING treats the whole result as a single group,
+    // so "HAVING COUNT(*) >= N" checks whether the TOTAL number of matching
+    // FPO rows is >= N, not each FPO's own member count - it silently returns
+    // either every row or none, never actually filtering per-FPO. Moved to a
+    // WHERE-clause correlated subquery, matching what's already shown in the
+    // SELECT list.
     let query = `
-      SELECT fpo.*, 
+      SELECT fpo.*, a.state,
              (SELECT COUNT(*) FROM farmers WHERE fpo_id = fpo.id) as member_count
       FROM fpos fpo
+      LEFT JOIN addresses a ON fpo.address_id = a.id
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (state) {
       paramCount++;
-      query += ` AND fpo.state = $${paramCount}`;
+      query += ` AND a.state = $${paramCount}`;
       params.push(state);
     }
-    
+
     if (min_members) {
-      query += ` HAVING COUNT(*) >= $${paramCount + 1}`;
+      paramCount++;
+      query += ` AND (SELECT COUNT(*) FROM farmers WHERE fpo_id = fpo.id) >= $${paramCount}`;
       params.push(min_members);
     }
-    
+
     query += ' ORDER BY fpo.name';
-    
+
     const result = await pg.query(query, params);
-    
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching FPOs', { error: error.message, stack: error.stack });
@@ -399,25 +409,51 @@ async function depositToWallet(farmerId, amount, paymentMethod, reference) {
     const pg = getPostgreSQL();
     const wallet = await getFarmerWallet(farmerId);
 
-    const query = `
-      INSERT INTO wallet_transactions 
-      (wallet_id, type, amount, balance_after, description, reference_id, payment_method, status)
-      VALUES ($1, 'credit', $2, $3, $4, $5, $6, 'completed')
-      RETURNING *
-    `;
+    const amt = parseFloat(amount);
+    if (!(amt > 0)) {
+      throw new Error('Deposit amount must be positive');
+    }
 
-    const newBalance = parseFloat(wallet.balance) + parseFloat(amount);
-    const result = await pg.query(query, [
-      wallet.id,
-      amount,
-      newBalance,
-      `Deposit via ${paymentMethod}`,
-      reference,
-      paymentMethod
-    ]);
+    // Previously this computed newBalance from the wallet row read above and
+    // only ever wrote it into wallet_transactions.balance_after - the actual
+    // farmer_wallets.balance column was never updated, so every deposit was
+    // "recorded" but never actually credited. Fixed with an atomic increment
+    // (UPDATE ... SET balance = balance + $1) so the new balance comes from
+    // Postgres reading its own current row, not a value read earlier in JS -
+    // two concurrent deposits can't lose one via a stale read - and both
+    // statements run in one transaction so a crash between them can't leave
+    // the balance changed with no transaction record, or vice versa.
+    const txClient = await pg.connect();
+    let result;
+    try {
+      await txClient.query('BEGIN');
 
-    logger.info(`Deposit of ${amount} to wallet ${wallet.id} successful`);
-    return result.rows[0];
+      const updateResult = await txClient.query(
+        `UPDATE farmer_wallets SET balance = balance + $1, updated_at = NOW()
+         WHERE id = $2 RETURNING balance`,
+        [amt, wallet.id]
+      );
+      const newBalance = updateResult.rows[0].balance;
+
+      const insertResult = await txClient.query(
+        `INSERT INTO wallet_transactions
+           (wallet_id, type, amount, balance_after, description, reference_id, payment_method, status)
+         VALUES ($1, 'credit', $2, $3, $4, $5, $6, 'completed')
+         RETURNING *`,
+        [wallet.id, amt, newBalance, `Deposit via ${paymentMethod}`, reference, paymentMethod]
+      );
+
+      await txClient.query('COMMIT');
+      result = insertResult.rows[0];
+    } catch (txErr) {
+      await txClient.query('ROLLBACK');
+      throw txErr;
+    } finally {
+      txClient.release();
+    }
+
+    logger.info(`Deposit of ${amt} to wallet ${wallet.id} successful, new balance ${result.balance_after}`);
+    return result;
   } catch (error) {
     logger.error('Error depositing to wallet', { error: error.message, stack: error.stack });
     throw error;
@@ -429,29 +465,55 @@ async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
     const pg = getPostgreSQL();
     const wallet = await getFarmerWallet(farmerId);
 
-    if (parseFloat(wallet.balance) < parseFloat(amount)) {
-      throw new Error('Insufficient balance');
+    const amt = parseFloat(amount);
+    if (!(amt > 0)) {
+      throw new Error('Withdrawal amount must be positive');
     }
 
-    const query = `
-      INSERT INTO wallet_transactions 
-      (wallet_id, type, amount, balance_after, description, reference_id, bank_account, status)
-      VALUES ($1, 'debit', $2, $3, $4, $5, $6, 'completed')
-      RETURNING *
-    `;
+    // Same bug as depositToWallet: farmer_wallets.balance was never actually
+    // updated, only wallet_transactions.balance_after. Also, the old balance
+    // check read wallet.balance before the write - two concurrent withdrawals
+    // could both pass that check against the same stale balance and jointly
+    // overdraw the wallet. Fixed with a single conditional atomic update:
+    // "balance - $1 WHERE balance >= $1" checks and decrements in the same
+    // statement, so Postgres's own row-level locking during the UPDATE
+    // prevents both problems at once. If the WHERE clause doesn't match
+    // (insufficient funds), RETURNING yields no row.
+    const txClient = await pg.connect();
+    let result;
+    try {
+      await txClient.query('BEGIN');
 
-    const newBalance = parseFloat(wallet.balance) - parseFloat(amount);
-    const result = await pg.query(query, [
-      wallet.id,
-      amount,
-      newBalance,
-      'Withdrawal to bank account',
-      reference,
-      bankAccount
-    ]);
+      const updateResult = await txClient.query(
+        `UPDATE farmer_wallets SET balance = balance - $1, updated_at = NOW()
+         WHERE id = $2 AND balance >= $1 RETURNING balance`,
+        [amt, wallet.id]
+      );
 
-    logger.info(`Withdrawal of ${amount} from wallet ${wallet.id} successful`);
-    return result.rows[0];
+      if (updateResult.rows.length === 0) {
+        throw new Error('Insufficient balance');
+      }
+      const newBalance = updateResult.rows[0].balance;
+
+      const insertResult = await txClient.query(
+        `INSERT INTO wallet_transactions
+           (wallet_id, type, amount, balance_after, description, reference_id, bank_account, status)
+         VALUES ($1, 'debit', $2, $3, $4, $5, $6, 'completed')
+         RETURNING *`,
+        [wallet.id, amt, newBalance, 'Withdrawal to bank account', reference, bankAccount]
+      );
+
+      await txClient.query('COMMIT');
+      result = insertResult.rows[0];
+    } catch (txErr) {
+      await txClient.query('ROLLBACK');
+      throw txErr;
+    } finally {
+      txClient.release();
+    }
+
+    logger.info(`Withdrawal of ${amt} from wallet ${wallet.id} successful, new balance ${result.balance_after}`);
+    return result;
   } catch (error) {
     logger.error('Error withdrawing from wallet', { error: error.message, stack: error.stack });
     throw error;
@@ -577,10 +639,23 @@ async function getWalletBalance(farmerId) {
 async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, accountHolder) {
   try {
     const pg = getPostgreSQL();
+
+    // Previously every linked account was inserted with is_primary=true - no
+    // constraint stops that, so a farmer's second/third account would each
+    // become "primary" too, and anything that assumes at most one primary
+    // account (payout routing, display) would just get whichever row a query
+    // happened to return first. Only the farmer's first account defaults to
+    // primary; later ones don't, until there's an explicit "set primary" flow.
+    const existing = await pg.query(
+      'SELECT COUNT(*) FROM farmer_bank_accounts WHERE farmer_id = $1',
+      [farmerId]
+    );
+    const isPrimary = parseInt(existing.rows[0].count, 10) === 0;
+
     const query = `
-      INSERT INTO farmer_bank_accounts 
+      INSERT INTO farmer_bank_accounts
       (farmer_id, bank_name, account_number, ifsc_code, account_holder, is_primary, verified)
-      VALUES ($1, $2, $3, $4, $5, true, false)
+      VALUES ($1, $2, $3, $4, $5, $6, false)
       RETURNING *
     `;
 
@@ -589,7 +664,8 @@ async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, acco
       bankName,
       accountNumber,
       ifscCode,
-      accountHolder
+      accountHolder,
+      isPrimary
     ]);
 
     logger.info(`Bank account linked for farmer ${farmerId}`);
