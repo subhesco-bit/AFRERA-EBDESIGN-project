@@ -149,11 +149,15 @@ function generateRefreshToken(user) {
 function verifyToken(token) {
   try {
     const secret = JWT_CONFIG.secret;
-    // In test mode tests sign tokens without issuer/audience; relax checks there
+    // Pin the algorithm explicitly so a token can't be forged by switching to
+    // 'none' or an asymmetric alg (algorithm confusion hardening).
+    // In test mode tests sign tokens without issuer/audience; relax those two
+    // checks there, but algorithms is always pinned regardless of environment.
     if (process.env.NODE_ENV === 'test') {
-      return jwt.verify(token, secret);
+      return jwt.verify(token, secret, { algorithms: ['HS256'] });
     }
     return jwt.verify(token, secret, {
+      algorithms: ['HS256'],
       issuer: JWT_CONFIG.issuer,
       audience: JWT_CONFIG.audience
     });

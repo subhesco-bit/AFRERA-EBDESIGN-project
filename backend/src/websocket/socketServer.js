@@ -5,7 +5,14 @@
 
 const WebSocket = require('ws');
 const { logger } = require('../utils/logger');
-const { verifyJWT } = require('../middleware/auth');
+// BUG FIX: this destructured `verifyJWT` from middleware/auth.js, which
+// never exported anything by that name (it exports authMiddleware and
+// friends - see module.exports at the bottom of that file). The
+// destructure silently resolved to `undefined`, so every WebSocket
+// connection attempt crashed with "verifyJWT is not a function" the moment
+// a token was presented. Token verification actually lives in
+// services/authService.js as `verifyToken`.
+const { verifyToken } = require('../services/authService');
 
 class SocketServer {
   constructor() {
@@ -46,7 +53,13 @@ class SocketServer {
       }
 
       // Verify JWT token
-      const decoded = await verifyJWT(token);
+      let decoded;
+      try {
+        decoded = verifyToken(token);
+      } catch (verifyError) {
+        ws.close(1008, 'Invalid token');
+        return;
+      }
       const userId = decoded.userId;
 
       if (!userId) {

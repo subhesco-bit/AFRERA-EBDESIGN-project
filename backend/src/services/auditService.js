@@ -3,7 +3,13 @@
  * Comprehensive audit trail and reporting system
  */
 
-const logger = require('../utils/logger');
+// BUG FIX: this assigned the whole logger MODULE (an object shaped
+// { logger, childLogger, httpLogger, logError }) to the bare `logger`
+// identifier, then called `.info`/`.error` on it below as if it were the
+// logger instance itself. Since the module object has no `.info`/`.error`
+// methods, every call site threw "logger.info is not a function" at
+// runtime. Destructure the actual logger instance out of the module.
+const { logger } = require('../utils/logger');
 
 class AuditService {
   constructor() {

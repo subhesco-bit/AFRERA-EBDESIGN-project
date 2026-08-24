@@ -8,10 +8,7 @@ process.env.REDIS_PORT = '6379';
 
 // Mock external services
 jest.mock('axios');
-jest.mock('nodemailer');
 jest.mock('twilio');
-jest.mock('firebase-admin');
-jest.mock('aws-sdk');
 
 // ---------------------------------------------------------------------------
 // Database mocks

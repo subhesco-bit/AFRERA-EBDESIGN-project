@@ -204,8 +204,10 @@ const platformCoreRoutes = require('./routes/platformCoreRoutes');
 // Unified Claude AI Coordinator
 const claudeAICoordinator = require('./core/claudeAICoordinator');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
-// SAP Module Architecture Service - Independent Module Architecture
-const sapModuleArchitectureService = require('./services/sapModuleArchitectureService');
+// SAP Module Architecture Service require REMOVED 2026-08-24 (route
+// reconciliation) — fake in-memory module registry, never mounted from
+// this require site anyway (dead duplicate require). See
+// docs/registry/ROUTE_RECONCILIATION.md.
 // Advance Rate Pricing — forward curves, basis, commitment advice.
 // Recovered from afrera_platform_v44.html (migration 051).
 const riskPricingRoutes = require('./routes/riskPricingRoutes');
@@ -384,8 +386,10 @@ const aiBrainRoutes = require('./routes/aiBrainRoutes');
 const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes');
 // AI Operation Intelligence Routes - Real-Time Optimization Layer
 const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes');
-// SAP Module Architecture Routes - Independent Module Architecture
-const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes');
+// SAP Module Architecture Routes - REMOVED 2026-08-24 (route reconciliation):
+// fully fake, in-memory-Map-only self-referential module registry
+// (registers fake "AF-FI"/"AF-HR"/"AF-SC" entries, "quantum-enhanced
+// modules"), zero frontend caller anywhere. See docs/registry/ROUTE_RECONCILIATION.md.
 // Research and Development Routes - R&D Management with AI Integration
 const researchAndDevelopmentRoutes = require('./routes/researchAndDevelopmentRoutes');
 // Information Sharing Routes - Document and Knowledge Sharing with AI Integration
@@ -843,8 +847,7 @@ app.use('/api/v1/ai-brain', aiBrainRoutes);
 app.use('/api/v1/ai-self-healing', aiSelfHealingRoutes);
 // AI Operation Intelligence - Real-Time Optimization Layer
 app.use('/api/v1/ai-operation-intelligence', aiOperationIntelligenceRoutes);
-// SAP Module Architecture - Independent Module Architecture
-app.use('/api/v1/sap-module-architecture', sapModuleArchitectureRoutes);
+// SAP Module Architecture mount REMOVED 2026-08-24 (route reconciliation) — see require-site comment above.
 // Research and Development - R&D Management with AI Integration
 app.use('/api/v1/research-and-development', researchAndDevelopmentRoutes);
 // Information Sharing - Document and Knowledge Sharing with AI Integration

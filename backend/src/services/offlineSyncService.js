@@ -97,11 +97,13 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
 async function processSyncQueue(userId) {
   try {
     // Get pending sync items for user
+    // SECURITY: unparenthesized AND/OR meant the OR branch had no user_id
+    // filter at all, leaking every user's failed sync items to any caller.
+    // Parenthesize so user_id scopes both branches.
     const query = `
       SELECT * FROM sync_queue
       WHERE user_id = $1
-        AND status = 'pending'
-        OR (status = 'failed' AND retry_count < $2)
+        AND (status = 'pending' OR (status = 'failed' AND retry_count < $2))
       ORDER BY priority ASC, created_at ASC
       LIMIT 50
     `;

@@ -2,15 +2,49 @@
 const express = require('express');
 const router = express.Router();
 const farmerHealthService = require('../modules/M029/service');
+const { authMiddleware } = require('../middleware/auth');
+const { adminMiddleware } = require('../middleware/admin');
+const { resolveFarmerId } = require('../middleware/resolveFarmerId');
+
+/**
+ * SECURITY FIX: every route below previously had zero authentication and no
+ * ownership check, letting any unauthenticated caller CRUD any farmer's
+ * health/welfare record (PII). All routes now require authMiddleware.
+ * Routes that accept an explicit farmerId (list, health-summary,
+ * welfare-enrollment) are scoped to the caller's OWN resolved farmerId via
+ * the shared resolveFarmerId middleware, unless the caller is an admin -
+ * mirroring the authMiddleware+adminMiddleware convention used elsewhere in
+ * this codebase. DELETE is admin-only as the safest interim posture for a
+ * destructive operation with no ownership signal available.
+ */
+
+// Admin bypass wrapper around the shared resolveFarmerId middleware: admins
+// don't have a farmers row, so they skip scoping and may act on any
+// farmerId they explicitly pass; everyone else gets scoped to their own.
+function selfScopeUnlessAdmin(req, res, next) {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'superadmin')) {
+    return next();
+  }
+  return resolveFarmerId(req, res, next);
+}
+
+function isAdmin(req) {
+  return req.user && (req.user.role === 'admin' || req.user.role === 'superadmin');
+}
 
 // Health Records Routes
-router.get('/health-records', async (req, res) => {
+router.get('/health-records', authMiddleware, selfScopeUnlessAdmin, async (req, res) => {
   try {
     const { page, limit, farmerId } = req.query;
-    const result = await farmerHealthService.listHealthRecords({ 
-      page: parseInt(page), 
-      limit: parseInt(limit), 
-      farmerId: farmerId ? parseInt(farmerId) : null 
+    // Non-admins are always scoped to their own resolved farmerId, regardless
+    // of what farmerId they pass in the query string.
+    const scopedFarmerId = isAdmin(req)
+      ? (farmerId ? parseInt(farmerId) : null)
+      : req.farmerId;
+    const result = await farmerHealthService.listHealthRecords({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      farmerId: scopedFarmerId
     });
     res.json(result);
   } catch (error) {
@@ -18,7 +52,7 @@ router.get('/health-records', async (req, res) => {
   }
 });
 
-router.get('/health-records/:id', async (req, res) => {
+router.get('/health-records/:id', authMiddleware, async (req, res) => {
   try {
     const record = await farmerHealthService.getHealthRecord(parseInt(req.params.id));
     if (!record) {
@@ -30,16 +64,17 @@ router.get('/health-records/:id', async (req, res) => {
   }
 });
 
-router.post('/health-records', async (req, res) => {
+router.post('/health-records', authMiddleware, selfScopeUnlessAdmin, async (req, res) => {
   try {
-    const record = await farmerHealthService.createHealthRecord(req.body);
+    const payload = isAdmin(req) ? req.body : { ...req.body, farmerId: req.farmerId };
+    const record = await farmerHealthService.createHealthRecord(payload);
     res.status(201).json(record);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.put('/health-records/:id', async (req, res) => {
+router.put('/health-records/:id', authMiddleware, async (req, res) => {
   try {
     const record = await farmerHealthService.updateHealthRecord(parseInt(req.params.id), req.body);
     if (!record) {
@@ -51,7 +86,7 @@ router.put('/health-records/:id', async (req, res) => {
   }
 });
 
-router.delete('/health-records/:id', async (req, res) => {
+router.delete('/health-records/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const deleted = await farmerHealthService.deleteHealthRecord(parseInt(req.params.id));
     if (!deleted) {
@@ -64,9 +99,13 @@ router.delete('/health-records/:id', async (req, res) => {
 });
 
 // Farmer Health Summary
-router.get('/farmers/:farmerId/health-summary', async (req, res) => {
+router.get('/farmers/:farmerId/health-summary', authMiddleware, selfScopeUnlessAdmin, async (req, res) => {
   try {
-    const summary = await farmerHealthService.getFarmerHealthSummary(parseInt(req.params.farmerId));
+    const requestedFarmerId = parseInt(req.params.farmerId);
+    if (!isAdmin(req) && req.farmerId !== requestedFarmerId) {
+      return res.status(403).json({ error: 'You may only view your own health summary' });
+    }
+    const summary = await farmerHealthService.getFarmerHealthSummary(requestedFarmerId);
     res.json(summary);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -74,13 +113,13 @@ router.get('/farmers/:farmerId/health-summary', async (req, res) => {
 });
 
 // Welfare Programs Routes
-router.get('/welfare-programs', async (req, res) => {
+router.get('/welfare-programs', authMiddleware, async (req, res) => {
   try {
     const { page, limit, eligibility } = req.query;
-    const result = await farmerHealthService.getWelfarePrograms({ 
-      page: parseInt(page), 
-      limit: parseInt(limit), 
-      eligibility 
+    const result = await farmerHealthService.getWelfarePrograms({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      eligibility
     });
     res.json(result);
   } catch (error) {
@@ -88,11 +127,12 @@ router.get('/welfare-programs', async (req, res) => {
   }
 });
 
-router.post('/welfare-enrollments', async (req, res) => {
+router.post('/welfare-enrollments', authMiddleware, selfScopeUnlessAdmin, async (req, res) => {
   try {
-    const { farmerId, programId } = req.body;
+    const { programId } = req.body;
+    const farmerId = isAdmin(req) ? parseInt(req.body.farmerId) : req.farmerId;
     const enrollment = await farmerHealthService.enrollWelfareProgram(
-      parseInt(farmerId), 
+      parseInt(farmerId),
       parseInt(programId)
     );
     res.status(201).json(enrollment);
