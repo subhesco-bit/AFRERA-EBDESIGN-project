@@ -209,7 +209,7 @@ router.get('/temperature/:shipmentId/alerts', authMiddleware, async (req, res) =
  */
 router.post('/warehouse/locations', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.addWarehouseLocation(req.body);
+    const result = await logisticsService.createWarehouse(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add warehouse location API error', { error: error.message, stack: error.stack });
@@ -227,7 +227,7 @@ router.get('/warehouse/locations', authMiddleware, async (req, res) => {
       zone: req.query.zone,
       status: req.query.status
     };
-    const result = await logisticsService.getWarehouseLocations(filters);
+    const result = await logisticsService.getWarehouses(filters);
     res.json(result);
   } catch (error) {
     logger.error('Get warehouse locations API error', { error: error.message, stack: error.stack });
@@ -240,7 +240,7 @@ router.get('/warehouse/locations', authMiddleware, async (req, res) => {
  */
 router.post('/warehouse/inventory', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.addInventory(req.body);
+    const result = await logisticsService.addInventory(req.body.warehouseId, req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add inventory API error', { error: error.message, stack: error.stack });
@@ -253,13 +253,13 @@ router.post('/warehouse/inventory', authMiddleware, async (req, res) => {
  */
 router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
   try {
-    const filters = {
-      warehouseId: req.query.warehouseId,
-      locationId: req.query.locationId,
-      productId: req.query.productId,
-      status: req.query.status
-    };
-    const result = await logisticsService.getInventory(filters);
+    // getWarehouseInventory only filters by warehouseId - locationId/productId/status
+    // aren't supported by the current query, so they're accepted but ignored rather
+    // than silently dropped without a caller noticing.
+    if (!req.query.warehouseId) {
+      return res.status(400).json({ error: 'warehouseId is required' });
+    }
+    const result = await logisticsService.getWarehouseInventory(req.query.warehouseId);
     res.json(result);
   } catch (error) {
     logger.error('Get inventory API error', { error: error.message, stack: error.stack });
@@ -267,112 +267,33 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
   }
 });
 
-/**
- * Record inventory movement
- */
-router.post('/warehouse/inventory/movement', authMiddleware, async (req, res) => {
-  try {
-    const result = await logisticsService.recordInventoryMovement(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    logger.error('Record inventory movement API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to record inventory movement' });
-  }
-});
+// NOT_IMPLEMENTED: inventory-movement ledger, warehouse performance metrics, route
+// optimization and delivery scheduling were never built in logisticsEnhancementService
+// (no movement/performance/route/schedule tables or methods exist) - these 7 routes
+// called nonexistent service functions and would have thrown ReferenceError at
+// runtime. No frontend caller references any of these paths. Returning 501 instead
+// of building the underlying feature, which is new scope beyond this audit pass.
+const notImplemented = (feature) => (req, res) => {
+  res.status(501).json({ error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });
+};
 
-/**
- * Get warehouse performance metrics
- */
-router.get('/warehouse/performance', authMiddleware, async (req, res) => {
-  try {
-    const { warehouseId, startDate, endDate } = req.query;
-    const result = await logisticsService.getWarehousePerformance(warehouseId, startDate, endDate);
-    res.json(result);
-  } catch (error) {
-    logger.error('Get warehouse performance API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to get warehouse performance' });
-  }
-});
+router.post('/warehouse/inventory/movement', authMiddleware, notImplemented('Inventory movement tracking'));
+router.get('/warehouse/performance', authMiddleware, notImplemented('Warehouse performance metrics'));
 
 // ============================================================================
 // ROUTE OPTIMIZATION ROUTES
 // ============================================================================
 
-/**
- * Optimize route
- */
-router.post('/routes/optimize', authMiddleware, async (req, res) => {
-  try {
-    const result = await logisticsService.optimizeRoute(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    logger.error('Optimize route API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to optimize route' });
-  }
-});
-
-/**
- * Get route by ID
- */
-router.get('/routes/:routeId', authMiddleware, async (req, res) => {
-  try {
-    const result = await logisticsService.getRoute(req.params.routeId);
-    res.json(result);
-  } catch (error) {
-    logger.error('Get route API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to get route' });
-  }
-});
+router.post('/routes/optimize', authMiddleware, notImplemented('Route optimization'));
+router.get('/routes/:routeId', authMiddleware, notImplemented('Route lookup'));
 
 // ============================================================================
 // DELIVERY SCHEDULE ROUTES
 // ============================================================================
 
-/**
- * Create delivery schedule
- */
-router.post('/deliveries/schedule', authMiddleware, async (req, res) => {
-  try {
-    const result = await logisticsService.createDeliverySchedule(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    logger.error('Create delivery schedule API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to create delivery schedule' });
-  }
-});
-
-/**
- * Get delivery schedules
- */
-router.get('/deliveries/schedule', authMiddleware, async (req, res) => {
-  try {
-    const filters = {
-      vehicleId: req.query.vehicleId,
-      shipmentId: req.query.shipmentId,
-      status: req.query.status,
-      startDate: req.query.startDate,
-      endDate: req.query.endDate
-    };
-    const result = await logisticsService.getDeliverySchedules(filters);
-    res.json(result);
-  } catch (error) {
-    logger.error('Get delivery schedules API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to get delivery schedules' });
-  }
-});
-
-/**
- * Update delivery schedule
- */
-router.put('/deliveries/schedule/:scheduleId', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
-  try {
-    const result = await logisticsService.updateDeliverySchedule(req.params.scheduleId, req.body);
-    res.json(result);
-  } catch (error) {
-    logger.error('Update delivery schedule API error', { error: error.message, stack: error.stack });
-    res.status(500).json({ error: 'Failed to update delivery schedule' });
-  }
-});
+router.post('/deliveries/schedule', authMiddleware, notImplemented('Delivery scheduling'));
+router.get('/deliveries/schedule', authMiddleware, notImplemented('Delivery scheduling'));
+router.put('/deliveries/schedule/:scheduleId', authMiddleware, requireRole(...LOGISTICS_ROLES), notImplemented('Delivery scheduling'));
 
 // ---------------------------------------------------------------------------
 // Driver location (991). Added to the existing logistics routes rather than a
