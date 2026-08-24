@@ -30,33 +30,41 @@ const PlatformFoundationPage = () => {
   const loadPlatformData = async () => {
     setLoading(true);
     setError(null);
-    
-    try {
-      // Load platform health
-      const health = await platformCoreAPI.getHealth();
-      setPlatformHealth(health.data);
-      
-      // Load scaling recommendations
-      const scaling = await platformCoreAPI.getScalingRecommendations();
-      setScalingRecommendations(scaling.data);
-      
-      // Load capacity forecast
-      const capacity = await platformCoreAPI.predictCapacity('24h');
-      setCapacityForecast(capacity.data);
-      
-      // Load configuration recommendations
-      const config = await platformConfigurationAPI.getRecommendations();
-      setConfigRecommendations(config.data);
-      
-      // Load system dashboard
-      const dashboard = await systemAdministrationAPI.getSystemHealthDashboard();
-      setSystemDashboard(dashboard.data);
-      
-    } catch (err) {
-      setError('Failed to load platform data: ' + err.message);
-    } finally {
-      setLoading(false);
+
+    // Each source loads independently - platformCoreAPI.getScalingRecommendations()
+    // has no backend implementation anywhere in the codebase (verified: no service
+    // exports it under any name), so it will always reject. Previously that one
+    // rejection aborted this whole sequential await chain, silently preventing
+    // configRecommendations and systemDashboard from ever loading even though both
+    // of those calls work correctly. Settling independently means the one missing
+    // feature degrades gracefully (its section just doesn't render) instead of
+    // taking down three working ones.
+    const [health, scaling, capacity, config, dashboard] = await Promise.allSettled([
+      platformCoreAPI.getHealth(),
+      platformCoreAPI.getScalingRecommendations(),
+      // predictCapacity('24h') pointed at platformCoreService's old M001 shape,
+      // which was rewritten and no longer has this endpoint. The real capacity
+      // forecast lives in systemAdministrationService, already used correctly by
+      // the dashboard call below.
+      systemAdministrationAPI.forecastCapacity('24h'),
+      platformConfigurationAPI.getRecommendations(),
+      systemAdministrationAPI.getSystemHealthDashboard(),
+    ]);
+
+    if (health.status === 'fulfilled') setPlatformHealth(health.value.data);
+    if (scaling.status === 'fulfilled') setScalingRecommendations(scaling.value.data);
+    if (capacity.status === 'fulfilled') setCapacityForecast(capacity.value.data);
+    if (config.status === 'fulfilled') setConfigRecommendations(config.value.data);
+    if (dashboard.status === 'fulfilled') setSystemDashboard(dashboard.value.data);
+
+    const failures = [health, scaling, capacity, config, dashboard].filter(r => r.status === 'rejected');
+    if (failures.length > 0 && [health, capacity, config, dashboard].some(r => r.status === 'rejected')) {
+      // Only surface an error banner for unexpected failures - scaling recommendations
+      // failing is expected (no backend), so it alone shouldn't alarm the user.
+      setError(`${failures.length} of 5 platform data sources failed to load`);
     }
+
+    setLoading(false);
   };
 
   const handleOptimizeConfiguration = async () => {
