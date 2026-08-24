@@ -806,12 +806,12 @@ const productionPlanning = {
     
     try {
       const { production_order, material_code, production_quantity, unit, planned_start_date, planned_finish_date, production_plant, bom, routing } = poData;
-      
+
       const { rows } = await pg.query(
-        `INSERT INTO erp_production_orders (production_order, material_code, production_quantity, unit, planned_start_date, planned_finish_date, production_plant, status, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 'created', NOW())
+        `INSERT INTO erp_production_orders (production_order, material_code, production_quantity, unit, planned_start_date, planned_finish_date, production_plant, bom_reference, routing_reference, status, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'created', NOW())
          RETURNING *`,
-        [production_order, material_code, production_quantity, unit, planned_start_date, planned_finish_date, production_plant]
+        [production_order, material_code, production_quantity, unit, planned_start_date, planned_finish_date, production_plant, bom || null, routing || null]
       );
       
       await signalBus.emit('erp.pp.po.created', { production_order, timestamp: new Date().toISOString() });

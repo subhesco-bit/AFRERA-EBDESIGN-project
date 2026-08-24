@@ -112,6 +112,7 @@ const insuranceEnhancements = require('./routes/insuranceEnhancements');
 const farmerPortalEnhancements = require('./routes/farmerPortalEnhancements');
 const governanceModule = require('./routes/governanceModule');
 const logisticsEnhancements = require('./routes/logisticsEnhancements');
+const logisticsEnhancementRoutes = require('./routes/logisticsEnhancementRoutes');
 const advancedFeatures = require('./routes/advancedFeatures');
 const enterpriseAIRoutes = require('./routes/enterpriseAIRoutes');
 const gstRoutes = require('./routes/gstRoutes');
@@ -129,8 +130,16 @@ const goatRoutes = require('./routes/goatRoutes');
 const sheepRoutes = require('./routes/sheepRoutes');
 const pigRoutes = require('./routes/pigRoutes');
 const animalHealthRoutes = require('./routes/animalHealthRoutes');
-// Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993)
-const enterpriseControlRoutes = require('./routes/enterpriseControlRoutes');
+// Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993).
+// enterpriseControlRoutes.js was deleted 2026-08-24: it imported
+// createWorkflow/createLegalCase/createRisk/etc from
+// services/enterpriseControlService.js, none of which exist there (the real
+// exports are startWorkflow/actOnWorkflow/listPendingApprovals/createLead/
+// convertLead/assessRisk/raiseIncident/etc) - every route in it would have
+// thrown TypeError on first call. Nothing called it (EnterpriseControlPage.jsx
+// / enterpriseControlAPI in api.js call /control/* - see the real,
+// already-working mountRoute('/api/v1/control', enterpriseControlService)
+// below, which exports its own correct router).
 // unifiedLedgerRoutes/unifiedLedgerService (migration 998, "One Ledger + 9
 // Economies") were deleted here (2026-08-17): the build directive explicitly
 // rejects a separate ledger per economy in favor of the canonical
@@ -183,6 +192,18 @@ const aiBrainService = require('./services/aiBrainService');
 const aiSelfHealingService = require('./services/aiSelfHealingService');
 // AI Operation Intelligence Service - Real-Time Optimization Layer
 const aiOperationIntelligenceService = require('./services/aiOperationIntelligenceService');
+// MFA Service - Multi-Factor Authentication
+const mfaService = require('./services/mfaService');
+const mfaRoutes = require('./routes/mfaRoutes');
+// GDPR Compliance Service
+const gdprService = require('./services/gdprService');
+const gdprRoutes = require('./routes/gdprRoutes');
+// M001 Platform Core Service
+const platformCoreService = require('./services/platformCoreService');
+const platformCoreRoutes = require('./routes/platformCoreRoutes');
+// Unified Claude AI Coordinator
+const claudeAICoordinator = require('./core/claudeAICoordinator');
+const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
 // SAP Module Architecture Service - Independent Module Architecture
 const sapModuleArchitectureService = require('./services/sapModuleArchitectureService');
 // Advance Rate Pricing — forward curves, basis, commitment advice.
@@ -375,7 +396,6 @@ const knowledgeRoutes = require('./routes/knowledgeRoutes');
 // Company lookup — resolves accounting UI gap for companyId/fiscalYear/chart-of-accounts
 const companyRoutes = require('./routes/companyRoutes');
 // Platform Foundation Routes - AI Enhanced Platform Foundation (D01)
-const platformCoreRoutes = require('./routes/platformCoreRoutes');
 const platformConfigurationRoutes = require('./routes/platformConfigurationRoutes');
 const tenantManagementRoutes = require('./routes/tenantManagementRoutes');
 const organizationManagementRoutes = require('./routes/organizationManagementRoutes');
@@ -615,6 +635,11 @@ app.use('/api/v1/insurance', insuranceEnhancements);
 app.use('/api/v1/farmer-portal', farmerPortalEnhancements);
 app.use('/api/v1/governance', governanceModule);
 app.use('/api/v1/logistics', logisticsEnhancements);
+app.use('/api/v1/logistics-enhancement', logisticsEnhancementRoutes);
+app.use('/api/v1/mfa', mfaRoutes);
+app.use('/api/v1/privacy', gdprRoutes);
+app.use('/api/v1/platform', platformCoreRoutes);
+app.use('/api/v1/ai', unifiedAIRoutes);
 app.use('/api/v1/advanced', advancedFeatures);
 app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
 
@@ -638,8 +663,6 @@ app.use('/api/v1/goat', goatRoutes);
 app.use('/api/v1/sheep', sheepRoutes);
 app.use('/api/v1/pig', pigRoutes);
 app.use('/api/v1/animal-health', animalHealthRoutes);
-// Enterprise Control — Workflow, CRM, Legal, Risk, Emergency (migration 993)
-app.use('/api/v1/enterprise', enterpriseControlRoutes);
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
 villageProfileService.setupRoutes(app);
 // Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)

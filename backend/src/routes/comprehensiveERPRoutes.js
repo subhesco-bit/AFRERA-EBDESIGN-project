@@ -22,7 +22,6 @@ const {
 } = require('../controllers/comprehensiveERPController');
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
-const { logger } = require('../utils/logger');
 
 const router = express.Router();
 
