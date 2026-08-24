@@ -5,6 +5,25 @@
 
 const rentalService = require('./service');
 
+const listRentalListings = async (req, res) => {
+  try {
+    const result = await rentalService.listRentalListings(req.query);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getRentalListing = async (req, res) => {
+  try {
+    const listing = await rentalService.getRentalListing(req.params.id);
+    if (!listing) return res.status(404).json({ success: false, error: 'Not found' });
+    res.status(200).json({ success: true, data: listing });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const listEquipmentForRental = async (req, res) => {
   try {
     const rental = await rentalService.listEquipmentForRental(req.body);
@@ -42,6 +61,8 @@ const generateRentalReport = async (req, res) => {
 };
 
 module.exports = {
+  listRentalListings,
+  getRentalListing,
   listEquipmentForRental,
   bookEquipmentRental,
   trackRentalPerformance,

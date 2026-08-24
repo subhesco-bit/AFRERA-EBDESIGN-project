@@ -5,6 +5,25 @@
 
 const breakdownService = require('./service');
 
+const listBreakdowns = async (req, res) => {
+  try {
+    const result = await breakdownService.listBreakdowns(req.query);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getBreakdown = async (req, res) => {
+  try {
+    const breakdown = await breakdownService.getBreakdown(req.params.id);
+    if (!breakdown) return res.status(404).json({ success: false, error: 'Not found' });
+    res.status(200).json({ success: true, data: breakdown });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const reportBreakdown = async (req, res) => {
   try {
     const breakdown = await breakdownService.reportBreakdown(req.body);
@@ -42,6 +61,8 @@ const generateBreakdownReport = async (req, res) => {
 };
 
 module.exports = {
+  listBreakdowns,
+  getBreakdown,
   reportBreakdown,
   scheduleEmergencyRepair,
   trackDowntime,

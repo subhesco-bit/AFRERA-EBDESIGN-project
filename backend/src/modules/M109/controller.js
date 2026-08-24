@@ -5,6 +5,25 @@
 
 const partsService = require('./service');
 
+const listSpareParts = async (req, res) => {
+  try {
+    const result = await partsService.listSpareParts(req.query);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getSparePart = async (req, res) => {
+  try {
+    const part = await partsService.getSparePart(req.params.id);
+    if (!part) return res.status(404).json({ success: false, error: 'Not found' });
+    res.status(200).json({ success: true, data: part });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const registerSparePart = async (req, res) => {
   try {
     const part = await partsService.registerSparePart(req.body);
@@ -42,6 +61,8 @@ const generateInventoryReport = async (req, res) => {
 };
 
 module.exports = {
+  listSpareParts,
+  getSparePart,
   registerSparePart,
   recordPartConsumption,
   trackInventoryStatus,

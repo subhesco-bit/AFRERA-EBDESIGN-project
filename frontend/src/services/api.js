@@ -2361,27 +2361,33 @@ export const farmOperationsDashboardAPI = {
 }
 
 /** M102 — Implement Management (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /machinery-implements. The real
+// backend (backend/src/modules/M102, migration added 2026-08-24) is
+// action-based (register/update-maintenance/track-usage/report), not
+// simple CRUD, and had no browse route at all until now - added GET /
+// and GET /:id alongside it. No update/delete here: the real PUT route
+// updates a maintenance record, not general implement fields, and there
+// is no delete route.
 export const implementManagementAPI = {
-  getImplements: (params) => api.get('/machinery-implements', { params }),
-  createImplement: (data) => api.post('/machinery-implements', data),
-  updateImplement: (id, data) => api.put(`/machinery-implements/${id}`, data),
-  deleteImplement: (id) => api.delete(`/machinery-implements/${id}`),
+  getImplements: (params) => api.get('/modules/m102', { params }),
+  createImplement: (data) => api.post('/modules/m102/register', data),
 }
 
 /** M103 — Equipment Inventory (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /equipment-inventory. Real
+// backend at backend/src/modules/M103, same shape/caveats as M102 above.
 export const equipmentInventoryAPI = {
-  getEquipment: (params) => api.get('/equipment-inventory', { params }),
-  createEquipment: (data) => api.post('/equipment-inventory', data),
-  updateEquipment: (id, data) => api.put(`/equipment-inventory/${id}`, data),
-  deleteEquipment: (id) => api.delete(`/equipment-inventory/${id}`),
+  getEquipment: (params) => api.get('/modules/m103', { params }),
+  createEquipment: (data) => api.post('/modules/m103/register', data),
 }
 
 /** M104 — Equipment Rental (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /equipment-rental. Real backend
+// at backend/src/modules/M104 (POST /list actually creates a listing,
+// despite the name - see routes.js).
 export const equipmentRentalAPI = {
-  getRentals: (params) => api.get('/equipment-rental', { params }),
-  createRental: (data) => api.post('/equipment-rental', data),
-  updateRental: (id, data) => api.put(`/equipment-rental/${id}`, data),
-  deleteRental: (id) => api.delete(`/equipment-rental/${id}`),
+  getRentals: (params) => api.get('/modules/m104', { params }),
+  createRental: (data) => api.post('/modules/m104/list', data),
 }
 
 /** M105 — Fleet Management (Machinery). Real backend at
@@ -2410,35 +2416,36 @@ export const preventiveMaintenanceAPI = {
 }
 
 /** M107 — Breakdown Maintenance (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /breakdown-maintenance. Real
+// backend at backend/src/modules/M107, same shape/caveats as M102 above.
 export const breakdownMaintenanceAPI = {
-  getRecords: (params) => api.get('/breakdown-maintenance', { params }),
-  createRecord: (data) => api.post('/breakdown-maintenance', data),
-  updateRecord: (id, data) => api.put(`/breakdown-maintenance/${id}`, data),
-  deleteRecord: (id) => api.delete(`/breakdown-maintenance/${id}`),
+  getRecords: (params) => api.get('/modules/m107', { params }),
+  createRecord: (data) => api.post('/modules/m107/report', data),
 }
 
 /** M108 — Fuel Management (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /fuel-management. Real backend
+// at backend/src/modules/M108 tracks purchases and consumption as two
+// separate records; this lists/logs purchases specifically.
 export const fuelManagementAPI = {
-  getLogs: (params) => api.get('/fuel-management', { params }),
-  createLog: (data) => api.post('/fuel-management', data),
-  updateLog: (id, data) => api.put(`/fuel-management/${id}`, data),
-  deleteLog: (id) => api.delete(`/fuel-management/${id}`),
+  getLogs: (params) => api.get('/modules/m108', { params }),
+  createLog: (data) => api.post('/modules/m108/purchase', data),
 }
 
 /** M109 — Spare Parts Management (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /spare-parts. Real backend at
+// backend/src/modules/M109, same shape/caveats as M102 above.
 export const sparePartsAPI = {
-  getParts: (params) => api.get('/spare-parts', { params }),
-  createPart: (data) => api.post('/spare-parts', data),
-  updatePart: (id, data) => api.put(`/spare-parts/${id}`, data),
-  deletePart: (id) => api.delete(`/spare-parts/${id}`),
+  getParts: (params) => api.get('/modules/m109', { params }),
+  createPart: (data) => api.post('/modules/m109/register', data),
 }
 
 /** M110 — Asset Lifecycle Management (Machinery). No backend route found. */
+// Fixed 2026-08-24: was calling nonexistent /asset-lifecycle. Real backend
+// at backend/src/modules/M110, same shape/caveats as M102 above.
 export const assetLifecycleAPI = {
-  getAssets: (params) => api.get('/asset-lifecycle', { params }),
-  createAsset: (data) => api.post('/asset-lifecycle', data),
-  updateAsset: (id, data) => api.put(`/asset-lifecycle/${id}`, data),
-  deleteAsset: (id) => api.delete(`/asset-lifecycle/${id}`),
+  getAssets: (params) => api.get('/modules/m110', { params }),
+  createAsset: (data) => api.post('/modules/m110/register', data),
 }
 
 /** M142 — Vegetable Production (Horticulture). No backend route found. */

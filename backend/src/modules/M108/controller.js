@@ -5,6 +5,25 @@
 
 const fuelService = require('./service');
 
+const listFuelPurchases = async (req, res) => {
+  try {
+    const result = await fuelService.listFuelPurchases(req.query);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getFuelPurchase = async (req, res) => {
+  try {
+    const purchase = await fuelService.getFuelPurchase(req.params.id);
+    if (!purchase) return res.status(404).json({ success: false, error: 'Not found' });
+    res.status(200).json({ success: true, data: purchase });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const recordFuelPurchase = async (req, res) => {
   try {
     const purchase = await fuelService.recordFuelPurchase(req.body);
@@ -42,6 +61,8 @@ const generateFuelReport = async (req, res) => {
 };
 
 module.exports = {
+  listFuelPurchases,
+  getFuelPurchase,
   recordFuelPurchase,
   recordFuelConsumption,
   trackFuelEfficiency,

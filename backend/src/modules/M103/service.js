@@ -385,7 +385,36 @@ async function generateInventoryRecommendations(farmerId) {
   ];
 }
 
+/**
+ * List equipment. No list route existed at all before this (2026-08-24).
+ */
+async function listEquipment({ page = 1, limit = 20, farmer_id = null, status = null } = {}) {
+  const offset = (Number(page) - 1) * Number(limit);
+  const conditions = [];
+  const params = [];
+  if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
+  if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const totalRes = await pool.query(`SELECT COUNT(*) FROM equipment_inventory ${where}`, params);
+  const total = parseInt(totalRes.rows[0].count, 10);
+
+  const listParams = [...params, limit, offset];
+  const res = await pool.query(
+    `SELECT * FROM equipment_inventory ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
+    listParams
+  );
+  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+}
+
+async function getEquipment(id) {
+  const res = await pool.query('SELECT * FROM equipment_inventory WHERE equipment_registry_id = $1', [id]);
+  return res.rows[0] || null;
+}
+
 module.exports = {
+  listEquipment,
+  getEquipment,
   registerEquipment,
   updateEquipmentStatus,
   trackEquipmentUtilization,

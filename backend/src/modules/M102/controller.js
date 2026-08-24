@@ -5,6 +5,25 @@
 
 const implementService = require('./service');
 
+const listImplements = async (req, res) => {
+  try {
+    const result = await implementService.listImplements(req.query);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const getImplement = async (req, res) => {
+  try {
+    const implement = await implementService.getImplement(req.params.id);
+    if (!implement) return res.status(404).json({ success: false, error: 'Not found' });
+    res.status(200).json({ success: true, data: implement });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const registerImplement = async (req, res) => {
   try {
     const implement = await implementService.registerImplement(req.body);
@@ -42,6 +61,8 @@ const generateImplementReport = async (req, res) => {
 };
 
 module.exports = {
+  listImplements,
+  getImplement,
   registerImplement,
   updateImplementMaintenance,
   trackImplementUsage,

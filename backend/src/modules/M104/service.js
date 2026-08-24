@@ -393,7 +393,38 @@ async function generateOwnerRecommendations(ownerId) {
   ];
 }
 
+/**
+ * List rental listings. `listEquipmentForRental` is misleadingly named -
+ * despite the name it creates a listing, it does not browse them. No real
+ * browse route existed at all before this (2026-08-24).
+ */
+async function listRentalListings({ page = 1, limit = 20, owner_id = null, status = null } = {}) {
+  const offset = (Number(page) - 1) * Number(limit);
+  const conditions = [];
+  const params = [];
+  if (owner_id) { params.push(owner_id); conditions.push(`owner_id = $${params.length}`); }
+  if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const totalRes = await pool.query(`SELECT COUNT(*) FROM equipment_rental_listings ${where}`, params);
+  const total = parseInt(totalRes.rows[0].count, 10);
+
+  const listParams = [...params, limit, offset];
+  const res = await pool.query(
+    `SELECT * FROM equipment_rental_listings ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
+    listParams
+  );
+  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+}
+
+async function getRentalListing(id) {
+  const res = await pool.query('SELECT * FROM equipment_rental_listings WHERE rental_listing_id = $1', [id]);
+  return res.rows[0] || null;
+}
+
 module.exports = {
+  listRentalListings,
+  getRentalListing,
   listEquipmentForRental,
   bookEquipmentRental,
   trackRentalPerformance,

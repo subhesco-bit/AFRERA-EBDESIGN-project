@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
 
+router.get('/', controller.listImplements);
+router.get('/:id', controller.getImplement);
 router.post('/register', controller.registerImplement);
 router.put('/maintenance/:id', controller.updateImplementMaintenance);
 router.get('/usage/:id', controller.trackImplementUsage);

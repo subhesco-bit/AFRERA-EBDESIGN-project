@@ -5,6 +5,8 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
 
+router.get('/', controller.listAssets);
+router.get('/:id', controller.getAsset);
 router.post('/register', controller.registerAsset);
 router.put('/lifecycle-stage/:id', controller.updateLifecycleStage);
 router.get('/depreciation/:id', controller.trackAssetDepreciation);

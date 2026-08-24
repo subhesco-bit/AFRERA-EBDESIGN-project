@@ -378,7 +378,36 @@ async function generateFuelRecommendations(farmerId) {
   ];
 }
 
+/**
+ * List fuel purchases. No list route existed at all before this
+ * (2026-08-24).
+ */
+async function listFuelPurchases({ page = 1, limit = 20, farmer_id = null } = {}) {
+  const offset = (Number(page) - 1) * Number(limit);
+  const conditions = [];
+  const params = [];
+  if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+  const totalRes = await pool.query(`SELECT COUNT(*) FROM fuel_purchases ${where}`, params);
+  const total = parseInt(totalRes.rows[0].count, 10);
+
+  const listParams = [...params, limit, offset];
+  const res = await pool.query(
+    `SELECT * FROM fuel_purchases ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
+    listParams
+  );
+  return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+}
+
+async function getFuelPurchase(id) {
+  const res = await pool.query('SELECT * FROM fuel_purchases WHERE purchase_id = $1', [id]);
+  return res.rows[0] || null;
+}
+
 module.exports = {
+  listFuelPurchases,
+  getFuelPurchase,
   recordFuelPurchase,
   recordFuelConsumption,
   trackFuelEfficiency,

@@ -1,6 +1,25 @@
 // Controller for Asset Lifecycle Management (M110)
 const service = require('./service');
 
+async function listAssets(req, res) {
+  try {
+    const result = await service.listAssets(req.query);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+async function getAsset(req, res) {
+  try {
+    const asset = await service.getAsset(req.params.id);
+    if (!asset) return res.status(404).json({ success: false, error: 'Not found' });
+    res.status(200).json({ success: true, data: asset });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
 async function registerAsset(req, res) {
   try {
     const asset = await service.registerAsset(req.body);
@@ -37,4 +56,4 @@ async function generateLifecycleReport(req, res) {
   }
 }
 
-module.exports = { registerAsset, updateLifecycleStage, trackAssetDepreciation, generateLifecycleReport };
+module.exports = { listAssets, getAsset, registerAsset, updateLifecycleStage, trackAssetDepreciation, generateLifecycleReport };

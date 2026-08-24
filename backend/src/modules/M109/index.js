@@ -1,15 +1,9 @@
 ﻿// M109 - Spare Parts Management
-const express = require('express');
-const router = express.Router();
-const controller = require('./controller');
-
-router.post('/register', controller.registerSparePart);
-router.post('/consumption', controller.recordPartConsumption);
-router.get('/status/:id', controller.trackInventoryStatus);
-router.get('/report/:farmerId', controller.generateInventoryReport);
-
-module.exports = { 
-  controller: require('./controller'), 
+// index.js used to build its own router inline, duplicating routes.js and
+// never picking up routes.js's edits (including the list/get routes added
+// 2026-08-24). Fixed to require routes.js as the single source of truth.
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router: require('./routes')
 };
