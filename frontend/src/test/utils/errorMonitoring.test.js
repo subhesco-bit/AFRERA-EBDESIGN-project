@@ -1,7 +1,8 @@
+import { vi } from 'vitest'
 import { errorMonitoring, logError, getErrorStats, clearErrors } from '../../utils/errorMonitoring'
 
 // Mock fetch for server communication
-global.fetch = jest.fn()
+global.fetch = vi.fn()
 
 describe('Error Monitoring', () => {
   beforeEach(() => {
