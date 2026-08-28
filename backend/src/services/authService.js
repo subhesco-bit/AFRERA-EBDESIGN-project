@@ -23,9 +23,16 @@ const { getPostgreSQL } = require('../database/connection');
 const lazyAuth = (req, res, next) =>
   require('../middleware/auth').authMiddleware(req, res, next);
 
+if (!process.env.JWT_SECRET) {
+  throw new Error(
+    'JWT_SECRET environment variable is required and must not be empty. ' +
+    'Generate one with: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'base64url\'))"'
+  );
+}
+
 // JWT Configuration
 const JWT_CONFIG = {
-  secret: process.env.JWT_SECRET || 'your-super-secret-key-change-in-production',
+  secret: process.env.JWT_SECRET,
   accessTokenExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
   refreshTokenExpiry: process.env.JWT_REFRESH_EXPIRY || '7d',
   issuer: process.env.JWT_ISSUER || 'afrera-platform',
@@ -134,7 +141,7 @@ function generateRefreshToken(user) {
  */
 function verifyToken(token) {
   try {
-    const secret = process.env.JWT_SECRET || JWT_CONFIG.secret;
+    const secret = JWT_CONFIG.secret;
     // In test mode tests sign tokens without issuer/audience; relax checks there
     if (process.env.NODE_ENV === 'test') {
       return jwt.verify(token, secret);
