@@ -38,7 +38,8 @@ found while fixing get appended immediately, not tracked separately.
 
 | # | Finding | Location | Source | Dependency | Status |
 |---|---|---|---|---|---|
-| H1 | Hardcoded fallback JWT signing secret — full auth bypass if `JWT_SECRET` unset | `backend/src/services/authService.js:28,133` | AUDIT_SECURITY #1 | none — fix first, everything auth-adjacent depends on this being sound | ⬜ Open |
+| H1 | Hardcoded fallback JWT signing secret — full auth bypass if `JWT_SECRET` unset | `backend/src/services/authService.js:28,133` | AUDIT_SECURITY #1 | none — fix first, everything auth-adjacent depends on this being sound | ✅ Fixed: both fallback sites now throw at load if `JWT_SECRET` is unset. Also found 2 unreported duplicate instances of the same bug class in `backend/src/modules/M012/service.js` and `M014/service.js` (independent JWT signing with their own `\|\| 'your-secret-key'`) — fixed identically, logged as H1b below. `docker-compose.yml`/CI already set `JWT_SECRET` explicitly so neither breaks. 22/22 backend unit tests pass (`auth.test.js`, `marketplace.test.js`). Commit pending. |
+| H1b | Two more hardcoded JWT fallback secrets, same bug class as H1, not caught by AUDIT_SECURITY | `backend/src/modules/M012/service.js:9`, `M014/service.js:8` — both independent duplicate auth implementations outside `authService.js` | found during H1 fix, this session | ✅ Fixed alongside H1 — same fail-fast pattern applied. **Separate, larger issue logged, not fixed**: M012/M014 duplicate the entire login/token-issuance logic that `authService.js` already implements — see M32 below. |
 | H2 | Broken access control (IDOR) on product mutation — any authenticated user can edit/delete any product | `backend/src/services/productService.js:476-501,221-328`; same shape in `formService.js:388-407` | AUDIT_SECURITY #2 | after H1 (auth core should be solid first) | ⬜ Open |
 | H3 | Blocking synchronous file I/O on login/register/forms/analytics request paths | `backend/src/services/authService.js` (`readAuthStore`/`writeAuthStore`), `formService.js`, `analyticsService.js` | AUDIT_PERF #2 | after H1 (touches same file) | ⬜ Open |
 | H4 | Unbounded `Map` growth (memory leak) in `realtimeMonitoringService` | `backend/src/services/realtimeMonitoringService.js` (`stopMonitoring`, lines 130-148) | AUDIT_PERF #3 | none | ⬜ Open |
@@ -87,6 +88,7 @@ found while fixing get appended immediately, not tracked separately.
 | M29 | 81 grids hard-code column count with no responsive breakpoint | frontend-wide | AUDIT_UI #6 | ⬜ Open |
 | M30 | Fixed `BottomNav` has no reserved layout space, can overlap page/footer content | `frontend/src/components/Layout.jsx:33-40`, `BottomNav.jsx:14` | AUDIT_UI #7 | ⬜ Open |
 | M31 | Footer social links have no `aria-label` and are dead `href="#"` placeholders | `frontend/src/components/Footer.jsx:21-32` | AUDIT_UI #8 | ⬜ Open |
+| M32 | `M012/service.js` and `M014/service.js` each independently reimplement login/JWT issuance instead of using `authService.js` — 3 parallel auth systems in one backend, drift risk (e.g. only `authService.js` has account-lockout logic; M012/M014 don't) | `backend/src/modules/M012/service.js`, `M014/service.js` | found during H1 fix, this session | ⬜ Open |
 
 ## LOW
 
