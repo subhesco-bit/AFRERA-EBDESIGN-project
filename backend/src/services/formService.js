@@ -131,7 +131,7 @@ function buildAiInsights(formData) {
   };
 }
 
-function normalizeForm(formData, existingForm = null) {
+function normalizeForm(formData, existingForm = null, requestingUser = null) {
   const fields = Array.isArray(formData.fields)
     ? formData.fields.map((field, index) => ({
         id: field.id || `field-${index + 1}`,
@@ -169,7 +169,12 @@ function normalizeForm(formData, existingForm = null) {
       owner: formData.metadata?.owner || 'system',
       department: formData.metadata?.department || 'operations',
       compliance: formData.metadata?.compliance || 'standard',
-      tags: Array.isArray(formData.metadata?.tags) ? formData.metadata.tags : []
+      tags: Array.isArray(formData.metadata?.tags) ? formData.metadata.tags : [],
+      // Set server-side from the authenticated caller, never from client input -
+      // this is the actual ownership record used for update/delete authorization.
+      // Preserved from the existing form on update so ownership can't be
+      // reassigned by editing the body.
+      createdByUserId: existingForm?.metadata?.createdByUserId ?? requestingUser?.id ?? null
     },
     aiInsights: buildAiInsights({ fields, workflow }),
     createdAt: existingForm?.createdAt || now,
@@ -203,8 +208,23 @@ async function getFormById(formId) {
   return forms.find((form) => form.id === formId) || null;
 }
 
-async function createForm(formData) {
-  const normalized = normalizeForm(formData);
+function assertFormOwnership(existingForm, requestingUser) {
+  if (requestingUser && (requestingUser.role === 'admin' || requestingUser.role === 'superadmin')) {
+    return;
+  }
+
+  const ownerId = existingForm.metadata?.createdByUserId;
+  // Forms created before this field existed have no recorded owner - fail
+  // closed (admin-only) rather than defaulting to "anyone may edit".
+  if (!requestingUser || !ownerId || ownerId !== requestingUser.id) {
+    const error = new Error('You do not have permission to modify this form');
+    error.status = 403;
+    throw error;
+  }
+}
+
+async function createForm(formData, requestingUser) {
+  const normalized = normalizeForm(formData, null, requestingUser);
   const pg = getPostgreSQL();
 
   if (pg) {
@@ -227,13 +247,16 @@ async function createForm(formData) {
   return normalized;
 }
 
-async function updateForm(formId, formData) {
+async function updateForm(formId, formData, requestingUser) {
   const existingForm = await getFormById(formId);
   if (!existingForm) {
-    throw new Error('Form not found');
+    const error = new Error('Form not found');
+    error.status = 404;
+    throw error;
   }
+  assertFormOwnership(existingForm, requestingUser);
 
-  const normalized = normalizeForm({ ...existingForm, ...formData }, existingForm);
+  const normalized = normalizeForm({ ...existingForm, ...formData }, existingForm, requestingUser);
   normalized.version = (existingForm.version || 1) + 1;
 
   const pg = getPostgreSQL();
@@ -256,7 +279,15 @@ async function updateForm(formId, formData) {
   return normalized;
 }
 
-async function deleteForm(formId) {
+async function deleteForm(formId, requestingUser) {
+  const existingForm = await getFormById(formId);
+  if (!existingForm) {
+    const error = new Error('Form not found');
+    error.status = 404;
+    throw error;
+  }
+  assertFormOwnership(existingForm, requestingUser);
+
   const pg = getPostgreSQL();
   if (pg) {
     try {
@@ -366,7 +397,7 @@ router.get('/templates', async (req, res) => {
 
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const form = await createForm(req.body);
+    const form = await createForm(req.body, req.user);
     res.status(201).json(form);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -387,19 +418,19 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const form = await updateForm(req.params.id, req.body);
+    const form = await updateForm(req.params.id, req.body, req.user);
     res.json(form);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(error.status || 404).json({ error: error.message });
   }
 });
 
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const result = await deleteForm(req.params.id);
+    const result = await deleteForm(req.params.id, req.user);
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(error.status || 500).json({ error: error.message });
   }
 });
 

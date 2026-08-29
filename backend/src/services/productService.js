@@ -250,10 +250,31 @@ async function createProduct(productData) {
 /**
  * Update product
  */
-async function updateProduct(productId, productData) {
+async function assertProductOwnership(pg, productId, requestingUser) {
+  if (requestingUser && (requestingUser.role === 'admin' || requestingUser.role === 'superadmin')) {
+    return;
+  }
+
+  const result = await pg.query('SELECT created_by FROM products WHERE id = $1', [productId]);
+  if (result.rows.length === 0) {
+    const error = new Error('Product not found');
+    error.status = 404;
+    throw error;
+  }
+
+  const ownerId = result.rows[0].created_by;
+  if (!requestingUser || ownerId !== requestingUser.id) {
+    const error = new Error('You do not have permission to modify this product');
+    error.status = 403;
+    throw error;
+  }
+}
+
+async function updateProduct(productId, productData, requestingUser) {
   try {
     const pg = getPostgreSQL();
-    
+    await assertProductOwnership(pg, productId, requestingUser);
+
     const query = `
       UPDATE products
       SET name = COALESCE($1, name),
@@ -333,10 +354,11 @@ async function updateProduct(productId, productData) {
 /**
  * Delete product (soft delete)
  */
-async function deleteProduct(productId) {
+async function deleteProduct(productId, requestingUser) {
   try {
     const pg = getPostgreSQL();
-    
+    await assertProductOwnership(pg, productId, requestingUser);
+
     const query = `
       UPDATE products
       SET is_active = FALSE, updated_at = NOW()
@@ -507,11 +529,13 @@ router.post('/', authMiddleware, async (req, res) => {
 // Update product
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
-    const product = await updateProduct(req.params.id, req.body);
+    const product = await updateProduct(req.params.id, req.body, req.user);
     res.json(product);
   } catch (error) {
-    if (error.message === 'Product not found') {
+    if (error.status === 404 || error.message === 'Product not found') {
       res.status(404).json({ error: error.message });
+    } else if (error.status === 403) {
+      res.status(403).json({ error: error.message });
     } else {
       res.status(400).json({ error: error.message });
     }
@@ -521,11 +545,13 @@ router.put('/:id', authMiddleware, async (req, res) => {
 // Delete product
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const product = await deleteProduct(req.params.id);
+    const product = await deleteProduct(req.params.id, req.user);
     res.json(product);
   } catch (error) {
-    if (error.message === 'Product not found') {
+    if (error.status === 404 || error.message === 'Product not found') {
       res.status(404).json({ error: error.message });
+    } else if (error.status === 403) {
+      res.status(403).json({ error: error.message });
     } else {
       res.status(500).json({ error: error.message });
     }
