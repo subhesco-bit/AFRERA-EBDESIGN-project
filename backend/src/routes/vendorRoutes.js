@@ -42,7 +42,7 @@ router.get('/corporate/:buyerId/profile', authMiddleware, async (req, res) => {
 router.get('/corporate/:buyerId/credit-status', authMiddleware, async (req, res) => {
   try {
     const { buyerId } = req.params;
-    const decisionSupportService = require('../services/decisionSupportService');
+    const decisionSupportService = require('../services/legacy/decisionSupportService');
     
     // Get buyer profile to determine credit eligibility
     const profile = {

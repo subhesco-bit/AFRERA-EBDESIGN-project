@@ -8,7 +8,7 @@
  */
 
 const { mcda, rankOptions } = require('../core/mcda');
-const ds = require('../services/decisionSupportService');
+const ds = require('../services/legacy/decisionSupportService');
 
 describe('MCDA framework', () => {
   test('computes the weighted total exactly', () => {

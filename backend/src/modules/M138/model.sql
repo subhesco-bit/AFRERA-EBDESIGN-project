@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Fish Processing Management (M138)
--- Define tables and indexes here

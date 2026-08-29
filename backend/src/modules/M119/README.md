@@ -1,1 +1,0 @@
-﻿# M119 - M119 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M119_generated.sql\n

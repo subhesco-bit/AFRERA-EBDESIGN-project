@@ -13,6 +13,7 @@ import {
   Trash2
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 function FarmerFieldPage() {
   const [selectedField, setSelectedField] = useState(null)
@@ -161,7 +162,7 @@ function FarmerFieldPage() {
 
       {/* Field Detail Modal */}
       {selectedField && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setSelectedField(null)}>
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -231,12 +232,12 @@ function FarmerFieldPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* Add Field Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowAddModal(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -251,20 +252,20 @@ function FarmerFieldPage() {
 
               <form className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="field-name" className="block text-sm font-medium text-gray-700 mb-1">
                     Field Name *
                   </label>
-                  <input
+                  <input id="field-name"
                     type="text"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="e.g., North Field, Main Plot"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
                     Location *
                   </label>
-                  <input
+                  <input id="location"
                     type="text"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="Village, District, State"
@@ -272,10 +273,10 @@ function FarmerFieldPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="area-hectares" className="block text-sm font-medium text-gray-700 mb-1">
                       Area (hectares) *
                     </label>
-                    <input
+                    <input id="area-hectares"
                       type="number"
                       step="0.1"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -283,10 +284,10 @@ function FarmerFieldPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="soil-type" className="block text-sm font-medium text-gray-700 mb-1">
                       Soil Type
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <select id="soil-type" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                       <option value="">Select type</option>
                       <option value="alluvial">Alluvial</option>
                       <option value="black">Black Soil</option>
@@ -297,10 +298,10 @@ function FarmerFieldPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="irrigation-type" className="block text-sm font-medium text-gray-700 mb-1">
                     Irrigation Type
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select id="irrigation-type" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Select type</option>
                     <option value="rainfed">Rainfed</option>
                     <option value="canal">Canal Irrigation</option>
@@ -327,7 +328,7 @@ function FarmerFieldPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

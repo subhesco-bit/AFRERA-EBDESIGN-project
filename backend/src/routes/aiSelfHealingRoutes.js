@@ -12,7 +12,7 @@
 
 const express = require('express');
 const router = express.Router();
-const aiSelfHealingService = require('../services/aiSelfHealingService');
+const aiSelfHealingService = require('../services/legacy/aiSelfHealingService');
 
 /**
  * Detect and classify error

@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { sheepAPI } from '../services/api'
+import { sheepAPI, sheepAIAPI } from '../services/api'
 import { Rabbit, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby, Scissors } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
+import ActionCard from '../components/common/ActionCard'
 
 const BREEDS = ['Merino', 'Rambouillet', 'Dorper', 'Suffolk', 'Hampshire', 'Corriedale', 'Local / Desi', 'Crossbred']
 const STATUSES = ['Active', 'Pregnant', 'Lambing', 'Weaning', 'Shearing', 'Sold', 'Deceased']
@@ -21,6 +23,7 @@ function SheepFarmingPage() {
   const [feedForm, setFeedForm] = useState({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
   const [breedingForm, setBreedingForm] = useState({ female_id: '', male_id: '', breeding_date: '', expected_lambing_date: '' })
   const [tab, setTab] = useState('flock')
+  const [aiAnimalId, setAiAnimalId] = useState('')
 
   const { data: flockData, isLoading, error } = useQuery({
     queryKey: ['sheep-flock'],
@@ -126,7 +129,9 @@ function SheepFarmingPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
-            <Sheep className="w-6 h-6 mr-2 text-purple-600" />
+            {/* Sheep icon does not exist in lucide-react; using the already-imported Rabbit icon
+              (was previously an undefined "Sheep" reference that would ReferenceError on every render) */}
+            <Rabbit className="w-6 h-6 mr-2 text-purple-600" />
             Sheep Farming
           </h1>
           <p className="text-gray-600">Track flock health, wool production, and breeding records</p>
@@ -140,10 +145,10 @@ function SheepFarmingPage() {
       </div>
 
       <div className="flex gap-2 mb-6 border-b">
-        {['flock', 'wool', 'feed', 'breeding', 'insights'].map((t) => (
+        {['flock', 'wool', 'feed', 'breeding', 'insights', 'ai_insights'].map((t) => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 font-medium ${tab === t ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === 'ai_insights' ? 'AI Insights' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
@@ -246,8 +251,48 @@ function SheepFarmingPage() {
         </div>
       )}
 
+      {tab === 'ai_insights' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Animal</label>
+            <select value={aiAnimalId} onChange={(e) => setAiAnimalId(e.target.value)} className="w-full md:w-72 px-3 py-2 border rounded">
+              <option value="">Select an animal</option>
+              {flock.map((a) => <option key={a.id} value={a.id}>{a.tag_id}</option>)}
+            </select>
+          </div>
+          {!aiAnimalId && (
+            <div className="text-sm text-gray-500 bg-white border rounded-lg p-4">Select an animal above to run AI actions against it.</div>
+          )}
+          {aiAnimalId && (
+            <>
+              <ActionCard
+                title="Optimize Wool Production"
+                description="AI analysis of recent wool production trend, with recommendations."
+                onRun={() => sheepAIAPI.optimizeWoolProduction(aiAnimalId)}
+              />
+              <ActionCard
+                title="Monitor Health"
+                description="AI-powered health risk monitoring for this animal."
+                onRun={() => sheepAIAPI.monitorSheepHealth(aiAnimalId)}
+              />
+              <ActionCard
+                title="Optimize Feed"
+                description="AI-recommended feed composition for a given production goal."
+                fields={[{ name: 'productionGoal', label: 'Production Goal', placeholder: 'e.g. increase wool yield' }]}
+                onRun={(v) => sheepAIAPI.optimizeSheepFeed(aiAnimalId, { productionGoal: v.productionGoal })}
+              />
+              <ActionCard
+                title="Recommend Breeding"
+                description="AI-powered breeding recommendations for this animal."
+                onRun={() => sheepAIAPI.recommendSheepBreeding(aiAnimalId)}
+              />
+            </>
+          )}
+        </div>
+      )}
+
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">{editingId ? 'Edit Animal' : 'Add New Animal'}</h3>
@@ -276,7 +321,7 @@ function SheepFarmingPage() {
               <button onClick={closeForm} className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Cancel</button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

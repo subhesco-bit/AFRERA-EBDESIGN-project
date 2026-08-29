@@ -3,7 +3,7 @@
  * See that file's header for the honest not_configured provider discipline.
  */
 
-const productMediaAIService = require('../services/productMediaAIService');
+const productMediaAIService = require('../services/legacy/productMediaAIService');
 const { logger } = require('../utils/logger');
 
 const productMediaAIController = {

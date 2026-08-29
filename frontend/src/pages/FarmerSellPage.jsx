@@ -80,10 +80,10 @@ function FarmerSellPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="product_name" className="block text-sm font-medium text-gray-700 mb-1">
                   Product Name *
                 </label>
-                <input
+                <input id="product_name"
                   type="text"
                   name="product_name"
                   value={formData.product_name}
@@ -95,10 +95,10 @@ function FarmerSellPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
                   Category *
                 </label>
-                <select
+                <select id="category"
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
@@ -114,10 +114,10 @@ function FarmerSellPage() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
-              <textarea
+              <textarea id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
@@ -137,11 +137,11 @@ function FarmerSellPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
                   Quantity *
                 </label>
                 <div className="flex">
-                  <input
+                  <input id="quantity"
                     type="number"
                     name="quantity"
                     value={formData.quantity}
@@ -166,10 +166,10 @@ function FarmerSellPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="expected_price" className="block text-sm font-medium text-gray-700 mb-1">
                   Expected Price (₹) *
                 </label>
-                <input
+                <input id="expected_price"
                   type="number"
                   name="expected_price"
                   value={formData.expected_price}
@@ -182,10 +182,10 @@ function FarmerSellPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="harvest_date" className="block text-sm font-medium text-gray-700 mb-1">
                   Harvest Date *
                 </label>
-                <input
+                <input id="harvest_date"
                   type="date"
                   name="harvest_date"
                   value={formData.harvest_date}
@@ -205,10 +205,10 @@ function FarmerSellPage() {
             </h2>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
                 Farm Location *
               </label>
-              <input
+              <input id="location"
                 type="text"
                 name="location"
                 value={formData.location}
@@ -236,8 +236,8 @@ function FarmerSellPage() {
                 'HACCP',
                 'Fair Trade'
               ].map((cert) => (
-                <label key={cert} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
+                <label htmlFor="type-checkbox" key={cert} className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input id="type-checkbox"
                     type="checkbox"
                     checked={formData.certifications.includes(cert)}
                     onChange={(e) => {

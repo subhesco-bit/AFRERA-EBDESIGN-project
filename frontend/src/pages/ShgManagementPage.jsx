@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { shgAPI } from '../services/api'
 import { HeartHandshake, Plus, X, Users2, IndianRupee, UserPlus } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const emptyGroup = { name: '', village: '', formation_date: '', focus_area: '' }
 const emptyMember = { name: '', phone: '', role: 'Member' }
@@ -189,7 +190,7 @@ function ShgManagementPage() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowForm(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -205,24 +206,24 @@ function ShgManagementPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Group name *</label>
-                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Group name *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Village *</label>
-                  <input value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Village *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-2" value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Formation date</label>
-                    <input type="date" value={form.formation_date} onChange={(e) => setForm({ ...form, formation_date: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Formation date</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-3" type="date" value={form.formation_date} onChange={(e) => setForm({ ...form, formation_date: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Focus area</label>
-                    <input value={form.focus_area} onChange={(e) => setForm({ ...form, focus_area: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Focus area</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-4" value={form.focus_area} onChange={(e) => setForm({ ...form, focus_area: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500" placeholder="e.g., Handloom, Dairy" />
                   </div>
                 </div>
@@ -235,7 +236,7 @@ function ShgManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

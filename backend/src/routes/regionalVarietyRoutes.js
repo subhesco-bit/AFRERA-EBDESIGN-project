@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const regionalVarietyService = require('../services/regionalVarietyService');
+const regionalVarietyService = require('../services/legacy/regionalVarietyService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {

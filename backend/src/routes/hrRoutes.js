@@ -12,7 +12,7 @@
 
 const express = require('express');
 const router = express.Router();
-const hrService = require('../services/hrService');
+const hrService = require('../services/legacy/hrService');
 const { authMiddleware } = require('../middleware/auth');
 
 // All HR routes require authentication

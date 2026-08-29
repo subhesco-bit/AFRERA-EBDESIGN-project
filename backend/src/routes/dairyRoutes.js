@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const dairyService = require('../services/dairyService');
+const dairyService = require('../services/legacy/dairyService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');

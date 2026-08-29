@@ -1,6 +1,16 @@
 /**
  * Reflex Engine — the platform's spinal reflex arc, not another brain.
  *
+ * ADOPTION STATUS (checked 2026-08-29, AI-backbone reconciliation pass):
+ * zero callers anywhere in backend/src — core/signalBus.js (~60 importers,
+ * the platform's real nervous system) does not dispatch into this file, and
+ * nothing has registered a single reflex yet. Real, complete, correctly
+ * isolated infrastructure sitting unused, not dead code that should be
+ * deleted. Wiring signalBus.js to check registered reflexes before falling
+ * through to decisionEngine.js is the natural next step, but that is a
+ * signal-flow change affecting every one of signalBus's ~60 callers and
+ * belongs in its own reviewed change, not bundled into this pass.
+ *
  * WHY THIS IS A SEPARATE FILE FROM decisionEngine.js
  *
  * `decisionEngine.js` already has a rule labelled "reflex.emergency_escalation",

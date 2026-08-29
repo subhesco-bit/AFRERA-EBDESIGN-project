@@ -13,7 +13,7 @@
 
 const express = require('express');
 const router = express.Router();
-const sapModuleArchitectureService = require('../services/sapModuleArchitectureService');
+const sapModuleArchitectureService = require('../services/legacy/sapModuleArchitectureService');
 
 /**
  * Get all modules

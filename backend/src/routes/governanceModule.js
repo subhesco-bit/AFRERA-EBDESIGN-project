@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const governanceService = require('../services/governanceService');
+const governanceService = require('../services/legacy/governanceService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PROCUREMENT_ROLES } = require('../middleware/roleGroups');
 const { adminMiddleware } = require('../middleware/admin');

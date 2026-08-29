@@ -1,3 +1,9 @@
+<!-- Claude AI Ready Module - Systematic Reorganization -->
+<!-- Category: documentation -->
+<!-- Processed: 2026-08-28 14:27:18 -->
+<!-- Status: AI Integration Ready -->
+<!-- File: AFRERA_CLAUDE_BUILD_DIRECTIVE.md -->
+
 # AFRERA — MASTER BUILD DIRECTIVE FOR CLAUDE
 
 **Owner:** Ethnoverde Dynamics Pvt. Ltd.

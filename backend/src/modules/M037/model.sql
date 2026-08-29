@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Water Resource Mapping (M037)
--- Define tables and indexes here

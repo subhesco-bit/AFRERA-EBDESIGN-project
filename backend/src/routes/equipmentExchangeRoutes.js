@@ -4,7 +4,7 @@
 
 const express = require('express');
 const router = express.Router();
-const equipmentExchangeService = require('../services/equipmentExchangeService');
+const equipmentExchangeService = require('../services/legacy/equipmentExchangeService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.post('/', authMiddleware, async (req, res) => {

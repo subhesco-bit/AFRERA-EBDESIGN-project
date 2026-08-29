@@ -1,0 +1,55 @@
+{
+  "moduleId": "M501100_IDENTITYMANAGEMENT",
+  "version": "1.0.0",
+  "name": "Identity Management",
+  "description": "Migrated from legacy service: identityManagementService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\identityManagementService.js",
+    "migratedAt": "2026-08-24T17:28:24.728Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 122,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.192Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": false,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/IdentityManagementPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    }
+  }
+}

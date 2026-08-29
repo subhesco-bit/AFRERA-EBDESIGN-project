@@ -8,7 +8,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const xp = require('../services/experienceLayerService');
+const xp = require('../services/legacy/experienceLayerService');
 const { authMiddleware } = require('../middleware/auth');
 const fail = (res, e) => res.status(/required|cannot|must/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });

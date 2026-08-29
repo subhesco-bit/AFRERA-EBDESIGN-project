@@ -7,23 +7,22 @@ import {
   watershedManagementAPI,
   waterAnalyticsAPI,
 } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
 
 /**
  * Consolidated Water domain sub-modules: M076 (Water Budgeting), M077 (Water
  * Quality Monitoring), M078 (Rainwater Harvesting), M079 (Watershed
- * Management), M080 (Water Analytics).
+ * Management), M080 (Water Analytics) - backend/src/modules/M076-M080.
  *
- * M075 (Irrigation Management) is not a tab here — it already has its own
- * full page (pages/IrrigationManagementPage.jsx) and is out of this batch's
- * scope.
+ * Rebuilt (2026-08-28) around what the real backend functions actually are:
+ * action-oriented operations (create a budget, monitor a system, generate a
+ * report), not CRUD resources. The previous version of this page assumed a
+ * list/create/update/delete shape none of these five modules ever had -
+ * every call failed against a route that was never built. Routed through
+ * /api/v1/backend-modules/:moduleId/:operation (backendModuleBridge.js),
+ * which calls the real exported function by name.
  *
- * Built as one tabbed page (third batch, 2026-08-08), matching the
- * LandManagementPage.jsx pattern. M079 has an empty scaffold at
- * backend/src/modules/M079 (controller.js says "Add route handlers here",
- * not registered in backend/src/index.js) — not real backend support. None
- * of the five tabs have a matching backend route; every tab is wired
- * against a conventional REST shape and flagged with a backendNote.
+ * M075 (Irrigation Management) is not a tab here - it has its own page
+ * (pages/IrrigationManagementPage.jsx).
  */
 const TABS = [
   { id: 'budgeting', label: 'Water Budgeting', icon: Calculator },
@@ -33,11 +32,95 @@ const TABS = [
   { id: 'analytics', label: 'Water Analytics', icon: BarChart3 },
 ]
 
-const WATER_SOURCES = ['Borewell', 'Canal', 'Pond', 'River', 'Rainwater', 'Municipal']
-const QUALITY_PARAMS = ['pH', 'TDS', 'EC (Electrical Conductivity)', 'Nitrate', 'Fluoride', 'Hardness']
-const HARVEST_TYPES = ['Farm Pond', 'Check Dam', 'Recharge Pit', 'Rooftop Harvesting', 'Percolation Tank']
-const WATERSHED_STATUS = ['Planned', 'Under Treatment', 'Treated', 'Monitoring']
-const ANALYTICS_METRICS = ['Water Table Level', 'Usage per Acre', 'Rainfall Recorded', 'Runoff Captured', 'Efficiency %']
+/** One real backend operation: a small form of scalar fields plus an optional
+ * JSON textarea for whatever nested payload shape the operation expects. */
+function ActionCard({ title, description, fields = [], hasJsonPayload, jsonLabel, jsonPlaceholder, onRun }) {
+  const [values, setValues] = useState({})
+  const [jsonText, setJsonText] = useState('')
+  const [jsonError, setJsonError] = useState('')
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleRun = async () => {
+    setError('')
+    setResult(null)
+    let payload
+    if (hasJsonPayload) {
+      try {
+        payload = jsonText.trim() ? JSON.parse(jsonText) : {}
+        setJsonError('')
+      } catch {
+        setJsonError('Not valid JSON')
+        return
+      }
+    }
+    setLoading(true)
+    try {
+      const res = await onRun(values, payload)
+      setResult(res?.data ?? res)
+    } catch (e) {
+      setError(e?.response?.data?.error || e.message || 'Request failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+      <h3 className="font-semibold text-gray-800">{title}</h3>
+      <p className="text-sm text-gray-500 mb-3">{description}</p>
+
+      {fields.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          {fields.map((f) => (
+            <div key={f.name}>
+              <label htmlFor="type" className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
+              <input id="type"
+                type={f.type || 'text'}
+                value={values[f.name] || ''}
+                onChange={(e) => setValues((v) => ({ ...v, [f.name]: e.target.value }))}
+                className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm"
+                placeholder={f.placeholder}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hasJsonPayload && (
+        <div className="mb-3">
+          <label htmlFor="value" className="block text-xs font-medium text-gray-600 mb-1">{jsonLabel}</label>
+          <textarea id="value"
+            value={jsonText}
+            onChange={(e) => setJsonText(e.target.value)}
+            rows={4}
+            className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm font-mono"
+            placeholder={jsonPlaceholder}
+          />
+          {jsonError && <p className="text-xs text-red-600 mt-1">{jsonError}</p>}
+        </div>
+      )}
+
+      <button
+        onClick={handleRun}
+        disabled={loading}
+        className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded font-medium hover:bg-blue-700 disabled:opacity-50"
+      >
+        {loading ? 'Running…' : 'Run'}
+      </button>
+
+      {error && (
+        <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-2">{error}</div>
+      )}
+      {result && (
+        <pre className="mt-3 text-xs bg-gray-50 border border-gray-200 rounded p-2 overflow-x-auto max-h-64">
+          {JSON.stringify(result, null, 2)}
+        </pre>
+      )}
+    </div>
+  )
+}
 
 function WaterManagementPage() {
   const [activeTab, setActiveTab] = useState('budgeting')
@@ -65,188 +148,176 @@ function WaterManagementPage() {
       </div>
 
       {activeTab === 'budgeting' && (
-        <ResourceManager
-          compact
-          accent="blue"
-          queryKey="water-budgets"
-          idField="id"
-          list={(params) => waterBudgetingAPI.getBudgets(params)}
-          create={(data) => waterBudgetingAPI.createBudget(data)}
-          update={(id, data) => waterBudgetingAPI.updateBudget(id, data)}
-          remove={(id) => waterBudgetingAPI.deleteBudget(id)}
-          searchPlaceholder="Search by plot/field name..."
-          emptyMessage="No water budgets recorded yet."
-          newLabel="Add Water Budget"
-          backendNote="Backend endpoint /water-budgeting/budgets has not been built yet — this tab is wired and ready to work once it is."
-          initialForm={{ plot_name: '', source: 'Borewell', demand_liters: '', supply_liters: '', season: '', notes: '' }}
-          requiredFields={['plot_name']}
-          columns={[
-            { key: 'plot_name', label: 'Plot / Field' },
-            { key: 'source', label: 'Source' },
-            { key: 'demand_liters', label: 'Demand (L)' },
-            { key: 'supply_liters', label: 'Supply (L)' },
-            { key: 'season', label: 'Season' },
-          ]}
-          fields={[
-            { name: 'plot_name', label: 'Plot / field name', required: true },
-            { name: 'source', label: 'Water source', type: 'select', options: WATER_SOURCES },
-            { name: 'demand_liters', label: 'Demand (litres)', type: 'number' },
-            { name: 'supply_liters', label: 'Supply (litres)', type: 'number' },
-            { name: 'season', label: 'Season (Kharif/Rabi/Zaid)' },
-            { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
-          ]}
-          stats={(items) => [
-            { label: 'Budgets tracked', value: items.length },
-            { label: 'Total demand (L)', value: items.reduce((s, i) => s + (Number(i.demand_liters) || 0), 0).toLocaleString() },
-          ]}
-        />
+        <div>
+          <ActionCard
+            title="Create Water Budget"
+            description="Register a new water budget for a plot/field."
+            hasJsonPayload
+            jsonLabel="Budget data (JSON)"
+            jsonPlaceholder='{"plot_name": "North Field", "source": "Borewell", "demand_liters": 50000, "supply_liters": 42000, "season": "Kharif"}'
+            onRun={(_, payload) => waterBudgetingAPI.createBudget(payload)}
+          />
+          <ActionCard
+            title="Track Water Usage"
+            description="Get usage tracking for an existing budget over a period."
+            fields={[{ name: 'budgetId', label: 'Budget ID' }, { name: 'period', label: 'Period (e.g. 2026-Q3)' }]}
+            onRun={(v) => waterBudgetingAPI.trackUsage(v.budgetId, v.period)}
+          />
+          <ActionCard
+            title="Optimize Water Allocation"
+            description="Get an optimized allocation plan for a budget given constraints."
+            fields={[{ name: 'budgetId', label: 'Budget ID' }]}
+            hasJsonPayload
+            jsonLabel="Constraints (JSON)"
+            jsonPlaceholder='{"maxDailyLiters": 5000, "priority": "crop"}'
+            onRun={(v, payload) => waterBudgetingAPI.optimizeAllocation(v.budgetId, payload)}
+          />
+          <ActionCard
+            title="Generate Budget Report"
+            description="Generate a report for a budget."
+            fields={[{ name: 'budgetId', label: 'Budget ID' }, { name: 'reportType', label: 'Report type', placeholder: 'summary' }]}
+            onRun={(v) => waterBudgetingAPI.generateReport(v.budgetId, v.reportType)}
+          />
+        </div>
       )}
 
       {activeTab === 'quality' && (
-        <ResourceManager
-          compact
-          accent="teal"
-          queryKey="water-quality-readings"
-          idField="id"
-          list={(params) => waterQualityAPI.getReadings(params)}
-          create={(data) => waterQualityAPI.createReading(data)}
-          update={(id, data) => waterQualityAPI.updateReading(id, data)}
-          remove={(id) => waterQualityAPI.deleteReading(id)}
-          searchPlaceholder="Search by source or location..."
-          emptyMessage="No water quality readings recorded yet."
-          newLabel="Add Reading"
-          backendNote="Backend endpoint /water-quality/readings has not been built yet — this tab is wired and ready to work once it is."
-          initialForm={{ location: '', parameter: 'pH', value: '', unit: '', reading_date: '', notes: '' }}
-          requiredFields={['location', 'parameter']}
-          columns={[
-            { key: 'location', label: 'Location' },
-            { key: 'parameter', label: 'Parameter' },
-            { key: 'value', label: 'Value' },
-            { key: 'unit', label: 'Unit' },
-            { key: 'reading_date', label: 'Date' },
-          ]}
-          fields={[
-            { name: 'location', label: 'Location / source', required: true },
-            { name: 'parameter', label: 'Parameter tested', type: 'select', options: QUALITY_PARAMS },
-            { name: 'value', label: 'Reading value', type: 'number', step: 'any' },
-            { name: 'unit', label: 'Unit' },
-            { name: 'reading_date', label: 'Reading date', type: 'date' },
-            { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
-          ]}
-          stats={(items) => [
-            { label: 'Readings', value: items.length },
-            { label: 'Locations covered', value: new Set(items.map((i) => i.location).filter(Boolean)).size },
-          ]}
-        />
+        <div>
+          <ActionCard
+            title="Record Water Quality Measurement"
+            description="Log a new water quality measurement."
+            hasJsonPayload
+            jsonLabel="Measurement data (JSON)"
+            jsonPlaceholder='{"location": "Borewell 1", "parameter": "pH", "value": 7.2, "unit": "pH", "reading_date": "2026-08-28"}'
+            onRun={(_, payload) => waterQualityAPI.recordMeasurement(payload)}
+          />
+          <ActionCard
+            title="Get Compliance Report"
+            description="Get a regulatory compliance report for a location."
+            fields={[{ name: 'locationId', label: 'Location ID' }, { name: 'period', label: 'Period' }]}
+            onRun={(v) => waterQualityAPI.getComplianceReport(v.locationId, v.period)}
+          />
+          <ActionCard
+            title="Monitor Water Quality"
+            description="Get the current quality monitoring snapshot for a location."
+            fields={[{ name: 'locationId', label: 'Location ID' }]}
+            onRun={(v) => waterQualityAPI.monitorQuality(v.locationId)}
+          />
+          <ActionCard
+            title="Get Treatment Recommendations"
+            description="Get treatment recommendations for known quality issues."
+            fields={[{ name: 'locationId', label: 'Location ID' }]}
+            hasJsonPayload
+            jsonLabel="Quality issues (JSON array)"
+            jsonPlaceholder='["high_fluoride", "high_tds"]'
+            onRun={(v, payload) => waterQualityAPI.getTreatmentRecommendations(v.locationId, payload)}
+          />
+        </div>
       )}
 
       {activeTab === 'harvesting' && (
-        <ResourceManager
-          compact
-          accent="indigo"
-          queryKey="rainwater-harvesting-structures"
-          idField="id"
-          list={(params) => rainwaterHarvestingAPI.getStructures(params)}
-          create={(data) => rainwaterHarvestingAPI.createStructure(data)}
-          update={(id, data) => rainwaterHarvestingAPI.updateStructure(id, data)}
-          remove={(id) => rainwaterHarvestingAPI.deleteStructure(id)}
-          searchPlaceholder="Search by structure name or village..."
-          emptyMessage="No rainwater harvesting structures recorded yet."
-          newLabel="Add Structure"
-          backendNote="Backend endpoint /rainwater-harvesting/structures has not been built yet — this tab is wired and ready to work once it is."
-          initialForm={{ structure_name: '', structure_type: 'Farm Pond', village: '', capacity_liters: '', built_date: '', notes: '' }}
-          requiredFields={['structure_name', 'structure_type']}
-          columns={[
-            { key: 'structure_name', label: 'Structure' },
-            { key: 'structure_type', label: 'Type' },
-            { key: 'village', label: 'Village' },
-            { key: 'capacity_liters', label: 'Capacity (L)' },
-          ]}
-          fields={[
-            { name: 'structure_name', label: 'Structure name', required: true },
-            { name: 'structure_type', label: 'Structure type', type: 'select', options: HARVEST_TYPES },
-            { name: 'village', label: 'Village' },
-            { name: 'capacity_liters', label: 'Capacity (litres)', type: 'number' },
-            { name: 'built_date', label: 'Built date', type: 'date' },
-            { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
-          ]}
-          stats={(items) => [
-            { label: 'Structures', value: items.length },
-            { label: 'Total capacity (L)', value: items.reduce((s, i) => s + (Number(i.capacity_liters) || 0), 0).toLocaleString() },
-          ]}
-        />
+        <div>
+          <ActionCard
+            title="Design Harvesting System"
+            description="Design a new rainwater harvesting structure."
+            hasJsonPayload
+            jsonLabel="Design data (JSON)"
+            jsonPlaceholder='{"structure_name": "Pond A", "structure_type": "Farm Pond", "village": "Rampur", "capacity_liters": 100000}'
+            onRun={(_, payload) => rainwaterHarvestingAPI.designSystem(payload)}
+          />
+          <ActionCard
+            title="Monitor Collection"
+            description="Get collection monitoring data for a system over a period."
+            fields={[{ name: 'systemId', label: 'System ID' }, { name: 'period', label: 'Period' }]}
+            onRun={(v) => rainwaterHarvestingAPI.monitorCollection(v.systemId, v.period)}
+          />
+          <ActionCard
+            title="Calculate Water Budget"
+            description="Calculate the water budget for a system over a time frame."
+            fields={[{ name: 'systemId', label: 'System ID' }, { name: 'timeFrame', label: 'Time frame' }]}
+            onRun={(v) => rainwaterHarvestingAPI.calculateBudget(v.systemId, v.timeFrame)}
+          />
+          <ActionCard
+            title="Manage Storage Capacity"
+            description="Update storage capacity management for a system."
+            fields={[{ name: 'systemId', label: 'System ID' }]}
+            hasJsonPayload
+            jsonLabel="Management data (JSON)"
+            jsonPlaceholder='{"action": "increase", "targetCapacityLiters": 150000}'
+            onRun={(v, payload) => rainwaterHarvestingAPI.manageStorage(v.systemId, payload)}
+          />
+        </div>
       )}
 
       {activeTab === 'watershed' && (
-        <ResourceManager
-          compact
-          accent="green"
-          queryKey="watersheds"
-          idField="id"
-          list={(params) => watershedManagementAPI.getWatersheds(params)}
-          create={(data) => watershedManagementAPI.createWatershed(data)}
-          update={(id, data) => watershedManagementAPI.updateWatershed(id, data)}
-          remove={(id) => watershedManagementAPI.deleteWatershed(id)}
-          searchPlaceholder="Search by watershed name..."
-          emptyMessage="No watersheds recorded yet."
-          newLabel="Add Watershed"
-          backendNote="Backend endpoint /watersheds has not been built yet — this tab is wired and ready to work once it is. (backend/src/modules/M079 is an empty scaffold — controller.js has no real handlers and is not registered in backend/src/index.js.)"
-          initialForm={{ name: '', area_hectares: '', status: 'Planned', villages_covered: '', notes: '' }}
-          requiredFields={['name']}
-          columns={[
-            { key: 'name', label: 'Watershed' },
-            { key: 'area_hectares', label: 'Area (ha)' },
-            { key: 'status', label: 'Status' },
-            { key: 'villages_covered', label: 'Villages Covered' },
-          ]}
-          fields={[
-            { name: 'name', label: 'Watershed name', required: true },
-            { name: 'area_hectares', label: 'Area (hectares)', type: 'number' },
-            { name: 'status', label: 'Treatment status', type: 'select', options: WATERSHED_STATUS },
-            { name: 'villages_covered', label: 'Villages covered' },
-            { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
-          ]}
-          stats={(items) => [
-            { label: 'Watersheds', value: items.length },
-            { label: 'Total area (ha)', value: items.reduce((s, i) => s + (Number(i.area_hectares) || 0), 0).toLocaleString() },
-          ]}
-        />
+        <div>
+          <ActionCard
+            title="Create Watershed Plan"
+            description="Create a new watershed management plan."
+            hasJsonPayload
+            jsonLabel="Plan data (JSON)"
+            jsonPlaceholder='{"name": "Hill Watershed 1", "area_hectares": 250, "villages_covered": "Rampur, Ganeshpur"}'
+            onRun={(_, payload) => watershedManagementAPI.createPlan(payload)}
+          />
+          <ActionCard
+            title="Monitor Watershed Health"
+            description="Get the current health status of a watershed."
+            fields={[{ name: 'watershedId', label: 'Watershed ID' }]}
+            onRun={(v) => watershedManagementAPI.monitorHealth(v.watershedId)}
+          />
+          <ActionCard
+            title="Implement Conservation Measures"
+            description="Record conservation measures being implemented."
+            fields={[{ name: 'watershedId', label: 'Watershed ID' }]}
+            hasJsonPayload
+            jsonLabel="Measures data (JSON)"
+            jsonPlaceholder='{"measureType": "check_dam", "status": "Under Treatment"}'
+            onRun={(v, payload) => watershedManagementAPI.implementConservation(v.watershedId, payload)}
+          />
+          <ActionCard
+            title="Generate Watershed Report"
+            description="Generate a report for a watershed."
+            fields={[{ name: 'watershedId', label: 'Watershed ID' }, { name: 'reportType', label: 'Report type', placeholder: 'summary' }]}
+            onRun={(v) => watershedManagementAPI.generateReport(v.watershedId, v.reportType)}
+          />
+        </div>
       )}
 
       {activeTab === 'analytics' && (
-        <ResourceManager
-          compact
-          accent="purple"
-          queryKey="water-analytics-records"
-          idField="id"
-          list={(params) => waterAnalyticsAPI.getRecords(params)}
-          create={(data) => waterAnalyticsAPI.createRecord(data)}
-          update={(id, data) => waterAnalyticsAPI.updateRecord(id, data)}
-          remove={(id) => waterAnalyticsAPI.deleteRecord(id)}
-          searchPlaceholder="Search by metric or period..."
-          emptyMessage="No water analytics entries recorded yet."
-          newLabel="Add Analytics Entry"
-          backendNote="Backend endpoint /water-analytics/records has not been built yet — this tab is wired and ready to work once it is."
-          initialForm={{ metric: 'Water Table Level', period: '', value: '', unit: '', notes: '' }}
-          requiredFields={['metric', 'period']}
-          columns={[
-            { key: 'metric', label: 'Metric' },
-            { key: 'period', label: 'Period' },
-            { key: 'value', label: 'Value' },
-            { key: 'unit', label: 'Unit' },
-          ]}
-          fields={[
-            { name: 'metric', label: 'Metric', type: 'select', options: ANALYTICS_METRICS },
-            { name: 'period', label: 'Period (e.g. 2026-Q3)', required: true },
-            { name: 'value', label: 'Value', type: 'number' },
-            { name: 'unit', label: 'Unit (e.g. m, %, mm)' },
-            { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
-          ]}
-          stats={(items) => [
-            { label: 'Entries', value: items.length },
-            { label: 'Metrics tracked', value: new Set(items.map((i) => i.metric).filter(Boolean)).size },
-          ]}
-        />
+        <div>
+          <ActionCard
+            title="Generate Water Usage Analytics"
+            description="Generate usage analytics for a location/period."
+            hasJsonPayload
+            jsonLabel="Params (JSON)"
+            jsonPlaceholder='{"locationId": "loc-1", "period": "2026-Q3"}'
+            onRun={(_, payload) => waterAnalyticsAPI.generateUsageAnalytics(payload)}
+          />
+          <ActionCard
+            title="Create Water Dashboard"
+            description="Create a configured analytics dashboard."
+            hasJsonPayload
+            jsonLabel="Dashboard config (JSON)"
+            jsonPlaceholder='{"widgets": ["usage", "efficiency"], "locationId": "loc-1"}'
+            onRun={(_, payload) => waterAnalyticsAPI.createDashboard(payload)}
+          />
+          <ActionCard
+            title="Generate Predictive Analysis"
+            description="Generate a predictive water-usage forecast."
+            hasJsonPayload
+            jsonLabel="Prediction params (JSON)"
+            jsonPlaceholder='{"locationId": "loc-1", "horizon": "90d"}'
+            onRun={(_, payload) => waterAnalyticsAPI.generatePrediction(payload)}
+          />
+          <ActionCard
+            title="Compare Water Performance"
+            description="Compare performance across locations."
+            hasJsonPayload
+            jsonLabel="Comparison params (JSON)"
+            jsonPlaceholder='{"locationIds": ["loc-1", "loc-2"], "metrics": ["efficiency"]}'
+            onRun={(_, payload) => waterAnalyticsAPI.comparePerformance(payload)}
+          />
+        </div>
       )}
     </div>
   )

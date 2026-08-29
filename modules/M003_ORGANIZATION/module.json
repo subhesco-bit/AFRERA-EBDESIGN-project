@@ -1,0 +1,107 @@
+{
+  "moduleId": "M003_ORGANIZATION",
+  "version": "1.0.0",
+  "name": "Organization Management",
+  "description": "Organization and enterprise management including company profiles, hierarchies, and settings",
+  "category": "organization",
+  "status": "production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": ["M002_USER_MANAGEMENT"],
+    "services": ["postgresql", "redis"],
+    "libraries": {
+      "backend": ["express"],
+      "frontend": ["react", "zustand"]
+    }
+  },
+  "discovery": {
+    "keywords": ["organization", "company", "enterprise", "business", "hierarchy"],
+    "capabilities": [
+      "organization-crud",
+      "hierarchy-management",
+      "organization-settings",
+      "member-management",
+      "organization-analytics"
+    ],
+    "aiContext": "Manages organizational structures, company profiles, and business hierarchies. Essential for enterprise and multi-tenant functionality.",
+    "useCases": [
+      "Create and manage organizations",
+      "Manage organizational hierarchies",
+      "Handle organization settings and preferences",
+      "Manage organization members",
+      "Track organization analytics"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "className": "OrganizationManagementService",
+      "apiRoutes": "backend/routes.js",
+      "port": 3003
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/components/OrganizationDashboard.jsx"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/organizations",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js"
+    }
+  },
+  "claudeIntegration": {
+    "supportedAgents": ["admin", "organization-admin", "business-analyst"],
+    "contextSources": [
+      "database:organizations",
+      "database:organization_members",
+      "database:organization_settings"
+    ],
+    "autoDiscovery": true,
+    "runtimeLoading": true,
+    "priority": "high"
+  },
+  "endpoints": {
+    "createOrganization": {
+      "method": "POST",
+      "path": "/api/v1/organizations",
+      "description": "Create new organization",
+      "authentication": true
+    },
+    "getOrganization": {
+      "method": "GET",
+      "path": "/api/v1/organizations/:id",
+      "description": "Get organization by ID",
+      "authentication": true
+    }
+  },
+  "dataModels": {
+    "input": {
+      "organizationCreate": "backend/models/organizationCreate.model.js"
+    },
+    "output": {
+      "organization": "backend/models/organization.model.js"
+    }
+  },
+  "testing": {
+    "unit": "tests/unit",
+    "integration": "tests/integration",
+    "e2e": "tests/e2e",
+    "coverage": ">= 80%"
+  },
+  "documentation": {
+    "readme": "docs/README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api": "docs/API.md",
+    "integration": "docs/CLAUDE_INTEGRATION.md"
+  },
+  "metadata": {
+    "createdAt": "2026-08-24T20:04:00Z",
+    "updatedAt": "2026-08-24T20:04:00Z",
+    "installedAt": null,
+    "lastHealthCheck": null,
+    "versionHistory": []
+  }
+}

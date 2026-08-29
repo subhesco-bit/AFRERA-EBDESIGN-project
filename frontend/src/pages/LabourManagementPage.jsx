@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { labourAPI } from '../services/api'
 import { Users, Plus, X, CheckCircle2, IndianRupee } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const SKILLS = ['General', 'Machine Operator', 'Sprayer', 'Harvester', 'Irrigation', 'Supervisor']
 const WAGE_TYPES = ['Daily', 'Piece Rate', 'Monthly']
@@ -149,21 +150,21 @@ function LabourManagementPage() {
               className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Worker</label>
-                <select value={attendanceForm.worker_id} onChange={(e) => setAttendanceForm({ ...attendanceForm, worker_id: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Worker</label>
+                <select id="classname-w-full-px-3-py-2-border-border" value={attendanceForm.worker_id} onChange={(e) => setAttendanceForm({ ...attendanceForm, worker_id: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                   <option value="">Select worker</option>
                   {workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date" value={attendanceForm.date} onChange={(e) => setAttendanceForm({ ...attendanceForm, date: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input id="classname-w-full-px-3-py-2-border-border-2" type="date" value={attendanceForm.date} onChange={(e) => setAttendanceForm({ ...attendanceForm, date: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select value={attendanceForm.status} onChange={(e) => setAttendanceForm({ ...attendanceForm, status: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="classname-w-full-px-3-py-2-border-border-3" value={attendanceForm.status} onChange={(e) => setAttendanceForm({ ...attendanceForm, status: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                   <option value="present">Present</option>
                   <option value="absent">Absent</option>
@@ -212,7 +213,7 @@ function LabourManagementPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowForm(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -228,34 +229,34 @@ function LabourManagementPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-4" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                  <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-5" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Skill</label>
-                    <select value={form.skill} onChange={(e) => setForm({ ...form, skill: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Skill</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-6" value={form.skill} onChange={(e) => setForm({ ...form, skill: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                       {SKILLS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Wage type</label>
-                    <select value={form.wage_type} onChange={(e) => setForm({ ...form, wage_type: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Wage type</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-7" value={form.wage_type} onChange={(e) => setForm({ ...form, wage_type: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                       {WAGE_TYPES.map((w) => <option key={w} value={w}>{w}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Wage rate (₹)</label>
-                  <input type="number" step="0.01" value={form.wage_rate} onChange={(e) => setForm({ ...form, wage_rate: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-8" className="block text-sm font-medium text-gray-700 mb-1">Wage rate (₹)</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-8" type="number" step="0.01" value={form.wage_rate} onChange={(e) => setForm({ ...form, wage_rate: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -267,7 +268,7 @@ function LabourManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

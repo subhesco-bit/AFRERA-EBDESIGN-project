@@ -14,7 +14,7 @@
 
 const express = require('express');
 const router = express.Router();
-const systemAdministrationService = require('../services/systemAdministrationService');
+const systemAdministrationService = require('../services/legacy/systemAdministrationService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');

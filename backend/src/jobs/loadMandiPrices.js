@@ -34,7 +34,7 @@
 
 'use strict';
 
-const marketData = require('../services/marketDataService');
+const marketData = require('../services/legacy/marketDataService');
 const { logger } = require('../utils/logger');
 
 const RESOURCE = '9ef84268-d588-465a-a308-a864a43d0070';

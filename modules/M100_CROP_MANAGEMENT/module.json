@@ -1,0 +1,44 @@
+{
+  "moduleId": "M100_CROP_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Crop Management",
+  "description": "Migrated from legacy service: cropManagementService.js",
+  "category": "platform",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\cropManagementService.js",
+    "migratedAt": "2026-08-24T17:28:24.294Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 52,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.593Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

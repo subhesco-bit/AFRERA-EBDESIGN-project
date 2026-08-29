@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Modal from '../components/common/Modal'
 import {
   Calendar,
   Sprout,
@@ -226,7 +227,7 @@ function HarvestPlanPage() {
 
       {/* Crop Detail Modal */}
       {selectedCrop && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setSelectedCrop(null)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -275,7 +276,7 @@ function HarvestPlanPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

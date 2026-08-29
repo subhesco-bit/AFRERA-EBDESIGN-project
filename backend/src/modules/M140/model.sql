@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Aquaculture Analytics (M140)
--- Define tables and indexes here

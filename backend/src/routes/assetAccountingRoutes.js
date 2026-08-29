@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const assetAccountingService = require('../services/assetAccountingService');
+const assetAccountingService = require('../services/legacy/assetAccountingService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');

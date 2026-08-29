@@ -1,0 +1,130 @@
+{
+  "moduleId": "M002_USER_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "User Management",
+  "description": "User account management including CRUD operations, authentication, and profile management",
+  "category": "identity",
+  "status": "production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": ["M003_ORGANIZATION", "M004_ROLE_MANAGEMENT"],
+    "services": ["postgresql", "redis"],
+    "libraries": {
+      "backend": ["express", "bcrypt", "jsonwebtoken"],
+      "frontend": ["react", "zustand"]
+    }
+  },
+  "discovery": {
+    "keywords": ["user", "account", "profile", "authentication", "identity"],
+    "capabilities": [
+      "user-crud",
+      "profile-management",
+      "authentication",
+      "user-search",
+      "user-roles"
+    ],
+    "aiContext": "Manages user accounts, profiles, and authentication. Essential for identity and access management across the platform.",
+    "useCases": [
+      "Create and manage user accounts",
+      "Handle user authentication and authorization",
+      "Manage user profiles and preferences",
+      "Search and filter users",
+      "Assign roles and permissions to users"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "className": "UserManagementService",
+      "apiRoutes": "backend/routes.js",
+      "port": 3002,
+      "startup": "backend/startup.js",
+      "shutdown": "backend/shutdown.js"
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/components/UserDashboard.jsx"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/users",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js"
+    }
+  },
+  "claudeIntegration": {
+    "supportedAgents": ["admin", "user-admin", "support-agent"],
+    "contextSources": [
+      "database:users",
+      "database:user_profiles",
+      "runtime:user_sessions",
+      "runtime:authentication_tokens"
+    ],
+    "autoDiscovery": true,
+    "runtimeLoading": true,
+    "priority": "critical",
+    "interactionPatterns": {
+      "discovery": "Natural language query for user management",
+      "execution": "Standard user CRUD operations",
+      "authentication": "User authentication and session management",
+      "authorization": "Role-based access control"
+    }
+  },
+  "endpoints": {
+    "createUser": {
+      "method": "POST",
+      "path": "/api/v1/users",
+      "description": "Create new user account",
+      "authentication": true
+    },
+    "getUser": {
+      "method": "GET",
+      "path": "/api/v1/users/:id",
+      "description": "Get user by ID",
+      "authentication": true
+    },
+    "updateUser": {
+      "method": "PUT",
+      "path": "/api/v1/users/:id",
+      "description": "Update user information",
+      "authentication": true
+    },
+    "deleteUser": {
+      "method": "DELETE",
+      "path": "/api/v1/users/:id",
+      "description": "Delete user account",
+      "authentication": true
+    }
+  },
+  "dataModels": {
+    "input": {
+      "userCreate": "backend/models/userCreate.model.js",
+      "userUpdate": "backend/models/userUpdate.model.js"
+    },
+    "output": {
+      "user": "backend/models/user.model.js",
+      "userList": "backend/models/userList.model.js"
+    }
+  },
+  "testing": {
+    "unit": "tests/unit",
+    "integration": "tests/integration",
+    "e2e": "tests/e2e",
+    "coverage": ">= 80%"
+  },
+  "documentation": {
+    "readme": "docs/README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api": "docs/API.md",
+    "integration": "docs/CLAUDE_INTEGRATION.md"
+  },
+  "metadata": {
+    "createdAt": "2026-08-24T20:04:00Z",
+    "updatedAt": "2026-08-24T20:04:00Z",
+    "installedAt": null,
+    "lastHealthCheck": null,
+    "versionHistory": []
+  }
+}

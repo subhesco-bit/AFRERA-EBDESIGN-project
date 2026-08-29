@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Water Quality Control (M135)
--- Define tables and indexes here

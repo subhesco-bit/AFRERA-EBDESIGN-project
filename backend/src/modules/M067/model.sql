@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Sowing Management (M067)
--- Define tables and indexes here

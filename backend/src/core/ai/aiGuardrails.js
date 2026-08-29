@@ -154,7 +154,11 @@ function sanitizeInput(input, violations) {
 function checkAuthorization(user, operation, resource) {
   // This would typically integrate with the auth system
   // For now, we'll implement basic checks
-  
+
+  if (!user) {
+    return { authorized: false, reason: 'No authenticated user on this request' };
+  }
+
   const permissions = {
     'text_generation': ['user', 'admin', 'system'],
     'image_analysis': ['user', 'admin', 'system'],

@@ -1,0 +1,26 @@
+[
+  {
+    "cableId": "CABLE_M309_COST_MANAGEMENT_TO_M001_PLATFORM_CORE_DATA",
+    "source": "M309_COST_MANAGEMENT",
+    "target": "M001_PLATFORM_CORE",
+    "type": "data",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "high",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  },
+  {
+    "cableId": "CABLE_M309_COST_MANAGEMENT_TO_M301_FINANCIAL_MANAGEMENT_DATA",
+    "source": "M309_COST_MANAGEMENT",
+    "target": "M301_FINANCIAL_MANAGEMENT",
+    "type": "data",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "high",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  }
+]

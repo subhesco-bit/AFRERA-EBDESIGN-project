@@ -11,7 +11,7 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
-const { farmerFamily } = require('../services/farmerFamilyService');
+const { farmerFamily } = require('../services/legacy/farmerFamilyService');
 
 router.get('/', async (req, res) => {
   try { res.json({ success: true, data: await farmerFamily.list(req.query) }); }

@@ -1,0 +1,42 @@
+{
+  "moduleId": "M775100_FARMERFAMILY",
+  "version": "1.0.0",
+  "name": "Farmer Family",
+  "description": "Migrated from legacy service: farmerFamilyService.js",
+  "category": "enterprise",
+  "status": "ROUTES_ONLY",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\farmerFamilyService.js",
+    "migratedAt": "2026-08-24T17:28:24.552Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 20,
+      "isComplete": false,
+      "category": "ROUTES_ONLY"
+    }
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": false,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

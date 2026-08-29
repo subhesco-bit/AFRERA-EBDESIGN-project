@@ -1,0 +1,17 @@
+﻿{
+    "discoveredRoots":  [
+                            ".claude",
+                            ".devin",
+                            ".ai"
+                        ],
+    "claudeRoots":  [
+                        ".claude"
+                    ],
+    "devinRoots":  [
+                       ".devin"
+                   ],
+    "commonRoots":  [
+
+                    ],
+    "aiRoot":  ".ai"
+}

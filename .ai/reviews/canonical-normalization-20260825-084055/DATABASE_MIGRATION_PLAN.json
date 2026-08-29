@@ -1,0 +1,16 @@
+﻿{
+    "execution":  "NOT_EXECUTED",
+    "requiredAnalysis":  [
+                             "existing tables",
+                             "new tables",
+                             "existing migrations",
+                             "new migrations",
+                             "migration order",
+                             "foreign keys",
+                             "indexes",
+                             "constraints",
+                             "seed data",
+                             "rollback strategy",
+                             "compatibility"
+                         ]
+}

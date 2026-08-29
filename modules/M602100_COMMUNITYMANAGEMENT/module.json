@@ -1,0 +1,53 @@
+{
+  "moduleId": "M602100_COMMUNITYMANAGEMENT",
+  "version": "1.0.0",
+  "name": "Community Management",
+  "description": "Migrated from legacy service: communityManagementService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\communityManagementService.js",
+    "migratedAt": "2026-08-24T17:28:24.220Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 52,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.273Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": false,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/CommunityManagementPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    }
+  }
+}

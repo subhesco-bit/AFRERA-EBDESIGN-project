@@ -8,7 +8,7 @@
 
 const express = require('express');
 const router = express.Router();
-const costControlService = require('../services/costControlService');
+const costControlService = require('../services/legacy/costControlService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

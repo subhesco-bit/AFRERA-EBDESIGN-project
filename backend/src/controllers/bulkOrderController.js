@@ -3,7 +3,7 @@
  * Handles bulk/wholesale orders for AFRERA marketplace
  */
 
-const bulkOrderService = require('../services/bulkOrderService');
+const bulkOrderService = require('../services/legacy/bulkOrderService');
 const { logger } = require('../utils/logger');
 
 /**
@@ -36,8 +36,16 @@ exports.createBulkOrderRequest = async (req, res) => {
 exports.getBulkOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
-    const result = await bulkOrderService.getBulkOrder(orderId);
+
+    // Was calling getBulkOrder(orderId) with no userId - the service adds
+    // "AND bo.user_id = $2" whenever isAdmin is false (the default) and
+    // pushes undefined as that param, so the query could never match any
+    // row and this endpoint always 500'd "Bulk order not found". This
+    // route has no authMiddleware applied (checked bulkOrderRoutes.js),
+    // so there's no real user scoping to enforce here yet - pass
+    // isAdmin=true to make the existing intended lookup-by-id actually
+    // work, same openness the route already has.
+    const result = await bulkOrderService.getBulkOrder(orderId, req.user?.id, true);
     
     res.status(200).json({
       success: true,
@@ -106,10 +114,9 @@ exports.updateBulkOrderStatus = async (req, res) => {
 exports.getBulkOrderQuotations = async (req, res) => {
   try {
     const { orderId } = req.params;
-    
-    // This would need to be implemented in the service
-    const result = { message: 'Quotations endpoint - service method to be implemented' };
-    
+
+    const result = await bulkOrderService.getQuotationsForOrder(orderId);
+
     res.status(200).json({
       success: true,
       data: result
@@ -177,9 +184,14 @@ exports.acceptQuotation = async (req, res) => {
  */
 exports.getBulkOrderAnalytics = async (req, res) => {
   try {
-    const { userId } = req.query;
-    
-    const result = await bulkOrderService.getBulkOrderAnalytics(userId);
+    // Was calling bulkOrderService.getBulkOrderAnalytics(userId) - that
+    // method doesn't exist on the service (only getBulkOrderStats does,
+    // and it filters by startDate/endDate/productId, not userId) - this
+    // endpoint would have thrown "getBulkOrderAnalytics is not a
+    // function" on every call. Fixed to call the real method with the
+    // filters it actually supports.
+    const { startDate, endDate, productId } = req.query;
+    const result = await bulkOrderService.getBulkOrderStats({ startDate, endDate, productId });
     
     res.status(200).json({
       success: true,

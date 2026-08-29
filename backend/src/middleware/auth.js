@@ -3,7 +3,7 @@
  * Provides JWT verification and authorization for protected routes
  */
 
-const { verifyToken, hasPermission } = require('../services/authService');
+const { verifyToken, hasPermission } = require('../services/dual-use/authService');
 const { logger } = require('../utils/logger');
 
 // SKIP_AUTH (and the relaxed test-mode verification below) must never take
@@ -59,7 +59,7 @@ function authMiddleware(req, res, next) {
 
       try {
         const token = authHeader.replace('Bearer ', '');
-        const payload = require('../services/authService').verifyToken(token);
+        const payload = require('../services/dual-use/authService').verifyToken(token);
         req.user = {
           id: payload.userId || payload.id,
           email: payload.email,

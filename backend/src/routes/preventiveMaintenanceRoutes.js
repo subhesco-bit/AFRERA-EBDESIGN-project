@@ -11,7 +11,7 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
-const { preventiveMaintenance } = require('../services/preventiveMaintenanceService');
+const { preventiveMaintenance } = require('../services/legacy/preventiveMaintenanceService');
 
 router.get('/', async (req, res) => {
   try { res.json({ success: true, data: await preventiveMaintenance.list(req.query) }); }

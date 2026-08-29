@@ -19,9 +19,9 @@
  * ENGINES registry for capabilities that are not real yet.
  */
 const express = require('express');
-const { getBuyerCreditEligibility, farmerCreditRiskScore } = require('../services/financialService');
-const governmentSchemeService = require('../services/governmentSchemeService');
-const aiOrchestrationService = require('../services/aiOrchestrationService');
+const { getBuyerCreditEligibility, farmerCreditRiskScore } = require('../services/legacy/financialService');
+const governmentSchemeService = require('../services/legacy/governmentSchemeService');
+const aiOrchestrationService = require('../services/legacy/aiOrchestrationService');
 const aiOrchestrator = require('../core/aiOrchestrator');
 const { authMiddleware } = require('../middleware/auth');
 

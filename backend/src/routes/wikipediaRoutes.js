@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const wikipediaService = require('../services/wikipediaService');
+const wikipediaService = require('../services/legacy/wikipediaService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.get('/lookup', authMiddleware, async (req, res) => {

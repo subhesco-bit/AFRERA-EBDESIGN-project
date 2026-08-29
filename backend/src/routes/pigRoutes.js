@@ -28,7 +28,7 @@ const {
   monitorPigHealth,
   optimizePigFeed,
   recommendPigBreeding,
-} = require('../services/pigService');
+} = require('../services/legacy/pigService');
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');

@@ -1,4 +1,4 @@
-const defenseFitnessPrepService = require('../services/defenseFitnessPrepService');
+const defenseFitnessPrepService = require('../services/legacy/defenseFitnessPrepService');
 const { logger } = require('../utils/logger');
 
 const defenseFitnessPrepController = {

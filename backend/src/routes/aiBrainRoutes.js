@@ -11,7 +11,7 @@
 
 const express = require('express');
 const router = express.Router();
-const aiBrainService = require('../services/aiBrainService');
+const aiBrainService = require('../services/legacy/aiBrainService');
 
 /**
  * Execute full cognitive cycle

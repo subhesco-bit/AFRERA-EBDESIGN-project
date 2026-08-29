@@ -5,7 +5,7 @@
  * Handles HTTP requests and responses, delegates to service layer
  */
 
-const hrService = require('../services/hrService');
+const hrService = require('../services/legacy/hrService');
 
 class HRController {
   /**

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { landAPI } from '../services/api'
 import { MapPin, Plus, Trash2, Edit, X, FileCheck2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const OWNERSHIP_TYPES = ['Owned', 'Leased', 'Sharecropped', 'Government Allotted']
 const TITLE_STATUS = ['Verified', 'Pending Verification', 'Disputed', 'Not Submitted']
@@ -192,7 +193,7 @@ function LandRegistryPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -202,64 +203,64 @@ function LandRegistryPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Parcel code</label>
-                    <input value={form.parcel_code} onChange={(e) => setForm({ ...form, parcel_code: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Parcel code</label>
+                    <input id="classname-w-full-px-3-py-2-border-border" value={form.parcel_code} onChange={(e) => setForm({ ...form, parcel_code: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="Auto-generated if blank" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Owner name *</label>
-                    <input value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Owner name *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-2" value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Village *</label>
-                    <input value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Village *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-3" value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
-                    <input value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">District</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-4" value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                    <input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Area (hectares) *</label>
-                    <input type="number" step="0.01" value={form.area_hectares} onChange={(e) => setForm({ ...form, area_hectares: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Survey number</label>
-                    <input value={form.survey_number} onChange={(e) => setForm({ ...form, survey_number: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-5" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ownership type</label>
-                    <select value={form.ownership_type} onChange={(e) => setForm({ ...form, ownership_type: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Area (hectares) *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-6" type="number" step="0.01" value={form.area_hectares} onChange={(e) => setForm({ ...form, area_hectares: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                  </div>
+                  <div>
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Survey number</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-7" value={form.survey_number} onChange={(e) => setForm({ ...form, survey_number: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-8" className="block text-sm font-medium text-gray-700 mb-1">Ownership type</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-8" value={form.ownership_type} onChange={(e) => setForm({ ...form, ownership_type: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                       {OWNERSHIP_TYPES.map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title status</label>
-                    <select value={form.title_status} onChange={(e) => setForm({ ...form, title_status: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-9" className="block text-sm font-medium text-gray-700 mb-1">Title status</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-9" value={form.title_status} onChange={(e) => setForm({ ...form, title_status: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                       {TITLE_STATUS.map((o) => <option key={o} value={o}>{o}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-10" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                  <textarea id="classname-w-full-px-3-py-2-border-border-10" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -272,7 +273,7 @@ function LandRegistryPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

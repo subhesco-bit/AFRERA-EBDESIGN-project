@@ -9,7 +9,7 @@
  * - Commission Management
  */
 
-const ecommerceBusinessSalesService = require('../services/ecommerceBusinessSalesService');
+const ecommerceBusinessSalesService = require('../services/legacy/ecommerceBusinessSalesService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

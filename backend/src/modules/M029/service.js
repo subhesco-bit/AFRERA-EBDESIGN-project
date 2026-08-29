@@ -127,7 +127,68 @@ async function enrollWelfareProgram(farmerId, programId) {
   return res.rows[0];
 }
 
+async function listItems(options = {}) {
+  return listHealthRecords(options);
+}
+
+async function getItem(id) {
+  return getHealthRecord(id);
+}
+
+async function createItem(payload) {
+  return createHealthRecord(payload);
+}
+
+async function updateItem(id, payload) {
+  return updateHealthRecord(id, payload);
+}
+
+async function deleteItem(id) {
+  return deleteHealthRecord(id);
+}
+
+async function healthCheck() {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  await pg.query('SELECT 1');
+  return {
+    status: 'healthy',
+    moduleId: 'M029',
+    moduleName: 'Farmer Health & Welfare',
+    tableName
+  };
+}
+
+async function execute(operation, parameters = {}) {
+  switch (operation) {
+    case 'list':
+      return { success: true, data: await listItems(parameters) };
+    case 'get':
+      return { success: true, data: await getItem(parameters.id) };
+    case 'create':
+      return { success: true, data: await createItem(parameters) };
+    case 'update':
+      return { success: true, data: await updateItem(parameters.id, parameters) };
+    case 'delete':
+      return { success: true, data: await deleteItem(parameters.id) };
+    case 'summary':
+    case 'analyze':
+      return { success: true, data: await getFarmerHealthSummary(parameters.farmerId) };
+    case 'welfarePrograms':
+      return { success: true, data: await getWelfarePrograms(parameters) };
+    case 'enrollWelfareProgram':
+      return { success: true, data: await enrollWelfareProgram(parameters.farmerId, parameters.programId) };
+    default:
+      return { success: false, error: `Unsupported M029 operation: ${operation}` };
+  }
+}
+
 module.exports = {
+  listItems,
+  getItem,
+  createItem,
+  updateItem,
+  deleteItem,
   listHealthRecords,
   getHealthRecord,
   createHealthRecord,
@@ -135,5 +196,7 @@ module.exports = {
   deleteHealthRecord,
   getFarmerHealthSummary,
   getWelfarePrograms,
-  enrollWelfareProgram
+  enrollWelfareProgram,
+  healthCheck,
+  execute
 };

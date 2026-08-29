@@ -217,6 +217,34 @@ async function callProvider(providerKey, _prompt, _opts = {}) {
 }
 
 // ============================================================================
+// MODULE REGISTRY SINGLETON — lazily created/initialized once, reused across
+// every module_dispatch invocation (mirrors routes/claude/moduleRegistryRoutes.js's
+// own singleton pattern, kept separate rather than importing a route file from
+// core/).
+// ============================================================================
+
+let moduleRegistryInstance = null;
+let moduleRegistryInitPromise = null;
+
+function getModuleRegistry() {
+  if (!moduleRegistryInstance) {
+    const ModuleRegistry = require('./moduleRegistry');
+    moduleRegistryInstance = new ModuleRegistry();
+  }
+  return moduleRegistryInstance;
+}
+
+function ensureModuleRegistryInitialized(registry) {
+  if (!moduleRegistryInitPromise) {
+    moduleRegistryInitPromise = registry.initialize().catch((error) => {
+      moduleRegistryInitPromise = null;
+      throw error;
+    });
+  }
+  return moduleRegistryInitPromise;
+}
+
+// ============================================================================
 // ENGINE REGISTRY — the 14 capabilities from PART 6, each grep-verified.
 // Registry pattern: dispatch only, no engine logic is reimplemented here.
 // ============================================================================
@@ -243,7 +271,7 @@ const ENGINES = {
     citation: 'services/knowledgeGraphService.js — Postgres-backed knowledge_nodes '
       + '/ knowledge_relationships, full-text search, find_related_nodes() SQL function.',
     invoke: async (payload = {}) => {
-      const kg = require('../services/knowledgeGraphService');
+      const kg = require('../services/legacy/knowledgeGraphService');
       if (!payload.query) throw new Error('knowledge_graph requires payload.query');
       return kg.searchKnowledgeNodes(payload.query, payload.nodeType || null);
     },
@@ -262,7 +290,7 @@ const ENGINES = {
       + 'nullable FK and LEFT JOINs them at read time. Built 2026-08-09 to close the gap '
       + 'this entry originally reported ("missing", invoke: null).',
     invoke: async (payload = {}) => {
-      const mem = require('../services/enterpriseMemoryService');
+      const mem = require('../services/legacy/enterpriseMemoryService');
       const { action = 'recallSimilar' } = payload;
 
       if (action === 'recordMemory') {
@@ -296,7 +324,7 @@ const ENGINES = {
       + 'decisionEngine, dispatched separately via workflow_engine below) are unrelated and '
       + 'untouched.',
     invoke: async (payload = {}) => {
-      const decisionSupport = require('../services/decisionSupportService');
+      const decisionSupport = require('../services/legacy/decisionSupportService');
       const RULES = {
         corpCreditEligible: (p) => decisionSupport.corpCreditEligible(p.turnoverCr, p.vintageYrs),
         buyVsRentDecision: (p) => decisionSupport.buyVsRentDecision(p),
@@ -342,7 +370,7 @@ const ENGINES = {
       + 'services/predictiveAnalyticsService.js and services/demandService.js are '
       + 'real but store/read stored forecasts only — neither computes one.',
     invoke: async (payload = {}) => {
-      const { advancedPredictDemand } = require('../services/advancedAIService');
+      const { advancedPredictDemand } = require('../services/legacy/advancedAIService');
       const { productId, timeHorizon = 30, includeExplanations = true } = payload;
       if (!productId) throw new Error('forecasting_engine requires payload.productId');
       return advancedPredictDemand(productId, timeHorizon, includeExplanations);
@@ -384,7 +412,7 @@ const ENGINES = {
       if (!productId || currentPrice == null) {
         throw new Error('simulation_engine requires payload.productId and payload.currentPrice');
       }
-      const { advancedOptimizePrice } = require('../services/advancedAIService');
+      const { advancedOptimizePrice } = require('../services/legacy/advancedAIService');
       return advancedOptimizePrice(productId, currentPrice, context || {});
     },
   },
@@ -402,7 +430,7 @@ const ENGINES = {
       + 'classification) remains an honest {available:false} stub; this does not change '
       + 'that.',
     invoke: async (payload = {}) => {
-      const vision = require('../services/visionService');
+      const vision = require('../services/legacy/visionService');
       const { buffer, imageBase64, operation = 'analyze_quality', width, height, fit, format } = payload;
       const imgBuffer = buffer || (imageBase64 ? Buffer.from(imageBase64, 'base64') : null);
       if (!imgBuffer) throw new Error('vision_engine requires payload.buffer (Buffer) or payload.imageBase64');
@@ -425,7 +453,7 @@ const ENGINES = {
       + 'report_data JSONB column, no invented schema. Bounded: decent on clean printed '
       + 'text, weak on handwriting/skewed scans — a human-review draft, not ground truth.',
     invoke: async (payload = {}) => {
-      const ocr = require('../services/ocrService');
+      const ocr = require('../services/legacy/ocrService');
       const { buffer, imageBase64, language = 'eng', reportNumber } = payload;
       const imgBuffer = buffer || (imageBase64 ? Buffer.from(imageBase64, 'base64') : null);
       if (!imgBuffer) throw new Error('ocr_engine requires payload.buffer (Buffer) or payload.imageBase64');
@@ -477,7 +505,7 @@ const ENGINES = {
       + 'recommendations. services/nutritionIntelligenceService.js (built earlier '
       + 'this session, not modified here) is the other real instance.',
     invoke: async (payload = {}) => {
-      const catalog = require('../services/catalogIntelligenceService');
+      const catalog = require('../services/legacy/catalogIntelligenceService');
       const { concern, month } = payload;
       if (!concern) throw new Error('recommendation_engine requires payload.concern');
       return catalog.wellnessRecommendation({ concern, month });
@@ -532,6 +560,45 @@ const ENGINES = {
     invoke: null,
   },
 
+  module_dispatch: {
+    label: 'Module Dispatch (Plug-and-Play Registry)',
+    status: 'real',
+    citation: '(2026-08-29) core/moduleRegistry.js — real discover()/discoverByCapabilities()/'
+      + 'execute() pipeline over the 302 registered plug-and-play modules (111 in '
+      + 'backend/src/modules/M0XX + 191 in root modules/, confirmed working earlier this '
+      + 'session via routes/claude/moduleRegistryRoutes.js at /api/v1/ai/modules). That route '
+      + "was previously the registry's ONLY caller — the orchestrator itself never queried it, "
+      + "so a task type this file's own ENGINES above has no entry for could not fall through "
+      + 'to any of the 302 modules even when one of them was the right tool. This entry closes '
+      + 'that gap: pass { moduleId, operation, parameters } to execute a known module directly, '
+      + 'or { query } / { requiredCapabilities, optionalCapabilities } to have the registry find '
+      + 'one first, same as the HTTP route does. Reuses one lazily-initialized ModuleRegistry '
+      + 'instance (mirrors moduleRegistryRoutes.js\'s own singleton pattern) rather than '
+      + 're-initializing the library service on every call.',
+    invoke: async (payload = {}) => {
+      const registry = getModuleRegistry();
+      await ensureModuleRegistryInitialized(registry);
+      const {
+        moduleId, operation, parameters = {}, context = {},
+        query, requiredCapabilities, optionalCapabilities = [],
+      } = payload;
+
+      if (moduleId && operation) {
+        return registry.execute(moduleId, operation, parameters, context);
+      }
+      if (Array.isArray(requiredCapabilities) && requiredCapabilities.length) {
+        return registry.discoverByCapabilities({ requiredCapabilities, optionalCapabilities }, context);
+      }
+      if (query) {
+        return registry.discover(query, context);
+      }
+      throw new Error(
+        'module_dispatch requires either { moduleId, operation } to execute a known module, '
+        + 'or { query } / { requiredCapabilities } to discover one first'
+      );
+    },
+  },
+
   llm: {
     label: 'LLMs',
     status: 'not_configured',
@@ -547,7 +614,7 @@ const ENGINES = {
       const { provider, prompt, allowTemplateFallback = false } = payload;
       if (provider) return callProvider(provider, prompt, payload);
       if (allowTemplateFallback) {
-        const copilot = require('../services/aiCopilotService');
+        const copilot = require('../services/legacy/aiCopilotService');
         const { copilotType = 'generic', message, context = {}, session = {} } = payload;
         if (!message) throw new Error('llm template fallback requires payload.message');
         const result = await copilot.generateCopilotResponse(copilotType, message, context, session);
@@ -664,6 +731,7 @@ const CLASSIFY_KEYWORDS = {
   ocr_engine: ['ocr', 'scan document', 'extract text from image', 'receipt'],
   speech_engine: ['voice', 'speech', 'audio', 'transcribe', 'spoken'],
   workflow_engine: ['workflow', 'approval step', 'process step'],
+  module_dispatch: ['module', 'plug-and-play', 'registry', 'discover module', 'run module'],
 };
 
 function keywordScore(text, words) {

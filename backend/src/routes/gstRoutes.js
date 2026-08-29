@@ -7,7 +7,7 @@ const express = require('express');
 const { logger } = require('../utils/logger');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
-const GSTService = require('../services/gstService');
+const GSTService = require('../services/legacy/gstService');
 
 const router = express.Router();
 const gstService = GSTService;

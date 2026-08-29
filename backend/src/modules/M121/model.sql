@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Dairy Management (M121)
--- Define tables and indexes here

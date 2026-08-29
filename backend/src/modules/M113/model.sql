@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Biofertilizer Management (M113)
--- Define tables and indexes here

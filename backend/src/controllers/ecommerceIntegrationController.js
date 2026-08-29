@@ -9,7 +9,7 @@
  * - Dietitian Services
  */
 
-const ecommerceIntegrationService = require('../services/ecommerceIntegrationService');
+const ecommerceIntegrationService = require('../services/legacy/ecommerceIntegrationService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

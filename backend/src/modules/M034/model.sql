@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Parcel Mapping (M034)
--- Define tables and indexes here

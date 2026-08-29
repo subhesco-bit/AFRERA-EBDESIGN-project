@@ -9,7 +9,7 @@
 
 const express = require('express');
 const router = express.Router();
-const dprGenerationService = require('../services/dprGenerationService');
+const dprGenerationService = require('../services/legacy/dprGenerationService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.post('/preview', authMiddleware, async (req, res) => {

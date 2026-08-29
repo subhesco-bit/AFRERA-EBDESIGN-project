@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { seedVaultAPI } from '../services/api'
 import { Package, Search, Plus, Edit, Trash2, Thermometer, Droplets, Sprout, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 function SeedVaultPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -237,7 +238,7 @@ function SeedVaultPage() {
 
       {/* Add Seed Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowAddModal(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -253,10 +254,10 @@ function SeedVaultPage() {
               <form className="space-y-4" onSubmit={handleAddSeedSubmit}>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="seed-name" className="block text-sm font-medium text-gray-700 mb-1">
                       Seed Name *
                     </label>
-                    <input
+                    <input id="seed-name"
                       type="text"
                       value={newSeed.name}
                       onChange={(e) => setNewSeed({ ...newSeed, name: e.target.value })}
@@ -266,10 +267,10 @@ function SeedVaultPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="variety" className="block text-sm font-medium text-gray-700 mb-1">
                       Variety
                     </label>
-                    <input
+                    <input id="variety"
                       type="text"
                       value={newSeed.variety}
                       onChange={(e) => setNewSeed({ ...newSeed, variety: e.target.value })}
@@ -280,10 +281,10 @@ function SeedVaultPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
                     Category *
                   </label>
-                  <input
+                  <input id="category"
                     type="text"
                     list="seed-category-options"
                     value={newSeed.category}
@@ -301,10 +302,10 @@ function SeedVaultPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
                       Quantity *
                     </label>
-                    <input
+                    <input id="quantity"
                       type="number"
                       min="0"
                       value={newSeed.quantity}
@@ -315,10 +316,10 @@ function SeedVaultPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="unit" className="block text-sm font-medium text-gray-700 mb-1">
                       Unit *
                     </label>
-                    <select
+                    <select id="unit"
                       value={newSeed.unit}
                       onChange={(e) => setNewSeed({ ...newSeed, unit: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -332,10 +333,10 @@ function SeedVaultPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="purchase-date" className="block text-sm font-medium text-gray-700 mb-1">
                       Purchase Date
                     </label>
-                    <input
+                    <input id="purchase-date"
                       type="date"
                       value={newSeed.purchaseDate}
                       onChange={(e) => setNewSeed({ ...newSeed, purchaseDate: e.target.value })}
@@ -343,10 +344,10 @@ function SeedVaultPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="min-stock-alert" className="block text-sm font-medium text-gray-700 mb-1">
                       Min Stock Alert
                     </label>
-                    <input
+                    <input id="min-stock-alert"
                       type="number"
                       min="0"
                       value={newSeed.minStock}
@@ -358,10 +359,10 @@ function SeedVaultPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="supplier" className="block text-sm font-medium text-gray-700 mb-1">
                     Supplier
                   </label>
-                  <input
+                  <input id="supplier"
                     type="text"
                     value={newSeed.supplier}
                     onChange={(e) => setNewSeed({ ...newSeed, supplier: e.target.value })}
@@ -389,12 +390,12 @@ function SeedVaultPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* Seed Detail Modal */}
       {selectedSeed && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setSelectedSeed(null)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -458,7 +459,7 @@ function SeedVaultPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

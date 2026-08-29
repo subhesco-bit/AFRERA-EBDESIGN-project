@@ -12,7 +12,7 @@
 
 const express = require('express');
 const router = express.Router();
-const aiOperationIntelligenceService = require('../services/aiOperationIntelligenceService');
+const aiOperationIntelligenceService = require('../services/legacy/aiOperationIntelligenceService');
 
 /**
  * Get performance metrics

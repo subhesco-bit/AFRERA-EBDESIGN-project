@@ -1,1 +1,0 @@
-﻿# M111 - M111 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M111_generated.sql\n

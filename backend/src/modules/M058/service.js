@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/aiService');
+const { aiAPI } = require('../../services/legacy/aiService');
 const pool = require('../../database/pool');
 
 async function createReturn(returnData) {

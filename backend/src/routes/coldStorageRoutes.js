@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const coldStorageService = require('../services/coldStorageService');
+const coldStorageService = require('../services/legacy/coldStorageService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
 const { adminMiddleware } = require('../middleware/admin');

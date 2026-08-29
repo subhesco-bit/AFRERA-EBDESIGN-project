@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Community Asset Management (M049)
--- Define tables and indexes here

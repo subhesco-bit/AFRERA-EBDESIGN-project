@@ -1,0 +1,57 @@
+﻿{
+  "system":"SUBH",
+  "source_project":"EBDESIGN",
+  "existing_system":"SVESCO",
+  "primary_transactional_database":"PostgreSQL",
+  "database_role":"system_of_record",
+
+  "supporting_systems":{
+    "cache":"Redis",
+    "queue":"Redis_or_managed_queue",
+    "search":"Search_index",
+    "time_series":"Time_series_database",
+    "graph":"Graph_database",
+    "object_storage":"Cloud_object_storage",
+    "vector":"Vector_capable_store"
+  },
+
+  "canonical_schemas":[
+    "platform",
+    "identity",
+    "farmer",
+    "land",
+    "village",
+    "fpo",
+    "crop",
+    "livestock",
+    "fisheries",
+    "horticulture",
+    "supply_chain",
+    "logistics",
+    "warehouse",
+    "market",
+    "finance",
+    "insurance",
+    "government",
+    "engineering",
+    "analytics",
+    "ai",
+    "media",
+    "gis",
+    "audit",
+    "notification",
+    "integration"
+  ],
+
+  "rules":{
+    "existing_sql_is_evidence":true,
+    "existing_sql_is_preserved":true,
+    "legacy_sql_is_not_auto_executed":true,
+    "canonical_migrations_are_versioned":true,
+    "production_credentials_are_external":true,
+    "database_changes_require_migrations":true,
+    "application_must_use_canonical_schema":true,
+    "duplicate_tables_require_reconciliation":true,
+    "duplicate_migrations_require_reconciliation":true
+  }
+}

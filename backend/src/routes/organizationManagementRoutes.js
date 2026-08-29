@@ -12,7 +12,7 @@
 
 const express = require('express');
 const router = express.Router();
-const organizationManagementService = require('../services/organizationManagementService');
+const organizationManagementService = require('../services/legacy/organizationManagementService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');

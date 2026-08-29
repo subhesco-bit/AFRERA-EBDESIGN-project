@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Tractor, ArrowLeft, ArrowRight, LogIn, Clock } from 'lucide-react'
+import { Tractor, ArrowLeft, ArrowRight, LogIn } from 'lucide-react'
 
 // Public door #4 of 4 — "Shared infra & rental". See FarmerEntranceHubPage.jsx
 // for background on why this exists. This page is intentionally NOT wrapped
@@ -7,11 +7,10 @@ import { Tractor, ArrowLeft, ArrowRight, LogIn, Clock } from 'lucide-react'
 // whether to sign in. Machinery booking (TractorManagementPage) stays behind
 // a plain <ProtectedRoute> — only the explanation is public.
 //
-// Cold storage / packhouse booking has a real backend service
-// (backend/src/services/sharedInfraService.js) but no page or route mounts
-// it yet, so that action is labelled "coming soon" rather than linked —
-// see the ground rule against pointing at functionality that doesn't exist
-// in the UI yet.
+// Cold storage / packhouse booking (SharedInfraPage.jsx) was routed at
+// /shared-infra on 2026-08-28 — it had a real backend
+// (sharedInfraService.js) and a real page all along, just never added to
+// routes.js. No longer "coming soon".
 const ACTIONS = [
   {
     label: 'See corridor and logistics economics for moving your produce',
@@ -21,6 +20,11 @@ const ACTIONS = [
   {
     label: 'Rent tractors and machinery, book by the day',
     to: '/tractor-management',
+    note: 'Requires signing in to this section',
+  },
+  {
+    label: 'Book cold storage and packhouse capacity',
+    to: '/shared-infra',
     note: 'Requires signing in to this section',
   },
 ]
@@ -66,14 +70,6 @@ function FarmerSharedDoorPage() {
                 </Link>
               </li>
             ))}
-            <li>
-              <div className="flex items-center justify-between p-3 rounded-lg border border-dashed border-gray-200 bg-gray-50 text-gray-400">
-                <span>Cold storage and packhouse booking</span>
-                <span className="flex items-center gap-2 text-xs flex-shrink-0 ml-3">
-                  <Clock className="w-4 h-4" /> Coming soon
-                </span>
-              </div>
-            </li>
           </ul>
         </div>
 

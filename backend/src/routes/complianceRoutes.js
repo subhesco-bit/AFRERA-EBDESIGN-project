@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const c = require('../services/complianceService');
+const c = require('../services/legacy/complianceService');
 const { authMiddleware } = require('../middleware/auth');
 const fail = (res, e) => res.status(/required|must|Unknown|Unsupported|No IRN/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });

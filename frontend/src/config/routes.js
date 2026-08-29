@@ -98,6 +98,21 @@ const HorticultureManagementPage = lazy(() => import('../pages/HorticultureManag
 const FisheriesManagementPage = lazy(() => import('../pages/FisheriesManagementPage'))
 const IdentityManagementPage = lazy(() => import('../pages/IdentityManagementPage'))
 const PlatformFoundationPage = lazy(() => import('../pages/PlatformFoundationPage'))
+const MFASetupPage = lazy(() => import('../pages/MFASetupPage'))
+const GDPRConsentPage = lazy(() => import('../pages/GDPRConsentPage'))
+const LibraryBrowserPage = lazy(() => import('../pages/LibraryBrowserPage'))
+const AIChatPage = lazy(() => import('../pages/AIChatPage'))
+const AICollaborationPage = lazy(() => import('../pages/AICollaborationPage'))
+const FPORegistrationPage = lazy(() => import('../pages/FPORegistrationPage'))
+const CattleRegistryPage = lazy(() => import('../pages/CattleRegistryPage'))
+const ImplementManagementPage = lazy(() => import('../pages/ImplementManagementPage'))
+const EquipmentInventoryPage = lazy(() => import('../pages/EquipmentInventoryPage'))
+const EquipmentRentalPage = lazy(() => import('../pages/EquipmentRentalPage'))
+const BreakdownMaintenancePage = lazy(() => import('../pages/BreakdownMaintenancePage'))
+const FuelManagementPage = lazy(() => import('../pages/FuelManagementPage'))
+const SparePartsManagementPage = lazy(() => import('../pages/SparePartsManagementPage'))
+const AssetLifecycleManagementPage = lazy(() => import('../pages/AssetLifecycleManagementPage'))
+const EnvironmentManagementPage = lazy(() => import('../pages/EnvironmentManagementPage'))
 const EnterpriseControlPage = lazy(() => import('../pages/EnterpriseControlPage'))
 const AIBackbonePage = lazy(() => import('../pages/AIBackbonePage'))
 const DietRecipesPage = lazy(() => import('../pages/DietRecipesPage'))
@@ -139,6 +154,36 @@ const CommunityManagementPage = lazy(() => import('../pages/CommunityManagementP
 const SoilManagementPage = lazy(() => import('../pages/SoilManagementPage'))
 const WaterManagementPage = lazy(() => import('../pages/WaterManagementPage'))
 const SubsidyManagementPage = lazy(() => import('../pages/SubsidyManagementPage'))
+const BulkOrderPage = lazy(() => import('../pages/BulkOrderPage'))
+const EcommerceMarketplacePage = lazy(() => import('../pages/EcommerceMarketplacePage'))
+const EcommerceIntegrationPage = lazy(() => import('../pages/EcommerceIntegrationPage'))
+const CompleteERPIntegrationPage = lazy(() => import('../pages/CompleteERPIntegrationPage'))
+const EngineeringProjectPage = lazy(() => import('../pages/EngineeringProjectPage'))
+const RealtimeMonitoringPage = lazy(() => import('../pages/RealtimeMonitoringPage'))
+const ColdStoragePage = lazy(() => import('../pages/ColdStoragePage'))
+const CooperativeSharePage = lazy(() => import('../pages/CooperativeSharePage'))
+const AgriculturalIntelligencePage = lazy(() => import('../pages/AgriculturalIntelligencePage'))
+const KnowledgeReferencePage = lazy(() => import('../pages/KnowledgeReferencePage'))
+const DecisionSupportPage = lazy(() => import('../pages/DecisionSupportPage'))
+const CompleteAIIntegrationPage = lazy(() => import('../pages/CompleteAIIntegrationPage'))
+const ComprehensiveERPPage = lazy(() => import('../pages/ComprehensiveERPPage'))
+const WaterRecordsPage = lazy(() => import('../pages/WaterRecordsPage'))
+const SAPModuleArchitecturePage = lazy(() => import('../pages/SAPModuleArchitecturePage'))
+const ResearchAndDevelopmentPage = lazy(() => import('../pages/ResearchAndDevelopmentPage'))
+const InformationSharingPage = lazy(() => import('../pages/InformationSharingPage'))
+const AIAgentPage = lazy(() => import('../pages/AIAgentPage'))
+const AIBrainPage = lazy(() => import('../pages/AIBrainPage'))
+const AISelfHealingPage = lazy(() => import('../pages/AISelfHealingPage'))
+const AIOperationIntelligencePage = lazy(() => import('../pages/AIOperationIntelligencePage'))
+const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'))
+const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'))
+const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'))
+const PlatformManagementPage = lazy(() => import('../pages/PlatformManagementPage'))
+const RolePermissionPage = lazy(() => import('../pages/RolePermissionPage'))
+const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'))
+const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'))
+const LogisticsMatchingPage = lazy(() => import('../pages/LogisticsMatchingPage'))
+const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'))
 
 /**
  * Public routes - no authentication required
@@ -992,6 +1037,126 @@ export const managementRoutes = [
     transition: 'fade'
   },
   {
+    path: '/account/mfa',
+    component: MFASetupPage,
+    title: 'Multi-Factor Authentication - AFRERA',
+    description: 'Set up multi-factor authentication for your account',
+    keywords: 'mfa, security, two-factor, authentication',
+    transition: 'fade'
+  },
+  {
+    path: '/account/privacy',
+    component: GDPRConsentPage,
+    title: 'Privacy & Consent - AFRERA',
+    description: 'Manage data privacy and consent preferences',
+    keywords: 'gdpr, privacy, consent, data',
+    transition: 'fade'
+  },
+  {
+    path: '/library',
+    component: LibraryBrowserPage,
+    title: 'Library - AFRERA',
+    description: 'Browse the module and knowledge library',
+    keywords: 'library, knowledge, modules, catalogue',
+    transition: 'fade'
+  },
+  {
+    path: '/ai/chat',
+    component: AIChatPage,
+    title: 'AI Assistant - AFRERA',
+    description: 'Chat with the AI coordinator',
+    keywords: 'ai, chat, assistant, claude',
+    transition: 'fade'
+  },
+  {
+    path: '/ai/collaboration',
+    component: AICollaborationPage,
+    title: 'AI Collaboration - AFRERA',
+    description: 'AI-Devin collaboration activity dashboard',
+    keywords: 'ai, collaboration, devin, activity',
+    transition: 'fade'
+  },
+  {
+    path: '/fpo-registration',
+    component: FPORegistrationPage,
+    title: 'FPO Registration - AFRERA',
+    description: 'FPO Registration',
+    keywords: 'fpo, registration, producer organization',
+    transition: 'fade'
+  },
+  {
+    path: '/cattle-registry',
+    component: CattleRegistryPage,
+    title: 'Cattle Registry - AFRERA',
+    description: 'Cattle Registry',
+    keywords: 'cattle, livestock, registry',
+    transition: 'fade'
+  },
+  {
+    path: '/implement-management',
+    component: ImplementManagementPage,
+    title: 'Implement Management - AFRERA',
+    description: 'Implement Management',
+    keywords: 'implement, agriculture, equipment',
+    transition: 'fade'
+  },
+  {
+    path: '/equipment-inventory',
+    component: EquipmentInventoryPage,
+    title: 'Equipment Inventory - AFRERA',
+    description: 'Equipment Inventory',
+    keywords: 'equipment, inventory, machinery',
+    transition: 'fade'
+  },
+  {
+    path: '/equipment-rental',
+    component: EquipmentRentalPage,
+    title: 'Equipment Rental - AFRERA',
+    description: 'Equipment Rental',
+    keywords: 'equipment, rental, machinery',
+    transition: 'fade'
+  },
+  {
+    path: '/breakdown-maintenance',
+    component: BreakdownMaintenancePage,
+    title: 'Breakdown Maintenance - AFRERA',
+    description: 'Breakdown Maintenance',
+    keywords: 'breakdown, maintenance, repair',
+    transition: 'fade'
+  },
+  {
+    path: '/fuel-management',
+    component: FuelManagementPage,
+    title: 'Fuel Management - AFRERA',
+    description: 'Fuel Management',
+    keywords: 'fuel, consumption, machinery',
+    transition: 'fade'
+  },
+  {
+    path: '/spare-parts-management',
+    component: SparePartsManagementPage,
+    title: 'Spare Parts Management - AFRERA',
+    description: 'Spare Parts Management',
+    keywords: 'spare parts, inventory, machinery',
+    transition: 'fade'
+  },
+  {
+    path: '/asset-lifecycle-management',
+    component: AssetLifecycleManagementPage,
+    title: 'Asset Lifecycle Management - AFRERA',
+    description: 'Asset Lifecycle Management',
+    keywords: 'asset, lifecycle, depreciation',
+    transition: 'fade'
+  },
+  {
+    path: '/environment-management',
+    component: EnvironmentManagementPage,
+    title: 'Environment Management - AFRERA',
+    description: 'Environment Management',
+    keywords: 'environment, configuration, deployment',
+    transition: 'fade'
+  },
+  {
     path: '/ai-backbone',
     component: AIBackbonePage,
     title: 'AI Backbone - AFRERA',
@@ -1141,6 +1306,246 @@ export const managementRoutes = [
     title: 'Nutrient Value Marketplace - AFRERA',
     description: 'Nutrient value trading',
     keywords: 'nutrient, value, marketplace',
+    transition: 'fade'
+  },
+  {
+    path: '/platform-management',
+    component: PlatformManagementPage,
+    title: 'Platform Management - AFRERA',
+    description: 'Platform administration with AI-powered insights',
+    keywords: 'platform, management, administration',
+    transition: 'fade'
+  },
+  {
+    path: '/role-permissions',
+    component: RolePermissionPage,
+    title: 'Roles & Permissions - AFRERA',
+    description: 'Role and permission management',
+    keywords: 'roles, permissions, access control',
+    transition: 'fade'
+  },
+  {
+    path: '/shared-infra',
+    component: SharedInfraPage,
+    title: 'Shared Infrastructure - AFRERA',
+    description: 'Shared assets, cold storage and community equipment',
+    keywords: 'shared, infrastructure, cold storage, equipment',
+    transition: 'fade'
+  },
+  {
+    path: '/system-administration',
+    component: SystemAdministrationPage,
+    title: 'System Administration - AFRERA',
+    description: 'System settings, audit logs and analytics',
+    keywords: 'system, administration, settings, audit',
+    transition: 'fade'
+  },
+  {
+    path: '/bulk-orders',
+    component: BulkOrderPage,
+    title: 'Bulk Orders - AFRERA',
+    description: 'Request wholesale quantities and manage supplier quotations',
+    keywords: 'bulk, wholesale, orders, quotations',
+    transition: 'fade'
+  },
+  {
+    path: '/ecommerce-marketplace',
+    component: EcommerceMarketplacePage,
+    title: 'Marketplace - AFRERA',
+    description: 'Browse listings, manage products, seller analytics and market intelligence',
+    keywords: 'marketplace, listings, seller, GI, price trends',
+    transition: 'fade'
+  },
+  {
+    path: '/ecommerce-integration',
+    component: EcommerceIntegrationPage,
+    title: 'Nutrition & Recipe Integration - AFRERA',
+    description: 'Nutrition scoring, recipe matching, cart health analysis and dietitian recommendations',
+    keywords: 'nutrition, recipes, health, dietitian, cart',
+    transition: 'fade'
+  },
+  {
+    path: '/complete-erp-integration',
+    component: CompleteERPIntegrationPage,
+    title: 'Complete ERP Integration - AFRERA',
+    description: 'Sync farmer, crop, livestock and inbuilt-module data with the ERP system',
+    keywords: 'erp, integration, sync, farmer, crop, livestock',
+    transition: 'fade'
+  },
+  {
+    path: '/engineering-projects',
+    component: EngineeringProjectPage,
+    title: 'Engineering Projects - AFRERA',
+    description: 'Create and manage engineering projects, track phases, and generate cost estimates',
+    keywords: 'engineering, projects, phases, cost estimate',
+    transition: 'fade'
+  },
+  {
+    path: '/realtime-monitoring',
+    component: RealtimeMonitoringPage,
+    title: 'Realtime Monitoring - AFRERA',
+    description: 'Start, stop and inspect real-time resource monitors',
+    keywords: 'monitoring, alerts, resources, realtime',
+    transition: 'fade'
+  },
+  {
+    path: '/cold-storage',
+    component: ColdStoragePage,
+    title: 'Cold Storage - AFRERA',
+    description: 'Manage cold storage facilities, capacity-checked bookings, and utilization tracking',
+    keywords: 'cold storage, facilities, bookings, utilization',
+    transition: 'fade'
+  },
+  {
+    path: '/cooperative-shares',
+    component: CooperativeSharePage,
+    title: 'Cooperative Shares - AFRERA',
+    description: 'Manage FPO member share capital and patronage dividend distributions',
+    keywords: 'cooperative, fpo, shares, patronage, dividend',
+    transition: 'fade'
+  },
+  {
+    path: '/agri-intelligence',
+    component: AgriculturalIntelligencePage,
+    title: 'Agricultural Intelligence - AFRERA',
+    description: 'Crop yield, soil, weather, pest and irrigation AI predictions',
+    keywords: 'agriculture, ai, crop yield, soil, weather, pest, irrigation',
+    transition: 'fade'
+  },
+  {
+    path: '/knowledge-reference',
+    component: KnowledgeReferencePage,
+    title: 'Knowledge Reference - AFRERA',
+    description: 'Wikipedia knowledge lookups and FOLU transition benchmark data',
+    keywords: 'wikipedia, folu, benchmark, reference',
+    transition: 'fade'
+  },
+  {
+    path: '/decision-support',
+    component: DecisionSupportPage,
+    title: 'Decision Support - AFRERA',
+    description: 'Core business logic functions for pricing, logistics, finance and governance',
+    keywords: 'decision support, pricing, logistics, finance, governance',
+    transition: 'fade'
+  },
+  {
+    path: '/complete-ai-integration',
+    component: CompleteAIIntegrationPage,
+    title: 'Complete AI Integration - AFRERA',
+    description: 'AI-driven predictions and optimization across farmer, crop, livestock and inbuilt modules',
+    keywords: 'ai, prediction, optimization, disease detection, yield',
+    transition: 'fade'
+  },
+  {
+    path: '/comprehensive-erp',
+    component: ComprehensiveERPPage,
+    title: 'Comprehensive ERP - AFRERA',
+    description: 'Oracle/SAP-standard enterprise resource planning across 12 modules',
+    keywords: 'erp, financial, sap, oracle, ledger, hr, payroll, inventory',
+    transition: 'fade'
+  },
+  {
+    path: '/water-records',
+    component: WaterRecordsPage,
+    title: 'Water Records - AFRERA',
+    description: 'Registry of water budgets, quality readings, rainwater structures, watersheds and analytics records',
+    keywords: 'water, budget, quality, rainwater, watershed, analytics',
+    transition: 'fade'
+  },
+  {
+    path: '/sap-module-architecture',
+    component: SAPModuleArchitecturePage,
+    title: 'SAP Module Architecture - AFRERA',
+    description: 'SAP-style independent module architecture: registration, dependencies, lifecycle, configuration, MTA descriptors',
+    keywords: 'sap, module, architecture, dependency, lifecycle, mta, clean core',
+    transition: 'fade'
+  },
+  {
+    path: '/research-and-development',
+    component: ResearchAndDevelopmentPage,
+    title: 'Research and Development - AFRERA',
+    description: 'R&D project management, collaborations, innovations, patents, funding, publications and AI research assistance',
+    keywords: 'research, development, innovation, patent, funding, publication, r&d',
+    transition: 'fade'
+  },
+  {
+    path: '/information-sharing',
+    component: InformationSharingPage,
+    title: 'Information Sharing - AFRERA',
+    description: 'Document management, folders, permissions, sharing links, live collaboration sessions and AI recommendations',
+    keywords: 'document, folder, permission, sharing, collaboration, information sharing',
+    transition: 'fade'
+  },
+  {
+    path: '/logistics-matching',
+    component: LogisticsMatchingPage,
+    title: 'Logistics Matching - AFRERA',
+    description: 'Freight pooling, return-load backhaul board and second-use equipment exchange',
+    keywords: 'freight, pooling, return load, backhaul, equipment exchange, logistics',
+    transition: 'fade'
+  },
+  {
+    path: '/market-signals',
+    component: MarketSignalsPage,
+    title: 'Market Signals - AFRERA',
+    description: 'Glut early-warning, seller trust ranking and civil disruption risk',
+    keywords: 'glut, oversupply, seller ranking, trust score, civil disruption, blockade',
+    transition: 'fade'
+  },
+  {
+    path: '/nervous-system',
+    component: NervousSystemPage,
+    title: 'Nervous System - AFRERA',
+    description: 'Enterprise route control: brain, heart, neural pathways, reflex arcs, sensors and motor functions',
+    keywords: 'nervous system, brain, heart, reflex, sensors, route control',
+    transition: 'fade'
+  },
+  {
+    path: '/logistics-enhancement',
+    component: LogisticsEnhancementPage,
+    title: 'Logistics Enhancement - AFRERA',
+    description: 'Fleet management, real-time shipment and driver tracking, temperature monitoring and warehouse integration',
+    keywords: 'logistics, fleet, tracking, temperature, warehouse, drivers',
+    transition: 'fade'
+  },
+  {
+    path: '/enterprise-ai',
+    component: EnterpriseAIPage,
+    title: 'Enterprise AI - AFRERA',
+    description: 'Credit scoring, government scheme eligibility, AI model-slot registry and conversational query',
+    keywords: 'enterprise ai, credit score, scheme eligibility, model registry',
+    transition: 'fade'
+  },
+  {
+    path: '/ai-agent',
+    component: AIAgentPage,
+    title: 'AI Agent - AFRERA',
+    description: 'Agentic task execution, multi-agent coordination and tool registry',
+    keywords: 'ai, agent, agentic, coordination, tools',
+    transition: 'fade'
+  },
+  {
+    path: '/ai-brain',
+    component: AIBrainPage,
+    title: 'AI Brain - AFRERA',
+    description: 'Cognitive processing: perception, attention, reasoning, learning, decision and planning',
+    keywords: 'ai, brain, cognitive, reasoning, knowledge graph, memory',
+    transition: 'fade'
+  },
+  {
+    path: '/ai-self-healing',
+    component: AISelfHealingPage,
+    title: 'AI Self-Healing - AFRERA',
+    description: 'Autonomous error detection, root cause analysis and recovery',
+    keywords: 'ai, self-healing, recovery, error detection, root cause',
+    transition: 'fade'
+  },
+  {
+    path: '/ai-operation-intelligence',
+    component: AIOperationIntelligencePage,
+    title: 'AI Operation Intelligence - AFRERA',
+    description: 'Real-time performance monitoring, optimization and anomaly detection',
+    keywords: 'ai, operations, performance, optimization, anomaly detection',
     transition: 'fade'
   }
 ]

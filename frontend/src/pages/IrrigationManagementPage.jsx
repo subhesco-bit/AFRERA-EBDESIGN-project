@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { irrigationAPI } from '../services/api'
 import { Droplets, Plus, X, Waves, Trash2, Edit } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const SOURCE_TYPES = ['Borewell', 'Canal', 'Tank/Pond', 'River Lift', 'Rainwater Harvesting']
 const METHODS = ['Drip', 'Sprinkler', 'Flood', 'Furrow']
@@ -174,7 +175,7 @@ function IrrigationManagementPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -194,26 +195,26 @@ function IrrigationManagementPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Field name *</label>
-                  <input value={form.field_name} onChange={(e) => setForm({ ...form, field_name: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Field name *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border" value={form.field_name} onChange={(e) => setForm({ ...form, field_name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Crop</label>
-                  <input value={form.crop} onChange={(e) => setForm({ ...form, crop: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Crop</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-2" value={form.crop} onChange={(e) => setForm({ ...form, crop: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Method</label>
-                    <select value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Method</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-3" value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                       {METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Water source</label>
-                    <select value={form.water_source} onChange={(e) => setForm({ ...form, water_source: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Water source</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-4" value={form.water_source} onChange={(e) => setForm({ ...form, water_source: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                       <option value="">Select source</option>
                       {SOURCE_TYPES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -222,13 +223,13 @@ function IrrigationManagementPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Frequency (days) *</label>
-                    <input type="number" value={form.frequency_days} onChange={(e) => setForm({ ...form, frequency_days: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Frequency (days) *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-5" type="number" value={form.frequency_days} onChange={(e) => setForm({ ...form, frequency_days: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
-                    <input type="number" value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-6" type="number" value={form.duration_minutes} onChange={(e) => setForm({ ...form, duration_minutes: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                   </div>
                 </div>
@@ -241,7 +242,7 @@ function IrrigationManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

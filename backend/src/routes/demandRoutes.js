@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const demandService = require('../services/demandService');
+const demandService = require('../services/legacy/demandService');
 
 const fail = (res, e) => res.status(/required/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });

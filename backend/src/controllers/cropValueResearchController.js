@@ -1,4 +1,4 @@
-const cropValueResearchService = require('../services/cropValueResearchService');
+const cropValueResearchService = require('../services/legacy/cropValueResearchService');
 const { logger } = require('../utils/logger');
 
 const cropValueResearchController = {

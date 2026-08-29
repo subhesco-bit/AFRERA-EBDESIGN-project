@@ -1,0 +1,26 @@
+[
+  {
+    "cableId": "CABLE_M001_PLATFORM_CORE_TO_M401_AI_GATEWAY_AI",
+    "source": "M001_PLATFORM_CORE",
+    "target": "M401_AI_GATEWAY",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  },
+  {
+    "cableId": "CABLE_M401_AI_GATEWAY_TO_M400_AI_CORE_AI",
+    "source": "M401_AI_GATEWAY",
+    "target": "M400_AI_CORE",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  }
+]

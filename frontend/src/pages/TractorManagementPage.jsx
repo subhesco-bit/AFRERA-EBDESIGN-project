@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { machineryAPI } from '../services/api'
 import { Truck, Plus, X, Trash2, Edit, CalendarClock } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const STATUSES = ['Available', 'Booked', 'Under Maintenance', 'Out of Service']
 
@@ -207,7 +208,7 @@ function TractorManagementPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -227,38 +228,38 @@ function TractorManagementPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Registration No. *</label>
-                  <input value={form.registration_no} onChange={(e) => setForm({ ...form, registration_no: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Registration No. *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border" value={form.registration_no} onChange={(e) => setForm({ ...form, registration_no: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                    <input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-2" value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Horsepower</label>
-                    <input type="number" value={form.horsepower} onChange={(e) => setForm({ ...form, horsepower: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Horsepower</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-3" type="number" value={form.horsepower} onChange={(e) => setForm({ ...form, horsepower: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Owner name</label>
-                  <input value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Owner name</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-4" value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-5" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
                       {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Hourly rate (₹)</label>
-                    <input type="number" step="0.01" value={form.hourly_rate} onChange={(e) => setForm({ ...form, hourly_rate: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Hourly rate (₹)</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-6" type="number" step="0.01" value={form.hourly_rate} onChange={(e) => setForm({ ...form, hourly_rate: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                   </div>
                 </div>
@@ -271,11 +272,11 @@ function TractorManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {showBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowBooking(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -291,33 +292,33 @@ function TractorManagementPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tractor *</label>
-                  <select value={bookingForm.tractor_id} onChange={(e) => setBookingForm({ ...bookingForm, tractor_id: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Tractor *</label>
+                  <select id="classname-w-full-px-3-py-2-border-border-7" value={bookingForm.tractor_id} onChange={(e) => setBookingForm({ ...bookingForm, tractor_id: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
                     <option value="">Select tractor</option>
                     {fleet.map((t) => <option key={t.id} value={t.id}>{t.registration_no}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Booked by</label>
-                  <input value={bookingForm.booked_by} onChange={(e) => setBookingForm({ ...bookingForm, booked_by: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-8" className="block text-sm font-medium text-gray-700 mb-1">Booked by</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-8" value={bookingForm.booked_by} onChange={(e) => setBookingForm({ ...bookingForm, booked_by: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Start date *</label>
-                    <input type="date" value={bookingForm.start_date} onChange={(e) => setBookingForm({ ...bookingForm, start_date: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-9" className="block text-sm font-medium text-gray-700 mb-1">Start date *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-9" type="date" value={bookingForm.start_date} onChange={(e) => setBookingForm({ ...bookingForm, start_date: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">End date</label>
-                    <input type="date" value={bookingForm.end_date} onChange={(e) => setBookingForm({ ...bookingForm, end_date: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-10" className="block text-sm font-medium text-gray-700 mb-1">End date</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-10" type="date" value={bookingForm.end_date} onChange={(e) => setBookingForm({ ...bookingForm, end_date: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
-                  <input value={bookingForm.purpose} onChange={(e) => setBookingForm({ ...bookingForm, purpose: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-11" className="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-11" value={bookingForm.purpose} onChange={(e) => setBookingForm({ ...bookingForm, purpose: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500" placeholder="e.g., Ploughing" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -329,7 +330,7 @@ function TractorManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

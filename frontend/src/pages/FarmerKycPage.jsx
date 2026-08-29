@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { kycAPI } from '../services/api'
 import { ShieldCheck, Plus, X, CheckCircle2, XCircle, Clock } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const ID_TYPES = ['Aadhaar', 'Voter ID', 'PAN', 'Ration Card', 'Kisan Credit Card']
 const STATUS_FILTERS = ['', 'pending', 'verified', 'rejected']
@@ -94,8 +95,8 @@ function FarmerKycPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 mb-6 flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-gray-700">Status</label>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+        <label htmlFor="classname-px-3-py-2-border-border-gray-3" className="text-sm font-medium text-gray-700">Status</label>
+        <select id="classname-px-3-py-2-border-border-gray-3" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
           {STATUS_FILTERS.map((s) => <option key={s} value={s}>{s === '' ? 'All statuses' : s}</option>)}
         </select>
@@ -153,7 +154,7 @@ function FarmerKycPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowForm(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -172,38 +173,38 @@ function FarmerKycPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Farmer name *</label>
-                  <input value={form.farmer_name} onChange={(e) => setForm({ ...form, farmer_name: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Farmer name *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border" value={form.farmer_name} onChange={(e) => setForm({ ...form, farmer_name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                  <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-2" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ID type</label>
-                    <select value={form.id_type} onChange={(e) => setForm({ ...form, id_type: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">ID type</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-3" value={form.id_type} onChange={(e) => setForm({ ...form, id_type: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500">
                       {ID_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ID number *</label>
-                    <input value={form.id_number} onChange={(e) => setForm({ ...form, id_number: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">ID number *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-4" value={form.id_number} onChange={(e) => setForm({ ...form, id_number: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Village</label>
-                    <input value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Village</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-5" value={form.village} onChange={(e) => setForm({ ...form, village: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Land holding (ha)</label>
-                    <input type="number" step="0.01" value={form.land_holding_hectares} onChange={(e) => setForm({ ...form, land_holding_hectares: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Land holding (ha)</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-6" type="number" step="0.01" value={form.land_holding_hectares} onChange={(e) => setForm({ ...form, land_holding_hectares: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500" />
                   </div>
                 </div>
@@ -216,7 +217,7 @@ function FarmerKycPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

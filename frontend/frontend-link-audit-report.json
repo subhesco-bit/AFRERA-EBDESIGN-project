@@ -1,0 +1,2708 @@
+{
+  "routes": [],
+  "links": [
+    {
+      "path": "src\\components\\Accessibility\\AccessibilityProvider.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\ArVr\\ExperienceViewer.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\BlockchainTraceability\\TraceabilityViewer.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\ConsumerHealth\\HealthDashboard.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\ConversationalAI\\ChatInterface.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\FarmerPortal\\LandRecords.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\FoodIntelligence\\FoodSafetyDashboard.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\GIIntelligence\\GIProductCard.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\Insurance\\InsurancePremiumCalculator.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\IoTIntegration\\DeviceMonitor.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\Layout.jsx",
+      "issues": [
+        "Multiple imports without lazy loading",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Consider lazy loading for better performance",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\Logistics\\RealTimeTracking.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\Marketplace\\GSTCalculator.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\Marketplace\\ProductReview.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\Multilingual\\LanguageSelector.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\NutritionIntelligence\\NutritionLabel.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\OrganicTraceability\\OrganicFarmRegistration.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\PredictiveAnalytics\\DemandForecast.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\ui\\common.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\ui\\Skeleton.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\components\\ui\\Toast.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\config\\routes.js",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\lib\\utils.js",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M001\\M001Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M002\\M002Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M003\\M003Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M004\\M004Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M005\\M005Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M006\\M006Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M006\\M006Page.jsx",
+      "issues": [
+        "Hardcoded API routes found"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL"
+      ]
+    },
+    {
+      "path": "src\\modules\\M007\\M007Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M008\\M008Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M008\\M008Page.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M009\\M009Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M010\\M010Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M011\\M011Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M011\\M011Page.jsx",
+      "issues": [
+        "Hardcoded API routes found"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL"
+      ]
+    },
+    {
+      "path": "src\\modules\\M012\\M012Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M013\\M013Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M014\\M014Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M015\\M015Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M016\\M016Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M017\\M017Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M018\\M018Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M019\\M019Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M020\\M020Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M021\\M021Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M022\\M022Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M023\\M023Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M024\\M024Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M025\\M025Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M026\\M026Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M027\\M027Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M027\\M027Page.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M028\\M028Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M029\\index.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M029\\M029Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M030\\M030Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M031\\M031Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M032\\M032Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M033\\M033Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M034\\M034Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M035\\M035Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M036\\M036Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M037\\M037Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M038\\M038Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M039\\M039Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M040\\M040Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M041\\M041Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M042\\M042Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M043\\M043Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M044\\M044Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M045\\M045Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M046\\M046Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M047\\M047Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M048\\M048Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M049\\M049Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M050\\M050Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M051\\M051Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M052\\M052Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M053\\M053Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M054\\M054Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M055\\M055Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M056\\M056Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M057\\M057Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M058\\M058Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M059\\M059Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M060\\M060Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M061\\M061Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M062\\M062Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M063\\M063Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M064\\M064Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M065\\M065Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M066\\M066Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M067\\M067Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M068\\M068Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M069\\M069Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M069\\M069Page.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M070\\M070Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M071\\M071Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M072\\M072Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M072\\M072Page.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M073\\M073Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M074\\M074Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M075\\M075Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M076\\M076Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M077\\M077Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M078\\M078Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M079\\M079Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M080\\M080Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M081\\M081Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M082\\M082Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M083\\M083Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M084\\M084Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M085\\M085Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M086\\M086Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M087\\M087Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M088\\M088Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M089\\M089Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M090\\M090Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M091\\M091Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M092\\M092Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M093\\M093Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M094\\M094Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M095\\M095Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M096\\M096Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M097\\M097Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M098\\M098Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M099\\M099Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M100\\M100Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M101\\M101Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M102\\M102Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M103\\M103Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M104\\M104Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M105\\M105Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M106\\M106Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M107\\M107Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M108\\M108Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M109\\M109Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M110\\M110Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M111\\M111Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M112\\M112Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M113\\M113Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M114\\M114Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M115\\M115Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M116\\M116Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M117\\M117Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M118\\M118Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M119\\M119Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M120\\M120Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M121\\M121Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M122\\M122Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M123\\M123Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M124\\M124Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M125\\M125Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M126\\M126Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M127\\M127Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M128\\M128Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M129\\M129Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M130\\M130Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M131\\M131Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M132\\M132Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M133\\M133Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M134\\M134Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M135\\M135Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M136\\M136Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M137\\M137Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M138\\M138Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M139\\M139Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M140\\M140Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M141\\M141Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M142\\M142Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M143\\M143Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M144\\M144Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M145\\M145Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M146\\M146Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M147\\M147Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M148\\M148Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M149\\M149Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\modules\\M150\\M150Component.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\AssetAccountingPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\BankPassportPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CheckoutPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\ClimateMonitoringPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\ClimateWeatherPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CommunityManagementPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CompetitivePositionPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CompliancePage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CorridorEconomicsPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CostControlPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CropCalendarPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CropMonitoringPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CropRegistrationPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\CropVarietyPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\DashboardPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\economic\\EconomicDashboard.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\EnterpriseControlPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\ExperienceLayerPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmAdvisorPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmerFamilyPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmerHealthWelfarePage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmerPortalPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmerProfilePage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmerSkillPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FarmerVerificationPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FisheriesManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FormManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\ForwardPricingPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\FPODashboardPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\HorticultureManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\IdentityManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\InputSupplyManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\InsurancePage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\LandManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\LandUseCarbonPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\LedgerPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\LivestockManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\LogisticsPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\MachineryManagementPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\MarketplacePage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\NurseryManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\OperationsManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\PlatformFoundationPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\PlatformManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\ProductDetailPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\ProjectSystemsPage.jsx",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\RfqPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\RolePermissionPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\SeedPlanningPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\SoilManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\SystemAdministrationPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\UnifiedLedgerPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\WalletPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\WaterManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\pages\\YieldManagementPage.jsx",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\services\\api.js",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\test\\utils\\errorMonitoring.test.js",
+      "issues": [
+        "Hardcoded API routes found"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL"
+      ]
+    },
+    {
+      "path": "src\\utils\\errorMonitoring.js",
+      "issues": [
+        "Hardcoded API routes found",
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL",
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\utils\\monitoring.js",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    },
+    {
+      "path": "src\\utils\\pushNotifications.js",
+      "issues": [
+        "Hardcoded API routes found"
+      ],
+      "recommendations": [
+        "Use environment variables for API base URL"
+      ]
+    },
+    {
+      "path": "src\\utils\\routePreloader.js",
+      "issues": [
+        "Component may not have error boundary"
+      ],
+      "recommendations": [
+        "Add ErrorBoundary wrapper for better error handling"
+      ]
+    }
+  ],
+  "issues": [
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Multiple imports without lazy loading",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Hardcoded API routes found",
+    "Component may not have error boundary",
+    "Component may not have error boundary",
+    "Hardcoded API routes found",
+    "Component may not have error boundary"
+  ],
+  "recommendations": [
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Consider lazy loading for better performance",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Add ErrorBoundary wrapper for better error handling",
+    "Use environment variables for API base URL",
+    "Add ErrorBoundary wrapper for better error handling"
+  ]
+}

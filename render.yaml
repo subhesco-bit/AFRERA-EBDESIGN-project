@@ -1,0 +1,49 @@
+# Render deploy config for the AFRERA backend (Node/Express).
+# See backend/.env.example for the full 59-variable reference — only the
+# variables required for a minimal working boot are declared here as
+# placeholders; add the rest (Mongo, Redis, SMS/email providers, LLM keys,
+# etc.) in the Render dashboard as those integrations are actually used.
+#
+# Usage: connect this repo in the Render dashboard, it will detect this file
+# automatically ("Blueprint" deploy), or create the service manually and
+# paste these settings in.
+
+services:
+  - type: web
+    name: afrera-api
+    runtime: node
+    region: oregon # change to your preferred region
+    plan: starter
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      # Set this to your Vercel frontend URL once deployed (step 4) - the
+      # backend's CORS config (backend/src/index.js) reads this directly.
+      - key: FRONTEND_URL
+        sync: false
+      # Paste the Supabase pooled connection string here (step 2's output).
+      - key: DATABASE_URL
+        sync: false
+      # Generate with: node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+      # Falls back to an insecure random per-process secret if unset (dev-only
+      # behavior, see backend/src/services/legacy/authService.js) - REQUIRED
+      # in production or sessions won't persist across restarts.
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_ISSUER
+        value: afrera-platform
+      - key: JWT_AUDIENCE
+        value: afrera-users
+      # Optional - the app boots and runs in fallback mode without these
+      # (confirmed throughout local development). Add only if/when you stand
+      # up managed Mongo/Redis instances.
+      - key: MONGO_URI
+        sync: false
+      - key: REDIS_HOST
+        sync: false

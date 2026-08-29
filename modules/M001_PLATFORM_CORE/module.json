@@ -1,0 +1,124 @@
+{
+  "moduleId": "M001_PLATFORM_CORE",
+  "version": "1.0.0",
+  "name": "Platform Core",
+  "description": "Core platform foundation services providing health monitoring, metrics collection, and configuration management",
+  "category": "platform",
+  "status": "production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": [],
+    "services": ["postgresql", "redis"],
+    "libraries": {
+      "backend": ["express", "winston"],
+      "frontend": ["react", "zustand"]
+    }
+  },
+  "discovery": {
+    "keywords": ["platform", "core", "foundation", "health", "metrics", "configuration"],
+    "capabilities": [
+      "health-check",
+      "metrics-collection", 
+      "configuration-management",
+      "platform-monitoring",
+      "system-diagnostics"
+    ],
+    "aiContext": "Provides platform health monitoring, metrics collection, and configuration management. Essential for platform stability and observability.",
+    "useCases": [
+      "Monitor platform health status",
+      "Collect system metrics and analytics",
+      "Manage platform configuration",
+      "Perform system diagnostics",
+      "Track platform performance"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "className": "PlatformCoreService",
+      "apiRoutes": "backend/routes.js",
+      "port": 3001,
+      "startup": "backend/startup.js",
+      "shutdown": "backend/shutdown.js"
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/components/PlatformDashboard.jsx"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/platform",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js"
+    }
+  },
+  "claudeIntegration": {
+    "supportedAgents": ["platform-admin", "devops", "system-administrator"],
+    "contextSources": [
+      "database:platform_metrics",
+      "database:platform_configuration",
+      "runtime:health_status",
+      "runtime:system_metrics"
+    ],
+    "autoDiscovery": true,
+    "runtimeLoading": true,
+    "priority": "critical",
+    "interactionPatterns": {
+      "discovery": "Natural language query for platform status",
+      "execution": "Standard health check and metrics retrieval",
+      "monitoring": "Real-time platform health monitoring",
+      "configuration": "Dynamic configuration updates"
+    }
+  },
+  "endpoints": {
+    "health": {
+      "method": "GET",
+      "path": "/api/v1/platform/health",
+      "description": "Get platform health status",
+      "authentication": false
+    },
+    "metrics": {
+      "method": "GET", 
+      "path": "/api/v1/platform/metrics",
+      "description": "Get platform metrics",
+      "authentication": true
+    },
+    "configuration": {
+      "method": "GET",
+      "path": "/api/v1/platform/configuration",
+      "description": "Get platform configuration",
+      "authentication": true
+    }
+  },
+  "dataModels": {
+    "input": {
+      "healthCheck": "backend/models/healthCheck.model.js",
+      "metricsQuery": "backend/models/metricsQuery.model.js"
+    },
+    "output": {
+      "healthStatus": "backend/models/healthStatus.model.js",
+      "platformMetrics": "backend/models/platformMetrics.model.js"
+    }
+  },
+  "testing": {
+    "unit": "tests/unit",
+    "integration": "tests/integration", 
+    "e2e": "tests/e2e",
+    "coverage": ">= 80%"
+  },
+  "documentation": {
+    "readme": "docs/README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api": "docs/API.md",
+    "integration": "docs/CLAUDE_INTEGRATION.md"
+  },
+  "metadata": {
+    "createdAt": "2026-08-24T19:43:00Z",
+    "updatedAt": "2026-08-24T19:43:00Z",
+    "installedAt": null,
+    "lastHealthCheck": null,
+    "versionHistory": []
+  }
+}

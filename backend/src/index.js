@@ -15,88 +15,88 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 
 // Import services
-const authService = require('./services/authService');
-const productService = require('./services/productService');
-const orderService = require('./services/orderService');
-const financialService = require('./services/financialService');
-const logisticsService = require('./services/logisticsService');
-const insuranceService = require('./services/insuranceService');
-const aiService = require('./services/aiService');
-const erpService = require('./services/erpService');
-const multilingualService = require('./services/multilingualService');
-const organicTraceabilityService = require('./services/organicTraceabilityService');
-const nutritionIntelligenceService = require('./services/nutritionIntelligenceService');
-const conversationalAIService = require('./services/conversationalAIService');
-const laboratoryERPService = require('./services/laboratoryERPService');
-const giIntelligenceService = require('./services/giIntelligenceService');
-const foodIntelligenceService = require('./services/foodIntelligenceService');
-const valueCommerceService = require('./services/valueCommerceService');
-const consumerHealthService = require('./services/consumerHealthService');
-const voiceAIService = require('./services/voiceAIService');
-const blockchainTraceabilityService = require('./services/blockchainTraceabilityService');
-const knowledgeGraphService = require('./services/knowledgeGraphService');
+const authService = require('./services/dual-use/authService');
+const productService = require('./services/legacy/productService');
+const orderService = require('./services/legacy/orderService');
+const financialService = require('./services/legacy/financialService');
+const logisticsService = require('./services/legacy/logisticsService');
+const insuranceService = require('./services/legacy/insuranceService');
+const aiService = require('./services/legacy/aiService');
+const erpService = require('./services/legacy/erpService');
+const multilingualService = require('./services/legacy/multilingualService');
+const organicTraceabilityService = require('./services/legacy/organicTraceabilityService');
+const nutritionIntelligenceService = require('./services/legacy/nutritionIntelligenceService');
+const conversationalAIService = require('./services/legacy/conversationalAIService');
+const laboratoryERPService = require('./services/legacy/laboratoryERPService');
+const giIntelligenceService = require('./services/legacy/giIntelligenceService');
+const foodIntelligenceService = require('./services/legacy/foodIntelligenceService');
+const valueCommerceService = require('./services/legacy/valueCommerceService');
+const consumerHealthService = require('./services/legacy/consumerHealthService');
+const voiceAIService = require('./services/legacy/voiceAIService');
+const blockchainTraceabilityService = require('./services/legacy/blockchainTraceabilityService');
+const knowledgeGraphService = require('./services/legacy/knowledgeGraphService');
 // Enterprise Memory ("Hippocampus" — AFRERA_CLAUDE_BUILD_DIRECTIVE.md §2.3):
 // case/episode log, real full-text retrieval. Was "missing" in
 // core/aiOrchestrator.js before 2026-08-09 — see that file's ENGINES.enterprise_memory
 // entry and migration 9997_enterprise_memory_schema.sql for the full rationale.
-const enterpriseMemoryService = require('./services/enterpriseMemoryService');
-const predictiveAnalyticsService = require('./services/predictiveAnalyticsService');
-const iotIntegrationService = require('./services/iotIntegrationService');
-const arVrService = require('./services/arVrService');
-const smsAuthService = require('./services/smsAuthService');
+const enterpriseMemoryService = require('./services/legacy/enterpriseMemoryService');
+const predictiveAnalyticsService = require('./services/legacy/predictiveAnalyticsService');
+const iotIntegrationService = require('./services/legacy/iotIntegrationService');
+const arVrService = require('./services/legacy/arVrService');
+const smsAuthService = require('./services/legacy/smsAuthService');
 // Real Twilio WhatsApp integration (outbound send + inbound webhook). Mirrors
 // smsAuthService's mock-mode-when-unconfigured pattern. See service header.
-const whatsappService = require('./services/whatsappService');
+const whatsappService = require('./services/legacy/whatsappService');
 const advancedVoiceAI = require('./services/advancedVoiceAI');
 // Escrow service for secure fund holding in transactions
-const escrowService = require('./services/escrowService');
+const escrowService = require('./services/legacy/escrowService');
 // Custody event service - chain tracking and settlement instructions
-const custodyEventRoutes = require('./services/custodyEventRoutes');
+const custodyEventRoutes = require('./services/legacy/custodyEventRoutes');
 // Health check routes for monitoring
 const healthRoutes = require('./routes/healthRoutes');
-const offlinePaymentService = require('./services/offlinePaymentService');
-const advancedAIService = require('./services/advancedAIService');
-const offlineSyncService = require('./services/offlineSyncService');
-const formService = require('./services/formService');
-const analyticsService = require('./services/analyticsService');
-const moduleCatalogService = require('./services/moduleCatalogService');
+const offlinePaymentService = require('./services/legacy/offlinePaymentService');
+const advancedAIService = require('./services/legacy/advancedAIService');
+const offlineSyncService = require('./services/legacy/offlineSyncService');
+const formService = require('./services/legacy/formService');
+const analyticsService = require('./services/legacy/analyticsService');
+const moduleCatalogService = require('./services/legacy/moduleCatalogService');
 // User management module (M011)
 const userModule = require('./modules/M011');
 // System Administration module (M006)
 const adminModule = require('./modules/M006');
-const indigenousKnowledgeService = require('./services/indigenousKnowledgeService');
-const biodiversityService = require('./services/biodiversityService');
-const aiCopilotService = require('./services/aiCopilotService');
-const omnichannelAIService = require('./services/omnichannelAIService');
-const foodSafetyService = require('./services/foodSafetyService');
-const shelfLifeService = require('./services/shelfLifeService');
-const institutionalProcurementService = require('./services/institutionalProcurementService');
-const millCircuitService = require('./services/millCircuitService');
-const digitalProductPassportService = require('./services/digitalProductPassportService');
-const recipeIntelligenceService = require('./services/recipeIntelligenceService');
+const indigenousKnowledgeService = require('./services/legacy/indigenousKnowledgeService');
+const biodiversityService = require('./services/legacy/biodiversityService');
+const aiCopilotService = require('./services/legacy/aiCopilotService');
+const omnichannelAIService = require('./services/legacy/omnichannelAIService');
+const foodSafetyService = require('./services/legacy/foodSafetyService');
+const shelfLifeService = require('./services/legacy/shelfLifeService');
+const institutionalProcurementService = require('./services/legacy/institutionalProcurementService');
+const millCircuitService = require('./services/legacy/millCircuitService');
+const digitalProductPassportService = require('./services/legacy/digitalProductPassportService');
+const recipeIntelligenceService = require('./services/legacy/recipeIntelligenceService');
 // Business rules recovered from the v43 prototype (see service header).
-const decisionSupportService = require('./services/decisionSupportService');
+const decisionSupportService = require('./services/legacy/decisionSupportService');
 // Recovered from the pre-v43 ne_harvest lineage (see service header).
-const neProductIntelligenceService = require('./services/neProductIntelligenceService');
-const commerceRulesService = require('./services/commerceRulesService');
-const catalogIntelligenceService = require('./services/catalogIntelligenceService');
-const enterpriseControlService = require('./services/enterpriseControlService');
-const v42IntelligenceService = require('./services/v42IntelligenceService');
+const neProductIntelligenceService = require('./services/legacy/neProductIntelligenceService');
+const commerceRulesService = require('./services/legacy/commerceRulesService');
+const catalogIntelligenceService = require('./services/legacy/catalogIntelligenceService');
+const enterpriseControlService = require('./services/legacy/enterpriseControlService');
+const v42IntelligenceService = require('./services/legacy/v42IntelligenceService');
 // Farmer Value Engine (991): the decision layer above every other module.
-const farmerValueService = require('./services/farmerValueService');
-const merchandisingService = require('./services/merchandisingService');
+const farmerValueService = require('./services/legacy/farmerValueService');
+const merchandisingService = require('./services/legacy/merchandisingService');
 
 // Previously-orphaned services: each of these exports its own setupRoutes(app)
 // function that was never being called anywhere, so none of them had a live route.
-const dynamicPricingService = require('./services/dynamicPricingService');
-const farmerTrainingService = require('./services/farmerTrainingService');
-const governmentSchemeService = require('./services/governmentSchemeService');
-const greenhouseService = require('./services/greenhouseService');
-const insuranceClaimsService = require('./services/insuranceClaimsService');
-const preSeasonOrderService = require('./services/preSeasonOrderService');
-const sharedInfraService = require('./services/sharedInfraService');
-const soilTestingService = require('./services/soilTestingService');
-const subsidyService = require('./services/subsidyService');
+const dynamicPricingService = require('./services/legacy/dynamicPricingService');
+const farmerTrainingService = require('./services/legacy/farmerTrainingService');
+const governmentSchemeService = require('./services/legacy/governmentSchemeService');
+const greenhouseService = require('./services/legacy/greenhouseService');
+const insuranceClaimsService = require('./services/legacy/insuranceClaimsService');
+const preSeasonOrderService = require('./services/legacy/preSeasonOrderService');
+const sharedInfraService = require('./services/legacy/sharedInfraService');
+const soilTestingService = require('./services/legacy/soilTestingService');
+const subsidyService = require('./services/legacy/subsidyService');
 
 // Import enhancement routes
 const marketplaceEnhancements = require('./routes/marketplaceEnhancements');
@@ -149,65 +149,70 @@ const animalHealthRoutes = require('./routes/animalHealthRoutes');
 // AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C. UnifiedLedgerPage.jsx now points
 // users at the real /ledger page instead of calling this.
 // Village Profile Service (REOS Missing Layer 5 - District/Village/Block Economic Database)
-const villageProfileService = require('./services/villageProfileService');
+const villageProfileService = require('./services/legacy/villageProfileService');
 // Procurement Subscription Service (REOS Missing Layer 1.9 - Subscription Commerce)
-const procurementSubscriptionService = require('./services/procurementSubscriptionService');
+const procurementSubscriptionService = require('./services/legacy/procurementSubscriptionService');
 // Buying Club Service (REOS Missing Layer 1.10-1.11 - Group Buying / Community Buying)
-const buyingClubService = require('./services/buyingClubService');
+const buyingClubService = require('./services/legacy/buyingClubService');
 // Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table)
-const ruralEnterpriseService = require('./services/ruralEnterpriseService');
+const ruralEnterpriseService = require('./services/legacy/ruralEnterpriseService');
 // Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table)
-const renewableEnergyService = require('./services/renewableEnergyService');
+const renewableEnergyService = require('./services/legacy/renewableEnergyService');
 // Household Economy Service (REOS Rural Life OS - household_economy table)
-const householdEconomyService = require('./services/householdEconomyService');
+const householdEconomyService = require('./services/legacy/householdEconomyService');
 // Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table)
-const sharedInfrastructureService = require('./services/sharedInfrastructureService');
+const sharedInfrastructureService = require('./services/legacy/sharedInfrastructureService');
 // Machinery Access Service (REOS Rural Life OS - machinery_access table)
-const machineryAccessService = require('./services/machineryAccessService');
+const machineryAccessService = require('./services/legacy/machineryAccessService');
 // Rural Finance Service (REOS Rural Life OS - rural_finance table)
-const ruralFinanceService = require('./services/ruralFinanceService');
+const ruralFinanceService = require('./services/legacy/ruralFinanceService');
 // AI Advisory Service (REOS Rural Life OS - ai_advisories table)
-const aiAdvisoryService = require('./services/aiAdvisoryService');
+const aiAdvisoryService = require('./services/legacy/aiAdvisoryService');
 // Market Access Service (REOS Rural Life OS - market_access table)
-const marketAccessService = require('./services/marketAccessService');
+const marketAccessService = require('./services/legacy/marketAccessService');
 // Market Intelligence Service (REOS Rural Life OS - market_intelligence table)
-const marketIntelligenceService = require('./services/marketIntelligenceService');
+const marketIntelligenceService = require('./services/legacy/marketIntelligenceService');
 // Mobility Rides Service (REOS Rural Life OS - mobility_rides table)
-const mobilityRidesService = require('./services/mobilityRidesService');
+const mobilityRidesService = require('./services/legacy/mobilityRidesService');
 // Backup and Disaster Recovery Service
-const backupService = require('./services/backupService');
+const backupService = require('./services/legacy/backupService');
 // Analytics and Monitoring Service
-const analyticsMonitoringService = require('./services/analyticsMonitoringService');
+const analyticsMonitoringService = require('./services/legacy/analyticsMonitoringService');
 // AI Agentic Companion Service
-const aiAgenticCompanionService = require('./services/aiAgenticCompanionService');
+const aiAgenticCompanionService = require('./services/legacy/aiAgenticCompanionService');
 // Digital Twin Service
-const digitalTwinService = require('./services/digitalTwinService');
+const digitalTwinService = require('./services/legacy/digitalTwinService');
 // AI Gateway Service - Real AI Backbone System
-const aiGatewayService = require('./services/aiGatewayService');
+const aiGatewayService = require('./services/legacy/aiGatewayService');
 // AI Agent Service - Agentic AI Capabilities
 const aiAgentService = require('./services/aiAgentService');
 // AI Brain Service - Cognitive Processing Layer
-const aiBrainService = require('./services/aiBrainService');
+const aiBrainService = require('./services/legacy/aiBrainService');
 // AI Self-Healing Service - Autonomous Error Recovery Layer
-const aiSelfHealingService = require('./services/aiSelfHealingService');
+const aiSelfHealingService = require('./services/legacy/aiSelfHealingService');
 // AI Operation Intelligence Service - Real-Time Optimization Layer
-const aiOperationIntelligenceService = require('./services/aiOperationIntelligenceService');
+const aiOperationIntelligenceService = require('./services/legacy/aiOperationIntelligenceService');
 // MFA Service - Multi-Factor Authentication
-const mfaService = require('./services/mfaService');
-const mfaRoutes = require('./routes/mfaRoutes');
+const mfaService = require('./services/dual-use/mfaService');
+const mfaRoutes = require('./routes/dual-use/mfaRoutes');
 // GDPR Compliance Service
-const gdprService = require('./services/gdprService');
-const gdprRoutes = require('./routes/gdprRoutes');
+const gdprService = require('./services/dual-use/gdprService');
+const gdprRoutes = require('./routes/dual-use/gdprRoutes');
 // M001 Platform Core Service
-const platformCoreService = require('./services/platformCoreService');
+const platformCoreService = require('./services/dual-use/platformCoreService');
 const platformCoreRoutes = require('./routes/platformCoreRoutes');
 // Unified Claude AI Coordinator
 const claudeAICoordinator = require('./core/claudeAICoordinator');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
 const libraryRoutes = require('./routes/libraryRoutes');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
+// Generic plug-and-play module discovery/load/execute bridge (backend/src/core/moduleRegistry.js)
+const moduleRegistryRoutes = require('./routes/claude/moduleRegistryRoutes');
+// REST bridge exposing backend/src/modules/M0XX's real functions over HTTP
+// (see routes/claude/backendModuleBridge.js for why this exists)
+const backendModuleBridge = require('./routes/claude/backendModuleBridge');
 // SAP Module Architecture Service - Independent Module Architecture
-const sapModuleArchitectureService = require('./services/sapModuleArchitectureService');
+const sapModuleArchitectureService = require('./services/legacy/sapModuleArchitectureService');
 // Advance Rate Pricing — forward curves, basis, commitment advice.
 // Recovered from afrera_platform_v44.html (migration 051).
 const riskPricingRoutes = require('./routes/riskPricingRoutes');
@@ -314,6 +319,16 @@ const {
 // (frontend/src/services/api.js getRoles/createRole/updateRole/deleteRole
 // against /roles), but no backend anywhere until now (2026-08-21).
 const roleManagementRoutes = require('./routes/roleManagementRoutes');
+// Irrigation schedules/water-sources/logs CRUD (2026-08-28) — same gap as
+// the batches above. M075 is actually Pig Management, not Irrigation - see
+// irrigationManagementService.js header.
+const {
+  irrigationSchedulesRoutes, irrigationWaterSourcesRoutes, irrigationLogsRoutes,
+} = require('./routes/irrigationManagementRoutes');
+// realtimeMonitoringService.js had zero callers anywhere in the app
+// (confirmed via repo-wide require() audit, 2026-08-28) despite being a
+// real, self-contained monitoring/alerting engine. Exposed directly.
+const realtimeMonitoringRoutes = require('./routes/realtimeMonitoringRoutes');
 // Domain D14 Climate & Weather (057) — was completely empty before today.
 const weatherRoutes = require('./routes/weatherRoutes');
 // M083 Climate Advisory (Operations wave 2) — CRUD for agromet_advisories,
@@ -352,6 +367,7 @@ const costControlRoutes = require('./routes/costControlRoutes');
 const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
 const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
+const decisionSupportRoutes = require('./routes/decisionSupportRoutes');
 const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes');
 const wikipediaRoutes = require('./routes/wikipediaRoutes');
 // Found built but with zero HTTP exposure (2026-08-15 junk/orphan sweep) —
@@ -359,7 +375,7 @@ const wikipediaRoutes = require('./routes/wikipediaRoutes');
 const agriculturalIntelligenceRoutes = require('./routes/agriculturalIntelligenceRoutes');
 const farmerHealthRoutes = require('./routes/farmerHealthRoutes');
 const foodRoutes = require('./routes/foodRoutes');
-const iotSensorService = require('./services/iotSensorService');
+const iotSensorService = require('./services/legacy/iotSensorService');
 const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes');
 const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes');
 const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes');
@@ -564,6 +580,11 @@ mountRoute('/api/v1/forms', formService);
 // services, not a REST endpoint. mountRoute() silently no-ops for it, same as
 // farmerService/gstService above.
 mountRoute('/api/v1/analytics', analyticsService);
+// analyticsService.js has real report-generation logic (buildAgriculturalOverview,
+// buildFinancialPerformance, etc.) but no .router, so the mountRoute() call
+// above always no-ops - confirmed still true 2026-08-28 via the boot log's
+// own warning. Give it a real route instead of leaving it silently unreachable.
+app.use('/api/v1/analytics', require('./routes/analyticsReportRoutes'));
 mountRoute('/api/v1/modules', moduleCatalogService);
 // decisionSupportService uses setupRoutes instead of mountRoute
 decisionSupportService.setupRoutes(app);
@@ -619,9 +640,12 @@ app.use('/api/v1/complete-ai-integration', completeAIIntegrationRoutes);
 // Comprehensive ERP - Oracle/SAP standards complete ERP system
 const comprehensiveERPRoutes = require('./routes/comprehensiveERPRoutes');
 app.use('/api/v1/comprehensive-erp', comprehensiveERPRoutes);
-// AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face)
+// AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face, Ollama)
 const aiBackboneRoutes = require('./routes/aiBackboneRoutes');
 app.use('/api/v1/ai-backbone', aiBackboneRoutes);
+// Devin - live agentic coding sessions (real Cognition Devin API, async - poll for status)
+const devinRoutes = require('./routes/devinRoutes');
+app.use('/api/v1/devin', devinRoutes);
 // Product Media AI - AI product-image generation, nutrient-comparison video generation
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes');
 app.use('/api/v1/product-media-ai', productMediaAIRoutes);
@@ -649,6 +673,8 @@ app.use('/api/v1/mfa', mfaRoutes);
 app.use('/api/v1/privacy', gdprRoutes);
 app.use('/api/v1/platform', platformCoreRoutes);
 app.use('/api/v1/ai', unifiedAIRoutes);
+app.use('/api/v1/ai/modules', moduleRegistryRoutes);
+app.use('/api/v1/backend-modules', backendModuleBridge);
 app.use('/api/v1/library', libraryRoutes);
 app.use('/api/v1/ai-collaboration', aiCollaborationRoutes);
 app.use('/api/v1/advanced', advancedFeatures);
@@ -795,6 +821,10 @@ app.use('/api/v1/digital-identities', digitalIdentityRoutes);
 app.use('/api/v1/consent-records', consentManagementRoutes);
 app.use('/api/v1/sessions', sessionManagementRoutes);
 app.use('/api/v1/roles', roleManagementRoutes);
+app.use('/api/v1/irrigation/schedules', irrigationSchedulesRoutes);
+app.use('/api/v1/irrigation/water-sources', irrigationWaterSourcesRoutes);
+app.use('/api/v1/irrigation/logs', irrigationLogsRoutes);
+app.use('/api/v1/realtime-monitoring', realtimeMonitoringRoutes);
 app.use('/api/v1/weather', weatherRoutes);
 app.use('/api/v1/climate-advisory', climateAdvisoryRoutes);
 app.use('/api/v1/compliance', complianceRoutes);
@@ -812,6 +842,7 @@ app.use('/api/v1/erp/controlling', costControlRoutes);
 app.use('/api/v1/erp/projects', projectSystemsRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
+app.use('/api/v1/decision-support', decisionSupportRoutes);
 app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
 // Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
 app.use('/api/v1/wikipedia', wikipediaRoutes);
@@ -836,8 +867,14 @@ app.use('/api/v1/vision', visionRoutes);
 // AI Gateway - Real AI Backbone System
 app.use('/api/v1/ai-gateway', aiGatewayRoutes);
 // AI Intelligence Fabric Routes (EBD-MOD-00000001)
-app.post('/api/v1/ai/orchestrate', handleAIRequest);
-app.post('/api/v1/ai/classify', handleAIRequest);
+// (2026-08-29) These were mounted with no authMiddleware, so req.user was
+// always undefined and handleAIRequest's checkAuthorization(undefined, ...)
+// crashed on `user.role` with a 500 on EVERY call, authenticated or not -
+// this endpoint never worked for anyone. Fixed alongside the executeEngine()
+// placeholder fix (see core/ai/aiOrchestratorCore.js) since both blocked the
+// same route from ever returning a real result.
+app.post('/api/v1/ai/orchestrate', authMiddleware, handleAIRequest);
+app.post('/api/v1/ai/classify', authMiddleware, handleAIRequest);
 app.get('/api/v1/ai/capabilities', (req, res) => {
   const { getAIStatus } = require('./core/ai/index');
   res.json({ success: true, data: getAIStatus() });

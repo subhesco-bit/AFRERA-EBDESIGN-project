@@ -145,8 +145,8 @@ function MarketplacePage() {
 
             {/* Sort */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Sort</label>
-              <select
+              <label htmlFor="value" className="block text-sm font-medium text-gray-700 mb-2">Sort</label>
+              <select id="value"
                 value={filters.sort}
                 onChange={(e) => { handleFilterChange('sort', e.target.value); setPagination((p) => ({ ...p, page: 1 })) }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"

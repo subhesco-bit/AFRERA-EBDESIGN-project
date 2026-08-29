@@ -1,4 +1,4 @@
-const platformTelemetryService = require('../services/platformTelemetryService');
+const platformTelemetryService = require('../services/legacy/platformTelemetryService');
 const { logger } = require('../utils/logger');
 
 const platformTelemetryController = {

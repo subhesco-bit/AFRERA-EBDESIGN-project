@@ -97,10 +97,10 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="farm_name" className="block text-sm font-medium text-gray-700 mb-2">
             Farm Name *
           </label>
-          <input
+          <input id="farm_name"
             type="text"
             name="farm_name"
             value={formData.farm_name}
@@ -112,10 +112,10 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="certification_standard_id" className="block text-sm font-medium text-gray-700 mb-2">
             Organic Certification Standard *
           </label>
-          <select
+          <select id="certification_standard_id"
             name="certification_standard_id"
             value={formData.certification_standard_id}
             onChange={handleChange}
@@ -133,10 +133,10 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="total_area_hectares" className="block text-sm font-medium text-gray-700 mb-2">
               Total Area (Hectares) *
             </label>
-            <input
+            <input id="total_area_hectares"
               type="number"
               step="0.01"
               name="total_area_hectares"
@@ -149,10 +149,10 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="organic_area_hectares" className="block text-sm font-medium text-gray-700 mb-2">
               Organic Area (Hectares) *
             </label>
-            <input
+            <input id="organic_area_hectares"
               type="number"
               step="0.01"
               name="organic_area_hectares"
@@ -165,10 +165,10 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="in_conversion_area_hectares" className="block text-sm font-medium text-gray-700 mb-2">
               In Conversion (Hectares)
             </label>
-            <input
+            <input id="in_conversion_area_hectares"
               type="number"
               step="0.01"
               name="in_conversion_area_hectares"

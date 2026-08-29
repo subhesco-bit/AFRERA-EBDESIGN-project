@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { farmCostingAPI } from '../services/api'
 import { Calculator, Plus, X, Trash2, IndianRupee } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const CATEGORIES = ['Seeds', 'Fertilizer', 'Labour', 'Irrigation', 'Machinery', 'Pesticides', 'Transport', 'Other']
 
@@ -134,7 +135,7 @@ function FarmCostingPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowForm(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -155,25 +156,25 @@ function FarmCostingPage() {
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Crop *</label>
-                    <input value={form.crop} onChange={(e) => setForm({ ...form, crop: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Crop *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border" value={form.crop} onChange={(e) => setForm({ ...form, crop: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Field name</label>
-                    <input value={form.field_name} onChange={(e) => setForm({ ...form, field_name: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Field name</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-2" value={form.field_name} onChange={(e) => setForm({ ...form, field_name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Season</label>
-                    <input value={form.season} onChange={(e) => setForm({ ...form, season: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Season</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-3" value={form.season} onChange={(e) => setForm({ ...form, season: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="e.g., Kharif 2026" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-4" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
                       {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
@@ -181,19 +182,19 @@ function FarmCostingPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹) *</label>
-                    <input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Amount (₹) *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-5" type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expected revenue (₹)</label>
-                    <input type="number" step="0.01" value={form.expected_revenue} onChange={(e) => setForm({ ...form, expected_revenue: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Expected revenue (₹)</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-6" type="number" step="0.01" value={form.expected_revenue} onChange={(e) => setForm({ ...form, expected_revenue: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                  <textarea id="classname-w-full-px-3-py-2-border-border-7" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -205,7 +206,7 @@ function FarmCostingPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

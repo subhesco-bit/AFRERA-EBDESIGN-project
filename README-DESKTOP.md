@@ -1,3 +1,9 @@
+<!-- Claude AI Ready Module - Systematic Reorganization -->
+<!-- Category: documentation -->
+<!-- Processed: 2026-08-28 14:27:18 -->
+<!-- Status: AI Integration Ready -->
+<!-- File: README-DESKTOP.md -->
+
 # AFRERA Desktop Application
 
 This document describes the desktop application setup for AFRERA using Tauri.

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { farmersAPI } from '../services/api'
 import { Package, Clock, Plus, Info } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 function PreOrderPage() {
   const [selectedPreOrder, setSelectedPreOrder] = useState(null)
@@ -170,7 +171,7 @@ function PreOrderPage() {
 
       {/* Pre-Order Modal */}
       {showOrderModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => { setShowOrderModal(false); setSelectedPreOrder(null) }}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -190,10 +191,10 @@ function PreOrderPage() {
 
               <form className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="crop" className="block text-sm font-medium text-gray-700 mb-1">
                     Crop *
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select id="crop" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Select crop</option>
                     <option value="rice">Rice</option>
                     <option value="wheat">Wheat</option>
@@ -203,20 +204,20 @@ function PreOrderPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="quantity-quintals" className="block text-sm font-medium text-gray-700 mb-1">
                       Quantity (quintals) *
                     </label>
-                    <input
+                    <input id="quantity-quintals"
                       type="number"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="expected-harvest-date" className="block text-sm font-medium text-gray-700 mb-1">
                       Expected Harvest Date *
                     </label>
-                    <input
+                    <input id="expected-harvest-date"
                       type="date"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
@@ -224,10 +225,10 @@ function PreOrderPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="expected-price-quintal" className="block text-sm font-medium text-gray-700 mb-1">
                     Expected Price (₹/quintal) *
                   </label>
-                  <input
+                  <input id="expected-price-quintal"
                     type="number"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="0"
@@ -235,10 +236,10 @@ function PreOrderPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="quality-specifications" className="block text-sm font-medium text-gray-700 mb-1">
                     Quality Specifications
                   </label>
-                  <textarea
+                  <textarea id="quality-specifications"
                     rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="Describe expected quality, variety, etc."
@@ -266,7 +267,7 @@ function PreOrderPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

@@ -8,7 +8,7 @@
  * - Customer ERP (CRM synchronization)
  */
 
-const ecommerceERPService = require('../services/ecommerceERPService');
+const ecommerceERPService = require('../services/legacy/ecommerceERPService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

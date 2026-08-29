@@ -29,7 +29,7 @@ const {
   monitorSheepHealth,
   optimizeSheepFeed,
   recommendSheepBreeding,
-} = require('../services/sheepService');
+} = require('../services/legacy/sheepService');
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');

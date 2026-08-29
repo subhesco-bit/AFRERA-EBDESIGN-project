@@ -5,7 +5,7 @@
  * Handles HTTP requests and responses for ERP operations
  */
 
-const comprehensiveERPService = require('../services/comprehensiveERPService');
+const comprehensiveERPService = require('../services/legacy/comprehensiveERPService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

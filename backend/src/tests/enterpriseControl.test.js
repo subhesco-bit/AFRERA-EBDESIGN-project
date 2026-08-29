@@ -8,7 +8,7 @@
  */
 
 const { AGENTS } = require('../core/erpAgents');
-const { SEVERITY_RANK, listActiveIncidents } = require('../services/enterpriseControlService');
+const { SEVERITY_RANK, listActiveIncidents } = require('../services/legacy/enterpriseControlService');
 const { SIGNAL, SEVERITY } = require('../core/signalBus');
 
 const agent = (id) => AGENTS.find((a) => a.id === id);

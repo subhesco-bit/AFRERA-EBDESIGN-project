@@ -1,0 +1,107 @@
+{
+  "moduleId": "M005_PERMISSION_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Permission Management",
+  "description": "Fine-grained permission management for resource-level access control",
+  "category": "security",
+  "status": "production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": [],
+    "services": ["postgresql"],
+    "libraries": {
+      "backend": ["express"],
+      "frontend": ["react", "zustand"]
+    }
+  },
+  "discovery": {
+    "keywords": ["permission", "access", "authorization", "resource", "privilege"],
+    "capabilities": [
+      "permission-crud",
+      "resource-permissions",
+      "permission-inheritance",
+      "access-grants",
+      "permission-audit"
+    ],
+    "aiContext": "Manages fine-grained permissions for resource-level access control. Essential for detailed authorization and security.",
+    "useCases": [
+      "Create and manage permissions",
+      "Assign permissions to resources",
+      "Implement permission inheritance",
+      "Audit permission changes",
+      "Manage access grants"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "className": "PermissionManagementService",
+      "apiRoutes": "backend/routes.js",
+      "port": 3005
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/components/PermissionDashboard.jsx"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/permissions",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js"
+    }
+  },
+  "claudeIntegration": {
+    "supportedAgents": ["admin", "security-admin"],
+    "contextSources": [
+      "database:permissions",
+      "database:resource_permissions",
+      "database:permission_audit"
+    ],
+    "autoDiscovery": true,
+    "runtimeLoading": true,
+    "priority": "critical"
+  },
+  "endpoints": {
+    "createPermission": {
+      "method": "POST",
+      "path": "/api/v1/permissions",
+      "description": "Create new permission",
+      "authentication": true
+    },
+    "checkPermission": {
+      "method": "GET",
+      "path": "/api/v1/permissions/check",
+      "description": "Check if user has permission",
+      "authentication": true
+    }
+  },
+  "dataModels": {
+    "input": {
+      "permissionCreate": "backend/models/permissionCreate.model.js"
+    },
+    "output": {
+      "permission": "backend/models/permission.model.js"
+    }
+  },
+  "testing": {
+    "unit": "tests/unit",
+    "integration": "tests/integration",
+    "e2e": "tests/e2e",
+    "coverage": ">= 80%"
+  },
+  "documentation": {
+    "readme": "docs/README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api": "docs/API.md",
+    "integration": "docs/CLAUDE_INTEGRATION.md"
+  },
+  "metadata": {
+    "createdAt": "2026-08-24T20:04:00Z",
+    "updatedAt": "2026-08-24T20:04:00Z",
+    "installedAt": null,
+    "lastHealthCheck": null,
+    "versionHistory": []
+  }
+}

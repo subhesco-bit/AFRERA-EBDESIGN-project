@@ -1,0 +1,2610 @@
+{
+  "routes": [
+    {
+      "path": "src\\routes\\advancedFeatures.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\agriculturalIntelligenceRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\aiAgentRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\aiBackboneRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling"
+      ]
+    },
+    {
+      "path": "src\\routes\\aiBrainRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\aiGatewayRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\aiOperationIntelligenceRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\aiSelfHealingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\animalHealthRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\assetAccountingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\auditRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\bulkOrderRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\civilDisruptionRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\climateAdvisoryRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\cloudManagementRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\coldStorageRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\communityRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\completeAIIntegrationRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\completeERPIntegrationRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\complianceRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\cooperativeShareRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\costControlRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\costRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\dairyRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\databaseManagementRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\decisionSupportRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\demandRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\dprGenerationRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\ecommerceAIRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\ecommerceBusinessSalesRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\ecommerceERPRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\ecommerceIntegrationRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\ecommerceMarketingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\ecommerceRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\energyRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\enterpriseAIRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\enterpriseControlRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\equipmentExchangeRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\experienceRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\farmerHealthRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\farmerPortalEnhancements.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\farmerRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\routes\\farmerTrainingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling"
+      ]
+    },
+    {
+      "path": "src\\routes\\fertilizerRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\foluBenchmarkRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\foluRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\foodRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\freightPoolingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\geofencingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\glutWarningRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\goatRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\governanceModule.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\healthRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\routes\\hrRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\informationSharingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\insuranceEnhancements.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\knowledgeRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\logisticsEnhancementRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\logisticsEnhancements.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\marketDataRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\marketplaceEnhancements.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\moduleSupportInfrastructureRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\nervousSystemRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\nutrientValueSalesRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\organizationManagementRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\pigRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\platformCoreRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\platformFoundationRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\poultryRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\projectSystemsRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\publicDomainDataExtractionRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\recoveredFinanceRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\regionalVarietyRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\researchAndDevelopmentRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\returnLoadBoardRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\revenueRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\rfqRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\riskPricingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\sapModuleArchitectureRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\seedVaultRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\routes\\sellerRankingRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\serverManagementRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\sheepRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\startupEnvironmentRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\systemAdministrationRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\tenantManagementRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\trackDartRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\routes\\unifiedLedgerRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation"
+      ],
+      "recommendations": [
+        "Add input validation middleware"
+      ]
+    },
+    {
+      "path": "src\\routes\\vendorRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\visionRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\weatherRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing input validation",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add input validation middleware",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\routes\\wikipediaRoutes.js",
+      "type": "routes",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "path": "src\\services\\advancedFeaturesService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\advancedServiceGenerator.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling"
+      ]
+    },
+    {
+      "path": "src\\services\\aiAdvisoryService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\aiOrchestrationService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\analyticsMonitoringService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\arVrService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\auditService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\biodiversityService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\bulkOrderService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\buyingClubService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\civilDisruptionService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\cloudManagementService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\commerceRulesService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\communityService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\complianceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\consumerHealthService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\conversationalAIService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\costService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\cropPlanningService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\custodyEventService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\databaseManagementService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\decisionSupportService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\demandService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\digitalProductPassportService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\dprGenerationService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\energy\\EnergyCostCalculator.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\equipmentExchangeService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\experienceLayerService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\farmerValueService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\foluBenchmarkService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\food\\FoodIntelligenceEngine.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\foodIntelligenceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\foodSafetyService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\freightPoolingService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\geofencingService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\giIntelligenceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\glutWarningService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\governanceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\governmentSchemeService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\householdEconomyService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\indigenousKnowledgeService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\informationSharingService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\institutionalProcurementService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\insuranceFraudDetectionService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\insurancePremiumService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\iotIntegrationService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\knowledgeGraphService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\knowledgeService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\laboratoryERPService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\landRecordsService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\logisticsEnhancementService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\machineryAccessService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\marketAccessService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\marketIntelligenceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\millCircuitService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\mobilityRidesService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\moduleSupportInfrastructureService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\multilingualService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\nutritionIntelligenceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\ocrService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\omnichannelAIService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\organicTraceabilityService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\predictiveAnalyticsService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\procurementSubscriptionService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\productReviewService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\projectSystemsService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\publicDomainDataExtractionService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\recipeIntelligenceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\recoveredFinanceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\regionalVarietyService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\renewableEnergyService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\researchAndDevelopmentService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\returnLoadBoardService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\revenueService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\rfqService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\riskPricingService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\ruralEnterpriseService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\ruralFinanceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\sapModuleArchitectureService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\seedVaultService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\sellerRankingService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Missing logging",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Add proper logging using logger",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\serverManagementService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\sharedInfraService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\sharedInfrastructureService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\shelfLifeService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\startupEnvironmentService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\valueCommerceService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\villageProfileService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\visionService.js",
+      "type": "services",
+      "issues": [
+        "Missing logging"
+      ],
+      "recommendations": [
+        "Add proper logging using logger"
+      ]
+    },
+    {
+      "path": "src\\services\\voiceAIService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\weatherService.js",
+      "type": "services",
+      "issues": [
+        "Missing error handling",
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Add try-catch blocks for error handling",
+        "Wrap database operations in transactions"
+      ]
+    },
+    {
+      "path": "src\\services\\whatsappService.js",
+      "type": "services",
+      "issues": [
+        "Database queries not wrapped in transactions"
+      ],
+      "recommendations": [
+        "Wrap database operations in transactions"
+      ]
+    }
+  ],
+  "issues": [
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing error handling",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing input validation",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing input validation",
+    "Missing logging",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions",
+    "Missing logging",
+    "Database queries not wrapped in transactions",
+    "Missing error handling",
+    "Database queries not wrapped in transactions",
+    "Database queries not wrapped in transactions"
+  ],
+  "recommendations": [
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add input validation middleware",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add input validation middleware",
+    "Add proper logging using logger",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions",
+    "Add proper logging using logger",
+    "Wrap database operations in transactions",
+    "Add try-catch blocks for error handling",
+    "Wrap database operations in transactions",
+    "Wrap database operations in transactions"
+  ]
+}

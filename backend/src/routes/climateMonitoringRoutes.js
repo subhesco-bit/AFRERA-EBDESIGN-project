@@ -15,12 +15,12 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const {
   droughtMonitoring, floodMonitoring, diseaseForecasting, climateRisk, agroMeteorology,
-} = require('../services/climateMonitoringService');
+} = require('../services/legacy/climateMonitoringService');
 
 function crudRouter(service) {
   const router = express.Router();
   router.get('/', async (req, res) => {
-    try { res.json({ success: true, data: await service.list(req.query) }); }
+    try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }
   });
   router.get('/:id', async (req, res) => {

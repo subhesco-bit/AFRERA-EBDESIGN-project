@@ -8,7 +8,7 @@
 
 const express = require('express');
 const router = express.Router();
-const researchAndDevelopmentService = require('../services/researchAndDevelopmentService');
+const researchAndDevelopmentService = require('../services/legacy/researchAndDevelopmentService');
 
 /**
  * R&D Project Management Routes

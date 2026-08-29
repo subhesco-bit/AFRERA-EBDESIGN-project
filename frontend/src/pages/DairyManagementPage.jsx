@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { dairyAPI } from '../services/api'
+import { dairyAPI, dairyAIAPI } from '../services/api'
 import { Milk, Plus, X, Trash2, Edit } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
+import ActionCard from '../components/common/ActionCard'
 
 const BREEDS = ['Jersey', 'Holstein Friesian', 'Sahiwal', 'Gir', 'Local / Desi', 'Crossbred']
 const STATUSES = ['Lactating', 'Dry', 'Pregnant', 'Calf', 'Sold']
@@ -16,6 +18,7 @@ function DairyManagementPage() {
   const [form, setForm] = useState(emptyAnimal)
   const [milkForm, setMilkForm] = useState({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
   const [tab, setTab] = useState('animals')
+  const [aiAnimalId, setAiAnimalId] = useState('')
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: animalsData, isLoading, error } = useQuery({
@@ -101,7 +104,7 @@ function DairyManagementPage() {
       </div>
 
       <div className="flex gap-2 mb-6 border-b border-gray-200">
-        {[['animals', 'Herd'], ['milk', 'Milk Records']].map(([id, label]) => (
+        {[['animals', 'Herd'], ['milk', 'Milk Records'], ['ai', 'AI Insights']].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`px-4 py-2 font-medium border-b-2 transition ${tab === id ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
             {label}
@@ -163,29 +166,29 @@ function DairyManagementPage() {
               className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end"
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Animal</label>
-                <select value={milkForm.animal_id} onChange={(e) => setMilkForm({ ...milkForm, animal_id: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Animal</label>
+                <select id="classname-w-full-px-3-py-2-border-border" value={milkForm.animal_id} onChange={(e) => setMilkForm({ ...milkForm, animal_id: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                   <option value="">Select</option>
                   {animals.map((a) => <option key={a.id} value={a.id}>{a.tag_id}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input type="date" value={milkForm.date} onChange={(e) => setMilkForm({ ...milkForm, date: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                <input id="classname-w-full-px-3-py-2-border-border-2" type="date" value={milkForm.date} onChange={(e) => setMilkForm({ ...milkForm, date: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Session</label>
-                <select value={milkForm.session} onChange={(e) => setMilkForm({ ...milkForm, session: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Session</label>
+                <select id="classname-w-full-px-3-py-2-border-border-3" value={milkForm.session} onChange={(e) => setMilkForm({ ...milkForm, session: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                   <option value="morning">Morning</option>
                   <option value="evening">Evening</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity (L)</label>
-                <input type="number" step="0.1" value={milkForm.quantity_liters} onChange={(e) => setMilkForm({ ...milkForm, quantity_liters: e.target.value })}
+                <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Quantity (L)</label>
+                <input id="classname-w-full-px-3-py-2-border-border-4" type="number" step="0.1" value={milkForm.quantity_liters} onChange={(e) => setMilkForm({ ...milkForm, quantity_liters: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
               </div>
               <button type="submit" disabled={recordMilkMutation.isPending}
@@ -229,8 +232,51 @@ function DairyManagementPage() {
         </div>
       )}
 
+      {tab === 'ai' && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-lg shadow p-4">
+            <label htmlFor="classname-w-full-md-w-72-px-3-py-2-borde" className="block text-sm font-medium text-gray-700 mb-1">Animal</label>
+            <select id="classname-w-full-md-w-72-px-3-py-2-borde" value={aiAnimalId} onChange={(e) => setAiAnimalId(e.target.value)}
+              className="w-full md:w-72 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <option value="">Select an animal</option>
+              {animals.map((a) => <option key={a.id} value={a.id}>{a.tag_id}</option>)}
+            </select>
+          </div>
+          {!aiAnimalId && (
+            <div className="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg p-4">
+              Select an animal above to run AI actions against it.
+            </div>
+          )}
+          {aiAnimalId && (
+            <>
+              <ActionCard
+                title="Optimize Milk Production"
+                description="AI analysis of recent yield trend and fat content, with recommendations."
+                onRun={() => dairyAIAPI.optimizeMilkProduction(aiAnimalId)}
+              />
+              <ActionCard
+                title="Predict Health Risks"
+                description="AI-powered health risk prediction from recent records."
+                onRun={() => dairyAIAPI.predictHealthRisks(aiAnimalId)}
+              />
+              <ActionCard
+                title="Optimize Feed Composition"
+                description="AI-recommended feed composition for a given production goal."
+                fields={[{ name: 'productionGoal', label: 'Production Goal', placeholder: 'e.g. increase milk yield' }]}
+                onRun={(v) => dairyAIAPI.optimizeFeedComposition(aiAnimalId, { productionGoal: v.productionGoal })}
+              />
+              <ActionCard
+                title="Recommend Breeding"
+                description="AI-powered breeding recommendations."
+                onRun={() => dairyAIAPI.recommendBreeding(aiAnimalId)}
+              />
+            </>
+          )}
+        </div>
+      )}
+
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -242,34 +288,34 @@ function DairyManagementPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tag ID *</label>
-                  <input value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Tag ID *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-5" value={form.tag_id} onChange={(e) => setForm({ ...form, tag_id: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., COW-014" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
-                    <select value={form.breed} onChange={(e) => setForm({ ...form, breed: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Breed</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-6" value={form.breed} onChange={(e) => setForm({ ...form, breed: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                       {BREEDS.map((b) => <option key={b} value={b}>{b}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-7" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
                       {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date of birth</label>
-                  <input type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-8" className="block text-sm font-medium text-gray-700 mb-1">Date of birth</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-8" type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-9" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                  <textarea id="classname-w-full-px-3-py-2-border-border-9" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -281,7 +327,7 @@ function DairyManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

@@ -5,7 +5,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const w = require('../services/weatherService');
+const w = require('../services/legacy/weatherService');
 const { authMiddleware } = require('../middleware/auth');
 const fail = (res, e) => res.status(/required|must|Unknown/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });

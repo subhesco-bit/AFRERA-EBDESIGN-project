@@ -26,6 +26,69 @@ const { validateInput, validateOutput, checkAuthorization, checkRateLimit } = re
 const { logAIDecision, generateTraceId } = require('./aiAuditLogger');
 
 /**
+ * Maps an ./aiEngineRegistry.js AI_ENGINES entry onto the corresponding real
+ * core/aiOrchestrator.js ENGINES task-type key. Returns null (not a fallback
+ * task type) when no honest mapping exists yet — the caller reports that
+ * explicitly rather than guessing.
+ */
+function mapEngineToRealTaskType(engine) {
+  if (engine.type === 'llm') return 'llm';
+  if (engine.name === 'Vision Quality Analysis') return 'vision_engine';
+  if (engine.name === 'OCR Engine') return 'ocr_engine';
+  if (engine.type === 'speech') return 'speech_engine';
+  if (engine.name === 'Recommendation Engine') return 'recommendation_engine';
+  // "Classification Engine" (domain/local) has no real backing anywhere in
+  // core/aiOrchestrator.js's ENGINES today - text classification only exists
+  // as a capability label on the LLM entries there, not a standalone engine.
+  return null;
+}
+
+/**
+ * Builds the payload shape core/aiOrchestrator.js's real ENGINES[taskType].invoke
+ * expects, from this class's more generic (engine, input, options) call shape.
+ */
+function buildRealOrchestratorPayload(taskType, engine, input, options) {
+  if (taskType === 'llm') {
+    return {
+      provider: engine.provider,
+      prompt: typeof input === 'string' ? input : JSON.stringify(input),
+      allowTemplateFallback: options.allowTemplateFallback || false,
+    };
+  }
+  if (taskType === 'vision_engine') {
+    return {
+      buffer: options.buffer,
+      imageBase64: options.imageBase64 || (typeof input === 'string' ? input : undefined),
+      operation: options.operation || 'analyze_quality',
+      width: options.width, height: options.height, fit: options.fit, format: options.format,
+    };
+  }
+  if (taskType === 'ocr_engine') {
+    return {
+      buffer: options.buffer,
+      imageBase64: options.imageBase64 || (typeof input === 'string' ? input : undefined),
+      language: options.language || 'eng',
+      reportNumber: options.reportNumber,
+    };
+  }
+  if (taskType === 'speech_engine') {
+    return {
+      provider: engine.provider,
+      action: options.action || 'transcribe',
+      audioBase64: options.audioBase64,
+      text: options.text || (typeof input === 'string' ? input : undefined),
+    };
+  }
+  if (taskType === 'recommendation_engine') {
+    return {
+      concern: options.concern || (typeof input === 'string' ? input : undefined),
+      month: options.month,
+    };
+  }
+  return { input, ...options };
+}
+
+/**
  * Main AI Orchestrator Class
  */
 class AIOrchestrator {
@@ -231,19 +294,46 @@ class AIOrchestrator {
   }
 
   /**
-   * Execute AI engine (placeholder for actual implementation)
+   * Execute AI engine.
+   *
+   * (2026-08-29) This used to be a literal placeholder — every call through
+   * this class's route() (validate -> authorize -> rate-limit -> cost ->
+   * HERE -> confidence -> audit-log, all real, working guardrail logic) was
+   * gating a fabricated `{message: 'AI engine execution placeholder'}`
+   * regardless of what engine findBestEngine() picked. The engine catalog in
+   * ./aiEngineRegistry.js is metadata-only (cost/confidence-threshold
+   * numbers for selection) and was never connected to anything that could
+   * actually run a task. core/aiOrchestrator.js (a sibling file one
+   * directory up, NOT this one) is the real dispatcher — 12 genuinely wired
+   * engines, each citing the exact service file backing it, honest
+   * not_configured/stub results where no real implementation exists. This
+   * method now maps the AI_ENGINES entry picked by findBestEngine() onto
+   * that real dispatcher's task-type keys and calls it, so every guardrail
+   * above is now gating something real. Where no honest mapping exists
+   * (e.g. AI_ENGINES' "Classification Engine" has no real backing anywhere
+   * in the codebase), this returns an explicit not_configured result rather
+   * than inventing one — same discipline core/aiOrchestrator.js already
+   * holds itself to.
    */
-  async executeEngine(engine, input, options) {
-    // This would dispatch to the actual engine implementation
-    // For now, we'll return a placeholder response
-    
-    return {
-      output: {
-        message: 'AI engine execution placeholder',
-        engine: engine.name,
-        inputSummary: typeof input === 'string' ? input.substring(0, 100) : 'complex input',
-      },
-    };
+  async executeEngine(engine, input, options = {}) {
+    const realOrchestrator = require('../aiOrchestrator');
+    const mapped = mapEngineToRealTaskType(engine);
+
+    if (!mapped) {
+      return {
+        output: {
+          ok: false,
+          status: 'not_configured',
+          engine: engine.name,
+          reason: `"${engine.name}" (${engine.id}) has no real implementation wired anywhere `
+            + 'in the codebase yet. Reported honestly rather than fabricating a result.',
+        },
+      };
+    }
+
+    const realPayload = buildRealOrchestratorPayload(mapped, engine, input, options);
+    const routed = await realOrchestrator.route(mapped, realPayload, options);
+    return { output: routed };
   }
 
   /**

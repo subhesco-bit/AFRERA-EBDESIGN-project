@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { vendorsAPI } from '../services/api'
 import { Building2, ShoppingCart, TrendingUp, CheckCircle, FileText, Truck, DollarSign, Users, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 function CorporateBuyerPage() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -271,7 +272,7 @@ function CorporateBuyerPage() {
 
       {/* Create Order Modal */}
       {showOrderModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowOrderModal(false)}>
           <div className="bg-white rounded-lg max-w-2xl w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -286,10 +287,10 @@ function CorporateBuyerPage() {
 
               <form className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="product" className="block text-sm font-medium text-gray-700 mb-1">
                     Product *
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select id="product" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Select product</option>
                     <option value="rice">Rice</option>
                     <option value="wheat">Wheat</option>
@@ -300,20 +301,20 @@ function CorporateBuyerPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="quantity-kg" className="block text-sm font-medium text-gray-700 mb-1">
                       Quantity (kg) *
                     </label>
-                    <input
+                    <input id="quantity-kg"
                       type="number"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="delivery-date" className="block text-sm font-medium text-gray-700 mb-1">
                       Delivery Date *
                     </label>
-                    <input
+                    <input id="delivery-date"
                       type="date"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
@@ -321,10 +322,10 @@ function CorporateBuyerPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="destination" className="block text-sm font-medium text-gray-700">
                     Destination *
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  <select id="destination" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Select destination</option>
                     <option value="ncr">NCR (Delhi NCR)</option>
                     <option value="guwahati">Guwahati</option>
@@ -350,7 +351,7 @@ function CorporateBuyerPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

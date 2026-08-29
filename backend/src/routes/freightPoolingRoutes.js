@@ -4,7 +4,7 @@
 
 const express = require('express');
 const router = express.Router();
-const freightPoolingService = require('../services/freightPoolingService');
+const freightPoolingService = require('../services/legacy/freightPoolingService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.get('/poolable-shipments', authMiddleware, async (req, res) => {

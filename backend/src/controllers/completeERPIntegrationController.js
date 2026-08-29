@@ -5,7 +5,7 @@
  * Integrates all agricultural operations with financial ERP, supply chain ERP, production ERP, and customer ERP
  */
 
-const completeERPIntegrationService = require('../services/completeERPIntegrationService');
+const completeERPIntegrationService = require('../services/legacy/completeERPIntegrationService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

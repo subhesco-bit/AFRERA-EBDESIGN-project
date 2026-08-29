@@ -1,0 +1,27 @@
+{
+  "moduleId": "M410_AI_INTELLIGENCE_FABRIC",
+  "version": "1.0.0",
+  "name": "AI Intelligence Fabric",
+  "description": "Core AI orchestration layer (EBD-MOD-00000001): provider routing, engine registry, confidence scoring, cost control, guardrails, and audit logging for every AI-backed feature in the platform. Real, working code at backend/src/core/ai/ - already imported and initialized in backend/src/index.js ('AI Intelligence Fabric initialized successfully' on every boot) but was never registered in this module registry, so Claude's discovery/execute system could not see it. Found via a whole-repo audit, 2026-08-28. Distinct from M400_AI_BACKBONE, M400_AI_CORE, M401_AI_GATEWAY, and M402_AI_ORCHESTRATION - four separately-built AI orchestration modules already in this registry, none of which reference this one or each other. That sprawl is a known, unresolved finding, not something this module's registration fixes.",
+  "category": "ai",
+  "status": "production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": ["express", "winston"],
+      "frontend": []
+    }
+  },
+  "discovery": {
+    "keywords": ["ai", "orchestration", "provider", "engine", "confidence", "cost", "guardrails", "audit", "fabric", "routing"],
+    "capabilities": ["route", "getStatus", "initialize"]
+  },
+  "claudeIntegration": {
+    "realImplementation": "backend/src/core/ai/index.js",
+    "alreadyLiveInIndexJs": true,
+    "verifiedBootLog": "AI Intelligence Fabric initialized successfully"
+  }
+}

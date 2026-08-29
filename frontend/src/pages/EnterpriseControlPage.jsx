@@ -481,8 +481,8 @@ function LegalTab() {
   return (
     <Section title="Legal calendar" description="Hearings and obligations due within the selected window (admin only). Read-only — no create route exists for legal matters or obligations on the backend.">
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-sm text-gray-700">Due within</label>
-        <input type="number" min="1" value={withinDays} onChange={(e) => setWithinDays(Number(e.target.value) || 60)}
+        <label htmlFor="classname" className="text-sm text-gray-700">Due within</label>
+        <input id="classname" type="number" min="1" value={withinDays} onChange={(e) => setWithinDays(Number(e.target.value) || 60)}
           className={inputClass()} style={{ maxWidth: 100 }} />
         <span className="text-sm text-gray-700">days</span>
       </div>

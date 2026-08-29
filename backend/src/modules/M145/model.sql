@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Polyhouse Management (M145)
--- Define tables and indexes here

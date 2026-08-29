@@ -7,7 +7,7 @@
  */
 
 const express = require('express');
-const { listCompanies, getCompanyById, getFiscalYears, getChartOfAccounts } = require('../services/companyService');
+const { listCompanies, getCompanyById, getFiscalYears, getChartOfAccounts } = require('../services/legacy/companyService');
 const { authMiddleware } = require('../middleware/auth');
 const { logger } = require('../utils/logger');
 

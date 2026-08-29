@@ -4,7 +4,7 @@
 
 const express = require('express');
 const router = express.Router();
-const glutWarningService = require('../services/glutWarningService');
+const glutWarningService = require('../services/legacy/glutWarningService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.get('/check', authMiddleware, async (req, res) => {

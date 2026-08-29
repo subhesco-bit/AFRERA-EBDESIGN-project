@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { createForm, listForms, submitForm } = require('../services/formService');
+const { createForm, listForms, submitForm } = require('../services/legacy/formService');
 
 const storePath = path.join(__dirname, '..', 'database', 'form_store.json');
 

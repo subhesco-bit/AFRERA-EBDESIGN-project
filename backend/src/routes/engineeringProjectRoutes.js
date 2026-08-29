@@ -3,7 +3,7 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
 const { authRateLimit } = require('../middleware/rateLimiter');
-const service = require('../services/engineeringProjectService');
+const service = require('../services/legacy/engineeringProjectService');
 
 const router = express.Router();
 

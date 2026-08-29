@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Vegetable Production (M142)
--- Define tables and indexes here

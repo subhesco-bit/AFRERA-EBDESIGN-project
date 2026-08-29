@@ -15,12 +15,12 @@ const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const {
   permissionManagement, ssoManagement, mfaManagement, digitalIdentity,
   consentManagement, sessionManagement,
-} = require('../services/identityManagementService');
+} = require('../services/legacy/identityManagementService');
 
 function crudRouter(service) {
   const router = express.Router();
   router.get('/', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
-    try { res.json({ success: true, data: await service.list(req.query) }); }
+    try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }
   });
   router.get('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {

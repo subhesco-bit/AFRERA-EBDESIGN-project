@@ -25,7 +25,7 @@
 const express = require('express');
 
 const router = express.Router();
-const risk = require('../services/riskPricingService');
+const risk = require('../services/legacy/riskPricingService');
 const { authMiddleware } = require('../middleware/auth');
 
 /** Shared error shape. 400 for bad input, 500 only for genuine faults. */
@@ -145,7 +145,7 @@ router.post('/basis', authMiddleware, async (req, res) => {
 // Yield management (059). Added to the existing pricing routes — one module
 // owns pricing, so two endpoints cannot quote two prices for the same lot.
 // ---------------------------------------------------------------------------
-const dynamicPricing = require('../services/dynamicPricingService');
+const dynamicPricing = require('../services/legacy/dynamicPricingService');
 
 router.get('/lots/:lotCode/price', async (req, res) => {
   try {

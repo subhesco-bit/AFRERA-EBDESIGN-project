@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const fertilizerInventoryService = require('../services/fertilizerInventoryService');
+const fertilizerInventoryService = require('../services/legacy/fertilizerInventoryService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 

@@ -5,9 +5,9 @@
 
 const express = require('express');
 const router = express.Router();
-const gstService = require('../services/gstService');
-const productReviewService = require('../services/productReviewService');
-const bulkOrderService = require('../services/bulkOrderService');
+const gstService = require('../services/legacy/gstService');
+const productReviewService = require('../services/legacy/productReviewService');
+const bulkOrderService = require('../services/legacy/bulkOrderService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');

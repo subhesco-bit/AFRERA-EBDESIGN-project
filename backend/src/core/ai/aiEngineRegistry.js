@@ -2,9 +2,29 @@
  * AI Engine Registry
  * Component ID: EBD-CMP-00000003
  * Purpose: AI capability engine registration and dispatch
- * 
+ *
  * This module provides a centralized registry for all AI engines
  * with their capabilities, status, and dispatch logic.
+ *
+ * RECONCILED (2026-08-29) with core/aiOrchestrator.js — the file one
+ * directory up that actually EXECUTES tasks (14 real engines, each with a
+ * citation to the exact service file backing it). This registry's job is
+ * narrower than its name suggests: it is the CAPABILITY SELECTION layer
+ * (findBestEngine() picks a candidate by capability/cost/confidence for
+ * ../ai/aiOrchestratorCore.js's guardrail pipeline to gate), not a second
+ * execution engine. ../ai/aiOrchestratorCore.js's executeEngine() maps
+ * whatever this file selects onto the matching real task-type key via
+ * mapEngineToRealTaskType() and calls the real orchestrator - so this file's
+ * metadata (cost_per_1k_tokens, confidence_threshold) still matters for
+ * selection and cost estimation, but no entry here reimplements execution.
+ *
+ * One entry has no real backing anywhere in the codebase and is honestly
+ * unmapped rather than faked: the `classification` entry below (generic
+ * standalone text classification). mapEngineToRealTaskType() returns null
+ * for it, and executeEngine() reports that explicitly instead of guessing.
+ * Every other entry (llm_*, vision_*, speech_*, `recommendation`) does map
+ * to a real, working engine - see aiOrchestratorCore.js's mapping function
+ * for the exact correspondence.
  */
 
 'use strict';
@@ -106,6 +126,9 @@ const AI_ENGINES = {
     cost_per_request: 0.001,
     confidence_threshold: 0.9,
   },
+  // No real backing anywhere in the codebase - mapEngineToRealTaskType() in
+  // ../ai/aiOrchestratorCore.js returns null for this entry on purpose, and
+  // executeEngine() reports that honestly rather than fabricating a result.
   classification: {
     id: 'EBD-ENG-00000009',
     name: 'Classification Engine',

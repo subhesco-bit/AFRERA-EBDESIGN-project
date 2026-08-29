@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const logisticsEnhancementService = require('../services/logisticsEnhancementService');
+const logisticsEnhancementService = require('../services/legacy/logisticsEnhancementService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');

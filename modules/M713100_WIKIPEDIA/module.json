@@ -1,0 +1,44 @@
+{
+  "moduleId": "M713100_WIKIPEDIA",
+  "version": "1.0.0",
+  "name": "Wikipedia",
+  "description": "Migrated from legacy service: wikipediaService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\wikipediaService.js",
+    "migratedAt": "2026-08-24T17:28:25.684Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 137,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.478Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

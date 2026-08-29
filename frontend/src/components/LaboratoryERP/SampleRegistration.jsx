@@ -134,10 +134,10 @@ const SampleRegistration = ({ onSuccess }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Laboratory Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="laboratory_id" className="block text-sm font-medium text-gray-700 mb-2">
             Select Laboratory *
           </label>
-          <select
+          <select id="laboratory_id"
             name="laboratory_id"
             value={formData.laboratory_id}
             onChange={handleChange}
@@ -156,10 +156,10 @@ const SampleRegistration = ({ onSuccess }) => {
         {/* Sample Information */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sample_type" className="block text-sm font-medium text-gray-700 mb-2">
               Sample Type *
             </label>
-            <select
+            <select id="sample_type"
               name="sample_type"
               value={formData.sample_type}
               onChange={handleChange}
@@ -174,10 +174,10 @@ const SampleRegistration = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="sample_source" className="block text-sm font-medium text-gray-700 mb-2">
               Sample Source *
             </label>
-            <input
+            <input id="sample_source"
               type="text"
               name="sample_source"
               value={formData.sample_source}
@@ -191,10 +191,10 @@ const SampleRegistration = ({ onSuccess }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="collection_date" className="block text-sm font-medium text-gray-700 mb-2">
               Collection Date *
             </label>
-            <input
+            <input id="collection_date"
               type="date"
               name="collection_date"
               value={formData.collection_date}
@@ -205,10 +205,10 @@ const SampleRegistration = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="collection_method" className="block text-sm font-medium text-gray-700 mb-2">
               Collection Method
             </label>
-            <input
+            <input id="collection_method"
               type="text"
               name="collection_method"
               value={formData.collection_method}
@@ -220,10 +220,10 @@ const SampleRegistration = ({ onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="sample_description" className="block text-sm font-medium text-gray-700 mb-2">
             Sample Description *
           </label>
-          <textarea
+          <textarea id="sample_description"
             name="sample_description"
             value={formData.sample_description}
             onChange={handleChange}
@@ -236,10 +236,10 @@ const SampleRegistration = ({ onSuccess }) => {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="quantity_g" className="block text-sm font-medium text-gray-700 mb-2">
               Quantity (grams) *
             </label>
-            <input
+            <input id="quantity_g"
               type="number"
               step="0.01"
               name="quantity_g"
@@ -252,10 +252,10 @@ const SampleRegistration = ({ onSuccess }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="batch_number" className="block text-sm font-medium text-gray-700 mb-2">
               Batch Number
             </label>
-            <input
+            <input id="batch_number"
               type="text"
               name="batch_number"
               value={formData.batch_number}
@@ -267,10 +267,10 @@ const SampleRegistration = ({ onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-2">
             Priority
           </label>
-          <select
+          <select id="priority"
             name="priority"
             value={formData.priority}
             onChange={handleChange}
@@ -331,10 +331,10 @@ const SampleRegistration = ({ onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="special_instructions" className="block text-sm font-medium text-gray-700 mb-2">
             Special Instructions
           </label>
-          <textarea
+          <textarea id="special_instructions"
             name="special_instructions"
             value={formData.special_instructions}
             onChange={handleChange}

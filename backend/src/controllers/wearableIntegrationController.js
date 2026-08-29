@@ -1,4 +1,4 @@
-const wearableIntegrationService = require('../services/wearableIntegrationService');
+const wearableIntegrationService = require('../services/legacy/wearableIntegrationService');
 const { logger } = require('../utils/logger');
 
 const wearableIntegrationController = {

@@ -8,7 +8,7 @@
 
 const express = require('express');
 const router = express.Router();
-const knowledgeService = require('../services/knowledgeService');
+const knowledgeService = require('../services/legacy/knowledgeService');
 
 /**
  * Article Management Routes

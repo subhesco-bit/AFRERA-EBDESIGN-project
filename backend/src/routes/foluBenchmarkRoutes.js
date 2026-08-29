@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const foluBenchmarkService = require('../services/foluBenchmarkService');
+const foluBenchmarkService = require('../services/legacy/foluBenchmarkService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.get('/transitions', async (req, res) => {

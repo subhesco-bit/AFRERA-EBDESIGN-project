@@ -7,7 +7,7 @@ const express = require('express');
 const { logger } = require('../utils/logger');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { LOGISTICS_ROLES } = require('../middleware/roleGroups');
-const logisticsService = require('../services/logisticsEnhancementService');
+const logisticsService = require('../services/legacy/logisticsEnhancementService');
 
 const router = express.Router();
 

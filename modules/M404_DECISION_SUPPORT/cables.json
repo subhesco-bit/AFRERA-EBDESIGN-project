@@ -1,0 +1,26 @@
+[
+  {
+    "cableId": "CABLE_M001_PLATFORM_CORE_TO_M404_DECISION_SUPPORT_AI",
+    "source": "M001_PLATFORM_CORE",
+    "target": "M404_DECISION_SUPPORT",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  },
+  {
+    "cableId": "CABLE_M404_DECISION_SUPPORT_TO_M400_AI_CORE_AI",
+    "source": "M404_DECISION_SUPPORT",
+    "target": "M400_AI_CORE",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  }
+]

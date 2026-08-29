@@ -1,0 +1,11 @@
+﻿[
+    "git reset --hard",
+    "git clean -fd",
+    "git push --force",
+    "git branch -D",
+    "git tag -d",
+    "production database migration",
+    "destructive catalogue deletion",
+    "Claude tree rewrite",
+    "COMMON tree rewrite"
+]

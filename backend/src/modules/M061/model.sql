@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Crop Planning (M061)
--- Define tables and indexes here

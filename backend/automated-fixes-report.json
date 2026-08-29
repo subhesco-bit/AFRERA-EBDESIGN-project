@@ -1,0 +1,9 @@
+{
+  "filesProcessed": 22,
+  "authenticationAdded": 0,
+  "errorHandlingAdded": 0,
+  "loggingAdded": 0,
+  "transactionWrappingAdded": 0,
+  "validationAdded": 22,
+  "errors": []
+}

@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Geo Boundary Management (M038)
--- Define tables and indexes here

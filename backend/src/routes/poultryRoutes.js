@@ -26,7 +26,7 @@ const {
   monitorFlockHealth,
   optimizePoultryFeed,
   predictMortalityRisk,
-} = require('../services/poultryService');
+} = require('../services/legacy/poultryService');
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');

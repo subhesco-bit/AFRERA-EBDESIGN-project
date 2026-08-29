@@ -10,7 +10,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../database/pool');
-const seedVaultService = require('../services/seedVaultService');
+const seedVaultService = require('../services/legacy/seedVaultService');
 const { authMiddleware } = require('../middleware/auth');
 
 async function resolveFarmerId(req, res, next) {

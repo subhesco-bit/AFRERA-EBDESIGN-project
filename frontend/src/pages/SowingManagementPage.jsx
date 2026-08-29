@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sowingAPI } from '../services/api'
 import { Sprout, Plus, Trash2, Edit, X, CalendarDays } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const SEASONS = ['Kharif', 'Rabi', 'Zaid']
 const METHODS = ['Broadcasting', 'Line Sowing', 'Dibbling', 'Transplanting', 'Drilling']
@@ -130,8 +131,8 @@ function SowingManagementPage() {
       </div>
 
       <div className="bg-white rounded-lg shadow p-4 mb-6 flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-gray-700">Season</label>
-        <select
+        <label htmlFor="value" className="text-sm font-medium text-gray-700">Season</label>
+        <select id="value"
           value={seasonFilter}
           onChange={(e) => setSeasonFilter(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -206,7 +207,7 @@ function SowingManagementPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -216,39 +217,39 @@ function SowingManagementPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Crop *</label>
-                    <input value={form.crop} onChange={(e) => setForm({ ...form, crop: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Crop *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border" value={form.crop} onChange={(e) => setForm({ ...form, crop: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., Paddy" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Variety</label>
-                    <input value={form.variety} onChange={(e) => setForm({ ...form, variety: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Variety</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-2" value={form.variety} onChange={(e) => setForm({ ...form, variety: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., IR-64" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Field name *</label>
-                    <input value={form.field_name} onChange={(e) => setForm({ ...form, field_name: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Field name *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-3" value={form.field_name} onChange={(e) => setForm({ ...form, field_name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" placeholder="e.g., North Plot" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Area (hectares)</label>
-                    <input type="number" step="0.01" value={form.area_hectares} onChange={(e) => setForm({ ...form, area_hectares: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Area (hectares)</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-4" type="number" step="0.01" value={form.area_hectares} onChange={(e) => setForm({ ...form, area_hectares: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Season</label>
-                    <select value={form.season} onChange={(e) => setForm({ ...form, season: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Season</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-5" value={form.season} onChange={(e) => setForm({ ...form, season: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                       {SEASONS.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Sowing method</label>
-                    <select value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Sowing method</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-6" value={form.method} onChange={(e) => setForm({ ...form, method: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                       {METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
                     </select>
@@ -256,24 +257,24 @@ function SowingManagementPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Sowing date *</label>
-                    <input type="date" value={form.sowing_date} onChange={(e) => setForm({ ...form, sowing_date: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Sowing date *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-7" type="date" value={form.sowing_date} onChange={(e) => setForm({ ...form, sowing_date: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expected germination</label>
-                    <input type="date" value={form.expected_germination_date} onChange={(e) => setForm({ ...form, expected_germination_date: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-8" className="block text-sm font-medium text-gray-700 mb-1">Expected germination</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-8" type="date" value={form.expected_germination_date} onChange={(e) => setForm({ ...form, expected_germination_date: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Seed rate (kg)</label>
-                  <input type="number" step="0.1" value={form.seed_rate_kg} onChange={(e) => setForm({ ...form, seed_rate_kg: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-9" className="block text-sm font-medium text-gray-700 mb-1">Seed rate (kg)</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-9" type="number" step="0.1" value={form.seed_rate_kg} onChange={(e) => setForm({ ...form, seed_rate_kg: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-10" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                  <textarea id="classname-w-full-px-3-py-2-border-border-10" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -286,7 +287,7 @@ function SowingManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

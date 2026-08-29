@@ -1,4 +1,4 @@
-const { buildPlatformOverview, buildAssistantResponse } = require('../services/moduleCatalogService');
+const { buildPlatformOverview, buildAssistantResponse } = require('../services/legacy/moduleCatalogService');
 
 describe('moduleCatalogService', () => {
   it('builds a platform overview with module coverage', () => {

@@ -6,9 +6,9 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../database/pool');
-const landRecordsService = require('../services/landRecordsService');
-const cropPlanningService = require('../services/cropPlanningService');
-const { getFarmerWallet, getWalletTransactions, depositToWallet, withdrawFromWallet, transferFromWallet, getWalletBalance, linkBankAccount } = require('../services/farmerService');
+const landRecordsService = require('../services/legacy/landRecordsService');
+const cropPlanningService = require('../services/legacy/cropPlanningService');
+const { getFarmerWallet, getWalletTransactions, depositToWallet, withdrawFromWallet, transferFromWallet, getWalletBalance, linkBankAccount } = require('../services/legacy/farmerService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { authRateLimit } = require('../middleware/rateLimiter');

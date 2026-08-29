@@ -14,7 +14,7 @@
 
 const express = require('express');
 const router = express.Router();
-const platformConfigurationService = require('../services/platformConfigurationService');
+const platformConfigurationService = require('../services/legacy/platformConfigurationService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { logger } = require('../utils/logger');

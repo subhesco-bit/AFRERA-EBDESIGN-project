@@ -8,7 +8,7 @@
 
 const express = require('express');
 const router = express.Router();
-const informationSharingService = require('../services/informationSharingService');
+const informationSharingService = require('../services/legacy/informationSharingService');
 
 /**
  * Document Management Routes
@@ -27,6 +27,33 @@ router.get('/documents', (req, res) => {
     };
     
     const documents = informationSharingService.getDocuments(filters);
+    res.json({
+      success: true,
+      count: documents.length,
+      data: documents
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Search documents
+// NOTE: must be registered before '/documents/:documentId' - otherwise Express
+// matches "search" as a :documentId and this route is unreachable (found
+// 2026-08-29 while wiring the frontend for informationSharingRoutes.js).
+router.get('/documents/search', (req, res) => {
+  try {
+    const query = req.query.q;
+    const filters = {
+      status: req.query.status,
+      category: req.query.category,
+      type: req.query.type
+    };
+
+    const documents = informationSharingService.searchDocuments(query, filters);
     res.json({
       success: true,
       count: documents.length,
@@ -103,30 +130,6 @@ router.delete('/documents/:documentId', (req, res) => {
     res.json({
       success: true,
       message: result.message
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
-// Search documents
-router.get('/documents/search', (req, res) => {
-  try {
-    const query = req.query.q;
-    const filters = {
-      status: req.query.status,
-      category: req.query.category,
-      type: req.query.type
-    };
-    
-    const documents = informationSharingService.searchDocuments(query, filters);
-    res.json({
-      success: true,
-      count: documents.length,
-      data: documents
     });
   } catch (error) {
     res.status(500).json({

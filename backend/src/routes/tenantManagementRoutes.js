@@ -12,7 +12,7 @@
 
 const express = require('express');
 const router = express.Router();
-const tenantManagementService = require('../services/tenantManagementService');
+const tenantManagementService = require('../services/legacy/tenantManagementService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');

@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const platformCoreService = require('../services/platformCoreService');
+const platformCoreService = require('../services/dual-use/platformCoreService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

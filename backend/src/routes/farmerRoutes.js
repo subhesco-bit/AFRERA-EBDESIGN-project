@@ -17,7 +17,7 @@ const {
   addFarmerCertification,
   getFarmerCertifications,
   getFPOs
-} = require('../services/farmerService');
+} = require('../services/legacy/farmerService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 const { resolveFarmerId } = require('../middleware/resolveFarmerId');

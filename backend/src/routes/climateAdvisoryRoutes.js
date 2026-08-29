@@ -10,7 +10,7 @@
 
 const express = require('express');
 const router = express.Router();
-const weatherService = require('../services/weatherService');
+const weatherService = require('../services/legacy/weatherService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 

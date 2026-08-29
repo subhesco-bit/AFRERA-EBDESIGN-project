@@ -13,12 +13,15 @@
     "react": { "version": "detect" }
   },
   "extends": ["eslint:recommended"],
+  "plugins": ["react"],
   "globals": {
     "React": "readonly",
     "process": "readonly"
   },
   "rules": {
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^React$" }],
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
     "no-undef": "error",
     "no-empty": ["error", { "allowEmptyCatch": true }],
     "prefer-const": "warn",

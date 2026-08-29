@@ -78,10 +78,10 @@ function CheckoutPage() {
             </h2>
             <form onSubmit={handleAddressSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="address-line-1" className="block text-sm font-medium text-gray-700 mb-2">
                   Address Line 1
                 </label>
-                <input
+                <input id="address-line-1"
                   type="text"
                   required
                   value={shippingAddress.address_line1}
@@ -91,10 +91,10 @@ function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                   City
                 </label>
-                <input
+                <input id="city"
                   type="text"
                   required
                   value={shippingAddress.city}
@@ -105,10 +105,10 @@ function CheckoutPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-2">
                     State
                   </label>
-                  <input
+                  <input id="state"
                     type="text"
                     required
                     value={shippingAddress.state}
@@ -118,10 +118,10 @@ function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="pincode" className="block text-sm font-medium text-gray-700 mb-2">
                     Pincode
                   </label>
-                  <input
+                  <input id="pincode"
                     type="text"
                     required
                     value={shippingAddress.pincode}
@@ -150,8 +150,8 @@ function CheckoutPage() {
             </h2>
             <form onSubmit={handlePaymentSubmit} className="space-y-4">
               <div className="space-y-3">
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
+                <label htmlFor="payment" className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input id="payment"
                     type="radio"
                     name="payment"
                     value="cod"
@@ -164,8 +164,8 @@ function CheckoutPage() {
                     <div className="text-sm text-gray-500">Pay when you receive your order</div>
                   </div>
                 </label>
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
+                <label htmlFor="payment" className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input id="payment"
                     type="radio"
                     name="payment"
                     value="upi"
@@ -178,8 +178,8 @@ function CheckoutPage() {
                     <div className="text-sm text-gray-500">Pay using any UPI app</div>
                   </div>
                 </label>
-                <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
+                <label htmlFor="payment" className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input id="payment"
                     type="radio"
                     name="payment"
                     value="card"

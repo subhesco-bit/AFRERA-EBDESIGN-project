@@ -1,0 +1,45 @@
+{
+  "testsRun": 24,
+  "testsPassed": 23,
+  "testsFailed": 1,
+  "categories": {
+    "database": {
+      "passed": 6,
+      "failed": 0,
+      "issues": []
+    },
+    "api": {
+      "passed": 4,
+      "failed": 0,
+      "issues": []
+    },
+    "authentication": {
+      "passed": 2,
+      "failed": 0,
+      "issues": []
+    },
+    "services": {
+      "passed": 1,
+      "failed": 1,
+      "issues": [
+        "Low service initialization: 65/172 services have init functions"
+      ]
+    },
+    "frontend": {
+      "passed": 3,
+      "failed": 0,
+      "issues": []
+    },
+    "security": {
+      "passed": 4,
+      "failed": 0,
+      "issues": []
+    },
+    "performance": {
+      "passed": 3,
+      "failed": 0,
+      "issues": []
+    }
+  },
+  "overallStatus": "FAIL"
+}

@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Crop Monitoring (M068)
--- Define tables and indexes here

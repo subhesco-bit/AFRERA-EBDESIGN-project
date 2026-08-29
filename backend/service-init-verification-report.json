@@ -1,0 +1,570 @@
+{
+  "services": [
+    {
+      "path": "src\\modules\\M001\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\modules\\M014\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\modules\\M015\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\modules\\M020\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\modules\\M021\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\modules\\M082\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\modules\\M084\\controller.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\advancedServiceGenerator.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\animalHealthService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\communityService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\completeERPIntegrationService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\comprehensiveERPService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\dairyService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\ecommerceAIService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\fertilizerInventoryService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\food\\FoodIntelligenceEngine.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\goatService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\hrService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\informationSharingService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\knowledgeService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\marketDataService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\moduleSupportInfrastructureService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\organizationManagementService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\pigService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\poultryService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\projectSystemsService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\publicDomainDataExtractionService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\realtimeMonitoringService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\researchAndDevelopmentService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\sheepService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\startupEnvironmentService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": false,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\systemAdministrationService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\tenantManagementService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": true,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\unifiedLedgerService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    },
+    {
+      "path": "src\\services\\weatherService.js",
+      "hasInit": true,
+      "hasSetupRoutes": false,
+      "hasConfig": false,
+      "hasErrorHandling": true,
+      "issues": [
+        "Service has init function but may not be initialized in index.js"
+      ],
+      "recommendations": [
+        "Ensure service is initialized in index.js"
+      ],
+      "hasExports": true
+    }
+  ],
+  "initializedServices": 174,
+  "uninitializedServices": 600,
+  "issues": [
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js",
+    "Service has init function but may not be initialized in index.js"
+  ],
+  "recommendations": [
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js",
+    "Ensure service is initialized in index.js"
+  ]
+}

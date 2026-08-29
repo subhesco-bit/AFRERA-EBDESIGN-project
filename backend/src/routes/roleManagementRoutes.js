@@ -11,7 +11,7 @@
 
 const express = require('express');
 const router = express.Router();
-const roleManagementService = require('../services/roleManagementService');
+const roleManagementService = require('../services/legacy/roleManagementService');
 const { authMiddleware, requirePermission } = require('../middleware/auth');
 
 router.post('/', authMiddleware, requirePermission('create_roles'), async (req, res) => {

@@ -5,7 +5,7 @@
  * authentication, and error handling.
  */
 
-const ecommerceService = require('../services/ecommerceService');
+const ecommerceService = require('../services/legacy/ecommerceService');
 const { logger } = require('../utils/logger');
 const { validateBody } = require('../middleware/inputValidation');
 

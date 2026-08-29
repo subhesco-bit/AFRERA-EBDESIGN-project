@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Disease Forecasting (M088)
--- Define tables and indexes here

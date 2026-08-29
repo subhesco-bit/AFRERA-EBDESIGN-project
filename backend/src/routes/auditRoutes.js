@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const auditService = require('../services/auditService');
+const auditService = require('../services/legacy/auditService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

@@ -4,7 +4,7 @@
 
 const express = require('express');
 const router = express.Router();
-const returnLoadBoardService = require('../services/returnLoadBoardService');
+const returnLoadBoardService = require('../services/legacy/returnLoadBoardService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.post('/', authMiddleware, async (req, res) => {

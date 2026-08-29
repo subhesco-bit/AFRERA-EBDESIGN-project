@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const projectSystemsService = require('../services/projectSystemsService');
+const projectSystemsService = require('../services/legacy/projectSystemsService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

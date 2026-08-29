@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2, Edit, X } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from './Modal'
 
 /**
  * Shared list/create/edit/delete scaffold for the second-batch domain
@@ -225,7 +226,7 @@ export default function ResourceManager({
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -289,7 +290,7 @@ export default function ResourceManager({
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

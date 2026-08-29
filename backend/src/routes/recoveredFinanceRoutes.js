@@ -12,7 +12,7 @@
 const express = require('express');
 
 const router = express.Router();
-const fin = require('../services/recoveredFinanceService');
+const fin = require('../services/legacy/recoveredFinanceService');
 const { authMiddleware } = require('../middleware/auth');
 const { resolveFarmerId } = require('../middleware/resolveFarmerId');
 

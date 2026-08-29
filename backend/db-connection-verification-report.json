@@ -1,0 +1,1082 @@
+{
+  "files": [
+    {
+      "path": "src\\core\\aiOrchestrator.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\core\\nervousSystem.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\core\\outcomeSink.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\core\\reflexEngine.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\backup\\backup_manager.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\migrations\\enhanced_migrate.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\monitoring\\database_monitor.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\optimization\\query_optimizer.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\pool.js",
+      "hasPoolQuery": true,
+      "hasTransaction": true,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\database\\seed.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\seed_economic.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\database\\transactions\\transaction_manager.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block"
+      ]
+    },
+    {
+      "path": "src\\middleware\\compliance.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\middleware\\resolveFarmerId.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M002\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M003\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M004\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M005\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M022\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M023\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M025\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M031\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M032\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M041\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M042\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M052\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M054\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M055\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M056\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M057\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M058\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M059\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M060\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M076\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M077\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M078\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M079\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M080\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M081\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M082\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M083\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M084\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M085\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M086\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M087\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M101\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M102\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M103\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M104\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M105\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M107\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M108\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M109\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M110\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M122\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M123\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\modules\\M127\\service.js",
+      "hasPoolQuery": true,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Direct pool.query usage without transaction wrapping"
+      ],
+      "recommendations": [
+        "Wrap database operations with transactionManager"
+      ]
+    },
+    {
+      "path": "src\\services\\arVrService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\blockchainTraceabilityService.js",
+      "hasPoolQuery": true,
+      "hasTransaction": true,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\consumerHealthService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\conversationalAIService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\foodIntelligenceService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\giIntelligenceService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\iotIntegrationService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\knowledgeGraphService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\laboratoryERPService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\multilingualService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\nutritionIntelligenceService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\organicTraceabilityService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\predictiveAnalyticsService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\valueCommerceService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    },
+    {
+      "path": "src\\services\\voiceAIService.js",
+      "hasPoolQuery": false,
+      "hasTransaction": false,
+      "hasEnhancement": false,
+      "issues": [
+        "Pool connection without proper cleanup",
+        "Potential connection leak - missing client.release()"
+      ],
+      "recommendations": [
+        "Ensure connections are properly closed in finally block",
+        "Add client.release() in finally block"
+      ]
+    }
+  ],
+  "wrappedConnections": 28,
+  "unwrappedConnections": 55,
+  "issues": [
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Pool connection without proper cleanup",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Direct pool.query usage without transaction wrapping",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()",
+    "Pool connection without proper cleanup",
+    "Potential connection leak - missing client.release()"
+  ],
+  "recommendations": [
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Ensure connections are properly closed in finally block",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Wrap database operations with transactionManager",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block",
+    "Ensure connections are properly closed in finally block",
+    "Add client.release() in finally block"
+  ]
+}

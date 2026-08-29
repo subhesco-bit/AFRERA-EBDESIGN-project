@@ -1,0 +1,118 @@
+{
+  "moduleId": "M645100_LIBRARYKNOWLEDGE",
+  "version": "1.1.0",
+  "name": "Library Knowledge",
+  "description": "Catalogues _EBDESIGN_LIBRARY, runtime modules, backend module scaffolds, route/API/UI surfaces, and AI retrieval context for Claude-compatible module discovery.",
+  "category": "enterprise",
+  "status": "production",
+  "domain": "library_catalogue",
+  "dependencies": {
+    "modules": [
+      "SYS-MOD-BACKBONE",
+      "SYS-MOD-REGISTRY",
+      "SYS-UIP"
+    ],
+    "services": [
+      "filesystem",
+      "postgresql_optional"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "crypto",
+        "fs",
+        "path"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "discovery": {
+    "keywords": [
+      "library",
+      "catalogue",
+      "catalog",
+      "module registry",
+      "module discovery",
+      "claude context",
+      "devin handoff",
+      "api inventory",
+      "frontend inventory",
+      "backend inventory"
+    ],
+    "capabilities": [
+      "library-indexing",
+      "module-discovery",
+      "catalogue-search",
+      "content-hashing",
+      "ai-context-packaging",
+      "backend-api-ui-inventory",
+      "module-health"
+    ],
+    "aiContext": "Use this module to find catalogue evidence, module manifests, backend route surfaces, frontend UI entry points, and Claude-compatible retrieval context without mutating source files."
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "classExport": true,
+      "singletonExport": true,
+      "operations": [
+        "initialize",
+        "search",
+        "discover",
+        "modules",
+        "getModule",
+        "aiContext",
+        "verify",
+        "statistics",
+        "syncDatabase"
+      ]
+    },
+    "api": {
+      "entryPoint": "api/routes.js",
+      "basePath": "/api/v1/library",
+      "routes": [
+        "POST /initialize",
+        "GET /statistics",
+        "GET /verify",
+        "GET /search",
+        "GET /modules",
+        "GET /modules/:moduleId",
+        "POST /ai-context"
+      ]
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "mainComponent": "LibraryKnowledgePage",
+      "routes": [
+        "/library-knowledge"
+      ]
+    }
+  },
+  "aiIntegration": {
+    "claudeCompatible": true,
+    "devinCompatible": true,
+    "guardrails": [
+      "read-only catalogue indexing by default",
+      "database sync is explicit via syncDatabase",
+      "does not edit .claude or .devin files"
+    ],
+    "contextOutputs": [
+      "matching catalogue cards",
+      "runtime module manifests",
+      "backend API readiness",
+      "frontend UI readiness",
+      "content hashes"
+    ]
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "api": true,
+    "tests": false,
+    "catalogue": true
+  }
+}

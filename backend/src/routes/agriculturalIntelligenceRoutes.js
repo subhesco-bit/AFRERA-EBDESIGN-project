@@ -9,7 +9,7 @@
 
 const express = require('express');
 const router = express.Router();
-const agriculturalIntelligenceService = require('../services/agriculturalIntelligenceService');
+const agriculturalIntelligenceService = require('../services/legacy/agriculturalIntelligenceService');
 const { authMiddleware } = require('../middleware/auth');
 
 router.post('/crop-yield/predict', authMiddleware, async (req, res) => {

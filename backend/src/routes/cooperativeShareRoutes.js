@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const cooperativeShareService = require('../services/cooperativeShareService');
+const cooperativeShareService = require('../services/legacy/cooperativeShareService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

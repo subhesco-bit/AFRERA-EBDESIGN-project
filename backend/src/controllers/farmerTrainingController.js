@@ -3,7 +3,7 @@
  * Handles HTTP requests and responses for farmer training operations
  */
 
-const farmerTrainingService = require('../services/farmerTrainingService');
+const farmerTrainingService = require('../services/legacy/farmerTrainingService');
 const { logger } = require('../utils/logger');
 
 const farmerTrainingController = {

@@ -1,5 +1,5 @@
 const winston = require('winston');
-const auditService = require('../services/auditService');
+const auditService = require('../services/legacy/auditService');
 
 // Compliance logger
 const complianceLogger = winston.createLogger({

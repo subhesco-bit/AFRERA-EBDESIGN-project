@@ -7,7 +7,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const organic = require('../services/organicTraceabilityService');
+const organic = require('../services/legacy/organicTraceabilityService');
 const { authMiddleware } = require('../middleware/auth');
 const fail = (res, e) => res.status(/required|must|Refusing/i.test(e.message) ? 400 : 500)
   .json({ success: false, error: e.message });

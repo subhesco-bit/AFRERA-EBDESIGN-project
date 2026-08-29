@@ -12,7 +12,7 @@
  * - Nutrient-Value Search
  */
 
-const nutrientValueSalesService = require('../services/nutrientValueSalesService');
+const nutrientValueSalesService = require('../services/legacy/nutrientValueSalesService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

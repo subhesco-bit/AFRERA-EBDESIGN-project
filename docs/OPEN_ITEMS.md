@@ -210,21 +210,23 @@ A 92%-confidence recommendation from the overconfident agent becomes 23% and
 `mayAutoExecute: false`. No human involved in that demotion. An unmeasured
 agent gets ×0.50, not ×1.00 — unknown is not the same as trustworthy.
 
-### KNOWN BROKEN — do not wire into CI yet
+### FIXED — wired into CI (this section was stale, corrected 2026-08-28)
 
-`tools/validate-resolution-rules.js` is **not working**. Its SQL tuple parser
-miscounts parentheses across the multi-line string concatenation in the
-`rationale` column: it finds 4 rules instead of 9 and emits a false error about
-an empty `truth_table`. It is deliberately NOT referenced in `.github/workflows/
-ci.yml`.
+`tools/validate-resolution-rules.js` was rewritten to do exactly what the
+"Fix approach" below used to recommend: it drops text parsing entirely and
+queries `information_schema.columns` directly (see the tool's own header
+comment for its before/after history — it used to miscount SQL tuples via a
+text parser, now it doesn't parse SQL at all). It IS referenced in
+`.github/workflows/ci.yml:166` and runs unconditionally there — this
+section previously said the opposite of both of those facts. Verified
+2026-08-28: running it locally without a database connection exits 0 with
+a clear "cannot reach the database" message rather than crashing or
+false-erroring, consistent with it being meant to run after the CI
+migration step against a real schema.
 
 The check it performs is still needed — the first seed of these rules named
 `gross_revenue`, `checked_at`, `batch_id` and `actual_delivery_hours`, none of
 which exist, and each would have failed silently at resolution time looking
 exactly like "ground truth has not arrived yet". Those four are now fixed
-against the real schema, but nothing prevents the next one.
-
-**Fix approach:** drop the text parsing and query `information_schema` after
-migrations apply. CI already provisions PostgreSQL, so the live schema is
-available and is ground truth — parsing SQL text to check SQL was the wrong
-idea to begin with.
+against the real schema, and the rewritten tool catches the next one
+automatically via `information_schema`, not by trusting the SQL text.

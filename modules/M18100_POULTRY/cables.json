@@ -1,0 +1,26 @@
+[
+  {
+    "cableId": "CABLE_M18100_POULTRY_TO_M001_PLATFORM_CORE_DATA",
+    "source": "M18100_POULTRY",
+    "target": "M001_PLATFORM_CORE",
+    "type": "data",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "high",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  },
+  {
+    "cableId": "CABLE_M18100_POULTRY_TO_M400_AI_CORE_AI",
+    "source": "M18100_POULTRY",
+    "target": "M400_AI_CORE",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  }
+]

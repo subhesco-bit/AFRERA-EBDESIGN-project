@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Modal from '../components/common/Modal'
 import { useQuery } from '@tanstack/react-query'
 import { farmersAPI } from '../services/api'
 import { Sprout, Search, TrendingUp, Droplets, Sun, MapPin, DollarSign, Info } from 'lucide-react'
@@ -37,11 +38,11 @@ function WhatGrowPage() {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="search-crops" className="block text-sm font-medium text-gray-700 mb-1">
               <Search className="w-4 h-4 inline mr-1" />
               Search Crops
             </label>
-            <input
+            <input id="search-crops"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -51,10 +52,10 @@ function WhatGrowPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="season" className="block text-sm font-medium text-gray-700 mb-1">
               Season
             </label>
-            <select
+            <select id="season"
               value={selectedSeason}
               onChange={(e) => setSelectedSeason(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -67,10 +68,10 @@ function WhatGrowPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="soil-type" className="block text-sm font-medium text-gray-700 mb-1">
               Soil Type
             </label>
-            <select
+            <select id="soil-type"
               value={selectedSoil}
               onChange={(e) => setSelectedSoil(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -182,7 +183,7 @@ function WhatGrowPage() {
 
       {/* Crop Detail Modal */}
       {selectedCrop && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setSelectedCrop(null)}>
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -282,7 +283,7 @@ function WhatGrowPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

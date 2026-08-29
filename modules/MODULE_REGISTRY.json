@@ -1,0 +1,339 @@
+{
+  "registryVersion": "1.0.0",
+  "registryName": "EBDESIGN Module Registry",
+  "lastUpdated": "2026-08-24T20:00:00Z",
+  "system": {
+    "version": "1.0.0",
+    "environment": "development",
+    "status": "operational"
+  },
+  "categories": {
+    "platform": {
+      "id": "platform",
+      "name": "Platform Modules",
+      "description": "Core platform infrastructure and foundation services",
+      "range": "M001-M099",
+      "count": 5
+    },
+    "domain": {
+      "id": "domain",
+      "name": "Domain Modules",
+      "description": "Industry-specific and domain-focused functionality",
+      "range": "M100-M199",
+      "count": 0
+    },
+    "enterprise": {
+      "id": "enterprise",
+      "name": "Enterprise Modules",
+      "description": "Complete business solutions for enterprise operations",
+      "range": "M200-M299",
+      "count": 0
+    },
+    "erp": {
+      "id": "erp",
+      "name": "ERP Modules",
+      "description": "Enterprise Resource Planning components",
+      "range": "M300-M399",
+      "count": 0
+    },
+    "ai": {
+      "id": "ai",
+      "name": "AI Modules",
+      "description": "AI backbone and intelligence systems",
+      "range": "M400-M499",
+      "count": 0
+    }
+  },
+  "modules": {
+    "M001_PLATFORM_CORE": {
+      "moduleId": "M001_PLATFORM_CORE",
+      "version": "1.0.0",
+      "name": "Platform Core",
+      "category": "platform",
+      "status": "installed",
+      "health": "healthy",
+      "priority": "critical",
+      "dependencies": {
+        "modules": [],
+        "services": ["postgresql", "redis"]
+      },
+      "connections": [
+        "CABLE_PLATFORM_TO_USER",
+        "CABLE_PLATFORM_TO_AI_BACKBONE"
+      ],
+      "endpoints": {
+        "health": "/api/v1/platform/health",
+        "metrics": "/api/v1/platform/metrics",
+        "config": "/api/v1/platform/configuration"
+      },
+      "aiCapabilities": {
+        "agents": ["platform-admin", "devops", "system-administrator"],
+        "decisionMaking": true,
+        "strategyEngine": false
+      },
+      "metadata": {
+        "installedAt": "2026-08-24T19:43:00Z",
+        "lastHealthCheck": "2026-08-24T20:00:00Z",
+        "lastUpdated": "2026-08-24T19:43:00Z"
+      }
+    },
+    "M002_USER_MANAGEMENT": {
+      "moduleId": "M002_USER_MANAGEMENT",
+      "version": "1.0.0",
+      "name": "User Management",
+      "category": "platform",
+      "status": "installed",
+      "health": "unknown",
+      "priority": "critical",
+      "dependencies": {
+        "modules": ["M001_PLATFORM_CORE"],
+        "services": ["postgresql"]
+      },
+      "connections": [
+        "CABLE_USER_TO_ORGANIZATION",
+        "CABLE_USER_TO_ROLE",
+        "CABLE_USER_TO_PLATFORM"
+      ],
+      "endpoints": {
+        "users": "/api/v1/users",
+        "auth": "/api/v1/auth",
+        "profile": "/api/v1/users/profile"
+      },
+      "aiCapabilities": {
+        "agents": ["user-admin", "support-agent"],
+        "decisionMaking": true,
+        "strategyEngine": false
+      },
+      "metadata": {
+        "installedAt": "2026-08-24T20:11:00Z",
+        "lastHealthCheck": null,
+        "lastUpdated": "2026-08-24T20:11:00Z"
+      }
+    },
+    "M003_ORGANIZATION": {
+      "moduleId": "M003_ORGANIZATION",
+      "version": "1.0.0",
+      "name": "Organization Management",
+      "category": "platform",
+      "status": "installed",
+      "health": "unknown",
+      "priority": "high",
+      "dependencies": {
+        "modules": ["M001_PLATFORM_CORE", "M002_USER_MANAGEMENT"],
+        "services": ["postgresql"]
+      },
+      "connections": [
+        "CABLE_ORGANIZATION_TO_USER",
+        "CABLE_ORGANIZATION_TO_PLATFORM"
+      ],
+      "endpoints": {
+        "organizations": "/api/v1/organizations",
+        "members": "/api/v1/organizations/members"
+      },
+      "aiCapabilities": {
+        "agents": ["org-admin", "business-analyst"],
+        "decisionMaking": true,
+        "strategyEngine": false
+      },
+      "metadata": {
+        "installedAt": "2026-08-24T20:12:00Z",
+        "lastHealthCheck": null,
+        "lastUpdated": "2026-08-24T20:12:00Z"
+      }
+    },
+    "M004_ROLE_MANAGEMENT": {
+      "moduleId": "M004_ROLE_MANAGEMENT",
+      "version": "1.0.0",
+      "name": "Role Management",
+      "category": "platform",
+      "status": "installed",
+      "health": "unknown",
+      "priority": "high",
+      "dependencies": {
+        "modules": ["M001_PLATFORM_CORE", "M002_USER_MANAGEMENT"],
+        "services": ["postgresql"]
+      },
+      "connections": [
+        "CABLE_ROLE_TO_PERMISSION",
+        "CABLE_ROLE_TO_USER"
+      ],
+      "endpoints": {
+        "roles": "/api/v1/roles",
+        "assignments": "/api/v1/roles/assignments"
+      },
+      "aiCapabilities": {
+        "agents": ["security-admin", "compliance-officer"],
+        "decisionMaking": true,
+        "strategyEngine": false
+      },
+      "metadata": {
+        "installedAt": "2026-08-24T20:12:00Z",
+        "lastHealthCheck": null,
+        "lastUpdated": "2026-08-24T20:12:00Z"
+      }
+    },
+    "M005_PERMISSION_MANAGEMENT": {
+      "moduleId": "M005_PERMISSION_MANAGEMENT",
+      "version": "1.0.0",
+      "name": "Permission Management",
+      "category": "platform",
+      "status": "installed",
+      "health": "unknown",
+      "priority": "high",
+      "dependencies": {
+        "modules": ["M001_PLATFORM_CORE", "M004_ROLE_MANAGEMENT"],
+        "services": ["postgresql"]
+      },
+      "connections": [
+        "CABLE_PERMISSION_TO_ROLE"
+      ],
+      "endpoints": {
+        "permissions": "/api/v1/permissions",
+        "checks": "/api/v1/permissions/check"
+      },
+      "aiCapabilities": {
+        "agents": ["security-admin", "audit-officer"],
+        "decisionMaking": true,
+        "strategyEngine": false
+      },
+      "metadata": {
+        "installedAt": "2026-08-24T20:12:00Z",
+        "lastHealthCheck": null,
+        "lastUpdated": "2026-08-24T20:12:00Z"
+      }
+    }
+  },
+  "cables": {
+    "CABLE_PLATFORM_TO_USER": {
+      "cableId": "CABLE_PLATFORM_TO_USER",
+      "sourceModule": "M001_PLATFORM_CORE",
+      "targetModule": "M002_USER_MANAGEMENT",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "high",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_PLATFORM_TO_AI_BACKBONE": {
+      "cableId": "CABLE_PLATFORM_TO_AI_BACKBONE",
+      "sourceModule": "M001_PLATFORM_CORE",
+      "targetModule": "M400_AI_BACKBONE",
+      "type": "ai",
+      "protocol": "uip-v1",
+      "status": "pending",
+      "bandwidth": "high",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_USER_TO_ORGANIZATION": {
+      "cableId": "CABLE_USER_TO_ORGANIZATION",
+      "sourceModule": "M002_USER_MANAGEMENT",
+      "targetModule": "M003_ORGANIZATION",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "medium",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_USER_TO_ROLE": {
+      "cableId": "CABLE_USER_TO_ROLE",
+      "sourceModule": "M002_USER_MANAGEMENT",
+      "targetModule": "M004_ROLE_MANAGEMENT",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "medium",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_USER_TO_PLATFORM": {
+      "cableId": "CABLE_USER_TO_PLATFORM",
+      "sourceModule": "M002_USER_MANAGEMENT",
+      "targetModule": "M001_PLATFORM_CORE",
+      "type": "event",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "low",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": false
+    },
+    "CABLE_ORGANIZATION_TO_USER": {
+      "cableId": "CABLE_ORGANIZATION_TO_USER",
+      "sourceModule": "M003_ORGANIZATION",
+      "targetModule": "M002_USER_MANAGEMENT",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "medium",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_ORGANIZATION_TO_PLATFORM": {
+      "cableId": "CABLE_ORGANIZATION_TO_PLATFORM",
+      "sourceModule": "M003_ORGANIZATION",
+      "targetModule": "M001_PLATFORM_CORE",
+      "type": "event",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "low",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": false
+    },
+    "CABLE_ROLE_TO_PERMISSION": {
+      "cableId": "CABLE_ROLE_TO_PERMISSION",
+      "sourceModule": "M004_ROLE_MANAGEMENT",
+      "targetModule": "M005_PERMISSION_MANAGEMENT",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "medium",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_ROLE_TO_USER": {
+      "cableId": "CABLE_ROLE_TO_USER",
+      "sourceModule": "M004_ROLE_MANAGEMENT",
+      "targetModule": "M002_USER_MANAGEMENT",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "medium",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    },
+    "CABLE_PERMISSION_TO_ROLE": {
+      "cableId": "CABLE_PERMISSION_TO_ROLE",
+      "sourceModule": "M005_PERMISSION_MANAGEMENT",
+      "targetModule": "M004_ROLE_MANAGEMENT",
+      "type": "data",
+      "protocol": "uip-v1",
+      "status": "connected",
+      "bandwidth": "medium",
+      "latency": "low",
+      "encryption": true,
+      "circuitBreaker": true
+    }
+  },
+  "statistics": {
+    "totalModules": 5,
+    "installedModules": 5,
+    "healthyModules": 1,
+    "unhealthyModules": 0,
+    "unknownHealthModules": 4,
+    "totalCables": 10,
+    "connectedCables": 9,
+    "pendingCables": 1,
+    "disconnectedCables": 0
+  }
+}

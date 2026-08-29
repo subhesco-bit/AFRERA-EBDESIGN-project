@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { orchardAPI } from '../services/api'
 import { TreeDeciduous, Plus, X, Trash2, Edit } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const FRUIT_TYPES = ['Orange', 'Pineapple', 'Litchi', 'Guava', 'Mango', 'Assam Lemon', 'Kiwi', 'Passion Fruit']
 
@@ -19,7 +20,8 @@ function OrchardManagementPage() {
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['orchards'],
-    queryFn: async () => (await orchardAPI.getOrchards()).data?.data ?? [],
+    // listOrchards returns { items, pagination }, not a bare array
+    queryFn: async () => (await orchardAPI.getOrchards()).data?.data?.items ?? [],
   })
 
   const saveMutation = useMutation({
@@ -52,9 +54,11 @@ function OrchardManagementPage() {
   const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
 
   const openEdit = (o) => {
+    // Real DB columns (see M141 createOrchard/updateOrchard): orchard_type,
+    // area, planting_date - not this form's original field names.
     setForm({
-      name: o.name || '', fruit_type: o.fruit_type || 'Orange', area_hectares: o.area_hectares ?? '',
-      tree_count: o.tree_count ?? '', planting_year: o.planting_year ?? '', location: o.location || '',
+      name: o.name || '', fruit_type: o.orchard_type || 'Orange', area_hectares: o.area ?? '',
+      tree_count: o.tree_count ?? '', planting_year: o.planting_date ?? '', location: o.location || '',
     })
     setEditingId(o.id)
     setShowForm(true)
@@ -62,7 +66,7 @@ function OrchardManagementPage() {
 
   const orchards = data || []
   const totalTrees = orchards.reduce((s, o) => s + (Number(o.tree_count) || 0), 0)
-  const totalArea = orchards.reduce((s, o) => s + (Number(o.area_hectares) || 0), 0)
+  const totalArea = orchards.reduce((s, o) => s + (Number(o.area) || 0), 0)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -98,7 +102,7 @@ function OrchardManagementPage() {
       {isLoading && <div className="animate-pulse h-40 bg-gray-200 rounded-lg" />}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
-          Error loading orchards: {error.message}. Backend endpoint /orchards has not been built yet — this page is wired and ready once it is.
+          Error loading orchards: {error.message}
         </div>
       )}
       {!isLoading && !error && (
@@ -122,10 +126,10 @@ function OrchardManagementPage() {
                     <div className="font-medium text-gray-800">{o.name}</div>
                     <div className="text-xs text-gray-500">{o.location || '—'}</div>
                   </td>
-                  <td className="px-4 py-3"><span className="text-xs px-2 py-1 rounded-full bg-lime-100 text-lime-800">{o.fruit_type}</span></td>
-                  <td className="px-4 py-3 text-gray-700">{o.area_hectares ?? '—'}</td>
+                  <td className="px-4 py-3"><span className="text-xs px-2 py-1 rounded-full bg-lime-100 text-lime-800">{o.orchard_type}</span></td>
+                  <td className="px-4 py-3 text-gray-700">{o.area ?? '—'}</td>
                   <td className="px-4 py-3 text-gray-700">{o.tree_count ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-700">{o.planting_year ?? '—'}</td>
+                  <td className="px-4 py-3 text-gray-700">{o.planting_date ?? '—'}</td>
                   <td className="px-4 py-3 text-right space-x-2">
                     <button onClick={() => setHarvestTarget(o)} className="px-2 py-1 text-xs text-lime-700 border border-lime-300 rounded hover:bg-lime-50">Log Harvest</button>
                     <button onClick={() => openEdit(o)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
@@ -139,7 +143,7 @@ function OrchardManagementPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -150,48 +154,52 @@ function OrchardManagementPage() {
                 onSubmit={(e) => {
                   e.preventDefault()
                   if (!form.name) { toast.error('Orchard name is required'); return }
+                  // Real backend fields (M141 createOrchard/updateOrchard) don't match this
+                  // form's names 1:1 - mapped explicitly rather than spreading form as-is.
                   saveMutation.mutate({
-                    ...form,
-                    area_hectares: form.area_hectares === '' ? null : Number(form.area_hectares),
-                    tree_count: form.tree_count === '' ? null : Number(form.tree_count),
-                    planting_year: form.planting_year === '' ? null : Number(form.planting_year),
+                    name: form.name,
+                    location: form.location,
+                    orchardType: form.fruit_type,
+                    area: form.area_hectares === '' ? null : Number(form.area_hectares),
+                    treeCount: form.tree_count === '' ? null : Number(form.tree_count),
+                    plantingDate: form.planting_year === '' ? null : Number(form.planting_year),
                   })
                 }}
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Orchard name *</label>
-                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Orchard name *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Fruit type</label>
-                    <select value={form.fruit_type} onChange={(e) => setForm({ ...form, fruit_type: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Fruit type</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-2" value={form.fruit_type} onChange={(e) => setForm({ ...form, fruit_type: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600">
                       {FRUIT_TYPES.map((f) => <option key={f} value={f}>{f}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                    <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-3" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Area (ha)</label>
-                    <input type="number" step="0.01" value={form.area_hectares} onChange={(e) => setForm({ ...form, area_hectares: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Area (ha)</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-4" type="number" step="0.01" value={form.area_hectares} onChange={(e) => setForm({ ...form, area_hectares: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tree count</label>
-                    <input type="number" value={form.tree_count} onChange={(e) => setForm({ ...form, tree_count: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Tree count</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-5" type="number" value={form.tree_count} onChange={(e) => setForm({ ...form, tree_count: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Planting year</label>
-                    <input type="number" value={form.planting_year} onChange={(e) => setForm({ ...form, planting_year: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-6" className="block text-sm font-medium text-gray-700 mb-1">Planting year</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-6" type="number" value={form.planting_year} onChange={(e) => setForm({ ...form, planting_year: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                   </div>
                 </div>
@@ -204,11 +212,11 @@ function OrchardManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {harvestTarget && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setHarvestTarget(null)}>
           <div className="bg-white rounded-lg max-w-md w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -219,24 +227,36 @@ function OrchardManagementPage() {
                 onSubmit={(e) => {
                   e.preventDefault()
                   if (!harvestForm.date || !harvestForm.quantity_kg) { toast.error('Date and quantity are required'); return }
-                  recordHarvestMutation.mutate({ id: harvestTarget.id, payload: { ...harvestForm, quantity_kg: Number(harvestForm.quantity_kg) } })
+                  // Real backend fields (M141 recordOrchardProduction) don't match this
+                  // form's names - mapped explicitly. productionYear/variety aren't
+                  // collected by this form; year is derived from the harvest date,
+                  // variety is left unset rather than guessed.
+                  recordHarvestMutation.mutate({
+                    id: harvestTarget.id,
+                    payload: {
+                      harvestDate: harvestForm.date,
+                      productionYear: new Date(harvestForm.date).getFullYear(),
+                      quantity: Number(harvestForm.quantity_kg),
+                      qualityGrade: harvestForm.grade,
+                    },
+                  })
                 }}
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Harvest date *</label>
-                  <input type="date" value={harvestForm.date} onChange={(e) => setHarvestForm({ ...harvestForm, date: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-7" className="block text-sm font-medium text-gray-700 mb-1">Harvest date *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-7" type="date" value={harvestForm.date} onChange={(e) => setHarvestForm({ ...harvestForm, date: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity (kg) *</label>
-                    <input type="number" step="0.1" value={harvestForm.quantity_kg} onChange={(e) => setHarvestForm({ ...harvestForm, quantity_kg: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-8" className="block text-sm font-medium text-gray-700 mb-1">Quantity (kg) *</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-8" type="number" step="0.1" value={harvestForm.quantity_kg} onChange={(e) => setHarvestForm({ ...harvestForm, quantity_kg: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Grade</label>
-                    <select value={harvestForm.grade} onChange={(e) => setHarvestForm({ ...harvestForm, grade: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-9" className="block text-sm font-medium text-gray-700 mb-1">Grade</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-9" value={harvestForm.grade} onChange={(e) => setHarvestForm({ ...harvestForm, grade: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lime-600">
                       <option value="A">Grade A</option>
                       <option value="B">Grade B</option>
@@ -253,7 +273,7 @@ function OrchardManagementPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

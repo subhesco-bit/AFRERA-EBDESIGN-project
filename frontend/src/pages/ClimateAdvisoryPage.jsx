@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { climateAdvisoryAPI, weatherAPI } from '../services/api'
 import { CloudSun, Plus, X, AlertTriangle, Bug } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const ADVISORY_TYPES = ['Sowing', 'Irrigation', 'Pest Management', 'Harvest Timing', 'General']
 
@@ -105,7 +106,7 @@ function ClimateAdvisoryPage() {
       )}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowForm(false)}>
           <div className="bg-white rounded-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -121,32 +122,32 @@ function ClimateAdvisoryPage() {
                 className="space-y-4"
               >
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                  <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border" className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                  <input id="classname-w-full-px-3-py-2-border-border" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Advisory text *</label>
-                  <textarea value={form.advisory} onChange={(e) => setForm({ ...form, advisory: e.target.value })} rows={4}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-2" className="block text-sm font-medium text-gray-700 mb-1">Advisory text *</label>
+                  <textarea id="classname-w-full-px-3-py-2-border-border-2" value={form.advisory} onChange={(e) => setForm({ ...form, advisory: e.target.value })} rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="Farm operations to do or postpone based on the forecast" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-3" className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select id="classname-w-full-px-3-py-2-border-border-3" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500">
                       {ADVISORY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
-                    <input value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })}
+                    <label htmlFor="classname-w-full-px-3-py-2-border-border-4" className="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                    <input id="classname-w-full-px-3-py-2-border-border-4" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500" placeholder="District / state, blank = all" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Valid until</label>
-                  <input type="date" value={form.valid_until} onChange={(e) => setForm({ ...form, valid_until: e.target.value })}
+                  <label htmlFor="classname-w-full-px-3-py-2-border-border-5" className="block text-sm font-medium text-gray-700 mb-1">Valid until</label>
+                  <input id="classname-w-full-px-3-py-2-border-border-5" type="date" value={form.valid_until} onChange={(e) => setForm({ ...form, valid_until: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500" />
                 </div>
                 <div className="flex justify-end space-x-3 pt-2">
@@ -158,7 +159,7 @@ function ClimateAdvisoryPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

@@ -13,12 +13,12 @@ const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const {
   biofertilizer, pesticideInventory, bioPesticide, micronutrient,
   organicInput, inputProcurement, inputDistribution, inputTraceability,
-} = require('../services/inputSupplyManagementService');
+} = require('../services/legacy/inputSupplyManagementService');
 
 function crudRouter(service) {
   const router = express.Router();
   router.get('/', async (req, res) => {
-    try { res.json({ success: true, data: await service.list(req.query) }); }
+    try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }
   });
   router.get('/:id', async (req, res) => {

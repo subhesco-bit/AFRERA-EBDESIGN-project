@@ -318,19 +318,29 @@ async function registerIoTDevice(farmerId, deviceData) {
 
 async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) {
   const pg = getPostgreSQL();
-  if (!pg) throw new Error('Error (Database not initialized');
+  if (!pg) throw new Error('Database not initialized');
   
-  // This would integrate with actual IoT device data
-  // For now, return mock data
+  const device = await pg.query(
+    'SELECT * FROM iot_devices WHERE farmer_id = $1 AND device_id = $2',
+    [farmerId, deviceId]
+  );
+
+  if (!device.rows.length) {
+    return {
+      deviceId,
+      timeframe,
+      implemented: false,
+      reason: 'No registered IoT device exists for this farmer/device pair.'
+    };
+  }
+
   return {
     deviceId,
     timeframe,
-    data: {
-      temperature: { average: 25, min: 20, max: 30 },
-      humidity: { average: 60, min: 50, max: 70 },
-      soilMoisture: { average: 45, min: 30, max: 60 },
-      sensorHealth: 'optimal'
-    }
+    device: device.rows[0],
+    data: [],
+    implemented: false,
+    reason: 'Device registry is connected, but no real IoT telemetry table/provider is wired to this module yet.'
   };
 }
 
@@ -441,6 +451,127 @@ function groupBy(array, key) {
   }, {});
 }
 
+function scorePerformance(payload = {}) {
+  const harvestQuality = Number(payload.harvestQualityScore ?? 0);
+  const marketReliability = Number(payload.marketReliabilityScore ?? 0);
+  const compliance = Number(payload.complianceScore ?? 0);
+  const training = Number(payload.trainingReadinessScore ?? 0);
+  const health = Number(payload.healthRiskScore ?? 0);
+
+  const weighted =
+    harvestQuality * 0.28 +
+    marketReliability * 0.22 +
+    compliance * 0.22 +
+    training * 0.18 -
+    health * 0.10;
+
+  return Math.max(0, Math.min(100, Math.round(weighted)));
+}
+
+function normalizePerformanceSnapshot(payload = {}) {
+  const performanceScore = scorePerformance(payload);
+  const improvementActions = [];
+
+  if (Number(payload.complianceScore ?? 0) < 70) {
+    improvementActions.push('Close certification and documentation gaps');
+  }
+  if (Number(payload.trainingReadinessScore ?? 0) < 70) {
+    improvementActions.push('Complete priority skill training modules');
+  }
+  if (Number(payload.marketReliabilityScore ?? 0) < 70) {
+    improvementActions.push('Improve fulfilment timeliness and buyer communication');
+  }
+  if (Number(payload.healthRiskScore ?? 0) > 50) {
+    improvementActions.push('Resolve health and welfare risk signals');
+  }
+
+  return {
+    moduleId: 'M030',
+    farmerId: payload.farmerId ?? payload.farmer_id ?? null,
+    periodStart: payload.periodStart ?? payload.period_start ?? null,
+    periodEnd: payload.periodEnd ?? payload.period_end ?? null,
+    harvestQualityScore: Number(payload.harvestQualityScore ?? 0),
+    marketReliabilityScore: Number(payload.marketReliabilityScore ?? 0),
+    complianceScore: Number(payload.complianceScore ?? 0),
+    trainingReadinessScore: Number(payload.trainingReadinessScore ?? 0),
+    healthRiskScore: Number(payload.healthRiskScore ?? 0),
+    performanceScore,
+    band: performanceScore >= 80 ? 'leader' : performanceScore >= 60 ? 'stable' : 'needs_support',
+    improvementActions,
+    sourceSignals: payload.sourceSignals ?? {},
+    updatedAt: new Date().toISOString()
+  };
+}
+
+async function createPerformanceSnapshot(payload) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+
+  const snapshot = normalizePerformanceSnapshot(payload);
+  const res = await pg.query(
+    `INSERT INTO farmer_m030_items (data, created_at, updated_at)
+     VALUES ($1, NOW(), NOW())
+     RETURNING *`,
+    [snapshot]
+  );
+
+  return res.rows[0];
+}
+
+async function getFarmerPerformance(farmerId, { limit = 12 } = {}) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+
+  const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 100);
+  const res = await pg.query(
+    `SELECT * FROM farmer_m030_items
+     WHERE data->>'farmerId' = $1
+     ORDER BY created_at DESC
+     LIMIT $2`,
+    [farmerId, safeLimit]
+  );
+  const snapshots = res.rows.map(row => ({ ...row, data: normalizePerformanceSnapshot(row.data || {}) }));
+
+  return {
+    farmerId,
+    latest: snapshots[0] || null,
+    history: snapshots,
+    trend: snapshots.length >= 2
+      ? snapshots[0].data.performanceScore - snapshots[snapshots.length - 1].data.performanceScore
+      : 0
+  };
+}
+
+async function healthCheck() {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  await pg.query('SELECT 1');
+  return {
+    status: 'healthy',
+    moduleId: 'M030',
+    moduleName: 'Farmer Performance',
+    advisoryRoutes: true,
+    performanceSnapshots: true
+  };
+}
+
+async function execute(operation, parameters = {}) {
+  switch (operation) {
+    case 'createPerformanceSnapshot':
+    case 'create':
+      return { success: true, data: await createPerformanceSnapshot(parameters) };
+    case 'performance':
+    case 'analyze':
+      return { success: true, data: await getFarmerPerformance(parameters.farmerId, parameters) };
+    case 'generateAdvisory':
+      return { success: true, data: await generateAdvisory(parameters.farmerId, parameters.advisoryType) };
+    case 'alerts':
+      return { success: true, data: await getFarmerAlerts(parameters.farmerId, parameters) };
+    default:
+      return { success: false, error: `Unsupported M030 operation: ${operation}` };
+  }
+}
+
 module.exports = {
   // Advisory generation
   generateAdvisory,
@@ -460,4 +591,10 @@ module.exports = {
   
   // Analytics
   getAdvisoryAnalytics,
+
+  // Farmer performance
+  createPerformanceSnapshot,
+  getFarmerPerformance,
+  healthCheck,
+  execute
 };

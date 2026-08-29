@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Biofloc Farm Management (M131)
--- Define tables and indexes here

@@ -1,2 +1,0 @@
-﻿-- SQL model placeholder for Climate Risk Assessment (M089)
--- Define tables and indexes here

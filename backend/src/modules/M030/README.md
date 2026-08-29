@@ -1,12 +1,17 @@
-﻿# M030 - Farmer Advisory
+# M030 - Farmer Performance
 
-Domain: Farmer
-Status: ENHANCED
+Farmer performance module with existing advisory, IoT, alert, and analytics routes plus performance snapshot operations.
 
-This module provides comprehensive Farmer Advisory capabilities:
-- AI-powered agricultural recommendations
-- Real-time crop advisory based on weather and soil data
-- Pest and disease alerts
-- Market price intelligence
-- Government scheme recommendations
-- IoT sensor integration for field monitoring
+## Backend
+- Advisory operations: `generateAdvisory`, `getFarmerAdvisories`, `getAdvisory`, `getAdvisoryAnalytics`
+- IoT and alert operations: `registerIoTDevice`, `getIoTDeviceData`, `createAlert`, `getFarmerAlerts`, `markAlertAsRead`
+- Performance operations: `createPerformanceSnapshot`, `getFarmerPerformance`
+- Module backbone operations: `healthCheck`, `execute`
+
+## API
+- Dedicated module API: `/api/v1/modules/m030`
+- Analytics route is declared before `/:advisoryId` to avoid route shadowing
+
+## AI Integration
+- Provides deterministic performance bands and improvement actions
+- Keeps advisory generation available for Claude-compatible farmer support workflows

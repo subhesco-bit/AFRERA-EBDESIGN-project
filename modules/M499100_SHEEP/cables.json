@@ -1,0 +1,26 @@
+[
+  {
+    "cableId": "CABLE_M001_PLATFORM_CORE_TO_M499100_SHEEP_AI",
+    "source": "M001_PLATFORM_CORE",
+    "target": "M499100_SHEEP",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  },
+  {
+    "cableId": "CABLE_M499100_SHEEP_TO_M400_AI_CORE_AI",
+    "source": "M499100_SHEEP",
+    "target": "M400_AI_CORE",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  }
+]

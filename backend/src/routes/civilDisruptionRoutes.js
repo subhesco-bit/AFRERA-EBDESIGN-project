@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const civilDisruptionService = require('../services/civilDisruptionService');
+const civilDisruptionService = require('../services/legacy/civilDisruptionService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

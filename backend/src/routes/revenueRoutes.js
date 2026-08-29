@@ -4,7 +4,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const revenueService = require('../services/revenueService');
+const revenueService = require('../services/legacy/revenueService');
 const { authMiddleware } = require('../middleware/auth');
 
 const fail = (res, e) => res.status(/required|must|not found/i.test(e.message) ? 400 : 500)

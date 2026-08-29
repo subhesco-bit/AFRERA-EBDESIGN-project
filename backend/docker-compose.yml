@@ -65,6 +65,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: afrera-backend
+    # FIXES.md H8 (2026-08-28): postgres's docker-entrypoint-initdb.d mount
+    # below only runs schema.sql once on an empty data dir (49 tables) -
+    # the real schema lives in src/database/migrations/ (1000+ CREATE
+    # TABLE statements across 90+ files, applied incrementally with its
+    # own tracking table via migrate.js). Nothing was ever running that
+    # migration step in the Docker path, so a fresh `docker compose up`
+    # left the app running against a barely-populated database. Runs the
+    # same `npm run migrate` documented in CLAUDE.md before starting.
+    command: sh -c "npm run migrate && node src/index.js"
     environment:
       NODE_ENV: development
       PORT: 3001

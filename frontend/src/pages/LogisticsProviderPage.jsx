@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { vendorsAPI } from '../services/api'
 import { Truck, Package, CheckCircle, Navigation, Thermometer, Clock, TrendingUp, DollarSign, Route } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 function LogisticsProviderPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -357,7 +358,7 @@ function LogisticsProviderPage() {
 
       {/* Booking Modal */}
       {showBookingModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
+        <Modal onClose={() => setShowBookingModal(false)}>
           <div className="bg-white rounded-lg max-w-2xl w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -373,10 +374,10 @@ function LogisticsProviderPage() {
               <form className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="origin" className="block text-sm font-medium text-gray-700 mb-1">
                       Origin *
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <select id="origin" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                       <option value="">Select origin</option>
                       <option value="manipur">Manipur</option>
                       <option value="nagaland">Nagaland</option>
@@ -384,10 +385,10 @@ function LogisticsProviderPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-1">
                       Destination *
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <select id="destination" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                       <option value="">Select destination</option>
                       <option value="ncr">NCR (Delhi)</option>
                       <option value="guwahati">Guwahati</option>
@@ -398,20 +399,20 @@ function LogisticsProviderPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="quantity-mt" className="block text-sm font-medium text-gray-700 mb-1">
                       Quantity (MT) *
                     </label>
-                    <input
+                    <input id="quantity-mt"
                       type="number"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="0"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="required-temperature-c" className="block text-sm font-medium text-gray-700 mb-1">
                       Required Temperature (°C) *
                     </label>
-                    <input
+                    <input id="required-temperature-c"
                       type="number"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       placeholder="0"
@@ -420,10 +421,10 @@ function LogisticsProviderPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="pickup-date" className="block text-sm font-medium text-gray-700 mb-1">
                     Pickup Date *
                   </label>
-                  <input
+                  <input id="pickup-date"
                     type="date"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
@@ -447,7 +448,7 @@ function LogisticsProviderPage() {
               </form>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

@@ -9,7 +9,7 @@
  * - Performance Analytics
  */
 
-const ecommerceMarketingService = require('../services/ecommerceMarketingService');
+const ecommerceMarketingService = require('../services/legacy/ecommerceMarketingService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================

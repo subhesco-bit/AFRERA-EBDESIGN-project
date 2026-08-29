@@ -8,7 +8,7 @@
  */
 const express = require('express');
 const router = express.Router();
-const costService = require('../services/costService');
+const costService = require('../services/legacy/costService');
 const { authMiddleware } = require('../middleware/auth');
 
 const fail = (res, e) => res.status(/required|No landed-cost/i.test(e.message) ? 400 : 500)

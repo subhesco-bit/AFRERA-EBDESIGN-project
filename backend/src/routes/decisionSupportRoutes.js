@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const decisionSupportService = require('../services/decisionSupportService');
+const decisionSupportService = require('../services/legacy/decisionSupportService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 

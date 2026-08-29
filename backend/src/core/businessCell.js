@@ -1,6 +1,18 @@
 /**
  * Business Cell — the composable base for AFRERA — MASTER BUILD DIRECTIVE §1.4.
  *
+ * ADOPTION STATUS (checked 2026-08-29, as part of the AI-backbone
+ * reconciliation pass): zero modules currently `extends BusinessCell` or
+ * `require()` this file anywhere in backend/src or root modules/. It is
+ * real, complete infrastructure built ahead of adoption, not dead code in
+ * the "nobody needs this" sense — the 112+ modules this was designed to
+ * standardize still each hand-roll their own shape. Left as-is rather than
+ * force-wiring a module to use it just to make it "used": that would be
+ * exactly the kind of fabricated integration this file's own §1.4 AI
+ * Intelligence default explicitly refuses to do (see below - "never a
+ * fabricated confident answer"). Adopt it deliberately, module by module,
+ * when doing real module work - not as a side effect of an audit.
+ *
  * WHY THIS FILE HAS TO EXIST BEFORE MODULE WORK SCALES
  *
  * §1.4 requires every Business Cell — the smallest independently executable

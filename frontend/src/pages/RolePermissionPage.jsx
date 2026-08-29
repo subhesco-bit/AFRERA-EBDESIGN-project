@@ -33,17 +33,18 @@ const RolePermissionPage = () => {
     
     try {
       if (activeTab === 'roles') {
-        const data = await rolePermissionAPI.listRoles();
-        setRoles(data.data);
+        // /api/v1/roles returns {roles, total} unwrapped, not {success, data}.
+        const res = await rolePermissionAPI.listRoles();
+        setRoles(res.data.roles);
       } else if (activeTab === 'permissions') {
-        const data = await rolePermissionAPI.listPermissions();
-        setPermissions(data.data);
+        const res = await rolePermissionAPI.listPermissions();
+        setPermissions(res.data.data);
       } else if (activeTab === 'matrix') {
-        const data = await rolePermissionAPI.getPermissionMatrix();
-        setPermissionMatrix(data.data);
+        const res = await rolePermissionAPI.getPermissionMatrix();
+        setPermissionMatrix(res.data.data);
       } else if (activeTab === 'hierarchy') {
-        const data = await rolePermissionAPI.getRoleHierarchy();
-        setRoleHierarchy(data.data);
+        const res = await rolePermissionAPI.getRoleHierarchy();
+        setRoleHierarchy(res.data.data);
       }
     } catch (err) {
       setError('Failed to load role data: ' + err.message);
@@ -99,7 +100,7 @@ const RolePermissionPage = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {roles.items?.map(role => (
+              {roles.map(role => (
                 <div key={role.id} className="flex justify-between items-center p-4 border rounded">
                   <div>
                     <div className="font-semibold">{role.name}</div>

@@ -5,7 +5,7 @@
  * Handles HTTP requests and responses for AI operations
  */
 
-const aiBackboneService = require('../services/aiBackboneService');
+const aiBackboneService = require('../services/legacy/aiBackboneService');
 const { logger } = require('../utils/logger');
 
 const aiBackboneController = {

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { animalHealthAPI } from '../services/api'
 import { HeartPulse, Plus, X, Trash2, Edit, Pill, AlertTriangle, ShieldAlert, Activity } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Modal from '../components/common/Modal'
 
 const SPECIES = ['Poultry', 'Goat', 'Sheep', 'Pig', 'Cattle', 'Other']
 const EXAMINATION_TYPES = ['Routine', 'Emergency', 'Follow-up', 'Preventive']
@@ -315,7 +316,7 @@ function AnimalHealthPage() {
       )}
 
       {showForm && formType === 'examination' && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-modal">
+        <Modal onClose={closeForm}>
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Record Examination</h3>
@@ -340,7 +341,7 @@ function AnimalHealthPage() {
               <button onClick={closeForm} className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Cancel</button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )

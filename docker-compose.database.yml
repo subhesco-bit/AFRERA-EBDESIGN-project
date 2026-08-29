@@ -1,0 +1,61 @@
+﻿services:
+
+  subh-postgres:
+    image: postgres:16
+    container_name: subh-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-subh_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-subh_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-subh_local_change_me}
+
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+    volumes:
+      - subh_postgres_data:/var/lib/postgresql/data
+      - ./database/docker/init:/docker-entrypoint-initdb.d:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-subh_admin} -d ${POSTGRES_DB:-subh_dev}"
+        ]
+      interval:10s
+      timeout:5s
+      retries:10
+      start_period:20s
+
+  subh-redis:
+    image: redis:7-alpine
+    container_name: subh-redis
+    restart: unless-stopped
+
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+    volumes:
+      - subh_redis_data:/data
+
+    command:
+      [
+        "redis-server",
+        "--appendonly",
+        "yes"
+      ]
+
+    healthcheck:
+      test:["CMD","redis-cli","ping"]
+      interval:10s
+      timeout:5s
+      retries:10
+
+volumes:
+
+  subh_postgres_data:
+    name: subh_postgres_data
+
+  subh_redis_data:
+    name: subh_redis_data

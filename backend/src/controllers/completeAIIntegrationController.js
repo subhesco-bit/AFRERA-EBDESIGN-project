@@ -5,7 +5,7 @@
  * Integrates all agricultural operations with predictive analytics, disease detection, yield prediction, and optimization
  */
 
-const completeAIIntegrationService = require('../services/completeAIIntegrationService');
+const completeAIIntegrationService = require('../services/legacy/completeAIIntegrationService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
