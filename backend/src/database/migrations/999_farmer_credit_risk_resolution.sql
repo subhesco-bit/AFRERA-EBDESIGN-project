@@ -1,5 +1,11 @@
 -- ============================================================================
--- 063_farmer_credit_risk_resolution.sql (2026-08-08)
+-- 999_farmer_credit_risk_resolution.sql (2026-08-08, renumbered 2026-08-30)
+--
+-- Renumbered from 063_farmer_credit_risk_resolution.sql: its own INSERT
+-- INTO ai_resolution_rules needs that table, which 990_ai_outcomes.sql
+-- creates - but 063 < 990 alphabetically, so it always ran first and failed
+-- "relation ai_resolution_rules does not exist" the first time this repo's
+-- CI actually ran npm run migrate for real. Content otherwise unchanged.
 --
 -- Ground truth for the new farmer-side credit-risk SCORE
 -- (financialService.js:farmerCreditRiskScore), so its accuracy becomes
