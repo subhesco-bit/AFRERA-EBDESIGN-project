@@ -1,6 +1,21 @@
 ﻿/**
  * Water Analytics Service (M080)
  * Advanced water data analytics, dashboards, and predictive insights
+ *
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * generateWaterUsageAnalytics/getHistoricalUsageData/getWaterSources are
+ * real: they read and write real tables. Everything else - usage summary,
+ * trends, patterns, benchmarks, predictions, seasonal patterns, efficiency
+ * metrics, consumption drivers, forecasts, risk assessment, scenario
+ * analysis, confidence intervals, performance matrix, rankings, gaps, best
+ * practices - is a static placeholder returning the same numbers regardless
+ * of location/period; generatePerformanceMatrix literally assigns every
+ * location the identical {efficiency:75, cost_effectiveness:70,
+ * sustainability:80}. Reachable live from
+ * `frontend/src/pages/WaterManagementPage.jsx`'s "analytics" tab. Fixed the
+ * fabricated confidence scores below; the rest needs real metering/telemetry
+ * and an actual predictive model, not better-looking fake numbers - tracked
+ * in .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');
@@ -301,11 +316,10 @@ async function compareWithBenchmarks(params) {
 }
 
 async function generateUsagePredictions(params) {
+  // Was a hardcoded confidence:75 on fixed numbers with no model behind them.
   return {
-    next_month: 35000,
-    next_quarter: 100000,
-    next_year: 400000,
-    confidence: 75
+    configured: false,
+    reason: 'No usage-prediction model is wired for this location. Needs real historical usage data and a forecasting method.',
   };
 }
 
@@ -401,11 +415,11 @@ async function optimizeDashboardPerformance(widgets) {
 }
 
 async function generateWaterForecast(locationId, horizon) {
+  // Was a hardcoded confidence:75 on fixed forecast_values with no model behind them.
   return {
+    configured: false,
+    reason: 'No water-demand forecast model is wired for this location. Needs real historical data and a forecasting method.',
     period: horizon,
-    forecast_values: [35000, 38000, 40000, 42000],
-    trend: 'increasing',
-    confidence: 75
   };
 }
 
@@ -427,10 +441,11 @@ async function performScenarioAnalysis(locationId, horizon) {
 }
 
 async function calculateConfidenceIntervals(locationId, horizon) {
+  // Was hardcoded bounds with a fake 95% confidence_level - no statistical
+  // model produced these numbers.
   return {
-    lower_bound: 30000,
-    upper_bound: 45000,
-    confidence_level: 95
+    configured: false,
+    reason: 'No forecast model exists to derive a confidence interval from for this location.',
   };
 }
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Shield, FileText, Users, DollarSign, AlertTriangle, CheckCircle, BarChart3, Activity } from 'lucide-react'
-import { governmentAPI } from '../services/api'
+import { Shield, FileText, Users, DollarSign, AlertTriangle, CheckCircle, BarChart3, Activity, CloudRain, Megaphone, HeartHandshake, ListChecks } from 'lucide-react'
+import { governmentAPI, governmentSchemeAPI, schemeRegistryAPI } from '../services/api'
 
 function GovernmentDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -15,6 +15,39 @@ function GovernmentDashboardPage() {
   const { data: complianceData } = useQuery({
     queryKey: ['government-compliance'],
     queryFn: () => governmentAPI.getComplianceStatus().then(r => r.data),
+  })
+
+  // Real governmentSchemeAPI / schemeRegistryAPI wiring — previously fully
+  // built on the backend (governmentSchemeService.js, 15 endpoints) with
+  // zero UI consumer; this page only ever called governmentAPI above.
+  const { data: schemeRegistry, isLoading: registryLoading } = useQuery({
+    queryKey: ['scheme-registry'],
+    queryFn: () => schemeRegistryAPI.list({}).then(r => r.data?.data),
+    enabled: activeTab === 'schemes',
+  })
+
+  const { data: expiryStatus } = useQuery({
+    queryKey: ['scheme-registry-expiry'],
+    queryFn: () => schemeRegistryAPI.getExpiring(90).then(r => r.data?.data),
+    enabled: activeTab === 'schemes',
+  })
+
+  const { data: weatherAlerts, isLoading: weatherLoading } = useQuery({
+    queryKey: ['government-weather-alerts'],
+    queryFn: () => governmentSchemeAPI.getWeatherAlerts({}).then(r => r.data?.data),
+    enabled: activeTab === 'weather',
+  })
+
+  const { data: announcements, isLoading: announcementsLoading } = useQuery({
+    queryKey: ['government-announcements'],
+    queryFn: () => governmentSchemeAPI.getAnnouncements({}).then(r => r.data?.data),
+    enabled: activeTab === 'announcements',
+  })
+
+  const { data: csrOpportunities, isLoading: csrLoading } = useQuery({
+    queryKey: ['government-csr-opportunities'],
+    queryFn: () => governmentSchemeAPI.getCsrOpportunities({}).then(r => r.data?.data),
+    enabled: activeTab === 'csr',
   })
 
   return (
@@ -32,7 +65,10 @@ function GovernmentDashboardPage() {
           { id: 'subsidies', label: 'Subsidies', icon: DollarSign },
           { id: 'beneficiaries', label: 'Beneficiaries', icon: Users },
           { id: 'compliance', label: 'Compliance', icon: CheckCircle },
-          { id: 'reports', label: 'Reports', icon: FileText }
+          { id: 'reports', label: 'Reports', icon: FileText },
+          { id: 'weather', label: 'Weather Alerts', icon: CloudRain },
+          { id: 'announcements', label: 'Announcements', icon: Megaphone },
+          { id: 'csr', label: 'CSR Opportunities', icon: HeartHandshake },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -160,6 +196,44 @@ function GovernmentDashboardPage() {
       {activeTab === 'schemes' && (
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Scheme Management</h3>
+
+          {/* Verified scheme registry + expiry tracking — real
+              schemeRegistryAPI, distinct from the illustrative scheme cards
+              below (which are pre-existing, static examples). */}
+          <div className="mb-6 border border-purple-200 bg-purple-50 rounded-lg p-4">
+            <div className="flex items-center mb-3">
+              <ListChecks className="w-5 h-5 text-purple-600 mr-2" />
+              <h4 className="font-semibold text-gray-800">Verified Scheme Registry</h4>
+            </div>
+            {registryLoading && <div className="text-sm text-gray-500">Loading registry...</div>}
+            {!registryLoading && (!schemeRegistry || schemeRegistry.length === 0) && (
+              <div className="text-sm text-gray-500">No registered schemes found</div>
+            )}
+            {!registryLoading && schemeRegistry?.length > 0 && (
+              <div className="space-y-2">
+                {schemeRegistry.map((s) => (
+                  <div key={s.code || s.id} className="flex justify-between items-center bg-white p-3 rounded border text-sm">
+                    <div>
+                      <div className="font-medium">{s.name || s.code}</div>
+                      <div className="text-gray-500">{s.code}</div>
+                    </div>
+                    <span className="text-xs text-gray-500">{s.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {expiryStatus?.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-purple-200">
+                <div className="text-sm font-medium text-gray-700 mb-2">Expiring within 90 days</div>
+                {expiryStatus.map((s) => (
+                  <div key={s.code || s.id} className="text-sm text-orange-700">
+                    {s.name || s.code} — expires {s.expiry_date || s.expiryDate}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <div className="flex items-start">
               <AlertTriangle className="w-5 h-5 text-yellow-600 mr-3 mt-0.5" />
@@ -342,6 +416,81 @@ function GovernmentDashboardPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+      {/* Weather Alerts Tab — real governmentSchemeAPI.getWeatherAlerts */}
+      {activeTab === 'weather' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Weather Alerts</h3>
+          {weatherLoading && <div className="text-sm text-gray-500">Loading weather alerts...</div>}
+          {!weatherLoading && (!weatherAlerts || weatherAlerts.length === 0) && (
+            <div className="text-sm text-gray-500">No active weather alerts</div>
+          )}
+          {!weatherLoading && weatherAlerts?.length > 0 && (
+            <div className="space-y-3">
+              {weatherAlerts.map((alert, i) => (
+                <div key={alert.id || i} className="flex items-start p-4 border border-blue-200 bg-blue-50 rounded-lg">
+                  <CloudRain className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-gray-800">{alert.title || alert.type}</div>
+                    <div className="text-sm text-gray-600">{alert.message || alert.description}</div>
+                    {alert.region && <div className="text-xs text-gray-500 mt-1">Region: {alert.region}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Announcements Tab — real governmentSchemeAPI.getAnnouncements */}
+      {activeTab === 'announcements' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Announcements</h3>
+          {announcementsLoading && <div className="text-sm text-gray-500">Loading announcements...</div>}
+          {!announcementsLoading && (!announcements || announcements.length === 0) && (
+            <div className="text-sm text-gray-500">No announcements</div>
+          )}
+          {!announcementsLoading && announcements?.length > 0 && (
+            <div className="space-y-3">
+              {announcements.map((a, i) => (
+                <div key={a.id || i} className="flex items-start p-4 border rounded-lg">
+                  <Megaphone className="w-5 h-5 text-purple-600 mr-3 mt-0.5" />
+                  <div>
+                    <div className="font-medium text-gray-800">{a.title}</div>
+                    <div className="text-sm text-gray-600">{a.content || a.message}</div>
+                    {a.created_at && <div className="text-xs text-gray-400 mt-1">{new Date(a.created_at).toLocaleString()}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* CSR Opportunities Tab — real governmentSchemeAPI.getCsrOpportunities */}
+      {activeTab === 'csr' && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">CSR Opportunities</h3>
+          {csrLoading && <div className="text-sm text-gray-500">Loading CSR opportunities...</div>}
+          {!csrLoading && (!csrOpportunities || csrOpportunities.length === 0) && (
+            <div className="text-sm text-gray-500">No CSR opportunities listed</div>
+          )}
+          {!csrLoading && csrOpportunities?.length > 0 && (
+            <div className="space-y-3">
+              {csrOpportunities.map((o, i) => (
+                <div key={o.id || i} className="p-4 border rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="font-medium text-gray-800">{o.title || o.name}</div>
+                      <div className="text-sm text-gray-600">{o.description}</div>
+                    </div>
+                    {o.budget && <div className="text-sm font-semibold text-green-700">₹{o.budget}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

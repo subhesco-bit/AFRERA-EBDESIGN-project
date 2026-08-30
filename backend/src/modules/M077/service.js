@@ -1,6 +1,23 @@
 ﻿/**
  * Water Quality Monitoring Service (M077)
  * Real-time water quality tracking, compliance monitoring, and alerts
+ *
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * recordWaterQualityMeasurement/getMeasurements/getHistoricalQualityData/
+ * getCurrentReadings/calculateComplianceScore/identifyViolations/
+ * generateQualityAlerts/getSourceType are real: they read and write real
+ * tables, and generateQualityAlerts genuinely evaluates the fetched reading.
+ * getWaterStandards/getFiltrationRequirements-equivalent lookups are
+ * legitimate static reference tables (WHO/regulatory thresholds), not
+ * fabrication. But calculateQualityIndex fetches the current reading and then
+ * IGNORES it, returning the same fixed index regardless; analyzeQualityTrends,
+ * predictQualityChanges, getTreatmentCapacity, getBudgetConstraints and
+ * getRegulatoryRequirements are static placeholders regardless of location.
+ * Reachable live from `frontend/src/pages/WaterManagementPage.jsx`
+ * (monitorQuality, getTreatmentRecommendations). Fixed the fabricated
+ * confidence score below; the rest needs real integration (a lab/telemetry
+ * feed, historical trend data), not better-looking fake numbers - tracked in
+ * .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');
@@ -361,9 +378,11 @@ async function generateQualityAlerts(locationId) {
 }
 
 async function predictQualityChanges(locationId) {
+  // Was a hardcoded confidence:75 dressing up a static guess as a scored
+  // prediction. No real trend model exists yet - say so honestly.
   return {
-    predicted_trend: 'slight_decline',
-    confidence: 75,
+    configured: false,
+    reason: 'No water-quality prediction model is wired for this location. Needs historical trend data and a real forecasting method.',
     factors: ['seasonal_changes', 'increased_usage', 'potential_contamination'],
     recommended_actions: ['increase_monitoring', 'check_sources']
   };

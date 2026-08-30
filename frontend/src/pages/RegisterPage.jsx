@@ -45,21 +45,21 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-v42-paddy2 py-12 px-4">
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-v42-paddy border border-v42-line rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-v42-forest rounded-lg flex items-center justify-center mx-auto mb-4">
               <span className="text-white font-bold text-3xl">A</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">Create Account</h1>
-            <p className="text-gray-600">Join the AFRERA community</p>
+            <h1 className="text-2xl font-bold text-v42-ink">Create Account</h1>
+            <p className="text-v42-mut">Join the AFRERA community</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="first_name" className="block text-sm font-medium text-v42-ink2 mb-2">
                   First Name
                 </label>
                 <input
@@ -69,12 +69,12 @@ function RegisterPage() {
                   value={formData.first_name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-3 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
                   placeholder="John"
                 />
               </div>
               <div>
-                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="last_name" className="block text-sm font-medium text-v42-ink2 mb-2">
                   Last Name
                 </label>
                 <input
@@ -84,14 +84,14 @@ function RegisterPage() {
                   value={formData.last_name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-3 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
                   placeholder="Doe"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-v42-ink2 mb-2">
                 Email Address
               </label>
               <input
@@ -101,13 +101,13 @@ function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-3 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phone" className="block text-sm font-medium text-v42-ink2 mb-2">
                 Phone Number
               </label>
               <input
@@ -116,13 +116,13 @@ function RegisterPage() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-3 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
                 placeholder="+91 98765 43210"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-v42-ink2 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -134,13 +134,13 @@ function RegisterPage() {
                   onChange={handleChange}
                   required
                   minLength="8"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 pr-12"
+                  className="w-full px-4 py-3 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric pr-12"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-v42-mut hover:text-v42-ink2"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -148,7 +148,7 @@ function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="role" className="block text-sm font-medium text-v42-ink2 mb-2">
                 I want to join as
               </label>
               <select
@@ -156,7 +156,7 @@ function RegisterPage() {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-3 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
               >
                 <option value="consumer">Consumer</option>
                 <option value="farmer">Farmer</option>
@@ -170,15 +170,15 @@ function RegisterPage() {
               <input
                 type="checkbox"
                 required
-                className="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                className="mt-1 rounded border-v42-line text-v42-forest focus:ring-v42-turmeric"
               />
-              <label className="ml-2 text-sm text-gray-600">
+              <label className="ml-2 text-sm text-v42-mut">
                 I agree to the{' '}
-                <Link to="/terms" className="text-green-600 hover:text-green-700">
+                <Link to="/terms" className="text-v42-forest hover:text-v42-turmericink">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-green-600 hover:text-green-700">
+                <Link to="/privacy" className="text-v42-forest hover:text-v42-turmericink">
                   Privacy Policy
                 </Link>
               </label>
@@ -187,7 +187,7 @@ function RegisterPage() {
             <button
               type="submit"
               disabled={registerMutation.isPending}
-              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full px-4 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {registerMutation.isPending ? (
                 <span className="animate-spin mr-2">⌛</span>
@@ -199,9 +199,9 @@ function RegisterPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-v42-mut">
               Already have an account?{' '}
-              <Link to="/login" className="text-green-600 hover:text-green-700 font-semibold">
+              <Link to="/login" className="text-v42-forest hover:text-v42-turmericink font-semibold">
                 Sign in here
               </Link>
             </p>

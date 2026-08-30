@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS ai_session_context (
     id SERIAL PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     query TEXT NOT NULL,
     response TEXT NOT NULL,
     agent VARCHAR(50),
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS ai_session_context (
 -- AI usage tracking table for monitoring and cost optimization
 CREATE TABLE IF NOT EXISTS ai_usage_tracking (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     request_type VARCHAR(50) NOT NULL,
     agent VARCHAR(50) NOT NULL,
     input_tokens INTEGER,
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS ai_tool_execution (
 CREATE TABLE IF NOT EXISTS ai_safety_events (
     id SERIAL PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     event_type VARCHAR(50) NOT NULL,
     severity VARCHAR(20),
     description TEXT,

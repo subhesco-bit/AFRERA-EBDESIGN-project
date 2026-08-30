@@ -33,7 +33,7 @@ function FarmerSharedDoorPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-2xl mx-auto">
-        <Link to="/farmer-entrance" className="inline-flex items-center text-sm text-gray-500 hover:text-green-600 mb-6">
+        <Link to="/farmer-entrance" className="inline-flex items-center text-sm text-v42-mut hover:text-v42-forest mb-6">
           <ArrowLeft className="w-4 h-4 mr-1" /> All farmer doors
         </Link>
 
@@ -42,28 +42,28 @@ function FarmerSharedDoorPage() {
             <Tractor className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Shared infra & rental</h1>
-            <p className="text-gray-500">Equipment, cold storage and processing you do not own</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-v42-ink">Shared infra & rental</h1>
+            <p className="text-v42-mut">Equipment, cold storage and processing you do not own</p>
           </div>
         </div>
 
-        <p className="text-gray-600 mb-8">
+        <p className="text-v42-mut mb-8">
           A smallholder should not have to buy a rotavator to use one. Renting and booking shared
           infrastructure is an operating expense, not an investment — so it has its own door, and
           its own budget.
         </p>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">What you can do here</h2>
+        <div className="bg-v42-paddy rounded-lg shadow p-6 mb-8">
+          <h2 className="text-lg font-semibold text-v42-ink mb-4">What you can do here</h2>
           <ul className="space-y-3">
             {ACTIONS.map((action) => (
               <li key={action.to}>
                 <Link
                   to={action.to}
-                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition group"
+                  className="flex items-center justify-between p-3 rounded-lg border border-v42-line hover:border-blue-400 hover:bg-blue-50 transition group"
                 >
-                  <span className="text-gray-800">{action.label}</span>
-                  <span className="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0 ml-3">
+                  <span className="text-v42-ink">{action.label}</span>
+                  <span className="flex items-center gap-2 text-xs text-v42-mut flex-shrink-0 ml-3">
                     {action.note}
                     <ArrowRight className="w-4 h-4 text-blue-600 group-hover:translate-x-0.5 transition-transform" />
                   </span>
@@ -76,7 +76,7 @@ function FarmerSharedDoorPage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             to="/corridor-economics"
-            className="flex-1 px-6 py-3 bg-white border-2 border-blue-600 text-blue-700 rounded-lg font-semibold hover:bg-blue-50 transition text-center"
+            className="flex-1 px-6 py-3 bg-v42-paddy border-2 border-blue-600 text-blue-700 rounded-lg font-semibold hover:bg-blue-50 transition text-center"
           >
             Open without signing in
           </Link>
@@ -89,7 +89,7 @@ function FarmerSharedDoorPage() {
           </Link>
         </div>
 
-        <p className="text-sm text-gray-400 mt-6 text-center">
+        <p className="text-sm text-v42-mut mt-6 text-center">
           Each farmer section signs in separately — booking equipment here does not expose your
           selling or household records.
         </p>

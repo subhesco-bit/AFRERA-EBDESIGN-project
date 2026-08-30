@@ -93,6 +93,10 @@ export const productsAPI = {
   getCategories: () => api.get('/products/categories/list'),
   getStates: () => api.get('/products/states/list'),
   searchProducts: (query) => api.get('/products/search', { params: { q: query } }),
+  // Real provider-adapter pipeline (services/productMediaAIService.js), mounted
+  // at /api/v1/product-media-ai - honestly reports not_configured with no
+  // image-gen API key present, rather than inventing an image.
+  requestImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
 }
 
 // Orders API
@@ -1494,7 +1498,11 @@ export const voiceAIAPI = {
 // frontend rewrite. See each module's README.md for the specific gap.
 // ---------------------------------------------------------------------------
 
-/** M067 — Sowing Management (Crop domain). No backend route found for sowing records. */
+/** M067 — Sowing Management (Crop domain). Real backend: sowingManagementRoutes
+ *  (via cropManagementRoutes.js's crudRouter) mounted at
+ *  /api/v1/sowing/records in index.js (line 827) - GET/POST '/', GET/PUT/
+ *  DELETE '/:id' all match the client below exactly. (F7 fix, 2026-08-30:
+ *  comment was stale, written before this was wired.) */
 export const sowingAPI = {
   getRecords: (params) => api.get('/sowing/records', { params }),
   getRecord: (id) => api.get(`/sowing/records/${id}`),
@@ -2548,7 +2556,10 @@ export const vegetableProductionAPI = {
   deleteRecord: (id) => api.delete(`/vegetable-production/${id}`),
 }
 
-/** M143 — Floriculture Management (Horticulture). No backend route found. */
+/** M143 — Floriculture Management (Horticulture). Real backend:
+ *  floricultureRoutes mounted at /api/v1/floriculture in index.js
+ *  (line 831) - matching CRUD. (F7 fix, 2026-08-30: comment was stale,
+ *  written before this was wired.) */
 export const floricultureAPI = {
   getRecords: (params) => api.get('/floriculture', { params }),
   createRecord: (data) => api.post('/floriculture', data),

@@ -388,14 +388,20 @@ class PlatformCoreService {
    */
   async getStats(parameters, context) {
     try {
+      // (2026-08-29) active_sessions/api_calls_today were hardcoded 0 with no
+      // query anywhere - no session-store or request-counter table exists in
+      // this codebase to compute real values. Reported as null, not a
+      // fabricated 0 (matches services/dual-use/platformCoreService.js's
+      // getPlatformStats(), the other live path to this same data).
       const stats = {
         users: 0,
         organizations: 0,
-        active_sessions: 0,
-        api_calls_today: 0,
+        active_sessions: null,
+        api_calls_today: null,
+        untracked_fields_note: 'active_sessions and api_calls_today are not currently tracked.',
         timestamp: new Date().toISOString()
       };
-      
+
       // Get user count
       try {
         const userCount = await this.pool.query('SELECT COUNT(*) FROM users WHERE deleted_at IS NULL');
@@ -403,7 +409,7 @@ class PlatformCoreService {
       } catch (error) {
         stats.users = -1; // Indicates error
       }
-      
+
       // Get organization count
       try {
         const orgCount = await this.pool.query('SELECT COUNT(*) FROM organizations');
@@ -411,7 +417,7 @@ class PlatformCoreService {
       } catch (error) {
         stats.organizations = -1; // Indicates error
       }
-      
+
       return {
         success: true,
         data: stats,
@@ -431,38 +437,46 @@ class PlatformCoreService {
    */
   async getOptimizations(parameters, context) {
     try {
-      // AI-powered platform optimization recommendations
+      // (2026-08-29) Was commented "AI-powered platform optimization
+      // recommendations" despite being a static hardcoded list with no AI
+      // call anywhere - the same fabricated-label pattern found and fixed in
+      // core/ai/aiOrchestratorCore.js this session. Relabeled honestly;
+      // `source: 'static'` on each entry says so in the response too.
       const optimizations = [
         {
           category: 'Performance',
           recommendation: 'Enable Redis caching for frequently accessed data',
           impact: 'HIGH',
           effort: 'MEDIUM',
-          estimatedBenefit: '40% reduction in database load'
+          estimatedBenefit: '40% reduction in database load',
+          source: 'static',
         },
         {
           category: 'Security',
           recommendation: 'Implement rate limiting on all public endpoints',
           impact: 'HIGH',
           effort: 'LOW',
-          estimatedBenefit: 'Protection against DDoS attacks'
+          estimatedBenefit: 'Protection against DDoS attacks',
+          source: 'static',
         },
         {
           category: 'Scalability',
           recommendation: 'Implement horizontal scaling for API services',
           impact: 'HIGH',
           effort: 'HIGH',
-          estimatedBenefit: '10x increase in capacity'
+          estimatedBenefit: '10x increase in capacity',
+          source: 'static',
         },
         {
           category: 'Monitoring',
           recommendation: 'Implement comprehensive logging and alerting',
           impact: 'MEDIUM',
           effort: 'MEDIUM',
-          estimatedBenefit: 'Faster issue detection and resolution'
+          estimatedBenefit: 'Faster issue detection and resolution',
+          source: 'static',
         }
       ];
-      
+
       return {
         success: true,
         data: optimizations,

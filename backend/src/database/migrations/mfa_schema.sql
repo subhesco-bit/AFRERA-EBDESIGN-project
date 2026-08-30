@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS mfa_secrets (
 -- Backup codes table
 CREATE TABLE IF NOT EXISTS mfa_backup_codes (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     code VARCHAR(10) NOT NULL,
     used BOOLEAN DEFAULT false,
     used_at TIMESTAMP,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS mfa_backup_codes (
 -- MFA verification attempts table for rate limiting and audit
 CREATE TABLE IF NOT EXISTS mfa_verification_attempts (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     ip_address VARCHAR(45),
     user_agent TEXT,
     success BOOLEAN DEFAULT false,

@@ -25,6 +25,11 @@ export default function LandUseCarbonPage() {
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState({ state: '', district: '' })
 
+  const [farmerId, setFarmerId] = useState('')
+  const [scheme, setScheme] = useState(null)
+  const [schemeLoading, setSchemeLoading] = useState(false)
+  const [schemeError, setSchemeError] = useState(null)
+
   const load = async (params = {}) => {
     setLoading(true)
     try {
@@ -34,6 +39,17 @@ export default function LandUseCarbonPage() {
   }
   useEffect(() => { load() }, [])
 
+  const loadSchemeStatus = async (e) => {
+    e.preventDefault()
+    if (!farmerId) return
+    setSchemeLoading(true)
+    setSchemeError(null)
+    try {
+      const r = await foluAPI.schemeStatus(farmerId)
+      setScheme(r.data?.data)
+    } catch (e2) { setSchemeError(e2.response?.data?.error || e2.message) } finally { setSchemeLoading(false) }
+  }
+
   return (
     <ModulePage
       title="Land use and carbon"
@@ -42,7 +58,7 @@ export default function LandUseCarbonPage() {
     >
       <Section title="Filter">
         <form onSubmit={(e) => { e.preventDefault(); load(filter) }}
-          style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+          style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Field label="State" id="folu-state">
             <input id="folu-state" value={filter.state}
               onChange={(e) => setFilter((f) => ({ ...f, state: e.target.value }))} />
@@ -105,6 +121,44 @@ export default function LandUseCarbonPage() {
               percentage and provenance <ProvenanceBadge provenance="assumed" />, because
               the default factors are assumptions until local measurement replaces them.
             </p>
+          </Section>
+
+          <Section title="NE organic scheme status"
+            description="Conversion-period tracking for North East organic certification schemes. Produce cannot be sold as certified organic until the scheme's required conversion period has elapsed — this is the period where a farmer carries the cost without the premium.">
+            <form onSubmit={loadSchemeStatus} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: 16 }}>
+              <Field label="Farmer ID" id="scheme-farmer-id">
+                <input id="scheme-farmer-id" value={farmerId}
+                  onChange={(e) => setFarmerId(e.target.value)} placeholder="Farmer ID" />
+              </Field>
+              <button type="submit" disabled={!farmerId || schemeLoading}>
+                {schemeLoading ? 'Loading…' : 'Check status'}
+              </button>
+            </form>
+
+            {schemeError && (
+              <p role="alert" style={{ color: '#cf222e' }}>{schemeError}</p>
+            )}
+
+            {scheme && (
+              <DataTable
+                caption={`${scheme.count} scheme enrolment(s) for farmer ${scheme.farmerId}`}
+                emptyMessage="This farmer is not enrolled in any NE organic scheme."
+                columns={[
+                  { key: 'scheme_name', label: 'Scheme' },
+                  { key: 'certification_body', label: 'Certification body' },
+                  { key: 'yearsIntoConversion', label: 'Years into conversion', numeric: true,
+                    render: (r) => <Value value={r.yearsIntoConversion} decimals={2} emptyLabel="not started" /> },
+                  { key: 'conversionComplete', label: 'Conversion complete',
+                    render: (r) => (r.conversionComplete ? 'Yes' : 'No') },
+                  { key: 'subsidy_per_ha_inr', label: 'Subsidy (₹/ha)', numeric: true,
+                    render: (r) => <Value value={r.subsidy_per_ha_inr} decimals={0} /> },
+                  { key: 'note', label: 'Note',
+                    render: (r) => r.note || '—' },
+                ]}
+                rows={scheme.enrolments || []}
+                rowKey={(r) => r.id || `${r.scheme_code}-${r.enrolled_on}`}
+              />
+            )}
           </Section>
         </>
       </AsyncState>

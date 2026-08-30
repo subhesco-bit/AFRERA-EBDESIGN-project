@@ -5,7 +5,7 @@
 -- Orchards Table (M141)
 CREATE TABLE IF NOT EXISTS orchards (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     area DECIMAL(10, 2), -- in hectares
@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS idx_orchard_production_variety ON orchard_production(
 -- Vegetable Crops Table (M142)
 CREATE TABLE IF NOT EXISTS vegetable_crops (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     variety VARCHAR(100),
     location VARCHAR(255),
@@ -72,7 +72,7 @@ CREATE INDEX IF NOT EXISTS idx_vegetable_crops_cultivation_method ON vegetable_c
 -- Floriculture Table (M143)
 CREATE TABLE IF NOT EXISTS floriculture (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     flower_type VARCHAR(100) NOT NULL,
     variety VARCHAR(100),
     location VARCHAR(255),
@@ -95,7 +95,7 @@ CREATE INDEX IF NOT EXISTS idx_floriculture_purpose ON floriculture(purpose);
 -- Greenhouses Table (M144)
 CREATE TABLE IF NOT EXISTS greenhouses (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     area DECIMAL(10, 2),
@@ -119,7 +119,7 @@ CREATE INDEX IF NOT EXISTS idx_greenhouses_usage ON greenhouses(current_usage);
 -- Hydroponics Systems Table (M146)
 CREATE TABLE IF NOT EXISTS hydroponics_systems (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     system_type VARCHAR(50), -- 'NFT', 'DWC', 'EBB_AND_FLOW', 'DRIP', 'AEROPONIC'
@@ -144,7 +144,7 @@ CREATE INDEX IF NOT EXISTS idx_hydroponics_systems_crop_type ON hydroponics_syst
 -- Horticulture Analytics Table (M150)
 CREATE TABLE IF NOT EXISTS horticulture_analytics (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     module_type VARCHAR(50) NOT NULL, -- 'ORCHARD', 'VEGETABLE', 'FLORICULTURE', 'GREENHOUSE', 'HYDROPONICS'
     module_id INTEGER NOT NULL,
     analytics_date DATE NOT NULL,

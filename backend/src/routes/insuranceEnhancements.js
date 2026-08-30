@@ -160,6 +160,18 @@ router.post('/policies/:policyId/documents', authMiddleware, async (req, res) =>
   }
 });
 
+// (2026-08-29) Ported from a redundant duplicate route file
+// (insurancePolicyIssuanceRoutes.js, deleted) - the one endpoint this file
+// didn't already have.
+router.patch('/quotes/:quoteId/status', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const result = await insurancePolicyIssuanceService.updateQuoteStatus(req.params.quoteId, req.body.status);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 // Fraud Detection Routes
 router.post('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, async (req, res) => {
   try {

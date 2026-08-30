@@ -1,4 +1,17 @@
 ﻿/**
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * Same pattern as M122: registration/update/count/distribution functions are
+ * real (read/write real tables); breed/vaccination/health-standard lookups
+ * are legitimate static reference tables; but the performance, health,
+ * mortality, weight-gain and farmer-summary metrics are static placeholders
+ * regardless of flock/farmer ID. `frontend/src/pages/PoultryManagementPage.jsx`
+ * calls `poultryAPI` (a separate legacy service, not this module) - this
+ * module's actual frontend reachability is unconfirmed as of this pass; may
+ * be a duplicate of that legacy poultry service, worth reconciling
+ * separately. Needs real flock telemetry, not better-looking fake numbers -
+ * tracked in .ai/tasks/ACTIVE.md.
+ */
+/**
  * Poultry Management Service (M123)
  * Comprehensive poultry farming, health monitoring, and production management
  */

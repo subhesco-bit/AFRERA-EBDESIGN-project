@@ -56,7 +56,12 @@ function App() {
 
   // Register service worker for PWA
   useEffect(() => {
-    if (config.ENABLE_PWA && 'serviceWorker' in navigator) {
+    // (2026-08-30) Was registering unconditionally, including under `vite
+    // dev` - a cache-first service worker in local dev means every source
+    // fix can appear to silently "not work" because the browser is still
+    // being served a stale cached bundle from before the fix. Restricted to
+    // production builds, where this is actually wanted.
+    if (import.meta.env.PROD && config.ENABLE_PWA && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
           

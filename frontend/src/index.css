@@ -2,8 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------
+ * "NE Harvest" design system, adopted from the afrera_platform_v42.html
+ * reference (2026-08-30) - real color palette and typography, not the
+ * generic Tailwind green-600 defaults the public homepage/header used
+ * before. Scoped as its own named token set (v42-*) rather than
+ * overwriting the existing primary/accent/sev/data tokens above, which
+ * ~140 other pages already depend on - this keeps the redesign contained
+ * to the homepage + shared header, as scoped, instead of reskinning the
+ * whole app in one pass.
+ * --------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
 @layer base {
   :root {
+    --v42-paddy: 43 48% 93%;
+    --v42-paddy-2: 43 40% 88%;
+    --v42-ink: 156 24% 15%;
+    --v42-ink-2: 156 15% 25%;
+    --v42-mut: 150 8% 42%;
+    --v42-forest: 155 47% 21%;
+    --v42-forest-d: 156 55% 15%;
+    --v42-turmeric: 40 84% 43%;
+    --v42-turmeric-tint: 40 62% 84%;
+    --v42-turmeric-ink: 42 100% 27%;
+    --v42-chilli: 6 65% 39%;
+    --v42-indigo: 224 41% 27%;
+    --v42-mist: 138 20% 91%;
+    --v42-line: 43 26% 79%;
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;

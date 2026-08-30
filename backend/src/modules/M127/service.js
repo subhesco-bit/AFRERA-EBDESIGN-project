@@ -1,4 +1,18 @@
 ﻿/**
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * Same pattern as M122/M123: createHealthRecord/scheduleVaccination and
+ * their direct DB reads are real; disease-pattern/treatment-recommendation
+ * lookups are legitimate static reference tables; but the herd-health-score,
+ * immunity, disease-risk, outbreak-detection, vaccination-coverage and
+ * treatment-compliance functions are static placeholders regardless of
+ * farmer/animal-type. `frontend/src/pages/AnimalHealthPage.jsx` calls
+ * `animalHealthAPI` (a separate legacy service, not this module) - this
+ * module's actual frontend reachability is unconfirmed as of this pass; may
+ * be a duplicate worth reconciling separately. Needs real herd health
+ * telemetry, not better-looking fake numbers - tracked in
+ * .ai/tasks/ACTIVE.md.
+ */
+/**
  * Animal Health Management Service (M127)
  * Comprehensive health monitoring, disease management, and veterinary services
  */

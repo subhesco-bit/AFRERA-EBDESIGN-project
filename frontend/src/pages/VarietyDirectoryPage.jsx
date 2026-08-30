@@ -31,6 +31,44 @@ function GiBadge({ status }) {
   return null
 }
 
+/**
+ * Calls the real image-generation pipeline (regionalVarietyService ->
+ * productMediaAIService -> IMAGE_PROVIDER_ENV). No provider API key exists
+ * in this deployment, so the honest, correct result today is
+ * status:'not_configured' — shown as information, not an error, since a
+ * provider declining because it isn't wired is the system working as
+ * designed. The moment OPENAI_API_KEY (or STABILITY_API_KEY) is set in the
+ * environment, this same button starts returning real images with zero
+ * code changes.
+ */
+function GenerateImageButton({ variety }) {
+  const [result, setResult] = useState(null)
+  const mutation = useMutation({
+    mutationFn: () => varietyDirectoryAPI.requestImage(variety.id),
+    onSuccess: (res) => setResult(res.data?.data),
+    onError: (err) => setResult({ status: 'failed', error: err.response?.data?.error || err.message }),
+  })
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2">
+      <Button size="sm" variant="ghost" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
+        {mutation.isPending ? 'Requesting…' : 'Generate reference image (AI)'}
+      </Button>
+      {result?.status === 'completed' && result.imageUrl && (
+        <img src={result.imageUrl} alt={`AI-generated reference for ${variety.product_name}`} className="h-10 w-10 rounded object-cover" />
+      )}
+      {result?.status === 'not_configured' && (
+        <span className="text-xs text-muted-foreground">
+          No image-generation API key ({result.envVar || 'OPENAI_API_KEY'}) is configured for this deployment — nothing was invented.
+        </span>
+      )}
+      {result?.status === 'failed' && (
+        <span className="text-xs text-sev-critical">{result.error || 'Image generation failed.'}</span>
+      )}
+    </div>
+  )
+}
+
 function CreateListingForm({ variety, onCreated }) {
   const [basePrice, setBasePrice] = useState('')
   const [error, setError] = useState(null)
@@ -117,6 +155,8 @@ export default function VarietyDirectoryPage() {
                 <CardContent className="space-y-2 pt-0 text-sm">
                   {v.specialty_usp && <p>{v.specialty_usp}</p>}
                   {v.commercial_potential && <p className="text-xs text-muted-foreground">{v.commercial_potential}</p>}
+
+                  <GenerateImageButton variety={v} />
 
                   {expandedId === v.id ? (
                     <CreateListingForm

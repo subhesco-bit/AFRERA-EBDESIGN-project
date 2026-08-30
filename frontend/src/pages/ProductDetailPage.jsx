@@ -17,10 +17,10 @@ function ProductDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
-          <div className="h-96 bg-gray-200 rounded-lg mb-8"></div>
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-12 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-96 bg-v42-paddy2 rounded-lg mb-8"></div>
+          <div className="h-8 bg-v42-paddy2 rounded w-1/2 mb-4"></div>
+          <div className="h-4 bg-v42-paddy2 rounded w-3/4 mb-4"></div>
+          <div className="h-12 bg-v42-paddy2 rounded w-1/4"></div>
         </div>
       </div>
     )
@@ -37,7 +37,7 @@ function ProductDetailPage() {
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-gray-600">Product not found</div>
+        <div className="text-v42-mut">Product not found</div>
       </div>
     )
   }
@@ -47,7 +47,7 @@ function ProductDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Images */}
         <div>
-          <div className="bg-gray-100 rounded-lg overflow-hidden mb-4">
+          <div className="bg-v42-paddy2 rounded-lg overflow-hidden mb-4">
             {product.images?.[0] ? (
               <img
                 src={product.images[0]}
@@ -56,7 +56,7 @@ function ProductDetailPage() {
               />
             ) : (
               <div className="w-full h-96 flex items-center justify-center">
-                <span className="text-gray-400">No image available</span>
+                <span className="text-v42-mut">No image available</span>
               </div>
             )}
           </div>
@@ -78,7 +78,7 @@ function ProductDetailPage() {
         <div>
           <div className="flex items-center gap-2 mb-2">
             {product.gi_status && (
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded flex items-center">
+              <span className="bg-v42-forest/10 text-v42-ink text-xs px-2 py-1 rounded flex items-center">
                 <Award className="w-3 h-3 mr-1" />
                 GI Certified
               </span>
@@ -91,34 +91,34 @@ function ProductDetailPage() {
             )}
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
-          <p className="text-gray-600 mb-4">
+          <h1 className="text-3xl font-bold text-v42-ink mb-2">{product.name}</h1>
+          <p className="text-v42-mut mb-4">
             {product.category_name} • {product.state_name}
           </p>
 
           <div className="flex items-center mb-4">
             <Star className="w-5 h-5 text-yellow-400 fill-current" />
-            <span className="ml-1 text-gray-700">4.5 (128 reviews)</span>
+            <span className="ml-1 text-v42-ink2">4.5 (128 reviews)</span>
           </div>
 
           <div className="mb-6">
-            <span className="text-3xl font-bold text-gray-800">
+            <span className="text-3xl font-bold text-v42-ink">
               ₹{product.base_price}
             </span>
-            <span className="text-gray-600">/{product.unit_symbol}</span>
+            <span className="text-v42-mut">/{product.unit_symbol}</span>
             {product.map_price && (
-              <span className="ml-2 text-sm text-gray-500">
+              <span className="ml-2 text-sm text-v42-mut">
                 MAP: ₹{product.map_price}
               </span>
             )}
           </div>
 
-          <p className="text-gray-700 mb-6">{product.description}</p>
+          <p className="text-v42-ink2 mb-6">{product.description}</p>
 
           {product.usp && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold text-green-800 mb-2">Why This Product?</h3>
-              <p className="text-green-700 text-sm">{product.usp}</p>
+            <div className="bg-v42-paddy2 border border-v42-line rounded-lg p-4 mb-6">
+              <h3 className="font-semibold text-v42-ink mb-2">Why This Product?</h3>
+              <p className="text-v42-forest text-sm">{product.usp}</p>
             </div>
           )}
 
@@ -133,7 +133,7 @@ function ProductDetailPage() {
           {/* Certifications */}
           {product.certifications && product.certifications.length > 0 && (
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-2">Certifications</h3>
+              <h3 className="font-semibold text-v42-ink mb-2">Certifications</h3>
               <div className="flex flex-wrap gap-2">
                 {product.certifications.map((cert, index) => (
                   <span
@@ -149,33 +149,33 @@ function ProductDetailPage() {
 
           {/* Quantity Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-v42-ink2 mb-2">
               Quantity
             </label>
             <div className="flex items-center gap-2">
-              <button className="w-10 h-10 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2">
                 -
               </button>
               <input
                 type="number"
                 defaultValue="1"
                 min="1"
-                className="w-20 text-center border border-gray-300 rounded-lg"
+                className="w-20 text-center border border-v42-line rounded-lg"
               />
-              <button className="w-10 h-10 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <button className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2">
                 +
               </button>
-              <span className="text-gray-600">{product.unit_symbol}</span>
+              <span className="text-v42-mut">{product.unit_symbol}</span>
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-4 mb-6">
-            <button className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center">
+            <button className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition flex items-center justify-center">
               <ShoppingCart className="w-5 h-5 mr-2" />
               Add to Cart
             </button>
-            <button className="px-6 py-3 border-2 border-green-600 text-green-600 rounded-lg font-semibold hover:bg-green-50 transition">
+            <button className="px-6 py-3 border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-forest/10 transition">
               Buy Now
             </button>
           </div>
@@ -183,10 +183,10 @@ function ProductDetailPage() {
           {/* Delivery Info */}
           <div className="border-t pt-6">
             <div className="flex items-start gap-3 mb-3">
-              <Truck className="w-5 h-5 text-gray-600 flex-shrink-0" />
+              <Truck className="w-5 h-5 text-v42-mut flex-shrink-0" />
               <div>
-                <h4 className="font-semibold text-gray-800">Free Delivery</h4>
-                <p className="text-sm text-gray-600">
+                <h4 className="font-semibold text-v42-ink">Free Delivery</h4>
+                <p className="text-sm text-v42-mut">
                   On orders above ₹1,500. Standard delivery in 3-5 business days.
                 </p>
               </div>

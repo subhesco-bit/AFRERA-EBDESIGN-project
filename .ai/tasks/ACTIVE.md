@@ -1,11 +1,501 @@
 # ACTIVE TASKS
 
+## TODO — "make all gaps zero" (2026-08-29, in progress, resume here)
+
+User asked to close every code-achievable gap from the AFRERA Gap Index
+(https://claude.ai/code/artifact/88f6d4d1-6e22-4c45-be8f-62fa28a96cbd) to
+zero. Confirmed scope with user: everything buildable through real code;
+explicitly NOT faking external integrations (PM-Kisan/DigiLocker/bank APIs)
+or fabricating ML models (genetic algorithms/RL/GNNs from the "imagination"
+doc) — those need real credentials/infra this session doesn't have and
+would violate the whole session's "never fabricate" discipline.
+
+### 1. Wire the 6 genuinely-orphaned backend services — ✅ DONE
+Built 6 route files (`cropPlanningRoutes.js`, `landRecordsRoutes.js`,
+`insurancePremiumRoutes.js`, `insurancePolicyIssuanceRoutes.js`,
+`insuranceFraudDetectionRoutes.js`, `productReviewRoutes.js`), mounted all 6
+in `index.js` at `/api/v1/crop-planning`, `/land-records`,
+`/insurance-premium`, `/insurance-policies`, `/insurance-fraud`,
+`/product-reviews`. Also fixed a real honesty bug found while wiring
+`landRecordsService.js`: `fetchGovernmentLandRecords()` silently returned
+`[]` disguised as "simulate the sync," so `syncWithGovernmentLandRecords()`
+would report a fake "0 synced" success forever instead of being honest that
+no real government API is configured — fixed to return an explicit
+`{configured: false, reason}` shape, matching the not_configured pattern
+used elsewhere in this codebase. Verified: fresh backend boot clean, all 6
+routes smoke-tested live (200/401 as expected; the 2 that hit real
+`ECONNREFUSED` did so inside real table-querying service code, not a
+routing bug — confirmed via log inspection).
+
+<details><summary>Original in-progress notes (superseded)</summary>
+All 6 are real, substantial, already-written service classes with zero
+route file and zero index.js wiring. Method signatures already gathered
+(see below) — next step is writing one route file per service (direct
+service calls, no controller layer needed, matching the platformCoreRoutes.js
+style established this session) + mounting in index.js + boot-verify +
+smoke-test each live.
+
+- **cropPlanningService.js** (533 lines) — `createCropPlan(farmerId, planData)`,
+  `getFarmerCropPlans(farmerId, filters)`, `getRecommendedCropPlan(farmerId, landRecordId)`,
+  `getSuitableCrops(soilType, state, district, season)`, `getMarketDemand(season)`,
+  `getWeatherForecast(district, season)`, `updateCropPlanStatus(planId, farmerId, status, updateData)`,
+  `getCropPlanningAnalytics(farmerId)`. Depends on `crop_plans` table (FK to `land_records`)
+  — verify migration exists before wiring.
+- **insuranceFraudDetectionService.js** (593 lines) — `analyzeClaimForFraud(claimId)`,
+  `getFraudAnalysis(claimId)` (plus 8 internal check* methods, not directly routed).
+- **insurancePolicyIssuanceService.js** (526 lines) — `issuePolicy(policyData)`,
+  `getPolicy(policyId, userId, isAdmin)`, `getPolicyByNumber(policyNumber)`,
+  `getUserPolicies(userId, filters)`, `renewPolicy(policyId, renewalData, userId, isAdmin)`,
+  `cancelPolicy(policyId, userId, reason)`, `processPayment(policyId, installmentNumber, paymentData)`,
+  `getPolicyDocuments(policyId)`, `uploadPolicyDocument(policyId, documentData)`.
+- **insurancePremiumService.js** (416 lines) — `calculateCropPremium(cropData)`,
+  `calculateTransitPremium(transitData)`, `calculateWarehousePremium(warehouseData)`,
+  `calculateLivestockPremium(livestockData)`, `generateQuote(quoteData)`, `getQuote(quoteId)`.
+- **landRecordsService.js** (468 lines) — `addLandRecord(farmerId, landData)`,
+  `getFarmerLandRecords(farmerId, filters)`, `getLandRecord(recordId, farmerId, isAdmin)`,
+  `updateLandRecord(recordId, farmerId, updateData)`, `verifyLandRecord(recordId, adminId, verificationData)`,
+  `syncWithGovernmentLandRecords(farmerId)` (calls `fetchGovernmentLandRecords` — check this is
+  an honest not_configured stub, not a fabricated government call), `updateFarmerFDIForLand(farmerId)`,
+  `getRegionalLandStatistics(filters)`, `deleteLandRecord(recordId, farmerId)`.
+- **productReviewService.js** (450 lines) — `createReview(userId, productId, reviewData)`,
+  `getProductReviews(productId, filters)`, `getProductReviewStats(productId)`,
+  `markReviewHelpful(reviewId, userId)`, `updateReview(reviewId, userId, updateData)`,
+  `deleteReview(reviewId, userId, isAdmin)`, `moderateReview(reviewId, status, moderatorId)`,
+  `getUserReviews(userId, page, limit)`, `reportReview(reviewId, userId, reason)`.
+</details>
+
+### 2. The 7 "Domain: TBD" modules — ✅ DONE (turned out not to be skeletons at all)
+Surprise finding: all 7 (`M013` Authorization/446 lines, `M055` Pricing/303,
+`M056` Payment Processing/95, `M057` Shipping/78, `M058` Returns/74, `M060`
+Review Management/87, `M144` Greenhouse/568) already have real, substantial
+service.js content — their READMEs were just never updated after the real
+code was written, still claiming "Auto-generated module template. Domain:
+TBD." All 7 are already live via the generic
+`/api/v1/backend-modules/:moduleId/:operation` bridge (confirmed:
+`generatedModuleRoot` auto-discovery in index.js) - no wiring needed.
+
+Fixed while verifying:
+- **M060 real bug**: `getProductContext()` returned a hardcoded fake
+  `{category:'grains', average_rating:4.2}` for every product regardless of
+  ID, fed straight into an "AI sentiment analysis" call as fabricated
+  context. Now queries real `products`/`categories` tables.
+- **M144 three real bugs**: `fetchGreenhouseSensorData()` returned one
+  hardcoded fake reading for every device (no real IoT gateway configured -
+  now honestly reports `configured:false`); `getGreenhouseAIInsights()` had
+  a hardcoded `confidence:0.89` on what's actually deterministic rule-based
+  math (removed); `evaluateTrigger()` unconditionally returned `true`, so
+  every automation rule fired on every check regardless of its actual
+  condition (now evaluates real field/operator/value thresholds).
+- **Known duplication flagged, not yet merged**: `M060` (Review Management,
+  writes to its own `reviews` table) duplicates
+  `services/legacy/productReviewService.js` (writes to `product_reviews`,
+  wired this session at `/api/v1/product-reviews`) - two independent real
+  review systems. Documented in both READMEs; reconciling them is separate
+  follow-up work, not done in this pass.
+
+All 7 READMEs rewritten to reflect real content. Verified: both M060 and
+M144 load clean after the fixes.
+
+### 3. Build the 2 genuinely-absent modules — ✅ DONE (also not actually absent)
+Re-verified per this session's own "verify by checking, not by trusting
+labels" rule, established while fixing the earlier 7 "Domain: TBD" modules.
+Both M005 and M132 turned out to already be real, complete, and fully wired
+end-to-end — README claims of "Status: ABSENT / scaffolding" were false, same
+bug as items 2 above. Confirmed: `M005/index.js` and `M132/index.js` both
+export `{controller, service, router}` (the shape `backendModuleBridge.js`'s
+generic scanner needs), both real frontends already call them
+(`EnvironmentManagementPage.jsx` via generic `moduleId="M005"` panel;
+`PondManagementPage.jsx` via `pondAPI` in `api.js`, hitting
+`/api/v1/backend-modules/M132/*`). Fixed both READMEs.
+
+Found and fixed 4 real fabrication bugs in M132 while verifying (identical
+pattern to the M144 fixes above): `fetchSensorData()` returned one hardcoded
+fake reading (`ph:7.2, temperature:28.5,...`) for every device — now honest
+`{readings:[], configured:false, reason}` since no real IoT hub exists;
+`analyzeTrends()` returned a hardcoded `{STABLE, INCREASING, STABLE}` for
+every single reading even though a trend needs 2+ points — now
+`'insufficient_data'`; `getPondAIInsights` and its sub-predictions carried
+hardcoded `confidence: 0.87/0.85/0.82` on deterministic arithmetic — replaced
+with `method: 'rule_based_calculation'`; constructor claimed
+`this.iotHubConnected = true` unconditionally — fixed to `false`. M005 had
+no bugs — its static lookup tables are legitimate fixed config, not
+fabricated data. Verified: both `node -c` clean, backend boots clean with
+both loaded.
+
+### 4. BR-08 unwrapped transactions — NOT STARTED
+20 (directive) to 46 (docs/registry) multi-statement writes with no
+transaction wrapper. Helper already exists (`core/withTransaction.js`).
+Needs finding the actual call sites (directive PART 8.3 categorizes them:
+money 4, identity 4, sync 4, lifecycle 7, other 1) and wrapping each —
+explicitly NOT a blanket auto-fix, each needs judgment per the directive's
+own standing rule.
+
+### 5. 6 ERP domains with no proactive AI agent — ✅ DONE
+Added 6 real, honest, rule-based agents to `core/erpAgents.js`'s AGENTS array,
+matching the existing pattern exactly (evaluate(ctx), return null when there
+is nothing to say, confidence:1 where the output is arithmetic on real
+inputs rather than a prediction): `controlling.cost_variance` (AF-CO, budget
+vs actual with a 10%-materiality gate), `assets.lifecycle` (AF-AA, fully
+depreciated-but-active assets + idle-asset detection), `logistics.delay_risk`
+(AF-TM, ETA vs delivery commitment), `production.oee` (AF-PP, Overall
+Equipment Effectiveness with weakest-factor callout), `hr.leave_liability`
+(AF-HCM, leave balances over policy cap — encashment liability + burnout
+signal), `masterdata.quality` (AF-MDM, missing required fields + unresolved
+duplicates). Verified: `node -c` syntax-clean, and a direct script confirms
+all 19 DOMAIN codes now have >=1 agent (21 agents total, up from 15).
+
+### 7. FOLU / NE organic-scheme tracking exposed to frontend — ✅ DONE
+Investigated per explicit user request ("folu, organic scheme in ne and its
+tracking... north east has organic scheme for which tracking is also
+required"). Backend was already real and complete:
+`organicTraceabilityService.js`'s `organicSchemeStatus(farmerId)` queries
+real `ne_organic_enrolment`/`ne_organic_schemes` tables and computes
+conversion-period progress honestly (with a human-readable note on how much
+of the conversion period remains). Already exposed via `foluRoutes.js` at
+`GET /api/v1/folu/schemes/:farmerId`, and — corrected an earlier wrong
+finding in this same session — already wired into `frontend/src/services/api.js`
+as `foluAPI.schemeStatus()` (an earlier grep for the literal string
+"organicScheme" missed it because the client method is named
+`schemeStatus`). The actual, narrower gap: `LandUseCarbonPage.jsx` never
+called it, so there was no UI to see it. Added an "NE organic scheme status"
+section to that page — farmer-ID lookup form + a table of scheme
+enrolments (scheme name, certification body, years into conversion,
+conversion-complete flag, subsidy rate, and the honest note). Verified:
+`npx vite build` clean.
+
+### 8. PWA + responsive audit — PWA already real; fixed 2 real mobile-overflow bugs
+User asked for production-level mobile/desktop/tablet compatibility; asked to
+choose PWA-first vs native wrappers vs finishing the gap list first — chose
+"Responsive PWA first." Investigated first rather than assuming nothing
+existed: the PWA layer was ALREADY real and complete from earlier in this
+session — `public/manifest.webmanifest` (icons, shortcuts, standalone
+display), `public/sw.js` (real cache-first/network-first strategy, correctly
+never caches writes or auth), registered in both `index.html` and `App.jsx`,
+plus a real `Layout.jsx` app shell with `BottomNav`/`Sidebar` and Tailwind
+responsive classes. Nothing to build there.
+
+The real gap: `DataPrimitives.jsx` (the shared scaffold ~50+ pages built this
+session import — `ModulePage`, `DataTable`, `Section`, `Field`) had 2 mobile
+bugs. `DataTable` rendered a bare `<table style={{width:'100%'}}>` with no
+overflow wrapper — on a narrow phone this pushes the whole page body
+sideways instead of scrolling internally; fixed by wrapping it in
+`<div style={{overflowX:'auto'}}>`. `ModulePage` used a fixed `24px` side
+padding, disproportionate on a 320px viewport; changed to
+`clamp(12px, 4vw, 24px)`. Also added `flexWrap:'wrap'` to
+`LandUseCarbonPage.jsx`'s two filter-row forms (a pattern several pages
+built this session repeat inline — worth checking others if this becomes a
+priority, not swept in this pass). Both fixes are centralized in the shared
+component, so every page built on `DataPrimitives.jsx` inherits them without
+being touched individually. Verified: `npx vite build` clean.
+
+Not done (explicitly out of scope for this pass, flagged for later): a
+systematic audit of all 150 frontend pages for viewport/breakpoint issues —
+most of the original 123 Devin-built pages already use Tailwind's
+mobile-first utility classes directly rather than `DataPrimitives.jsx`, so
+this fix doesn't reach them; a full page-by-page pass is real, bounded work
+but large enough to warrant its own scoped session rather than folding into
+this one.
+
+### 9. "Replace all generic to professional" sweep — 12 modules, DONE
+User: "replace all generic to professional enhanced to highest industry
+standard meeting our project requirement", then "you decide for all gap
+filling in best interest of project." Interpreted as: find every remaining
+module still carrying literal generic scaffold boilerplate ("Auto-generated
+module template. Domain: TBD" / "Status: ABSENT") and fix it properly, not
+just relabel it.
+
+Found 12 via `grep -rl "Domain: TBD\|Status: ABSENT"` (the earlier 9 fixed
+this session false-matched on their own explanatory prose quoting the old
+text — not real remaining generics). All 12 (M001, M003, M004, M076-M080,
+M122, M123, M127, M141) turned out to have real, substantial service.js
+content (54-568 lines each) despite the false "ABSENT" label — same pattern
+as the earlier 7+2. Rewrote all 12 READMEs with accurate status + an honest
+real-vs-placeholder breakdown.
+
+Found the fabrication problem is systemic in the Water domain (M076-M080,
+~2200 lines) and mirrored (without confidence fabrication) in Livestock
+(M122/M123/M127): dozens of helper functions return the same hardcoded
+numbers regardless of input, dressed up as computed metrics. Confirmed this
+is LIVE and user-facing, not theoretical - `frontend/src/pages/
+WaterManagementPage.jsx` calls all 5 Water modules directly through every
+tab. Given the scale (~80+ functions, many chained), a full rewrite was
+judged disproportionate risk/effort for one pass. Instead: added a clear
+`DATA-SOURCE DISCLOSURE` banner comment to the top of each service.js
+naming exactly which functions are real vs static placeholder, and fixed
+the single most misleading pattern specifically - every hardcoded
+`confidence:`/`confidence_level:` field (7 fixed across M077/M078/M080),
+which falsely implies statistical/ML rigor. M122/M123/M127 had no local
+confidence fabrication to fix. Also fixed M003's `getBandwidthUsage`/
+`getResourceUtilization` (hardcoded per-tenant "usage metrics" ignoring the
+tenant ID entirely). Verified: all 12 `node -c` clean.
+
+Discovered in passing, not yet reconciled: M123 (Poultry) and M127 (Animal
+Health) may duplicate separate legacy services - `PoultryManagementPage.jsx`
+and `AnimalHealthPage.jsx` call `poultryAPI`/`animalHealthAPI`, not these
+M0XX modules. Worth a dedicated reconciliation pass, same shape as the
+M060/productReviewService duplication found earlier this session.
+
+### 10. NE Variety Directory + AI image-gen pipeline — mostly already done, closed the one real gap
+User attached `North East India Variety Directory.docx` (a real,
+citation-backed 142-variety NE India commercial/agronomic database) asking
+to add it to vendor/consumer with AI-generated images "to test our next-gen
+AI image tool." Investigated before building: this was ALREADY fully built
+earlier in this session - `regional_variety_directory` schema + seed
+migration (142 rows, verbatim from this exact document), `regionalVarietyService.js`,
+`routes/regionalVarietyRoutes.js` (mounted at `/api/v1/variety-directory`),
+and `frontend/src/pages/VarietyDirectoryPage.jsx` (browse/search + a real
+"create listing from this variety" vendor flow requiring a real
+seller-entered price). The image-generation pipeline itself
+(`productMediaAIService.js`) is also already real and honest: a real
+provider-adapter pattern keyed off `OPENAI_API_KEY`/`STABILITY_API_KEY`,
+returns `not_configured` (not a fake image) since neither key is set here.
+
+The one real gap: the frontend page never called the already-wired
+`requestImage` endpoint anywhere. Added a "Generate reference image (AI)"
+button per variety card that calls it and honestly renders whatever comes
+back (`completed` + image, or `not_configured` with the missing env var
+named, or `failed`). This is the correct way to "test" the tool right now -
+it will honestly report not_configured until a real API key is added, then
+work with zero code changes. Verified: `npx vite build` clean.
+
+### 11. AI dietitian/naturopath layer — found already 80% built, wired the missing 20%
+User: "ai based Dietitian cum Natural Therapist (Naturopath) layer is
+completely missing." Checked before assuming: `nutritionIntelligenceService.js`
+(1165 lines, real) already has nutrition scoring, personalized product
+recommendations by dietary profile, diet-based recipe generation, and
+wellness practices - genuinely most of what an AI dietitian/naturopath
+layer needs. It even already defines and exports its own Express `router`
+with 16 real routes. The actual gap: zero mounting in `index.js`, ever -
+fixed with one `app.use()` line. Verified: backend boots clean with it
+mounted (only pre-existing, unrelated infra noise - no Postgres/Redis
+running locally, a port-in-use conflict from a prior test boot).
+
+**Correction, same pass:** the frontend WAS already built too -
+`frontend/src/pages/DietRecipesPage.jsx` (135 lines) already calls the
+exact `nutritionAPI` object in `services/api.js`, which already targets
+`/nutrition-intelligence/*` (dietary profiles, recommendations, diet-based
+recipes, wellness practices) - already registered in the router at
+`/diet-recipes` with "dietitian" in its own SEO keywords. So the entire
+feature - backend service, route mounting, API client, frontend page, router
+registration - is now complete end-to-end; the ONLY real gap was the single
+missing `app.use()` line, now fixed. Not a partial win - closed.
+
+Checked separately: `NutrientValueMarketplace.jsx` is confirmed a genuinely
+different, already-wired feature (value-per-nutrient pricing, not diet/health
+advice) - no gap there either. No dedicated AI chatbot specific to nutrition
+was found or built; the existing floating `ChatInterface`/`VoiceAssistant`
+widgets (mounted globally in `Layout.jsx`) are the platform's general
+conversational AI surface, not nutrition-specific.
+
+### 12. Systematic "zero route wiring" sweep + duplicate-route correction
+User: "correct all zero route wiring, orphaned routes so that all hidden
+comes out", then "mount all route files", then "duplicate route search and
+correcctions". Generalized the manual orphan-finding done earlier into a
+real scan: every `services/legacy/*.js` filename cross-referenced against
+all text in `routes/`, `core/`, `controllers/`, `modules/`, and `index.js`.
+
+**Found and fixed real gaps:**
+- `nutritionIntelligenceService.js` mounted (see item 11).
+- 6 route files under `routes/legacy/` (apiculture, fisheries, forestry,
+  mushroom, sericulture, vermicompost — M028/M025/M026/M029/M027/M030) were
+  never mounted. Root cause: all 6 imported `{ authenticate }` from
+  `../../middleware/authMiddleware`, a module that **does not exist**
+  (the real file is `middleware/auth.js`) — mounting them as-written would
+  have crashed the boot at require-time. That's the actual reason they sat
+  unwired, not incompleteness. Fixed the import in all 6 (aliased to the
+  real `authMiddleware` export), verified each backing service
+  (`apicultureService.js` etc.) exports the exact method names the routes
+  call, mounted all 6 at `/api/v1/{apiculture,fisheries,forestry,mushroom,
+  sericulture,vermicompost}`. Verified: full backend boot clean, only
+  pre-existing unrelated infra noise (no local Postgres/Redis).
+
+**False positives caught before acting on them (both corrected same pass):**
+- `custodyEventService.js` looked orphaned by the scan (only checked
+  `routes/`), but was already wired via a `setupRoutes(app)` pattern in
+  `services/legacy/custodyEventRoutes.js` — a different mounting convention
+  the scan didn't check. Built a redundant `routes/custodyEventRoutes.js`
+  before catching this; deleted it once found.
+- `resourceCrudFactory.js` and `unifiedConfigService.js` are a factory
+  function and a compatibility shim respectively, not meant to be routed
+  directly — correctly unreferenced by name in route files, not gaps.
+
+**Real duplicate-route correction (not just orphan-finding):** searching
+`index.js` for `app.use()` calls on the same path twice surfaced
+`/api/v1/insurance` mounted from both `insuranceEnhancements.js`
+(pre-existing) and, it turned out, from the 3 "orphaned" insurance route
+files this session itself added earlier (item 1 above) —
+`insurancePremiumRoutes.js`/`insurancePolicyIssuanceRoutes.js`/
+`insuranceFraudDetectionRoutes.js` mounted at `/insurance-premium`,
+`/insurance-policies`, `/insurance-fraud`. **Correction to item 1's record
+above: those 3 were NOT genuinely orphaned** — `insuranceEnhancements.js`
+already called the exact same 3 underlying services
+(`insurancePremiumService`/`insurancePolicyIssuanceService`/
+`insuranceFraudDetectionService`) under `/api/v1/insurance`, and
+`frontend/src/services/api.js` already calls that path, not the new one —
+confirmed via grep before deleting anything. Compared route-by-route: the
+only real gap in `insuranceEnhancements.js` was
+`PATCH /quotes/:quoteId/status` (admin quote-status update), ported it over;
+deleted the 3 redundant route files and their `index.js` wiring entirely.
+Net effect: item 1's actual orphaned-and-now-fixed count is 3 (crop
+planning, land records, product review), not 6 — the insurance functionality
+was already live the whole time, just re-discovered under a
+misleadingly-named routes file. Verified: boot clean after removal.
+
+**Correction (same day, later check):** the "devinService.js has zero route
+wiring" claim above was WRONG - a bug in the orphan-scan script (root
+`services/*.js` files were checked against the wrong text-source list).
+Direct grep confirmed it WAS fully wired: `index.js` → `routes/devinRoutes.js`
+→ `controllers/devinController.js` → `services/devinService.js`, mounted at
+`/api/v1/devin`, live the whole time. User explicitly asked to remove the
+Devin integration entirely once this was found ("stop devin services",
+"devin layer was remove"). Deleted all 3 files
+(`devinService.js`/`devinController.js`/`devinRoutes.js`) and the
+`index.js` mount; confirmed nothing else referenced any of them first.
+Verified: boot clean, zero dangling references.
+
+### 13. NE Harvest visual redesign + marketplace seeding (2026-08-30)
+User compared the live app unfavourably against afrera_platform_v42/v43/v44.html
+(static design references, ~13k lines each, same design system across all
+three: paddy/forest/turmeric/chilli/indigo palette, Bricolage Grotesque +
+Public Sans + IBM Plex Mono typography). Scoped explicitly to "public pages
+first" per AskUserQuestion.
+
+**Made one real mistake, caught and fixed same pass**: used `Write` on
+`pages/FarmerEntranceHubPage.jsx` without reading it first - it already
+existed, fully built (real 4-door public entrance system, better than what
+was written). Overwrite caught via `git status` immediately, restored from
+git, redundant new file + duplicate routes.js entries removed. Root cause:
+assumed a documented UX gap was unbuilt without checking; the actual gap was
+just that HomePage.jsx's CTA never linked to the already-built hub - fixed
+that one real line.
+
+**Delivered**: added the real design tokens as scoped `v42-*` CSS custom
+properties (`index.css`) + Tailwind theme extension (`tailwind.config.js`),
+so they don't collide with the ~140 other pages' existing token system.
+Restyled `Header.jsx` (all real dropdown links/logic untouched, className
+only) and all 13 public routes (`HomePage`, `MarketplacePage`,
+`ProductDetailPage`, `LoginPage`, `RegisterPage`,
+`FarmerEntranceHubPage` + its 4 door pages, `ForwardPricingPage`,
+`ClimateWeatherPage`, `CorridorEconomicsPage`, `LandUseCarbonPage`).
+Verified `npx vite build` clean (3220 modules) after every batch.
+
+**AI image generation**: found `productMediaAIService.js`'s general
+per-product image pipeline (`requestProductImageGeneration`) was fully built
+and even routed (`productMediaAIRoutes.js`, mounted at
+`/api/v1/product-media-ai`) but had zero frontend caller. Added
+`productsAPI.requestImage()` and a real "Generate reference image (AI)"
+button on Marketplace product cards with no photo - same honest
+not_configured pattern as the Variety Directory's existing one.
+
+**Marketplace seeding**: confirmed via `grep` across every migration - zero
+seeded products anywhere, ever. User's explicit decision (asked via
+AskUserQuestion, given this touches the "never fabricate a price" rule):
+seed real products from the 142-variety regional_variety_directory with
+clearly-labelled indicative directory-estimate pricing (matching v42's own
+"Product prices are indicative directory estimates" disclaimer). Wrote
+`9999_zzzzz_products_from_regional_variety_seed.sql` - maps the directory's
+21 granular categories onto the 12 real seeded product categories, flat
+per-category-tier indicative pricing (not researched per product), excludes
+Animal Product/Fisheries (no honest category fit), tags every row
+`indicative-pricing`, sets no `created_by` (no fake seller), links back via
+`variety_directory_id`. **NOT executed or verified against a live database**
+- no Postgres running in this dev environment, consistent with every other
+migration this whole session. Needs a real DB run + spot-check before
+trusting the exact row count/mapping.
+Root `modules/` tree vs `backend/src/modules/M0XX/` — no doc declares which
+is canonical. This session empirically resolved the practical question (real
+logic lives in `backend/service.js`, delegates to `backend/src/services/legacy/`)
+but that finding only lives in this session's log — write it up as a short,
+permanent doc (e.g. `.ai/architecture/MODULE_SCAFFOLD_RECONCILIATION.md`) so
+it doesn't need re-deriving next time.
+
+
+
 **Project:** SVESCO/EBDESIGN Agricultural Digital Operating System
 **Last Updated:** 28 August 2026
 **Status:** In Progress — rewritten to reflect verified current state, not the
 2026-08-24 Devin-handoff snapshot below. Everything under "Closed" was
 checked by actually running the code (backend boot + frontend build), not
 inferred from reading it.
+
+## Closed this session (2026-08-29, later still): AI orchestration consolidation, part 2
+
+Recovered the 2026-08-28 stakeholder briefing artifact and checked its "Still
+open" table against everything done since. Confirmed: the "5 independent AI
+orchestration systems — architecture debt" item was only half-closed by the
+earlier aiOrchestrator.js/aiOrchestratorCore.js merge. Found the other 2:
+`core/claudeAICoordinator.js` (a separate, real, live Claude SDK coordinator
+— constructs an actual `@anthropic-ai/sdk` client — reachable via two
+duplicate route files, `routes/unifiedAIRoutes.js` and
+`routes/claude/unifiedAIRoutes.js`, neither of which the orchestrator's
+ENGINES ever routed to) and `services/legacy/aiOrchestrationService.js`
+(real Postgres-backed `ai_model_registry`/`ai_routing_rules` config CRUD,
+live via `routes/enterpriseAIRoutes.js`).
+
+Added `claude_coordinator` and `model_registry` engines to
+`core/aiOrchestrator.js` — same additive, non-breaking pattern as
+`module_dispatch`: the existing direct routes are untouched, this just gives
+orchestrator-routed callers (and `classifyAndRoute()`) a path to the same
+real systems, so their traffic now goes through the same guardrail/audit
+pipeline. Verified live: `model_registry` engine dispatches correctly;
+`claude_coordinator` engine correctly reaches the real coordinator and
+returns a clean, caught error (no ANTHROPIC_API_KEY / no Postgres in this
+dev env — both expected) instead of crashing the process.
+
+Also removed a small, genuinely dead import: `index.js` had its own
+`const claudeAICoordinator = require('./core/claudeAICoordinator')` that was
+never referenced again — `routes/unifiedAIRoutes.js` already requires the
+same file directly (Node caches the singleton either way).
+
+**Result:** all 5 systems the stakeholder report flagged are now reachable
+through one real, guardrail-wrapped orchestrator (18 total engines), while
+every one of their original direct routes still works unchanged.
+
+**Verification:** fresh backend boot clean, both new engines tested live.
+
+## Closed this session (2026-08-29, later still): platform/domain/enterprise/ERP scoping + fixes
+
+Third enhancement phase. Scoped via a research-only agent across platform,
+domain (agriculture business logic), enterprise, and ERP layers. Result:
+domain and ERP layers are genuinely solid (spot-checked farmerService.js,
+cropManagementService.js, livestockManagementService.js, marketDataService.js,
+comprehensiveERPService.js's GL/BI/QM sub-modules — zero stub markers, real
+SQL-computed logic throughout). Two real, concrete gaps found and fixed:
+
+1. **Platform-core fabrication (2 live paths, same bug in both).**
+   `services/dual-use/platformCoreService.js` (the only implementation
+   actually reachable via the real `/api/v1/platform` REST route) and
+   `modules/M001_PLATFORM_CORE/backend/service.js` (reachable via the AI
+   orchestrator's new `module_dispatch` engine) both hardcoded
+   `active_sessions`/`api_calls_today` to `0` with a comment admitting
+   "placeholder" that never surfaced to callers, and both had a
+   `getOptimizations`/`getPlatformOptimizations` method commented "AI-powered
+   platform optimization recommendations" that was a fully static hardcoded
+   list with no AI call anywhere — the same fabricated-label pattern already
+   found and fixed in `core/ai/aiOrchestratorCore.js` this session. Fixed
+   both: the two untracked stats fields now report `null` + an explicit note
+   instead of a fake `0` (no session-store or request-counter table exists
+   anywhere in this codebase to compute real values), and the optimization
+   lists are honestly relabeled as static best-practice guidance
+   (`source: 'static'` on each entry) rather than claimed as AI-generated.
+
+2. **erpAgents.js proposals were never persisted — closed the gap
+   `aiOrchestrator.js` had documented since it was written.** `proposal()`
+   already built a row shaped exactly for the real `ai_proposals` table
+   (migration 995, "AI proposes, a human approves" with CHECK constraints
+   enforcing a human approver) — its own comment said so — but nothing ever
+   did the `INSERT`. Added `persistProposals()` to `core/erpAgents.js`
+   (best-effort, same never-break-the-caller discipline as
+   `core/outcomeSink.js`). Wired `aiOrchestrator.js`'s `workflow_engine`
+   entry to call it behind a `payload.persist:true` flag (defaults to
+   `false`, preserving prior in-memory-only behavior for backward
+   compatibility). Verified end-to-end: a real `cash_shortfall_warning`
+   proposal was generated and a persist attempt was made (failed gracefully
+   in this dev environment — no real Postgres running, exactly the expected
+   error — the proposal itself was still returned to the caller, not lost).
+
+**Verification:** all modified files load clean, fresh backend boot clean,
+in-memory and persist-attempt paths both tested live end-to-end.
 
 ## Closed this session (2026-08-29, later still): AI backbone consolidation
 
@@ -694,6 +1184,316 @@ remains untouched.
   from the module-registry integration layer which works without it)
 - Test coverage still at 0% — no session has written tests yet
 - Monitoring/observability (Prometheus/Grafana) still PLANNED, untouched
+
+---
+
+## 2026-08-30 — Agent B2: API route linkage fixes (AUDIT_API.md F1-F5, F7)
+
+Overnight parallel agent (B2 of 3, no shared file targets with B1/F1 agents —
+did not touch `backend/src/index.js`, `backend/src/database/`,
+`docker-compose.yml`, or any `modules/M0XX/model.sql`). All 6 findings closed.
+
+- **F1 (platformCoreAPI, 9 missing routes)** — `backend/src/routes/platformCoreRoutes.js`.
+  Checked `services/dual-use/platformCoreService.js` first: it only has
+  getPlatformConfig/updatePlatformConfig/getPlatformHealth/getPlatformStats/
+  getPlatformOptimizations — no backing method for initialize, scaling,
+  capacity, disaster-recovery, performance-monitor, self-healing, optimized-
+  configuration, metrics, or system-state anywhere in the codebase. Added all
+  9 as honest `501 NOT_IMPLEMENTED` routes (admin-gated), same pattern as
+  `aiGatewayRoutes.js`'s `notImplemented()` helper — did not fabricate
+  scaling/capacity/DR logic.
+- **F2 (animal-health missing DELETE/PUT)** — added `deleteExamination`,
+  `updateTreatment`, `deleteTreatment`, `deleteOutbreak`, `deleteQuarantine`
+  to `backend/src/services/legacy/animalHealthService.js` (real SQL against
+  the existing `animal_health_examinations`/`animal_treatments`/
+  `disease_outbreaks`/`quarantine_records` tables, hard-delete with
+  `RETURNING id` — matches the sibling convention in `goatService.js`/
+  `dairyService.js`'s `deleteAnimal`), then wired 5 new routes in
+  `backend/src/routes/animalHealthRoutes.js`.
+- **F3 (breeding-outcome path mismatch, goat/sheep/pig)** — `goatRoutes.js`,
+  `sheepRoutes.js`, `pigRoutes.js`: each `PUT /breeding/:id` handler now also
+  registers on `/breeding/:id/kidding-outcome` (goat) /
+  `/lambing-outcome` (sheep) / `/farrowing-outcome` (pig) via Express's
+  array-of-paths syntax (`router.put(['/breeding/:id', '/breeding/:id/...']`)
+  — same handler/service call/body shape, zero behavior change for the bare
+  path.
+- **F4 (pig FCR)** — added `GET /herd/:animalId/fcr` to `pigRoutes.js`,
+  reusing the real FCR calc already in `pigService.js`'s
+  `getHerdPerformance()` (feed consumed / weight gained, trailing 30 days)
+  rather than duplicating the query; returns just the FCR-relevant subset.
+- **F5 (M056 missing PUT/DELETE)** — `backend/src/modules/M056/service.js`:
+  added `updatePayment()` (amount/payment_method/payment_details, keeps
+  `updatePaymentStatus()` as the sole status-changing path) and
+  `deletePayment()` (hard delete, `RETURNING payment_id`); wired
+  `controller.js`'s `update`/`remove` and `routes.js`'s bare
+  `PUT /:id` / `DELETE /:id`. Note found but out of scope to fix here: the
+  frontend's `fpoInventoryAPI` client (`api.js` ~line 1930) documents
+  `/modules/m056` as backing `fpo_inventory_items`, but the module actually
+  auto-mounted at that path by `index.js`'s generic loop is
+  `backend/src/modules/M056` = Payment Processing (`payments`/`refunds`
+  tables) — a real naming/content mismatch, flagged for a future session,
+  not attempted tonight (would require the model.sql/schema work another
+  agent owns).
+- **F7 (stale doc-comments)** — `frontend/src/services/api.js`: fixed the
+  `sowingAPI` (~line 1501) and `floricultureAPI` (~line 2555) comments to
+  reflect the real, mounted, matching backend routes (verified against
+  `index.js` lines 827 and 831) instead of the stale "no backend route
+  found" text. Did not touch the other 87 similar comments (explicitly out
+  of scope per this task).
+
+**Verification:** `node --check` on every modified `.js` file (all pass).
+Full backend boot check (`node -e "require('./src/index.js')"`, 20s) shows
+only pre-existing, expected noise (Twilio not configured, PostgreSQL
+connection refused — DB not running in this environment) — no new
+TypeError/ReferenceError/SyntaxError/crash traceable to any file touched
+tonight.
+
+**Files touched:** `backend/src/routes/platformCoreRoutes.js`,
+`backend/src/routes/animalHealthRoutes.js`,
+`backend/src/services/legacy/animalHealthService.js`,
+`backend/src/routes/goatRoutes.js`, `backend/src/routes/sheepRoutes.js`,
+`backend/src/routes/pigRoutes.js`, `backend/src/modules/M056/service.js`,
+`backend/src/modules/M056/controller.js`, `backend/src/modules/M056/routes.js`,
+`frontend/src/services/api.js` (comments only).
+
+---
+
+## Closed this session (2026-08-30): UI wiring sweep — notification bell, admin audit/security panels, government scheme sections, nav reachability (AUDIT_UI.md Findings 1, 2, 3, 7)
+
+Executed as Agent F1 of the overnight `.claude/audits/FIXES.md` remediation
+plan, working only in `frontend/src/`. All four findings from `AUDIT_UI.md`
+closed; verified with a clean `cd frontend && npx vite build` (no new errors
+— only the pre-existing `@import` CSS ordering warning and the pre-existing
+>1000kB `pages` chunk warning, both unrelated to this work).
+
+### Finding 1 — Notification bell (HIGH) — DONE
+New `frontend/src/components/NotificationBell.jsx`, mounted in
+`frontend/src/components/Header.jsx` next to the cart icon (only rendered
+for authenticated users, matching the backend's `authMiddleware` gate on
+all M010 routes). Calls the real `notificationAPI` from `services/api.js`:
+`getNotifications({ userId, limit: 20 })` on mount and every 60s, bell badge
+shows unread count (`!n.read`), dropdown lists recent notifications with a
+per-item "mark read" (`markAsRead`) and a header "mark all read"
+(`markAllAsRead`). No fabricated notification content — empty/loading/error
+states render honestly.
+
+### Finding 2 — Audit-compliance + security-access-control panels (HIGH) — DONE
+Extended `frontend/src/pages/SystemAdministrationPage.jsx` with two new
+tabs alongside the existing settings/analytics/anomalies/maintenance ones:
+- **Audit** tab: real `auditComplianceAPI.getAuditLogs()` (recent entries,
+  paginated) + `detectAuditAnomalies()`, with a per-log "Verify Integrity"
+  button wired to `verifyAuditLogIntegrity(id)`.
+- **Security** tab: real `securityAccessControlAPI.getSecurityEvents()`,
+  `getIpLists('whitelist'/'blacklist')`, and (for the logged-in user)
+  `calculateSecurityScore(user.id)`.
+Both M008/M009 route sets require `requireRole('admin')` server-side
+(confirmed in `backend/src/modules/M008/routes.js` and `M009/routes.js`) —
+non-admin viewers get a caught 403 rendered as the existing error banner,
+same pattern the page already used for its other tabs. Read-only, no
+fabricated fields — anything the API didn't return isn't shown.
+
+### Finding 3 — Government schemes / CSR / localization (MEDIUM) — DONE
+Extended `frontend/src/pages/GovernmentDashboardPage.jsx` (previously only
+called `governmentAPI`, never `governmentSchemeAPI`/`schemeRegistryAPI`):
+- Existing **Schemes** tab gained a "Verified Scheme Registry" section
+  (`schemeRegistryAPI.list()`) plus an expiring-within-90-days list
+  (`schemeRegistryAPI.getExpiring(90)`), inserted above the pre-existing
+  static example scheme cards (left untouched — they're illustrative, not
+  fabricated-as-real).
+- Three new tabs: **Weather Alerts** (`governmentSchemeAPI.getWeatherAlerts`),
+  **Announcements** (`getAnnouncements`), **CSR Opportunities**
+  (`getCsrOpportunities`). All real calls, honest empty/loading states.
+
+### Finding 7 — Primary nav reachability (MEDIUM) — DONE
+`frontend/src/components/Sidebar.jsx` rewritten from a flat 15-item list
+into the same flat quick-links list plus 10 new grouped sections (Livestock
+& Aquaculture, Crops & Land, Equipment & Logistics, Farmer & Community,
+Finance & ERP, AI & Intelligence, Dashboards, Admin & Platform, E-commerce,
+More) covering all 110 previously-unlinked non-parameterized routed paths
+(verified by diffing every `path:` in `config/routes.js` against every
+`to=`/`to:` in `Header.jsx`/`Sidebar.jsx`/`BottomNav.jsx` — zero gaps
+remain, excluding the 2 legitimate `:id` param routes and the OAuth
+`/wearables/fitbit-callback` redirect target, neither of which belongs in
+primary nav). Sidebar has no role-gating today (unlike Header's admin/
+vendor dropdowns), so all groups render for every user — reachable but not
+perfectly IA'd beats unreachable, per the finding's own remediation note.
+
+**Files touched:** `frontend/src/components/NotificationBell.jsx` (new),
+`frontend/src/components/Header.jsx`, `frontend/src/components/Sidebar.jsx`,
+`frontend/src/pages/SystemAdministrationPage.jsx`,
+`frontend/src/pages/GovernmentDashboardPage.jsx`. No backend files touched.
+
+---
+
+## 2026-08-30 — Agent B1: DB/schema linkage fix (AUDIT_DB.md Findings 11-14)
+
+Overnight parallel agent (B1 of 3, scoped to `backend/src/database/`,
+`backend/src/modules/M022`, `backend/src/modules/M107`, and
+`backend/docker-compose.yml` — no overlap with B2/F1's file targets).
+
+### Finding 11/13 — folded 44 of the 46 "real" module.sql files into executed migrations — DONE
+
+**Approach chosen:** option (a) from the finding's own remediation text —
+fold each module's `model.sql` into a numbered file under
+`backend/src/database/migrations/`, not option (b) (`migrate.js` globbing
+`modules/*/model.sql`). Reasoning: (a) keeps `migrate.js` and its
+`schema_migrations` tracking/auto-repair logic (Findings 8/9) completely
+untouched — zero risk of regressing the one migration-execution path CI
+already exercises — and produces files CI's existing "apply everything
+under `migrations/`, assert table/index/FK counts" step picks up for free
+with no CI changes needed either.
+
+Used the `9500`-`9543` numbering block (checked `ls migrations/9*` first;
+nothing occupied that range — existing reserved late-numbers are
+`990`-`999`, `9995`-`9999`). One file per module, `M001` first (audit
+order), e.g. `9500_m001_platform_core.sql` ... `9543_m127_m127.sql`.
+
+**Verified the "46 real modules" count first:** `grep -L "CREATE TABLE"
+modules/M*/model.sql` confirmed exactly 46 modules ship a filled-in
+`model.sql` (M001-M005, M022-M025, M031-M032, M041-M042, M051-M060,
+M076-M087, M101-M109, M122-M123, M127); 18 are empty placeholders and 17
+have no `model.sql` at all — matches Finding 12 exactly (left untouched,
+still open, see below).
+
+**Collision handling (the actual hard part, and a real finding beyond what
+AUDIT_DB.md's Finding 13 anticipated):** before folding anything, cross-
+referenced every table name across all 46 modules' `CREATE TABLE`
+statements against every existing `CREATE TABLE` in
+`backend/src/database/migrations/*.sql` (302 files). Result: it is **not**
+just the 4 tables Finding 13 called out (`platform_configurations`,
+`tenants`, `organizations`, `environments`) — those do already exist
+(`014_platform_foundation_modules.sql`, `1001_platform_configuration.sql`)
+but with a completely different, incompatible column set (e.g. the real
+`platform_configurations` has `id SERIAL, config_key, config_value`; M001's
+version needs `config_id VARCHAR(50) PRIMARY KEY`). Also found ~35 more
+collisions the audit didn't surface: several modules' tables (e.g. M101's
+sibling machinery/livestock/alert/water-management tables, M107's
+`equipment_breakdowns`/`emergency_repairs`) were **already** partially
+recovered by an earlier session into `9999_zz...hidden_modules_schema_
+recovery.sql`, `..._machinery_action_modules_schema.sql`,
+`..._livestock_management_schema.sql`, `..._alert_management_schema.sql`,
+`..._water_management_schema.sql` — under the same table names, so a naive
+duplicate `CREATE TABLE IF NOT EXISTS` would have silently no-op'd against
+whichever version runs first, leaving the module's actual required columns
+possibly absent with no error raised anywhere.
+
+**Conservative rule applied (matches the task brief's "prefer the safer,
+more conservative option"):** wrote a small one-off Node script
+(`fold_migrations.js`, not checked into the repo — scratchpad tool only)
+that, for every module in fold order:
+1. Skips (does not re-create) any `CREATE TABLE` whose name already exists
+   anywhere in `migrations/` — logged per-table so the gap is visible
+   rather than silently absorbed.
+2. Strips `REFERENCES <table>(<col>)` (keeps the column, drops the FK
+   constraint) whenever `<table>` is one that got skipped in step 1 —
+   covers the M001-M005 cross-references to `platform_configurations`/
+   `tenants`/`organizations`/`environments`, and every other module whose
+   child tables reference a sibling table that already exists elsewhere
+   under a different schema.
+3. Skips any `CREATE INDEX` targeting a table that wasn't created (avoids
+   `42P01` on the index statement itself).
+4. Adds `IF NOT EXISTS` everywhere it was missing.
+
+Net result: **44 new migration files created** (`M057` and `M087` were
+skipped entirely — every table they define already exists elsewhere, so
+there was nothing left to fold for those two); **≈35 individual tables
+skipped** (already defined elsewhere, logged by name/module in the script
+output); **≈40 `REFERENCES` clauses stripped** (column kept, FK dropped,
+also logged). This closes the `42P01 relation does not exist` crash for
+every table that genuinely didn't exist before tonight — which is most of
+what each module's `service.js` actually queries — while explicitly not
+touching (and not risking silently corrupting) the pre-existing tables
+under those collided names. **Follow-up needed, not done tonight:** for
+every skipped table, someone needs to manually diff the module's expected
+columns against the pre-existing table's real columns and decide
+migrate-vs-rename; until then those specific modules' queries may still
+fail with `42703 column does not exist` rather than `42P01` — a narrower,
+more specific failure than before, but not fully closed. The stripped-FK
+list and skipped-table list are in this agent's terminal output (not
+persisted as a repo file per instructions — re-derivable by re-running the
+same collision scan against the current `migrations/` tree if needed).
+
+### Finding 14 — 2 fabricated-output functions — DONE, real logic implemented (not just relabeled)
+
+- **`backend/src/modules/M022/service.js` `generateEnrichmentSuggestions(profileData)`**
+  — now calls the file's own existing `identifyMissingFields(profile)` and
+  only suggests a field that's actually missing; the language suggestion
+  reads `profileData.state` against a small NE-India regional-language
+  default map (`source: 'regional_default'`) and only falls back to the
+  previous hardcoded `hindi` (`source: 'static'`) when no matching state is
+  on file. Dropped the fabricated `confidence` field per the codebase's own
+  `source: 'static'` pattern (`services/dual-use/platformCoreService.js`).
+- **`backend/src/modules/M107/service.js` `analyzeSymptoms(symptoms,
+  equipmentType)`** — now keyword-matches the actual `symptoms` input
+  against 7 rule categories (overheating/cooling, noise/vibration,
+  leaks, electrical/no-start, hydraulic, brakes, tires) and returns the
+  matched cause + affected components (`source: 'rule_based'`), or an
+  honest `'undetermined'`/`'unknown'` (`source: 'static'`) when nothing
+  matches or no symptoms were given — instead of always returning
+  `mechanical_failure` regardless of input.
+- **`estimateRepairTime(breakdownId, requiredParts)`** — now derives
+  `estimated_hours` from the actual size of `requiredParts` (4h base + 1.5h
+  per part) instead of a fixed `8`; `source: 'static'` only when no parts
+  list was given at all.
+- `node -c` on both files: pass.
+
+### Finding 2 — `docker-compose.yml` schema gap — verified already fixed, one real bug found and fixed in the fix
+
+The `backend` service's `command: sh -c "npm run migrate && node
+src/index.js"` (with a dated `FIXES.md H8 (2026-08-28)` comment) already
+addresses the "docker-compose only provisions 4% of the schema" gap from a
+prior session — no `depends_on: service_healthy` gap either, that was
+already correct. **But** `database/migrate.js`'s `Pool` only reads
+`process.env.DATABASE_URL` (confirmed by reading the file — its own error
+message literally says "DATABASE_URL is set in .env file"), while the
+`backend` service's `environment:` block only set `PG_HOST`/`PG_PORT`/
+`PG_DATABASE`/`PG_USER`/`PG_PASSWORD` (the vars `database/connection.js`,
+the *app's* runtime pool, supports as a fallback — a different file with
+different behavior). Without `DATABASE_URL`, `npm run migrate` inside the
+container would connect with `pg`'s bare defaults (effectively
+`localhost`, not the `postgres` service), so the already-written migrate
+step would silently fail to reach the right database — the fix from
+2026-08-28 was real but incomplete. Added `DATABASE_URL:
+postgresql://afrera:afrera_password@postgres:5432/afrera_db` to the
+`backend` service's environment block (kept the existing `PG_*` vars too,
+since `connection.js` still uses them as its own fallback path).
+
+### Verification
+
+- `node -c` on both modified `.js` files: pass.
+- All 44 new SQL files: paren-balance checked (open/close counts match)
+  and checked for trailing-comma-before-`)` syntax errors (a risk from the
+  REFERENCES-stripping step) — none found.
+- **Postgres was not reachable in this environment** (confirmed via a raw
+  TCP connect attempt to `localhost:5432` — `ECONNREFUSED`, consistent with
+  this file's own "Database not running" section above). `npm run migrate`
+  was **not** actually executed against a live database tonight. This is
+  the single biggest remaining verification gap: the SQL is believed
+  correct by careful manual construction (verbatim column defs from each
+  module's own `model.sql`, only mechanical IF-NOT-EXISTS/REFERENCES
+  changes applied) and passes structural checks, but has not been proven
+  to actually apply cleanly. **Must be run in CI or a real Postgres
+  instance before trusting it fully** — if `npm run migrate` fails on any
+  of the 44 new files, `migrate.js`'s auto-repair (Finding 9) will attempt
+  a regex rewrite; a human should review the `migrations/repairs/` output
+  rather than trust that silently.
+
+### Still open (out of scope tonight, per the task brief)
+
+- **Finding 12** — 35 modules (18 placeholder `model.sql`, 17 missing
+  entirely) still have zero schema anywhere. Needs real schema *design*
+  work per module before any wiring fix applies. Unchanged.
+- The ≈35 skipped-table / ≈40 dropped-FK items noted above under Finding
+  11 — each is a specific, named, re-discoverable gap, not a vague TODO,
+  but needs per-table column reconciliation this pass didn't have scope
+  for.
+
+**Files touched:** `backend/src/database/migrations/9500_m001_platform_core.sql`
+through `9543_m127_m127.sql` (44 new files — see directory listing, one per
+folded module), `backend/src/modules/M022/service.js`,
+`backend/src/modules/M107/service.js`, `backend/docker-compose.yml`. No
+existing migration file, `migrate.js`, or any file outside this list was
+modified.
 
 ---
 

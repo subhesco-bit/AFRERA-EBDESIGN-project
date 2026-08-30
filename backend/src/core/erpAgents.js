@@ -36,6 +36,7 @@ const { decisionEngine, ACTION } = require('./decisionEngine');
 const { mcda } = require('./mcda');
 const stats = require('../utils/statistics');
 const { logger } = require('../utils/logger');
+const pool = require('../database/pool');
 
 /** ERP domains, mirroring the AF-* module register from the v44 report. */
 const DOMAIN = Object.freeze({
@@ -757,6 +758,242 @@ const AGENTS = [
           '. One person able to both initiate and approve the same transaction defeats the control entirely.'
       });
     }
+  },
+
+  // -------------------------------------------------------------------
+  // CONTROLLING — Cost Center Variance Agent
+  // -------------------------------------------------------------------
+  {
+    id: 'controlling.cost_variance',
+    domain: DOMAIN.CONTROLLING,
+    description: 'Flags cost centers running materially over or under budget.',
+    evaluate(ctx = {}) {
+      const budgeted = Number(ctx.budgeted);
+      const actual = Number(ctx.actual);
+      if (!Number.isFinite(budgeted) || !Number.isFinite(actual) || budgeted === 0) return null;
+
+      const variance = actual - budgeted;
+      const pct = variance / budgeted;
+      if (Math.abs(pct) < 0.10) return null; // under 10% is normal noise, not a signal
+
+      const over = variance > 0;
+      return proposal({
+        domain: DOMAIN.CONTROLLING,
+        type: 'cost_variance_alert',
+        subjectType: 'cost_center',
+        subjectId: ctx.costCenterId,
+        proposed: { action: over ? 'review_overspend' : 'review_underutilisation', variance, pct: Math.round(pct * 1000) / 10 },
+        current: { budgeted, actual, period: ctx.periodLabel ?? null },
+        confidence: 1, // arithmetic on posted actuals, not a prediction
+        rationale:
+          `Cost center is ${Math.abs(Math.round(pct * 100))}% ${over ? 'over' : 'under'} budget for ` +
+          `${ctx.periodLabel ?? 'the period'}: ₹${Math.round(actual)} actual against ₹${Math.round(budgeted)} budgeted ` +
+          `(₹${Math.round(Math.abs(variance))} ${over ? 'overspend' : 'underspend'}). ` +
+          (over
+            ? 'Review the driving line items before the variance compounds into the next period.'
+            : 'Sustained underspend against budget may mean the budget was wrong, or planned work did not happen — worth a look either way.')
+      });
+    }
+  },
+
+  // -------------------------------------------------------------------
+  // ASSETS — Fixed Asset Lifecycle Agent
+  // -------------------------------------------------------------------
+  {
+    id: 'assets.lifecycle',
+    domain: DOMAIN.ASSETS,
+    description: 'Flags fully depreciated assets still carried as active, and assets sitting idle.',
+    evaluate(ctx = {}) {
+      const assets = ctx.assets || [];
+      if (assets.length === 0) return null;
+
+      const fullyDepreciatedActive = assets.filter((a) => a.fullyDepreciated && a.status === 'active');
+      const idle = assets.filter((a) => Number(a.idleDays) >= (ctx.idleThresholdDays ?? 60) && a.status === 'active');
+      if (fullyDepreciatedActive.length === 0 && idle.length === 0) return null;
+
+      return proposal({
+        domain: DOMAIN.ASSETS,
+        type: 'asset_lifecycle_review',
+        subjectType: 'asset_group',
+        subjectId: ctx.facilityId ?? ctx.companyId,
+        proposed: {
+          action: fullyDepreciatedActive.length ? 'review_disposal_or_revalue' : 'review_idle_assets',
+          fullyDepreciatedCount: fullyDepreciatedActive.length,
+          idleCount: idle.length,
+          assets: [...fullyDepreciatedActive, ...idle].slice(0, 10).map((a) => ({ code: a.assetCode, idleDays: a.idleDays ?? null }))
+        },
+        confidence: 1,
+        rationale:
+          (fullyDepreciatedActive.length
+            ? `${fullyDepreciatedActive.length} asset(s) are fully depreciated but still carried active — decide disposal, revaluation, or continued use. `
+            : '') +
+          (idle.length
+            ? `${idle.length} asset(s) have been idle ${ctx.idleThresholdDays ?? 60}+ days while marked active — capital sitting unused, or a status that no longer reflects reality.`
+            : '')
+      });
+    }
+  },
+
+  // -------------------------------------------------------------------
+  // LOGISTICS — Shipment Delay Risk Agent
+  // -------------------------------------------------------------------
+  {
+    id: 'logistics.delay_risk',
+    domain: DOMAIN.LOGISTICS,
+    description: 'Flags shipments whose remaining transit time exceeds what the commitment allows.',
+    evaluate(ctx = {}) {
+      const shipments = ctx.shipments || [];
+      const atRisk = shipments.filter((s) =>
+        Number.isFinite(Number(s.etaHoursRemaining)) &&
+        Number.isFinite(Number(s.committedHoursRemaining)) &&
+        Number(s.etaHoursRemaining) > Number(s.committedHoursRemaining)
+      );
+      if (atRisk.length === 0) return null;
+
+      const worst = [...atRisk].sort((a, b) =>
+        (b.etaHoursRemaining - b.committedHoursRemaining) - (a.etaHoursRemaining - a.committedHoursRemaining)
+      )[0];
+      const worstOverrun = Math.round(worst.etaHoursRemaining - worst.committedHoursRemaining);
+
+      return proposal({
+        domain: DOMAIN.LOGISTICS,
+        type: 'shipment_delay_risk',
+        subjectType: 'shipment',
+        subjectId: worst.shipmentCode,
+        proposed: {
+          action: 'expedite_or_notify_customer',
+          atRiskCount: atRisk.length,
+          shipments: atRisk.slice(0, 10).map((s) => ({
+            code: s.shipmentCode, overrunHours: Math.round(s.etaHoursRemaining - s.committedHoursRemaining)
+          }))
+        },
+        confidence: 1,
+        rationale:
+          `${atRisk.length} shipment(s) are tracking to arrive later than their delivery commitment. ` +
+          `Worst case: ${worst.shipmentCode} is projected ${worstOverrun}h over commitment. ` +
+          'Expedite where possible, or notify the customer now — a late notice costs less trust than a silent miss.'
+      });
+    }
+  },
+
+  // -------------------------------------------------------------------
+  // PRODUCTION — OEE Agent
+  // -------------------------------------------------------------------
+  {
+    id: 'production.oee',
+    domain: DOMAIN.PRODUCTION,
+    description: 'Computes Overall Equipment Effectiveness and names the weakest factor.',
+    evaluate(ctx = {}) {
+      const availability = Number(ctx.availability);
+      const performance = Number(ctx.performance);
+      const quality = Number(ctx.quality);
+      if (![availability, performance, quality].every((v) => Number.isFinite(v) && v >= 0 && v <= 1)) return null;
+
+      const oee = availability * performance * quality;
+      if (oee >= (ctx.warnBelow ?? 0.6)) return null; // healthy line, nothing to say
+
+      const factors = [
+        { name: 'availability', value: availability },
+        { name: 'performance', value: performance },
+        { name: 'quality', value: quality }
+      ].sort((a, b) => a.value - b.value);
+      const weakest = factors[0];
+
+      return proposal({
+        domain: DOMAIN.PRODUCTION,
+        type: 'oee_below_threshold',
+        subjectType: 'production_line',
+        subjectId: ctx.lineId,
+        proposed: {
+          action: 'investigate_line',
+          oee: Math.round(oee * 1000) / 10,
+          weakestFactor: weakest.name,
+          weakestValue: Math.round(weakest.value * 1000) / 10
+        },
+        current: { availability, performance, quality },
+        confidence: 1,
+        rationale:
+          `OEE is ${Math.round(oee * 100)}% (availability ${Math.round(availability * 100)}%, ` +
+          `performance ${Math.round(performance * 100)}%, quality ${Math.round(quality * 100)}%), below the ` +
+          `${Math.round((ctx.warnBelow ?? 0.6) * 100)}% floor. ${weakest.name} is the weakest factor at ` +
+          `${Math.round(weakest.value * 100)}% — start there, since the lowest factor caps every other gain.`
+      });
+    }
+  },
+
+  // -------------------------------------------------------------------
+  // HR — Leave Liability Agent
+  // -------------------------------------------------------------------
+  {
+    id: 'hr.leave_liability',
+    domain: DOMAIN.HR,
+    description: 'Flags employees carrying a leave balance past policy cap — an encashment liability and a burnout signal.',
+    evaluate(ctx = {}) {
+      const employees = ctx.employees || [];
+      const cap = Number(ctx.capDays) || 45;
+      const over = employees.filter((e) => Number(e.leaveBalanceDays) > cap);
+      if (over.length === 0) return null;
+
+      const liabilityDays = over.reduce((s, e) => s + (Number(e.leaveBalanceDays) - cap), 0);
+
+      return proposal({
+        domain: DOMAIN.HR,
+        type: 'leave_liability_review',
+        subjectType: 'company',
+        subjectId: ctx.companyId,
+        proposed: {
+          action: 'schedule_leave_or_encash',
+          overCapCount: over.length,
+          excessDaysTotal: Math.round(liabilityDays),
+          employees: over.slice(0, 10).map((e) => ({ id: e.employeeId, balance: e.leaveBalanceDays }))
+        },
+        confidence: 1,
+        rationale:
+          `${over.length} employee(s) carry a leave balance above the ${cap}-day policy cap, ` +
+          `${Math.round(liabilityDays)} excess day(s) combined. This is both a growing encashment liability on the ` +
+          'books and, for the individuals, a sign they are not taking the rest the policy assumes they are.'
+      });
+    }
+  },
+
+  // -------------------------------------------------------------------
+  // MASTER DATA — Data Quality Agent
+  // -------------------------------------------------------------------
+  {
+    id: 'masterdata.quality',
+    domain: DOMAIN.MASTERDATA,
+    description: 'Flags master records with missing critical fields or unresolved duplicates.',
+    evaluate(ctx = {}) {
+      const records = ctx.records || [];
+      const incomplete = records.filter((r) => (r.missingFields || []).length > 0);
+      const duplicates = records.filter((r) => r.duplicateOf);
+      if (incomplete.length === 0 && duplicates.length === 0) return null;
+
+      return proposal({
+        domain: DOMAIN.MASTERDATA,
+        type: 'data_quality_issue',
+        subjectType: ctx.entityType || 'master_record',
+        subjectId: ctx.batchId ?? ctx.entityType,
+        proposed: {
+          action: incomplete.length ? 'complete_required_fields' : 'merge_duplicates',
+          incompleteCount: incomplete.length,
+          duplicateCount: duplicates.length,
+          examples: [...incomplete, ...duplicates].slice(0, 10).map((r) => ({
+            id: r.recordId, missingFields: r.missingFields || null, duplicateOf: r.duplicateOf || null
+          }))
+        },
+        confidence: 1,
+        rationale:
+          (incomplete.length
+            ? `${incomplete.length} record(s) are missing a required field — every downstream process that reads ` +
+              'them inherits the gap silently. '
+            : '') +
+          (duplicates.length
+            ? `${duplicates.length} record(s) appear to duplicate an existing one — left unresolved, transactions ` +
+              'and history split across both copies.'
+            : '')
+      });
+    }
   }
 ];
 
@@ -816,10 +1053,50 @@ function listAgents() {
   return AGENTS.map((a) => ({ id: a.id, domain: a.domain, description: a.description }));
 }
 
+/**
+ * Persist proposals to ai_proposals (migration 995_erp_process_layer.sql).
+ *
+ * (2026-08-29) This is the gap core/aiOrchestrator.js's workflow_engine
+ * entry has documented since it was written: "does not persist the
+ * returned proposal to the ai_proposals table - no INSERT INTO ai_proposals
+ * exists anywhere in src/ yet". proposal() already builds a row shaped
+ * exactly for this table (its own comment says so) - this just does the
+ * actual INSERT. Best-effort: a persistence failure must never break the
+ * caller's request, same rule core/outcomeSink.js holds itself to. Returns
+ * the DB-assigned ids so a caller can look a proposal up later (e.g. to
+ * approve/reject it), or an empty array if persistence failed - the
+ * proposals themselves are still returned to the caller either way, they
+ * just won't be findable by id.
+ */
+async function persistProposals(proposals) {
+  const ids = [];
+  for (const p of proposals) {
+    try {
+      const { rows } = await pool.query(
+        `INSERT INTO ai_proposals
+           (domain, proposal_type, subject_type, subject_id, proposed_value,
+            current_value, rationale, confidence, mcda_breakdown, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING id`,
+        [
+          p.domain, p.proposal_type, p.subject_type, p.subject_id,
+          JSON.stringify(p.proposed_value), p.current_value ? JSON.stringify(p.current_value) : null,
+          p.rationale, p.confidence, p.mcda_breakdown ? JSON.stringify(p.mcda_breakdown) : null,
+          p.status || 'proposed',
+        ]
+      );
+      ids.push(rows[0].id);
+    } catch (err) {
+      logger.error(`erpAgents:persist_proposal_failed domain=${p.domain} type=${p.proposal_type}: ${err.message}`);
+    }
+  }
+  return ids;
+}
+
 module.exports = {
   AGENTS, DOMAIN, ACTION,
   runAgent, runDomain, runAll,
-  publishProposals, listAgents,
+  publishProposals, persistProposals, listAgents,
   proposal,
   decisionEngine
 };

@@ -125,7 +125,7 @@ function ErrorFallback({ error, route, onGoHome, onGoBack }) {
             {route?.title ? `Error loading ${route.title}` : 'An unexpected error occurred while loading this page.'}
           </p>
 
-          {error?.message && process.env.NODE_ENV === 'development' && (
+          {error?.message && import.meta.env.DEV && (
             <div className="bg-gray-100 dark:bg-gray-700 rounded p-3 mb-6 text-left">
               <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">
                 {error.message}
@@ -170,7 +170,7 @@ function ErrorWithRetry({ error, route, onRetry, onGoHome, onGoBack, retryCount 
             {route?.title ? `Failed to load ${route.title}` : 'There was a problem loading this page.'}
           </p>
 
-          {error?.message && process.env.NODE_ENV === 'development' && (
+          {error?.message && import.meta.env.DEV && (
             <div className="bg-gray-100 dark:bg-gray-700 rounded p-3 mb-6 text-left">
               <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">
                 {error.message}

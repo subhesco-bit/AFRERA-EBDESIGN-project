@@ -1,6 +1,21 @@
 ﻿/**
  * Watershed Management Service (M079)
  * Comprehensive watershed planning, ecosystem management, and conservation
+ *
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * createWatershedPlan/getEcologicalAssessment/getHydrologicalData/
+ * getLandUsePatterns/getBiodiversityInventory/getConservationStatus/
+ * getWatershedOverview are real: they read and write real tables.
+ * getConservationBestPractices is a legitimate static reference table, not
+ * fabrication. Everything else - climate impact, stakeholder analysis,
+ * restoration opportunities, all the ecological/hydrological/biodiversity
+ * health scores, water quality index, soil health, threats, economic
+ * valuation, community impact - is a static placeholder returning the same
+ * numbers for every watershed regardless of ID. Reachable live from
+ * `frontend/src/pages/WaterManagementPage.jsx`'s "watershed" tab
+ * (monitorHealth, generateReport). Needs a real ecological
+ * survey/remote-sensing/GIS integration, not better-looking fake numbers -
+ * tracked in .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');

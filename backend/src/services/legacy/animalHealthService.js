@@ -105,6 +105,13 @@ async function updateExamination(id, payload) {
   return res.rows[0] || null;
 }
 
+async function deleteExamination(id) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  const res = await pg.query('DELETE FROM animal_health_examinations WHERE id = $1 RETURNING id', [id]);
+  return res.rows[0] || null;
+}
+
 // ---------------------------------------------------------------------
 // Treatments (CRUD)
 // ---------------------------------------------------------------------
@@ -157,6 +164,32 @@ async function createTreatment(payload) {
     [animal_type, animal_id, treatment_date, medication_name, dosage || null, administration_route || null, prescribing_vet || null, diagnosis || null, notes || null]
   );
   return res.rows[0];
+}
+
+async function updateTreatment(id, payload) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  const { medication_name, dosage, administration_route, prescribing_vet, diagnosis, notes } = payload || {};
+  const res = await pg.query(
+    `UPDATE animal_treatments SET
+       medication_name = COALESCE($1, medication_name),
+       dosage = COALESCE($2, dosage),
+       administration_route = COALESCE($3, administration_route),
+       prescribing_vet = COALESCE($4, prescribing_vet),
+       diagnosis = COALESCE($5, diagnosis),
+       notes = COALESCE($6, notes)
+     WHERE id = $7
+     RETURNING *`,
+    [medication_name, dosage, administration_route, prescribing_vet, diagnosis, notes, id]
+  );
+  return res.rows[0] || null;
+}
+
+async function deleteTreatment(id) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  const res = await pg.query('DELETE FROM animal_treatments WHERE id = $1 RETURNING id', [id]);
+  return res.rows[0] || null;
 }
 
 // ---------------------------------------------------------------------
@@ -238,6 +271,13 @@ async function updateOutbreak(id, payload) {
   return res.rows[0] || null;
 }
 
+async function deleteOutbreak(id) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  const res = await pg.query('DELETE FROM disease_outbreaks WHERE id = $1 RETURNING id', [id]);
+  return res.rows[0] || null;
+}
+
 // ---------------------------------------------------------------------
 // Quarantine records (CRUD)
 // ---------------------------------------------------------------------
@@ -311,6 +351,13 @@ async function updateQuarantine(id, payload) {
      RETURNING *`,
     [quarantine_end_date, status, notes, id]
   );
+  return res.rows[0] || null;
+}
+
+async function deleteQuarantine(id) {
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+  const res = await pg.query('DELETE FROM quarantine_records WHERE id = $1 RETURNING id', [id]);
   return res.rows[0] || null;
 }
 
@@ -473,14 +520,19 @@ module.exports = {
   listExaminations,
   createExamination,
   updateExamination,
+  deleteExamination,
   listTreatments,
   createTreatment,
+  updateTreatment,
+  deleteTreatment,
   listOutbreaks,
   createOutbreak,
   updateOutbreak,
+  deleteOutbreak,
   listQuarantines,
   createQuarantine,
   updateQuarantine,
+  deleteQuarantine,
   getHealthOverview,
   getActiveOutbreaks,
   getActiveQuarantines,

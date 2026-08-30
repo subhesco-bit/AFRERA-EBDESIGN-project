@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS consent_templates (
 -- Consent Acceptances Table
 CREATE TABLE IF NOT EXISTS consent_acceptances (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   policy_id INTEGER NOT NULL REFERENCES consent_templates(id) ON DELETE CASCADE,
   accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ip_address INET,

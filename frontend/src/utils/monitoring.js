@@ -231,6 +231,20 @@ function trackFormSubmission(formName, success, errors = []) {
 }
 
 /**
+ * Track a performance metric (e.g. page load time). RouteAnalytics.jsx
+ * calls this on every route change; it was never implemented here despite
+ * every sibling trackX function (trackAction/trackPageView/trackAPICall/
+ * trackFormSubmission) following this exact addBreadcrumb wrapper pattern.
+ */
+function trackPerformance(metricName, value, properties = {}) {
+  addBreadcrumb('performance', `${metricName}: ${value}ms`, 'info', {
+    metric: metricName,
+    value,
+    ...properties
+  })
+}
+
+/**
  * Track feature usage
  */
 function trackFeatureUsage(featureName, properties = {}) {
@@ -405,6 +419,7 @@ const monitoring = {
   trackAPICall,
   trackFormSubmission,
   trackFeatureUsage,
+  trackPerformance,
   performance,
   errorCategories,
   categorizeError,

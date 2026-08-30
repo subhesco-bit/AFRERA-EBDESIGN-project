@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS platform_config (
     category VARCHAR(50) DEFAULT 'general',
     data_type VARCHAR(20) DEFAULT 'string',
     active BOOLEAN DEFAULT true,
-    created_by INTEGER REFERENCES users(id),
-    updated_by INTEGER REFERENCES users(id),
+    created_by UUID REFERENCES users(id),
+    updated_by UUID REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS platform_versions (
     description TEXT,
     changelog TEXT,
     is_current BOOLEAN DEFAULT false,
-    created_by INTEGER REFERENCES users(id)
+    created_by UUID REFERENCES users(id)
 );
 
 -- Platform events table (for audit logging)
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS platform_events (
     event_category VARCHAR(50),
     description TEXT,
     metadata JSONB,
-    user_id INTEGER REFERENCES users(id),
+    user_id UUID REFERENCES users(id),
     ip_address VARCHAR(45),
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS platform_maintenance (
     impact_level VARCHAR(20) DEFAULT 'low',
     affected_services TEXT[],
     notification_sent BOOLEAN DEFAULT false,
-    created_by INTEGER REFERENCES users(id),
+    created_by UUID REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

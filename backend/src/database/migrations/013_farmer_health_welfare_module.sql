@@ -5,7 +5,7 @@
 -- Farmer Health Records Table
 CREATE TABLE IF NOT EXISTS farmer_health_records (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     health_type VARCHAR(50) NOT NULL, -- 'GENERAL', 'OCCUPATIONAL', 'CHRONIC', 'EMERGENCY'
     description TEXT,
     severity VARCHAR(20) NOT NULL, -- 'LOW', 'MEDIUM', 'HIGH'
@@ -48,7 +48,7 @@ CREATE INDEX IF NOT EXISTS idx_welfare_programs_dates ON welfare_programs(start_
 -- Welfare Enrollments Table
 CREATE TABLE IF NOT EXISTS welfare_enrollments (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     program_id INTEGER NOT NULL REFERENCES welfare_programs(id) ON DELETE CASCADE,
     enrollment_date DATE NOT NULL,
     status VARCHAR(20) DEFAULT 'PENDING', -- 'PENDING', 'APPROVED', 'REJECTED', 'COMPLETED'

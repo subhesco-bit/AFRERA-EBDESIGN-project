@@ -4,7 +4,7 @@
 -- User consent table
 CREATE TABLE IF NOT EXISTS user_consent (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     consent_type VARCHAR(100) NOT NULL,
     consent_given BOOLEAN NOT NULL,
     ip_address VARCHAR(45),
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS user_consent (
 -- Data subject requests table (GDPR rights requests)
 CREATE TABLE IF NOT EXISTS data_subject_requests (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     request_type VARCHAR(50) NOT NULL,
     reason TEXT,
     status VARCHAR(20) DEFAULT 'PENDING',
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS data_subject_requests (
 -- User data residency table (for data localization compliance)
 CREATE TABLE IF NOT EXISTS user_data_residency (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     data_region VARCHAR(10) NOT NULL DEFAULT 'IN',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS privacy_impact_assessments (
     risks JSONB,
     mitigations JSONB,
     assessment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    assessor_id INTEGER REFERENCES users(id)
+    assessor_id UUID REFERENCES users(id)
 );
 
 -- Data processing activities table (GDPR Article 30)

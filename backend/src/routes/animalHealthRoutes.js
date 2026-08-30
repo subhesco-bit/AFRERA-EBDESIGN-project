@@ -11,14 +11,19 @@ const {
   listExaminations,
   createExamination,
   updateExamination,
+  deleteExamination,
   listTreatments,
   createTreatment,
+  updateTreatment,
+  deleteTreatment,
   listOutbreaks,
   createOutbreak,
   updateOutbreak,
+  deleteOutbreak,
   listQuarantines,
   createQuarantine,
   updateQuarantine,
+  deleteQuarantine,
   getHealthOverview,
   getActiveOutbreaks,
   getActiveQuarantines,
@@ -94,6 +99,23 @@ router.put('/examinations/:id', async (req, res, next) => {
 });
 
 /**
+ * DELETE /api/v1/animal-health/examinations/:id
+ * Delete a health examination.
+ */
+router.delete('/examinations/:id', async (req, res, next) => {
+  try {
+    const deleted = await deleteExamination(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Examination not found' });
+    }
+    res.json({ success: true, data: deleted });
+  } catch (error) {
+    logger.error('animalHealthRoutes:deleteExamination', { error: error.message });
+    next(error);
+  }
+});
+
+/**
  * GET /api/v1/animal-health/treatments
  * List treatments with optional animal type filter.
  */
@@ -133,6 +155,40 @@ router.post('/treatments', async (req, res, next) => {
     res.json({ success: true, data: treatment });
   } catch (error) {
     logger.error('animalHealthRoutes:createTreatment', { error: error.message });
+    next(error);
+  }
+});
+
+/**
+ * PUT /api/v1/animal-health/treatments/:id
+ * Update a treatment record.
+ */
+router.put('/treatments/:id', async (req, res, next) => {
+  try {
+    const treatment = await updateTreatment(req.params.id, req.body);
+    if (!treatment) {
+      return res.status(404).json({ success: false, error: 'Treatment not found' });
+    }
+    res.json({ success: true, data: treatment });
+  } catch (error) {
+    logger.error('animalHealthRoutes:updateTreatment', { error: error.message });
+    next(error);
+  }
+});
+
+/**
+ * DELETE /api/v1/animal-health/treatments/:id
+ * Delete a treatment record.
+ */
+router.delete('/treatments/:id', async (req, res, next) => {
+  try {
+    const deleted = await deleteTreatment(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Treatment not found' });
+    }
+    res.json({ success: true, data: deleted });
+  } catch (error) {
+    logger.error('animalHealthRoutes:deleteTreatment', { error: error.message });
     next(error);
   }
 });
@@ -199,6 +255,23 @@ router.put('/outbreaks/:id', async (req, res, next) => {
 });
 
 /**
+ * DELETE /api/v1/animal-health/outbreaks/:id
+ * Delete a disease outbreak record.
+ */
+router.delete('/outbreaks/:id', async (req, res, next) => {
+  try {
+    const deleted = await deleteOutbreak(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Outbreak not found' });
+    }
+    res.json({ success: true, data: deleted });
+  } catch (error) {
+    logger.error('animalHealthRoutes:deleteOutbreak', { error: error.message });
+    next(error);
+  }
+});
+
+/**
  * GET /api/v1/animal-health/quarantines
  * List quarantine records with optional filters.
  */
@@ -255,6 +328,23 @@ router.put('/quarantines/:id', async (req, res, next) => {
     res.json({ success: true, data: quarantine });
   } catch (error) {
     logger.error('animalHealthRoutes:updateQuarantine', { error: error.message });
+    next(error);
+  }
+});
+
+/**
+ * DELETE /api/v1/animal-health/quarantines/:id
+ * Delete a quarantine record.
+ */
+router.delete('/quarantines/:id', async (req, res, next) => {
+  try {
+    const deleted = await deleteQuarantine(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, error: 'Quarantine record not found' });
+    }
+    res.json({ success: true, data: deleted });
+  } catch (error) {
+    logger.error('animalHealthRoutes:deleteQuarantine', { error: error.message });
     next(error);
   }
 });

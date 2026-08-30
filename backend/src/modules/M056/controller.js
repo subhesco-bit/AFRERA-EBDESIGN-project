@@ -41,4 +41,24 @@ const refund = async (req, res) => {
   }
 };
 
-module.exports = { create, get, updateStatus, refund };
+const update = async (req, res) => {
+  try {
+    const payment = await paymentService.updatePayment(req.params.id, req.body);
+    if (!payment) return res.status(404).json({ success: false, error: 'Payment not found' });
+    res.status(200).json({ success: true, data: payment });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+const remove = async (req, res) => {
+  try {
+    const deleted = await paymentService.deletePayment(req.params.id);
+    if (!deleted) return res.status(404).json({ success: false, error: 'Payment not found' });
+    res.status(200).json({ success: true, data: deleted });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = { create, get, updateStatus, refund, update, remove };

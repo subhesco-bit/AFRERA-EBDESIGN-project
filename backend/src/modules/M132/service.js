@@ -6,9 +6,10 @@ const tableName = 'ponds';
 
 class PondManagementService {
   constructor() {
-    this.iotHubConnected = true;
-    this.aiEnabled = true;
-    this.realTimeProcessing = true;
+    // No real IoT hub integration exists in this deployment (see
+    // fetchSensorData below) - this flag previously claimed true
+    // unconditionally, which was false on every boot.
+    this.iotHubConnected = false;
     this.sensorDataCache = new Map();
   }
 
@@ -177,16 +178,13 @@ class PondManagementService {
   }
 
   async fetchSensorData(deviceId, startTime, endTime) {
-    // Fetch from IoT hub
+    // (2026-08-29) Was a hardcoded {ph:7.2, temperature:28.5, ...} reading
+    // returned for every device regardless of ID or time range - fed
+    // straight into health-index/AI-insight calculations as fabricated
+    // input. No real IoT hub is wired in this deployment, so report that
+    // honestly instead of inventing a reading.
     logger.info(`Fetching sensor data for device ${deviceId}`);
-    
-    // Placeholder for IoT hub integration
-    return {
-      deviceId,
-      readings: [
-        { timestamp: new Date(), ph: 7.2, temperature: 28.5, dissolvedOxygen: 6.8, turbidity: 15 }
-      ]
-    };
+    return { deviceId, readings: [], configured: false, reason: 'No IoT sensor hub is configured in this deployment. No live call was attempted.' };
   }
 
   async processSensorData(sensorDataArray) {
@@ -230,12 +228,11 @@ class PondManagementService {
   }
 
   analyzeTrends(reading) {
-    // Analyze trends (would use historical data in production)
-    return {
-      phTrend: 'STABLE',
-      temperatureTrend: 'INCREASING',
-      oxygenTrend: 'STABLE'
-    };
+    // (2026-08-29) Was a hardcoded {STABLE, INCREASING, STABLE} for every
+    // single reading regardless of history. A trend needs at least two
+    // points; this function only ever receives one, so report that
+    // honestly instead of inventing a direction.
+    return { phTrend: 'insufficient_data', temperatureTrend: 'insufficient_data', oxygenTrend: 'insufficient_data' };
   }
 
   generateSensorSummary(processedData) {
@@ -406,18 +403,23 @@ class PondManagementService {
     return {
       pondId,
       insights,
-      confidence: 0.87
+      // (2026-08-29) Was a hardcoded confidence:0.87/0.85/0.82 sprinkled
+      // through this file, dressing up plain arithmetic on the health
+      // index as a scored ML prediction. Every number below is
+      // deterministic - same inputs always give the same outputs - so
+      // labelled as such instead.
+      method: 'rule_based_calculation'
     };
   }
 
   async predictGrowthPotential(sensorData) {
     const summary = sensorData.summary;
     const healthIndex = this.calculateHealthIndex(summary);
-    
+
     return {
       potential: healthIndex > 75 ? 'HIGH' : healthIndex > 50 ? 'MODERATE' : 'LOW',
       estimatedGrowthRate: healthIndex / 100 * 2.5, // kg/m²/week
-      confidence: 0.85
+      method: 'rule_based_calculation'
     };
   }
 
@@ -500,7 +502,7 @@ class PondManagementService {
       estimatedHarvestDate: harvestDate.toISOString().split('T')[0],
       expectedYield: growthPotential.estimatedGrowthRate * 120, // 4 months
       qualityPrediction: healthIndex > 75 ? 'PREMIUM' : healthIndex > 50 ? 'STANDARD' : 'BASIC',
-      confidence: 0.82
+      method: 'rule_based_calculation'
     };
   }
 }

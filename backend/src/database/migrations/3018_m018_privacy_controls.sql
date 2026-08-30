@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS privacy_policies (
 -- Privacy Policy Acceptances Table
 CREATE TABLE IF NOT EXISTS privacy_policy_acceptances (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   policy_id INTEGER NOT NULL REFERENCES privacy_policies(id) ON DELETE CASCADE,
   accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ip_address INET,
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS privacy_policy_acceptances (
 -- Profile Views Table
 CREATE TABLE IF NOT EXISTS profile_views (
   id SERIAL PRIMARY KEY,
-  profile_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  profile_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   viewer_user_id INTEGER,
   ip_address INET,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS profile_views (
 -- Profile Activity Table
 CREATE TABLE IF NOT EXISTS profile_activity (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   activity_type VARCHAR(50) NOT NULL,
   details JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

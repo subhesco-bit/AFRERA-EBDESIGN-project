@@ -1,6 +1,22 @@
 ﻿/**
  * Rainwater Harvesting Service (M078)
  * Rainwater collection, storage management, and distribution systems
+ *
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * designHarvestingSystem/getRainfallPatterns/getRainfallReceived/
+ * getWaterCollected/calculateCollectionEfficiency/getStorageLevel are real:
+ * they read and write real tables, and calculateCollectionEfficiency
+ * genuinely divides collected by received. calculateCatchmentEfficiency,
+ * getStorageOptions and getFiltrationRequirements are deterministic
+ * math/legitimate static catalogs, not fabrication. But
+ * getEnvironmentalFactors, getHarvestedWaterQuality, getExpectedRainfall,
+ * getDemandForecast, generateAllocationPlan and getDistributionPoints are
+ * static placeholders returning the same numbers regardless of
+ * system/location/intended use. Reachable live from
+ * `frontend/src/pages/WaterManagementPage.jsx` (monitorCollection,
+ * calculateBudget). Fixed the fabricated confidence score below; the rest
+ * needs a real rain-gauge/weather feed and demand study, not better-looking
+ * fake numbers - tracked in .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');
@@ -312,15 +328,17 @@ async function generateCollectionRecommendations(systemId, period) {
 }
 
 async function getExpectedRainfall(systemId, timeFrame) {
+  // Was a hardcoded confidence:75 dressing up a fixed guess as a scored
+  // forecast. No real rainfall-forecast integration exists yet.
   return {
-    expected_mm: 500,
-    expected_liters: 25000,
-    confidence: 75
+    configured: false,
+    reason: 'No rainfall forecast source is wired for this system. Needs a real weather API or local rain-gauge feed.',
   };
 }
 
 async function getExpectedCollection(systemId, timeFrame) {
   const rainfall = await getExpectedRainfall(systemId, timeFrame);
+  if (!rainfall.configured) return { configured: false, reason: rainfall.reason };
   return {
     expected_liters: rainfall.expected_liters * 0.65,
     efficiency_factor: 0.65
@@ -343,12 +361,14 @@ async function getStorageCapacity(systemId) {
 
 async function calculateSurplus(systemId, timeFrame) {
   const collection = await getExpectedCollection(systemId, timeFrame);
+  if (!collection.configured) return null; // no rainfall forecast to base a surplus on
   const demand = await getDemandForecast(systemId, timeFrame);
   return collection.expected_liters - demand.total_demand;
 }
 
 async function calculateDeficit(systemId, timeFrame) {
   const surplus = await calculateSurplus(systemId, timeFrame);
+  if (surplus === null) return null;
   return surplus < 0 ? Math.abs(surplus) : 0;
 }
 

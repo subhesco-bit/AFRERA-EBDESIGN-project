@@ -201,8 +201,9 @@ const gdprRoutes = require('./routes/dual-use/gdprRoutes');
 // M001 Platform Core Service
 const platformCoreService = require('./services/dual-use/platformCoreService');
 const platformCoreRoutes = require('./routes/platformCoreRoutes');
-// Unified Claude AI Coordinator
-const claudeAICoordinator = require('./core/claudeAICoordinator');
+// Unified Claude AI Coordinator - routes/unifiedAIRoutes.js requires
+// core/claudeAICoordinator.js directly (Node caches the singleton either
+// way), so a second unused require here was dead weight. Removed 2026-08-29.
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
 const libraryRoutes = require('./routes/libraryRoutes');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
@@ -368,6 +369,38 @@ const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
 const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
 const decisionSupportRoutes = require('./routes/decisionSupportRoutes');
+// Genuinely orphaned services found during the 2026-08-29 gap-index audit -
+// real, substantial code, zero prior route/index.js wiring. See .ai/tasks/ACTIVE.md.
+// (The 3 insurance-* route files originally added here were themselves a
+// duplication mistake, corrected the same day - see the ACTIVE.md
+// "duplicate route correction" note. insuranceEnhancements.js, mounted
+// below at /api/v1/insurance, already covered this - and is what the
+// frontend actually calls.)
+const cropPlanningRoutes = require('./routes/cropPlanningRoutes');
+const landRecordsRoutes = require('./routes/landRecordsRoutes');
+const productReviewRoutes = require('./routes/productReviewRoutes');
+// nutritionIntelligenceService.js (1165 lines, real) already defines and
+// exports its own `router` - nutrition scoring, personalized recommendations
+// by dietary profile, diet-based recipe generation, wellness practices. Zero
+// prior mounting - the AI dietitian/naturopath layer the user asked for
+// (2026-08-29) is mostly this, already built, just never exposed.
+const nutritionIntelligenceRoutes = require('./services/legacy/nutritionIntelligenceService').router;
+// custodyEventService.js is NOT orphaned - it was already wired via
+// services/legacy/custodyEventRoutes.js's setupRoutes(app) pattern (called
+// below), which this session's orphan scan initially missed because it
+// only checked routes/. Confirmed and left alone; see the scan note further
+// down for what WAS actually found orphaned.
+// 6 route files under routes/legacy/ found never mounted during the
+// 2026-08-29 sweep - root cause: all 6 imported from
+// '../../middleware/authMiddleware', a module that does not exist, so
+// mounting them as-is would have crashed the boot. Fixed the import in each
+// file (see their own comments) to the real '../../middleware/auth' module.
+const apicultureRoutes = require('./routes/legacy/apicultureRoutes');
+const legacyFisheriesRoutes = require('./routes/legacy/fisheriesRoutes');
+const forestryRoutes = require('./routes/legacy/forestryRoutes');
+const mushroomRoutes = require('./routes/legacy/mushroomRoutes');
+const sericultureRoutes = require('./routes/legacy/sericultureRoutes');
+const vermicompostRoutes = require('./routes/legacy/vermicompostRoutes');
 const cooperativeShareRoutes = require('./routes/cooperativeShareRoutes');
 const wikipediaRoutes = require('./routes/wikipediaRoutes');
 // Found built but with zero HTTP exposure (2026-08-15 junk/orphan sweep) —
@@ -643,9 +676,11 @@ app.use('/api/v1/comprehensive-erp', comprehensiveERPRoutes);
 // AI Backbone - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face, Ollama)
 const aiBackboneRoutes = require('./routes/aiBackboneRoutes');
 app.use('/api/v1/ai-backbone', aiBackboneRoutes);
-// Devin - live agentic coding sessions (real Cognition Devin API, async - poll for status)
-const devinRoutes = require('./routes/devinRoutes');
-app.use('/api/v1/devin', devinRoutes);
+// Devin integration removed 2026-08-29 at explicit user request (real live
+// Cognition Devin API - user did not want this surface reachable). Was
+// routes/devinRoutes.js -> controllers/devinController.js ->
+// services/devinService.js, all deleted together; nothing else depended on
+// any of the three.
 // Product Media AI - AI product-image generation, nutrient-comparison video generation
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes');
 app.use('/api/v1/product-media-ai', productMediaAIRoutes);
@@ -843,6 +878,16 @@ app.use('/api/v1/erp/projects', projectSystemsRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/decision-support', decisionSupportRoutes);
+app.use('/api/v1/crop-planning', cropPlanningRoutes);
+app.use('/api/v1/land-records', landRecordsRoutes);
+app.use('/api/v1/nutrition-intelligence', nutritionIntelligenceRoutes);
+app.use('/api/v1/apiculture', apicultureRoutes);
+app.use('/api/v1/fisheries', legacyFisheriesRoutes);
+app.use('/api/v1/forestry', forestryRoutes);
+app.use('/api/v1/mushroom', mushroomRoutes);
+app.use('/api/v1/sericulture', sericultureRoutes);
+app.use('/api/v1/vermicompost', vermicompostRoutes);
+app.use('/api/v1/product-reviews', productReviewRoutes);
 app.use('/api/v1/cooperative-shares', cooperativeShareRoutes);
 // Real Wikimedia REST API reference lookups (see services/wikipediaService.js).
 app.use('/api/v1/wikipedia', wikipediaRoutes);

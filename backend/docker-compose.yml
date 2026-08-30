@@ -77,6 +77,15 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3001
+      # database/migrate.js's Pool only reads DATABASE_URL (see its own error
+      # message: "DATABASE_URL is set in .env file") - it does not fall back
+      # to PG_* vars. Without this, `npm run migrate` in the command above
+      # connects with pg's bare defaults (localhost/current user), which
+      # inside this container is not the postgres service, so the "fixed"
+      # migrate step below would silently fail to actually run. PG_* vars
+      # are kept too since database/connection.js (the app's own runtime
+      # pool) supports both, preferring DATABASE_URL when present.
+      DATABASE_URL: postgresql://afrera:afrera_password@postgres:5432/afrera_db
       PG_HOST: postgres
       PG_PORT: 5432
       PG_DATABASE: afrera_db

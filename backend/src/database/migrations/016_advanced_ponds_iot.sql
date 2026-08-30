@@ -5,7 +5,7 @@
 -- Ponds Table (Enhanced)
 CREATE TABLE IF NOT EXISTS ponds (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     area DECIMAL(10, 2), -- in square meters

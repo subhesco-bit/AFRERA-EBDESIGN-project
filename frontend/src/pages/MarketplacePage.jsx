@@ -1,9 +1,51 @@
 import { useState, useEffect, useRef } from 'react'
-import { useQuery, keepPreviousData } from '@tanstack/react-query'
+import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query'
 import { productsAPI } from '../services/api'
-import { Filter, ShoppingCart, Star } from 'lucide-react'
+import { Filter, ShoppingCart, Star, Sparkles } from 'lucide-react'
 import { ordersAPI } from '../services/api'
 import toast from 'react-hot-toast'
+
+/**
+ * Requests an AI reference image for a product with no photo on file.
+ * Real provider-adapter pipeline (productMediaAIService.js) - honestly
+ * reports "not configured" since no image-gen API key exists in this
+ * deployment, rather than inventing an image. Same pattern as
+ * VarietyDirectoryPage.jsx's GenerateImageButton.
+ */
+function ProductImagePlaceholder({ product }) {
+  const [result, setResult] = useState(null)
+  const mutation = useMutation({
+    mutationFn: () => productsAPI.requestImage(product.id, `Professional product photography of ${product.name}, natural lighting, clean background, realistic.`),
+    onSuccess: (res) => setResult(res.data?.data),
+    onError: (err) => setResult({ status: 'failed', error: err.response?.data?.error || err.message }),
+  })
+
+  if (result?.status === 'completed' && result.imageUrl) {
+    return <img src={result.imageUrl} alt={product.name} className="w-full h-48 object-cover" />
+  }
+
+  return (
+    <div className="w-full h-48 bg-v42-paddy2 flex flex-col items-center justify-center gap-2 px-3 text-center">
+      <span className="text-v42-mut text-sm">No image</span>
+      <button
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); mutation.mutate() }}
+        disabled={mutation.isPending}
+        className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-full bg-v42-forest/10 text-v42-forest hover:bg-v42-forest/20 transition disabled:opacity-60"
+      >
+        <Sparkles className="w-3.5 h-3.5" />
+        {mutation.isPending ? 'Requesting…' : 'Generate reference image (AI)'}
+      </button>
+      {result?.status === 'not_configured' && (
+        <span className="text-[11px] text-v42-mut px-2">
+          No image-generation API key ({result.envVar || 'OPENAI_API_KEY'}) is configured — nothing was invented.
+        </span>
+      )}
+      {result?.status === 'failed' && (
+        <span className="text-[11px] text-v42-chilli px-2">{result.error || 'Image generation failed.'}</span>
+      )}
+    </div>
+  )
+}
 
 function MarketplacePage() {
   const [filters, setFilters] = useState({
@@ -57,10 +99,10 @@ function MarketplacePage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+          <div className="h-8 bg-v42-paddy2 rounded w-1/4 mb-8"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-200 h-64 rounded-lg"></div>
+              <div key={i} className="bg-v42-paddy2 h-64 rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -81,7 +123,7 @@ function MarketplacePage() {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Filters */}
         <aside className="w-full md:w-64 flex-shrink-0">
-          <div className="bg-white rounded-lg shadow p-6 sticky top-24">
+          <div className="bg-v42-paddy border border-v42-line rounded-lg shadow p-6 sticky top-24">
             <h2 className="text-lg font-semibold mb-4 flex items-center">
               <Filter className="w-5 h-5 mr-2" />
               Filters
@@ -89,7 +131,7 @@ function MarketplacePage() {
 
             {/* Search */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-v42-ink2 mb-2">
                 Search
               </label>
                   <input
@@ -97,19 +139,19 @@ function MarketplacePage() {
                     placeholder="Search products..."
                     value={searchInput}
                     onChange={handleSearchInput}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
                   />
             </div>
 
             {/* Category Filter */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-v42-ink2 mb-2">
                 Category
               </label>
               <select
                 value={filters.category_id}
                 onChange={(e) => handleFilterChange('category_id', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
               >
                 <option value="">All Categories</option>
                 <option value="1">Grains & Millets</option>
@@ -123,13 +165,13 @@ function MarketplacePage() {
 
             {/* State Filter */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-v42-ink2 mb-2">
                 State
               </label>
               <select
                 value={filters.state_id}
                 onChange={(e) => handleFilterChange('state_id', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
               >
                 <option value="">All States</option>
                 <option value="1">Assam</option>
@@ -145,11 +187,11 @@ function MarketplacePage() {
 
             {/* Sort */}
             <div className="mb-6">
-              <label htmlFor="value" className="block text-sm font-medium text-gray-700 mb-2">Sort</label>
+              <label htmlFor="value" className="block text-sm font-medium text-v42-ink2 mb-2">Sort</label>
               <select id="value"
                 value={filters.sort}
                 onChange={(e) => { handleFilterChange('sort', e.target.value); setPagination((p) => ({ ...p, page: 1 })) }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
               >
                 <option value="">Relevance</option>
                 <option value="price_asc">Price: Low → High</option>
@@ -169,13 +211,13 @@ function MarketplacePage() {
                   }
                   className="mr-2"
                 />
-                <span className="text-sm text-gray-700">GI Certified Only</span>
+                <span className="text-sm text-v42-ink2">GI Certified Only</span>
               </label>
             </div>
 
             <button
               onClick={() => setFilters({ category_id: '', state_id: '', gi_status: '', search: '' })}
-              className="w-full px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className="w-full px-4 py-2 text-sm text-v42-mut border border-v42-line rounded-lg hover:bg-v42-paddy2 transition"
             >
               Clear Filters
             </button>
@@ -185,8 +227,8 @@ function MarketplacePage() {
         {/* Product Grid */}
         <div className="flex-1">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Marketplace</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-v42-ink">Marketplace</h1>
+            <p className="text-v42-mut">
               Showing {data?.products?.length || 0} of {data?.pagination?.total || 0} products
             </p>
           </div>
@@ -195,7 +237,7 @@ function MarketplacePage() {
             {data?.products?.map((product) => (
               <div
                 key={product.id}
-                className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition"
+                className="bg-v42-paddy border border-v42-line rounded-lg shadow overflow-hidden hover:shadow-lg transition"
               >
                 <div className="relative">
                   {product.images?.[0] ? (
@@ -205,12 +247,10 @@ function MarketplacePage() {
                       className="w-full h-48 object-cover"
                     />
                   ) : (
-                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">No image</span>
-                    </div>
+                    <ProductImagePlaceholder product={product} />
                   )}
                   {product.gi_status && (
-                    <span className="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                    <span className="absolute top-2 right-2 bg-v42-forest text-v42-paddy text-xs px-2 py-1 rounded">
                       GI
                     </span>
                   )}
@@ -222,20 +262,20 @@ function MarketplacePage() {
                 </div>
 
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">
+                  <h3 className="font-semibold text-v42-ink mb-1 line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-gray-500 mb-2">
+                  <p className="text-sm text-v42-mut mb-2">
                     {product.category_name} • {product.state_name}
                   </p>
                   <div className="flex items-center mb-2">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-gray-600 ml-1">4.5</span>
+                    <span className="text-sm text-v42-mut ml-1">4.5</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-lg font-bold text-gray-800">₹{product.base_price}</span>
-                      <span className="text-sm text-gray-500">/{product.unit_symbol}</span>
+                      <span className="text-lg font-bold text-v42-ink">₹{product.base_price}</span>
+                      <span className="text-sm text-v42-mut">/{product.unit_symbol}</span>
                     </div>
                     <button
                       onClick={async () => {
@@ -251,7 +291,7 @@ function MarketplacePage() {
                           setAddingMap((m) => ({ ...m, [product.id]: false }))
                         }
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-60"
+                      className="flex items-center gap-2 px-3 py-2 bg-v42-forest text-v42-paddy rounded-lg hover:bg-v42-forestd transition disabled:opacity-60"
                       disabled={!!addingMap[product.id]}
                     >
                       {addingMap[product.id] ? 'Adding...' : <ShoppingCart className="w-5 h-5" />}
@@ -270,7 +310,7 @@ function MarketplacePage() {
                   setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))
                 }
                 disabled={pagination.page === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50"
+                className="px-4 py-2 border border-v42-line rounded-lg disabled:opacity-50 hover:bg-v42-paddy2"
               >
                 Previous
               </button>
@@ -285,7 +325,7 @@ function MarketplacePage() {
                   }))
                 }
                 disabled={pagination.page === data.pagination.totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-50"
+                className="px-4 py-2 border border-v42-line rounded-lg disabled:opacity-50 hover:bg-v42-paddy2"
               >
                 Next
               </button>

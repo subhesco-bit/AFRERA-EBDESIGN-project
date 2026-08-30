@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS platform_configurations (
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  created_by INTEGER REFERENCES users(id),
-  updated_by INTEGER REFERENCES users(id)
+  created_by UUID REFERENCES users(id),
+  updated_by UUID REFERENCES users(id)
 );
 
 CREATE INDEX idx_platform_configurations_category ON platform_configurations(category);
@@ -81,7 +81,7 @@ CREATE INDEX idx_environments_type ON environments(type);
 -- System Administrators Table
 CREATE TABLE IF NOT EXISTS system_administrators (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  user_id UUID REFERENCES users(id),
   permissions JSONB DEFAULT '[]',
   access_level VARCHAR(50) DEFAULT 'full',
   last_login_at TIMESTAMP,
@@ -223,7 +223,7 @@ CREATE INDEX idx_sso_organization ON sso_configurations(organization_id);
 -- Consent Management Table
 CREATE TABLE IF NOT EXISTS consents (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  user_id UUID NOT NULL REFERENCES users(id),
   consent_type VARCHAR(100) NOT NULL,
   consent_version VARCHAR(50) NOT NULL,
   consent_text TEXT,
@@ -243,7 +243,7 @@ CREATE INDEX idx_consents_granted ON consents(is_granted);
 -- Session Management Table
 CREATE TABLE IF NOT EXISTS user_sessions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id),
+  user_id UUID NOT NULL REFERENCES users(id),
   session_token VARCHAR(255) NOT NULL UNIQUE,
   refresh_token VARCHAR(255) UNIQUE,
   device_info JSONB,

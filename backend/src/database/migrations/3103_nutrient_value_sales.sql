@@ -62,7 +62,7 @@ ON CONFLICT DO NOTHING;
 CREATE TABLE IF NOT EXISTS nutrient_content_verification (
     id VARCHAR(50) PRIMARY KEY,
     product_id VARCHAR(50) REFERENCES product_listings(id),
-    farmer_id VARCHAR(50) REFERENCES users(id),
+    farmer_id UUID REFERENCES users(id),
     nutrient_content JSONB NOT NULL,
     testing_method VARCHAR(100),
     sample_batch_number VARCHAR(100),
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS nutrient_content_verification (
     location TEXT,
     farming_practices JSONB DEFAULT '{}',
     verification_status VARCHAR(20) DEFAULT 'pending',
-    approved_by VARCHAR(50) REFERENCES users(id),
+    approved_by UUID REFERENCES users(id),
     approval_notes TEXT,
     approved_at TIMESTAMP,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -122,7 +122,7 @@ CREATE INDEX IF NOT EXISTS idx_nutrient_certificates_status ON nutrient_certific
 
 CREATE TABLE IF NOT EXISTS nutrient_based_commissions (
     id VARCHAR(50) PRIMARY KEY,
-    order_id VARCHAR(50) REFERENCES orders(id),
+    order_id UUID REFERENCES orders(id),
     commission_breakdown JSONB NOT NULL,
     total_commission DECIMAL(15, 2) NOT NULL,
     total_value DECIMAL(15, 2) NOT NULL,

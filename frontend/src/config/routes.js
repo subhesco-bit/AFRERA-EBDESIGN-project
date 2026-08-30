@@ -188,7 +188,7 @@ const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'))
 /**
  * Public routes - no authentication required
  */
-export const publicRoutes = undefined[
+export const publicRoutes = [
   {
     path: '/',
     component: HomePage,

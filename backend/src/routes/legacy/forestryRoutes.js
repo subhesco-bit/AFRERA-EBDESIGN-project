@@ -6,7 +6,9 @@
 const express = require('express');
 const router = express.Router();
 const forestryService = require('../../services/legacy/forestryService');
-const { authenticate } = require('../../middleware/authMiddleware');
+// (2026-08-29) Was importing from '../../middleware/authMiddleware', which
+// does not exist - fixed to the real middleware module. See apicultureRoutes.js.
+const { authMiddleware: authenticate } = require('../../middleware/auth');
 
 // GET /api/v1/forestry - Get all forestry
 router.get('/', authenticate, async (req, res) => {

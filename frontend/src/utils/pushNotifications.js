@@ -68,7 +68,7 @@ class PushNotificationManager {
 
     try {
       // Convert VAPID key to Uint8Array
-      const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || 'your-vapid-public-key';
+      const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || 'your-vapid-public-key';
       const convertedVapidKey = this.urlBase64ToUint8Array(vapidPublicKey);
 
       // Subscribe to push

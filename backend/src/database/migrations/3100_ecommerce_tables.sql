@@ -6,7 +6,7 @@
 -- Product Listings Table
 CREATE TABLE IF NOT EXISTS product_listings (
     id VARCHAR(50) PRIMARY KEY,
-    seller_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    seller_id UUID NOT NULL REFERENCES users(id),
     product_name VARCHAR(255) NOT NULL,
     category_id INTEGER REFERENCES categories(id),
     description TEXT,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS product_listings (
     quality_score DECIMAL(3, 2) DEFAULT 0.50,
     demand_prediction VARCHAR(20),
     harvest_date DATE,
-    location_id INTEGER REFERENCES addresses(id),
+    location_id UUID REFERENCES addresses(id),
     state_id INTEGER REFERENCES states(id),
     certifications JSONB DEFAULT '[]',
     images JSONB DEFAULT '[]',
@@ -120,7 +120,7 @@ CREATE INDEX IF NOT EXISTS idx_product_reviews_created ON product_reviews(create
 CREATE TABLE IF NOT EXISTS review_helpful_votes (
     id VARCHAR(50) PRIMARY KEY,
     review_id VARCHAR(50) NOT NULL REFERENCES product_reviews(id) ON DELETE CASCADE,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT uk_review_user UNIQUE (review_id, user_id)
@@ -173,7 +173,7 @@ CREATE INDEX IF NOT EXISTS idx_bulk_orders_created ON bulk_orders(created_at DES
 CREATE TABLE IF NOT EXISTS quotations (
     id VARCHAR(50) PRIMARY KEY,
     bulk_order_id VARCHAR(50) NOT NULL REFERENCES bulk_orders(id),
-    seller_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    seller_id UUID NOT NULL REFERENCES users(id),
     quoted_price DECIMAL(15, 2) NOT NULL,
     available_quantity DECIMAL(15, 2) NOT NULL,
     unit VARCHAR(20) NOT NULL,
@@ -197,7 +197,7 @@ CREATE INDEX IF NOT EXISTS idx_quotations_status ON quotations(status);
 
 -- Seller Analytics Summary Table (materialized view refresh strategy)
 CREATE TABLE IF NOT EXISTS seller_analytics_summary (
-    seller_id VARCHAR(50) PRIMARY KEY REFERENCES users(id),
+    seller_id UUID PRIMARY KEY REFERENCES users(id),
     total_listings INTEGER DEFAULT 0,
     active_listings INTEGER DEFAULT 0,
     sold_listings INTEGER DEFAULT 0,
@@ -239,8 +239,8 @@ CREATE TABLE IF NOT EXISTS marketplace_events (
     event_type VARCHAR(50) NOT NULL,
     entity_id VARCHAR(50) NOT NULL,
     entity_type VARCHAR(50) NOT NULL,
-    seller_id VARCHAR(50) REFERENCES users(id),
-    buyer_id VARCHAR(50) REFERENCES users(id),
+    seller_id UUID REFERENCES users(id),
+    buyer_id UUID REFERENCES users(id),
     event_data JSONB DEFAULT '{}',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

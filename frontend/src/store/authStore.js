@@ -11,7 +11,7 @@ export const useAuthStore = create(
       initializeAuth: () => {
         const token = localStorage.getItem('access_token')
         const userStr = localStorage.getItem('user')
-        
+
         if (token && userStr) {
           try {
             const user = JSON.parse(userStr)
@@ -22,6 +22,15 @@ export const useAuthStore = create(
           }
         }
       },
+
+      // Alias for initializeAuth. App.jsx and RouteGuard.jsx both call
+      // checkAuth() on mount, but this store never defined it - only
+      // initializeAuth existed, so every page load threw
+      // "checkAuth is not a function" inside App's own useEffect (which
+      // sits above ErrorBoundary in the tree, so nothing caught it) and
+      // React unmounted the whole root, producing a blank white page on
+      // every load. Root cause of the 2026-08-29 blank-screen incident.
+      checkAuth: () => get().initializeAuth(),
       
       setAuth: (user, accessToken, refreshToken) => {
         localStorage.setItem('access_token', accessToken)

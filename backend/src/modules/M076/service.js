@@ -1,6 +1,20 @@
 ﻿/**
  * Water Budgeting Service (M076)
  * Comprehensive water resource management, budgeting, and allocation
+ *
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * createWaterBudget/getBudgetLimits/getActualWaterUsage/getHistoricalWaterUsage/
+ * getCropPatterns/getGroundwaterLevels/calculateVariance are real: they read and
+ * write real tables. Everything else in this file - weather forecast, efficiency
+ * metrics, demand forecast, supply constraints, priority matrix, environmental
+ * requirements, usage analysis, water forecast, risk assessment - is a static
+ * placeholder returning the same fixed numbers for every location/budget,
+ * pending real integration (a weather API, metering telemetry, a groundwater
+ * survey feed). Reachable live from `frontend/src/pages/WaterManagementPage.jsx`,
+ * so a user calling trackWaterUsage/optimizeWaterAllocation/generateBudgetReport
+ * today sees these placeholders as if computed. Not fixed in this pass because
+ * the real fix is wiring actual data sources, not inventing better-looking
+ * fake numbers - tracked in .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');

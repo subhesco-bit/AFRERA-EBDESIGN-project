@@ -208,9 +208,15 @@ router.post('/herd/:sowId/breeding', async (req, res, next) => {
 
 /**
  * PUT /api/v1/pig/breeding/:id
+ * PUT /api/v1/pig/breeding/:id/farrowing-outcome
  * Update farrowing outcome for a breeding record.
+ *
+ * F3 fix (2026-08-30): frontend (frontend/src/services/api.js:610,
+ * updateFarrowingOutcome) calls the `/farrowing-outcome` suffixed path;
+ * both paths now delegate to the same handler - no behavior change for the
+ * bare path's existing callers.
  */
-router.put('/breeding/:id', async (req, res, next) => {
+router.put(['/breeding/:id', '/breeding/:id/farrowing-outcome'], async (req, res, next) => {
   try {
     const record = await updateFarrowingOutcome(req.params.id, req.body);
     if (!record) {
@@ -262,6 +268,41 @@ router.get('/herd/:animalId/performance', async (req, res, next) => {
     res.json({ success: true, data: performance });
   } catch (error) {
     logger.error('pigRoutes:getHerdPerformance', { error: error.message });
+    next(error);
+  }
+});
+
+/**
+ * GET /api/v1/pig/herd/:animalId/fcr
+ * Get feed-conversion-ratio for an animal.
+ *
+ * F4 fix (2026-08-30): frontend (frontend/src/services/api.js:617,
+ * getFeedConversionRatio) calls this dedicated path; no route previously
+ * existed. Reuses getHerdPerformance() (real FCR calc, feed consumed /
+ * weight gained over the trailing 30 days from pig_feed_consumption /
+ * pig_weight_records - see that function, ~line 393) rather than
+ * duplicating the query, and returns just the FCR-relevant subset.
+ */
+router.get('/herd/:animalId/fcr', async (req, res, next) => {
+  try {
+    const performance = await getHerdPerformance(req.params.animalId);
+    res.json({
+      success: true,
+      data: {
+        animalId: performance.animalId,
+        tagId: performance.tagId,
+        period: performance.period,
+        feedConversionRatio: performance.metrics.feedConversionRatio,
+        fcrStatus: performance.metrics.fcrStatus,
+        targetFCR: performance.metrics.targetFCR,
+        dailyFeedAvgKg: performance.metrics.dailyFeedAvgKg,
+        avgWeightKg: performance.metrics.avgWeightKg,
+        dataQuality: performance.dataQuality,
+        assumptions: performance.assumptions,
+      },
+    });
+  } catch (error) {
+    logger.error('pigRoutes:getFeedConversionRatio', { error: error.message });
     next(error);
   }
 });
