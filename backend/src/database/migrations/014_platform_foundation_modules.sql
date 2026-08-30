@@ -157,8 +157,13 @@ CREATE TABLE IF NOT EXISTS roles (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_roles_system ON roles(is_system_role);
-CREATE INDEX idx_roles_level ON roles(level);
+-- 2026-08-30: removed unconditional CREATE INDEX on is_system_role/level -
+-- this file's own CREATE TABLE roles above is a no-op (000_base_schema.sql's
+-- narrower roles table already exists and runs first), so these columns
+-- don't exist on the real table and the index creation fails outright
+-- ("column is_system_role does not exist"). The equivalent indexes are
+-- already created safely, with IF NOT EXISTS, after the columns actually
+-- exist, by 9999_zzzzzzzzzzzzzzzzzzz_roles_collision_repair.sql.
 
 -- Permissions Table
 CREATE TABLE IF NOT EXISTS permissions (
@@ -191,7 +196,11 @@ CREATE TABLE IF NOT EXISTS user_roles (
 
 CREATE INDEX idx_user_roles_user ON user_roles(user_id);
 CREATE INDEX idx_user_roles_role ON user_roles(role_id);
-CREATE INDEX idx_user_roles_active ON user_roles(is_active);
+-- 2026-08-30: removed idx_user_roles_active - this file's own CREATE TABLE
+-- user_roles above is a no-op (000_base_schema.sql's user_roles already
+-- exists and runs first, with no is_active column), so this unconditional
+-- index creation fails with "column is_active does not exist" against a
+-- real database. See schema-decisions.json ("user_roles", kind: deferred).
 
 -- Role Permissions Table
 CREATE TABLE IF NOT EXISTS role_permissions (
@@ -278,7 +287,11 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX idx_audit_user ON audit_logs(user_id);
 CREATE INDEX idx_audit_action ON audit_logs(action);
 CREATE INDEX idx_audit_entity ON audit_logs(entity_type, entity_id);
-CREATE INDEX idx_audit_created ON audit_logs(created_at);
+-- 2026-08-30: removed idx_audit_created ON audit_logs(created_at) - this
+-- file's own CREATE TABLE audit_logs above is a no-op (000_base_schema.sql's
+-- audit_logs already exists and runs first; its equivalent column is named
+-- `timestamp`, not `created_at`), so this unconditional index creation fails
+-- with "column created_at does not exist" against a real database.
 
 -- Create trigger functions
 CREATE OR REPLACE FUNCTION update_updated_at_column()
