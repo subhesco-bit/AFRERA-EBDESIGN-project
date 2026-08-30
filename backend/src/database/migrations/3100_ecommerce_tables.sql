@@ -119,7 +119,12 @@ CREATE INDEX IF NOT EXISTS idx_product_reviews_created ON product_reviews(create
 -- Review Helpful Votes Table
 CREATE TABLE IF NOT EXISTS review_helpful_votes (
     id VARCHAR(50) PRIMARY KEY,
-    review_id VARCHAR(50) NOT NULL REFERENCES product_reviews(id) ON DELETE CASCADE,
+    -- 2026-08-30: dropped "REFERENCES product_reviews(id)" - this file's own
+    -- product_reviews (line 93) is a deferred collision loser (see
+    -- schema-decisions.json), the real table is 009_marketplace_enhancements.sql's,
+    -- whose id is SERIAL not VARCHAR(50) - "foreign key constraint cannot be
+    -- implemented" against a real database. Column kept, FK dropped.
+    review_id VARCHAR(50) NOT NULL,
     user_id UUID NOT NULL REFERENCES users(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
@@ -172,7 +177,11 @@ CREATE INDEX IF NOT EXISTS idx_bulk_orders_created ON bulk_orders(created_at DES
 -- Quotations Table
 CREATE TABLE IF NOT EXISTS quotations (
     id VARCHAR(50) PRIMARY KEY,
-    bulk_order_id VARCHAR(50) NOT NULL REFERENCES bulk_orders(id),
+    -- 2026-08-30: dropped "REFERENCES bulk_orders(id)" - this file's own
+    -- bulk_orders (line 145) is a deferred collision loser (see
+    -- schema-decisions.json), the real table is 009_marketplace_enhancements.sql's,
+    -- whose id is SERIAL not VARCHAR(50). Column kept, FK dropped.
+    bulk_order_id VARCHAR(50) NOT NULL,
     seller_id UUID NOT NULL REFERENCES users(id),
     quoted_price DECIMAL(15, 2) NOT NULL,
     available_quantity DECIMAL(15, 2) NOT NULL,
