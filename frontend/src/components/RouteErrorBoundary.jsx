@@ -13,7 +13,7 @@
 import { Component } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { logError } from '../utils/errorMonitoring'
-import { Button } from './ui/Button'
+import { Button } from './ui/button'
 import { LoadingSpinner } from './ui/Skeleton'
 
 /**
