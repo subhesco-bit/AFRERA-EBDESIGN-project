@@ -1,6 +1,6 @@
 # Nervous System Audit
 
-**Generated:** 2026-08-28 by `tools/module-audit.js`
+**Generated:** 2026-08-30 by `tools/module-audit.js`
 **Status:** DESCRIPTIVE — read from source, comments stripped before analysis.
 **Do not edit by hand.**
 
@@ -15,9 +15,9 @@ breach in such a module reaches no one.
 |---|---|
 | Afferent (sensory — emit signals) | **19** |
 | Efferent (motor — subscribe) | **1** |
-| Denervated (routes, no bus) | **174** |
+| Denervated (routes, no bus) | **177** |
 | **Broken emits (signalBus.emit instead of emitSignal)** | **0** |
-| Total modules | 327 |
+| Total modules | 329 |
 
 **Innervation: 6%**
 
@@ -25,8 +25,8 @@ breach in such a module reaches no one.
 
 - **foodSafetyService** — 1 emit(s)
 - **goatRoutes** — 4 emit(s)
-- **shelfLifeService** — 2 emit(s)
 - **animalHealthRoutes** — 4 emit(s)
+- **shelfLifeService** — 2 emit(s)
 - **enterpriseControlService** — 2 emit(s)
 - **dairyRoutes** — 1 emit(s)
 - **iotIntegrationService** — 2 emit(s)
@@ -58,15 +58,15 @@ breach in such a module reaches no one.
 - informationSharingRoutes (22 routes)
 - knowledgeRoutes (22 routes)
 - nervousSystemRoutes (22 routes)
-- sheepRoutes (22 routes)
 - logisticsEnhancements (21 routes)
 - pigRoutes (21 routes)
+- sheepRoutes (21 routes)
 - farmerPortalEnhancements (20 routes)
 - indigenousKnowledgeService (19 routes)
 - institutionalProcurementService (19 routes)
+- insuranceEnhancements (19 routes)
 - poultryRoutes (19 routes)
 - sapModuleArchitectureRoutes (19 routes)
-- insuranceEnhancements (18 routes)
 - biodiversityService (17 routes)
 - recipeIntelligenceService (17 routes)
 - gstRoutes (16 routes)
@@ -76,6 +76,7 @@ breach in such a module reaches no one.
 - completeAIIntegrationRoutes (15 routes)
 - completeERPIntegrationRoutes (15 routes)
 - costControlRoutes (15 routes)
+- platformCoreRoutes (15 routes)
 - aiBrainRoutes (14 routes)
 - experienceRoutes (14 routes)
 - projectSystemsRoutes (14 routes)
@@ -121,6 +122,7 @@ breach in such a module reaches no one.
 - decisionSupportRoutes (9 routes)
 - farmerTrainingRoutes (9 routes)
 - nutrientValueSalesRoutes (9 routes)
+- productReviewRoutes (9 routes)
 - rfqRoutes (9 routes)
 - roleManagementRoutes (9 routes)
 - catalogIntelligenceService (8 routes)
@@ -131,10 +133,12 @@ breach in such a module reaches no one.
 - auditRoutes (8 routes)
 - coldStorageRoutes (8 routes)
 - complianceRoutes (8 routes)
+- cropPlanningRoutes (8 routes)
 - ecommerceAIRoutes (8 routes)
 - ecommerceBusinessSalesRoutes (8 routes)
 - farmerHealthRoutes (8 routes)
 - hrRoutes (8 routes)
+- landRecordsRoutes (8 routes)
 - aiAdvisoryService (7 routes)
 - erpService (7 routes)
 - knowledgeGraphService (7 routes)
@@ -197,7 +201,6 @@ breach in such a module reaches no one.
 - vermicompostRoutes (5 routes)
 - livestockManagementRoutes (5 routes)
 - operationsManagementRoutes (5 routes)
-- platformCoreRoutes (5 routes)
 - preventiveMaintenanceRoutes (5 routes)
 - realtimeMonitoringRoutes (5 routes)
 - regionalVarietyRoutes (5 routes)
@@ -209,11 +212,11 @@ breach in such a module reaches no one.
 - companyRoutes (4 routes)
 - cropValueResearchRoutes (4 routes)
 - defenseFitnessPrepRoutes (4 routes)
-- devinRoutes (4 routes)
 - productMediaAIRoutes (4 routes)
 - returnLoadBoardRoutes (4 routes)
 - visionRoutes (4 routes)
 - demandRoutes (3 routes)
+- analyticsReportRoutes (2 routes)
 - costRoutes (2 routes)
 - foluBenchmarkRoutes (2 routes)
 - glutWarningRoutes (2 routes)

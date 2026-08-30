@@ -19,17 +19,17 @@ const ACTIONS = [
   },
   {
     label: 'Seed vault — rare and traditional varieties',
-    to: '/seedvault',
+    to: '/seed-vault',
     note: 'Requires signing in to this section',
   },
   {
     label: 'What to grow next season',
-    to: '/whatgrow',
+    to: '/what-grow',
     note: 'Requires signing in to this section',
   },
   {
     label: 'Farm advisor — inputs, tools and compost advice',
-    to: '/farmadvisor',
+    to: '/farm-advisor',
     note: 'Requires signing in to this section',
   },
 ]
@@ -43,7 +43,7 @@ function FarmerFieldDoorPage() {
         </Link>
 
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-v42-forest/10 text-v42-forest flex items-center justify-center flex-shrink-0">
             <Sprout className="w-7 h-7" />
           </div>
           <div>
@@ -65,12 +65,12 @@ function FarmerFieldDoorPage() {
               <li key={action.to}>
                 <Link
                   to={action.to}
-                  className="flex items-center justify-between p-3 rounded-lg border border-v42-line hover:border-emerald-400 hover:bg-emerald-50 transition group"
+                  className="flex items-center justify-between p-3 rounded-lg border border-v42-line hover:border-v42-forest hover:bg-v42-paddy2 transition group"
                 >
                   <span className="text-v42-ink">{action.label}</span>
                   <span className="flex items-center gap-2 text-xs text-v42-mut flex-shrink-0 ml-3">
                     {action.note}
-                    <ArrowRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
+                    <ArrowRight className="w-4 h-4 text-v42-forest group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </Link>
               </li>
@@ -81,14 +81,14 @@ function FarmerFieldDoorPage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             to="/climate"
-            className="flex-1 px-6 py-3 bg-v42-paddy border-2 border-emerald-600 text-emerald-700 rounded-lg font-semibold hover:bg-emerald-50 transition text-center"
+            className="flex-1 px-6 py-3 bg-v42-paddy border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-paddy2 transition text-center"
           >
             Open without signing in
           </Link>
           <Link
             to="/login"
-            state={{ from: '/seedvault' }}
-            className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition inline-flex items-center justify-center gap-2"
+            state={{ from: '/seed-vault' }}
+            className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition inline-flex items-center justify-center gap-2"
           >
             <LogIn className="w-5 h-5" /> Sign in to this section
           </Link>

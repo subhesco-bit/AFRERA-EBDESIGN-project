@@ -1,30 +1,6 @@
 {
-  "generated": "2026-08-17",
+  "generated": "2026-08-30",
   "objects": [
-    {
-      "objectId": "SVC-ADVANCEDAISERVICE",
-      "type": "Service",
-      "name": "advancedAIService",
-      "evidence": "backend/src/services/advancedAIService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-ADVANCEDFEATURESSERVICE",
-      "type": "Service",
-      "name": "advancedFeaturesService",
-      "evidence": "backend/src/services/advancedFeaturesService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ADVANCEDSERVICEGENERATOR",
-      "type": "Service",
-      "name": "advancedServiceGenerator",
-      "evidence": "backend/src/services/advancedServiceGenerator.js",
-      "completion": 50,
-      "status": "No route"
-    },
     {
       "objectId": "SVC-ADVANCEDVOICEAI",
       "type": "Service",
@@ -32,30 +8,6 @@
       "evidence": "backend/src/services/advancedVoiceAI.js",
       "completion": 100,
       "status": "Wired"
-    },
-    {
-      "objectId": "SVC-AGRICULTURALINTELLIGENCESERVICE",
-      "type": "Service",
-      "name": "agriculturalIntelligenceService",
-      "evidence": "backend/src/services/agriculturalIntelligenceService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-AIADVISORYSERVICE",
-      "type": "Service",
-      "name": "aiAdvisoryService",
-      "evidence": "backend/src/services/aiAdvisoryService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-AIAGENTICCOMPANIONSERVICE",
-      "type": "Service",
-      "name": "aiAgenticCompanionService",
-      "evidence": "backend/src/services/aiAgenticCompanionService.js",
-      "completion": 50,
-      "status": "No route"
     },
     {
       "objectId": "SVC-AIAGENTSERVICE",
@@ -66,114 +18,34 @@
       "status": "No route"
     },
     {
-      "objectId": "SVC-AIBACKBONESERVICE",
+      "objectId": "SVC-AICOLLABORATIONSERVICE",
       "type": "Service",
-      "name": "aiBackboneService",
-      "evidence": "backend/src/services/aiBackboneService.js",
+      "name": "aiCollaborationService",
+      "evidence": "backend/src/services/aiCollaborationService.js",
       "completion": 50,
       "status": "No route"
     },
     {
-      "objectId": "SVC-AIBRAINSERVICE",
+      "objectId": "SVC-AICOLLABORATIONSERVICE",
       "type": "Service",
-      "name": "aiBrainService",
-      "evidence": "backend/src/services/aiBrainService.js",
+      "name": "aiCollaborationService",
+      "evidence": "backend/src/services/claude/aiCollaborationService.js",
       "completion": 50,
       "status": "No route"
     },
     {
-      "objectId": "SVC-AICOPILOTSERVICE",
+      "objectId": "SVC-ENHANCEDLIBRARYKNOWLEDGESERVICE",
       "type": "Service",
-      "name": "aiCopilotService",
-      "evidence": "backend/src/services/aiCopilotService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-AIGATEWAYSERVICE",
-      "type": "Service",
-      "name": "aiGatewayService",
-      "evidence": "backend/src/services/aiGatewayService.js",
+      "name": "enhancedLibraryKnowledgeService",
+      "evidence": "backend/src/services/claude/enhancedLibraryKnowledgeService.js",
       "completion": 50,
       "status": "No route"
     },
     {
-      "objectId": "SVC-AIOPERATIONINTELLIGENCESERVICE",
+      "objectId": "SVC-UNIFIEDCONFIGSERVICE",
       "type": "Service",
-      "name": "aiOperationIntelligenceService",
-      "evidence": "backend/src/services/aiOperationIntelligenceService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-AIORCHESTRATIONSERVICE",
-      "type": "Service",
-      "name": "aiOrchestrationService",
-      "evidence": "backend/src/services/aiOrchestrationService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-AISELFHEALINGSERVICE",
-      "type": "Service",
-      "name": "aiSelfHealingService",
-      "evidence": "backend/src/services/aiSelfHealingService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-AISERVICE",
-      "type": "Service",
-      "name": "aiService",
-      "evidence": "backend/src/services/aiService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-ANALYTICSMONITORINGSERVICE",
-      "type": "Service",
-      "name": "analyticsMonitoringService",
-      "evidence": "backend/src/services/analyticsMonitoringService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ANALYTICSSERVICE",
-      "type": "Service",
-      "name": "analyticsService",
-      "evidence": "backend/src/services/analyticsService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ANIMALHEALTHSERVICE",
-      "type": "Service",
-      "name": "animalHealthService",
-      "evidence": "backend/src/services/animalHealthService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ARVRSERVICE",
-      "type": "Service",
-      "name": "arVrService",
-      "evidence": "backend/src/services/arVrService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-ASSETACCOUNTINGSERVICE",
-      "type": "Service",
-      "name": "assetAccountingService",
-      "evidence": "backend/src/services/assetAccountingService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-AUDITSERVICE",
-      "type": "Service",
-      "name": "auditService",
-      "evidence": "backend/src/services/auditService.js",
+      "name": "unifiedConfigService",
+      "evidence": "backend/src/services/claude/unifiedConfigService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -181,311 +53,31 @@
       "objectId": "SVC-AUTHSERVICE",
       "type": "Service",
       "name": "authService",
-      "evidence": "backend/src/services/authService.js",
+      "evidence": "backend/src/services/dual-use/authService.js",
       "completion": 100,
       "status": "Wired"
     },
     {
-      "objectId": "SVC-BACKUPSERVICE",
+      "objectId": "SVC-GDPRSERVICE",
       "type": "Service",
-      "name": "backupService",
-      "evidence": "backend/src/services/backupService.js",
+      "name": "gdprService",
+      "evidence": "backend/src/services/dual-use/gdprService.js",
       "completion": 50,
       "status": "No route"
     },
     {
-      "objectId": "SVC-BIODIVERSITYSERVICE",
+      "objectId": "SVC-MFASERVICE",
       "type": "Service",
-      "name": "biodiversityService",
-      "evidence": "backend/src/services/biodiversityService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-BLOCKCHAINTRACEABILITYSERVICE",
-      "type": "Service",
-      "name": "blockchainTraceabilityService",
-      "evidence": "backend/src/services/blockchainTraceabilityService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-BULKORDERSERVICE",
-      "type": "Service",
-      "name": "bulkOrderService",
-      "evidence": "backend/src/services/bulkOrderService.js",
+      "name": "mfaService",
+      "evidence": "backend/src/services/dual-use/mfaService.js",
       "completion": 50,
       "status": "No route"
     },
     {
-      "objectId": "SVC-BUYINGCLUBSERVICE",
+      "objectId": "SVC-PLATFORMCORESERVICE",
       "type": "Service",
-      "name": "buyingClubService",
-      "evidence": "backend/src/services/buyingClubService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-CATALOGINTELLIGENCESERVICE",
-      "type": "Service",
-      "name": "catalogIntelligenceService",
-      "evidence": "backend/src/services/catalogIntelligenceService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-CIVILDISRUPTIONSERVICE",
-      "type": "Service",
-      "name": "civilDisruptionService",
-      "evidence": "backend/src/services/civilDisruptionService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COLDSTORAGESERVICE",
-      "type": "Service",
-      "name": "coldStorageService",
-      "evidence": "backend/src/services/coldStorageService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COMMERCERULESSERVICE",
-      "type": "Service",
-      "name": "commerceRulesService",
-      "evidence": "backend/src/services/commerceRulesService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-COMMUNITYSERVICE",
-      "type": "Service",
-      "name": "communityService",
-      "evidence": "backend/src/services/communityService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COMPANYSERVICE",
-      "type": "Service",
-      "name": "companyService",
-      "evidence": "backend/src/services/companyService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COMPLETEAIINTEGRATIONSERVICE",
-      "type": "Service",
-      "name": "completeAIIntegrationService",
-      "evidence": "backend/src/services/completeAIIntegrationService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COMPLETEERPINTEGRATIONSERVICE",
-      "type": "Service",
-      "name": "completeERPIntegrationService",
-      "evidence": "backend/src/services/completeERPIntegrationService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COMPLIANCESERVICE",
-      "type": "Service",
-      "name": "complianceService",
-      "evidence": "backend/src/services/complianceService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COMPREHENSIVEERPSERVICE",
-      "type": "Service",
-      "name": "comprehensiveERPService",
-      "evidence": "backend/src/services/comprehensiveERPService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-CONSUMERHEALTHSERVICE",
-      "type": "Service",
-      "name": "consumerHealthService",
-      "evidence": "backend/src/services/consumerHealthService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-CONVERSATIONALAISERVICE",
-      "type": "Service",
-      "name": "conversationalAIService",
-      "evidence": "backend/src/services/conversationalAIService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-COOPERATIVESHARESERVICE",
-      "type": "Service",
-      "name": "cooperativeShareService",
-      "evidence": "backend/src/services/cooperativeShareService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COSTCONTROLSERVICE",
-      "type": "Service",
-      "name": "costControlService",
-      "evidence": "backend/src/services/costControlService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-COSTSERVICE",
-      "type": "Service",
-      "name": "costService",
-      "evidence": "backend/src/services/costService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-CROPPLANNINGSERVICE",
-      "type": "Service",
-      "name": "cropPlanningService",
-      "evidence": "backend/src/services/cropPlanningService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-CROPVALUERESEARCHSERVICE",
-      "type": "Service",
-      "name": "cropValueResearchService",
-      "evidence": "backend/src/services/cropValueResearchService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-CUSTODYEVENTROUTES",
-      "type": "Service",
-      "name": "custodyEventRoutes",
-      "evidence": "backend/src/services/custodyEventRoutes.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-CUSTODYEVENTSERVICE",
-      "type": "Service",
-      "name": "custodyEventService",
-      "evidence": "backend/src/services/custodyEventService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DAIRYSERVICE",
-      "type": "Service",
-      "name": "dairyService",
-      "evidence": "backend/src/services/dairyService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DECISIONSUPPORTSERVICE",
-      "type": "Service",
-      "name": "decisionSupportService",
-      "evidence": "backend/src/services/decisionSupportService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DEFENSEFITNESSPREPSERVICE",
-      "type": "Service",
-      "name": "defenseFitnessPrepService",
-      "evidence": "backend/src/services/defenseFitnessPrepService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DEMANDSERVICE",
-      "type": "Service",
-      "name": "demandService",
-      "evidence": "backend/src/services/demandService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DIGITALPRODUCTPASSPORTSERVICE",
-      "type": "Service",
-      "name": "digitalProductPassportService",
-      "evidence": "backend/src/services/digitalProductPassportService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-DIGITALTWINSERVICE",
-      "type": "Service",
-      "name": "digitalTwinService",
-      "evidence": "backend/src/services/digitalTwinService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DPRGENERATIONSERVICE",
-      "type": "Service",
-      "name": "dprGenerationService",
-      "evidence": "backend/src/services/dprGenerationService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-DYNAMICPRICINGSERVICE",
-      "type": "Service",
-      "name": "dynamicPricingService",
-      "evidence": "backend/src/services/dynamicPricingService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ECOMMERCEAISERVICE",
-      "type": "Service",
-      "name": "ecommerceAIService",
-      "evidence": "backend/src/services/ecommerceAIService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ECOMMERCEBUSINESSSALESSERVICE",
-      "type": "Service",
-      "name": "ecommerceBusinessSalesService",
-      "evidence": "backend/src/services/ecommerceBusinessSalesService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ECOMMERCEERPSERVICE",
-      "type": "Service",
-      "name": "ecommerceERPService",
-      "evidence": "backend/src/services/ecommerceERPService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ECOMMERCEINTEGRATIONSERVICE",
-      "type": "Service",
-      "name": "ecommerceIntegrationService",
-      "evidence": "backend/src/services/ecommerceIntegrationService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ECOMMERCEMARKETINGSERVICE",
-      "type": "Service",
-      "name": "ecommerceMarketingService",
-      "evidence": "backend/src/services/ecommerceMarketingService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ECOMMERCESERVICE",
-      "type": "Service",
-      "name": "ecommerceService",
-      "evidence": "backend/src/services/ecommerceService.js",
+      "name": "platformCoreService",
+      "evidence": "backend/src/services/dual-use/platformCoreService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -498,102 +90,6 @@
       "status": "No route"
     },
     {
-      "objectId": "SVC-ENTERPRISECONTROLSERVICE",
-      "type": "Service",
-      "name": "enterpriseControlService",
-      "evidence": "backend/src/services/enterpriseControlService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-ENTERPRISEMEMORYSERVICE",
-      "type": "Service",
-      "name": "enterpriseMemoryService",
-      "evidence": "backend/src/services/enterpriseMemoryService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-EQUIPMENTEXCHANGESERVICE",
-      "type": "Service",
-      "name": "equipmentExchangeService",
-      "evidence": "backend/src/services/equipmentExchangeService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-ERPSERVICE",
-      "type": "Service",
-      "name": "erpService",
-      "evidence": "backend/src/services/erpService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-ESCROWSERVICE",
-      "type": "Service",
-      "name": "escrowService",
-      "evidence": "backend/src/services/escrowService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-EXPERIENCELAYERSERVICE",
-      "type": "Service",
-      "name": "experienceLayerService",
-      "evidence": "backend/src/services/experienceLayerService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-FARMERSERVICE",
-      "type": "Service",
-      "name": "farmerService",
-      "evidence": "backend/src/services/farmerService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-FARMERTRAININGSERVICE",
-      "type": "Service",
-      "name": "farmerTrainingService",
-      "evidence": "backend/src/services/farmerTrainingService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-FARMERVALUESERVICE",
-      "type": "Service",
-      "name": "farmerValueService",
-      "evidence": "backend/src/services/farmerValueService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-FERTILIZERINVENTORYSERVICE",
-      "type": "Service",
-      "name": "fertilizerInventoryService",
-      "evidence": "backend/src/services/fertilizerInventoryService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-FINANCIALSERVICE",
-      "type": "Service",
-      "name": "financialService",
-      "evidence": "backend/src/services/financialService.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
-      "objectId": "SVC-FOLUBENCHMARKSERVICE",
-      "type": "Service",
-      "name": "foluBenchmarkService",
-      "evidence": "backend/src/services/foluBenchmarkService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
       "objectId": "SVC-FOODINTELLIGENCEENGINE",
       "type": "Service",
       "name": "FoodIntelligenceEngine",
@@ -602,10 +98,618 @@
       "status": "No route"
     },
     {
+      "objectId": "SVC-ADVANCEDAISERVICE",
+      "type": "Service",
+      "name": "advancedAIService",
+      "evidence": "backend/src/services/legacy/advancedAIService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ADVANCEDFEATURESSERVICE",
+      "type": "Service",
+      "name": "advancedFeaturesService",
+      "evidence": "backend/src/services/legacy/advancedFeaturesService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AGRICULTURALINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "agriculturalIntelligenceService",
+      "evidence": "backend/src/services/legacy/agriculturalIntelligenceService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AIADVISORYSERVICE",
+      "type": "Service",
+      "name": "aiAdvisoryService",
+      "evidence": "backend/src/services/legacy/aiAdvisoryService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-AIAGENTICCOMPANIONSERVICE",
+      "type": "Service",
+      "name": "aiAgenticCompanionService",
+      "evidence": "backend/src/services/legacy/aiAgenticCompanionService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AIBACKBONESERVICE",
+      "type": "Service",
+      "name": "aiBackboneService",
+      "evidence": "backend/src/services/legacy/aiBackboneService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AIBRAINSERVICE",
+      "type": "Service",
+      "name": "aiBrainService",
+      "evidence": "backend/src/services/legacy/aiBrainService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AICOPILOTSERVICE",
+      "type": "Service",
+      "name": "aiCopilotService",
+      "evidence": "backend/src/services/legacy/aiCopilotService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-AIGATEWAYSERVICE",
+      "type": "Service",
+      "name": "aiGatewayService",
+      "evidence": "backend/src/services/legacy/aiGatewayService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AIOPERATIONINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "aiOperationIntelligenceService",
+      "evidence": "backend/src/services/legacy/aiOperationIntelligenceService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AIORCHESTRATIONSERVICE",
+      "type": "Service",
+      "name": "aiOrchestrationService",
+      "evidence": "backend/src/services/legacy/aiOrchestrationService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AISELFHEALINGSERVICE",
+      "type": "Service",
+      "name": "aiSelfHealingService",
+      "evidence": "backend/src/services/legacy/aiSelfHealingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AISERVICE",
+      "type": "Service",
+      "name": "aiService",
+      "evidence": "backend/src/services/legacy/aiService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ANALYTICSMONITORINGSERVICE",
+      "type": "Service",
+      "name": "analyticsMonitoringService",
+      "evidence": "backend/src/services/legacy/analyticsMonitoringService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ANALYTICSSERVICE",
+      "type": "Service",
+      "name": "analyticsService",
+      "evidence": "backend/src/services/legacy/analyticsService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ANIMALHEALTHSERVICE",
+      "type": "Service",
+      "name": "animalHealthService",
+      "evidence": "backend/src/services/legacy/animalHealthService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-APICULTURESERVICE",
+      "type": "Service",
+      "name": "apicultureService",
+      "evidence": "backend/src/services/legacy/apicultureService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ARVRSERVICE",
+      "type": "Service",
+      "name": "arVrService",
+      "evidence": "backend/src/services/legacy/arVrService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ASSETACCOUNTINGSERVICE",
+      "type": "Service",
+      "name": "assetAccountingService",
+      "evidence": "backend/src/services/legacy/assetAccountingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-AUDITSERVICE",
+      "type": "Service",
+      "name": "auditService",
+      "evidence": "backend/src/services/legacy/auditService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-BACKUPSERVICE",
+      "type": "Service",
+      "name": "backupService",
+      "evidence": "backend/src/services/legacy/backupService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-BIODIVERSITYSERVICE",
+      "type": "Service",
+      "name": "biodiversityService",
+      "evidence": "backend/src/services/legacy/biodiversityService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-BLOCKCHAINTRACEABILITYSERVICE",
+      "type": "Service",
+      "name": "blockchainTraceabilityService",
+      "evidence": "backend/src/services/legacy/blockchainTraceabilityService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-BULKORDERSERVICE",
+      "type": "Service",
+      "name": "bulkOrderService",
+      "evidence": "backend/src/services/legacy/bulkOrderService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-BUYINGCLUBSERVICE",
+      "type": "Service",
+      "name": "buyingClubService",
+      "evidence": "backend/src/services/legacy/buyingClubService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CATALOGINTELLIGENCESERVICE",
+      "type": "Service",
+      "name": "catalogIntelligenceService",
+      "evidence": "backend/src/services/legacy/catalogIntelligenceService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CIVILDISRUPTIONSERVICE",
+      "type": "Service",
+      "name": "civilDisruptionService",
+      "evidence": "backend/src/services/legacy/civilDisruptionService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CLIMATEMONITORINGSERVICE",
+      "type": "Service",
+      "name": "climateMonitoringService",
+      "evidence": "backend/src/services/legacy/climateMonitoringService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COLDSTORAGESERVICE",
+      "type": "Service",
+      "name": "coldStorageService",
+      "evidence": "backend/src/services/legacy/coldStorageService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COMMERCERULESSERVICE",
+      "type": "Service",
+      "name": "commerceRulesService",
+      "evidence": "backend/src/services/legacy/commerceRulesService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-COMMUNITYMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "communityManagementService",
+      "evidence": "backend/src/services/legacy/communityManagementService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COMPANYSERVICE",
+      "type": "Service",
+      "name": "companyService",
+      "evidence": "backend/src/services/legacy/companyService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COMPLETEAIINTEGRATIONSERVICE",
+      "type": "Service",
+      "name": "completeAIIntegrationService",
+      "evidence": "backend/src/services/legacy/completeAIIntegrationService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COMPLETEERPINTEGRATIONSERVICE",
+      "type": "Service",
+      "name": "completeERPIntegrationService",
+      "evidence": "backend/src/services/legacy/completeERPIntegrationService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COMPLIANCESERVICE",
+      "type": "Service",
+      "name": "complianceService",
+      "evidence": "backend/src/services/legacy/complianceService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COMPREHENSIVEERPSERVICE",
+      "type": "Service",
+      "name": "comprehensiveERPService",
+      "evidence": "backend/src/services/legacy/comprehensiveERPService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CONSUMERHEALTHSERVICE",
+      "type": "Service",
+      "name": "consumerHealthService",
+      "evidence": "backend/src/services/legacy/consumerHealthService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CONVERSATIONALAISERVICE",
+      "type": "Service",
+      "name": "conversationalAIService",
+      "evidence": "backend/src/services/legacy/conversationalAIService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-COOPERATIVESHARESERVICE",
+      "type": "Service",
+      "name": "cooperativeShareService",
+      "evidence": "backend/src/services/legacy/cooperativeShareService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COSTCONTROLSERVICE",
+      "type": "Service",
+      "name": "costControlService",
+      "evidence": "backend/src/services/legacy/costControlService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-COSTSERVICE",
+      "type": "Service",
+      "name": "costService",
+      "evidence": "backend/src/services/legacy/costService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CROPMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "cropManagementService",
+      "evidence": "backend/src/services/legacy/cropManagementService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CROPPLANNINGSERVICE",
+      "type": "Service",
+      "name": "cropPlanningService",
+      "evidence": "backend/src/services/legacy/cropPlanningService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CROPVALUERESEARCHSERVICE",
+      "type": "Service",
+      "name": "cropValueResearchService",
+      "evidence": "backend/src/services/legacy/cropValueResearchService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-CUSTODYEVENTROUTES",
+      "type": "Service",
+      "name": "custodyEventRoutes",
+      "evidence": "backend/src/services/legacy/custodyEventRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-CUSTODYEVENTSERVICE",
+      "type": "Service",
+      "name": "custodyEventService",
+      "evidence": "backend/src/services/legacy/custodyEventService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DAIRYSERVICE",
+      "type": "Service",
+      "name": "dairyService",
+      "evidence": "backend/src/services/legacy/dairyService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DECISIONSUPPORTSERVICE",
+      "type": "Service",
+      "name": "decisionSupportService",
+      "evidence": "backend/src/services/legacy/decisionSupportService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DEFENSEFITNESSPREPSERVICE",
+      "type": "Service",
+      "name": "defenseFitnessPrepService",
+      "evidence": "backend/src/services/legacy/defenseFitnessPrepService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DEMANDSERVICE",
+      "type": "Service",
+      "name": "demandService",
+      "evidence": "backend/src/services/legacy/demandService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DIGITALPRODUCTPASSPORTSERVICE",
+      "type": "Service",
+      "name": "digitalProductPassportService",
+      "evidence": "backend/src/services/legacy/digitalProductPassportService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-DIGITALTWINSERVICE",
+      "type": "Service",
+      "name": "digitalTwinService",
+      "evidence": "backend/src/services/legacy/digitalTwinService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DPRGENERATIONSERVICE",
+      "type": "Service",
+      "name": "dprGenerationService",
+      "evidence": "backend/src/services/legacy/dprGenerationService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-DYNAMICPRICINGSERVICE",
+      "type": "Service",
+      "name": "dynamicPricingService",
+      "evidence": "backend/src/services/legacy/dynamicPricingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ECOMMERCEAISERVICE",
+      "type": "Service",
+      "name": "ecommerceAIService",
+      "evidence": "backend/src/services/legacy/ecommerceAIService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ECOMMERCEBUSINESSSALESSERVICE",
+      "type": "Service",
+      "name": "ecommerceBusinessSalesService",
+      "evidence": "backend/src/services/legacy/ecommerceBusinessSalesService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ECOMMERCEERPSERVICE",
+      "type": "Service",
+      "name": "ecommerceERPService",
+      "evidence": "backend/src/services/legacy/ecommerceERPService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ECOMMERCEINTEGRATIONSERVICE",
+      "type": "Service",
+      "name": "ecommerceIntegrationService",
+      "evidence": "backend/src/services/legacy/ecommerceIntegrationService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ECOMMERCEMARKETINGSERVICE",
+      "type": "Service",
+      "name": "ecommerceMarketingService",
+      "evidence": "backend/src/services/legacy/ecommerceMarketingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ECOMMERCESERVICE",
+      "type": "Service",
+      "name": "ecommerceService",
+      "evidence": "backend/src/services/legacy/ecommerceService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ENGINEERINGPROJECTSERVICE",
+      "type": "Service",
+      "name": "engineeringProjectService",
+      "evidence": "backend/src/services/legacy/engineeringProjectService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ENTERPRISECONTROLSERVICE",
+      "type": "Service",
+      "name": "enterpriseControlService",
+      "evidence": "backend/src/services/legacy/enterpriseControlService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ENTERPRISEMEMORYSERVICE",
+      "type": "Service",
+      "name": "enterpriseMemoryService",
+      "evidence": "backend/src/services/legacy/enterpriseMemoryService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-EQUIPMENTEXCHANGESERVICE",
+      "type": "Service",
+      "name": "equipmentExchangeService",
+      "evidence": "backend/src/services/legacy/equipmentExchangeService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-ERPSERVICE",
+      "type": "Service",
+      "name": "erpService",
+      "evidence": "backend/src/services/legacy/erpService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-ESCROWSERVICE",
+      "type": "Service",
+      "name": "escrowService",
+      "evidence": "backend/src/services/legacy/escrowService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-EXPERIENCELAYERSERVICE",
+      "type": "Service",
+      "name": "experienceLayerService",
+      "evidence": "backend/src/services/legacy/experienceLayerService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FARMERFAMILYSERVICE",
+      "type": "Service",
+      "name": "farmerFamilyService",
+      "evidence": "backend/src/services/legacy/farmerFamilyService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FARMERSERVICE",
+      "type": "Service",
+      "name": "farmerService",
+      "evidence": "backend/src/services/legacy/farmerService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FARMERTRAININGSERVICE",
+      "type": "Service",
+      "name": "farmerTrainingService",
+      "evidence": "backend/src/services/legacy/farmerTrainingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FARMERVALUESERVICE",
+      "type": "Service",
+      "name": "farmerValueService",
+      "evidence": "backend/src/services/legacy/farmerValueService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FERTILIZERINVENTORYSERVICE",
+      "type": "Service",
+      "name": "fertilizerInventoryService",
+      "evidence": "backend/src/services/legacy/fertilizerInventoryService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FINANCIALSERVICE",
+      "type": "Service",
+      "name": "financialService",
+      "evidence": "backend/src/services/legacy/financialService.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FISHERIESMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "fisheriesManagementService",
+      "evidence": "backend/src/services/legacy/fisheriesManagementService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FISHERIESSERVICE",
+      "type": "Service",
+      "name": "fisheriesService",
+      "evidence": "backend/src/services/legacy/fisheriesService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-FOLUBENCHMARKSERVICE",
+      "type": "Service",
+      "name": "foluBenchmarkService",
+      "evidence": "backend/src/services/legacy/foluBenchmarkService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
       "objectId": "SVC-FOODINTELLIGENCESERVICE",
       "type": "Service",
       "name": "foodIntelligenceService",
-      "evidence": "backend/src/services/foodIntelligenceService.js",
+      "evidence": "backend/src/services/legacy/foodIntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -613,15 +717,23 @@
       "objectId": "SVC-FOODSAFETYSERVICE",
       "type": "Service",
       "name": "foodSafetyService",
-      "evidence": "backend/src/services/foodSafetyService.js",
+      "evidence": "backend/src/services/legacy/foodSafetyService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-FORESTRYSERVICE",
+      "type": "Service",
+      "name": "forestryService",
+      "evidence": "backend/src/services/legacy/forestryService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-FORMSERVICE",
       "type": "Service",
       "name": "formService",
-      "evidence": "backend/src/services/formService.js",
+      "evidence": "backend/src/services/legacy/formService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -629,7 +741,7 @@
       "objectId": "SVC-FREIGHTPOOLINGSERVICE",
       "type": "Service",
       "name": "freightPoolingService",
-      "evidence": "backend/src/services/freightPoolingService.js",
+      "evidence": "backend/src/services/legacy/freightPoolingService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -637,7 +749,7 @@
       "objectId": "SVC-GEOFENCINGSERVICE",
       "type": "Service",
       "name": "geofencingService",
-      "evidence": "backend/src/services/geofencingService.js",
+      "evidence": "backend/src/services/legacy/geofencingService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -645,7 +757,7 @@
       "objectId": "SVC-GIINTELLIGENCESERVICE",
       "type": "Service",
       "name": "giIntelligenceService",
-      "evidence": "backend/src/services/giIntelligenceService.js",
+      "evidence": "backend/src/services/legacy/giIntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -653,7 +765,7 @@
       "objectId": "SVC-GLUTWARNINGSERVICE",
       "type": "Service",
       "name": "glutWarningService",
-      "evidence": "backend/src/services/glutWarningService.js",
+      "evidence": "backend/src/services/legacy/glutWarningService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -661,7 +773,7 @@
       "objectId": "SVC-GOATSERVICE",
       "type": "Service",
       "name": "goatService",
-      "evidence": "backend/src/services/goatService.js",
+      "evidence": "backend/src/services/legacy/goatService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -669,7 +781,7 @@
       "objectId": "SVC-GOVERNANCESERVICE",
       "type": "Service",
       "name": "governanceService",
-      "evidence": "backend/src/services/governanceService.js",
+      "evidence": "backend/src/services/legacy/governanceService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -677,7 +789,7 @@
       "objectId": "SVC-GOVERNMENTSCHEMESERVICE",
       "type": "Service",
       "name": "governmentSchemeService",
-      "evidence": "backend/src/services/governmentSchemeService.js",
+      "evidence": "backend/src/services/legacy/governmentSchemeService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -685,7 +797,7 @@
       "objectId": "SVC-GREENHOUSESERVICE",
       "type": "Service",
       "name": "greenhouseService",
-      "evidence": "backend/src/services/greenhouseService.js",
+      "evidence": "backend/src/services/legacy/greenhouseService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -693,7 +805,15 @@
       "objectId": "SVC-GSTSERVICE",
       "type": "Service",
       "name": "gstService",
-      "evidence": "backend/src/services/gstService.js",
+      "evidence": "backend/src/services/legacy/gstService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-HORTICULTUREMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "horticultureManagementService",
+      "evidence": "backend/src/services/legacy/horticultureManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -701,7 +821,7 @@
       "objectId": "SVC-HOUSEHOLDECONOMYSERVICE",
       "type": "Service",
       "name": "householdEconomyService",
-      "evidence": "backend/src/services/householdEconomyService.js",
+      "evidence": "backend/src/services/legacy/householdEconomyService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -709,7 +829,15 @@
       "objectId": "SVC-HRSERVICE",
       "type": "Service",
       "name": "hrService",
-      "evidence": "backend/src/services/hrService.js",
+      "evidence": "backend/src/services/legacy/hrService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-IDENTITYMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "identityManagementService",
+      "evidence": "backend/src/services/legacy/identityManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -717,7 +845,7 @@
       "objectId": "SVC-INDIGENOUSKNOWLEDGESERVICE",
       "type": "Service",
       "name": "indigenousKnowledgeService",
-      "evidence": "backend/src/services/indigenousKnowledgeService.js",
+      "evidence": "backend/src/services/legacy/indigenousKnowledgeService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -725,7 +853,15 @@
       "objectId": "SVC-INFORMATIONSHARINGSERVICE",
       "type": "Service",
       "name": "informationSharingService",
-      "evidence": "backend/src/services/informationSharingService.js",
+      "evidence": "backend/src/services/legacy/informationSharingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-INPUTSUPPLYMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "inputSupplyManagementService",
+      "evidence": "backend/src/services/legacy/inputSupplyManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -733,7 +869,7 @@
       "objectId": "SVC-INSTITUTIONALPROCUREMENTSERVICE",
       "type": "Service",
       "name": "institutionalProcurementService",
-      "evidence": "backend/src/services/institutionalProcurementService.js",
+      "evidence": "backend/src/services/legacy/institutionalProcurementService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -741,7 +877,7 @@
       "objectId": "SVC-INSURANCECLAIMSSERVICE",
       "type": "Service",
       "name": "insuranceClaimsService",
-      "evidence": "backend/src/services/insuranceClaimsService.js",
+      "evidence": "backend/src/services/legacy/insuranceClaimsService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -749,7 +885,7 @@
       "objectId": "SVC-INSURANCEFRAUDDETECTIONSERVICE",
       "type": "Service",
       "name": "insuranceFraudDetectionService",
-      "evidence": "backend/src/services/insuranceFraudDetectionService.js",
+      "evidence": "backend/src/services/legacy/insuranceFraudDetectionService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -757,7 +893,7 @@
       "objectId": "SVC-INSURANCEPOLICYISSUANCESERVICE",
       "type": "Service",
       "name": "insurancePolicyIssuanceService",
-      "evidence": "backend/src/services/insurancePolicyIssuanceService.js",
+      "evidence": "backend/src/services/legacy/insurancePolicyIssuanceService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -765,7 +901,7 @@
       "objectId": "SVC-INSURANCEPREMIUMSERVICE",
       "type": "Service",
       "name": "insurancePremiumService",
-      "evidence": "backend/src/services/insurancePremiumService.js",
+      "evidence": "backend/src/services/legacy/insurancePremiumService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -773,7 +909,7 @@
       "objectId": "SVC-INSURANCESERVICE",
       "type": "Service",
       "name": "insuranceService",
-      "evidence": "backend/src/services/insuranceService.js",
+      "evidence": "backend/src/services/legacy/insuranceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -781,7 +917,7 @@
       "objectId": "SVC-IOTINTEGRATIONSERVICE",
       "type": "Service",
       "name": "iotIntegrationService",
-      "evidence": "backend/src/services/iotIntegrationService.js",
+      "evidence": "backend/src/services/legacy/iotIntegrationService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -789,7 +925,15 @@
       "objectId": "SVC-IOTSENSORSERVICE",
       "type": "Service",
       "name": "iotSensorService",
-      "evidence": "backend/src/services/iotSensorService.js",
+      "evidence": "backend/src/services/legacy/iotSensorService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-IRRIGATIONMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "irrigationManagementService",
+      "evidence": "backend/src/services/legacy/irrigationManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -797,7 +941,7 @@
       "objectId": "SVC-KNOWLEDGEGRAPHSERVICE",
       "type": "Service",
       "name": "knowledgeGraphService",
-      "evidence": "backend/src/services/knowledgeGraphService.js",
+      "evidence": "backend/src/services/legacy/knowledgeGraphService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -805,7 +949,7 @@
       "objectId": "SVC-KNOWLEDGESERVICE",
       "type": "Service",
       "name": "knowledgeService",
-      "evidence": "backend/src/services/knowledgeService.js",
+      "evidence": "backend/src/services/legacy/knowledgeService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -813,15 +957,39 @@
       "objectId": "SVC-LABORATORYERPSERVICE",
       "type": "Service",
       "name": "laboratoryERPService",
-      "evidence": "backend/src/services/laboratoryERPService.js",
+      "evidence": "backend/src/services/legacy/laboratoryERPService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-LANDMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "landManagementService",
+      "evidence": "backend/src/services/legacy/landManagementService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-LANDRECORDSSERVICE",
       "type": "Service",
       "name": "landRecordsService",
-      "evidence": "backend/src/services/landRecordsService.js",
+      "evidence": "backend/src/services/legacy/landRecordsService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-LIBRARYKNOWLEDGESERVICE",
+      "type": "Service",
+      "name": "libraryKnowledgeService",
+      "evidence": "backend/src/services/legacy/libraryKnowledgeService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-LIVESTOCKMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "livestockManagementService",
+      "evidence": "backend/src/services/legacy/livestockManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -829,7 +997,7 @@
       "objectId": "SVC-LOGISTICSENHANCEMENTSERVICE",
       "type": "Service",
       "name": "logisticsEnhancementService",
-      "evidence": "backend/src/services/logisticsEnhancementService.js",
+      "evidence": "backend/src/services/legacy/logisticsEnhancementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -837,7 +1005,7 @@
       "objectId": "SVC-LOGISTICSSERVICE",
       "type": "Service",
       "name": "logisticsService",
-      "evidence": "backend/src/services/logisticsService.js",
+      "evidence": "backend/src/services/legacy/logisticsService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -845,7 +1013,7 @@
       "objectId": "SVC-MACHINERYACCESSSERVICE",
       "type": "Service",
       "name": "machineryAccessService",
-      "evidence": "backend/src/services/machineryAccessService.js",
+      "evidence": "backend/src/services/legacy/machineryAccessService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -853,7 +1021,7 @@
       "objectId": "SVC-MARKETACCESSSERVICE",
       "type": "Service",
       "name": "marketAccessService",
-      "evidence": "backend/src/services/marketAccessService.js",
+      "evidence": "backend/src/services/legacy/marketAccessService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -861,7 +1029,7 @@
       "objectId": "SVC-MARKETDATASERVICE",
       "type": "Service",
       "name": "marketDataService",
-      "evidence": "backend/src/services/marketDataService.js",
+      "evidence": "backend/src/services/legacy/marketDataService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -869,7 +1037,7 @@
       "objectId": "SVC-MARKETINTELLIGENCESERVICE",
       "type": "Service",
       "name": "marketIntelligenceService",
-      "evidence": "backend/src/services/marketIntelligenceService.js",
+      "evidence": "backend/src/services/legacy/marketIntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -877,7 +1045,7 @@
       "objectId": "SVC-MERCHANDISINGSERVICE",
       "type": "Service",
       "name": "merchandisingService",
-      "evidence": "backend/src/services/merchandisingService.js",
+      "evidence": "backend/src/services/legacy/merchandisingService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -885,7 +1053,7 @@
       "objectId": "SVC-MILLCIRCUITSERVICE",
       "type": "Service",
       "name": "millCircuitService",
-      "evidence": "backend/src/services/millCircuitService.js",
+      "evidence": "backend/src/services/legacy/millCircuitService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -893,7 +1061,7 @@
       "objectId": "SVC-MOBILITYRIDESSERVICE",
       "type": "Service",
       "name": "mobilityRidesService",
-      "evidence": "backend/src/services/mobilityRidesService.js",
+      "evidence": "backend/src/services/legacy/mobilityRidesService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -901,7 +1069,7 @@
       "objectId": "SVC-MODULECATALOGSERVICE",
       "type": "Service",
       "name": "moduleCatalogService",
-      "evidence": "backend/src/services/moduleCatalogService.js",
+      "evidence": "backend/src/services/legacy/moduleCatalogService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -909,15 +1077,23 @@
       "objectId": "SVC-MULTILINGUALSERVICE",
       "type": "Service",
       "name": "multilingualService",
-      "evidence": "backend/src/services/multilingualService.js",
+      "evidence": "backend/src/services/legacy/multilingualService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-MUSHROOMSERVICE",
+      "type": "Service",
+      "name": "mushroomService",
+      "evidence": "backend/src/services/legacy/mushroomService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-NEPRODUCTINTELLIGENCESERVICE",
       "type": "Service",
       "name": "neProductIntelligenceService",
-      "evidence": "backend/src/services/neProductIntelligenceService.js",
+      "evidence": "backend/src/services/legacy/neProductIntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -925,7 +1101,7 @@
       "objectId": "SVC-NUTRIENTVALUESALESSERVICE",
       "type": "Service",
       "name": "nutrientValueSalesService",
-      "evidence": "backend/src/services/nutrientValueSalesService.js",
+      "evidence": "backend/src/services/legacy/nutrientValueSalesService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -933,7 +1109,7 @@
       "objectId": "SVC-NUTRITIONINTELLIGENCESERVICE",
       "type": "Service",
       "name": "nutritionIntelligenceService",
-      "evidence": "backend/src/services/nutritionIntelligenceService.js",
+      "evidence": "backend/src/services/legacy/nutritionIntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -941,7 +1117,7 @@
       "objectId": "SVC-OCRSERVICE",
       "type": "Service",
       "name": "ocrService",
-      "evidence": "backend/src/services/ocrService.js",
+      "evidence": "backend/src/services/legacy/ocrService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -949,7 +1125,7 @@
       "objectId": "SVC-OFFLINEPAYMENTSERVICE",
       "type": "Service",
       "name": "offlinePaymentService",
-      "evidence": "backend/src/services/offlinePaymentService.js",
+      "evidence": "backend/src/services/legacy/offlinePaymentService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -957,7 +1133,7 @@
       "objectId": "SVC-OFFLINESYNCSERVICE",
       "type": "Service",
       "name": "offlineSyncService",
-      "evidence": "backend/src/services/offlineSyncService.js",
+      "evidence": "backend/src/services/legacy/offlineSyncService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -965,15 +1141,23 @@
       "objectId": "SVC-OMNICHANNELAISERVICE",
       "type": "Service",
       "name": "omnichannelAIService",
-      "evidence": "backend/src/services/omnichannelAIService.js",
+      "evidence": "backend/src/services/legacy/omnichannelAIService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-OPERATIONSMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "operationsManagementService",
+      "evidence": "backend/src/services/legacy/operationsManagementService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-ORDERSERVICE",
       "type": "Service",
       "name": "orderService",
-      "evidence": "backend/src/services/orderService.js",
+      "evidence": "backend/src/services/legacy/orderService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -981,7 +1165,7 @@
       "objectId": "SVC-ORGANICTRACEABILITYSERVICE",
       "type": "Service",
       "name": "organicTraceabilityService",
-      "evidence": "backend/src/services/organicTraceabilityService.js",
+      "evidence": "backend/src/services/legacy/organicTraceabilityService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -989,7 +1173,7 @@
       "objectId": "SVC-ORGANIZATIONMANAGEMENTSERVICE",
       "type": "Service",
       "name": "organizationManagementService",
-      "evidence": "backend/src/services/organizationManagementService.js",
+      "evidence": "backend/src/services/legacy/organizationManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -997,7 +1181,7 @@
       "objectId": "SVC-PIGSERVICE",
       "type": "Service",
       "name": "pigService",
-      "evidence": "backend/src/services/pigService.js",
+      "evidence": "backend/src/services/legacy/pigService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1005,15 +1189,7 @@
       "objectId": "SVC-PLATFORMCONFIGURATIONSERVICE",
       "type": "Service",
       "name": "platformConfigurationService",
-      "evidence": "backend/src/services/platformConfigurationService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-PLATFORMCORESERVICE",
-      "type": "Service",
-      "name": "platformCoreService",
-      "evidence": "backend/src/services/platformCoreService.js",
+      "evidence": "backend/src/services/legacy/platformConfigurationService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1021,7 +1197,7 @@
       "objectId": "SVC-PLATFORMTELEMETRYSERVICE",
       "type": "Service",
       "name": "platformTelemetryService",
-      "evidence": "backend/src/services/platformTelemetryService.js",
+      "evidence": "backend/src/services/legacy/platformTelemetryService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1029,7 +1205,7 @@
       "objectId": "SVC-POULTRYSERVICE",
       "type": "Service",
       "name": "poultryService",
-      "evidence": "backend/src/services/poultryService.js",
+      "evidence": "backend/src/services/legacy/poultryService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1037,7 +1213,7 @@
       "objectId": "SVC-PREDICTIVEANALYTICSSERVICE",
       "type": "Service",
       "name": "predictiveAnalyticsService",
-      "evidence": "backend/src/services/predictiveAnalyticsService.js",
+      "evidence": "backend/src/services/legacy/predictiveAnalyticsService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1045,7 +1221,15 @@
       "objectId": "SVC-PRESEASONORDERSERVICE",
       "type": "Service",
       "name": "preSeasonOrderService",
-      "evidence": "backend/src/services/preSeasonOrderService.js",
+      "evidence": "backend/src/services/legacy/preSeasonOrderService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-PREVENTIVEMAINTENANCESERVICE",
+      "type": "Service",
+      "name": "preventiveMaintenanceService",
+      "evidence": "backend/src/services/legacy/preventiveMaintenanceService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1053,7 +1237,7 @@
       "objectId": "SVC-PROCUREMENTSUBSCRIPTIONSERVICE",
       "type": "Service",
       "name": "procurementSubscriptionService",
-      "evidence": "backend/src/services/procurementSubscriptionService.js",
+      "evidence": "backend/src/services/legacy/procurementSubscriptionService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1061,7 +1245,7 @@
       "objectId": "SVC-PRODUCTMEDIAAISERVICE",
       "type": "Service",
       "name": "productMediaAIService",
-      "evidence": "backend/src/services/productMediaAIService.js",
+      "evidence": "backend/src/services/legacy/productMediaAIService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1069,7 +1253,7 @@
       "objectId": "SVC-PRODUCTREVIEWSERVICE",
       "type": "Service",
       "name": "productReviewService",
-      "evidence": "backend/src/services/productReviewService.js",
+      "evidence": "backend/src/services/legacy/productReviewService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1077,7 +1261,7 @@
       "objectId": "SVC-PRODUCTSERVICE",
       "type": "Service",
       "name": "productService",
-      "evidence": "backend/src/services/productService.js",
+      "evidence": "backend/src/services/legacy/productService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1085,7 +1269,7 @@
       "objectId": "SVC-PROJECTSYSTEMSSERVICE",
       "type": "Service",
       "name": "projectSystemsService",
-      "evidence": "backend/src/services/projectSystemsService.js",
+      "evidence": "backend/src/services/legacy/projectSystemsService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1093,7 +1277,7 @@
       "objectId": "SVC-REALTIMEMONITORINGSERVICE",
       "type": "Service",
       "name": "realtimeMonitoringService",
-      "evidence": "backend/src/services/realtimeMonitoringService.js",
+      "evidence": "backend/src/services/legacy/realtimeMonitoringService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1101,7 +1285,7 @@
       "objectId": "SVC-RECIPEINTELLIGENCESERVICE",
       "type": "Service",
       "name": "recipeIntelligenceService",
-      "evidence": "backend/src/services/recipeIntelligenceService.js",
+      "evidence": "backend/src/services/legacy/recipeIntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1109,7 +1293,7 @@
       "objectId": "SVC-RECOVEREDFINANCESERVICE",
       "type": "Service",
       "name": "recoveredFinanceService",
-      "evidence": "backend/src/services/recoveredFinanceService.js",
+      "evidence": "backend/src/services/legacy/recoveredFinanceService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1117,7 +1301,7 @@
       "objectId": "SVC-REGIONALVARIETYSERVICE",
       "type": "Service",
       "name": "regionalVarietyService",
-      "evidence": "backend/src/services/regionalVarietyService.js",
+      "evidence": "backend/src/services/legacy/regionalVarietyService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1125,7 +1309,7 @@
       "objectId": "SVC-RENEWABLEENERGYSERVICE",
       "type": "Service",
       "name": "renewableEnergyService",
-      "evidence": "backend/src/services/renewableEnergyService.js",
+      "evidence": "backend/src/services/legacy/renewableEnergyService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1133,7 +1317,15 @@
       "objectId": "SVC-RESEARCHANDDEVELOPMENTSERVICE",
       "type": "Service",
       "name": "researchAndDevelopmentService",
-      "evidence": "backend/src/services/researchAndDevelopmentService.js",
+      "evidence": "backend/src/services/legacy/researchAndDevelopmentService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-RESOURCECRUDFACTORY",
+      "type": "Service",
+      "name": "resourceCrudFactory",
+      "evidence": "backend/src/services/legacy/resourceCrudFactory.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1141,7 +1333,7 @@
       "objectId": "SVC-RETURNLOADBOARDSERVICE",
       "type": "Service",
       "name": "returnLoadBoardService",
-      "evidence": "backend/src/services/returnLoadBoardService.js",
+      "evidence": "backend/src/services/legacy/returnLoadBoardService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1149,7 +1341,7 @@
       "objectId": "SVC-REVENUESERVICE",
       "type": "Service",
       "name": "revenueService",
-      "evidence": "backend/src/services/revenueService.js",
+      "evidence": "backend/src/services/legacy/revenueService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1157,7 +1349,7 @@
       "objectId": "SVC-RFQSERVICE",
       "type": "Service",
       "name": "rfqService",
-      "evidence": "backend/src/services/rfqService.js",
+      "evidence": "backend/src/services/legacy/rfqService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1165,7 +1357,7 @@
       "objectId": "SVC-RISKPRICINGSERVICE",
       "type": "Service",
       "name": "riskPricingService",
-      "evidence": "backend/src/services/riskPricingService.js",
+      "evidence": "backend/src/services/legacy/riskPricingService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1173,7 +1365,7 @@
       "objectId": "SVC-ROLEMANAGEMENTSERVICE",
       "type": "Service",
       "name": "roleManagementService",
-      "evidence": "backend/src/services/roleManagementService.js",
+      "evidence": "backend/src/services/legacy/roleManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1181,7 +1373,7 @@
       "objectId": "SVC-RURALENTERPRISESERVICE",
       "type": "Service",
       "name": "ruralEnterpriseService",
-      "evidence": "backend/src/services/ruralEnterpriseService.js",
+      "evidence": "backend/src/services/legacy/ruralEnterpriseService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1189,7 +1381,7 @@
       "objectId": "SVC-RURALFINANCESERVICE",
       "type": "Service",
       "name": "ruralFinanceService",
-      "evidence": "backend/src/services/ruralFinanceService.js",
+      "evidence": "backend/src/services/legacy/ruralFinanceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1197,7 +1389,7 @@
       "objectId": "SVC-SAPMODULEARCHITECTURESERVICE",
       "type": "Service",
       "name": "sapModuleArchitectureService",
-      "evidence": "backend/src/services/sapModuleArchitectureService.js",
+      "evidence": "backend/src/services/legacy/sapModuleArchitectureService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1205,7 +1397,7 @@
       "objectId": "SVC-SEEDVAULTSERVICE",
       "type": "Service",
       "name": "seedVaultService",
-      "evidence": "backend/src/services/seedVaultService.js",
+      "evidence": "backend/src/services/legacy/seedVaultService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1213,7 +1405,15 @@
       "objectId": "SVC-SELLERRANKINGSERVICE",
       "type": "Service",
       "name": "sellerRankingService",
-      "evidence": "backend/src/services/sellerRankingService.js",
+      "evidence": "backend/src/services/legacy/sellerRankingService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-SERICULTURESERVICE",
+      "type": "Service",
+      "name": "sericultureService",
+      "evidence": "backend/src/services/legacy/sericultureService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1221,7 +1421,7 @@
       "objectId": "SVC-SHAREDINFRASERVICE",
       "type": "Service",
       "name": "sharedInfraService",
-      "evidence": "backend/src/services/sharedInfraService.js",
+      "evidence": "backend/src/services/legacy/sharedInfraService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1229,7 +1429,7 @@
       "objectId": "SVC-SHAREDINFRASTRUCTURESERVICE",
       "type": "Service",
       "name": "sharedInfrastructureService",
-      "evidence": "backend/src/services/sharedInfrastructureService.js",
+      "evidence": "backend/src/services/legacy/sharedInfrastructureService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1237,7 +1437,7 @@
       "objectId": "SVC-SHEEPSERVICE",
       "type": "Service",
       "name": "sheepService",
-      "evidence": "backend/src/services/sheepService.js",
+      "evidence": "backend/src/services/legacy/sheepService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1245,7 +1445,7 @@
       "objectId": "SVC-SHELFLIFESERVICE",
       "type": "Service",
       "name": "shelfLifeService",
-      "evidence": "backend/src/services/shelfLifeService.js",
+      "evidence": "backend/src/services/legacy/shelfLifeService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1253,15 +1453,23 @@
       "objectId": "SVC-SMSAUTHSERVICE",
       "type": "Service",
       "name": "smsAuthService",
-      "evidence": "backend/src/services/smsAuthService.js",
+      "evidence": "backend/src/services/legacy/smsAuthService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-SOILMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "soilManagementService",
+      "evidence": "backend/src/services/legacy/soilManagementService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-SOILTESTINGSERVICE",
       "type": "Service",
       "name": "soilTestingService",
-      "evidence": "backend/src/services/soilTestingService.js",
+      "evidence": "backend/src/services/legacy/soilTestingService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1269,7 +1477,7 @@
       "objectId": "SVC-SUBSIDYSERVICE",
       "type": "Service",
       "name": "subsidyService",
-      "evidence": "backend/src/services/subsidyService.js",
+      "evidence": "backend/src/services/legacy/subsidyService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1277,7 +1485,7 @@
       "objectId": "SVC-SYSTEMADMINISTRATIONSERVICE",
       "type": "Service",
       "name": "systemAdministrationService",
-      "evidence": "backend/src/services/systemAdministrationService.js",
+      "evidence": "backend/src/services/legacy/systemAdministrationService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1285,23 +1493,7 @@
       "objectId": "SVC-TENANTMANAGEMENTSERVICE",
       "type": "Service",
       "name": "tenantManagementService",
-      "evidence": "backend/src/services/tenantManagementService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-UNIFIEDLEDGERSERVICE",
-      "type": "Service",
-      "name": "unifiedLedgerService",
-      "evidence": "backend/src/services/unifiedLedgerService.js",
-      "completion": 50,
-      "status": "No route"
-    },
-    {
-      "objectId": "SVC-USERMANAGEMENTSERVICE",
-      "type": "Service",
-      "name": "userManagementService",
-      "evidence": "backend/src/services/userManagementService.js",
+      "evidence": "backend/src/services/legacy/tenantManagementService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1309,7 +1501,7 @@
       "objectId": "SVC-V42INTELLIGENCESERVICE",
       "type": "Service",
       "name": "v42IntelligenceService",
-      "evidence": "backend/src/services/v42IntelligenceService.js",
+      "evidence": "backend/src/services/legacy/v42IntelligenceService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1317,15 +1509,23 @@
       "objectId": "SVC-VALUECOMMERCESERVICE",
       "type": "Service",
       "name": "valueCommerceService",
-      "evidence": "backend/src/services/valueCommerceService.js",
+      "evidence": "backend/src/services/legacy/valueCommerceService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-VERMICOMPOSTSERVICE",
+      "type": "Service",
+      "name": "vermicompostService",
+      "evidence": "backend/src/services/legacy/vermicompostService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-VILLAGEPROFILESERVICE",
       "type": "Service",
       "name": "villageProfileService",
-      "evidence": "backend/src/services/villageProfileService.js",
+      "evidence": "backend/src/services/legacy/villageProfileService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1333,7 +1533,7 @@
       "objectId": "SVC-VISIONSERVICE",
       "type": "Service",
       "name": "visionService",
-      "evidence": "backend/src/services/visionService.js",
+      "evidence": "backend/src/services/legacy/visionService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1341,15 +1541,23 @@
       "objectId": "SVC-VOICEAISERVICE",
       "type": "Service",
       "name": "voiceAIService",
-      "evidence": "backend/src/services/voiceAIService.js",
+      "evidence": "backend/src/services/legacy/voiceAIService.js",
       "completion": 100,
       "status": "Wired"
+    },
+    {
+      "objectId": "SVC-WATERMANAGEMENTSERVICE",
+      "type": "Service",
+      "name": "waterManagementService",
+      "evidence": "backend/src/services/legacy/waterManagementService.js",
+      "completion": 50,
+      "status": "No route"
     },
     {
       "objectId": "SVC-WEARABLEINTEGRATIONSERVICE",
       "type": "Service",
       "name": "wearableIntegrationService",
-      "evidence": "backend/src/services/wearableIntegrationService.js",
+      "evidence": "backend/src/services/legacy/wearableIntegrationService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1357,7 +1565,7 @@
       "objectId": "SVC-WEATHERSERVICE",
       "type": "Service",
       "name": "weatherService",
-      "evidence": "backend/src/services/weatherService.js",
+      "evidence": "backend/src/services/legacy/weatherService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1365,7 +1573,7 @@
       "objectId": "SVC-WHATSAPPSERVICE",
       "type": "Service",
       "name": "whatsappService",
-      "evidence": "backend/src/services/whatsappService.js",
+      "evidence": "backend/src/services/legacy/whatsappService.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1373,7 +1581,23 @@
       "objectId": "SVC-WIKIPEDIASERVICE",
       "type": "Service",
       "name": "wikipediaService",
-      "evidence": "backend/src/services/wikipediaService.js",
+      "evidence": "backend/src/services/legacy/wikipediaService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-LIBRARYKNOWLEDGESERVICE",
+      "type": "Service",
+      "name": "libraryKnowledgeService",
+      "evidence": "backend/src/services/libraryKnowledgeService.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "SVC-UNIFIEDCONFIGSERVICE",
+      "type": "Service",
+      "name": "unifiedConfigService",
+      "evidence": "backend/src/services/unifiedConfigService.js",
       "completion": 50,
       "status": "No route"
     },
@@ -1418,6 +1642,14 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-AICOLLABORATIONROUTES",
+      "type": "Route",
+      "name": "aiCollaborationRoutes",
+      "evidence": "backend/src/routes/aiCollaborationRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-AIGATEWAYROUTES",
       "type": "Route",
       "name": "aiGatewayRoutes",
@@ -1438,6 +1670,14 @@
       "type": "Route",
       "name": "aiSelfHealingRoutes",
       "evidence": "backend/src/routes/aiSelfHealingRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-ANALYTICSREPORTROUTES",
+      "type": "Route",
+      "name": "analyticsReportRoutes",
+      "evidence": "backend/src/routes/analyticsReportRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1482,10 +1722,58 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-AICOLLABORATIONROUTES",
+      "type": "Route",
+      "name": "aiCollaborationRoutes",
+      "evidence": "backend/src/routes/claude/aiCollaborationRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-BACKENDMODULEBRIDGE",
+      "type": "Route",
+      "name": "backendModuleBridge",
+      "evidence": "backend/src/routes/claude/backendModuleBridge.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-LIBRARYROUTES",
+      "type": "Route",
+      "name": "libraryRoutes",
+      "evidence": "backend/src/routes/claude/libraryRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-MODULEREGISTRYROUTES",
+      "type": "Route",
+      "name": "moduleRegistryRoutes",
+      "evidence": "backend/src/routes/claude/moduleRegistryRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-UNIFIEDAIROUTES",
+      "type": "Route",
+      "name": "unifiedAIRoutes",
+      "evidence": "backend/src/routes/claude/unifiedAIRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-CLIMATEADVISORYROUTES",
       "type": "Route",
       "name": "climateAdvisoryRoutes",
       "evidence": "backend/src/routes/climateAdvisoryRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-CLIMATEMONITORINGROUTES",
+      "type": "Route",
+      "name": "climateMonitoringRoutes",
+      "evidence": "backend/src/routes/climateMonitoringRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1498,10 +1786,10 @@
       "status": "Wired"
     },
     {
-      "objectId": "RTE-COMMUNITYROUTES",
+      "objectId": "RTE-COMMUNITYMANAGEMENTROUTES",
       "type": "Route",
-      "name": "communityRoutes",
-      "evidence": "backend/src/routes/communityRoutes.js",
+      "name": "communityManagementRoutes",
+      "evidence": "backend/src/routes/communityManagementRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1570,6 +1858,22 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-CROPMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "cropManagementRoutes",
+      "evidence": "backend/src/routes/cropManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-CROPPLANNINGROUTES",
+      "type": "Route",
+      "name": "cropPlanningRoutes",
+      "evidence": "backend/src/routes/cropPlanningRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-CROPVALUERESEARCHROUTES",
       "type": "Route",
       "name": "cropValueResearchRoutes",
@@ -1614,6 +1918,22 @@
       "type": "Route",
       "name": "dprGenerationRoutes",
       "evidence": "backend/src/routes/dprGenerationRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-GDPRROUTES",
+      "type": "Route",
+      "name": "gdprRoutes",
+      "evidence": "backend/src/routes/dual-use/gdprRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-MFAROUTES",
+      "type": "Route",
+      "name": "mfaRoutes",
+      "evidence": "backend/src/routes/dual-use/mfaRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1674,18 +1994,18 @@
       "status": "Wired"
     },
     {
-      "objectId": "RTE-ENTERPRISEAIROUTES",
+      "objectId": "RTE-ENGINEERINGPROJECTROUTES",
       "type": "Route",
-      "name": "enterpriseAIRoutes",
-      "evidence": "backend/src/routes/enterpriseAIRoutes.js",
+      "name": "engineeringProjectRoutes",
+      "evidence": "backend/src/routes/engineeringProjectRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
     {
-      "objectId": "RTE-ENTERPRISECONTROLROUTES",
+      "objectId": "RTE-ENTERPRISEAIROUTES",
       "type": "Route",
-      "name": "enterpriseControlRoutes",
-      "evidence": "backend/src/routes/enterpriseControlRoutes.js",
+      "name": "enterpriseAIRoutes",
+      "evidence": "backend/src/routes/enterpriseAIRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1702,6 +2022,14 @@
       "type": "Route",
       "name": "experienceRoutes",
       "evidence": "backend/src/routes/experienceRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-FARMERFAMILYROUTES",
+      "type": "Route",
+      "name": "farmerFamilyRoutes",
+      "evidence": "backend/src/routes/farmerFamilyRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1742,6 +2070,14 @@
       "type": "Route",
       "name": "fertilizerRoutes",
       "evidence": "backend/src/routes/fertilizerRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-FISHERIESMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "fisheriesManagementRoutes",
+      "evidence": "backend/src/routes/fisheriesManagementRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1826,10 +2162,26 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-HORTICULTUREMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "horticultureManagementRoutes",
+      "evidence": "backend/src/routes/horticultureManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-HRROUTES",
       "type": "Route",
       "name": "hrRoutes",
       "evidence": "backend/src/routes/hrRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-IDENTITYMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "identityManagementRoutes",
+      "evidence": "backend/src/routes/identityManagementRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1842,6 +2194,14 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-INPUTSUPPLYMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "inputSupplyManagementRoutes",
+      "evidence": "backend/src/routes/inputSupplyManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-INSURANCEENHANCEMENTS",
       "type": "Route",
       "name": "insuranceEnhancements",
@@ -1850,10 +2210,98 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-IRRIGATIONMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "irrigationManagementRoutes",
+      "evidence": "backend/src/routes/irrigationManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-KNOWLEDGEROUTES",
       "type": "Route",
       "name": "knowledgeRoutes",
       "evidence": "backend/src/routes/knowledgeRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-LANDMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "landManagementRoutes",
+      "evidence": "backend/src/routes/landManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-LANDRECORDSROUTES",
+      "type": "Route",
+      "name": "landRecordsRoutes",
+      "evidence": "backend/src/routes/landRecordsRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-APICULTUREROUTES",
+      "type": "Route",
+      "name": "apicultureRoutes",
+      "evidence": "backend/src/routes/legacy/apicultureRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-FISHERIESROUTES",
+      "type": "Route",
+      "name": "fisheriesRoutes",
+      "evidence": "backend/src/routes/legacy/fisheriesRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-FORESTRYROUTES",
+      "type": "Route",
+      "name": "forestryRoutes",
+      "evidence": "backend/src/routes/legacy/forestryRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-MUSHROOMROUTES",
+      "type": "Route",
+      "name": "mushroomRoutes",
+      "evidence": "backend/src/routes/legacy/mushroomRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-SERICULTUREROUTES",
+      "type": "Route",
+      "name": "sericultureRoutes",
+      "evidence": "backend/src/routes/legacy/sericultureRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-VERMICOMPOSTROUTES",
+      "type": "Route",
+      "name": "vermicompostRoutes",
+      "evidence": "backend/src/routes/legacy/vermicompostRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-LIBRARYROUTES",
+      "type": "Route",
+      "name": "libraryRoutes",
+      "evidence": "backend/src/routes/libraryRoutes.js",
+      "completion": 50,
+      "status": "No route"
+    },
+    {
+      "objectId": "RTE-LIVESTOCKMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "livestockManagementRoutes",
+      "evidence": "backend/src/routes/livestockManagementRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -1906,6 +2354,14 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-OPERATIONSMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "operationsManagementRoutes",
+      "evidence": "backend/src/routes/operationsManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-ORGANIZATIONMANAGEMENTROUTES",
       "type": "Route",
       "name": "organizationManagementRoutes",
@@ -1938,14 +2394,6 @@
       "status": "Wired"
     },
     {
-      "objectId": "RTE-PLATFORMFOUNDATIONROUTES",
-      "type": "Route",
-      "name": "platformFoundationRoutes",
-      "evidence": "backend/src/routes/platformFoundationRoutes.js",
-      "completion": 100,
-      "status": "Wired"
-    },
-    {
       "objectId": "RTE-PLATFORMTELEMETRYROUTES",
       "type": "Route",
       "name": "platformTelemetryRoutes",
@@ -1962,6 +2410,14 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-PREVENTIVEMAINTENANCEROUTES",
+      "type": "Route",
+      "name": "preventiveMaintenanceRoutes",
+      "evidence": "backend/src/routes/preventiveMaintenanceRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-PRODUCTMEDIAAIROUTES",
       "type": "Route",
       "name": "productMediaAIRoutes",
@@ -1970,10 +2426,26 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-PRODUCTREVIEWROUTES",
+      "type": "Route",
+      "name": "productReviewRoutes",
+      "evidence": "backend/src/routes/productReviewRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-PROJECTSYSTEMSROUTES",
       "type": "Route",
       "name": "projectSystemsRoutes",
       "evidence": "backend/src/routes/projectSystemsRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-REALTIMEMONITORINGROUTES",
+      "type": "Route",
+      "name": "realtimeMonitoringRoutes",
+      "evidence": "backend/src/routes/realtimeMonitoringRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -2034,6 +2506,14 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-ROLEMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "roleManagementRoutes",
+      "evidence": "backend/src/routes/roleManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-SAPMODULEARCHITECTUREROUTES",
       "type": "Route",
       "name": "sapModuleArchitectureRoutes",
@@ -2066,6 +2546,14 @@
       "status": "Wired"
     },
     {
+      "objectId": "RTE-SOILMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "soilManagementRoutes",
+      "evidence": "backend/src/routes/soilManagementRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
       "objectId": "RTE-SYSTEMADMINISTRATIONROUTES",
       "type": "Route",
       "name": "systemAdministrationRoutes",
@@ -2090,10 +2578,10 @@
       "status": "Wired"
     },
     {
-      "objectId": "RTE-UNIFIEDLEDGERROUTES",
+      "objectId": "RTE-UNIFIEDAIROUTES",
       "type": "Route",
-      "name": "unifiedLedgerRoutes",
-      "evidence": "backend/src/routes/unifiedLedgerRoutes.js",
+      "name": "unifiedAIRoutes",
+      "evidence": "backend/src/routes/unifiedAIRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -2110,6 +2598,14 @@
       "type": "Route",
       "name": "visionRoutes",
       "evidence": "backend/src/routes/visionRoutes.js",
+      "completion": 100,
+      "status": "Wired"
+    },
+    {
+      "objectId": "RTE-WATERMANAGEMENTROUTES",
+      "type": "Route",
+      "name": "waterManagementRoutes",
+      "evidence": "backend/src/routes/waterManagementRoutes.js",
       "completion": 100,
       "status": "Wired"
     },
@@ -2917,9 +3413,9 @@
       "objectId": "TBL-PLATFORM_CONFIGURATIONS",
       "type": "Table",
       "name": "platform_configurations",
-      "evidence": "backend/src/database/migrations/014_platform_foundation_modules.sql + backend/src/database/migrations/1001_platform_configuration.sql",
+      "evidence": "backend/src/database/migrations/014_platform_foundation_modules.sql",
       "completion": 100,
-      "status": "Duplicate"
+      "status": "Defined"
     },
     {
       "objectId": "TBL-TENANTS",
@@ -6229,9 +6725,9 @@
       "objectId": "TBL-CLIMATE_RISK_ASSESSMENTS",
       "type": "Table",
       "name": "climate_risk_assessments",
-      "evidence": "backend/src/database/migrations/057_climate_weather_d14.sql",
+      "evidence": "backend/src/database/migrations/057_climate_weather_d14.sql + backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
       "completion": 100,
-      "status": "Defined"
+      "status": "Duplicate"
     },
     {
       "objectId": "TBL-AGROMET_ADVISORIES",
@@ -7813,9 +8309,9 @@
       "objectId": "TBL-MFA_SECRETS",
       "type": "Table",
       "name": "mfa_secrets",
-      "evidence": "backend/src/database/migrations/3015_m015_mfa.sql",
+      "evidence": "backend/src/database/migrations/3015_m015_mfa.sql + backend/src/database/migrations/mfa_schema.sql",
       "completion": 100,
-      "status": "Defined"
+      "status": "Duplicate"
     },
     {
       "objectId": "TBL-MFA_OTP",
@@ -8269,9 +8765,9 @@
       "objectId": "TBL-PROMOTIONS",
       "type": "Table",
       "name": "promotions",
-      "evidence": "backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql + backend/src/database/migrations/3200_hr_module_schema.sql",
+      "evidence": "backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql",
       "completion": 100,
-      "status": "Duplicate"
+      "status": "Defined"
     },
     {
       "objectId": "TBL-DISCOUNT_RECORDS",
@@ -8381,9 +8877,9 @@
       "objectId": "TBL-DEPARTMENTS",
       "type": "Table",
       "name": "departments",
-      "evidence": "backend/src/database/migrations/3200_hr_module_schema.sql + backend/src/database/migrations/996_enterprise_foundation.sql",
+      "evidence": "backend/src/database/migrations/3200_hr_module_schema.sql",
       "completion": 100,
-      "status": "Duplicate"
+      "status": "Defined"
     },
     {
       "objectId": "TBL-PERFORMANCE_REVIEWS",
@@ -8405,6 +8901,14 @@
       "objectId": "TBL-TRAINING_PROGRAMS",
       "type": "Table",
       "name": "training_programs",
+      "evidence": "backend/src/database/migrations/3200_hr_module_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMPLOYEE_PROMOTIONS",
+      "type": "Table",
+      "name": "employee_promotions",
       "evidence": "backend/src/database/migrations/3200_hr_module_schema.sql",
       "completion": 100,
       "status": "Defined"
@@ -8734,6 +9238,1326 @@
       "type": "Table",
       "name": "erp_depreciation",
       "evidence": "backend/src/database/migrations/4000_comprehensive_erp_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_HEALTH_LOGS",
+      "type": "Table",
+      "name": "platform_health_logs",
+      "evidence": "backend/src/database/migrations/9500_m001_platform_core.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_METRICS",
+      "type": "Table",
+      "name": "platform_metrics",
+      "evidence": "backend/src/database/migrations/9500_m001_platform_core.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONFIGURATION_UPDATES",
+      "type": "Table",
+      "name": "configuration_updates",
+      "evidence": "backend/src/database/migrations/9500_m001_platform_core.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_ALERTS",
+      "type": "Table",
+      "name": "platform_alerts",
+      "evidence": "backend/src/database/migrations/9500_m001_platform_core.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FEATURE_FLAGS",
+      "type": "Table",
+      "name": "feature_flags",
+      "evidence": "backend/src/database/migrations/9500_m001_platform_core.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONFIGURATION_HISTORY",
+      "type": "Table",
+      "name": "configuration_history",
+      "evidence": "backend/src/database/migrations/9501_m002_platform_configuration.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONFIGURATION_TEMPLATES",
+      "type": "Table",
+      "name": "configuration_templates",
+      "evidence": "backend/src/database/migrations/9501_m002_platform_configuration.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENVIRONMENT_CONFIGS",
+      "type": "Table",
+      "name": "environment_configs",
+      "evidence": "backend/src/database/migrations/9501_m002_platform_configuration.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TENANT_USERS",
+      "type": "Table",
+      "name": "tenant_users",
+      "evidence": "backend/src/database/migrations/9502_m003_tenant_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TENANT_USAGE_LOGS",
+      "type": "Table",
+      "name": "tenant_usage_logs",
+      "evidence": "backend/src/database/migrations/9502_m003_tenant_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TENANT_BILLING",
+      "type": "Table",
+      "name": "tenant_billing",
+      "evidence": "backend/src/database/migrations/9502_m003_tenant_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TENANT_SETTINGS",
+      "type": "Table",
+      "name": "tenant_settings",
+      "evidence": "backend/src/database/migrations/9502_m003_tenant_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORG_DEPARTMENTS",
+      "type": "Table",
+      "name": "org_departments",
+      "evidence": "backend/src/database/migrations/9503_m004_organization_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORG_TEAMS",
+      "type": "Table",
+      "name": "org_teams",
+      "evidence": "backend/src/database/migrations/9503_m004_organization_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORG_USERS",
+      "type": "Table",
+      "name": "org_users",
+      "evidence": "backend/src/database/migrations/9503_m004_organization_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORG_HIERARCHY",
+      "type": "Table",
+      "name": "org_hierarchy",
+      "evidence": "backend/src/database/migrations/9503_m004_organization_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENVIRONMENT_VARIABLES",
+      "type": "Table",
+      "name": "environment_variables",
+      "evidence": "backend/src/database/migrations/9504_m005_environment_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEPLOYMENT_LOGS",
+      "type": "Table",
+      "name": "deployment_logs",
+      "evidence": "backend/src/database/migrations/9504_m005_environment_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ENVIRONMENT_METRICS",
+      "type": "Table",
+      "name": "environment_metrics",
+      "evidence": "backend/src/database/migrations/9504_m005_environment_management.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_PROFILES",
+      "type": "Table",
+      "name": "farmer_profiles",
+      "evidence": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_CONTACT_INFO",
+      "type": "Table",
+      "name": "farmer_contact_info",
+      "evidence": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_HOUSEHOLD",
+      "type": "Table",
+      "name": "farmer_household",
+      "evidence": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_EDUCATION",
+      "type": "Table",
+      "name": "farmer_education",
+      "evidence": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_SKILLS",
+      "type": "Table",
+      "name": "farmer_skills",
+      "evidence": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROFILE_ENRICHMENT_LOG",
+      "type": "Table",
+      "name": "profile_enrichment_log",
+      "evidence": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRAINING_SESSIONS",
+      "type": "Table",
+      "name": "training_sessions",
+      "evidence": "backend/src/database/migrations/9506_m023_farmer_training.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_ENROLLMENTS",
+      "type": "Table",
+      "name": "farmer_enrollments",
+      "evidence": "backend/src/database/migrations/9506_m023_farmer_training.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRAINING_ASSESSMENTS",
+      "type": "Table",
+      "name": "training_assessments",
+      "evidence": "backend/src/database/migrations/9506_m023_farmer_training.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ASSESSMENT_RESULTS",
+      "type": "Table",
+      "name": "assessment_results",
+      "evidence": "backend/src/database/migrations/9506_m023_farmer_training.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRAINING_MATERIALS",
+      "type": "Table",
+      "name": "training_materials",
+      "evidence": "backend/src/database/migrations/9506_m023_farmer_training.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRAINING_ATTENDANCE",
+      "type": "Table",
+      "name": "training_attendance",
+      "evidence": "backend/src/database/migrations/9506_m023_farmer_training.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_GROUPS",
+      "type": "Table",
+      "name": "farmer_groups",
+      "evidence": "backend/src/database/migrations/9507_m024_farmer_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GROUP_MEMBERSHIPS",
+      "type": "Table",
+      "name": "group_memberships",
+      "evidence": "backend/src/database/migrations/9507_m024_farmer_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GROUP_MEETINGS",
+      "type": "Table",
+      "name": "group_meetings",
+      "evidence": "backend/src/database/migrations/9507_m024_farmer_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GROUP_FINANCES",
+      "type": "Table",
+      "name": "group_finances",
+      "evidence": "backend/src/database/migrations/9507_m024_farmer_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SUBSIDY_SCHEMES",
+      "type": "Table",
+      "name": "subsidy_schemes",
+      "evidence": "backend/src/database/migrations/9508_m025_land_parcels_a.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SUBSIDY_APPLICATIONS",
+      "type": "Table",
+      "name": "subsidy_applications",
+      "evidence": "backend/src/database/migrations/9508_m025_land_parcels_a.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAND_PARCELS",
+      "type": "Table",
+      "name": "land_parcels",
+      "evidence": "backend/src/database/migrations/9509_m031_land_parcels_b.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAND_TRANSFERS",
+      "type": "Table",
+      "name": "land_transfers",
+      "evidence": "backend/src/database/migrations/9509_m031_land_parcels_b.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOIL_SAMPLES",
+      "type": "Table",
+      "name": "soil_samples",
+      "evidence": "backend/src/database/migrations/9510_m032_land_records_extra.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOIL_HEALTH_REPORTS",
+      "type": "Table",
+      "name": "soil_health_reports",
+      "evidence": "backend/src/database/migrations/9510_m032_land_records_extra.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VILLAGE_RESOURCES",
+      "type": "Table",
+      "name": "village_resources",
+      "evidence": "backend/src/database/migrations/9511_m041_m041.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_USAGE_LOG",
+      "type": "Table",
+      "name": "equipment_usage_log",
+      "evidence": "backend/src/database/migrations/9512_m042_m042.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FPO_MEMBERSHIPS",
+      "type": "Table",
+      "name": "fpo_memberships",
+      "evidence": "backend/src/database/migrations/9513_m051_m051.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FPO_FINANCIAL_TRANSACTIONS",
+      "type": "Table",
+      "name": "fpo_financial_transactions",
+      "evidence": "backend/src/database/migrations/9513_m051_m051.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FPO_PERFORMANCE_REPORTS",
+      "type": "Table",
+      "name": "fpo_performance_reports",
+      "evidence": "backend/src/database/migrations/9513_m051_m051.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_CATEGORIES",
+      "type": "Table",
+      "name": "product_categories",
+      "evidence": "backend/src/database/migrations/9514_m052_m052.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCT_RECOMMENDATIONS",
+      "type": "Table",
+      "name": "product_recommendations",
+      "evidence": "backend/src/database/migrations/9514_m052_m052.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INVENTORY_LOGS",
+      "type": "Table",
+      "name": "inventory_logs",
+      "evidence": "backend/src/database/migrations/9514_m052_m052.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORDER_TRACKING",
+      "type": "Table",
+      "name": "order_tracking",
+      "evidence": "backend/src/database/migrations/9515_m053_m053.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORDER_FULFILLMENT",
+      "type": "Table",
+      "name": "order_fulfillment",
+      "evidence": "backend/src/database/migrations/9515_m053_m053.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CUSTOMERS",
+      "type": "Table",
+      "name": "customers",
+      "evidence": "backend/src/database/migrations/9516_m054_customer_segmentation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CUSTOMER_PREFERENCES",
+      "type": "Table",
+      "name": "customer_preferences",
+      "evidence": "backend/src/database/migrations/9516_m054_customer_segmentation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CUSTOMER_SEGMENT_ASSIGNMENTS",
+      "type": "Table",
+      "name": "customer_segment_assignments",
+      "evidence": "backend/src/database/migrations/9516_m054_customer_segmentation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CUSTOMER_INSIGHTS",
+      "type": "Table",
+      "name": "customer_insights",
+      "evidence": "backend/src/database/migrations/9516_m054_customer_segmentation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRICING_RULES",
+      "type": "Table",
+      "name": "pricing_rules",
+      "evidence": "backend/src/database/migrations/9517_m055_m055.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRICE_HISTORY",
+      "type": "Table",
+      "name": "price_history",
+      "evidence": "backend/src/database/migrations/9517_m055_m055.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPETITOR_PRICING",
+      "type": "Table",
+      "name": "competitor_pricing",
+      "evidence": "backend/src/database/migrations/9517_m055_m055.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRICE_ELASTICITY",
+      "type": "Table",
+      "name": "price_elasticity",
+      "evidence": "backend/src/database/migrations/9517_m055_m055.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REFUNDS",
+      "type": "Table",
+      "name": "refunds",
+      "evidence": "backend/src/database/migrations/9518_m056_m056.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RETURNS",
+      "type": "Table",
+      "name": "returns",
+      "evidence": "backend/src/database/migrations/9519_m058_m058.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DISCOUNTS",
+      "type": "Table",
+      "name": "discounts",
+      "evidence": "backend/src/database/migrations/9520_m059_m059.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REVIEWS",
+      "type": "Table",
+      "name": "reviews",
+      "evidence": "backend/src/database/migrations/9521_m060_m060.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_USAGE_RECORDS",
+      "type": "Table",
+      "name": "water_usage_records",
+      "evidence": "backend/src/database/migrations/9522_m076_m076.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_USAGE_HISTORY",
+      "type": "Table",
+      "name": "water_usage_history",
+      "evidence": "backend/src/database/migrations/9522_m076_m076.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_PATTERNS",
+      "type": "Table",
+      "name": "crop_patterns",
+      "evidence": "backend/src/database/migrations/9522_m076_m076.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GROUNDWATER_LEVELS",
+      "type": "Table",
+      "name": "groundwater_levels",
+      "evidence": "backend/src/database/migrations/9522_m076_m076.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_QUALITY_MEASUREMENTS",
+      "type": "Table",
+      "name": "water_quality_measurements",
+      "evidence": "backend/src/database/migrations/9523_m077_m077.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_SOURCES",
+      "type": "Table",
+      "name": "water_sources",
+      "evidence": "backend/src/database/migrations/9523_m077_m077.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_USAGE_CONTEXT",
+      "type": "Table",
+      "name": "water_usage_context",
+      "evidence": "backend/src/database/migrations/9523_m077_m077.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-QUALITY_ALERTS",
+      "type": "Table",
+      "name": "quality_alerts",
+      "evidence": "backend/src/database/migrations/9523_m077_m077.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREATMENT_RECOMMENDATIONS",
+      "type": "Table",
+      "name": "treatment_recommendations",
+      "evidence": "backend/src/database/migrations/9523_m077_m077.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DISTRIBUTION_POINTS",
+      "type": "Table",
+      "name": "distribution_points",
+      "evidence": "backend/src/database/migrations/9524_m078_m078.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATERSHED_PLANS",
+      "type": "Table",
+      "name": "watershed_plans",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ECOLOGICAL_ASSESSMENTS",
+      "type": "Table",
+      "name": "ecological_assessments",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HYDROLOGICAL_DATA",
+      "type": "Table",
+      "name": "hydrological_data",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAND_USE_PATTERNS",
+      "type": "Table",
+      "name": "land_use_patterns",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BIODIVERSITY_INVENTORY",
+      "type": "Table",
+      "name": "biodiversity_inventory",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONSERVATION_IMPLEMENTATIONS",
+      "type": "Table",
+      "name": "conservation_implementations",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATERSHED_HEALTH_MONITORING",
+      "type": "Table",
+      "name": "watershed_health_monitoring",
+      "evidence": "backend/src/database/migrations/9525_m079_m079.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_ANALYTICS",
+      "type": "Table",
+      "name": "water_analytics",
+      "evidence": "backend/src/database/migrations/9526_m080_m080.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_DASHBOARDS",
+      "type": "Table",
+      "name": "water_dashboards",
+      "evidence": "backend/src/database/migrations/9526_m080_m080.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_PREDICTIONS",
+      "type": "Table",
+      "name": "water_predictions",
+      "evidence": "backend/src/database/migrations/9526_m080_m080.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_PERFORMANCE_COMPARISONS",
+      "type": "Table",
+      "name": "water_performance_comparisons",
+      "evidence": "backend/src/database/migrations/9526_m080_m080.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_ANOMALY_ALERTS",
+      "type": "Table",
+      "name": "water_anomaly_alerts",
+      "evidence": "backend/src/database/migrations/9526_m080_m080.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARDS",
+      "type": "Table",
+      "name": "dashboards",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARD_WIDGETS",
+      "type": "Table",
+      "name": "dashboard_widgets",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARD_DATA_SOURCES",
+      "type": "Table",
+      "name": "dashboard_data_sources",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARD_FILTERS",
+      "type": "Table",
+      "name": "dashboard_filters",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARD_SNAPSHOTS",
+      "type": "Table",
+      "name": "dashboard_snapshots",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARD_SHARES",
+      "type": "Table",
+      "name": "dashboard_shares",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DASHBOARD_USAGE_LOGS",
+      "type": "Table",
+      "name": "dashboard_usage_logs",
+      "evidence": "backend/src/database/migrations/9527_m081_dashboard.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_DEFINITIONS",
+      "type": "Table",
+      "name": "kpi_definitions",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_MEASUREMENTS",
+      "type": "Table",
+      "name": "kpi_measurements",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_TARGETS",
+      "type": "Table",
+      "name": "kpi_targets",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_ALERTS",
+      "type": "Table",
+      "name": "kpi_alerts",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_SCORES",
+      "type": "Table",
+      "name": "kpi_scores",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-METRIC_BENCHMARKS",
+      "type": "Table",
+      "name": "metric_benchmarks",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_DIMENSIONS",
+      "type": "Table",
+      "name": "kpi_dimensions",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-KPI_AGGREGATIONS",
+      "type": "Table",
+      "name": "kpi_aggregations",
+      "evidence": "backend/src/database/migrations/9528_m082_kpi.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_METRICS",
+      "type": "Table",
+      "name": "performance_metrics",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_BENCHMARKS",
+      "type": "Table",
+      "name": "performance_benchmarks",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_REPORTS",
+      "type": "Table",
+      "name": "performance_reports",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_TRENDS",
+      "type": "Table",
+      "name": "performance_trends",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_COMPARISONS",
+      "type": "Table",
+      "name": "performance_comparisons",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_TARGETS",
+      "type": "Table",
+      "name": "performance_targets",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_DRIVERS",
+      "type": "Table",
+      "name": "performance_drivers",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PERFORMANCE_ALERTS",
+      "type": "Table",
+      "name": "performance_alerts",
+      "evidence": "backend/src/database/migrations/9529_m083_performance_metrics.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_DEFINITIONS",
+      "type": "Table",
+      "name": "trend_definitions",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_DATA_POINTS",
+      "type": "Table",
+      "name": "trend_data_points",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_FORECASTS",
+      "type": "Table",
+      "name": "trend_forecasts",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_SEASONALITY",
+      "type": "Table",
+      "name": "trend_seasonality",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_CORRELATIONS",
+      "type": "Table",
+      "name": "trend_correlations",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_BREAKPOINTS",
+      "type": "Table",
+      "name": "trend_breakpoints",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TREND_ALERTS",
+      "type": "Table",
+      "name": "trend_alerts",
+      "evidence": "backend/src/database/migrations/9530_m084_m084.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_GROUPS",
+      "type": "Table",
+      "name": "comparison_groups",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_CONFIGS",
+      "type": "Table",
+      "name": "comparison_configs",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_RESULTS",
+      "type": "Table",
+      "name": "comparison_results",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_BENCHMARKS",
+      "type": "Table",
+      "name": "comparison_benchmarks",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_TRENDS",
+      "type": "Table",
+      "name": "comparison_trends",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_ALERTS",
+      "type": "Table",
+      "name": "comparison_alerts",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMPARISON_SNAPSHOTS",
+      "type": "Table",
+      "name": "comparison_snapshots",
+      "evidence": "backend/src/database/migrations/9531_m085_comparison_groups.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MONITORING_SOURCES",
+      "type": "Table",
+      "name": "monitoring_sources",
+      "evidence": "backend/src/database/migrations/9532_m086_monitoring_alerts.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MONITORING_METRICS",
+      "type": "Table",
+      "name": "monitoring_metrics",
+      "evidence": "backend/src/database/migrations/9532_m086_monitoring_alerts.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REAL_TIME_DATA",
+      "type": "Table",
+      "name": "real_time_data",
+      "evidence": "backend/src/database/migrations/9532_m086_monitoring_alerts.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MONITORING_DASHBOARDS",
+      "type": "Table",
+      "name": "monitoring_dashboards",
+      "evidence": "backend/src/database/migrations/9532_m086_monitoring_alerts.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MONITORING_ALERTS",
+      "type": "Table",
+      "name": "monitoring_alerts",
+      "evidence": "backend/src/database/migrations/9532_m086_monitoring_alerts.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MONITORING_EVENTS",
+      "type": "Table",
+      "name": "monitoring_events",
+      "evidence": "backend/src/database/migrations/9532_m086_monitoring_alerts.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRACTOR_REGISTRY",
+      "type": "Table",
+      "name": "tractor_registry",
+      "evidence": "backend/src/database/migrations/9533_m101_tractor_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRACTOR_MAINTENANCE_RECORDS",
+      "type": "Table",
+      "name": "tractor_maintenance_records",
+      "evidence": "backend/src/database/migrations/9533_m101_tractor_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRACTOR_PERFORMANCE_LOGS",
+      "type": "Table",
+      "name": "tractor_performance_logs",
+      "evidence": "backend/src/database/migrations/9533_m101_tractor_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRACTOR_USAGE_LOGS",
+      "type": "Table",
+      "name": "tractor_usage_logs",
+      "evidence": "backend/src/database/migrations/9533_m101_tractor_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-TRACTOR_INSURANCE_RECORDS",
+      "type": "Table",
+      "name": "tractor_insurance_records",
+      "evidence": "backend/src/database/migrations/9533_m101_tractor_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IMPLEMENT_MAINTENANCE_RECORDS",
+      "type": "Table",
+      "name": "implement_maintenance_records",
+      "evidence": "backend/src/database/migrations/9534_m102_m102.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IMPLEMENT_USAGE_LOGS",
+      "type": "Table",
+      "name": "implement_usage_logs",
+      "evidence": "backend/src/database/migrations/9534_m102_m102.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IMPLEMENT_CONDITION_ASSESSMENTS",
+      "type": "Table",
+      "name": "implement_condition_assessments",
+      "evidence": "backend/src/database/migrations/9534_m102_m102.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_STATUS_HISTORY",
+      "type": "Table",
+      "name": "equipment_status_history",
+      "evidence": "backend/src/database/migrations/9535_m103_m103.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_USAGE_LOGS",
+      "type": "Table",
+      "name": "equipment_usage_logs",
+      "evidence": "backend/src/database/migrations/9535_m103_m103.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_MAINTENANCE_RECORDS",
+      "type": "Table",
+      "name": "equipment_maintenance_records",
+      "evidence": "backend/src/database/migrations/9535_m103_m103.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RENTAL_TRANSACTIONS",
+      "type": "Table",
+      "name": "rental_transactions",
+      "evidence": "backend/src/database/migrations/9536_m104_m104.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RENTAL_REVIEWS",
+      "type": "Table",
+      "name": "rental_reviews",
+      "evidence": "backend/src/database/migrations/9536_m104_m104.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLEET_DISPATCHES",
+      "type": "Table",
+      "name": "fleet_dispatches",
+      "evidence": "backend/src/database/migrations/9537_m105_m105.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLEET_ROUTES",
+      "type": "Table",
+      "name": "fleet_routes",
+      "evidence": "backend/src/database/migrations/9537_m105_m105.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLEET_MAINTENANCE_RECORDS",
+      "type": "Table",
+      "name": "fleet_maintenance_records",
+      "evidence": "backend/src/database/migrations/9537_m105_m105.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLEET_FUEL_LOGS",
+      "type": "Table",
+      "name": "fleet_fuel_logs",
+      "evidence": "backend/src/database/migrations/9537_m105_m105.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DOWNTIME_LOGS",
+      "type": "Table",
+      "name": "downtime_logs",
+      "evidence": "backend/src/database/migrations/9538_m107_equipment_breakdowns.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REPAIR_PARTS_INVENTORY",
+      "type": "Table",
+      "name": "repair_parts_inventory",
+      "evidence": "backend/src/database/migrations/9538_m107_equipment_breakdowns.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FUEL_INVENTORY",
+      "type": "Table",
+      "name": "fuel_inventory",
+      "evidence": "backend/src/database/migrations/9539_m108_m108.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FUEL_SUPPLIERS",
+      "type": "Table",
+      "name": "fuel_suppliers",
+      "evidence": "backend/src/database/migrations/9539_m108_m108.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SPARE_PARTS_PROCUREMENT",
+      "type": "Table",
+      "name": "spare_parts_procurement",
+      "evidence": "backend/src/database/migrations/9540_m109_m109.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PARTS_SUPPLIERS",
+      "type": "Table",
+      "name": "parts_suppliers",
+      "evidence": "backend/src/database/migrations/9540_m109_m109.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CATTLE_HEALTH_RECORDS",
+      "type": "Table",
+      "name": "cattle_health_records",
+      "evidence": "backend/src/database/migrations/9541_m122_m122.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CATTLE_BREED_CHARACTERISTICS",
+      "type": "Table",
+      "name": "cattle_breed_characteristics",
+      "evidence": "backend/src/database/migrations/9541_m122_m122.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REGIONAL_CATTLE_HEALTH_PATTERNS",
+      "type": "Table",
+      "name": "regional_cattle_health_patterns",
+      "evidence": "backend/src/database/migrations/9541_m122_m122.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CATTLE_PERFORMANCE_TRACKING",
+      "type": "Table",
+      "name": "cattle_performance_tracking",
+      "evidence": "backend/src/database/migrations/9541_m122_m122.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POULTRY_REGISTRY",
+      "type": "Table",
+      "name": "poultry_registry",
+      "evidence": "backend/src/database/migrations/9542_m123_poultry_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POULTRY_HEALTH_RECORDS",
+      "type": "Table",
+      "name": "poultry_health_records",
+      "evidence": "backend/src/database/migrations/9542_m123_poultry_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POULTRY_BREED_CHARACTERISTICS",
+      "type": "Table",
+      "name": "poultry_breed_characteristics",
+      "evidence": "backend/src/database/migrations/9542_m123_poultry_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REGIONAL_POULTRY_HEALTH_PATTERNS",
+      "type": "Table",
+      "name": "regional_poultry_health_patterns",
+      "evidence": "backend/src/database/migrations/9542_m123_poultry_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POULTRY_PERFORMANCE_TRACKING",
+      "type": "Table",
+      "name": "poultry_performance_tracking",
+      "evidence": "backend/src/database/migrations/9542_m123_poultry_registry.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ANIMAL_HEALTH_RECORDS",
+      "type": "Table",
+      "name": "animal_health_records",
+      "evidence": "backend/src/database/migrations/9543_m127_m127.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VACCINATION_SCHEDULES",
+      "type": "Table",
+      "name": "vaccination_schedules",
+      "evidence": "backend/src/database/migrations/9543_m127_m127.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-REGIONAL_DISEASE_PATTERNS",
+      "type": "Table",
+      "name": "regional_disease_patterns",
+      "evidence": "backend/src/database/migrations/9543_m127_m127.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ANIMAL_REGISTRY",
+      "type": "Table",
+      "name": "animal_registry",
+      "evidence": "backend/src/database/migrations/9543_m127_m127.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HERD_HEALTH_MONITORING",
+      "type": "Table",
+      "name": "herd_health_monitoring",
+      "evidence": "backend/src/database/migrations/9543_m127_m127.sql",
       "completion": 100,
       "status": "Defined"
     },
@@ -9426,6 +11250,14 @@
       "status": "Defined"
     },
     {
+      "objectId": "TBL-ENTERPRISE_DEPARTMENTS",
+      "type": "Table",
+      "name": "enterprise_departments",
+      "evidence": "backend/src/database/migrations/996_enterprise_foundation.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
       "objectId": "TBL-COST_CENTERS",
       "type": "Table",
       "name": "cost_centers",
@@ -9754,6 +11586,1086 @@
       "status": "Defined"
     },
     {
+      "objectId": "TBL-NOTIFICATIONS",
+      "type": "Table",
+      "name": "notifications",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NOTIFICATION_DELIVERIES",
+      "type": "Table",
+      "name": "notification_deliveries",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NOTIFICATION_PREFERENCES",
+      "type": "Table",
+      "name": "notification_preferences",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NOTIFICATION_TEMPLATES",
+      "type": "Table",
+      "name": "notification_templates",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RAINWATER_HARVESTING_SYSTEMS",
+      "type": "Table",
+      "name": "rainwater_harvesting_systems",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RAINFALL_PATTERNS",
+      "type": "Table",
+      "name": "rainfall_patterns",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RAINFALL_RECORDS",
+      "type": "Table",
+      "name": "rainfall_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COLLECTION_RECORDS",
+      "type": "Table",
+      "name": "collection_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-STORAGE_TANKS",
+      "type": "Table",
+      "name": "storage_tanks",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_RENTAL_LISTINGS",
+      "type": "Table",
+      "name": "equipment_rental_listings",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_RENTAL_BOOKINGS",
+      "type": "Table",
+      "name": "equipment_rental_bookings",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_BREAKDOWNS",
+      "type": "Table",
+      "name": "equipment_breakdowns",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EMERGENCY_REPAIRS",
+      "type": "Table",
+      "name": "emergency_repairs",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SESSIONS",
+      "type": "Table",
+      "name": "sessions",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DEVICE_FINGERPRINTS",
+      "type": "Table",
+      "name": "device_fingerprints",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SECURITY_EVENTS",
+      "type": "Table",
+      "name": "security_events",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_RULES",
+      "type": "Table",
+      "name": "alert_rules",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_NOTIFICATIONS",
+      "type": "Table",
+      "name": "alert_notifications",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_INCIDENTS",
+      "type": "Table",
+      "name": "alert_incidents",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_ESCALATIONS",
+      "type": "Table",
+      "name": "alert_escalations",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_SUPPRESSIONS",
+      "type": "Table",
+      "name": "alert_suppressions",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_MAINTENANCE_WINDOWS",
+      "type": "Table",
+      "name": "alert_maintenance_windows",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_STATISTICS",
+      "type": "Table",
+      "name": "alert_statistics",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ALERT_HISTORY",
+      "type": "Table",
+      "name": "alert_history",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DROUGHT_OBSERVATIONS",
+      "type": "Table",
+      "name": "drought_observations",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLOOD_OBSERVATIONS",
+      "type": "Table",
+      "name": "flood_observations",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DISEASE_FORECASTS",
+      "type": "Table",
+      "name": "disease_forecasts",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AGRO_METEOROLOGY_READINGS",
+      "type": "Table",
+      "name": "agro_meteorology_readings",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IRRIGATION_SCHEDULES",
+      "type": "Table",
+      "name": "irrigation_schedules",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IRRIGATION_WATER_SOURCES",
+      "type": "Table",
+      "name": "irrigation_water_sources",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IRRIGATION_LOGS",
+      "type": "Table",
+      "name": "irrigation_logs",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARM_ACTIVITIES",
+      "type": "Table",
+      "name": "farm_activities",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARM_TASKS",
+      "type": "Table",
+      "name": "farm_tasks",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONTRACTORS",
+      "type": "Table",
+      "name": "contractors",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MACHINERY_OPERATIONS",
+      "type": "Table",
+      "name": "machinery_operations",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_SCHEDULES",
+      "type": "Table",
+      "name": "equipment_schedules",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INPUT_CONSUMPTION_RECORDS",
+      "type": "Table",
+      "name": "input_consumption_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARM_PRODUCTIVITY_METRICS",
+      "type": "Table",
+      "name": "farm_productivity_metrics",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARM_OPERATIONS_KPIS",
+      "type": "Table",
+      "name": "farm_operations_kpis",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_BUDGETS",
+      "type": "Table",
+      "name": "water_budgets",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_QUALITY_READINGS",
+      "type": "Table",
+      "name": "water_quality_readings",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RAINWATER_HARVESTING_STRUCTURES",
+      "type": "Table",
+      "name": "rainwater_harvesting_structures",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATERSHEDS",
+      "type": "Table",
+      "name": "watersheds",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_ANALYTICS_RECORDS",
+      "type": "Table",
+      "name": "water_analytics_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOIL_HEALTH_CARDS",
+      "type": "Table",
+      "name": "soil_health_cards",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NUTRIENT_MANAGEMENT_PLANS",
+      "type": "Table",
+      "name": "nutrient_management_plans",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FERTILITY_MANAGEMENT_RECORDS",
+      "type": "Table",
+      "name": "fertility_management_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMMUNITY_BLOCKS",
+      "type": "Table",
+      "name": "community_blocks",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMMUNITY_DISTRICTS",
+      "type": "Table",
+      "name": "community_districts",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMMUNITY_STATES",
+      "type": "Table",
+      "name": "community_states",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRODUCER_GROUPS",
+      "type": "Table",
+      "name": "producer_groups",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COMMUNITY_ASSETS",
+      "type": "Table",
+      "name": "community_assets",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-RURAL_DEVELOPMENT_PROJECTS",
+      "type": "Table",
+      "name": "rural_development_projects",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BIOFERTILIZER_STOCK",
+      "type": "Table",
+      "name": "biofertilizer_stock",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PESTICIDE_INVENTORY",
+      "type": "Table",
+      "name": "pesticide_inventory",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BIO_PESTICIDE_STOCK",
+      "type": "Table",
+      "name": "bio_pesticide_stock",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MICRONUTRIENT_STOCK",
+      "type": "Table",
+      "name": "micronutrient_stock",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ORGANIC_INPUT_STOCK",
+      "type": "Table",
+      "name": "organic_input_stock",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INPUT_PROCUREMENT_ORDERS",
+      "type": "Table",
+      "name": "input_procurement_orders",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INPUT_DISTRIBUTION_RECORDS",
+      "type": "Table",
+      "name": "input_distribution_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-INPUT_TRACEABILITY_RECORDS",
+      "type": "Table",
+      "name": "input_traceability_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CATTLE_REGISTRY",
+      "type": "Table",
+      "name": "cattle_registry",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POULTRY_BATCHES",
+      "type": "Table",
+      "name": "poultry_batches",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GOAT_FARMING_ANIMALS",
+      "type": "Table",
+      "name": "goat_farming_animals",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SHEEP_FARMING_ANIMALS",
+      "type": "Table",
+      "name": "sheep_farming_animals",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PIG_FARMING_ANIMALS",
+      "type": "Table",
+      "name": "pig_farming_animals",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LIVESTOCK_FEED_RECORDS",
+      "type": "Table",
+      "name": "livestock_feed_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BREEDING_RECORDS",
+      "type": "Table",
+      "name": "breeding_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LIVESTOCK_ANALYTICS_RECORDS",
+      "type": "Table",
+      "name": "livestock_analytics_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FARMER_FAMILY_MEMBERS",
+      "type": "Table",
+      "name": "farmer_family_members",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAND_LEASES",
+      "type": "Table",
+      "name": "land_leases",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GIS_LAND_MAPPING_PARCELS",
+      "type": "Table",
+      "name": "gis_land_mapping_parcels",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOIL_MAPPING_ZONES",
+      "type": "Table",
+      "name": "soil_mapping_zones",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-WATER_RESOURCE_MAPPING",
+      "type": "Table",
+      "name": "water_resource_mapping",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-GEO_BOUNDARIES",
+      "type": "Table",
+      "name": "geo_boundaries",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-LAND_SURVEYS",
+      "type": "Table",
+      "name": "land_surveys",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_REGISTRATIONS",
+      "type": "Table",
+      "name": "crop_registrations",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_VARIETIES",
+      "type": "Table",
+      "name": "crop_varieties",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SEED_PLANNING_PLANS",
+      "type": "Table",
+      "name": "seed_planning_plans",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-NURSERIES",
+      "type": "Table",
+      "name": "nurseries",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SOWING_RECORDS",
+      "type": "Table",
+      "name": "sowing_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CROP_MONITORING_OBSERVATIONS",
+      "type": "Table",
+      "name": "crop_monitoring_observations",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ASSET_LIFECYCLE",
+      "type": "Table",
+      "name": "asset_lifecycle",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-ASSET_LIFECYCLE_STAGES",
+      "type": "Table",
+      "name": "asset_lifecycle_stages",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PREVENTIVE_MAINTENANCE_RECORDS",
+      "type": "Table",
+      "name": "preventive_maintenance_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preventive_maintenance_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-VEGETABLE_PRODUCTION_RECORDS",
+      "type": "Table",
+      "name": "vegetable_production_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FLORICULTURE_RECORDS",
+      "type": "Table",
+      "name": "floriculture_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-POLYHOUSE_RECORDS",
+      "type": "Table",
+      "name": "polyhouse_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HYDROPONIC_SYSTEMS",
+      "type": "Table",
+      "name": "hydroponic_systems",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AEROPONIC_SYSTEMS",
+      "type": "Table",
+      "name": "aeroponic_systems",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRECISION_HORTICULTURE_READINGS",
+      "type": "Table",
+      "name": "precision_horticulture_readings",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PROTECTED_CULTIVATION_STRUCTURES",
+      "type": "Table",
+      "name": "protected_cultivation_structures",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HORTICULTURE_ANALYTICS_METRICS",
+      "type": "Table",
+      "name": "horticulture_analytics_metrics",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SEEDLING_BATCHES",
+      "type": "Table",
+      "name": "seedling_batches",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SEEDLING_HEALTH_RECORDS",
+      "type": "Table",
+      "name": "seedling_health_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-BIOFLOC_FARM_TANKS",
+      "type": "Table",
+      "name": "biofloc_farm_tanks",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-HATCHERY_BATCHES",
+      "type": "Table",
+      "name": "hatchery_batches",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISH_FEED_LOGS",
+      "type": "Table",
+      "name": "fish_feed_logs",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISHERIES_WATER_QUALITY_READINGS",
+      "type": "Table",
+      "name": "fisheries_water_quality_readings",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISH_HEALTH_RECORDS",
+      "type": "Table",
+      "name": "fish_health_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISHERIES_HARVEST_RECORDS",
+      "type": "Table",
+      "name": "fisheries_harvest_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FISH_PROCESSING_BATCHES",
+      "type": "Table",
+      "name": "fish_processing_batches",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-COLD_FISH_CHAIN_SHIPMENTS",
+      "type": "Table",
+      "name": "cold_fish_chain_shipments",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AQUACULTURE_ANALYTICS_METRICS",
+      "type": "Table",
+      "name": "aquaculture_analytics_metrics",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IDENTITY_PERMISSIONS",
+      "type": "Table",
+      "name": "identity_permissions",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SSO_PROVIDERS",
+      "type": "Table",
+      "name": "sso_providers",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MFA_DEVICES",
+      "type": "Table",
+      "name": "mfa_devices",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DIGITAL_IDENTITIES",
+      "type": "Table",
+      "name": "digital_identities",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-CONSENT_RECORDS",
+      "type": "Table",
+      "name": "consent_records",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-IMPLEMENT_REGISTRY",
+      "type": "Table",
+      "name": "implement_registry",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-EQUIPMENT_INVENTORY",
+      "type": "Table",
+      "name": "equipment_inventory",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FUEL_PURCHASES",
+      "type": "Table",
+      "name": "fuel_purchases",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-FUEL_CONSUMPTION",
+      "type": "Table",
+      "name": "fuel_consumption",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SPARE_PARTS_INVENTORY",
+      "type": "Table",
+      "name": "spare_parts_inventory",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-SPARE_PARTS_CONSUMPTION",
+      "type": "Table",
+      "name": "spare_parts_consumption",
+      "evidence": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_CONSENT",
+      "type": "Table",
+      "name": "user_consent",
+      "evidence": "backend/src/database/migrations/gdpr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DATA_SUBJECT_REQUESTS",
+      "type": "Table",
+      "name": "data_subject_requests",
+      "evidence": "backend/src/database/migrations/gdpr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-USER_DATA_RESIDENCY",
+      "type": "Table",
+      "name": "user_data_residency",
+      "evidence": "backend/src/database/migrations/gdpr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PRIVACY_IMPACT_ASSESSMENTS",
+      "type": "Table",
+      "name": "privacy_impact_assessments",
+      "evidence": "backend/src/database/migrations/gdpr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DATA_PROCESSING_ACTIVITIES",
+      "type": "Table",
+      "name": "data_processing_activities",
+      "evidence": "backend/src/database/migrations/gdpr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-DATA_BREACH_NOTIFICATIONS",
+      "type": "Table",
+      "name": "data_breach_notifications",
+      "evidence": "backend/src/database/migrations/gdpr_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_CONFIG",
+      "type": "Table",
+      "name": "platform_config",
+      "evidence": "backend/src/database/migrations/m001_platform_core_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_VERSIONS",
+      "type": "Table",
+      "name": "platform_versions",
+      "evidence": "backend/src/database/migrations/m001_platform_core_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_EVENTS",
+      "type": "Table",
+      "name": "platform_events",
+      "evidence": "backend/src/database/migrations/m001_platform_core_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-PLATFORM_MAINTENANCE",
+      "type": "Table",
+      "name": "platform_maintenance",
+      "evidence": "backend/src/database/migrations/m001_platform_core_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MFA_BACKUP_CODES",
+      "type": "Table",
+      "name": "mfa_backup_codes",
+      "evidence": "backend/src/database/migrations/mfa_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-MFA_VERIFICATION_ATTEMPTS",
+      "type": "Table",
+      "name": "mfa_verification_attempts",
+      "evidence": "backend/src/database/migrations/mfa_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_SESSION_CONTEXT",
+      "type": "Table",
+      "name": "ai_session_context",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_USAGE_TRACKING",
+      "type": "Table",
+      "name": "ai_usage_tracking",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_AGENT_PERFORMANCE",
+      "type": "Table",
+      "name": "ai_agent_performance",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_KNOWLEDGE_BASE",
+      "type": "Table",
+      "name": "ai_knowledge_base",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_CONTEXT_ENRICHMENT",
+      "type": "Table",
+      "name": "ai_context_enrichment",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_TOOL_EXECUTION",
+      "type": "Table",
+      "name": "ai_tool_execution",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_SAFETY_EVENTS",
+      "type": "Table",
+      "name": "ai_safety_events",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
+      "objectId": "TBL-AI_COST_OPTIMIZATION",
+      "type": "Table",
+      "name": "ai_cost_optimization",
+      "evidence": "backend/src/database/migrations/unified_ai_schema.sql",
+      "completion": 100,
+      "status": "Defined"
+    },
+    {
       "objectId": "AGT-FINANCE_CASHFLOW",
       "type": "AI Agent",
       "name": "finance.cashflow",
@@ -9874,10 +12786,58 @@
       "status": "Proposing"
     },
     {
+      "objectId": "AGT-CONTROLLING_COST_VARIANCE",
+      "type": "AI Agent",
+      "name": "controlling.cost_variance",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-ASSETS_LIFECYCLE",
+      "type": "AI Agent",
+      "name": "assets.lifecycle",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-LOGISTICS_DELAY_RISK",
+      "type": "AI Agent",
+      "name": "logistics.delay_risk",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-PRODUCTION_OEE",
+      "type": "AI Agent",
+      "name": "production.oee",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-HR_LEAVE_LIABILITY",
+      "type": "AI Agent",
+      "name": "hr.leave_liability",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
+      "objectId": "AGT-MASTERDATA_QUALITY",
+      "type": "AI Agent",
+      "name": "masterdata.quality",
+      "evidence": "backend/src/core/erpAgents.js",
+      "completion": 100,
+      "status": "Proposing"
+    },
+    {
       "objectId": "CAP-MARKETPLACE_CATALOG",
       "type": "Capability",
       "name": "Marketplace / catalog",
-      "evidence": "{\"tables\":10,\"services\":9,\"endpoints\":68,\"components\":9,\"tests\":1}",
+      "evidence": "{\"tables\":11,\"services\":10,\"endpoints\":77,\"components\":10,\"tests\":1}",
       "completion": 100,
       "status": "Production Candidate"
     },
@@ -9885,7 +12845,7 @@
       "objectId": "CAP-ORDERS_CHECKOUT",
       "type": "Capability",
       "name": "Orders / checkout",
-      "evidence": "{\"tables\":2,\"services\":4,\"endpoints\":19,\"components\":4,\"tests\":0}",
+      "evidence": "{\"tables\":2,\"services\":4,\"endpoints\":19,\"components\":5,\"tests\":0}",
       "completion": 80,
       "status": "Testing Pending"
     },
@@ -9893,7 +12853,7 @@
       "objectId": "CAP-PAYMENTS",
       "type": "Capability",
       "name": "Payments",
-      "evidence": "{\"tables\":16,\"services\":2,\"endpoints\":20,\"components\":1,\"tests\":0}",
+      "evidence": "{\"tables\":18,\"services\":2,\"endpoints\":20,\"components\":1,\"tests\":0}",
       "completion": 80,
       "status": "Testing Pending"
     },
@@ -9925,7 +12885,7 @@
       "objectId": "CAP-ACCOUNTING_DOUBLE_ENTRY_",
       "type": "Capability",
       "name": "Accounting (double-entry)",
-      "evidence": "{\"tables\":10,\"services\":3,\"endpoints\":19,\"components\":3,\"tests\":0}",
+      "evidence": "{\"tables\":10,\"services\":3,\"endpoints\":19,\"components\":4,\"tests\":0}",
       "completion": 80,
       "status": "Testing Pending"
     },
@@ -9933,7 +12893,7 @@
       "objectId": "CAP-SUBSIDY",
       "type": "Capability",
       "name": "Subsidy",
-      "evidence": "{\"tables\":2,\"services\":1,\"endpoints\":0,\"components\":1,\"tests\":0}",
+      "evidence": "{\"tables\":4,\"services\":1,\"endpoints\":0,\"components\":1,\"tests\":0}",
       "completion": 60,
       "status": "Testing Pending"
     },
@@ -9941,7 +12901,7 @@
       "objectId": "CAP-INSURANCE",
       "type": "Capability",
       "name": "Insurance",
-      "evidence": "{\"tables\":8,\"services\":6,\"endpoints\":29,\"components\":2,\"tests\":1}",
+      "evidence": "{\"tables\":9,\"services\":6,\"endpoints\":30,\"components\":2,\"tests\":1}",
       "completion": 100,
       "status": "Production Candidate"
     },
@@ -9949,7 +12909,7 @@
       "objectId": "CAP-LOGISTICS_SHIPMENT",
       "type": "Capability",
       "name": "Logistics / shipment",
-      "evidence": "{\"tables\":11,\"services\":4,\"endpoints\":60,\"components\":4,\"tests\":0}",
+      "evidence": "{\"tables\":12,\"services\":4,\"endpoints\":60,\"components\":6,\"tests\":0}",
       "completion": 80,
       "status": "Testing Pending"
     },
@@ -9957,15 +12917,15 @@
       "objectId": "CAP-COLD_CHAIN_TEMPERATURE",
       "type": "Capability",
       "name": "Cold chain / temperature",
-      "evidence": "{\"tables\":7,\"services\":3,\"endpoints\":27,\"components\":0,\"tests\":1}",
-      "completion": 80,
-      "status": "Backend Complete / Frontend Missing"
+      "evidence": "{\"tables\":8,\"services\":3,\"endpoints\":27,\"components\":1,\"tests\":1}",
+      "completion": 100,
+      "status": "Production Candidate"
     },
     {
       "objectId": "CAP-FARMER_PORTAL",
       "type": "Capability",
       "name": "Farmer portal",
-      "evidence": "{\"tables\":4,\"services\":7,\"endpoints\":49,\"components\":16,\"tests\":2}",
+      "evidence": "{\"tables\":9,\"services\":9,\"endpoints\":54,\"components\":16,\"tests\":2}",
       "completion": 100,
       "status": "Production Candidate"
     },
@@ -9973,7 +12933,7 @@
       "objectId": "CAP-ORGANIC_TRACEABILITY",
       "type": "Capability",
       "name": "Organic traceability",
-      "evidence": "{\"tables\":22,\"services\":1,\"endpoints\":13,\"components\":2,\"tests\":1}",
+      "evidence": "{\"tables\":23,\"services\":1,\"endpoints\":13,\"components\":2,\"tests\":1}",
       "completion": 100,
       "status": "Production Candidate"
     },
@@ -9997,7 +12957,7 @@
       "objectId": "CAP-WORKFLOW_APPROVALS",
       "type": "Capability",
       "name": "Workflow / approvals",
-      "evidence": "{\"tables\":4,\"services\":2,\"endpoints\":40,\"components\":0,\"tests\":1}",
+      "evidence": "{\"tables\":4,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
       "completion": 80,
       "status": "Backend Complete / Frontend Missing"
     },
@@ -10005,7 +12965,7 @@
       "objectId": "CAP-CRM",
       "type": "Capability",
       "name": "CRM",
-      "evidence": "{\"tables\":4,\"services\":2,\"endpoints\":40,\"components\":0,\"tests\":1}",
+      "evidence": "{\"tables\":4,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
       "completion": 80,
       "status": "Backend Complete / Frontend Missing"
     },
@@ -10013,7 +12973,7 @@
       "objectId": "CAP-RISK_MANAGEMENT",
       "type": "Capability",
       "name": "Risk management",
-      "evidence": "{\"tables\":9,\"services\":2,\"endpoints\":40,\"components\":0,\"tests\":1}",
+      "evidence": "{\"tables\":9,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
       "completion": 80,
       "status": "Backend Complete / Frontend Missing"
     },
@@ -10021,7 +12981,7 @@
       "objectId": "CAP-LEGAL_MANAGEMENT",
       "type": "Capability",
       "name": "Legal management",
-      "evidence": "{\"tables\":3,\"services\":2,\"endpoints\":40,\"components\":0,\"tests\":1}",
+      "evidence": "{\"tables\":3,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
       "completion": 80,
       "status": "Backend Complete / Frontend Missing"
     },
@@ -10029,7 +12989,7 @@
       "objectId": "CAP-EMERGENCY_MANAGEMENT",
       "type": "Capability",
       "name": "Emergency management",
-      "evidence": "{\"tables\":5,\"services\":2,\"endpoints\":40,\"components\":0,\"tests\":1}",
+      "evidence": "{\"tables\":6,\"services\":1,\"endpoints\":13,\"components\":0,\"tests\":1}",
       "completion": 80,
       "status": "Backend Complete / Frontend Missing"
     },
@@ -10037,7 +12997,7 @@
       "objectId": "CAP-CROP_SEMANTIC_SEARCH",
       "type": "Capability",
       "name": "Crop semantic search",
-      "evidence": "{\"tables\":2,\"services\":1,\"endpoints\":11,\"components\":1,\"tests\":0}",
+      "evidence": "{\"tables\":2,\"services\":1,\"endpoints\":11,\"components\":2,\"tests\":0}",
       "completion": 80,
       "status": "Testing Pending"
     },
@@ -10045,7 +13005,7 @@
       "objectId": "CAP-DISRUPTION_REROUTING",
       "type": "Capability",
       "name": "Disruption / rerouting",
-      "evidence": "{\"tables\":1,\"services\":5,\"endpoints\":42,\"components\":0,\"tests\":0}",
+      "evidence": "{\"tables\":1,\"services\":7,\"endpoints\":56,\"components\":0,\"tests\":0}",
       "completion": 60,
       "status": "Backend Complete / Frontend Missing"
     },
@@ -10053,7 +13013,7 @@
       "objectId": "CAP-KNOWLEDGE_GRAPH",
       "type": "Capability",
       "name": "Knowledge graph",
-      "evidence": "{\"tables\":1,\"services\":1,\"endpoints\":7,\"components\":1,\"tests\":1}",
+      "evidence": "{\"tables\":1,\"services\":1,\"endpoints\":7,\"components\":2,\"tests\":1}",
       "completion": 100,
       "status": "Production Candidate"
     },
@@ -10077,15 +13037,39 @@
       "objectId": "CAP-MONITORING_OBSERVABILITY",
       "type": "Capability",
       "name": "Monitoring / observability",
-      "evidence": "{\"tables\":2,\"services\":4,\"endpoints\":2,\"components\":3,\"tests\":0}",
+      "evidence": "{\"tables\":10,\"services\":7,\"endpoints\":12,\"components\":4,\"tests\":0}",
       "completion": 80,
       "status": "Testing Pending"
+    },
+    {
+      "objectId": "UI-ABOUTPAGE",
+      "type": "Page",
+      "name": "AboutPage.jsx",
+      "evidence": "frontend/src/pages/AboutPage.jsx",
+      "completion": 100,
+      "status": "Present"
     },
     {
       "objectId": "UI-ADMINDASHBOARDPAGE",
       "type": "Page",
       "name": "AdminDashboardPage.jsx",
       "evidence": "frontend/src/pages/AdminDashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-AGRICULTURALINTELLIGENCEPAGE",
+      "type": "Page",
+      "name": "AgriculturalIntelligencePage.jsx",
+      "evidence": "frontend/src/pages/AgriculturalIntelligencePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-AIAGENTPAGE",
+      "type": "Page",
+      "name": "AIAgentPage.jsx",
+      "evidence": "frontend/src/pages/AIAgentPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10098,10 +13082,50 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-AIBRAINPAGE",
+      "type": "Page",
+      "name": "AIBrainPage.jsx",
+      "evidence": "frontend/src/pages/AIBrainPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-AICHATPAGE",
+      "type": "Page",
+      "name": "AIChatPage.jsx",
+      "evidence": "frontend/src/pages/AIChatPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-AICOLLABORATIONPAGE",
+      "type": "Page",
+      "name": "AICollaborationPage.jsx",
+      "evidence": "frontend/src/pages/AICollaborationPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-AIDASHBOARD",
       "type": "Page",
       "name": "AIDashboard.jsx",
       "evidence": "frontend/src/pages/AIDashboard.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-AIOPERATIONINTELLIGENCEPAGE",
+      "type": "Page",
+      "name": "AIOperationIntelligencePage.jsx",
+      "evidence": "frontend/src/pages/AIOperationIntelligencePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-AISELFHEALINGPAGE",
+      "type": "Page",
+      "name": "AISelfHealingPage.jsx",
+      "evidence": "frontend/src/pages/AISelfHealingPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10126,6 +13150,14 @@
       "type": "Page",
       "name": "AssetAccountingPage.jsx",
       "evidence": "frontend/src/pages/AssetAccountingPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-ASSETLIFECYCLEMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "AssetLifecycleManagementPage.jsx",
+      "evidence": "frontend/src/pages/AssetLifecycleManagementPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10162,6 +13194,22 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-BREAKDOWNMAINTENANCEPAGE",
+      "type": "Page",
+      "name": "BreakdownMaintenancePage.jsx",
+      "evidence": "frontend/src/pages/BreakdownMaintenancePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-BULKORDERPAGE",
+      "type": "Page",
+      "name": "BulkOrderPage.jsx",
+      "evidence": "frontend/src/pages/BulkOrderPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-CADASHBOARDPAGE",
       "type": "Page",
       "name": "CADashboardPage.jsx",
@@ -10174,6 +13222,14 @@
       "type": "Page",
       "name": "CartPage.jsx",
       "evidence": "frontend/src/pages/CartPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-CATTLEREGISTRYPAGE",
+      "type": "Page",
+      "name": "CattleRegistryPage.jsx",
+      "evidence": "frontend/src/pages/CattleRegistryPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10210,6 +13266,14 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-COLDSTORAGEPAGE",
+      "type": "Page",
+      "name": "ColdStoragePage.jsx",
+      "evidence": "frontend/src/pages/ColdStoragePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-COMMUNITYMANAGEMENTPAGE",
       "type": "Page",
       "name": "CommunityManagementPage.jsx",
@@ -10234,10 +13298,42 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-COMPLETEAIINTEGRATIONPAGE",
+      "type": "Page",
+      "name": "CompleteAIIntegrationPage.jsx",
+      "evidence": "frontend/src/pages/CompleteAIIntegrationPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-COMPLETEERPINTEGRATIONPAGE",
+      "type": "Page",
+      "name": "CompleteERPIntegrationPage.jsx",
+      "evidence": "frontend/src/pages/CompleteERPIntegrationPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-COMPLIANCEPAGE",
       "type": "Page",
       "name": "CompliancePage.jsx",
       "evidence": "frontend/src/pages/CompliancePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-COMPREHENSIVEERPPAGE",
+      "type": "Page",
+      "name": "ComprehensiveERPPage.jsx",
+      "evidence": "frontend/src/pages/ComprehensiveERPPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-COOPERATIVESHAREPAGE",
+      "type": "Page",
+      "name": "CooperativeSharePage.jsx",
+      "evidence": "frontend/src/pages/CooperativeSharePage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10322,6 +13418,14 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-DECISIONSUPPORTPAGE",
+      "type": "Page",
+      "name": "DecisionSupportPage.jsx",
+      "evidence": "frontend/src/pages/DecisionSupportPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-DEFENSEFITNESSPREPPAGE",
       "type": "Page",
       "name": "DefenseFitnessPrepPage.jsx",
@@ -10354,6 +13458,22 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-ECOMMERCEINTEGRATIONPAGE",
+      "type": "Page",
+      "name": "EcommerceIntegrationPage.jsx",
+      "evidence": "frontend/src/pages/EcommerceIntegrationPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-ECOMMERCEMARKETPLACEPAGE",
+      "type": "Page",
+      "name": "EcommerceMarketplacePage.jsx",
+      "evidence": "frontend/src/pages/EcommerceMarketplacePage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-ECONOMICDASHBOARD",
       "type": "Page",
       "name": "EconomicDashboard.jsx",
@@ -10362,10 +13482,50 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-ENGINEERINGPROJECTPAGE",
+      "type": "Page",
+      "name": "EngineeringProjectPage.jsx",
+      "evidence": "frontend/src/pages/EngineeringProjectPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-ENTERPRISEAIPAGE",
+      "type": "Page",
+      "name": "EnterpriseAIPage.jsx",
+      "evidence": "frontend/src/pages/EnterpriseAIPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-ENTERPRISECONTROLPAGE",
       "type": "Page",
       "name": "EnterpriseControlPage.jsx",
       "evidence": "frontend/src/pages/EnterpriseControlPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-ENVIRONMENTMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "EnvironmentManagementPage.jsx",
+      "evidence": "frontend/src/pages/EnvironmentManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-EQUIPMENTINVENTORYPAGE",
+      "type": "Page",
+      "name": "EquipmentInventoryPage.jsx",
+      "evidence": "frontend/src/pages/EquipmentInventoryPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-EQUIPMENTRENTALPAGE",
+      "type": "Page",
+      "name": "EquipmentRentalPage.jsx",
+      "evidence": "frontend/src/pages/EquipmentRentalPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10570,6 +13730,30 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-FPOREGISTRATIONPAGE",
+      "type": "Page",
+      "name": "FPORegistrationPage.jsx",
+      "evidence": "frontend/src/pages/FPORegistrationPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-FUELMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "FuelManagementPage.jsx",
+      "evidence": "frontend/src/pages/FuelManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-GDPRCONSENTPAGE",
+      "type": "Page",
+      "name": "GDPRConsentPage.jsx",
+      "evidence": "frontend/src/pages/GDPRConsentPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-GOATFARMINGPAGE",
       "type": "Page",
       "name": "GoatFarmingPage.jsx",
@@ -10626,6 +13810,22 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-IMPLEMENTMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "ImplementManagementPage.jsx",
+      "evidence": "frontend/src/pages/ImplementManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-INFORMATIONSHARINGPAGE",
+      "type": "Page",
+      "name": "InformationSharingPage.jsx",
+      "evidence": "frontend/src/pages/InformationSharingPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-INPUTSUPPLYMANAGEMENTPAGE",
       "type": "Page",
       "name": "InputSupplyManagementPage.jsx",
@@ -10646,6 +13846,14 @@
       "type": "Page",
       "name": "IrrigationManagementPage.jsx",
       "evidence": "frontend/src/pages/IrrigationManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-KNOWLEDGEREFERENCEPAGE",
+      "type": "Page",
+      "name": "KnowledgeReferencePage.jsx",
+      "evidence": "frontend/src/pages/KnowledgeReferencePage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10690,6 +13898,14 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-LIBRARYBROWSERPAGE",
+      "type": "Page",
+      "name": "LibraryBrowserPage.jsx",
+      "evidence": "frontend/src/pages/LibraryBrowserPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-LIVESTOCKMANAGEMENTPAGE",
       "type": "Page",
       "name": "LivestockManagementPage.jsx",
@@ -10702,6 +13918,22 @@
       "type": "Page",
       "name": "LoginPage.jsx",
       "evidence": "frontend/src/pages/LoginPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-LOGISTICSENHANCEMENTPAGE",
+      "type": "Page",
+      "name": "LogisticsEnhancementPage.jsx",
+      "evidence": "frontend/src/pages/LogisticsEnhancementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-LOGISTICSMATCHINGPAGE",
+      "type": "Page",
+      "name": "LogisticsMatchingPage.jsx",
+      "evidence": "frontend/src/pages/LogisticsMatchingPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10746,10 +13978,34 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-MARKETSIGNALSPAGE",
+      "type": "Page",
+      "name": "MarketSignalsPage.jsx",
+      "evidence": "frontend/src/pages/MarketSignalsPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-MFASETUPPAGE",
+      "type": "Page",
+      "name": "MFASetupPage.jsx",
+      "evidence": "frontend/src/pages/MFASetupPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-MODULEHUBPAGE",
       "type": "Page",
       "name": "ModuleHubPage.jsx",
       "evidence": "frontend/src/pages/ModuleHubPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-NERVOUSSYSTEMPAGE",
+      "type": "Page",
+      "name": "NervousSystemPage.jsx",
+      "evidence": "frontend/src/pages/NervousSystemPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10874,6 +14130,14 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-REALTIMEMONITORINGPAGE",
+      "type": "Page",
+      "name": "RealtimeMonitoringPage.jsx",
+      "evidence": "frontend/src/pages/RealtimeMonitoringPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-REGISTERPAGE",
       "type": "Page",
       "name": "RegisterPage.jsx",
@@ -10886,6 +14150,14 @@
       "type": "Page",
       "name": "REOSDashboardPage.jsx",
       "evidence": "frontend/src/pages/REOSDashboardPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-RESEARCHANDDEVELOPMENTPAGE",
+      "type": "Page",
+      "name": "ResearchAndDevelopmentPage.jsx",
+      "evidence": "frontend/src/pages/ResearchAndDevelopmentPage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10910,6 +14182,14 @@
       "type": "Page",
       "name": "RolePermissionPage.jsx",
       "evidence": "frontend/src/pages/RolePermissionPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-SAPMODULEARCHITECTUREPAGE",
+      "type": "Page",
+      "name": "SAPModuleArchitecturePage.jsx",
+      "evidence": "frontend/src/pages/SAPModuleArchitecturePage.jsx",
       "completion": 100,
       "status": "Present"
     },
@@ -10986,6 +14266,14 @@
       "status": "Present"
     },
     {
+      "objectId": "UI-SPAREPARTSMANAGEMENTPAGE",
+      "type": "Page",
+      "name": "SparePartsManagementPage.jsx",
+      "evidence": "frontend/src/pages/SparePartsManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
       "objectId": "UI-SUBSIDYMANAGEMENTPAGE",
       "type": "Page",
       "name": "SubsidyManagementPage.jsx",
@@ -11046,6 +14334,14 @@
       "type": "Page",
       "name": "WaterManagementPage.jsx",
       "evidence": "frontend/src/pages/WaterManagementPage.jsx",
+      "completion": 100,
+      "status": "Present"
+    },
+    {
+      "objectId": "UI-WATERRECORDSPAGE",
+      "type": "Page",
+      "name": "WaterRecordsPage.jsx",
+      "evidence": "frontend/src/pages/WaterRecordsPage.jsx",
       "completion": 100,
       "status": "Present"
     },

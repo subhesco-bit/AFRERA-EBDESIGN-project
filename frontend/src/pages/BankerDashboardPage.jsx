@@ -96,34 +96,52 @@ function BankerDashboardPage() {
             </div>
           </div>
 
-          {/* AI Insights */}
+          {/* AI Insights - illustrative only. bankerAPI.getPortfolio() /
+              getRiskDashboard() call /banker/portfolio and /banker/risk-dashboard,
+              which have no matching backend route yet (see services/api.js
+              comment above bankerAPI), so there is no live figure to show here.
+              These numbers used to be hardcoded as if live; now labeled honestly. */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-blue-600" />
-              AI-Powered Insights
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <Activity className="w-5 h-5 mr-2 text-blue-600" />
+                AI-Powered Insights
+              </h3>
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+                Example — not live
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              This is a sample of what AI-scored portfolio insights will look like once the credit-scoring engine is connected to real loan data.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">High-Potential Borrowers</div>
                 <div className="text-2xl font-bold text-blue-600">12</div>
-                <div className="text-xs text-gray-500">Farmers with 750+ credit score</div>
+                <div className="text-xs text-gray-500">Example: farmers with 750+ credit score</div>
               </div>
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">Risk Alerts</div>
                 <div className="text-2xl font-bold text-orange-600">3</div>
-                <div className="text-xs text-gray-500">Loans requiring attention</div>
+                <div className="text-xs text-gray-500">Example: loans requiring attention</div>
               </div>
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">Portfolio Opportunity</div>
                 <div className="text-2xl font-bold text-green-600">₹2.5Cr</div>
-                <div className="text-xs text-gray-500">Additional lending capacity</div>
+                <div className="text-xs text-gray-500">Example: additional lending capacity</div>
               </div>
             </div>
           </div>
 
-          {/* Recent Applications */}
+          {/* Recent Applications - sample rows illustrating the workflow;
+              no loan-application-list endpoint exists on the backend yet. */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Loan Applications</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Recent Loan Applications</h3>
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+                Example — not live
+              </span>
+            </div>
             <div className="space-y-3">
               {[
                 { id: 'APP-001', farmer: 'Bornali Gogoi', amount: 500000, score: 780, status: 'approved' },
@@ -197,7 +215,12 @@ function BankerDashboardPage() {
               </div>
             </div>
             <div className="border rounded-lg p-4">
-              <h4 className="font-medium text-gray-800 mb-2">Score Distribution</h4>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-gray-800">Score Distribution</h4>
+                <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                  Example
+                </span>
+              </div>
               <div className="space-y-2">
                 <div className="flex items-center">
                   <div className="w-24 text-sm text-gray-600">750-850</div>
@@ -236,7 +259,12 @@ function BankerDashboardPage() {
       {/* Loan Applications Tab */}
       {activeTab === 'loan-applications' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Loan Applications</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Loan Applications</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example data — no loan-application API is wired up yet
+            </span>
+          </div>
           <div className="space-y-4">
             {[
               { id: 'APP-001', farmer: 'Bornali Gogoi', type: 'Crop Loan', amount: 500000, purpose: 'Kharif sowing', score: 780, status: 'approved', date: '2026-08-01' },
@@ -300,7 +328,12 @@ function BankerDashboardPage() {
       {/* Portfolio Tab */}
       {activeTab === 'portfolio' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Portfolio Analytics</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Portfolio Analytics</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example — /banker/portfolio isn't wired to real loan records yet
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-medium text-gray-800 mb-3">Portfolio Composition</h4>
@@ -347,7 +380,12 @@ function BankerDashboardPage() {
       {/* Risk Assessment Tab */}
       {activeTab === 'risk' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Risk Dashboard</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Risk Dashboard</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example — riskDashboard has no live figures yet
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="border rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">Overall Risk</div>
@@ -382,7 +420,12 @@ function BankerDashboardPage() {
       {/* Reports Tab */}
       {activeTab === 'reports' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Regulatory Reports</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Regulatory Reports</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example status — report generation isn't wired up yet
+            </span>
+          </div>
           <div className="space-y-3">
             {[
               { name: 'RBI Monthly Returns', frequency: 'Monthly', status: 'on_track', due: '2026-08-15' },

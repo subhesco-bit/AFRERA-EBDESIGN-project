@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Leaf, Truck, Shield, TrendingUp, Users, Award } from 'lucide-react'
+import { ArrowRight, Leaf, Truck, Shield, TrendingUp, Users, Award, Sprout, ShoppingBag, Landmark, Building2, Wheat } from 'lucide-react'
+
+const doors = [
+  { icon: Sprout, label: 'Farmer', to: '/farmer-entrance', blurb: 'Sell produce, plan harvests' },
+  { icon: ShoppingBag, label: 'Buyer', to: '/marketplace', blurb: 'Shop GI-certified produce' },
+  { icon: Building2, label: 'Corporate buyer', to: '/corporate-buyer', blurb: 'Source at volume' },
+  { icon: Landmark, label: 'Bank', to: '/banker-dashboard', blurb: 'Farmer credit & repayment data' },
+  { icon: Wheat, label: 'Government', to: '/government-dashboard', blurb: 'Scheme & subsidy tracking' },
+  { icon: Truck, label: 'Logistics partner', to: '/logistics-provider', blurb: 'Coordinate pickup & cold chain' },
+]
 
 function HomePage() {
   return (
@@ -45,6 +54,36 @@ function HomePage() {
         <svg className="absolute bottom-0 left-0 w-full h-16 text-v42-paddy" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
           <path d="M0 90 L0 60 L160 30 L320 58 L480 20 L680 60 L860 26 L1060 56 L1240 24 L1440 58 L1440 90 Z" fill="currentColor" />
         </svg>
+      </section>
+
+      {/* Find your door — persona fork. AFRERA is used by six distinct
+          audiences (see stakeholder mapping in DOCUMENTATION/Volume_1);
+          each already has a working dashboard route, but none were
+          reachable from the homepage until now. */}
+      <section className="py-16 bg-v42-paddy2">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-display font-bold text-center mb-3 text-v42-ink">
+            Find your door
+          </h2>
+          <p className="text-center text-v42-mut mb-12 max-w-xl mx-auto">
+            AFRERA looks different depending on who you are. Pick the one that's you.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {doors.map(({ icon: Icon, label, to, blurb }) => (
+              <Link
+                key={label}
+                to={to}
+                className="group bg-v42-paddy border border-v42-line rounded-lg p-6 text-center hover:shadow-lg hover:border-v42-turmeric transition"
+              >
+                <div className="w-14 h-14 bg-v42-forest/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Icon className="w-7 h-7 text-v42-forest" />
+                </div>
+                <h3 className="font-display font-semibold text-v42-ink">{label}</h3>
+                <p className="text-xs text-v42-mut mt-1">{blurb}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Features Section */}

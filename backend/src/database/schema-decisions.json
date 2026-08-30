@@ -287,6 +287,30 @@
       "loser": "994_recovered_capabilities.sql",
       "kind": "deferred",
       "rationale": "Different PK type (UUID vs SERIAL) suggesting two independently-built cold-storage booking systems. Deferred pending a review of which is actually live."
+    },
+    {
+      "table": "iot_devices",
+      "winner": "015_advanced_features.sql",
+      "loser": "031_iot_integration_schema.sql (ALTERs merged), 3030_m030_farmer_advisory.sql (no-op, farmer_id INTEGER type already flagged bad)",
+      "kind": "deferred",
+      "rationale": "072_tier1_m025_m030_schema.sql added farmer_id/specifications/registered_at/last_active as real ALTER columns so iotIntegrationService.js's hardcoded raw-SQL column names resolve. That is NOT the same as resolving the underlying model conflict: iotIntegrationService.js links a device to its owner via farmer_id, while digitalTwinService.js's getIoTDataForEntity() queries `iot_devices WHERE entity_id = $1` - a column that still does not exist anywhere and was deliberately not added, because adding a bare entity_id with no entity_type companion would be ambiguous (a farm and a crop could collide on the same UUID). Two same-day Devin services disagree on this table's ownership model; someone has to decide whether digital-twin IoT lookups should go through farmer_id (via the twin's owner_id) or a real polymorphic entity_id/entity_type pair before digitalTwinService.getIoTDataForEntity() can work.",
+      "note": "See .claude/audits/AUDIT_DB.md finding #3 and .ai/tasks/ACTIVE.md for the full analysis."
+    },
+    {
+      "table": "iot_sensor_data",
+      "winner": "072_tier1_m025_m030_schema.sql (new table, not a rename)",
+      "loser": "031_iot_integration_schema.sql's sensor_data (different table, kept as-is)",
+      "kind": "deferred",
+      "rationale": "sensor_data (031) and iot_sensor_data (072, matching iotIntegrationService.js's actual writes) are the same real-world concept - sensor readings - but not safe to merge: sensor_data.device_id is an INTEGER FK to iot_devices.id (the surrogate key), while iotIntegrationService.js writes/reads the business device_id STRING directly with no surrogate-key lookup step. They also disagree semantically on 'quality' (031: a 0-100 anomaly score; iotIntegrationService.js: a good/out_of_range/invalid enum). Created as two separate tables rather than guessing which linking strategy wins. Reconcile once IoT ingestion is actually live and one device-linking strategy is chosen platform-wide.",
+      "note": "See .claude/audits/AUDIT_DB.md finding #8."
+    },
+    {
+      "table": "crops (per-farmer planting model)",
+      "winner": "041_rural_life_os_schema.sql (crop catalog/taxonomy - unchanged)",
+      "loser": "N/A - no competing migration exists; advancedAnalyticsService.js and predictiveIntelligenceService.js were written against a table that was never built",
+      "kind": "deferred",
+      "rationale": "advancedAnalyticsService.js and predictiveIntelligenceService.js query crops.farmer_id, crops.expected_yield_kg, crops.planting_date, crops.growth_stage, orders.farmer_id, orders.region, order_items.crop_id, order_items.price_per_kg, and a `harvests` table - none of which exist. The real crops table (041) is a static catalog (crop_code, common_name, category, duration_days), not a per-farmer planted-crop instance with yield/harvest tracking; orders.user_id and order_items.product_id are the real columns, with no crop_id. This is not a missing-migration gap, it's a schema design gap: a crop_plantings/crop_cycles table (farmer_id, crop_id FK to the catalog, planting_date, expected_yield_kg, growth_stage, harvest records) needs to be designed before either service can run. Not attempted in 072_tier1_m025_m030_schema.sql - bolting 10+ unrelated columns onto the catalog table was explicitly avoided per this file's own no-guessing convention.",
+      "note": "Also blocks digitalTwinService.js's farm-twin path, which separately depends on a `farms` table that does not exist at all (no CREATE TABLE anywhere) and joins crops ON f.id = c.farm_id, a column crops does not have either. See .claude/audits/AUDIT_DB.md findings #1 and #6, and .ai/tasks/ACTIVE.md."
     }
   ]
 }

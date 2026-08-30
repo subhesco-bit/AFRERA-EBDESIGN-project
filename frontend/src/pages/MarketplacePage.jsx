@@ -268,10 +268,14 @@ function MarketplacePage() {
                   <p className="text-sm text-v42-mut mb-2">
                     {product.category_name} • {product.state_name}
                   </p>
-                  <div className="flex items-center mb-2">
-                    <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-v42-mut ml-1">4.5</span>
-                  </div>
+                  {typeof product.average_rating === 'number' && product.review_count > 0 && (
+                    <div className="flex items-center mb-2">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-sm text-v42-mut ml-1">
+                        {product.average_rating.toFixed(1)} ({product.review_count})
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-lg font-bold text-v42-ink">₹{product.base_price}</span>

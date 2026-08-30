@@ -1,6 +1,6 @@
 # AI Application Map — applications WITHIN each module
 
-**Generated:** 2026-08-28 by `tools/module-audit.js`
+**Generated:** 2026-08-30 by `tools/module-audit.js`
 **Status:** DESCRIPTIVE — read from source, comments stripped before analysis.
 **Do not edit by hand.**
 
@@ -9,9 +9,9 @@
 The question is not how many modules exist, but how many AI applications
 operate inside each one.
 
-- Modules with at least one AI application: **142 / 327**
-- Total AI applications: **265**
-- Modules with routes and NO AI: **118**
+- Modules with at least one AI application: **144 / 329**
+- Total AI applications: **268**
+- Modules with routes and NO AI: **119**
 
 ## Randomness review list — NOT a verdict
 
@@ -81,6 +81,7 @@ asserting fabrication. Judge each on the line, not on the count.
 | predictiveAnalyticsService | 2 | Forecasting, Scoring / ranking |
 | advancedFeatures | 2 | Forecasting, Recommendation |
 | valueCommerceService | 2 | Scoring / ranking, Recommendation |
+| cropPlanningRoutes | 2 | Forecasting, Recommendation |
 | ecommerceAIRoutes | 2 | Forecasting, Recommendation |
 | systemAdministrationRoutes | 2 | Forecasting, Recommendation |
 | aiAdvisoryService | 2 | Scoring / ranking, Recommendation |
@@ -118,14 +119,15 @@ asserting fabrication. Judge each on the line, not on the count.
 | digitalProductPassportService | 1 | Scoring / ranking |
 | informationSharingRoutes | 1 | Recommendation |
 | knowledgeRoutes | 1 | Recommendation |
-| sheepRoutes | 1 | Recommendation |
-| goatRoutes | 1 | Recommendation |
 | pigRoutes | 1 | Recommendation |
+| sheepRoutes | 1 | Recommendation |
 | farmerPortalEnhancements | 1 | Recommendation |
+| goatRoutes | 1 | Recommendation |
 | recipeIntelligenceService | 1 | Recommendation |
 | consumerHealthService | 1 | Recommendation |
 | completeAIIntegrationRoutes | 1 | Recommendation |
 | costControlRoutes | 1 | Recommendation |
+| platformCoreRoutes | 1 | Recommendation |
 | enterpriseControlService | 1 | Scoring / ranking |
 | logisticsService | 1 | Scoring / ranking |
 | dairyRoutes | 1 | Recommendation |
@@ -191,14 +193,14 @@ asserting fabrication. Judge each on the line, not on the count.
 - nervousSystemRoutes (22 routes)
 - logisticsEnhancements (21 routes)
 - indigenousKnowledgeService (19 routes)
+- animalHealthRoutes (19 routes)
+- insuranceEnhancements (19 routes)
 - poultryRoutes (19 routes)
 - sapModuleArchitectureRoutes (19 routes)
-- insuranceEnhancements (18 routes)
 - gstRoutes (16 routes)
 - omnichannelAIService (15 routes)
 - completeERPIntegrationRoutes (15 routes)
 - aiBrainRoutes (14 routes)
-- animalHealthRoutes (14 routes)
 - experienceRoutes (14 routes)
 - projectSystemsRoutes (14 routes)
 - laboratoryERPService (13 routes)
@@ -223,6 +225,7 @@ asserting fabrication. Judge each on the line, not on the count.
 - bulkOrderRoutes (9 routes)
 - backendModuleBridge (9 routes)
 - nutrientValueSalesRoutes (9 routes)
+- productReviewRoutes (9 routes)
 - rfqRoutes (9 routes)
 - roleManagementRoutes (9 routes)
 - offlineSyncService (8 routes)
@@ -232,6 +235,7 @@ asserting fabrication. Judge each on the line, not on the count.
 - complianceRoutes (8 routes)
 - ecommerceBusinessSalesRoutes (8 routes)
 - farmerHealthRoutes (8 routes)
+- landRecordsRoutes (8 routes)
 - ruralEnterpriseService (7 routes)
 - aiGatewayRoutes (7 routes)
 - libraryRoutes (7 routes)
@@ -280,7 +284,6 @@ asserting fabrication. Judge each on the line, not on the count.
 - vermicompostRoutes (5 routes)
 - livestockManagementRoutes (5 routes)
 - operationsManagementRoutes (5 routes)
-- platformCoreRoutes (5 routes)
 - preventiveMaintenanceRoutes (5 routes)
 - realtimeMonitoringRoutes (5 routes)
 - regionalVarietyRoutes (5 routes)
@@ -290,10 +293,10 @@ asserting fabrication. Judge each on the line, not on the count.
 - companyRoutes (4 routes)
 - cropValueResearchRoutes (4 routes)
 - defenseFitnessPrepRoutes (4 routes)
-- devinRoutes (4 routes)
 - productMediaAIRoutes (4 routes)
 - returnLoadBoardRoutes (4 routes)
 - enterpriseMemoryService (3 routes)
+- analyticsReportRoutes (2 routes)
 - costRoutes (2 routes)
 - foluBenchmarkRoutes (2 routes)
 - glutWarningRoutes (2 routes)

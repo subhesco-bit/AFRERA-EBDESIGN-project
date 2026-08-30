@@ -99,6 +99,16 @@ export const productsAPI = {
   requestImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
 }
 
+// Product Reviews API — real table-backed reviews (product_reviews, migration
+// 009_marketplace_enhancements.sql), mounted at /api/v1/product-reviews.
+// getStats is unauthenticated: used to show a real average rating on the
+// product detail page instead of a fabricated one.
+export const productReviewsAPI = {
+  getReviews: (productId, params = {}) => api.get(`/product-reviews/products/${productId}`, { params }),
+  getStats: (productId) => api.get(`/product-reviews/products/${productId}/stats`),
+  createReview: (productId, data) => api.post(`/product-reviews/products/${productId}`, data),
+}
+
 // Orders API
 export const ordersAPI = {
   getCart: () => api.get('/orders/cart'),
@@ -1247,7 +1257,10 @@ export const vendorsAPI = {
   createCorporateOrder: (body) => api.post('/vendors/corporate/orders', body),
   getLogisticsProfile: (providerId) => api.get(`/vendors/logistics/${providerId}/profile`),
   getActiveShipments: (providerId) => api.get(`/vendors/logistics/${providerId}/shipments`),
-  getColdChainNodes: () => api.get('/vendors/logistics/cold-chain/nodes'),
+  // Path must match backend's actual route name: 'coldchain-nodes', not
+  // 'cold-chain/nodes' - the old path always 404'd since vendorRoutes.js
+  // was added (see backend/src/routes/vendorRoutes.js).
+  getColdChainNodes: () => api.get('/vendors/logistics/coldchain-nodes'),
   getReturnTruckOpportunities: () => api.get('/vendors/logistics/return-trucks'),
   createLogisticsBooking: (body) => api.post('/vendors/logistics/bookings', body),
 }

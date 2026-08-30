@@ -1,5 +1,104 @@
 # ACTIVE TASKS
 
+## TODO — Devin's 30 Aug 2026 Tier 1 batch: integrated, blockers fixed, schema gaps remain (resume here, target 5pm 31 Aug)
+
+Devin landed a large uncommitted batch on 30 Aug 2026: 6 new "Tier 1" backend services
+(M025-M030 - advanced analytics, predictive intelligence, IoT integration, blockchain
+verification, digital twin, enterprise integration), 9 new frontend pages, an API response
+handler, and a UI/UX enhancement pass (~208 files). Self-reported as "production-level" /
+"COMPLETE" in `.ai/enhancements/PRODUCTION_COMPLETION_REPORT.md` etc. — per this project's
+established pattern, that claim did not hold up under verification. Ran a bug audit and a DB
+audit (`.claude/audits/AUDIT_BUGS.md`, `.claude/audits/AUDIT_DB.md`) against the full batch
+before integrating. Result: 0 of the 6 services could complete a single request or DB query
+as committed. Fixed everything mechanical; left everything that needed a product/schema
+decision **explicitly flagged**, not guessed.
+
+### Fixed this pass (boot/build blockers + mechanical bugs) — ✅ DONE
+- `frontend/src/config/routes.js` — malformed orphaned object literal (leftover from a
+  botched dedup of `CorporateBuyerPage`, which already has a real route at line 722) was a
+  JS syntax error that failed the **entire frontend build**, not just the 6 new dashboards.
+  Deleted the dead fragment.
+- `backend/src/middleware/apiResponseHandler.js` — only exported `success`/`error`, but all
+  9 touched route files (6 new + `farmerRoutes.js`/`cropManagementRoutes.js`/
+  `marketplaceEnhancements.js`, a regression against previously-working code) called
+  `sendSuccess`/`sendError`, which didn't exist — every request 500'd. Added matching aliases.
+- All 6 new route files imported `{ authenticate, authorize }` from
+  `'../middleware/authMiddleware'` — **that file does not exist anywhere in this repo** (the
+  real module is `../middleware/auth`, exporting `authMiddleware`/`requireRole`). This meant
+  none of the 6 route files could even `require()` successfully — missed by the bug audit
+  (which only ran up to the response-handler bug), caught by an actual `require()` smoke test
+  before commit. Fixed via a shim import in each file:
+  `const { authMiddleware: authenticate, requireRole } = require('../middleware/auth'); const authorize = (roles) => requireRole(...roles);`
+- `frontend/src/components/ui/common.jsx` — `DataTable`'s `column.render` was silently
+  renamed to `column.cell`, breaking custom cell rendering on 21 pre-existing pages with no
+  error (tables just rendered raw values). Now supports both (`column.cell || column.render`).
+- `backend/src/services/blockchainVerificationService.js` — was reading/writing the wrong
+  table (`blockchain_transactions`, which already exists under a totally different
+  Ethereum-style schema from `019_blockchain_traceability_schema.sql`) and the wrong `products`
+  columns (`product_name`/`farmer_id`/`status` vs real `name`/`created_by`/`is_active`).
+  Repointed at a new `product_custody_transactions` table and fixed the `products` query.
+- `backend/src/database/migrations/072_tier1_m025_m030_schema.sql` (new) — added the 7
+  genuinely-missing tables (`analytics_data`, `iot_sensor_data`, `digital_twins`,
+  `twin_simulations`, `enterprise_integrations`, `integration_sync_logs`, `payment_records`,
+  `product_custody_transactions`) plus the `iot_devices` ALTERs (`farmer_id`,
+  `specifications`, `registered_at`, `last_active`) that `iotIntegrationService.js` hardcodes
+  in raw SQL. Column shapes verified against what the service code actually queries, not
+  against Devin's speculative sketch in the completion report.
+- `advancedAnalyticsService.js` — fixed a `CROSS JOIN`-without-a-join-condition Cartesian
+  product in `getPlatformAnalytics` (rewrote as independent scalar subqueries), and SQL
+  injection via string-interpolated `timeRange`/filter values (added `toSafeInterval()`
+  whitelist + a column whitelist for `buildCustomQuery`/`buildWhereClause`, now parameterized).
+- `predictiveIntelligenceService.js` — same `timeRange`/`days` injection pattern fixed
+  (clamped/whitelisted). `getEnvironmentalConditions()` returns hardcoded fake weather
+  (25°C/70%/120mm for every farm regardless of real location) fed into every yield
+  prediction — did **not** fabricate a fix (no weather API is configured), instead made it
+  honest: returns `configured: false`, and `predictCropYield()` now surfaces
+  `environmentalDataConfigured: false` and caps confidence at 0.4 instead of the previous flat
+  0.75 that implied a real model.
+- `digitalTwinService.js` — `storeTwinState()` was discarding every twin-sync state update
+  (only bumped `last_synced`, never persisted `state`); `getLatestTwinState()` hardcoded
+  `'farm'` for every twin including crop twins, silently corrupting simulation input. Added a
+  `current_state JSONB` column (in 072) and fixed both methods to actually use it, reading
+  `entity_type` from the row instead of hardcoding.
+- `iotIntegrationService.js` — 2 small logic bugs: `processDataBuffer()` logged the buffer
+  size *after* clearing it (always logged 0); `checkThresholds()` treated a threshold of `0`
+  as falsy and silently skipped it.
+- `IoTMonitoringDashboard.jsx` / `DigitalTwinPage.jsx` — were calling the backend with the
+  literal string `"current"` instead of the signed-in farmer's real ID
+  (`/api/iot/farmers/current/devices`), which would either 500 on a typed FK column or
+  silently return zero rows. Wired both to `useAuthStore()`, matching the pattern already used
+  elsewhere in this codebase (see `DashboardPage.jsx`).
+- Verified: `npx vite build` succeeds clean; all 9 touched route files `require()` without
+  throwing; backend boots to the point of listening (got as far as `EADDRINUSE` against an
+  already-running dev instance — confirms route mounting itself no longer crashes).
+
+### Deferred — needs a product/architecture decision, NOT guessed (pick this up tomorrow)
+Recorded in `backend/src/database/schema-decisions.json` (4 new `deferred` entries) and
+`.claude/audits/AUDIT_DB.md`:
+1. **`crop_plantings`/`crop_cycles` model doesn't exist.** `advancedAnalyticsService.js` and
+   `predictiveIntelligenceService.js` were written against an imagined per-farmer
+   planted-crop-instance schema (yield tracking, growth stage, harvest date) that was never
+   built — the real `crops` table (041) is a static catalog. Every analytics/prediction query
+   in both services will still fail until this is designed. Not a one-line ALTER.
+2. **`farms` table doesn't exist at all.** `digitalTwinService.js`'s farm-twin path
+   (`verifyFarm`, `getFarmRealTimeData`) is 100% broken until either a real `farms` table is
+   added or the service is pointed at whichever existing table (`farm_plots`?
+   `farm_information`?) was actually intended — needs a human decision, not a guess.
+3. **`iot_devices` ownership model conflict.** `iotIntegrationService.js` links devices to a
+   farmer via `farmer_id`; `digitalTwinService.getIoTDataForEntity()` expects a generic
+   `entity_id` link to any twin-able entity. Two same-day Devin services disagree on this
+   table's shape — didn't add a bare `entity_id` (ambiguous without an `entity_type`
+   companion) to paper over it.
+4. **`iot_sensor_data` (new, 072) vs `sensor_data` (031, pre-existing).** Same real-world
+   concept, incompatible device-linking strategy (business string ID vs INTEGER surrogate FK)
+   and incompatible `quality` semantics (enum vs 0-100 score). Kept as two tables; reconcile
+   once IoT ingestion is actually live.
+
+None of these four block the app from booting or building — they block specific
+DB-touching methods within the 6 new Tier 1 services from succeeding against a live database.
+Everything else in the batch is now wired, honest about what's fake vs real, and building
+clean.
+
 ## TODO — "make all gaps zero" (2026-08-29, in progress, resume here)
 
 User asked to close every code-achievable gap from the AFRERA Gap Index

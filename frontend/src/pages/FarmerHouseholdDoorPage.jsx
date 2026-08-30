@@ -13,9 +13,9 @@ const ACTIONS = [
     note: 'Open — no sign-in needed',
   },
   {
-    label: 'Check indicative prices before you buy',
-    to: '/pricecheck',
-    note: 'Open — no sign-in needed',
+    label: 'Check indicative market prices before you buy',
+    to: '/price-check',
+    note: 'Requires signing in to this section',
   },
   {
     label: 'Open your farmer home hub — household and farm overview',
@@ -33,7 +33,7 @@ function FarmerHouseholdDoorPage() {
         </Link>
 
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-14 h-14 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-14 h-14 rounded-full bg-v42-turmeric/15 text-v42-turmericink flex items-center justify-center flex-shrink-0">
             <Home className="w-7 h-7" />
           </div>
           <div>
@@ -55,12 +55,12 @@ function FarmerHouseholdDoorPage() {
               <li key={action.to}>
                 <Link
                   to={action.to}
-                  className="flex items-center justify-between p-3 rounded-lg border border-v42-line hover:border-orange-400 hover:bg-orange-50 transition group"
+                  className="flex items-center justify-between p-3 rounded-lg border border-v42-line hover:border-v42-turmeric hover:bg-v42-paddy2 transition group"
                 >
                   <span className="text-v42-ink">{action.label}</span>
                   <span className="flex items-center gap-2 text-xs text-v42-mut flex-shrink-0 ml-3">
                     {action.note}
-                    <ArrowRight className="w-4 h-4 text-orange-600 group-hover:translate-x-0.5 transition-transform" />
+                    <ArrowRight className="w-4 h-4 text-v42-turmericink group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </Link>
               </li>
@@ -71,14 +71,14 @@ function FarmerHouseholdDoorPage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             to="/marketplace"
-            className="flex-1 px-6 py-3 bg-v42-paddy border-2 border-orange-600 text-orange-700 rounded-lg font-semibold hover:bg-orange-50 transition text-center"
+            className="flex-1 px-6 py-3 bg-v42-paddy border-2 border-v42-turmeric text-v42-turmericink rounded-lg font-semibold hover:bg-v42-paddy2 transition text-center"
           >
             Open without signing in
           </Link>
           <Link
             to="/login"
             state={{ from: '/farmerhome' }}
-            className="flex-1 px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition inline-flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 bg-v42-turmeric text-white rounded-lg font-semibold hover:bg-v42-turmericink transition inline-flex items-center justify-center gap-2"
           >
             <LogIn className="w-5 h-5" /> Sign in to this section
           </Link>

@@ -10,6 +10,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../database/pool');
+const apiResponseHandler = require('../middleware/apiResponseHandler');
 const {
   getFarmerById,
   getFarmers,
@@ -27,9 +28,9 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const { page, limit, sort_by, sort_order, ...filters } = req.query;
     const result = await getFarmers(filters, { page: Number(page) || 1, limit: Number(limit) || 20, sort_by, sort_order });
-    res.json({ success: true, data: result });
+    return apiResponseHandler.sendSuccess(res, result, 'Farmers retrieved successfully');
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return apiResponseHandler.sendError(res, 'Failed to retrieve farmers', 500, 'SERVER_ERROR', error.message);
   }
 });
 
@@ -37,9 +38,9 @@ router.get('/', authMiddleware, async (req, res) => {
 router.get('/fpos/list', authMiddleware, async (req, res) => {
   try {
     const result = await getFPOs(req.query);
-    res.json({ success: true, data: result });
+    return apiResponseHandler.sendSuccess(res, result, 'FPOs retrieved successfully');
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return apiResponseHandler.sendError(res, 'Failed to retrieve FPOs', 500, 'SERVER_ERROR', error.message);
   }
 });
 

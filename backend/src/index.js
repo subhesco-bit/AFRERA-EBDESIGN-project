@@ -715,6 +715,21 @@ app.use('/api/v1/ai-collaboration', aiCollaborationRoutes);
 app.use('/api/v1/advanced', advancedFeatures);
 app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
 
+// Tier 1 Advanced Modules (M025-M030) - Production-level services
+const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes');
+const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRoutes');
+const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes');
+const blockchainVerificationRoutes = require('./routes/blockchainVerificationRoutes');
+const digitalTwinRoutes = require('./routes/digitalTwinRoutes');
+const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoutes');
+
+app.use('/api/analytics', advancedAnalyticsRoutes);
+app.use('/api/predictive', predictiveIntelligenceRoutes);
+app.use('/api/iot', iotIntegrationRoutes);
+app.use('/api/blockchain', blockchainVerificationRoutes);
+app.use('/api/digital-twin', digitalTwinRoutes);
+app.use('/api/enterprise', enterpriseIntegrationRoutes);
+
 // Routes that existed but were never mounted anywhere
 app.use('/api/v1/gst', gstRoutes);
 // REMOVED: logisticsOpsRoutes - missing file, will crash app

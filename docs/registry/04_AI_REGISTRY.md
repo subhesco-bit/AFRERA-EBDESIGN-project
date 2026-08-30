@@ -1,21 +1,21 @@
 # AI Registry
 
-**Generated:** 2026-08-17 by `tools/engineering-registry.js`
+**Generated:** 2026-08-30 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
-**Objects indexed:** 15
+**Objects indexed:** 21
 
 ---
 
-- Agents: **15**
-- Domains: **13**
+- Agents: **21**
+- Domains: **19**
 - Signal types: **48**
 - Correlation rules: **6**
 - MCDA framework: **present**
 - Propose-only (no self-execution): **enforced**
-- Outcome feedback loop: **MISSING — agents cannot learn**
-- Fabricated outputs (`Math.random()` in services): **69**
+- Outcome feedback loop: **present**
+- Fabricated outputs (`Math.random()` in services): **68**
 
 ## Agents
 
@@ -36,6 +36,12 @@
 | AGT-RISK_REGISTER_HEALTH | risk.register_health | RISK |
 | AGT-EMERGENCY_INCIDENT_COMMAND | emergency.incident_command | EMERGENCY |
 | AGT-COMPLIANCE_SOD | compliance.sod | COMPLIANCE |
+| AGT-CONTROLLING_COST_VARIANCE | controlling.cost_variance | CONTROLLING |
+| AGT-ASSETS_LIFECYCLE | assets.lifecycle | ASSETS |
+| AGT-LOGISTICS_DELAY_RISK | logistics.delay_risk | LOGISTICS |
+| AGT-PRODUCTION_OEE | production.oee | PRODUCTION |
+| AGT-HR_LEAVE_LIABILITY | hr.leave_liability | HR |
+| AGT-MASTERDATA_QUALITY | masterdata.quality | MASTERDATA |
 
 ## Signals
 

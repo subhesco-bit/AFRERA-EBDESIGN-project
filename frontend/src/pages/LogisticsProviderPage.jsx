@@ -4,21 +4,29 @@ import { vendorsAPI } from '../services/api'
 import { Truck, Package, CheckCircle, Navigation, Thermometer, Clock, TrendingUp, DollarSign, Route } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
+import { useAuthStore } from '../store/authStore'
 
 function LogisticsProviderPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [showBookingModal, setShowBookingModal] = useState(false)
   const queryClient = useQueryClient()
+  const { user } = useAuthStore()
+
+  // Was hardcoded to the literal string 'current-provider-id' for every
+  // visitor. Use the logged-in user's real id instead.
+  const providerId = user?.id
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: providerProfile } = useQuery({
-    queryKey: ['logistics-profile'],
-    queryFn: () => vendorsAPI.getLogisticsProfile('current-provider-id').then(r => r.data),
+    queryKey: ['logistics-profile', providerId],
+    queryFn: () => vendorsAPI.getLogisticsProfile(providerId).then(r => r.data),
+    enabled: !!providerId,
   })
 
   const { data: activeShipments } = useQuery({
-    queryKey: ['active-shipments'],
-    queryFn: () => vendorsAPI.getActiveShipments('current-provider-id').then(r => r.data),
+    queryKey: ['active-shipments', providerId],
+    queryFn: () => vendorsAPI.getActiveShipments(providerId).then(r => r.data),
+    enabled: !!providerId,
   })
 
   const { data: coldChainNodes } = useQuery({
@@ -121,9 +129,10 @@ function LogisticsProviderPage() {
             </div>
           </div>
 
-          {/* Cold-Chain Corridor Map */}
+          {/* Cold-Chain Corridor Map - node counts derived from the real
+              coldChainNodes list fetched above, not hardcoded. */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">12-Node Cold-Chain Corridor</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Cold-Chain Corridor</h2>
             <div className="bg-gray-100 rounded-lg p-6">
               <div className="flex items-center justify-center mb-4">
                 <Navigation className="w-12 h-12 text-green-600" />
@@ -133,24 +142,36 @@ function LogisticsProviderPage() {
               </div>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">6</div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {coldChainNodes?.filter(n => n.type === 'production').length ?? 0}
+                  </div>
                   <div className="text-sm text-gray-600">Production Nodes</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">4</div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {coldChainNodes?.filter(n => n.type === 'transit').length ?? 0}
+                  </div>
                   <div className="text-sm text-gray-600">Transit Hubs</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-800">2</div>
+                  <div className="text-2xl font-bold text-gray-800">
+                    {coldChainNodes?.filter(n => n.type === 'distribution').length ?? 0}
+                  </div>
                   <div className="text-sm text-gray-600">Distribution Centers</div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Equipment Status */}
+          {/* Equipment Status - illustrative example; no fleet/equipment
+              inventory API exists on the backend yet. */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Equipment Status</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">Equipment Status</h2>
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+                Example — not live
+              </span>
+            </div>
             <div className="space-y-3">
               {[
                 { type: 'Reefer Trucks', total: 45, active: 38, status: 'operational' },

@@ -19,6 +19,7 @@ import { lazy } from 'react'
  * Lazy load page components
  */
 const HomePage = lazy(() => import('../pages/HomePage'))
+const AboutPage = lazy(() => import('../pages/AboutPage'))
 const MarketplacePage = lazy(() => import('../pages/MarketplacePage'))
 const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'))
 const CartPage = lazy(() => import('../pages/CartPage'))
@@ -47,6 +48,23 @@ const InsurancePage = lazy(() => import('../pages/InsurancePage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const WalletPage = lazy(() => import('../pages/WalletPage'))
 const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
+
+// Tier 1 Advanced Services Pages (M025-M030)
+const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'))
+const PredictiveIntelligencePage = lazy(() => import('../pages/PredictiveIntelligencePage'))
+const IoTMonitoringDashboard = lazy(() => import('../pages/IoTMonitoringDashboard'))
+const BlockchainVerificationPage = lazy(() => import('../pages/BlockchainVerificationPage'))
+const DigitalTwinPage = lazy(() => import('../pages/DigitalTwinPage'))
+const EnterpriseIntegrationPage = lazy(() => import('../pages/EnterpriseIntegrationPage'))
+
+// Additional Dashboard Pages
+const FinancialServicesDashboard = lazy(() => import('../pages/FinancialServicesDashboard'))
+const OperationalDashboard = lazy(() => import('../pages/OperationalDashboard'))
+
+// Financial Services Pages
+const LoanManagementPage = lazy(() => import('../pages/LoanManagementPage'))
+const InsuranceManagementPage = lazy(() => import('../pages/InsuranceManagementPage'))
+const PaymentProcessingPage = lazy(() => import('../pages/PaymentProcessingPage'))
 const FarmerEntranceHubPage = lazy(() => import('../pages/FarmerEntranceHubPage'))
 const FarmerSellDoorPage = lazy(() => import('../pages/FarmerSellDoorPage'))
 const FarmerHouseholdDoorPage = lazy(() => import('../pages/FarmerHouseholdDoorPage'))
@@ -195,6 +213,14 @@ export const publicRoutes = [
     title: 'Home - AFRERA Agriculture Platform',
     description: 'Welcome to AFRERA - Your comprehensive agriculture and rural economy platform',
     keywords: 'agriculture, farming, rural economy, marketplace',
+    transition: 'fade'
+  },
+  {
+    path: '/about',
+    component: AboutPage,
+    title: 'About AFRERA - Who The Platform Is For',
+    description: 'AFRERA connects farmers, buyers, government, financial institutions and service providers on one platform',
+    keywords: 'about, stakeholders, mission, agriculture platform',
     transition: 'fade'
   },
   {
@@ -696,10 +722,112 @@ export const dashboardRoutes = [
     path: '/corporate-buyer',
     component: CorporateBuyerPage,
     title: 'Corporate Buyer - AFRERA',
-    description: 'Corporate buyer portal',
+    description: 'Corporate procurement dashboard',
     keywords: 'corporate, buyer, procurement',
     transition: 'fade',
     role: 'corporate'
+  },
+  // Tier 1 Advanced Services Dashboards
+  {
+    path: '/advanced-analytics',
+    component: AdvancedAnalyticsDashboard,
+    title: 'Advanced Analytics - AFRERA',
+    description: 'Production-level analytics and business intelligence',
+    keywords: 'analytics, business intelligence, data',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/predictive-intelligence',
+    component: PredictiveIntelligencePage,
+    title: 'Predictive Intelligence - AFRERA',
+    description: 'AI-powered predictions and forecasting',
+    keywords: 'AI, predictions, forecasting, intelligence',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/iot-monitoring',
+    component: IoTMonitoringDashboard,
+    title: 'IoT Monitoring - AFRERA',
+    description: 'IoT device monitoring and management',
+    keywords: 'IoT, sensors, monitoring, devices',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/blockchain-verification',
+    component: BlockchainVerificationPage,
+    title: 'Blockchain Verification - AFRERA',
+    description: 'Blockchain-based product verification and traceability',
+    keywords: 'blockchain, verification, traceability, supply chain',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/digital-twin',
+    component: DigitalTwinPage,
+    title: 'Digital Twin - AFRERA',
+    description: 'Digital twin management and simulation',
+    keywords: 'digital twin, simulation, modeling',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/enterprise-integration',
+    component: EnterpriseIntegrationPage,
+    title: 'Enterprise Integration - AFRERA',
+    description: 'Enterprise system integration management',
+    keywords: 'enterprise, integration, ERP, API',
+    transition: 'fade',
+    role: 'admin'
+  },
+  // Additional Production Dashboards
+  {
+    path: '/financial-services',
+    component: FinancialServicesDashboard,
+    title: 'Financial Services - AFRERA',
+    description: 'Financial services overview and management',
+    keywords: 'financial, services, loans, insurance',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/operational-dashboard',
+    component: OperationalDashboard,
+    title: 'Operations Dashboard - AFRERA',
+    description: 'Operational monitoring and management',
+    keywords: 'operations, monitoring, management',
+    transition: 'fade',
+    role: 'admin'
+  },
+  // Financial Services Pages
+  {
+    path: '/loan-management',
+    component: LoanManagementPage,
+    title: 'Loan Management - AFRERA',
+    description: 'Loan application and management',
+    keywords: 'loan, credit, finance',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/insurance-management',
+    component: InsuranceManagementPage,
+    title: 'Insurance Management - AFRERA',
+    description: 'Insurance policy management',
+    keywords: 'insurance, policy, coverage',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/payment-processing',
+    component: PaymentProcessingPage,
+    title: 'Payment Processing - AFRERA',
+    description: 'Payment processing and transaction management',
+    keywords: 'payment, transaction, finance',
+    transition: 'fade',
+    role: 'farmer'
   },
   {
     path: '/logistics-provider',

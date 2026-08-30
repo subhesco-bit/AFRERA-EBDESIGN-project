@@ -132,34 +132,48 @@ function GovernmentDashboardPage() {
             </div>
           </div>
 
-          {/* AI Insights */}
+          {/* AI Insights - illustrative only. governmentAPI.getSchemeAnalytics()
+              calls /government/scheme-analytics, which has no matching backend
+              route yet (see services/api.js comment above governmentAPI), so
+              there's no live figure behind these numbers. */}
           <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-6 border border-purple-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-purple-600" />
-              AI-Powered Scheme Insights
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <Activity className="w-5 h-5 mr-2 text-purple-600" />
+                AI-Powered Scheme Insights
+              </h3>
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+                Example — not live
+              </span>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">Underserved Regions</div>
                 <div className="text-2xl font-bold text-purple-600">3</div>
-                <div className="text-xs text-gray-500">Districts with low scheme uptake</div>
+                <div className="text-xs text-gray-500">Example: districts with low scheme uptake</div>
               </div>
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">Optimization Opportunity</div>
                 <div className="text-2xl font-bold text-green-600">₹15Cr</div>
-                <div className="text-xs text-gray-500">Additional subsidy reach potential</div>
+                <div className="text-xs text-gray-500">Example: additional subsidy reach potential</div>
               </div>
               <div className="bg-white rounded-lg p-4">
                 <div className="text-sm text-gray-600 mb-1">Fraud Detection</div>
                 <div className="text-2xl font-bold text-blue-600">0</div>
-                <div className="text-xs text-gray-500">AI-detected anomalies this month</div>
+                <div className="text-xs text-gray-500">Example: AI-detected anomalies this month</div>
               </div>
             </div>
           </div>
 
-          {/* Scheme Performance */}
+          {/* Scheme Performance - sample rows; see the Schemes tab's
+              "Verified Scheme Registry" for the real, live-wired data. */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Scheme Performance</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Scheme Performance</h3>
+              <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+                Example — not live
+              </span>
+            </div>
             <div className="space-y-3">
               {[
                 { name: 'PMFBY', beneficiaries: 12500, disbursed: 45, utilization: 78, status: 'active' },
@@ -245,6 +259,12 @@ function GovernmentDashboardPage() {
               </div>
             </div>
           </div>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-gray-700">Illustrative Scheme Cards</h4>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example budget/utilization — not live (see Verified Scheme Registry above for real data)
+            </span>
+          </div>
           <div className="space-y-4">
             {[
               { id: 'PMFBY', name: 'Pradhan Mantri Fasal Bima Yojana', ministry: 'Agriculture', budget: 5000, utilized: 3900, status: 'active', expiry: '2027-03-31' },
@@ -301,7 +321,12 @@ function GovernmentDashboardPage() {
       {/* Subsidies Tab */}
       {activeTab === 'subsidies' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Subsidy Management</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Subsidy Management</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example — no subsidy disbursement API is wired up yet
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="border rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">Pending Disbursements</div>
@@ -328,7 +353,12 @@ function GovernmentDashboardPage() {
       {/* Beneficiaries Tab */}
       {activeTab === 'beneficiaries' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Beneficiary Management</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Beneficiary Management</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example — no beneficiary registry API is wired up yet
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="border rounded-lg p-4">
               <div className="text-sm text-gray-600 mb-1">Total Beneficiaries</div>
@@ -356,7 +386,12 @@ function GovernmentDashboardPage() {
       {/* Compliance Tab */}
       {activeTab === 'compliance' && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Compliance Monitoring</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Compliance Monitoring</h3>
+            <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-1">
+              Example — governmentAPI.getComplianceStatus() has no live data yet
+            </span>
+          </div>
           <div className="space-y-4">
             {[
               { type: 'Scheme Eligibility', status: 'compliant', lastCheck: '2026-08-04', issues: 0 },

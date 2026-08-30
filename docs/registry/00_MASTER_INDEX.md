@@ -1,203 +1,239 @@
 # Master Engineering Index
 
-**Generated:** 2026-08-17 by `tools/engineering-registry.js`
+**Generated:** 2026-08-30 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
-**Objects indexed:** 1384
+**Objects indexed:** 1796
 
 ---
 
 | ID | Type | Name | Status | % | Evidence |
 |---|---|---|---|---|---|
-| SVC-ADVANCEDAISERVICE | Service | advancedAIService | Wired | 100 | backend/src/services/advancedAIService.js |
-| SVC-ADVANCEDFEATURESSERVICE | Service | advancedFeaturesService | No route | 50 | backend/src/services/advancedFeaturesService.js |
-| SVC-ADVANCEDSERVICEGENERATOR | Service | advancedServiceGenerator | No route | 50 | backend/src/services/advancedServiceGenerator.js |
 | SVC-ADVANCEDVOICEAI | Service | advancedVoiceAI | Wired | 100 | backend/src/services/advancedVoiceAI.js |
-| SVC-AGRICULTURALINTELLIGENCESERVICE | Service | agriculturalIntelligenceService | No route | 50 | backend/src/services/agriculturalIntelligenceService.js |
-| SVC-AIADVISORYSERVICE | Service | aiAdvisoryService | Wired | 100 | backend/src/services/aiAdvisoryService.js |
-| SVC-AIAGENTICCOMPANIONSERVICE | Service | aiAgenticCompanionService | No route | 50 | backend/src/services/aiAgenticCompanionService.js |
 | SVC-AIAGENTSERVICE | Service | aiAgentService | No route | 50 | backend/src/services/aiAgentService.js |
-| SVC-AIBACKBONESERVICE | Service | aiBackboneService | No route | 50 | backend/src/services/aiBackboneService.js |
-| SVC-AIBRAINSERVICE | Service | aiBrainService | No route | 50 | backend/src/services/aiBrainService.js |
-| SVC-AICOPILOTSERVICE | Service | aiCopilotService | Wired | 100 | backend/src/services/aiCopilotService.js |
-| SVC-AIGATEWAYSERVICE | Service | aiGatewayService | No route | 50 | backend/src/services/aiGatewayService.js |
-| SVC-AIOPERATIONINTELLIGENCESERVICE | Service | aiOperationIntelligenceService | No route | 50 | backend/src/services/aiOperationIntelligenceService.js |
-| SVC-AIORCHESTRATIONSERVICE | Service | aiOrchestrationService | No route | 50 | backend/src/services/aiOrchestrationService.js |
-| SVC-AISELFHEALINGSERVICE | Service | aiSelfHealingService | No route | 50 | backend/src/services/aiSelfHealingService.js |
-| SVC-AISERVICE | Service | aiService | Wired | 100 | backend/src/services/aiService.js |
-| SVC-ANALYTICSMONITORINGSERVICE | Service | analyticsMonitoringService | No route | 50 | backend/src/services/analyticsMonitoringService.js |
-| SVC-ANALYTICSSERVICE | Service | analyticsService | No route | 50 | backend/src/services/analyticsService.js |
-| SVC-ANIMALHEALTHSERVICE | Service | animalHealthService | No route | 50 | backend/src/services/animalHealthService.js |
-| SVC-ARVRSERVICE | Service | arVrService | Wired | 100 | backend/src/services/arVrService.js |
-| SVC-ASSETACCOUNTINGSERVICE | Service | assetAccountingService | No route | 50 | backend/src/services/assetAccountingService.js |
-| SVC-AUDITSERVICE | Service | auditService | No route | 50 | backend/src/services/auditService.js |
-| SVC-AUTHSERVICE | Service | authService | Wired | 100 | backend/src/services/authService.js |
-| SVC-BACKUPSERVICE | Service | backupService | No route | 50 | backend/src/services/backupService.js |
-| SVC-BIODIVERSITYSERVICE | Service | biodiversityService | Wired | 100 | backend/src/services/biodiversityService.js |
-| SVC-BLOCKCHAINTRACEABILITYSERVICE | Service | blockchainTraceabilityService | Wired | 100 | backend/src/services/blockchainTraceabilityService.js |
-| SVC-BULKORDERSERVICE | Service | bulkOrderService | No route | 50 | backend/src/services/bulkOrderService.js |
-| SVC-BUYINGCLUBSERVICE | Service | buyingClubService | Wired | 100 | backend/src/services/buyingClubService.js |
-| SVC-CATALOGINTELLIGENCESERVICE | Service | catalogIntelligenceService | Wired | 100 | backend/src/services/catalogIntelligenceService.js |
-| SVC-CIVILDISRUPTIONSERVICE | Service | civilDisruptionService | No route | 50 | backend/src/services/civilDisruptionService.js |
-| SVC-COLDSTORAGESERVICE | Service | coldStorageService | No route | 50 | backend/src/services/coldStorageService.js |
-| SVC-COMMERCERULESSERVICE | Service | commerceRulesService | Wired | 100 | backend/src/services/commerceRulesService.js |
-| SVC-COMMUNITYSERVICE | Service | communityService | No route | 50 | backend/src/services/communityService.js |
-| SVC-COMPANYSERVICE | Service | companyService | No route | 50 | backend/src/services/companyService.js |
-| SVC-COMPLETEAIINTEGRATIONSERVICE | Service | completeAIIntegrationService | No route | 50 | backend/src/services/completeAIIntegrationService.js |
-| SVC-COMPLETEERPINTEGRATIONSERVICE | Service | completeERPIntegrationService | No route | 50 | backend/src/services/completeERPIntegrationService.js |
-| SVC-COMPLIANCESERVICE | Service | complianceService | No route | 50 | backend/src/services/complianceService.js |
-| SVC-COMPREHENSIVEERPSERVICE | Service | comprehensiveERPService | No route | 50 | backend/src/services/comprehensiveERPService.js |
-| SVC-CONSUMERHEALTHSERVICE | Service | consumerHealthService | Wired | 100 | backend/src/services/consumerHealthService.js |
-| SVC-CONVERSATIONALAISERVICE | Service | conversationalAIService | Wired | 100 | backend/src/services/conversationalAIService.js |
-| SVC-COOPERATIVESHARESERVICE | Service | cooperativeShareService | No route | 50 | backend/src/services/cooperativeShareService.js |
-| SVC-COSTCONTROLSERVICE | Service | costControlService | No route | 50 | backend/src/services/costControlService.js |
-| SVC-COSTSERVICE | Service | costService | No route | 50 | backend/src/services/costService.js |
-| SVC-CROPPLANNINGSERVICE | Service | cropPlanningService | No route | 50 | backend/src/services/cropPlanningService.js |
-| SVC-CROPVALUERESEARCHSERVICE | Service | cropValueResearchService | No route | 50 | backend/src/services/cropValueResearchService.js |
-| SVC-CUSTODYEVENTROUTES | Service | custodyEventRoutes | Wired | 100 | backend/src/services/custodyEventRoutes.js |
-| SVC-CUSTODYEVENTSERVICE | Service | custodyEventService | No route | 50 | backend/src/services/custodyEventService.js |
-| SVC-DAIRYSERVICE | Service | dairyService | No route | 50 | backend/src/services/dairyService.js |
-| SVC-DECISIONSUPPORTSERVICE | Service | decisionSupportService | No route | 50 | backend/src/services/decisionSupportService.js |
-| SVC-DEFENSEFITNESSPREPSERVICE | Service | defenseFitnessPrepService | No route | 50 | backend/src/services/defenseFitnessPrepService.js |
-| SVC-DEMANDSERVICE | Service | demandService | No route | 50 | backend/src/services/demandService.js |
-| SVC-DIGITALPRODUCTPASSPORTSERVICE | Service | digitalProductPassportService | Wired | 100 | backend/src/services/digitalProductPassportService.js |
-| SVC-DIGITALTWINSERVICE | Service | digitalTwinService | No route | 50 | backend/src/services/digitalTwinService.js |
-| SVC-DPRGENERATIONSERVICE | Service | dprGenerationService | No route | 50 | backend/src/services/dprGenerationService.js |
-| SVC-DYNAMICPRICINGSERVICE | Service | dynamicPricingService | No route | 50 | backend/src/services/dynamicPricingService.js |
-| SVC-ECOMMERCEAISERVICE | Service | ecommerceAIService | No route | 50 | backend/src/services/ecommerceAIService.js |
-| SVC-ECOMMERCEBUSINESSSALESSERVICE | Service | ecommerceBusinessSalesService | No route | 50 | backend/src/services/ecommerceBusinessSalesService.js |
-| SVC-ECOMMERCEERPSERVICE | Service | ecommerceERPService | No route | 50 | backend/src/services/ecommerceERPService.js |
-| SVC-ECOMMERCEINTEGRATIONSERVICE | Service | ecommerceIntegrationService | No route | 50 | backend/src/services/ecommerceIntegrationService.js |
-| SVC-ECOMMERCEMARKETINGSERVICE | Service | ecommerceMarketingService | No route | 50 | backend/src/services/ecommerceMarketingService.js |
-| SVC-ECOMMERCESERVICE | Service | ecommerceService | No route | 50 | backend/src/services/ecommerceService.js |
+| SVC-AICOLLABORATIONSERVICE | Service | aiCollaborationService | No route | 50 | backend/src/services/aiCollaborationService.js |
+| SVC-AICOLLABORATIONSERVICE | Service | aiCollaborationService | No route | 50 | backend/src/services/claude/aiCollaborationService.js |
+| SVC-ENHANCEDLIBRARYKNOWLEDGESERVICE | Service | enhancedLibraryKnowledgeService | No route | 50 | backend/src/services/claude/enhancedLibraryKnowledgeService.js |
+| SVC-UNIFIEDCONFIGSERVICE | Service | unifiedConfigService | No route | 50 | backend/src/services/claude/unifiedConfigService.js |
+| SVC-AUTHSERVICE | Service | authService | Wired | 100 | backend/src/services/dual-use/authService.js |
+| SVC-GDPRSERVICE | Service | gdprService | No route | 50 | backend/src/services/dual-use/gdprService.js |
+| SVC-MFASERVICE | Service | mfaService | No route | 50 | backend/src/services/dual-use/mfaService.js |
+| SVC-PLATFORMCORESERVICE | Service | platformCoreService | No route | 50 | backend/src/services/dual-use/platformCoreService.js |
 | SVC-ENERGYCOSTCALCULATOR | Service | EnergyCostCalculator | No route | 50 | backend/src/services/energy/EnergyCostCalculator.js |
-| SVC-ENTERPRISECONTROLSERVICE | Service | enterpriseControlService | Wired | 100 | backend/src/services/enterpriseControlService.js |
-| SVC-ENTERPRISEMEMORYSERVICE | Service | enterpriseMemoryService | Wired | 100 | backend/src/services/enterpriseMemoryService.js |
-| SVC-EQUIPMENTEXCHANGESERVICE | Service | equipmentExchangeService | No route | 50 | backend/src/services/equipmentExchangeService.js |
-| SVC-ERPSERVICE | Service | erpService | Wired | 100 | backend/src/services/erpService.js |
-| SVC-ESCROWSERVICE | Service | escrowService | No route | 50 | backend/src/services/escrowService.js |
-| SVC-EXPERIENCELAYERSERVICE | Service | experienceLayerService | No route | 50 | backend/src/services/experienceLayerService.js |
-| SVC-FARMERSERVICE | Service | farmerService | No route | 50 | backend/src/services/farmerService.js |
-| SVC-FARMERTRAININGSERVICE | Service | farmerTrainingService | No route | 50 | backend/src/services/farmerTrainingService.js |
-| SVC-FARMERVALUESERVICE | Service | farmerValueService | Wired | 100 | backend/src/services/farmerValueService.js |
-| SVC-FERTILIZERINVENTORYSERVICE | Service | fertilizerInventoryService | No route | 50 | backend/src/services/fertilizerInventoryService.js |
-| SVC-FINANCIALSERVICE | Service | financialService | Wired | 100 | backend/src/services/financialService.js |
-| SVC-FOLUBENCHMARKSERVICE | Service | foluBenchmarkService | No route | 50 | backend/src/services/foluBenchmarkService.js |
 | SVC-FOODINTELLIGENCEENGINE | Service | FoodIntelligenceEngine | No route | 50 | backend/src/services/food/FoodIntelligenceEngine.js |
-| SVC-FOODINTELLIGENCESERVICE | Service | foodIntelligenceService | Wired | 100 | backend/src/services/foodIntelligenceService.js |
-| SVC-FOODSAFETYSERVICE | Service | foodSafetyService | Wired | 100 | backend/src/services/foodSafetyService.js |
-| SVC-FORMSERVICE | Service | formService | Wired | 100 | backend/src/services/formService.js |
-| SVC-FREIGHTPOOLINGSERVICE | Service | freightPoolingService | No route | 50 | backend/src/services/freightPoolingService.js |
-| SVC-GEOFENCINGSERVICE | Service | geofencingService | No route | 50 | backend/src/services/geofencingService.js |
-| SVC-GIINTELLIGENCESERVICE | Service | giIntelligenceService | Wired | 100 | backend/src/services/giIntelligenceService.js |
-| SVC-GLUTWARNINGSERVICE | Service | glutWarningService | No route | 50 | backend/src/services/glutWarningService.js |
-| SVC-GOATSERVICE | Service | goatService | No route | 50 | backend/src/services/goatService.js |
-| SVC-GOVERNANCESERVICE | Service | governanceService | No route | 50 | backend/src/services/governanceService.js |
-| SVC-GOVERNMENTSCHEMESERVICE | Service | governmentSchemeService | No route | 50 | backend/src/services/governmentSchemeService.js |
-| SVC-GREENHOUSESERVICE | Service | greenhouseService | No route | 50 | backend/src/services/greenhouseService.js |
-| SVC-GSTSERVICE | Service | gstService | No route | 50 | backend/src/services/gstService.js |
-| SVC-HOUSEHOLDECONOMYSERVICE | Service | householdEconomyService | Wired | 100 | backend/src/services/householdEconomyService.js |
-| SVC-HRSERVICE | Service | hrService | No route | 50 | backend/src/services/hrService.js |
-| SVC-INDIGENOUSKNOWLEDGESERVICE | Service | indigenousKnowledgeService | Wired | 100 | backend/src/services/indigenousKnowledgeService.js |
-| SVC-INFORMATIONSHARINGSERVICE | Service | informationSharingService | No route | 50 | backend/src/services/informationSharingService.js |
-| SVC-INSTITUTIONALPROCUREMENTSERVICE | Service | institutionalProcurementService | Wired | 100 | backend/src/services/institutionalProcurementService.js |
-| SVC-INSURANCECLAIMSSERVICE | Service | insuranceClaimsService | No route | 50 | backend/src/services/insuranceClaimsService.js |
-| SVC-INSURANCEFRAUDDETECTIONSERVICE | Service | insuranceFraudDetectionService | No route | 50 | backend/src/services/insuranceFraudDetectionService.js |
-| SVC-INSURANCEPOLICYISSUANCESERVICE | Service | insurancePolicyIssuanceService | No route | 50 | backend/src/services/insurancePolicyIssuanceService.js |
-| SVC-INSURANCEPREMIUMSERVICE | Service | insurancePremiumService | No route | 50 | backend/src/services/insurancePremiumService.js |
-| SVC-INSURANCESERVICE | Service | insuranceService | Wired | 100 | backend/src/services/insuranceService.js |
-| SVC-IOTINTEGRATIONSERVICE | Service | iotIntegrationService | Wired | 100 | backend/src/services/iotIntegrationService.js |
-| SVC-IOTSENSORSERVICE | Service | iotSensorService | No route | 50 | backend/src/services/iotSensorService.js |
-| SVC-KNOWLEDGEGRAPHSERVICE | Service | knowledgeGraphService | Wired | 100 | backend/src/services/knowledgeGraphService.js |
-| SVC-KNOWLEDGESERVICE | Service | knowledgeService | No route | 50 | backend/src/services/knowledgeService.js |
-| SVC-LABORATORYERPSERVICE | Service | laboratoryERPService | Wired | 100 | backend/src/services/laboratoryERPService.js |
-| SVC-LANDRECORDSSERVICE | Service | landRecordsService | No route | 50 | backend/src/services/landRecordsService.js |
-| SVC-LOGISTICSENHANCEMENTSERVICE | Service | logisticsEnhancementService | No route | 50 | backend/src/services/logisticsEnhancementService.js |
-| SVC-LOGISTICSSERVICE | Service | logisticsService | Wired | 100 | backend/src/services/logisticsService.js |
-| SVC-MACHINERYACCESSSERVICE | Service | machineryAccessService | Wired | 100 | backend/src/services/machineryAccessService.js |
-| SVC-MARKETACCESSSERVICE | Service | marketAccessService | Wired | 100 | backend/src/services/marketAccessService.js |
-| SVC-MARKETDATASERVICE | Service | marketDataService | No route | 50 | backend/src/services/marketDataService.js |
-| SVC-MARKETINTELLIGENCESERVICE | Service | marketIntelligenceService | Wired | 100 | backend/src/services/marketIntelligenceService.js |
-| SVC-MERCHANDISINGSERVICE | Service | merchandisingService | Wired | 100 | backend/src/services/merchandisingService.js |
-| SVC-MILLCIRCUITSERVICE | Service | millCircuitService | Wired | 100 | backend/src/services/millCircuitService.js |
-| SVC-MOBILITYRIDESSERVICE | Service | mobilityRidesService | Wired | 100 | backend/src/services/mobilityRidesService.js |
-| SVC-MODULECATALOGSERVICE | Service | moduleCatalogService | Wired | 100 | backend/src/services/moduleCatalogService.js |
-| SVC-MULTILINGUALSERVICE | Service | multilingualService | Wired | 100 | backend/src/services/multilingualService.js |
-| SVC-NEPRODUCTINTELLIGENCESERVICE | Service | neProductIntelligenceService | Wired | 100 | backend/src/services/neProductIntelligenceService.js |
-| SVC-NUTRIENTVALUESALESSERVICE | Service | nutrientValueSalesService | No route | 50 | backend/src/services/nutrientValueSalesService.js |
-| SVC-NUTRITIONINTELLIGENCESERVICE | Service | nutritionIntelligenceService | Wired | 100 | backend/src/services/nutritionIntelligenceService.js |
-| SVC-OCRSERVICE | Service | ocrService | No route | 50 | backend/src/services/ocrService.js |
-| SVC-OFFLINEPAYMENTSERVICE | Service | offlinePaymentService | Wired | 100 | backend/src/services/offlinePaymentService.js |
-| SVC-OFFLINESYNCSERVICE | Service | offlineSyncService | Wired | 100 | backend/src/services/offlineSyncService.js |
-| SVC-OMNICHANNELAISERVICE | Service | omnichannelAIService | Wired | 100 | backend/src/services/omnichannelAIService.js |
-| SVC-ORDERSERVICE | Service | orderService | Wired | 100 | backend/src/services/orderService.js |
-| SVC-ORGANICTRACEABILITYSERVICE | Service | organicTraceabilityService | Wired | 100 | backend/src/services/organicTraceabilityService.js |
-| SVC-ORGANIZATIONMANAGEMENTSERVICE | Service | organizationManagementService | No route | 50 | backend/src/services/organizationManagementService.js |
-| SVC-PIGSERVICE | Service | pigService | No route | 50 | backend/src/services/pigService.js |
-| SVC-PLATFORMCONFIGURATIONSERVICE | Service | platformConfigurationService | No route | 50 | backend/src/services/platformConfigurationService.js |
-| SVC-PLATFORMCORESERVICE | Service | platformCoreService | No route | 50 | backend/src/services/platformCoreService.js |
-| SVC-PLATFORMTELEMETRYSERVICE | Service | platformTelemetryService | No route | 50 | backend/src/services/platformTelemetryService.js |
-| SVC-POULTRYSERVICE | Service | poultryService | No route | 50 | backend/src/services/poultryService.js |
-| SVC-PREDICTIVEANALYTICSSERVICE | Service | predictiveAnalyticsService | Wired | 100 | backend/src/services/predictiveAnalyticsService.js |
-| SVC-PRESEASONORDERSERVICE | Service | preSeasonOrderService | No route | 50 | backend/src/services/preSeasonOrderService.js |
-| SVC-PROCUREMENTSUBSCRIPTIONSERVICE | Service | procurementSubscriptionService | Wired | 100 | backend/src/services/procurementSubscriptionService.js |
-| SVC-PRODUCTMEDIAAISERVICE | Service | productMediaAIService | No route | 50 | backend/src/services/productMediaAIService.js |
-| SVC-PRODUCTREVIEWSERVICE | Service | productReviewService | No route | 50 | backend/src/services/productReviewService.js |
-| SVC-PRODUCTSERVICE | Service | productService | Wired | 100 | backend/src/services/productService.js |
-| SVC-PROJECTSYSTEMSSERVICE | Service | projectSystemsService | No route | 50 | backend/src/services/projectSystemsService.js |
-| SVC-REALTIMEMONITORINGSERVICE | Service | realtimeMonitoringService | No route | 50 | backend/src/services/realtimeMonitoringService.js |
-| SVC-RECIPEINTELLIGENCESERVICE | Service | recipeIntelligenceService | Wired | 100 | backend/src/services/recipeIntelligenceService.js |
-| SVC-RECOVEREDFINANCESERVICE | Service | recoveredFinanceService | No route | 50 | backend/src/services/recoveredFinanceService.js |
-| SVC-REGIONALVARIETYSERVICE | Service | regionalVarietyService | No route | 50 | backend/src/services/regionalVarietyService.js |
-| SVC-RENEWABLEENERGYSERVICE | Service | renewableEnergyService | Wired | 100 | backend/src/services/renewableEnergyService.js |
-| SVC-RESEARCHANDDEVELOPMENTSERVICE | Service | researchAndDevelopmentService | No route | 50 | backend/src/services/researchAndDevelopmentService.js |
-| SVC-RETURNLOADBOARDSERVICE | Service | returnLoadBoardService | No route | 50 | backend/src/services/returnLoadBoardService.js |
-| SVC-REVENUESERVICE | Service | revenueService | No route | 50 | backend/src/services/revenueService.js |
-| SVC-RFQSERVICE | Service | rfqService | No route | 50 | backend/src/services/rfqService.js |
-| SVC-RISKPRICINGSERVICE | Service | riskPricingService | No route | 50 | backend/src/services/riskPricingService.js |
-| SVC-ROLEMANAGEMENTSERVICE | Service | roleManagementService | No route | 50 | backend/src/services/roleManagementService.js |
-| SVC-RURALENTERPRISESERVICE | Service | ruralEnterpriseService | Wired | 100 | backend/src/services/ruralEnterpriseService.js |
-| SVC-RURALFINANCESERVICE | Service | ruralFinanceService | Wired | 100 | backend/src/services/ruralFinanceService.js |
-| SVC-SAPMODULEARCHITECTURESERVICE | Service | sapModuleArchitectureService | No route | 50 | backend/src/services/sapModuleArchitectureService.js |
-| SVC-SEEDVAULTSERVICE | Service | seedVaultService | No route | 50 | backend/src/services/seedVaultService.js |
-| SVC-SELLERRANKINGSERVICE | Service | sellerRankingService | No route | 50 | backend/src/services/sellerRankingService.js |
-| SVC-SHAREDINFRASERVICE | Service | sharedInfraService | No route | 50 | backend/src/services/sharedInfraService.js |
-| SVC-SHAREDINFRASTRUCTURESERVICE | Service | sharedInfrastructureService | Wired | 100 | backend/src/services/sharedInfrastructureService.js |
-| SVC-SHEEPSERVICE | Service | sheepService | No route | 50 | backend/src/services/sheepService.js |
-| SVC-SHELFLIFESERVICE | Service | shelfLifeService | Wired | 100 | backend/src/services/shelfLifeService.js |
-| SVC-SMSAUTHSERVICE | Service | smsAuthService | Wired | 100 | backend/src/services/smsAuthService.js |
-| SVC-SOILTESTINGSERVICE | Service | soilTestingService | No route | 50 | backend/src/services/soilTestingService.js |
-| SVC-SUBSIDYSERVICE | Service | subsidyService | No route | 50 | backend/src/services/subsidyService.js |
-| SVC-SYSTEMADMINISTRATIONSERVICE | Service | systemAdministrationService | No route | 50 | backend/src/services/systemAdministrationService.js |
-| SVC-TENANTMANAGEMENTSERVICE | Service | tenantManagementService | No route | 50 | backend/src/services/tenantManagementService.js |
-| SVC-UNIFIEDLEDGERSERVICE | Service | unifiedLedgerService | No route | 50 | backend/src/services/unifiedLedgerService.js |
-| SVC-USERMANAGEMENTSERVICE | Service | userManagementService | No route | 50 | backend/src/services/userManagementService.js |
-| SVC-V42INTELLIGENCESERVICE | Service | v42IntelligenceService | Wired | 100 | backend/src/services/v42IntelligenceService.js |
-| SVC-VALUECOMMERCESERVICE | Service | valueCommerceService | Wired | 100 | backend/src/services/valueCommerceService.js |
-| SVC-VILLAGEPROFILESERVICE | Service | villageProfileService | Wired | 100 | backend/src/services/villageProfileService.js |
-| SVC-VISIONSERVICE | Service | visionService | No route | 50 | backend/src/services/visionService.js |
-| SVC-VOICEAISERVICE | Service | voiceAIService | Wired | 100 | backend/src/services/voiceAIService.js |
-| SVC-WEARABLEINTEGRATIONSERVICE | Service | wearableIntegrationService | No route | 50 | backend/src/services/wearableIntegrationService.js |
-| SVC-WEATHERSERVICE | Service | weatherService | No route | 50 | backend/src/services/weatherService.js |
-| SVC-WHATSAPPSERVICE | Service | whatsappService | Wired | 100 | backend/src/services/whatsappService.js |
-| SVC-WIKIPEDIASERVICE | Service | wikipediaService | No route | 50 | backend/src/services/wikipediaService.js |
+| SVC-ADVANCEDAISERVICE | Service | advancedAIService | Wired | 100 | backend/src/services/legacy/advancedAIService.js |
+| SVC-ADVANCEDFEATURESSERVICE | Service | advancedFeaturesService | No route | 50 | backend/src/services/legacy/advancedFeaturesService.js |
+| SVC-AGRICULTURALINTELLIGENCESERVICE | Service | agriculturalIntelligenceService | No route | 50 | backend/src/services/legacy/agriculturalIntelligenceService.js |
+| SVC-AIADVISORYSERVICE | Service | aiAdvisoryService | Wired | 100 | backend/src/services/legacy/aiAdvisoryService.js |
+| SVC-AIAGENTICCOMPANIONSERVICE | Service | aiAgenticCompanionService | No route | 50 | backend/src/services/legacy/aiAgenticCompanionService.js |
+| SVC-AIBACKBONESERVICE | Service | aiBackboneService | No route | 50 | backend/src/services/legacy/aiBackboneService.js |
+| SVC-AIBRAINSERVICE | Service | aiBrainService | No route | 50 | backend/src/services/legacy/aiBrainService.js |
+| SVC-AICOPILOTSERVICE | Service | aiCopilotService | Wired | 100 | backend/src/services/legacy/aiCopilotService.js |
+| SVC-AIGATEWAYSERVICE | Service | aiGatewayService | No route | 50 | backend/src/services/legacy/aiGatewayService.js |
+| SVC-AIOPERATIONINTELLIGENCESERVICE | Service | aiOperationIntelligenceService | No route | 50 | backend/src/services/legacy/aiOperationIntelligenceService.js |
+| SVC-AIORCHESTRATIONSERVICE | Service | aiOrchestrationService | No route | 50 | backend/src/services/legacy/aiOrchestrationService.js |
+| SVC-AISELFHEALINGSERVICE | Service | aiSelfHealingService | No route | 50 | backend/src/services/legacy/aiSelfHealingService.js |
+| SVC-AISERVICE | Service | aiService | Wired | 100 | backend/src/services/legacy/aiService.js |
+| SVC-ANALYTICSMONITORINGSERVICE | Service | analyticsMonitoringService | No route | 50 | backend/src/services/legacy/analyticsMonitoringService.js |
+| SVC-ANALYTICSSERVICE | Service | analyticsService | No route | 50 | backend/src/services/legacy/analyticsService.js |
+| SVC-ANIMALHEALTHSERVICE | Service | animalHealthService | No route | 50 | backend/src/services/legacy/animalHealthService.js |
+| SVC-APICULTURESERVICE | Service | apicultureService | No route | 50 | backend/src/services/legacy/apicultureService.js |
+| SVC-ARVRSERVICE | Service | arVrService | Wired | 100 | backend/src/services/legacy/arVrService.js |
+| SVC-ASSETACCOUNTINGSERVICE | Service | assetAccountingService | No route | 50 | backend/src/services/legacy/assetAccountingService.js |
+| SVC-AUDITSERVICE | Service | auditService | No route | 50 | backend/src/services/legacy/auditService.js |
+| SVC-BACKUPSERVICE | Service | backupService | No route | 50 | backend/src/services/legacy/backupService.js |
+| SVC-BIODIVERSITYSERVICE | Service | biodiversityService | Wired | 100 | backend/src/services/legacy/biodiversityService.js |
+| SVC-BLOCKCHAINTRACEABILITYSERVICE | Service | blockchainTraceabilityService | Wired | 100 | backend/src/services/legacy/blockchainTraceabilityService.js |
+| SVC-BULKORDERSERVICE | Service | bulkOrderService | No route | 50 | backend/src/services/legacy/bulkOrderService.js |
+| SVC-BUYINGCLUBSERVICE | Service | buyingClubService | Wired | 100 | backend/src/services/legacy/buyingClubService.js |
+| SVC-CATALOGINTELLIGENCESERVICE | Service | catalogIntelligenceService | Wired | 100 | backend/src/services/legacy/catalogIntelligenceService.js |
+| SVC-CIVILDISRUPTIONSERVICE | Service | civilDisruptionService | No route | 50 | backend/src/services/legacy/civilDisruptionService.js |
+| SVC-CLIMATEMONITORINGSERVICE | Service | climateMonitoringService | No route | 50 | backend/src/services/legacy/climateMonitoringService.js |
+| SVC-COLDSTORAGESERVICE | Service | coldStorageService | No route | 50 | backend/src/services/legacy/coldStorageService.js |
+| SVC-COMMERCERULESSERVICE | Service | commerceRulesService | Wired | 100 | backend/src/services/legacy/commerceRulesService.js |
+| SVC-COMMUNITYMANAGEMENTSERVICE | Service | communityManagementService | No route | 50 | backend/src/services/legacy/communityManagementService.js |
+| SVC-COMPANYSERVICE | Service | companyService | No route | 50 | backend/src/services/legacy/companyService.js |
+| SVC-COMPLETEAIINTEGRATIONSERVICE | Service | completeAIIntegrationService | No route | 50 | backend/src/services/legacy/completeAIIntegrationService.js |
+| SVC-COMPLETEERPINTEGRATIONSERVICE | Service | completeERPIntegrationService | No route | 50 | backend/src/services/legacy/completeERPIntegrationService.js |
+| SVC-COMPLIANCESERVICE | Service | complianceService | No route | 50 | backend/src/services/legacy/complianceService.js |
+| SVC-COMPREHENSIVEERPSERVICE | Service | comprehensiveERPService | No route | 50 | backend/src/services/legacy/comprehensiveERPService.js |
+| SVC-CONSUMERHEALTHSERVICE | Service | consumerHealthService | Wired | 100 | backend/src/services/legacy/consumerHealthService.js |
+| SVC-CONVERSATIONALAISERVICE | Service | conversationalAIService | Wired | 100 | backend/src/services/legacy/conversationalAIService.js |
+| SVC-COOPERATIVESHARESERVICE | Service | cooperativeShareService | No route | 50 | backend/src/services/legacy/cooperativeShareService.js |
+| SVC-COSTCONTROLSERVICE | Service | costControlService | No route | 50 | backend/src/services/legacy/costControlService.js |
+| SVC-COSTSERVICE | Service | costService | No route | 50 | backend/src/services/legacy/costService.js |
+| SVC-CROPMANAGEMENTSERVICE | Service | cropManagementService | No route | 50 | backend/src/services/legacy/cropManagementService.js |
+| SVC-CROPPLANNINGSERVICE | Service | cropPlanningService | No route | 50 | backend/src/services/legacy/cropPlanningService.js |
+| SVC-CROPVALUERESEARCHSERVICE | Service | cropValueResearchService | No route | 50 | backend/src/services/legacy/cropValueResearchService.js |
+| SVC-CUSTODYEVENTROUTES | Service | custodyEventRoutes | Wired | 100 | backend/src/services/legacy/custodyEventRoutes.js |
+| SVC-CUSTODYEVENTSERVICE | Service | custodyEventService | No route | 50 | backend/src/services/legacy/custodyEventService.js |
+| SVC-DAIRYSERVICE | Service | dairyService | No route | 50 | backend/src/services/legacy/dairyService.js |
+| SVC-DECISIONSUPPORTSERVICE | Service | decisionSupportService | No route | 50 | backend/src/services/legacy/decisionSupportService.js |
+| SVC-DEFENSEFITNESSPREPSERVICE | Service | defenseFitnessPrepService | No route | 50 | backend/src/services/legacy/defenseFitnessPrepService.js |
+| SVC-DEMANDSERVICE | Service | demandService | No route | 50 | backend/src/services/legacy/demandService.js |
+| SVC-DIGITALPRODUCTPASSPORTSERVICE | Service | digitalProductPassportService | Wired | 100 | backend/src/services/legacy/digitalProductPassportService.js |
+| SVC-DIGITALTWINSERVICE | Service | digitalTwinService | No route | 50 | backend/src/services/legacy/digitalTwinService.js |
+| SVC-DPRGENERATIONSERVICE | Service | dprGenerationService | No route | 50 | backend/src/services/legacy/dprGenerationService.js |
+| SVC-DYNAMICPRICINGSERVICE | Service | dynamicPricingService | No route | 50 | backend/src/services/legacy/dynamicPricingService.js |
+| SVC-ECOMMERCEAISERVICE | Service | ecommerceAIService | No route | 50 | backend/src/services/legacy/ecommerceAIService.js |
+| SVC-ECOMMERCEBUSINESSSALESSERVICE | Service | ecommerceBusinessSalesService | No route | 50 | backend/src/services/legacy/ecommerceBusinessSalesService.js |
+| SVC-ECOMMERCEERPSERVICE | Service | ecommerceERPService | No route | 50 | backend/src/services/legacy/ecommerceERPService.js |
+| SVC-ECOMMERCEINTEGRATIONSERVICE | Service | ecommerceIntegrationService | No route | 50 | backend/src/services/legacy/ecommerceIntegrationService.js |
+| SVC-ECOMMERCEMARKETINGSERVICE | Service | ecommerceMarketingService | No route | 50 | backend/src/services/legacy/ecommerceMarketingService.js |
+| SVC-ECOMMERCESERVICE | Service | ecommerceService | No route | 50 | backend/src/services/legacy/ecommerceService.js |
+| SVC-ENGINEERINGPROJECTSERVICE | Service | engineeringProjectService | No route | 50 | backend/src/services/legacy/engineeringProjectService.js |
+| SVC-ENTERPRISECONTROLSERVICE | Service | enterpriseControlService | Wired | 100 | backend/src/services/legacy/enterpriseControlService.js |
+| SVC-ENTERPRISEMEMORYSERVICE | Service | enterpriseMemoryService | Wired | 100 | backend/src/services/legacy/enterpriseMemoryService.js |
+| SVC-EQUIPMENTEXCHANGESERVICE | Service | equipmentExchangeService | No route | 50 | backend/src/services/legacy/equipmentExchangeService.js |
+| SVC-ERPSERVICE | Service | erpService | Wired | 100 | backend/src/services/legacy/erpService.js |
+| SVC-ESCROWSERVICE | Service | escrowService | No route | 50 | backend/src/services/legacy/escrowService.js |
+| SVC-EXPERIENCELAYERSERVICE | Service | experienceLayerService | No route | 50 | backend/src/services/legacy/experienceLayerService.js |
+| SVC-FARMERFAMILYSERVICE | Service | farmerFamilyService | No route | 50 | backend/src/services/legacy/farmerFamilyService.js |
+| SVC-FARMERSERVICE | Service | farmerService | No route | 50 | backend/src/services/legacy/farmerService.js |
+| SVC-FARMERTRAININGSERVICE | Service | farmerTrainingService | No route | 50 | backend/src/services/legacy/farmerTrainingService.js |
+| SVC-FARMERVALUESERVICE | Service | farmerValueService | Wired | 100 | backend/src/services/legacy/farmerValueService.js |
+| SVC-FERTILIZERINVENTORYSERVICE | Service | fertilizerInventoryService | No route | 50 | backend/src/services/legacy/fertilizerInventoryService.js |
+| SVC-FINANCIALSERVICE | Service | financialService | Wired | 100 | backend/src/services/legacy/financialService.js |
+| SVC-FISHERIESMANAGEMENTSERVICE | Service | fisheriesManagementService | No route | 50 | backend/src/services/legacy/fisheriesManagementService.js |
+| SVC-FISHERIESSERVICE | Service | fisheriesService | No route | 50 | backend/src/services/legacy/fisheriesService.js |
+| SVC-FOLUBENCHMARKSERVICE | Service | foluBenchmarkService | No route | 50 | backend/src/services/legacy/foluBenchmarkService.js |
+| SVC-FOODINTELLIGENCESERVICE | Service | foodIntelligenceService | Wired | 100 | backend/src/services/legacy/foodIntelligenceService.js |
+| SVC-FOODSAFETYSERVICE | Service | foodSafetyService | Wired | 100 | backend/src/services/legacy/foodSafetyService.js |
+| SVC-FORESTRYSERVICE | Service | forestryService | No route | 50 | backend/src/services/legacy/forestryService.js |
+| SVC-FORMSERVICE | Service | formService | Wired | 100 | backend/src/services/legacy/formService.js |
+| SVC-FREIGHTPOOLINGSERVICE | Service | freightPoolingService | No route | 50 | backend/src/services/legacy/freightPoolingService.js |
+| SVC-GEOFENCINGSERVICE | Service | geofencingService | No route | 50 | backend/src/services/legacy/geofencingService.js |
+| SVC-GIINTELLIGENCESERVICE | Service | giIntelligenceService | Wired | 100 | backend/src/services/legacy/giIntelligenceService.js |
+| SVC-GLUTWARNINGSERVICE | Service | glutWarningService | No route | 50 | backend/src/services/legacy/glutWarningService.js |
+| SVC-GOATSERVICE | Service | goatService | No route | 50 | backend/src/services/legacy/goatService.js |
+| SVC-GOVERNANCESERVICE | Service | governanceService | No route | 50 | backend/src/services/legacy/governanceService.js |
+| SVC-GOVERNMENTSCHEMESERVICE | Service | governmentSchemeService | No route | 50 | backend/src/services/legacy/governmentSchemeService.js |
+| SVC-GREENHOUSESERVICE | Service | greenhouseService | No route | 50 | backend/src/services/legacy/greenhouseService.js |
+| SVC-GSTSERVICE | Service | gstService | No route | 50 | backend/src/services/legacy/gstService.js |
+| SVC-HORTICULTUREMANAGEMENTSERVICE | Service | horticultureManagementService | No route | 50 | backend/src/services/legacy/horticultureManagementService.js |
+| SVC-HOUSEHOLDECONOMYSERVICE | Service | householdEconomyService | Wired | 100 | backend/src/services/legacy/householdEconomyService.js |
+| SVC-HRSERVICE | Service | hrService | No route | 50 | backend/src/services/legacy/hrService.js |
+| SVC-IDENTITYMANAGEMENTSERVICE | Service | identityManagementService | No route | 50 | backend/src/services/legacy/identityManagementService.js |
+| SVC-INDIGENOUSKNOWLEDGESERVICE | Service | indigenousKnowledgeService | Wired | 100 | backend/src/services/legacy/indigenousKnowledgeService.js |
+| SVC-INFORMATIONSHARINGSERVICE | Service | informationSharingService | No route | 50 | backend/src/services/legacy/informationSharingService.js |
+| SVC-INPUTSUPPLYMANAGEMENTSERVICE | Service | inputSupplyManagementService | No route | 50 | backend/src/services/legacy/inputSupplyManagementService.js |
+| SVC-INSTITUTIONALPROCUREMENTSERVICE | Service | institutionalProcurementService | Wired | 100 | backend/src/services/legacy/institutionalProcurementService.js |
+| SVC-INSURANCECLAIMSSERVICE | Service | insuranceClaimsService | No route | 50 | backend/src/services/legacy/insuranceClaimsService.js |
+| SVC-INSURANCEFRAUDDETECTIONSERVICE | Service | insuranceFraudDetectionService | No route | 50 | backend/src/services/legacy/insuranceFraudDetectionService.js |
+| SVC-INSURANCEPOLICYISSUANCESERVICE | Service | insurancePolicyIssuanceService | No route | 50 | backend/src/services/legacy/insurancePolicyIssuanceService.js |
+| SVC-INSURANCEPREMIUMSERVICE | Service | insurancePremiumService | No route | 50 | backend/src/services/legacy/insurancePremiumService.js |
+| SVC-INSURANCESERVICE | Service | insuranceService | Wired | 100 | backend/src/services/legacy/insuranceService.js |
+| SVC-IOTINTEGRATIONSERVICE | Service | iotIntegrationService | Wired | 100 | backend/src/services/legacy/iotIntegrationService.js |
+| SVC-IOTSENSORSERVICE | Service | iotSensorService | No route | 50 | backend/src/services/legacy/iotSensorService.js |
+| SVC-IRRIGATIONMANAGEMENTSERVICE | Service | irrigationManagementService | No route | 50 | backend/src/services/legacy/irrigationManagementService.js |
+| SVC-KNOWLEDGEGRAPHSERVICE | Service | knowledgeGraphService | Wired | 100 | backend/src/services/legacy/knowledgeGraphService.js |
+| SVC-KNOWLEDGESERVICE | Service | knowledgeService | No route | 50 | backend/src/services/legacy/knowledgeService.js |
+| SVC-LABORATORYERPSERVICE | Service | laboratoryERPService | Wired | 100 | backend/src/services/legacy/laboratoryERPService.js |
+| SVC-LANDMANAGEMENTSERVICE | Service | landManagementService | No route | 50 | backend/src/services/legacy/landManagementService.js |
+| SVC-LANDRECORDSSERVICE | Service | landRecordsService | No route | 50 | backend/src/services/legacy/landRecordsService.js |
+| SVC-LIBRARYKNOWLEDGESERVICE | Service | libraryKnowledgeService | No route | 50 | backend/src/services/legacy/libraryKnowledgeService.js |
+| SVC-LIVESTOCKMANAGEMENTSERVICE | Service | livestockManagementService | No route | 50 | backend/src/services/legacy/livestockManagementService.js |
+| SVC-LOGISTICSENHANCEMENTSERVICE | Service | logisticsEnhancementService | No route | 50 | backend/src/services/legacy/logisticsEnhancementService.js |
+| SVC-LOGISTICSSERVICE | Service | logisticsService | Wired | 100 | backend/src/services/legacy/logisticsService.js |
+| SVC-MACHINERYACCESSSERVICE | Service | machineryAccessService | Wired | 100 | backend/src/services/legacy/machineryAccessService.js |
+| SVC-MARKETACCESSSERVICE | Service | marketAccessService | Wired | 100 | backend/src/services/legacy/marketAccessService.js |
+| SVC-MARKETDATASERVICE | Service | marketDataService | No route | 50 | backend/src/services/legacy/marketDataService.js |
+| SVC-MARKETINTELLIGENCESERVICE | Service | marketIntelligenceService | Wired | 100 | backend/src/services/legacy/marketIntelligenceService.js |
+| SVC-MERCHANDISINGSERVICE | Service | merchandisingService | Wired | 100 | backend/src/services/legacy/merchandisingService.js |
+| SVC-MILLCIRCUITSERVICE | Service | millCircuitService | Wired | 100 | backend/src/services/legacy/millCircuitService.js |
+| SVC-MOBILITYRIDESSERVICE | Service | mobilityRidesService | Wired | 100 | backend/src/services/legacy/mobilityRidesService.js |
+| SVC-MODULECATALOGSERVICE | Service | moduleCatalogService | Wired | 100 | backend/src/services/legacy/moduleCatalogService.js |
+| SVC-MULTILINGUALSERVICE | Service | multilingualService | Wired | 100 | backend/src/services/legacy/multilingualService.js |
+| SVC-MUSHROOMSERVICE | Service | mushroomService | No route | 50 | backend/src/services/legacy/mushroomService.js |
+| SVC-NEPRODUCTINTELLIGENCESERVICE | Service | neProductIntelligenceService | Wired | 100 | backend/src/services/legacy/neProductIntelligenceService.js |
+| SVC-NUTRIENTVALUESALESSERVICE | Service | nutrientValueSalesService | No route | 50 | backend/src/services/legacy/nutrientValueSalesService.js |
+| SVC-NUTRITIONINTELLIGENCESERVICE | Service | nutritionIntelligenceService | Wired | 100 | backend/src/services/legacy/nutritionIntelligenceService.js |
+| SVC-OCRSERVICE | Service | ocrService | No route | 50 | backend/src/services/legacy/ocrService.js |
+| SVC-OFFLINEPAYMENTSERVICE | Service | offlinePaymentService | Wired | 100 | backend/src/services/legacy/offlinePaymentService.js |
+| SVC-OFFLINESYNCSERVICE | Service | offlineSyncService | Wired | 100 | backend/src/services/legacy/offlineSyncService.js |
+| SVC-OMNICHANNELAISERVICE | Service | omnichannelAIService | Wired | 100 | backend/src/services/legacy/omnichannelAIService.js |
+| SVC-OPERATIONSMANAGEMENTSERVICE | Service | operationsManagementService | No route | 50 | backend/src/services/legacy/operationsManagementService.js |
+| SVC-ORDERSERVICE | Service | orderService | Wired | 100 | backend/src/services/legacy/orderService.js |
+| SVC-ORGANICTRACEABILITYSERVICE | Service | organicTraceabilityService | Wired | 100 | backend/src/services/legacy/organicTraceabilityService.js |
+| SVC-ORGANIZATIONMANAGEMENTSERVICE | Service | organizationManagementService | No route | 50 | backend/src/services/legacy/organizationManagementService.js |
+| SVC-PIGSERVICE | Service | pigService | No route | 50 | backend/src/services/legacy/pigService.js |
+| SVC-PLATFORMCONFIGURATIONSERVICE | Service | platformConfigurationService | No route | 50 | backend/src/services/legacy/platformConfigurationService.js |
+| SVC-PLATFORMTELEMETRYSERVICE | Service | platformTelemetryService | No route | 50 | backend/src/services/legacy/platformTelemetryService.js |
+| SVC-POULTRYSERVICE | Service | poultryService | No route | 50 | backend/src/services/legacy/poultryService.js |
+| SVC-PREDICTIVEANALYTICSSERVICE | Service | predictiveAnalyticsService | Wired | 100 | backend/src/services/legacy/predictiveAnalyticsService.js |
+| SVC-PRESEASONORDERSERVICE | Service | preSeasonOrderService | No route | 50 | backend/src/services/legacy/preSeasonOrderService.js |
+| SVC-PREVENTIVEMAINTENANCESERVICE | Service | preventiveMaintenanceService | No route | 50 | backend/src/services/legacy/preventiveMaintenanceService.js |
+| SVC-PROCUREMENTSUBSCRIPTIONSERVICE | Service | procurementSubscriptionService | Wired | 100 | backend/src/services/legacy/procurementSubscriptionService.js |
+| SVC-PRODUCTMEDIAAISERVICE | Service | productMediaAIService | No route | 50 | backend/src/services/legacy/productMediaAIService.js |
+| SVC-PRODUCTREVIEWSERVICE | Service | productReviewService | No route | 50 | backend/src/services/legacy/productReviewService.js |
+| SVC-PRODUCTSERVICE | Service | productService | Wired | 100 | backend/src/services/legacy/productService.js |
+| SVC-PROJECTSYSTEMSSERVICE | Service | projectSystemsService | No route | 50 | backend/src/services/legacy/projectSystemsService.js |
+| SVC-REALTIMEMONITORINGSERVICE | Service | realtimeMonitoringService | No route | 50 | backend/src/services/legacy/realtimeMonitoringService.js |
+| SVC-RECIPEINTELLIGENCESERVICE | Service | recipeIntelligenceService | Wired | 100 | backend/src/services/legacy/recipeIntelligenceService.js |
+| SVC-RECOVEREDFINANCESERVICE | Service | recoveredFinanceService | No route | 50 | backend/src/services/legacy/recoveredFinanceService.js |
+| SVC-REGIONALVARIETYSERVICE | Service | regionalVarietyService | No route | 50 | backend/src/services/legacy/regionalVarietyService.js |
+| SVC-RENEWABLEENERGYSERVICE | Service | renewableEnergyService | Wired | 100 | backend/src/services/legacy/renewableEnergyService.js |
+| SVC-RESEARCHANDDEVELOPMENTSERVICE | Service | researchAndDevelopmentService | No route | 50 | backend/src/services/legacy/researchAndDevelopmentService.js |
+| SVC-RESOURCECRUDFACTORY | Service | resourceCrudFactory | No route | 50 | backend/src/services/legacy/resourceCrudFactory.js |
+| SVC-RETURNLOADBOARDSERVICE | Service | returnLoadBoardService | No route | 50 | backend/src/services/legacy/returnLoadBoardService.js |
+| SVC-REVENUESERVICE | Service | revenueService | No route | 50 | backend/src/services/legacy/revenueService.js |
+| SVC-RFQSERVICE | Service | rfqService | No route | 50 | backend/src/services/legacy/rfqService.js |
+| SVC-RISKPRICINGSERVICE | Service | riskPricingService | No route | 50 | backend/src/services/legacy/riskPricingService.js |
+| SVC-ROLEMANAGEMENTSERVICE | Service | roleManagementService | No route | 50 | backend/src/services/legacy/roleManagementService.js |
+| SVC-RURALENTERPRISESERVICE | Service | ruralEnterpriseService | Wired | 100 | backend/src/services/legacy/ruralEnterpriseService.js |
+| SVC-RURALFINANCESERVICE | Service | ruralFinanceService | Wired | 100 | backend/src/services/legacy/ruralFinanceService.js |
+| SVC-SAPMODULEARCHITECTURESERVICE | Service | sapModuleArchitectureService | No route | 50 | backend/src/services/legacy/sapModuleArchitectureService.js |
+| SVC-SEEDVAULTSERVICE | Service | seedVaultService | No route | 50 | backend/src/services/legacy/seedVaultService.js |
+| SVC-SELLERRANKINGSERVICE | Service | sellerRankingService | No route | 50 | backend/src/services/legacy/sellerRankingService.js |
+| SVC-SERICULTURESERVICE | Service | sericultureService | No route | 50 | backend/src/services/legacy/sericultureService.js |
+| SVC-SHAREDINFRASERVICE | Service | sharedInfraService | No route | 50 | backend/src/services/legacy/sharedInfraService.js |
+| SVC-SHAREDINFRASTRUCTURESERVICE | Service | sharedInfrastructureService | Wired | 100 | backend/src/services/legacy/sharedInfrastructureService.js |
+| SVC-SHEEPSERVICE | Service | sheepService | No route | 50 | backend/src/services/legacy/sheepService.js |
+| SVC-SHELFLIFESERVICE | Service | shelfLifeService | Wired | 100 | backend/src/services/legacy/shelfLifeService.js |
+| SVC-SMSAUTHSERVICE | Service | smsAuthService | Wired | 100 | backend/src/services/legacy/smsAuthService.js |
+| SVC-SOILMANAGEMENTSERVICE | Service | soilManagementService | No route | 50 | backend/src/services/legacy/soilManagementService.js |
+| SVC-SOILTESTINGSERVICE | Service | soilTestingService | No route | 50 | backend/src/services/legacy/soilTestingService.js |
+| SVC-SUBSIDYSERVICE | Service | subsidyService | No route | 50 | backend/src/services/legacy/subsidyService.js |
+| SVC-SYSTEMADMINISTRATIONSERVICE | Service | systemAdministrationService | No route | 50 | backend/src/services/legacy/systemAdministrationService.js |
+| SVC-TENANTMANAGEMENTSERVICE | Service | tenantManagementService | No route | 50 | backend/src/services/legacy/tenantManagementService.js |
+| SVC-V42INTELLIGENCESERVICE | Service | v42IntelligenceService | Wired | 100 | backend/src/services/legacy/v42IntelligenceService.js |
+| SVC-VALUECOMMERCESERVICE | Service | valueCommerceService | Wired | 100 | backend/src/services/legacy/valueCommerceService.js |
+| SVC-VERMICOMPOSTSERVICE | Service | vermicompostService | No route | 50 | backend/src/services/legacy/vermicompostService.js |
+| SVC-VILLAGEPROFILESERVICE | Service | villageProfileService | Wired | 100 | backend/src/services/legacy/villageProfileService.js |
+| SVC-VISIONSERVICE | Service | visionService | No route | 50 | backend/src/services/legacy/visionService.js |
+| SVC-VOICEAISERVICE | Service | voiceAIService | Wired | 100 | backend/src/services/legacy/voiceAIService.js |
+| SVC-WATERMANAGEMENTSERVICE | Service | waterManagementService | No route | 50 | backend/src/services/legacy/waterManagementService.js |
+| SVC-WEARABLEINTEGRATIONSERVICE | Service | wearableIntegrationService | No route | 50 | backend/src/services/legacy/wearableIntegrationService.js |
+| SVC-WEATHERSERVICE | Service | weatherService | No route | 50 | backend/src/services/legacy/weatherService.js |
+| SVC-WHATSAPPSERVICE | Service | whatsappService | Wired | 100 | backend/src/services/legacy/whatsappService.js |
+| SVC-WIKIPEDIASERVICE | Service | wikipediaService | No route | 50 | backend/src/services/legacy/wikipediaService.js |
+| SVC-LIBRARYKNOWLEDGESERVICE | Service | libraryKnowledgeService | No route | 50 | backend/src/services/libraryKnowledgeService.js |
+| SVC-UNIFIEDCONFIGSERVICE | Service | unifiedConfigService | No route | 50 | backend/src/services/unifiedConfigService.js |
 | RTE-ADVANCEDFEATURES | Route | advancedFeatures | Wired | 100 | backend/src/routes/advancedFeatures.js |
 | RTE-AGRICULTURALINTELLIGENCEROUTES | Route | agriculturalIntelligenceRoutes | Wired | 100 | backend/src/routes/agriculturalIntelligenceRoutes.js |
 | RTE-AIAGENTROUTES | Route | aiAgentRoutes | Wired | 100 | backend/src/routes/aiAgentRoutes.js |
 | RTE-AIBACKBONEROUTES | Route | aiBackboneRoutes | Wired | 100 | backend/src/routes/aiBackboneRoutes.js |
 | RTE-AIBRAINROUTES | Route | aiBrainRoutes | Wired | 100 | backend/src/routes/aiBrainRoutes.js |
+| RTE-AICOLLABORATIONROUTES | Route | aiCollaborationRoutes | Wired | 100 | backend/src/routes/aiCollaborationRoutes.js |
 | RTE-AIGATEWAYROUTES | Route | aiGatewayRoutes | Wired | 100 | backend/src/routes/aiGatewayRoutes.js |
 | RTE-AIOPERATIONINTELLIGENCEROUTES | Route | aiOperationIntelligenceRoutes | Wired | 100 | backend/src/routes/aiOperationIntelligenceRoutes.js |
 | RTE-AISELFHEALINGROUTES | Route | aiSelfHealingRoutes | Wired | 100 | backend/src/routes/aiSelfHealingRoutes.js |
+| RTE-ANALYTICSREPORTROUTES | Route | analyticsReportRoutes | Wired | 100 | backend/src/routes/analyticsReportRoutes.js |
 | RTE-ANIMALHEALTHROUTES | Route | animalHealthRoutes | Wired | 100 | backend/src/routes/animalHealthRoutes.js |
 | RTE-ASSETACCOUNTINGROUTES | Route | assetAccountingRoutes | Wired | 100 | backend/src/routes/assetAccountingRoutes.js |
 | RTE-AUDITROUTES | Route | auditRoutes | Wired | 100 | backend/src/routes/auditRoutes.js |
 | RTE-BULKORDERROUTES | Route | bulkOrderRoutes | Wired | 100 | backend/src/routes/bulkOrderRoutes.js |
 | RTE-CIVILDISRUPTIONROUTES | Route | civilDisruptionRoutes | Wired | 100 | backend/src/routes/civilDisruptionRoutes.js |
+| RTE-AICOLLABORATIONROUTES | Route | aiCollaborationRoutes | Wired | 100 | backend/src/routes/claude/aiCollaborationRoutes.js |
+| RTE-BACKENDMODULEBRIDGE | Route | backendModuleBridge | Wired | 100 | backend/src/routes/claude/backendModuleBridge.js |
+| RTE-LIBRARYROUTES | Route | libraryRoutes | Wired | 100 | backend/src/routes/claude/libraryRoutes.js |
+| RTE-MODULEREGISTRYROUTES | Route | moduleRegistryRoutes | Wired | 100 | backend/src/routes/claude/moduleRegistryRoutes.js |
+| RTE-UNIFIEDAIROUTES | Route | unifiedAIRoutes | Wired | 100 | backend/src/routes/claude/unifiedAIRoutes.js |
 | RTE-CLIMATEADVISORYROUTES | Route | climateAdvisoryRoutes | Wired | 100 | backend/src/routes/climateAdvisoryRoutes.js |
+| RTE-CLIMATEMONITORINGROUTES | Route | climateMonitoringRoutes | Wired | 100 | backend/src/routes/climateMonitoringRoutes.js |
 | RTE-COLDSTORAGEROUTES | Route | coldStorageRoutes | Wired | 100 | backend/src/routes/coldStorageRoutes.js |
-| RTE-COMMUNITYROUTES | Route | communityRoutes | Wired | 100 | backend/src/routes/communityRoutes.js |
+| RTE-COMMUNITYMANAGEMENTROUTES | Route | communityManagementRoutes | Wired | 100 | backend/src/routes/communityManagementRoutes.js |
 | RTE-COMPANYROUTES | Route | companyRoutes | Wired | 100 | backend/src/routes/companyRoutes.js |
 | RTE-COMPLETEAIINTEGRATIONROUTES | Route | completeAIIntegrationRoutes | Wired | 100 | backend/src/routes/completeAIIntegrationRoutes.js |
 | RTE-COMPLETEERPINTEGRATIONROUTES | Route | completeERPIntegrationRoutes | Wired | 100 | backend/src/routes/completeERPIntegrationRoutes.js |
@@ -206,12 +242,16 @@
 | RTE-COOPERATIVESHAREROUTES | Route | cooperativeShareRoutes | Wired | 100 | backend/src/routes/cooperativeShareRoutes.js |
 | RTE-COSTCONTROLROUTES | Route | costControlRoutes | Wired | 100 | backend/src/routes/costControlRoutes.js |
 | RTE-COSTROUTES | Route | costRoutes | Wired | 100 | backend/src/routes/costRoutes.js |
+| RTE-CROPMANAGEMENTROUTES | Route | cropManagementRoutes | Wired | 100 | backend/src/routes/cropManagementRoutes.js |
+| RTE-CROPPLANNINGROUTES | Route | cropPlanningRoutes | Wired | 100 | backend/src/routes/cropPlanningRoutes.js |
 | RTE-CROPVALUERESEARCHROUTES | Route | cropValueResearchRoutes | Wired | 100 | backend/src/routes/cropValueResearchRoutes.js |
 | RTE-DAIRYROUTES | Route | dairyRoutes | Wired | 100 | backend/src/routes/dairyRoutes.js |
 | RTE-DECISIONSUPPORTROUTES | Route | decisionSupportRoutes | Wired | 100 | backend/src/routes/decisionSupportRoutes.js |
 | RTE-DEFENSEFITNESSPREPROUTES | Route | defenseFitnessPrepRoutes | Wired | 100 | backend/src/routes/defenseFitnessPrepRoutes.js |
 | RTE-DEMANDROUTES | Route | demandRoutes | Wired | 100 | backend/src/routes/demandRoutes.js |
 | RTE-DPRGENERATIONROUTES | Route | dprGenerationRoutes | Wired | 100 | backend/src/routes/dprGenerationRoutes.js |
+| RTE-GDPRROUTES | Route | gdprRoutes | Wired | 100 | backend/src/routes/dual-use/gdprRoutes.js |
+| RTE-MFAROUTES | Route | mfaRoutes | Wired | 100 | backend/src/routes/dual-use/mfaRoutes.js |
 | RTE-ECOMMERCEAIROUTES | Route | ecommerceAIRoutes | Wired | 100 | backend/src/routes/ecommerceAIRoutes.js |
 | RTE-ECOMMERCEBUSINESSSALESROUTES | Route | ecommerceBusinessSalesRoutes | Wired | 100 | backend/src/routes/ecommerceBusinessSalesRoutes.js |
 | RTE-ECOMMERCEERPROUTES | Route | ecommerceERPRoutes | Wired | 100 | backend/src/routes/ecommerceERPRoutes.js |
@@ -219,15 +259,17 @@
 | RTE-ECOMMERCEMARKETINGROUTES | Route | ecommerceMarketingRoutes | Wired | 100 | backend/src/routes/ecommerceMarketingRoutes.js |
 | RTE-ECOMMERCEROUTES | Route | ecommerceRoutes | Wired | 100 | backend/src/routes/ecommerceRoutes.js |
 | RTE-ENERGYROUTES | Route | energyRoutes | Wired | 100 | backend/src/routes/energyRoutes.js |
+| RTE-ENGINEERINGPROJECTROUTES | Route | engineeringProjectRoutes | Wired | 100 | backend/src/routes/engineeringProjectRoutes.js |
 | RTE-ENTERPRISEAIROUTES | Route | enterpriseAIRoutes | Wired | 100 | backend/src/routes/enterpriseAIRoutes.js |
-| RTE-ENTERPRISECONTROLROUTES | Route | enterpriseControlRoutes | Wired | 100 | backend/src/routes/enterpriseControlRoutes.js |
 | RTE-EQUIPMENTEXCHANGEROUTES | Route | equipmentExchangeRoutes | Wired | 100 | backend/src/routes/equipmentExchangeRoutes.js |
 | RTE-EXPERIENCEROUTES | Route | experienceRoutes | Wired | 100 | backend/src/routes/experienceRoutes.js |
+| RTE-FARMERFAMILYROUTES | Route | farmerFamilyRoutes | Wired | 100 | backend/src/routes/farmerFamilyRoutes.js |
 | RTE-FARMERHEALTHROUTES | Route | farmerHealthRoutes | Wired | 100 | backend/src/routes/farmerHealthRoutes.js |
 | RTE-FARMERPORTALENHANCEMENTS | Route | farmerPortalEnhancements | Wired | 100 | backend/src/routes/farmerPortalEnhancements.js |
 | RTE-FARMERROUTES | Route | farmerRoutes | Wired | 100 | backend/src/routes/farmerRoutes.js |
 | RTE-FARMERTRAININGROUTES | Route | farmerTrainingRoutes | Wired | 100 | backend/src/routes/farmerTrainingRoutes.js |
 | RTE-FERTILIZERROUTES | Route | fertilizerRoutes | Wired | 100 | backend/src/routes/fertilizerRoutes.js |
+| RTE-FISHERIESMANAGEMENTROUTES | Route | fisheriesManagementRoutes | Wired | 100 | backend/src/routes/fisheriesManagementRoutes.js |
 | RTE-FOLUBENCHMARKROUTES | Route | foluBenchmarkRoutes | Wired | 100 | backend/src/routes/foluBenchmarkRoutes.js |
 | RTE-FOLUROUTES | Route | foluRoutes | Wired | 100 | backend/src/routes/foluRoutes.js |
 | RTE-FOODROUTES | Route | foodRoutes | Wired | 100 | backend/src/routes/foodRoutes.js |
@@ -238,25 +280,42 @@
 | RTE-GOVERNANCEMODULE | Route | governanceModule | Wired | 100 | backend/src/routes/governanceModule.js |
 | RTE-GSTROUTES | Route | gstRoutes | Wired | 100 | backend/src/routes/gstRoutes.js |
 | RTE-HEALTHROUTES | Route | healthRoutes | Wired | 100 | backend/src/routes/healthRoutes.js |
+| RTE-HORTICULTUREMANAGEMENTROUTES | Route | horticultureManagementRoutes | Wired | 100 | backend/src/routes/horticultureManagementRoutes.js |
 | RTE-HRROUTES | Route | hrRoutes | Wired | 100 | backend/src/routes/hrRoutes.js |
+| RTE-IDENTITYMANAGEMENTROUTES | Route | identityManagementRoutes | Wired | 100 | backend/src/routes/identityManagementRoutes.js |
 | RTE-INFORMATIONSHARINGROUTES | Route | informationSharingRoutes | Wired | 100 | backend/src/routes/informationSharingRoutes.js |
+| RTE-INPUTSUPPLYMANAGEMENTROUTES | Route | inputSupplyManagementRoutes | Wired | 100 | backend/src/routes/inputSupplyManagementRoutes.js |
 | RTE-INSURANCEENHANCEMENTS | Route | insuranceEnhancements | Wired | 100 | backend/src/routes/insuranceEnhancements.js |
+| RTE-IRRIGATIONMANAGEMENTROUTES | Route | irrigationManagementRoutes | Wired | 100 | backend/src/routes/irrigationManagementRoutes.js |
 | RTE-KNOWLEDGEROUTES | Route | knowledgeRoutes | Wired | 100 | backend/src/routes/knowledgeRoutes.js |
+| RTE-LANDMANAGEMENTROUTES | Route | landManagementRoutes | Wired | 100 | backend/src/routes/landManagementRoutes.js |
+| RTE-LANDRECORDSROUTES | Route | landRecordsRoutes | Wired | 100 | backend/src/routes/landRecordsRoutes.js |
+| RTE-APICULTUREROUTES | Route | apicultureRoutes | Wired | 100 | backend/src/routes/legacy/apicultureRoutes.js |
+| RTE-FISHERIESROUTES | Route | fisheriesRoutes | Wired | 100 | backend/src/routes/legacy/fisheriesRoutes.js |
+| RTE-FORESTRYROUTES | Route | forestryRoutes | Wired | 100 | backend/src/routes/legacy/forestryRoutes.js |
+| RTE-MUSHROOMROUTES | Route | mushroomRoutes | Wired | 100 | backend/src/routes/legacy/mushroomRoutes.js |
+| RTE-SERICULTUREROUTES | Route | sericultureRoutes | Wired | 100 | backend/src/routes/legacy/sericultureRoutes.js |
+| RTE-VERMICOMPOSTROUTES | Route | vermicompostRoutes | Wired | 100 | backend/src/routes/legacy/vermicompostRoutes.js |
+| RTE-LIBRARYROUTES | Route | libraryRoutes | No route | 50 | backend/src/routes/libraryRoutes.js |
+| RTE-LIVESTOCKMANAGEMENTROUTES | Route | livestockManagementRoutes | Wired | 100 | backend/src/routes/livestockManagementRoutes.js |
 | RTE-LOGISTICSENHANCEMENTROUTES | Route | logisticsEnhancementRoutes | Wired | 100 | backend/src/routes/logisticsEnhancementRoutes.js |
 | RTE-LOGISTICSENHANCEMENTS | Route | logisticsEnhancements | Wired | 100 | backend/src/routes/logisticsEnhancements.js |
 | RTE-MARKETDATAROUTES | Route | marketDataRoutes | Wired | 100 | backend/src/routes/marketDataRoutes.js |
 | RTE-MARKETPLACEENHANCEMENTS | Route | marketplaceEnhancements | Wired | 100 | backend/src/routes/marketplaceEnhancements.js |
 | RTE-NERVOUSSYSTEMROUTES | Route | nervousSystemRoutes | Wired | 100 | backend/src/routes/nervousSystemRoutes.js |
 | RTE-NUTRIENTVALUESALESROUTES | Route | nutrientValueSalesRoutes | Wired | 100 | backend/src/routes/nutrientValueSalesRoutes.js |
+| RTE-OPERATIONSMANAGEMENTROUTES | Route | operationsManagementRoutes | Wired | 100 | backend/src/routes/operationsManagementRoutes.js |
 | RTE-ORGANIZATIONMANAGEMENTROUTES | Route | organizationManagementRoutes | Wired | 100 | backend/src/routes/organizationManagementRoutes.js |
 | RTE-PIGROUTES | Route | pigRoutes | Wired | 100 | backend/src/routes/pigRoutes.js |
 | RTE-PLATFORMCONFIGURATIONROUTES | Route | platformConfigurationRoutes | Wired | 100 | backend/src/routes/platformConfigurationRoutes.js |
 | RTE-PLATFORMCOREROUTES | Route | platformCoreRoutes | Wired | 100 | backend/src/routes/platformCoreRoutes.js |
-| RTE-PLATFORMFOUNDATIONROUTES | Route | platformFoundationRoutes | Wired | 100 | backend/src/routes/platformFoundationRoutes.js |
 | RTE-PLATFORMTELEMETRYROUTES | Route | platformTelemetryRoutes | Wired | 100 | backend/src/routes/platformTelemetryRoutes.js |
 | RTE-POULTRYROUTES | Route | poultryRoutes | Wired | 100 | backend/src/routes/poultryRoutes.js |
+| RTE-PREVENTIVEMAINTENANCEROUTES | Route | preventiveMaintenanceRoutes | Wired | 100 | backend/src/routes/preventiveMaintenanceRoutes.js |
 | RTE-PRODUCTMEDIAAIROUTES | Route | productMediaAIRoutes | Wired | 100 | backend/src/routes/productMediaAIRoutes.js |
+| RTE-PRODUCTREVIEWROUTES | Route | productReviewRoutes | Wired | 100 | backend/src/routes/productReviewRoutes.js |
 | RTE-PROJECTSYSTEMSROUTES | Route | projectSystemsRoutes | Wired | 100 | backend/src/routes/projectSystemsRoutes.js |
+| RTE-REALTIMEMONITORINGROUTES | Route | realtimeMonitoringRoutes | Wired | 100 | backend/src/routes/realtimeMonitoringRoutes.js |
 | RTE-RECOVEREDFINANCEROUTES | Route | recoveredFinanceRoutes | Wired | 100 | backend/src/routes/recoveredFinanceRoutes.js |
 | RTE-REGIONALVARIETYROUTES | Route | regionalVarietyRoutes | Wired | 100 | backend/src/routes/regionalVarietyRoutes.js |
 | RTE-RESEARCHANDDEVELOPMENTROUTES | Route | researchAndDevelopmentRoutes | Wired | 100 | backend/src/routes/researchAndDevelopmentRoutes.js |
@@ -264,16 +323,19 @@
 | RTE-REVENUEROUTES | Route | revenueRoutes | Wired | 100 | backend/src/routes/revenueRoutes.js |
 | RTE-RFQROUTES | Route | rfqRoutes | Wired | 100 | backend/src/routes/rfqRoutes.js |
 | RTE-RISKPRICINGROUTES | Route | riskPricingRoutes | Wired | 100 | backend/src/routes/riskPricingRoutes.js |
+| RTE-ROLEMANAGEMENTROUTES | Route | roleManagementRoutes | Wired | 100 | backend/src/routes/roleManagementRoutes.js |
 | RTE-SAPMODULEARCHITECTUREROUTES | Route | sapModuleArchitectureRoutes | Wired | 100 | backend/src/routes/sapModuleArchitectureRoutes.js |
 | RTE-SEEDVAULTROUTES | Route | seedVaultRoutes | Wired | 100 | backend/src/routes/seedVaultRoutes.js |
 | RTE-SELLERRANKINGROUTES | Route | sellerRankingRoutes | Wired | 100 | backend/src/routes/sellerRankingRoutes.js |
 | RTE-SHEEPROUTES | Route | sheepRoutes | Wired | 100 | backend/src/routes/sheepRoutes.js |
+| RTE-SOILMANAGEMENTROUTES | Route | soilManagementRoutes | Wired | 100 | backend/src/routes/soilManagementRoutes.js |
 | RTE-SYSTEMADMINISTRATIONROUTES | Route | systemAdministrationRoutes | Wired | 100 | backend/src/routes/systemAdministrationRoutes.js |
 | RTE-TENANTMANAGEMENTROUTES | Route | tenantManagementRoutes | Wired | 100 | backend/src/routes/tenantManagementRoutes.js |
 | RTE-TRACKDARTROUTES | Route | trackDartRoutes | Wired | 100 | backend/src/routes/trackDartRoutes.js |
-| RTE-UNIFIEDLEDGERROUTES | Route | unifiedLedgerRoutes | Wired | 100 | backend/src/routes/unifiedLedgerRoutes.js |
+| RTE-UNIFIEDAIROUTES | Route | unifiedAIRoutes | Wired | 100 | backend/src/routes/unifiedAIRoutes.js |
 | RTE-VENDORROUTES | Route | vendorRoutes | Wired | 100 | backend/src/routes/vendorRoutes.js |
 | RTE-VISIONROUTES | Route | visionRoutes | Wired | 100 | backend/src/routes/visionRoutes.js |
+| RTE-WATERMANAGEMENTROUTES | Route | waterManagementRoutes | Wired | 100 | backend/src/routes/waterManagementRoutes.js |
 | RTE-WEARABLEINTEGRATIONROUTES | Route | wearableIntegrationRoutes | Wired | 100 | backend/src/routes/wearableIntegrationRoutes.js |
 | RTE-WEATHERROUTES | Route | weatherRoutes | Wired | 100 | backend/src/routes/weatherRoutes.js |
 | RTE-WIKIPEDIAROUTES | Route | wikipediaRoutes | Wired | 100 | backend/src/routes/wikipediaRoutes.js |
@@ -374,7 +436,7 @@
 | TBL-GREENHOUSES | Table | greenhouses | Defined | 100 | backend/src/database/migrations/014_horticulture_module.sql |
 | TBL-HYDROPONICS_SYSTEMS | Table | hydroponics_systems | Defined | 100 | backend/src/database/migrations/014_horticulture_module.sql |
 | TBL-HORTICULTURE_ANALYTICS | Table | horticulture_analytics | Defined | 100 | backend/src/database/migrations/014_horticulture_module.sql |
-| TBL-PLATFORM_CONFIGURATIONS | Table | platform_configurations | Duplicate | 100 | backend/src/database/migrations/014_platform_foundation_modules.sql +  |
+| TBL-PLATFORM_CONFIGURATIONS | Table | platform_configurations | Defined | 100 | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | TBL-TENANTS | Table | tenants | Defined | 100 | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | TBL-ORGANIZATIONS | Table | organizations | Defined | 100 | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | TBL-ENVIRONMENTS | Table | environments | Defined | 100 | backend/src/database/migrations/014_platform_foundation_modules.sql |
@@ -788,7 +850,7 @@
 | TBL-CLIMATE_ALERTS | Table | climate_alerts | Defined | 100 | backend/src/database/migrations/057_climate_weather_d14.sql |
 | TBL-CLIMATE_INDICES | Table | climate_indices | Defined | 100 | backend/src/database/migrations/057_climate_weather_d14.sql |
 | TBL-PEST_DISEASE_FORECASTS | Table | pest_disease_forecasts | Defined | 100 | backend/src/database/migrations/057_climate_weather_d14.sql |
-| TBL-CLIMATE_RISK_ASSESSMENTS | Table | climate_risk_assessments | Defined | 100 | backend/src/database/migrations/057_climate_weather_d14.sql |
+| TBL-CLIMATE_RISK_ASSESSMENTS | Table | climate_risk_assessments | Duplicate | 100 | backend/src/database/migrations/057_climate_weather_d14.sql + backend/ |
 | TBL-AGROMET_ADVISORIES | Table | agromet_advisories | Defined | 100 | backend/src/database/migrations/057_climate_weather_d14.sql |
 | TBL-AI_MODEL_REGISTRY | Table | ai_model_registry | Defined | 100 | backend/src/database/migrations/058_sam_ai_orchestration.sql |
 | TBL-AI_ROUTING_RULES | Table | ai_routing_rules | Defined | 100 | backend/src/database/migrations/058_sam_ai_orchestration.sql |
@@ -986,7 +1048,7 @@
 | TBL-CORE_M148_ITEMS | Table | core_m148_items | Defined | 100 | backend/src/database/migrations/3000_M148_generated.sql |
 | TBL-CORE_M149_ITEMS | Table | core_m149_items | Defined | 100 | backend/src/database/migrations/3000_M149_generated.sql |
 | TBL-HORTICULTURE_M150_ITEMS | Table | horticulture_m150_items | Defined | 100 | backend/src/database/migrations/3000_M150_generated.sql |
-| TBL-MFA_SECRETS | Table | mfa_secrets | Defined | 100 | backend/src/database/migrations/3015_m015_mfa.sql |
+| TBL-MFA_SECRETS | Table | mfa_secrets | Duplicate | 100 | backend/src/database/migrations/3015_m015_mfa.sql + backend/src/databa |
 | TBL-MFA_OTP | Table | mfa_otp | Defined | 100 | backend/src/database/migrations/3015_m015_mfa.sql |
 | TBL-MFA_BIOMETRICS | Table | mfa_biometrics | Defined | 100 | backend/src/database/migrations/3015_m015_mfa.sql |
 | TBL-TRUSTED_DEVICES | Table | trusted_devices | Defined | 100 | backend/src/database/migrations/3015_m015_mfa.sql |
@@ -1043,7 +1105,7 @@
 | TBL-MARKETING_CAMPAIGNS | Table | marketing_campaigns | Defined | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
 | TBL-AD_PLACEMENTS | Table | ad_placements | Defined | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
 | TBL-SPONSORED_PRODUCTS | Table | sponsored_products | Defined | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
-| TBL-PROMOTIONS | Table | promotions | Duplicate | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
+| TBL-PROMOTIONS | Table | promotions | Defined | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
 | TBL-DISCOUNT_RECORDS | Table | discount_records | Defined | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
 | TBL-RETARGETING_CAMPAIGNS | Table | retargeting_campaigns | Defined | 100 | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketi |
 | TBL-NUTRIENT_BENCHMARKS | Table | nutrient_benchmarks | Defined | 100 | backend/src/database/migrations/3103_nutrient_value_sales.sql |
@@ -1057,10 +1119,11 @@
 | TBL-FPO_PROFIT_DISTRIBUTIONS | Table | fpo_profit_distributions | Defined | 100 | backend/src/database/migrations/3106_fpo_member_shares_schema.sql |
 | TBL-FPO_PROFIT_DISTRIBUTION_LINES | Table | fpo_profit_distribution_lines | Defined | 100 | backend/src/database/migrations/3106_fpo_member_shares_schema.sql |
 | TBL-EMPLOYEES | Table | employees | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
-| TBL-DEPARTMENTS | Table | departments | Duplicate | 100 | backend/src/database/migrations/3200_hr_module_schema.sql + backend/sr |
+| TBL-DEPARTMENTS | Table | departments | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
 | TBL-PERFORMANCE_REVIEWS | Table | performance_reviews | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
 | TBL-LEAVE_REQUESTS | Table | leave_requests | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
 | TBL-TRAINING_PROGRAMS | Table | training_programs | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
+| TBL-EMPLOYEE_PROMOTIONS | Table | employee_promotions | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
 | TBL-EMPLOYEE_FEEDBACK | Table | employee_feedback | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
 | TBL-TIMESHEETS | Table | timesheets | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
 | TBL-TIMESHEET_ENTRIES | Table | timesheet_entries | Defined | 100 | backend/src/database/migrations/3200_hr_module_schema.sql |
@@ -1102,6 +1165,171 @@
 | TBL-ERP_CASH_FLOWS | Table | erp_cash_flows | Defined | 100 | backend/src/database/migrations/4000_comprehensive_erp_schema.sql |
 | TBL-ERP_FIXED_ASSETS | Table | erp_fixed_assets | Defined | 100 | backend/src/database/migrations/4000_comprehensive_erp_schema.sql |
 | TBL-ERP_DEPRECIATION | Table | erp_depreciation | Defined | 100 | backend/src/database/migrations/4000_comprehensive_erp_schema.sql |
+| TBL-PLATFORM_HEALTH_LOGS | Table | platform_health_logs | Defined | 100 | backend/src/database/migrations/9500_m001_platform_core.sql |
+| TBL-PLATFORM_METRICS | Table | platform_metrics | Defined | 100 | backend/src/database/migrations/9500_m001_platform_core.sql |
+| TBL-CONFIGURATION_UPDATES | Table | configuration_updates | Defined | 100 | backend/src/database/migrations/9500_m001_platform_core.sql |
+| TBL-PLATFORM_ALERTS | Table | platform_alerts | Defined | 100 | backend/src/database/migrations/9500_m001_platform_core.sql |
+| TBL-FEATURE_FLAGS | Table | feature_flags | Defined | 100 | backend/src/database/migrations/9500_m001_platform_core.sql |
+| TBL-CONFIGURATION_HISTORY | Table | configuration_history | Defined | 100 | backend/src/database/migrations/9501_m002_platform_configuration.sql |
+| TBL-CONFIGURATION_TEMPLATES | Table | configuration_templates | Defined | 100 | backend/src/database/migrations/9501_m002_platform_configuration.sql |
+| TBL-ENVIRONMENT_CONFIGS | Table | environment_configs | Defined | 100 | backend/src/database/migrations/9501_m002_platform_configuration.sql |
+| TBL-TENANT_USERS | Table | tenant_users | Defined | 100 | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| TBL-TENANT_USAGE_LOGS | Table | tenant_usage_logs | Defined | 100 | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| TBL-TENANT_BILLING | Table | tenant_billing | Defined | 100 | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| TBL-TENANT_SETTINGS | Table | tenant_settings | Defined | 100 | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| TBL-ORG_DEPARTMENTS | Table | org_departments | Defined | 100 | backend/src/database/migrations/9503_m004_organization_management.sql |
+| TBL-ORG_TEAMS | Table | org_teams | Defined | 100 | backend/src/database/migrations/9503_m004_organization_management.sql |
+| TBL-ORG_USERS | Table | org_users | Defined | 100 | backend/src/database/migrations/9503_m004_organization_management.sql |
+| TBL-ORG_HIERARCHY | Table | org_hierarchy | Defined | 100 | backend/src/database/migrations/9503_m004_organization_management.sql |
+| TBL-ENVIRONMENT_VARIABLES | Table | environment_variables | Defined | 100 | backend/src/database/migrations/9504_m005_environment_management.sql |
+| TBL-DEPLOYMENT_LOGS | Table | deployment_logs | Defined | 100 | backend/src/database/migrations/9504_m005_environment_management.sql |
+| TBL-ENVIRONMENT_METRICS | Table | environment_metrics | Defined | 100 | backend/src/database/migrations/9504_m005_environment_management.sql |
+| TBL-FARMER_PROFILES | Table | farmer_profiles | Defined | 100 | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| TBL-FARMER_CONTACT_INFO | Table | farmer_contact_info | Defined | 100 | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| TBL-FARMER_HOUSEHOLD | Table | farmer_household | Defined | 100 | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| TBL-FARMER_EDUCATION | Table | farmer_education | Defined | 100 | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| TBL-FARMER_SKILLS | Table | farmer_skills | Defined | 100 | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| TBL-PROFILE_ENRICHMENT_LOG | Table | profile_enrichment_log | Defined | 100 | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| TBL-TRAINING_SESSIONS | Table | training_sessions | Defined | 100 | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| TBL-FARMER_ENROLLMENTS | Table | farmer_enrollments | Defined | 100 | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| TBL-TRAINING_ASSESSMENTS | Table | training_assessments | Defined | 100 | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| TBL-ASSESSMENT_RESULTS | Table | assessment_results | Defined | 100 | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| TBL-TRAINING_MATERIALS | Table | training_materials | Defined | 100 | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| TBL-TRAINING_ATTENDANCE | Table | training_attendance | Defined | 100 | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| TBL-FARMER_GROUPS | Table | farmer_groups | Defined | 100 | backend/src/database/migrations/9507_m024_farmer_groups.sql |
+| TBL-GROUP_MEMBERSHIPS | Table | group_memberships | Defined | 100 | backend/src/database/migrations/9507_m024_farmer_groups.sql |
+| TBL-GROUP_MEETINGS | Table | group_meetings | Defined | 100 | backend/src/database/migrations/9507_m024_farmer_groups.sql |
+| TBL-GROUP_FINANCES | Table | group_finances | Defined | 100 | backend/src/database/migrations/9507_m024_farmer_groups.sql |
+| TBL-SUBSIDY_SCHEMES | Table | subsidy_schemes | Defined | 100 | backend/src/database/migrations/9508_m025_land_parcels_a.sql |
+| TBL-SUBSIDY_APPLICATIONS | Table | subsidy_applications | Defined | 100 | backend/src/database/migrations/9508_m025_land_parcels_a.sql |
+| TBL-LAND_PARCELS | Table | land_parcels | Defined | 100 | backend/src/database/migrations/9509_m031_land_parcels_b.sql |
+| TBL-LAND_TRANSFERS | Table | land_transfers | Defined | 100 | backend/src/database/migrations/9509_m031_land_parcels_b.sql |
+| TBL-SOIL_SAMPLES | Table | soil_samples | Defined | 100 | backend/src/database/migrations/9510_m032_land_records_extra.sql |
+| TBL-SOIL_HEALTH_REPORTS | Table | soil_health_reports | Defined | 100 | backend/src/database/migrations/9510_m032_land_records_extra.sql |
+| TBL-VILLAGE_RESOURCES | Table | village_resources | Defined | 100 | backend/src/database/migrations/9511_m041_m041.sql |
+| TBL-EQUIPMENT_USAGE_LOG | Table | equipment_usage_log | Defined | 100 | backend/src/database/migrations/9512_m042_m042.sql |
+| TBL-FPO_MEMBERSHIPS | Table | fpo_memberships | Defined | 100 | backend/src/database/migrations/9513_m051_m051.sql |
+| TBL-FPO_FINANCIAL_TRANSACTIONS | Table | fpo_financial_transactions | Defined | 100 | backend/src/database/migrations/9513_m051_m051.sql |
+| TBL-FPO_PERFORMANCE_REPORTS | Table | fpo_performance_reports | Defined | 100 | backend/src/database/migrations/9513_m051_m051.sql |
+| TBL-PRODUCT_CATEGORIES | Table | product_categories | Defined | 100 | backend/src/database/migrations/9514_m052_m052.sql |
+| TBL-PRODUCT_RECOMMENDATIONS | Table | product_recommendations | Defined | 100 | backend/src/database/migrations/9514_m052_m052.sql |
+| TBL-INVENTORY_LOGS | Table | inventory_logs | Defined | 100 | backend/src/database/migrations/9514_m052_m052.sql |
+| TBL-ORDER_TRACKING | Table | order_tracking | Defined | 100 | backend/src/database/migrations/9515_m053_m053.sql |
+| TBL-ORDER_FULFILLMENT | Table | order_fulfillment | Defined | 100 | backend/src/database/migrations/9515_m053_m053.sql |
+| TBL-CUSTOMERS | Table | customers | Defined | 100 | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
+| TBL-CUSTOMER_PREFERENCES | Table | customer_preferences | Defined | 100 | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
+| TBL-CUSTOMER_SEGMENT_ASSIGNMENTS | Table | customer_segment_assignments | Defined | 100 | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
+| TBL-CUSTOMER_INSIGHTS | Table | customer_insights | Defined | 100 | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
+| TBL-PRICING_RULES | Table | pricing_rules | Defined | 100 | backend/src/database/migrations/9517_m055_m055.sql |
+| TBL-PRICE_HISTORY | Table | price_history | Defined | 100 | backend/src/database/migrations/9517_m055_m055.sql |
+| TBL-COMPETITOR_PRICING | Table | competitor_pricing | Defined | 100 | backend/src/database/migrations/9517_m055_m055.sql |
+| TBL-PRICE_ELASTICITY | Table | price_elasticity | Defined | 100 | backend/src/database/migrations/9517_m055_m055.sql |
+| TBL-REFUNDS | Table | refunds | Defined | 100 | backend/src/database/migrations/9518_m056_m056.sql |
+| TBL-RETURNS | Table | returns | Defined | 100 | backend/src/database/migrations/9519_m058_m058.sql |
+| TBL-DISCOUNTS | Table | discounts | Defined | 100 | backend/src/database/migrations/9520_m059_m059.sql |
+| TBL-REVIEWS | Table | reviews | Defined | 100 | backend/src/database/migrations/9521_m060_m060.sql |
+| TBL-WATER_USAGE_RECORDS | Table | water_usage_records | Defined | 100 | backend/src/database/migrations/9522_m076_m076.sql |
+| TBL-WATER_USAGE_HISTORY | Table | water_usage_history | Defined | 100 | backend/src/database/migrations/9522_m076_m076.sql |
+| TBL-CROP_PATTERNS | Table | crop_patterns | Defined | 100 | backend/src/database/migrations/9522_m076_m076.sql |
+| TBL-GROUNDWATER_LEVELS | Table | groundwater_levels | Defined | 100 | backend/src/database/migrations/9522_m076_m076.sql |
+| TBL-WATER_QUALITY_MEASUREMENTS | Table | water_quality_measurements | Defined | 100 | backend/src/database/migrations/9523_m077_m077.sql |
+| TBL-WATER_SOURCES | Table | water_sources | Defined | 100 | backend/src/database/migrations/9523_m077_m077.sql |
+| TBL-WATER_USAGE_CONTEXT | Table | water_usage_context | Defined | 100 | backend/src/database/migrations/9523_m077_m077.sql |
+| TBL-QUALITY_ALERTS | Table | quality_alerts | Defined | 100 | backend/src/database/migrations/9523_m077_m077.sql |
+| TBL-TREATMENT_RECOMMENDATIONS | Table | treatment_recommendations | Defined | 100 | backend/src/database/migrations/9523_m077_m077.sql |
+| TBL-DISTRIBUTION_POINTS | Table | distribution_points | Defined | 100 | backend/src/database/migrations/9524_m078_m078.sql |
+| TBL-WATERSHED_PLANS | Table | watershed_plans | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-ECOLOGICAL_ASSESSMENTS | Table | ecological_assessments | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-HYDROLOGICAL_DATA | Table | hydrological_data | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-LAND_USE_PATTERNS | Table | land_use_patterns | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-BIODIVERSITY_INVENTORY | Table | biodiversity_inventory | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-CONSERVATION_IMPLEMENTATIONS | Table | conservation_implementations | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-WATERSHED_HEALTH_MONITORING | Table | watershed_health_monitoring | Defined | 100 | backend/src/database/migrations/9525_m079_m079.sql |
+| TBL-WATER_ANALYTICS | Table | water_analytics | Defined | 100 | backend/src/database/migrations/9526_m080_m080.sql |
+| TBL-WATER_DASHBOARDS | Table | water_dashboards | Defined | 100 | backend/src/database/migrations/9526_m080_m080.sql |
+| TBL-WATER_PREDICTIONS | Table | water_predictions | Defined | 100 | backend/src/database/migrations/9526_m080_m080.sql |
+| TBL-WATER_PERFORMANCE_COMPARISONS | Table | water_performance_comparisons | Defined | 100 | backend/src/database/migrations/9526_m080_m080.sql |
+| TBL-WATER_ANOMALY_ALERTS | Table | water_anomaly_alerts | Defined | 100 | backend/src/database/migrations/9526_m080_m080.sql |
+| TBL-DASHBOARDS | Table | dashboards | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-DASHBOARD_WIDGETS | Table | dashboard_widgets | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-DASHBOARD_DATA_SOURCES | Table | dashboard_data_sources | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-DASHBOARD_FILTERS | Table | dashboard_filters | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-DASHBOARD_SNAPSHOTS | Table | dashboard_snapshots | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-DASHBOARD_SHARES | Table | dashboard_shares | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-DASHBOARD_USAGE_LOGS | Table | dashboard_usage_logs | Defined | 100 | backend/src/database/migrations/9527_m081_dashboard.sql |
+| TBL-KPI_DEFINITIONS | Table | kpi_definitions | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-KPI_MEASUREMENTS | Table | kpi_measurements | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-KPI_TARGETS | Table | kpi_targets | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-KPI_ALERTS | Table | kpi_alerts | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-KPI_SCORES | Table | kpi_scores | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-METRIC_BENCHMARKS | Table | metric_benchmarks | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-KPI_DIMENSIONS | Table | kpi_dimensions | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-KPI_AGGREGATIONS | Table | kpi_aggregations | Defined | 100 | backend/src/database/migrations/9528_m082_kpi.sql |
+| TBL-PERFORMANCE_METRICS | Table | performance_metrics | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_BENCHMARKS | Table | performance_benchmarks | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_REPORTS | Table | performance_reports | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_TRENDS | Table | performance_trends | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_COMPARISONS | Table | performance_comparisons | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_TARGETS | Table | performance_targets | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_DRIVERS | Table | performance_drivers | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-PERFORMANCE_ALERTS | Table | performance_alerts | Defined | 100 | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| TBL-TREND_DEFINITIONS | Table | trend_definitions | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-TREND_DATA_POINTS | Table | trend_data_points | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-TREND_FORECASTS | Table | trend_forecasts | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-TREND_SEASONALITY | Table | trend_seasonality | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-TREND_CORRELATIONS | Table | trend_correlations | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-TREND_BREAKPOINTS | Table | trend_breakpoints | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-TREND_ALERTS | Table | trend_alerts | Defined | 100 | backend/src/database/migrations/9530_m084_m084.sql |
+| TBL-COMPARISON_GROUPS | Table | comparison_groups | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-COMPARISON_CONFIGS | Table | comparison_configs | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-COMPARISON_RESULTS | Table | comparison_results | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-COMPARISON_BENCHMARKS | Table | comparison_benchmarks | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-COMPARISON_TRENDS | Table | comparison_trends | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-COMPARISON_ALERTS | Table | comparison_alerts | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-COMPARISON_SNAPSHOTS | Table | comparison_snapshots | Defined | 100 | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| TBL-MONITORING_SOURCES | Table | monitoring_sources | Defined | 100 | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| TBL-MONITORING_METRICS | Table | monitoring_metrics | Defined | 100 | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| TBL-REAL_TIME_DATA | Table | real_time_data | Defined | 100 | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| TBL-MONITORING_DASHBOARDS | Table | monitoring_dashboards | Defined | 100 | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| TBL-MONITORING_ALERTS | Table | monitoring_alerts | Defined | 100 | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| TBL-MONITORING_EVENTS | Table | monitoring_events | Defined | 100 | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| TBL-TRACTOR_REGISTRY | Table | tractor_registry | Defined | 100 | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| TBL-TRACTOR_MAINTENANCE_RECORDS | Table | tractor_maintenance_records | Defined | 100 | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| TBL-TRACTOR_PERFORMANCE_LOGS | Table | tractor_performance_logs | Defined | 100 | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| TBL-TRACTOR_USAGE_LOGS | Table | tractor_usage_logs | Defined | 100 | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| TBL-TRACTOR_INSURANCE_RECORDS | Table | tractor_insurance_records | Defined | 100 | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| TBL-IMPLEMENT_MAINTENANCE_RECORDS | Table | implement_maintenance_records | Defined | 100 | backend/src/database/migrations/9534_m102_m102.sql |
+| TBL-IMPLEMENT_USAGE_LOGS | Table | implement_usage_logs | Defined | 100 | backend/src/database/migrations/9534_m102_m102.sql |
+| TBL-IMPLEMENT_CONDITION_ASSESSMENTS | Table | implement_condition_assessments | Defined | 100 | backend/src/database/migrations/9534_m102_m102.sql |
+| TBL-EQUIPMENT_STATUS_HISTORY | Table | equipment_status_history | Defined | 100 | backend/src/database/migrations/9535_m103_m103.sql |
+| TBL-EQUIPMENT_USAGE_LOGS | Table | equipment_usage_logs | Defined | 100 | backend/src/database/migrations/9535_m103_m103.sql |
+| TBL-EQUIPMENT_MAINTENANCE_RECORDS | Table | equipment_maintenance_records | Defined | 100 | backend/src/database/migrations/9535_m103_m103.sql |
+| TBL-RENTAL_TRANSACTIONS | Table | rental_transactions | Defined | 100 | backend/src/database/migrations/9536_m104_m104.sql |
+| TBL-RENTAL_REVIEWS | Table | rental_reviews | Defined | 100 | backend/src/database/migrations/9536_m104_m104.sql |
+| TBL-FLEET_DISPATCHES | Table | fleet_dispatches | Defined | 100 | backend/src/database/migrations/9537_m105_m105.sql |
+| TBL-FLEET_ROUTES | Table | fleet_routes | Defined | 100 | backend/src/database/migrations/9537_m105_m105.sql |
+| TBL-FLEET_MAINTENANCE_RECORDS | Table | fleet_maintenance_records | Defined | 100 | backend/src/database/migrations/9537_m105_m105.sql |
+| TBL-FLEET_FUEL_LOGS | Table | fleet_fuel_logs | Defined | 100 | backend/src/database/migrations/9537_m105_m105.sql |
+| TBL-DOWNTIME_LOGS | Table | downtime_logs | Defined | 100 | backend/src/database/migrations/9538_m107_equipment_breakdowns.sql |
+| TBL-REPAIR_PARTS_INVENTORY | Table | repair_parts_inventory | Defined | 100 | backend/src/database/migrations/9538_m107_equipment_breakdowns.sql |
+| TBL-FUEL_INVENTORY | Table | fuel_inventory | Defined | 100 | backend/src/database/migrations/9539_m108_m108.sql |
+| TBL-FUEL_SUPPLIERS | Table | fuel_suppliers | Defined | 100 | backend/src/database/migrations/9539_m108_m108.sql |
+| TBL-SPARE_PARTS_PROCUREMENT | Table | spare_parts_procurement | Defined | 100 | backend/src/database/migrations/9540_m109_m109.sql |
+| TBL-PARTS_SUPPLIERS | Table | parts_suppliers | Defined | 100 | backend/src/database/migrations/9540_m109_m109.sql |
+| TBL-CATTLE_HEALTH_RECORDS | Table | cattle_health_records | Defined | 100 | backend/src/database/migrations/9541_m122_m122.sql |
+| TBL-CATTLE_BREED_CHARACTERISTICS | Table | cattle_breed_characteristics | Defined | 100 | backend/src/database/migrations/9541_m122_m122.sql |
+| TBL-REGIONAL_CATTLE_HEALTH_PATTERNS | Table | regional_cattle_health_patterns | Defined | 100 | backend/src/database/migrations/9541_m122_m122.sql |
+| TBL-CATTLE_PERFORMANCE_TRACKING | Table | cattle_performance_tracking | Defined | 100 | backend/src/database/migrations/9541_m122_m122.sql |
+| TBL-POULTRY_REGISTRY | Table | poultry_registry | Defined | 100 | backend/src/database/migrations/9542_m123_poultry_registry.sql |
+| TBL-POULTRY_HEALTH_RECORDS | Table | poultry_health_records | Defined | 100 | backend/src/database/migrations/9542_m123_poultry_registry.sql |
+| TBL-POULTRY_BREED_CHARACTERISTICS | Table | poultry_breed_characteristics | Defined | 100 | backend/src/database/migrations/9542_m123_poultry_registry.sql |
+| TBL-REGIONAL_POULTRY_HEALTH_PATTERNS | Table | regional_poultry_health_patterns | Defined | 100 | backend/src/database/migrations/9542_m123_poultry_registry.sql |
+| TBL-POULTRY_PERFORMANCE_TRACKING | Table | poultry_performance_tracking | Defined | 100 | backend/src/database/migrations/9542_m123_poultry_registry.sql |
+| TBL-ANIMAL_HEALTH_RECORDS | Table | animal_health_records | Defined | 100 | backend/src/database/migrations/9543_m127_m127.sql |
+| TBL-VACCINATION_SCHEDULES | Table | vaccination_schedules | Defined | 100 | backend/src/database/migrations/9543_m127_m127.sql |
+| TBL-REGIONAL_DISEASE_PATTERNS | Table | regional_disease_patterns | Defined | 100 | backend/src/database/migrations/9543_m127_m127.sql |
+| TBL-ANIMAL_REGISTRY | Table | animal_registry | Defined | 100 | backend/src/database/migrations/9543_m127_m127.sql |
+| TBL-HERD_HEALTH_MONITORING | Table | herd_health_monitoring | Defined | 100 | backend/src/database/migrations/9543_m127_m127.sql |
 | TBL-AI_OUTCOMES | Table | ai_outcomes | Defined | 100 | backend/src/database/migrations/990_ai_outcomes.sql |
 | TBL-AI_PREDICTION_LOG | Table | ai_prediction_log | Defined | 100 | backend/src/database/migrations/990_ai_outcomes.sql |
 | TBL-AI_AGENT_SCORECARD | Table | ai_agent_scorecard | Defined | 100 | backend/src/database/migrations/990_ai_outcomes.sql |
@@ -1188,6 +1416,7 @@
 | TBL-COMPANIES | Table | companies | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
 | TBL-BUSINESS_UNITS | Table | business_units | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
 | TBL-BRANCHES | Table | branches | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
+| TBL-ENTERPRISE_DEPARTMENTS | Table | enterprise_departments | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
 | TBL-COST_CENTERS | Table | cost_centers | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
 | TBL-PROFIT_CENTERS | Table | profit_centers | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
 | TBL-FISCAL_YEARS | Table | fiscal_years | Defined | 100 | backend/src/database/migrations/996_enterprise_foundation.sql |
@@ -1229,6 +1458,141 @@
 | TBL-DEFENSE_FITNESS_STANDARDS | Table | defense_fitness_standards | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzz_defense_fitness_prep |
 | TBL-DEFENSE_FITNESS_PREP_ATTEMPTS | Table | defense_fitness_prep_attempts | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzz_defense_fitness_prep |
 | TBL-CROP_VALUE_COMPOUND_REFERENCE | Table | crop_value_compound_reference | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzz_crop_value_compound |
+| TBL-NOTIFICATIONS | Table | notifications | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-NOTIFICATION_DELIVERIES | Table | notification_deliveries | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-NOTIFICATION_PREFERENCES | Table | notification_preferences | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-NOTIFICATION_TEMPLATES | Table | notification_templates | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-RAINWATER_HARVESTING_SYSTEMS | Table | rainwater_harvesting_systems | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-RAINFALL_PATTERNS | Table | rainfall_patterns | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-RAINFALL_RECORDS | Table | rainfall_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-COLLECTION_RECORDS | Table | collection_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-STORAGE_TANKS | Table | storage_tanks | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-EQUIPMENT_RENTAL_LISTINGS | Table | equipment_rental_listings | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-EQUIPMENT_RENTAL_BOOKINGS | Table | equipment_rental_bookings | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-EQUIPMENT_BREAKDOWNS | Table | equipment_breakdowns | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-EMERGENCY_REPAIRS | Table | emergency_repairs | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_sch |
+| TBL-SESSIONS | Table | sessions | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_secu |
+| TBL-DEVICE_FINGERPRINTS | Table | device_fingerprints | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_secu |
+| TBL-SECURITY_EVENTS | Table | security_events | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_secu |
+| TBL-ALERT_RULES | Table | alert_rules | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_NOTIFICATIONS | Table | alert_notifications | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_INCIDENTS | Table | alert_incidents | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_ESCALATIONS | Table | alert_escalations | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_SUPPRESSIONS | Table | alert_suppressions | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_MAINTENANCE_WINDOWS | Table | alert_maintenance_windows | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_STATISTICS | Table | alert_statistics | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-ALERT_HISTORY | Table | alert_history | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management |
+| TBL-DROUGHT_OBSERVATIONS | Table | drought_observations | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitor |
+| TBL-FLOOD_OBSERVATIONS | Table | flood_observations | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitor |
+| TBL-DISEASE_FORECASTS | Table | disease_forecasts | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitor |
+| TBL-AGRO_METEOROLOGY_READINGS | Table | agro_meteorology_readings | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitor |
+| TBL-IRRIGATION_SCHEDULES | Table | irrigation_schedules | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_man |
+| TBL-IRRIGATION_WATER_SOURCES | Table | irrigation_water_sources | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_man |
+| TBL-IRRIGATION_LOGS | Table | irrigation_logs | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_man |
+| TBL-FARM_ACTIVITIES | Table | farm_activities | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-FARM_TASKS | Table | farm_tasks | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-CONTRACTORS | Table | contractors | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-MACHINERY_OPERATIONS | Table | machinery_operations | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-EQUIPMENT_SCHEDULES | Table | equipment_schedules | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-INPUT_CONSUMPTION_RECORDS | Table | input_consumption_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-FARM_PRODUCTIVITY_METRICS | Table | farm_productivity_metrics | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-FARM_OPERATIONS_KPIS | Table | farm_operations_kpis | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_man |
+| TBL-WATER_BUDGETS | Table | water_budgets | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_managem |
+| TBL-WATER_QUALITY_READINGS | Table | water_quality_readings | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_managem |
+| TBL-RAINWATER_HARVESTING_STRUCTURES | Table | rainwater_harvesting_structures | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_managem |
+| TBL-WATERSHEDS | Table | watersheds | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_managem |
+| TBL-WATER_ANALYTICS_RECORDS | Table | water_analytics_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_managem |
+| TBL-SOIL_HEALTH_CARDS | Table | soil_health_cards | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_managem |
+| TBL-NUTRIENT_MANAGEMENT_PLANS | Table | nutrient_management_plans | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_managem |
+| TBL-FERTILITY_MANAGEMENT_RECORDS | Table | fertility_management_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_managem |
+| TBL-COMMUNITY_BLOCKS | Table | community_blocks | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_m |
+| TBL-COMMUNITY_DISTRICTS | Table | community_districts | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_m |
+| TBL-COMMUNITY_STATES | Table | community_states | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_m |
+| TBL-PRODUCER_GROUPS | Table | producer_groups | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_m |
+| TBL-COMMUNITY_ASSETS | Table | community_assets | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_m |
+| TBL-RURAL_DEVELOPMENT_PROJECTS | Table | rural_development_projects | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_m |
+| TBL-BIOFERTILIZER_STOCK | Table | biofertilizer_stock | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-PESTICIDE_INVENTORY | Table | pesticide_inventory | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-BIO_PESTICIDE_STOCK | Table | bio_pesticide_stock | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-MICRONUTRIENT_STOCK | Table | micronutrient_stock | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-ORGANIC_INPUT_STOCK | Table | organic_input_stock | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-INPUT_PROCUREMENT_ORDERS | Table | input_procurement_orders | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-INPUT_DISTRIBUTION_RECORDS | Table | input_distribution_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-INPUT_TRACEABILITY_RECORDS | Table | input_traceability_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supp |
+| TBL-CATTLE_REGISTRY | Table | cattle_registry | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-POULTRY_BATCHES | Table | poultry_batches | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-GOAT_FARMING_ANIMALS | Table | goat_farming_animals | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-SHEEP_FARMING_ANIMALS | Table | sheep_farming_animals | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-PIG_FARMING_ANIMALS | Table | pig_farming_animals | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-LIVESTOCK_FEED_RECORDS | Table | livestock_feed_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-BREEDING_RECORDS | Table | breeding_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-LIVESTOCK_ANALYTICS_RECORDS | Table | livestock_analytics_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock |
+| TBL-FARMER_FAMILY_MEMBERS | Table | farmer_family_members | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-LAND_LEASES | Table | land_leases | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-GIS_LAND_MAPPING_PARCELS | Table | gis_land_mapping_parcels | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-SOIL_MAPPING_ZONES | Table | soil_mapping_zones | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-WATER_RESOURCE_MAPPING | Table | water_resource_mapping | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-GEO_BOUNDARIES | Table | geo_boundaries | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-LAND_SURVEYS | Table | land_surveys | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_l |
+| TBL-CROP_REGISTRATIONS | Table | crop_registrations | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_ma |
+| TBL-CROP_VARIETIES | Table | crop_varieties | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_ma |
+| TBL-SEED_PLANNING_PLANS | Table | seed_planning_plans | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_ma |
+| TBL-NURSERIES | Table | nurseries | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_ma |
+| TBL-SOWING_RECORDS | Table | sowing_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_ma |
+| TBL-CROP_MONITORING_OBSERVATIONS | Table | crop_monitoring_observations | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_ma |
+| TBL-ASSET_LIFECYCLE | Table | asset_lifecycle | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_ |
+| TBL-ASSET_LIFECYCLE_STAGES | Table | asset_lifecycle_stages | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_ |
+| TBL-PREVENTIVE_MAINTENANCE_RECORDS | Table | preventive_maintenance_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preve |
+| TBL-VEGETABLE_PRODUCTION_RECORDS | Table | vegetable_production_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-FLORICULTURE_RECORDS | Table | floriculture_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-POLYHOUSE_RECORDS | Table | polyhouse_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-HYDROPONIC_SYSTEMS | Table | hydroponic_systems | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-AEROPONIC_SYSTEMS | Table | aeroponic_systems | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-PRECISION_HORTICULTURE_READINGS | Table | precision_horticulture_readings | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-PROTECTED_CULTIVATION_STRUCTURES | Table | protected_cultivation_structures | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-HORTICULTURE_ANALYTICS_METRICS | Table | horticulture_analytics_metrics | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_hort |
+| TBL-SEEDLING_BATCHES | Table | seedling_batches | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seed |
+| TBL-SEEDLING_HEALTH_RECORDS | Table | seedling_health_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seed |
+| TBL-BIOFLOC_FARM_TANKS | Table | biofloc_farm_tanks | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-HATCHERY_BATCHES | Table | hatchery_batches | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-FISH_FEED_LOGS | Table | fish_feed_logs | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-FISHERIES_WATER_QUALITY_READINGS | Table | fisheries_water_quality_readings | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-FISH_HEALTH_RECORDS | Table | fish_health_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-FISHERIES_HARVEST_RECORDS | Table | fisheries_harvest_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-FISH_PROCESSING_BATCHES | Table | fish_processing_batches | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-COLD_FISH_CHAIN_SHIPMENTS | Table | cold_fish_chain_shipments | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-AQUACULTURE_ANALYTICS_METRICS | Table | aquaculture_analytics_metrics | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fis |
+| TBL-IDENTITY_PERMISSIONS | Table | identity_permissions | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_id |
+| TBL-SSO_PROVIDERS | Table | sso_providers | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_id |
+| TBL-MFA_DEVICES | Table | mfa_devices | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_id |
+| TBL-DIGITAL_IDENTITIES | Table | digital_identities | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_id |
+| TBL-CONSENT_RECORDS | Table | consent_records | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_id |
+| TBL-IMPLEMENT_REGISTRY | Table | implement_registry | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_m |
+| TBL-EQUIPMENT_INVENTORY | Table | equipment_inventory | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_m |
+| TBL-FUEL_PURCHASES | Table | fuel_purchases | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_m |
+| TBL-FUEL_CONSUMPTION | Table | fuel_consumption | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_m |
+| TBL-SPARE_PARTS_INVENTORY | Table | spare_parts_inventory | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_m |
+| TBL-SPARE_PARTS_CONSUMPTION | Table | spare_parts_consumption | Defined | 100 | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_m |
+| TBL-USER_CONSENT | Table | user_consent | Defined | 100 | backend/src/database/migrations/gdpr_schema.sql |
+| TBL-DATA_SUBJECT_REQUESTS | Table | data_subject_requests | Defined | 100 | backend/src/database/migrations/gdpr_schema.sql |
+| TBL-USER_DATA_RESIDENCY | Table | user_data_residency | Defined | 100 | backend/src/database/migrations/gdpr_schema.sql |
+| TBL-PRIVACY_IMPACT_ASSESSMENTS | Table | privacy_impact_assessments | Defined | 100 | backend/src/database/migrations/gdpr_schema.sql |
+| TBL-DATA_PROCESSING_ACTIVITIES | Table | data_processing_activities | Defined | 100 | backend/src/database/migrations/gdpr_schema.sql |
+| TBL-DATA_BREACH_NOTIFICATIONS | Table | data_breach_notifications | Defined | 100 | backend/src/database/migrations/gdpr_schema.sql |
+| TBL-PLATFORM_CONFIG | Table | platform_config | Defined | 100 | backend/src/database/migrations/m001_platform_core_schema.sql |
+| TBL-PLATFORM_VERSIONS | Table | platform_versions | Defined | 100 | backend/src/database/migrations/m001_platform_core_schema.sql |
+| TBL-PLATFORM_EVENTS | Table | platform_events | Defined | 100 | backend/src/database/migrations/m001_platform_core_schema.sql |
+| TBL-PLATFORM_MAINTENANCE | Table | platform_maintenance | Defined | 100 | backend/src/database/migrations/m001_platform_core_schema.sql |
+| TBL-MFA_BACKUP_CODES | Table | mfa_backup_codes | Defined | 100 | backend/src/database/migrations/mfa_schema.sql |
+| TBL-MFA_VERIFICATION_ATTEMPTS | Table | mfa_verification_attempts | Defined | 100 | backend/src/database/migrations/mfa_schema.sql |
+| TBL-AI_SESSION_CONTEXT | Table | ai_session_context | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_USAGE_TRACKING | Table | ai_usage_tracking | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_AGENT_PERFORMANCE | Table | ai_agent_performance | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_KNOWLEDGE_BASE | Table | ai_knowledge_base | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_CONTEXT_ENRICHMENT | Table | ai_context_enrichment | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_TOOL_EXECUTION | Table | ai_tool_execution | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_SAFETY_EVENTS | Table | ai_safety_events | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
+| TBL-AI_COST_OPTIMIZATION | Table | ai_cost_optimization | Defined | 100 | backend/src/database/migrations/unified_ai_schema.sql |
 | AGT-FINANCE_CASHFLOW | AI Agent | finance.cashflow | Proposing | 100 | backend/src/core/erpAgents.js |
 | AGT-FINANCE_RECEIVABLES | AI Agent | finance.receivables | Proposing | 100 | backend/src/core/erpAgents.js |
 | AGT-PROCUREMENT_VENDOR_SELECTION | AI Agent | procurement.vendor_selection | Proposing | 100 | backend/src/core/erpAgents.js |
@@ -1244,52 +1608,75 @@
 | AGT-RISK_REGISTER_HEALTH | AI Agent | risk.register_health | Proposing | 100 | backend/src/core/erpAgents.js |
 | AGT-EMERGENCY_INCIDENT_COMMAND | AI Agent | emergency.incident_command | Proposing | 100 | backend/src/core/erpAgents.js |
 | AGT-COMPLIANCE_SOD | AI Agent | compliance.sod | Proposing | 100 | backend/src/core/erpAgents.js |
-| CAP-MARKETPLACE_CATALOG | Capability | Marketplace / catalog | Production Candidate | 100 | {"tables":10,"services":9,"endpoints":68,"components":9,"tests":1} |
-| CAP-ORDERS_CHECKOUT | Capability | Orders / checkout | Testing Pending | 80 | {"tables":2,"services":4,"endpoints":19,"components":4,"tests":0} |
-| CAP-PAYMENTS | Capability | Payments | Testing Pending | 80 | {"tables":16,"services":2,"endpoints":20,"components":1,"tests":0} |
+| AGT-CONTROLLING_COST_VARIANCE | AI Agent | controlling.cost_variance | Proposing | 100 | backend/src/core/erpAgents.js |
+| AGT-ASSETS_LIFECYCLE | AI Agent | assets.lifecycle | Proposing | 100 | backend/src/core/erpAgents.js |
+| AGT-LOGISTICS_DELAY_RISK | AI Agent | logistics.delay_risk | Proposing | 100 | backend/src/core/erpAgents.js |
+| AGT-PRODUCTION_OEE | AI Agent | production.oee | Proposing | 100 | backend/src/core/erpAgents.js |
+| AGT-HR_LEAVE_LIABILITY | AI Agent | hr.leave_liability | Proposing | 100 | backend/src/core/erpAgents.js |
+| AGT-MASTERDATA_QUALITY | AI Agent | masterdata.quality | Proposing | 100 | backend/src/core/erpAgents.js |
+| CAP-MARKETPLACE_CATALOG | Capability | Marketplace / catalog | Production Candidate | 100 | {"tables":11,"services":10,"endpoints":77,"components":10,"tests":1} |
+| CAP-ORDERS_CHECKOUT | Capability | Orders / checkout | Testing Pending | 80 | {"tables":2,"services":4,"endpoints":19,"components":5,"tests":0} |
+| CAP-PAYMENTS | Capability | Payments | Testing Pending | 80 | {"tables":18,"services":2,"endpoints":20,"components":1,"tests":0} |
 | CAP-WALLET | Capability | Wallet | Testing Pending | 80 | {"tables":4,"services":1,"endpoints":10,"components":1,"tests":0} |
 | CAP-ESCROW | Capability | Escrow | Testing Pending | 40 | {"tables":2,"services":1,"endpoints":0,"components":0,"tests":0} |
 | CAP-GST_TAX | Capability | GST / tax | Testing Pending | 80 | {"tables":15,"services":2,"endpoints":16,"components":1,"tests":0} |
-| CAP-ACCOUNTING_DOUBLE_ENTRY_ | Capability | Accounting (double-entry) | Testing Pending | 80 | {"tables":10,"services":3,"endpoints":19,"components":3,"tests":0} |
-| CAP-SUBSIDY | Capability | Subsidy | Testing Pending | 60 | {"tables":2,"services":1,"endpoints":0,"components":1,"tests":0} |
-| CAP-INSURANCE | Capability | Insurance | Production Candidate | 100 | {"tables":8,"services":6,"endpoints":29,"components":2,"tests":1} |
-| CAP-LOGISTICS_SHIPMENT | Capability | Logistics / shipment | Testing Pending | 80 | {"tables":11,"services":4,"endpoints":60,"components":4,"tests":0} |
-| CAP-COLD_CHAIN_TEMPERATURE | Capability | Cold chain / temperature | Backend Complete / Frontend Missing | 80 | {"tables":7,"services":3,"endpoints":27,"components":0,"tests":1} |
-| CAP-FARMER_PORTAL | Capability | Farmer portal | Production Candidate | 100 | {"tables":4,"services":7,"endpoints":49,"components":16,"tests":2} |
-| CAP-ORGANIC_TRACEABILITY | Capability | Organic traceability | Production Candidate | 100 | {"tables":22,"services":1,"endpoints":13,"components":2,"tests":1} |
+| CAP-ACCOUNTING_DOUBLE_ENTRY_ | Capability | Accounting (double-entry) | Testing Pending | 80 | {"tables":10,"services":3,"endpoints":19,"components":4,"tests":0} |
+| CAP-SUBSIDY | Capability | Subsidy | Testing Pending | 60 | {"tables":4,"services":1,"endpoints":0,"components":1,"tests":0} |
+| CAP-INSURANCE | Capability | Insurance | Production Candidate | 100 | {"tables":9,"services":6,"endpoints":30,"components":2,"tests":1} |
+| CAP-LOGISTICS_SHIPMENT | Capability | Logistics / shipment | Testing Pending | 80 | {"tables":12,"services":4,"endpoints":60,"components":6,"tests":0} |
+| CAP-COLD_CHAIN_TEMPERATURE | Capability | Cold chain / temperature | Production Candidate | 100 | {"tables":8,"services":3,"endpoints":27,"components":1,"tests":1} |
+| CAP-FARMER_PORTAL | Capability | Farmer portal | Production Candidate | 100 | {"tables":9,"services":9,"endpoints":54,"components":16,"tests":2} |
+| CAP-ORGANIC_TRACEABILITY | Capability | Organic traceability | Production Candidate | 100 | {"tables":23,"services":1,"endpoints":13,"components":2,"tests":1} |
 | CAP-GI_INTELLIGENCE | Capability | GI intelligence | Production Candidate | 100 | {"tables":11,"services":1,"endpoints":11,"components":1,"tests":1} |
 | CAP-MULTILINGUAL | Capability | Multilingual | Production Candidate | 100 | {"tables":7,"services":1,"endpoints":12,"components":3,"tests":1} |
-| CAP-WORKFLOW_APPROVALS | Capability | Workflow / approvals | Backend Complete / Frontend Missing | 80 | {"tables":4,"services":2,"endpoints":40,"components":0,"tests":1} |
-| CAP-CRM | Capability | CRM | Backend Complete / Frontend Missing | 80 | {"tables":4,"services":2,"endpoints":40,"components":0,"tests":1} |
-| CAP-RISK_MANAGEMENT | Capability | Risk management | Backend Complete / Frontend Missing | 80 | {"tables":9,"services":2,"endpoints":40,"components":0,"tests":1} |
-| CAP-LEGAL_MANAGEMENT | Capability | Legal management | Backend Complete / Frontend Missing | 80 | {"tables":3,"services":2,"endpoints":40,"components":0,"tests":1} |
-| CAP-EMERGENCY_MANAGEMENT | Capability | Emergency management | Backend Complete / Frontend Missing | 80 | {"tables":5,"services":2,"endpoints":40,"components":0,"tests":1} |
-| CAP-CROP_SEMANTIC_SEARCH | Capability | Crop semantic search | Testing Pending | 80 | {"tables":2,"services":1,"endpoints":11,"components":1,"tests":0} |
-| CAP-DISRUPTION_REROUTING | Capability | Disruption / rerouting | Backend Complete / Frontend Missing | 60 | {"tables":1,"services":5,"endpoints":42,"components":0,"tests":0} |
-| CAP-KNOWLEDGE_GRAPH | Capability | Knowledge graph | Production Candidate | 100 | {"tables":1,"services":1,"endpoints":7,"components":1,"tests":1} |
+| CAP-WORKFLOW_APPROVALS | Capability | Workflow / approvals | Backend Complete / Frontend Missing | 80 | {"tables":4,"services":1,"endpoints":13,"components":0,"tests":1} |
+| CAP-CRM | Capability | CRM | Backend Complete / Frontend Missing | 80 | {"tables":4,"services":1,"endpoints":13,"components":0,"tests":1} |
+| CAP-RISK_MANAGEMENT | Capability | Risk management | Backend Complete / Frontend Missing | 80 | {"tables":9,"services":1,"endpoints":13,"components":0,"tests":1} |
+| CAP-LEGAL_MANAGEMENT | Capability | Legal management | Backend Complete / Frontend Missing | 80 | {"tables":3,"services":1,"endpoints":13,"components":0,"tests":1} |
+| CAP-EMERGENCY_MANAGEMENT | Capability | Emergency management | Backend Complete / Frontend Missing | 80 | {"tables":6,"services":1,"endpoints":13,"components":0,"tests":1} |
+| CAP-CROP_SEMANTIC_SEARCH | Capability | Crop semantic search | Testing Pending | 80 | {"tables":2,"services":1,"endpoints":11,"components":2,"tests":0} |
+| CAP-DISRUPTION_REROUTING | Capability | Disruption / rerouting | Backend Complete / Frontend Missing | 60 | {"tables":1,"services":7,"endpoints":56,"components":0,"tests":0} |
+| CAP-KNOWLEDGE_GRAPH | Capability | Knowledge graph | Production Candidate | 100 | {"tables":1,"services":1,"endpoints":7,"components":2,"tests":1} |
 | CAP-MANDI_REFERENCE_PRICE | Capability | Mandi / reference price | Database Only | 20 | {"tables":1,"services":0,"endpoints":0,"components":0,"tests":0} |
 | CAP-GOVERNMENT_DPI_ONDC_ETC_ | Capability | Government DPI (ONDC etc.) | Missing | 0 | {"tables":0,"services":0,"endpoints":0,"components":0,"tests":0} |
-| CAP-MONITORING_OBSERVABILITY | Capability | Monitoring / observability | Testing Pending | 80 | {"tables":2,"services":4,"endpoints":2,"components":3,"tests":0} |
+| CAP-MONITORING_OBSERVABILITY | Capability | Monitoring / observability | Testing Pending | 80 | {"tables":10,"services":7,"endpoints":12,"components":4,"tests":0} |
+| UI-ABOUTPAGE | Page | AboutPage.jsx | Present | 100 | frontend/src/pages/AboutPage.jsx |
 | UI-ADMINDASHBOARDPAGE | Page | AdminDashboardPage.jsx | Present | 100 | frontend/src/pages/AdminDashboardPage.jsx |
+| UI-AGRICULTURALINTELLIGENCEPAGE | Page | AgriculturalIntelligencePage.jsx | Present | 100 | frontend/src/pages/AgriculturalIntelligencePage.jsx |
+| UI-AIAGENTPAGE | Page | AIAgentPage.jsx | Present | 100 | frontend/src/pages/AIAgentPage.jsx |
 | UI-AIBACKBONEPAGE | Page | AIBackbonePage.jsx | Present | 100 | frontend/src/pages/AIBackbonePage.jsx |
+| UI-AIBRAINPAGE | Page | AIBrainPage.jsx | Present | 100 | frontend/src/pages/AIBrainPage.jsx |
+| UI-AICHATPAGE | Page | AIChatPage.jsx | Present | 100 | frontend/src/pages/AIChatPage.jsx |
+| UI-AICOLLABORATIONPAGE | Page | AICollaborationPage.jsx | Present | 100 | frontend/src/pages/AICollaborationPage.jsx |
 | UI-AIDASHBOARD | Page | AIDashboard.jsx | Present | 100 | frontend/src/pages/AIDashboard.jsx |
+| UI-AIOPERATIONINTELLIGENCEPAGE | Page | AIOperationIntelligencePage.jsx | Present | 100 | frontend/src/pages/AIOperationIntelligencePage.jsx |
+| UI-AISELFHEALINGPAGE | Page | AISelfHealingPage.jsx | Present | 100 | frontend/src/pages/AISelfHealingPage.jsx |
 | UI-ANALYTICSPAGE | Page | AnalyticsPage.jsx | Present | 100 | frontend/src/pages/AnalyticsPage.jsx |
 | UI-ANIMALHEALTHPAGE | Page | AnimalHealthPage.jsx | Present | 100 | frontend/src/pages/AnimalHealthPage.jsx |
 | UI-ASSETACCOUNTINGPAGE | Page | AssetAccountingPage.jsx | Present | 100 | frontend/src/pages/AssetAccountingPage.jsx |
+| UI-ASSETLIFECYCLEMANAGEMENTPAGE | Page | AssetLifecycleManagementPage.jsx | Present | 100 | frontend/src/pages/AssetLifecycleManagementPage.jsx |
 | UI-AUTHORIZATIONPAGE | Page | AuthorizationPage.jsx | Present | 100 | frontend/src/pages/AuthorizationPage.jsx |
 | UI-B2BMARKETPLACE | Page | B2BMarketplace.jsx | Present | 100 | frontend/src/pages/B2BMarketplace.jsx |
 | UI-BANKERDASHBOARDPAGE | Page | BankerDashboardPage.jsx | Present | 100 | frontend/src/pages/BankerDashboardPage.jsx |
 | UI-BANKPASSPORTPAGE | Page | BankPassportPage.jsx | Present | 100 | frontend/src/pages/BankPassportPage.jsx |
+| UI-BREAKDOWNMAINTENANCEPAGE | Page | BreakdownMaintenancePage.jsx | Present | 100 | frontend/src/pages/BreakdownMaintenancePage.jsx |
+| UI-BULKORDERPAGE | Page | BulkOrderPage.jsx | Present | 100 | frontend/src/pages/BulkOrderPage.jsx |
 | UI-CADASHBOARDPAGE | Page | CADashboardPage.jsx | Present | 100 | frontend/src/pages/CADashboardPage.jsx |
 | UI-CARTPAGE | Page | CartPage.jsx | Present | 100 | frontend/src/pages/CartPage.jsx |
+| UI-CATTLEREGISTRYPAGE | Page | CattleRegistryPage.jsx | Present | 100 | frontend/src/pages/CattleRegistryPage.jsx |
 | UI-CHECKOUTPAGE | Page | CheckoutPage.jsx | Present | 100 | frontend/src/pages/CheckoutPage.jsx |
 | UI-CLIMATEADVISORYPAGE | Page | ClimateAdvisoryPage.jsx | Present | 100 | frontend/src/pages/ClimateAdvisoryPage.jsx |
 | UI-CLIMATEMONITORINGPAGE | Page | ClimateMonitoringPage.jsx | Present | 100 | frontend/src/pages/ClimateMonitoringPage.jsx |
 | UI-CLIMATEWEATHERPAGE | Page | ClimateWeatherPage.jsx | Present | 100 | frontend/src/pages/ClimateWeatherPage.jsx |
+| UI-COLDSTORAGEPAGE | Page | ColdStoragePage.jsx | Present | 100 | frontend/src/pages/ColdStoragePage.jsx |
 | UI-COMMUNITYMANAGEMENTPAGE | Page | CommunityManagementPage.jsx | Present | 100 | frontend/src/pages/CommunityManagementPage.jsx |
 | UI-COMPAREPAGE | Page | ComparePage.jsx | Present | 100 | frontend/src/pages/ComparePage.jsx |
 | UI-COMPETITIVEPOSITIONPAGE | Page | CompetitivePositionPage.jsx | Present | 100 | frontend/src/pages/CompetitivePositionPage.jsx |
+| UI-COMPLETEAIINTEGRATIONPAGE | Page | CompleteAIIntegrationPage.jsx | Present | 100 | frontend/src/pages/CompleteAIIntegrationPage.jsx |
+| UI-COMPLETEERPINTEGRATIONPAGE | Page | CompleteERPIntegrationPage.jsx | Present | 100 | frontend/src/pages/CompleteERPIntegrationPage.jsx |
 | UI-COMPLIANCEPAGE | Page | CompliancePage.jsx | Present | 100 | frontend/src/pages/CompliancePage.jsx |
+| UI-COMPREHENSIVEERPPAGE | Page | ComprehensiveERPPage.jsx | Present | 100 | frontend/src/pages/ComprehensiveERPPage.jsx |
+| UI-COOPERATIVESHAREPAGE | Page | CooperativeSharePage.jsx | Present | 100 | frontend/src/pages/CooperativeSharePage.jsx |
 | UI-CORPORATEBUYERPAGE | Page | CorporateBuyerPage.jsx | Present | 100 | frontend/src/pages/CorporateBuyerPage.jsx |
 | UI-CORRIDORECONOMICSPAGE | Page | CorridorEconomicsPage.jsx | Present | 100 | frontend/src/pages/CorridorEconomicsPage.jsx |
 | UI-COSTCONTROLPAGE | Page | CostControlPage.jsx | Present | 100 | frontend/src/pages/CostControlPage.jsx |
@@ -1300,12 +1687,20 @@
 | UI-CROPVARIETYPAGE | Page | CropVarietyPage.jsx | Present | 100 | frontend/src/pages/CropVarietyPage.jsx |
 | UI-DAIRYMANAGEMENTPAGE | Page | DairyManagementPage.jsx | Present | 100 | frontend/src/pages/DairyManagementPage.jsx |
 | UI-DASHBOARDPAGE | Page | DashboardPage.jsx | Present | 100 | frontend/src/pages/DashboardPage.jsx |
+| UI-DECISIONSUPPORTPAGE | Page | DecisionSupportPage.jsx | Present | 100 | frontend/src/pages/DecisionSupportPage.jsx |
 | UI-DEFENSEFITNESSPREPPAGE | Page | DefenseFitnessPrepPage.jsx | Present | 100 | frontend/src/pages/DefenseFitnessPrepPage.jsx |
 | UI-DIETRECIPESPAGE | Page | DietRecipesPage.jsx | Present | 100 | frontend/src/pages/DietRecipesPage.jsx |
 | UI-DISCOVERPAGE | Page | DiscoverPage.jsx | Present | 100 | frontend/src/pages/DiscoverPage.jsx |
 | UI-DYNAMICPRICINGPAGE | Page | DynamicPricingPage.jsx | Present | 100 | frontend/src/pages/DynamicPricingPage.jsx |
+| UI-ECOMMERCEINTEGRATIONPAGE | Page | EcommerceIntegrationPage.jsx | Present | 100 | frontend/src/pages/EcommerceIntegrationPage.jsx |
+| UI-ECOMMERCEMARKETPLACEPAGE | Page | EcommerceMarketplacePage.jsx | Present | 100 | frontend/src/pages/EcommerceMarketplacePage.jsx |
 | UI-ECONOMICDASHBOARD | Page | EconomicDashboard.jsx | Present | 100 | frontend/src/pages/economic/EconomicDashboard.jsx |
+| UI-ENGINEERINGPROJECTPAGE | Page | EngineeringProjectPage.jsx | Present | 100 | frontend/src/pages/EngineeringProjectPage.jsx |
+| UI-ENTERPRISEAIPAGE | Page | EnterpriseAIPage.jsx | Present | 100 | frontend/src/pages/EnterpriseAIPage.jsx |
 | UI-ENTERPRISECONTROLPAGE | Page | EnterpriseControlPage.jsx | Present | 100 | frontend/src/pages/EnterpriseControlPage.jsx |
+| UI-ENVIRONMENTMANAGEMENTPAGE | Page | EnvironmentManagementPage.jsx | Present | 100 | frontend/src/pages/EnvironmentManagementPage.jsx |
+| UI-EQUIPMENTINVENTORYPAGE | Page | EquipmentInventoryPage.jsx | Present | 100 | frontend/src/pages/EquipmentInventoryPage.jsx |
+| UI-EQUIPMENTRENTALPAGE | Page | EquipmentRentalPage.jsx | Present | 100 | frontend/src/pages/EquipmentRentalPage.jsx |
 | UI-ERPDASHBOARD | Page | ERPDashboard.jsx | Present | 100 | frontend/src/pages/ERPDashboard.jsx |
 | UI-EXPERIENCELAYERPAGE | Page | ExperienceLayerPage.jsx | Present | 100 | frontend/src/pages/ExperienceLayerPage.jsx |
 | UI-FARMADVISORPAGE | Page | FarmAdvisorPage.jsx | Present | 100 | frontend/src/pages/FarmAdvisorPage.jsx |
@@ -1331,6 +1726,9 @@
 | UI-FORMMANAGEMENTPAGE | Page | FormManagementPage.jsx | Present | 100 | frontend/src/pages/FormManagementPage.jsx |
 | UI-FORWARDPRICINGPAGE | Page | ForwardPricingPage.jsx | Present | 100 | frontend/src/pages/ForwardPricingPage.jsx |
 | UI-FPODASHBOARDPAGE | Page | FPODashboardPage.jsx | Present | 100 | frontend/src/pages/FPODashboardPage.jsx |
+| UI-FPOREGISTRATIONPAGE | Page | FPORegistrationPage.jsx | Present | 100 | frontend/src/pages/FPORegistrationPage.jsx |
+| UI-FUELMANAGEMENTPAGE | Page | FuelManagementPage.jsx | Present | 100 | frontend/src/pages/FuelManagementPage.jsx |
+| UI-GDPRCONSENTPAGE | Page | GDPRConsentPage.jsx | Present | 100 | frontend/src/pages/GDPRConsentPage.jsx |
 | UI-GOATFARMINGPAGE | Page | GoatFarmingPage.jsx | Present | 100 | frontend/src/pages/GoatFarmingPage.jsx |
 | UI-GOVERNMENTDASHBOARDPAGE | Page | GovernmentDashboardPage.jsx | Present | 100 | frontend/src/pages/GovernmentDashboardPage.jsx |
 | UI-HARVESTPLANPAGE | Page | HarvestPlanPage.jsx | Present | 100 | frontend/src/pages/HarvestPlanPage.jsx |
@@ -1338,22 +1736,31 @@
 | UI-HOMEPAGE | Page | HomePage.jsx | Present | 100 | frontend/src/pages/HomePage.jsx |
 | UI-HORTICULTUREMANAGEMENTPAGE | Page | HorticultureManagementPage.jsx | Present | 100 | frontend/src/pages/HorticultureManagementPage.jsx |
 | UI-IDENTITYMANAGEMENTPAGE | Page | IdentityManagementPage.jsx | Present | 100 | frontend/src/pages/IdentityManagementPage.jsx |
+| UI-IMPLEMENTMANAGEMENTPAGE | Page | ImplementManagementPage.jsx | Present | 100 | frontend/src/pages/ImplementManagementPage.jsx |
+| UI-INFORMATIONSHARINGPAGE | Page | InformationSharingPage.jsx | Present | 100 | frontend/src/pages/InformationSharingPage.jsx |
 | UI-INPUTSUPPLYMANAGEMENTPAGE | Page | InputSupplyManagementPage.jsx | Present | 100 | frontend/src/pages/InputSupplyManagementPage.jsx |
 | UI-INSURANCEPAGE | Page | InsurancePage.jsx | Present | 100 | frontend/src/pages/InsurancePage.jsx |
 | UI-IRRIGATIONMANAGEMENTPAGE | Page | IrrigationManagementPage.jsx | Present | 100 | frontend/src/pages/IrrigationManagementPage.jsx |
+| UI-KNOWLEDGEREFERENCEPAGE | Page | KnowledgeReferencePage.jsx | Present | 100 | frontend/src/pages/KnowledgeReferencePage.jsx |
 | UI-LABOURMANAGEMENTPAGE | Page | LabourManagementPage.jsx | Present | 100 | frontend/src/pages/LabourManagementPage.jsx |
 | UI-LANDMANAGEMENTPAGE | Page | LandManagementPage.jsx | Present | 100 | frontend/src/pages/LandManagementPage.jsx |
 | UI-LANDREGISTRYPAGE | Page | LandRegistryPage.jsx | Present | 100 | frontend/src/pages/LandRegistryPage.jsx |
 | UI-LANDUSECARBONPAGE | Page | LandUseCarbonPage.jsx | Present | 100 | frontend/src/pages/LandUseCarbonPage.jsx |
 | UI-LEDGERPAGE | Page | LedgerPage.jsx | Present | 100 | frontend/src/pages/LedgerPage.jsx |
+| UI-LIBRARYBROWSERPAGE | Page | LibraryBrowserPage.jsx | Present | 100 | frontend/src/pages/LibraryBrowserPage.jsx |
 | UI-LIVESTOCKMANAGEMENTPAGE | Page | LivestockManagementPage.jsx | Present | 100 | frontend/src/pages/LivestockManagementPage.jsx |
 | UI-LOGINPAGE | Page | LoginPage.jsx | Present | 100 | frontend/src/pages/LoginPage.jsx |
+| UI-LOGISTICSENHANCEMENTPAGE | Page | LogisticsEnhancementPage.jsx | Present | 100 | frontend/src/pages/LogisticsEnhancementPage.jsx |
+| UI-LOGISTICSMATCHINGPAGE | Page | LogisticsMatchingPage.jsx | Present | 100 | frontend/src/pages/LogisticsMatchingPage.jsx |
 | UI-LOGISTICSPAGE | Page | LogisticsPage.jsx | Present | 100 | frontend/src/pages/LogisticsPage.jsx |
 | UI-LOGISTICSPROVIDERPAGE | Page | LogisticsProviderPage.jsx | Present | 100 | frontend/src/pages/LogisticsProviderPage.jsx |
 | UI-MACHINERYMANAGEMENTPAGE | Page | MachineryManagementPage.jsx | Present | 100 | frontend/src/pages/MachineryManagementPage.jsx |
 | UI-MARKETINGCENTER | Page | MarketingCenter.jsx | Present | 100 | frontend/src/pages/MarketingCenter.jsx |
 | UI-MARKETPLACEPAGE | Page | MarketplacePage.jsx | Present | 100 | frontend/src/pages/MarketplacePage.jsx |
+| UI-MARKETSIGNALSPAGE | Page | MarketSignalsPage.jsx | Present | 100 | frontend/src/pages/MarketSignalsPage.jsx |
+| UI-MFASETUPPAGE | Page | MFASetupPage.jsx | Present | 100 | frontend/src/pages/MFASetupPage.jsx |
 | UI-MODULEHUBPAGE | Page | ModuleHubPage.jsx | Present | 100 | frontend/src/pages/ModuleHubPage.jsx |
+| UI-NERVOUSSYSTEMPAGE | Page | NervousSystemPage.jsx | Present | 100 | frontend/src/pages/NervousSystemPage.jsx |
 | UI-NURSERYMANAGEMENTPAGE | Page | NurseryManagementPage.jsx | Present | 100 | frontend/src/pages/NurseryManagementPage.jsx |
 | UI-NUTRIENTVALUEMARKETPLACE | Page | NutrientValueMarketplace.jsx | Present | 100 | frontend/src/pages/NutrientValueMarketplace.jsx |
 | UI-OPERATIONSMANAGEMENTPAGE | Page | OperationsManagementPage.jsx | Present | 100 | frontend/src/pages/OperationsManagementPage.jsx |
@@ -1369,11 +1776,14 @@
 | UI-PRICECHECKPAGE | Page | PriceCheckPage.jsx | Present | 100 | frontend/src/pages/PriceCheckPage.jsx |
 | UI-PRODUCTDETAILPAGE | Page | ProductDetailPage.jsx | Present | 100 | frontend/src/pages/ProductDetailPage.jsx |
 | UI-PROJECTSYSTEMSPAGE | Page | ProjectSystemsPage.jsx | Present | 100 | frontend/src/pages/ProjectSystemsPage.jsx |
+| UI-REALTIMEMONITORINGPAGE | Page | RealtimeMonitoringPage.jsx | Present | 100 | frontend/src/pages/RealtimeMonitoringPage.jsx |
 | UI-REGISTERPAGE | Page | RegisterPage.jsx | Present | 100 | frontend/src/pages/RegisterPage.jsx |
 | UI-REOSDASHBOARDPAGE | Page | REOSDashboardPage.jsx | Present | 100 | frontend/src/pages/REOSDashboardPage.jsx |
+| UI-RESEARCHANDDEVELOPMENTPAGE | Page | ResearchAndDevelopmentPage.jsx | Present | 100 | frontend/src/pages/ResearchAndDevelopmentPage.jsx |
 | UI-RESEARCHDASHBOARDPAGE | Page | ResearchDashboardPage.jsx | Present | 100 | frontend/src/pages/ResearchDashboardPage.jsx |
 | UI-RFQPAGE | Page | RfqPage.jsx | Present | 100 | frontend/src/pages/RfqPage.jsx |
 | UI-ROLEPERMISSIONPAGE | Page | RolePermissionPage.jsx | Present | 100 | frontend/src/pages/RolePermissionPage.jsx |
+| UI-SAPMODULEARCHITECTUREPAGE | Page | SAPModuleArchitecturePage.jsx | Present | 100 | frontend/src/pages/SAPModuleArchitecturePage.jsx |
 | UI-SEEDPLANNINGPAGE | Page | SeedPlanningPage.jsx | Present | 100 | frontend/src/pages/SeedPlanningPage.jsx |
 | UI-SEEDVAULTPAGE | Page | SeedVaultPage.jsx | Present | 100 | frontend/src/pages/SeedVaultPage.jsx |
 | UI-SELLERPRODUCTFORMPAGE | Page | SellerProductFormPage.jsx | Present | 100 | frontend/src/pages/SellerProductFormPage.jsx |
@@ -1383,6 +1793,7 @@
 | UI-SHGMANAGEMENTPAGE | Page | ShgManagementPage.jsx | Present | 100 | frontend/src/pages/ShgManagementPage.jsx |
 | UI-SOILMANAGEMENTPAGE | Page | SoilManagementPage.jsx | Present | 100 | frontend/src/pages/SoilManagementPage.jsx |
 | UI-SOWINGMANAGEMENTPAGE | Page | SowingManagementPage.jsx | Present | 100 | frontend/src/pages/SowingManagementPage.jsx |
+| UI-SPAREPARTSMANAGEMENTPAGE | Page | SparePartsManagementPage.jsx | Present | 100 | frontend/src/pages/SparePartsManagementPage.jsx |
 | UI-SUBSIDYMANAGEMENTPAGE | Page | SubsidyManagementPage.jsx | Present | 100 | frontend/src/pages/SubsidyManagementPage.jsx |
 | UI-SYSTEMADMINISTRATIONPAGE | Page | SystemAdministrationPage.jsx | Present | 100 | frontend/src/pages/SystemAdministrationPage.jsx |
 | UI-TRACTORMANAGEMENTPAGE | Page | TractorManagementPage.jsx | Present | 100 | frontend/src/pages/TractorManagementPage.jsx |
@@ -1391,6 +1802,7 @@
 | UI-VILLAGEREGISTRYPAGE | Page | VillageRegistryPage.jsx | Present | 100 | frontend/src/pages/VillageRegistryPage.jsx |
 | UI-WALLETPAGE | Page | WalletPage.jsx | Present | 100 | frontend/src/pages/WalletPage.jsx |
 | UI-WATERMANAGEMENTPAGE | Page | WaterManagementPage.jsx | Present | 100 | frontend/src/pages/WaterManagementPage.jsx |
+| UI-WATERRECORDSPAGE | Page | WaterRecordsPage.jsx | Present | 100 | frontend/src/pages/WaterRecordsPage.jsx |
 | UI-WEARABLESPAGE | Page | WearablesPage.jsx | Present | 100 | frontend/src/pages/WearablesPage.jsx |
 | UI-WHATGROWPAGE | Page | WhatGrowPage.jsx | Present | 100 | frontend/src/pages/WhatGrowPage.jsx |
 | UI-YIELDMANAGEMENTPAGE | Page | YieldManagementPage.jsx | Present | 100 | frontend/src/pages/YieldManagementPage.jsx |

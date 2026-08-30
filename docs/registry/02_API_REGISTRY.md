@@ -1,10 +1,10 @@
 # API Registry
 
-**Generated:** 2026-08-17 by `tools/engineering-registry.js`
+**Generated:** 2026-08-30 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
-**Objects indexed:** 1660
+**Objects indexed:** 1794
 
 ---
 
@@ -56,97 +56,6 @@
 - `POST /am/fixed-assets/:asset_code/depreciation`
 - `GET /bi/executive-dashboard`
 - `GET /bi/profitability-analysis`
-
-### platformFoundationRoutes  (29)
-
-- `GET /platform/status`
-- `GET /platform/health`
-- `GET /platform/config`
-- `PUT /platform/config/:configId`
-- `POST /platform/optimize`
-- `POST /platform/analyze`
-- `GET /platform/analytics`
-- `POST /platform/monitoring/start`
-- `POST /users`
-- `GET /users`
-- `GET /users/:id`
-- `PUT /users/:id`
-- `DELETE /users/:id`
-- `POST /users/:id/roles/:roleId`
-- `DELETE /users/:id/roles/:roleId`
-- `GET /users/:id/behavior`
-- `POST /users/segment`
-- `GET /users/analytics`
-- `POST /roles`
-- `GET /roles`
-- `GET /roles/:id`
-- `PUT /roles/:id`
-- `DELETE /roles/:id`
-- `POST /roles/:id/permissions/:permissionId`
-- `DELETE /roles/:id/permissions/:permissionId`
-- `POST /roles/optimize`
-- `GET /roles/permissions/analysis`
-- `GET /health/users`
-- `GET /health/roles`
-
-### enterpriseControlRoutes  (27)
-
-- `POST /workflows`
-- `GET /workflows`
-- `GET /workflows/:id`
-- `PUT /workflows/:id`
-- `DELETE /workflows/:id`
-- `POST /workflows/:id/execute`
-- `POST /clients`
-- `GET /clients`
-- `GET /clients/:id`
-- `PUT /clients/:id`
-- `DELETE /clients/:id`
-- `POST /legal`
-- `GET /legal`
-- `GET /legal/:id`
-- `PUT /legal/:id`
-- `DELETE /legal/:id`
-- `POST /risks`
-- `GET /risks`
-- `GET /risks/:id`
-- `PUT /risks/:id`
-- `DELETE /risks/:id`
-- `POST /emergencies`
-- `GET /emergencies`
-- `GET /emergencies/:id`
-- `PUT /emergencies/:id`
-- `DELETE /emergencies/:id`
-- `POST /emergencies/:id/execute`
-
-### communityRoutes  (26)
-
-- `GET /members`
-- `GET /members/:memberId`
-- `POST /members`
-- `PUT /members/:memberId`
-- `GET /categories`
-- `POST /categories`
-- `GET /threads`
-- `GET /threads/:threadId`
-- `POST /threads`
-- `GET /threads/:threadId/posts`
-- `POST /posts`
-- `POST /like`
-- `GET /groups`
-- `POST /groups`
-- `POST /groups/:groupId/join`
-- `GET /events`
-- `POST /events`
-- `POST /events/:eventId/register`
-- `GET /moderation`
-- `POST /moderation`
-- `PUT /moderation/:queueId`
-- `POST /members/:memberId/badges`
-- `POST /ai-insights`
-- `GET /activity-feed`
-- `GET /analytics`
-- `GET /health`
 
 ### logisticsEnhancementRoutes  (26)
 
@@ -287,11 +196,11 @@
 ### informationSharingRoutes  (22)
 
 - `GET /documents`
+- `GET /documents/search`
 - `GET /documents/:documentId`
 - `POST /documents`
 - `PUT /documents/:documentId`
 - `DELETE /documents/:documentId`
-- `GET /documents/search`
 - `GET /folders`
 - `GET /folders/tree`
 - `POST /folders`
@@ -359,31 +268,6 @@
 - `POST /route/deactivate/:routeId`
 - `GET /health`
 
-### sheepRoutes  (22)
-
-- `GET /flock`
-- `POST /flock`
-- `GET /flock/:id`
-- `PUT /flock/:id`
-- `DELETE /flock/:id`
-- `GET /flock/:animalId/wool-production`
-- `POST /flock/:animalId/wool-production`
-- `GET /flock/:animalId/feed-consumption`
-- `POST /flock/:animalId/feed-consumption`
-- `GET /flock/:femaleId/breeding`
-- `POST /flock/:femaleId/breeding`
-- `PUT /breeding/:id`
-- `GET /flock/:animalId/vaccinations`
-- `POST /flock/:animalId/vaccinations`
-- `GET /flock/:animalId/performance`
-- `GET /breeding-alerts`
-- `GET /vaccination-alerts`
-- `GET /shearing-alerts`
-- `POST /ai/optimize-wool/:animalId`
-- `POST /ai/monitor-health/:animalId`
-- `POST /ai/optimize-feed/:animalId`
-- `POST /ai/recommend-breeding/:animalId`
-
 ### foodSafetyService  (21)
 
 - `POST /haccp`
@@ -407,30 +291,6 @@
 - `PUT /corrective-actions/:id/status`
 - `GET /corrective-actions`
 - `GET /dashboard`
-
-### goatRoutes  (21)
-
-- `GET /herd`
-- `POST /herd`
-- `GET /herd/:id`
-- `PUT /herd/:id`
-- `DELETE /herd/:id`
-- `GET /herd/:animalId/milk-production`
-- `POST /herd/:animalId/milk-production`
-- `GET /herd/:animalId/feed-consumption`
-- `POST /herd/:animalId/feed-consumption`
-- `GET /herd/:femaleId/breeding`
-- `POST /herd/:femaleId/breeding`
-- `PUT /breeding/:id`
-- `GET /herd/:animalId/vaccinations`
-- `POST /herd/:animalId/vaccinations`
-- `GET /herd/:animalId/performance`
-- `GET /breeding-alerts`
-- `GET /vaccination-alerts`
-- `POST /ai/optimize-milk/:animalId`
-- `POST /ai/monitor-health/:animalId`
-- `POST /ai/optimize-feed/:animalId`
-- `POST /ai/recommend-breeding/:animalId`
 
 ### logisticsEnhancements  (21)
 
@@ -469,13 +329,37 @@
 - `POST /herd/:animalId/feed-consumption`
 - `GET /herd/:sowId/breeding`
 - `POST /herd/:sowId/breeding`
-- `PUT /breeding/:id`
 - `GET /herd/:animalId/vaccinations`
 - `POST /herd/:animalId/vaccinations`
 - `GET /herd/:animalId/performance`
+- `GET /herd/:animalId/fcr`
 - `GET /breeding-alerts`
 - `GET /vaccination-alerts`
 - `POST /ai/optimize-meat/:animalId`
+- `POST /ai/monitor-health/:animalId`
+- `POST /ai/optimize-feed/:animalId`
+- `POST /ai/recommend-breeding/:animalId`
+
+### sheepRoutes  (21)
+
+- `GET /flock`
+- `POST /flock`
+- `GET /flock/:id`
+- `PUT /flock/:id`
+- `DELETE /flock/:id`
+- `GET /flock/:animalId/wool-production`
+- `POST /flock/:animalId/wool-production`
+- `GET /flock/:animalId/feed-consumption`
+- `POST /flock/:animalId/feed-consumption`
+- `GET /flock/:femaleId/breeding`
+- `POST /flock/:femaleId/breeding`
+- `GET /flock/:animalId/vaccinations`
+- `POST /flock/:animalId/vaccinations`
+- `GET /flock/:animalId/performance`
+- `GET /breeding-alerts`
+- `GET /vaccination-alerts`
+- `GET /shearing-alerts`
+- `POST /ai/optimize-wool/:animalId`
 - `POST /ai/monitor-health/:animalId`
 - `POST /ai/optimize-feed/:animalId`
 - `POST /ai/recommend-breeding/:animalId`
@@ -502,6 +386,29 @@
 - `POST /wallet/transfer`
 - `GET /wallet/balance`
 - `POST /wallet/link-bank`
+
+### goatRoutes  (20)
+
+- `GET /herd`
+- `POST /herd`
+- `GET /herd/:id`
+- `PUT /herd/:id`
+- `DELETE /herd/:id`
+- `GET /herd/:animalId/milk-production`
+- `POST /herd/:animalId/milk-production`
+- `GET /herd/:animalId/feed-consumption`
+- `POST /herd/:animalId/feed-consumption`
+- `GET /herd/:femaleId/breeding`
+- `POST /herd/:femaleId/breeding`
+- `GET /herd/:animalId/vaccinations`
+- `POST /herd/:animalId/vaccinations`
+- `GET /herd/:animalId/performance`
+- `GET /breeding-alerts`
+- `GET /vaccination-alerts`
+- `POST /ai/optimize-milk/:animalId`
+- `POST /ai/monitor-health/:animalId`
+- `POST /ai/optimize-feed/:animalId`
+- `POST /ai/recommend-breeding/:animalId`
 
 ### indigenousKnowledgeService  (19)
 
@@ -547,6 +454,50 @@
 - `GET /contract-offers`
 - `PUT /contract-offers/:id`
 
+### animalHealthRoutes  (19)
+
+- `GET /examinations`
+- `POST /examinations`
+- `PUT /examinations/:id`
+- `DELETE /examinations/:id`
+- `GET /treatments`
+- `POST /treatments`
+- `PUT /treatments/:id`
+- `DELETE /treatments/:id`
+- `GET /outbreaks`
+- `POST /outbreaks`
+- `PUT /outbreaks/:id`
+- `DELETE /outbreaks/:id`
+- `GET /quarantines`
+- `POST /quarantines`
+- `PUT /quarantines/:id`
+- `DELETE /quarantines/:id`
+- `GET /overview`
+- `GET /active-outbreaks`
+- `GET /active-quarantines`
+
+### insuranceEnhancements  (19)
+
+- `POST /quotes`
+- `GET /quotes/:quoteId`
+- `POST /calculate/crop`
+- `POST /calculate/transit`
+- `POST /calculate/warehouse`
+- `POST /calculate/livestock`
+- `POST /policies`
+- `GET /policies/:policyId`
+- `GET /policies/number/:policyNumber`
+- `GET /policies`
+- `PUT /policies/:policyId/renew`
+- `DELETE /policies/:policyId`
+- `POST /policies/:policyId/payments/:installmentNumber`
+- `GET /policies/:policyId/documents`
+- `POST /policies/:policyId/documents`
+- `PATCH /quotes/:quoteId/status`
+- `POST /claims/:claimId/fraud-analysis`
+- `GET /claims/:claimId/fraud-analysis`
+- `GET /fraud/statistics`
+
 ### poultryRoutes  (19)
 
 - `GET /flocks`
@@ -590,27 +541,6 @@
 - `GET /modules/:id/mta-descriptor`
 - `GET /overview`
 - `GET /service-health`
-
-### insuranceEnhancements  (18)
-
-- `POST /quotes`
-- `GET /quotes/:quoteId`
-- `POST /calculate/crop`
-- `POST /calculate/transit`
-- `POST /calculate/warehouse`
-- `POST /calculate/livestock`
-- `POST /policies`
-- `GET /policies/:policyId`
-- `GET /policies/number/:policyNumber`
-- `GET /policies`
-- `PUT /policies/:policyId/renew`
-- `DELETE /policies/:policyId`
-- `POST /policies/:policyId/payments/:installmentNumber`
-- `GET /policies/:policyId/documents`
-- `POST /policies/:policyId/documents`
-- `POST /claims/:claimId/fraud-analysis`
-- `GET /claims/:claimId/fraud-analysis`
-- `GET /fraud/statistics`
 
 ### biodiversityService  (17)
 
@@ -798,6 +728,24 @@
 - `GET /budgets/:budgetId/vs-actual`
 - `GET /budgets/:budgetId/cost-reduction-recommendations`
 
+### platformCoreRoutes  (15)
+
+- `GET /config`
+- `PUT /config/:key`
+- `GET /health`
+- `GET /stats`
+- `GET /optimizations`
+- `POST /initialize`
+- `GET /scaling/recommendations`
+- `GET /capacity/predict`
+- `POST /disaster-recovery`
+- `GET /performance/monitor`
+- `POST /self-healing`
+- `GET /configuration/optimized`
+- `POST /configuration/apply`
+- `GET /metrics`
+- `GET /state`
+
 ### aiBrainRoutes  (14)
 
 - `POST /cycle`
@@ -814,23 +762,6 @@
 - `PUT /context`
 - `DELETE /working-memory`
 - `GET /health`
-
-### animalHealthRoutes  (14)
-
-- `GET /examinations`
-- `POST /examinations`
-- `PUT /examinations/:id`
-- `GET /treatments`
-- `POST /treatments`
-- `GET /outbreaks`
-- `POST /outbreaks`
-- `PUT /outbreaks/:id`
-- `GET /quarantines`
-- `POST /quarantines`
-- `PUT /quarantines/:id`
-- `GET /overview`
-- `GET /active-outbreaks`
-- `GET /active-quarantines`
 
 ### experienceRoutes  (14)
 
@@ -961,22 +892,6 @@
 - `GET /unserved-intents`
 - `POST /model-slots`
 - `POST /query`
-
-### recoveredFinanceRoutes  (13)
-
-- `GET /gst/classify`
-- `POST /gst/invoice`
-- `POST /ledger/entry`
-- `GET /ledger/trial-balance`
-- `GET /ledger/verify`
-- `GET /schemes/match`
-- `POST /enwr/issue`
-- `GET /enwr/my-receipts`
-- `GET /freight/rate`
-- `GET /subsidy/equipment`
-- `POST /risk/event`
-- `GET /risk/:partyId`
-- `GET /certificates/expiring`
 
 ### multilingualService  (12)
 
@@ -1120,20 +1035,6 @@
 - `GET /market/demand/:categoryId`
 - `POST /price-recommendation`
 
-### platformCoreRoutes  (11)
-
-- `POST /initialize`
-- `GET /health`
-- `GET /scaling/recommendations`
-- `GET /capacity/predict`
-- `POST /disaster-recovery`
-- `GET /performance/monitor`
-- `POST /self-healing`
-- `GET /configuration/optimized`
-- `POST /configuration/apply`
-- `GET /metrics`
-- `GET /state`
-
 ### riskPricingRoutes  (11)
 
 - `GET /crops/:cropKey`
@@ -1176,19 +1077,6 @@
 - `POST /forecasts/score`
 - `POST /alerts`
 
-### arVrService  (10)
-
-- `POST /experiences`
-- `GET /experiences`
-- `PATCH /experiences/:experienceId/publish`
-- `POST /assets`
-- `GET /assets`
-- `POST /interaction-points`
-- `GET /experiences/:experienceId/interaction-points`
-- `POST /sessions`
-- `PATCH /sessions/:sessionId/end`
-- `POST /ar-vr-analytics`
-
 ### authService  (10)
 
 - `POST /register`
@@ -1201,6 +1089,19 @@
 - `GET /oauth/:provider/url`
 - `POST /oauth/:provider/callback`
 - `GET /me`
+
+### arVrService  (10)
+
+- `POST /experiences`
+- `GET /experiences`
+- `PATCH /experiences/:experienceId/publish`
+- `POST /assets`
+- `GET /assets`
+- `POST /interaction-points`
+- `GET /experiences/:experienceId/interaction-points`
+- `POST /sessions`
+- `PATCH /sessions/:sessionId/end`
+- `POST /ar-vr-analytics`
 
 ### blockchainTraceabilityService  (10)
 
@@ -1332,6 +1233,32 @@
 - `GET /tools`
 - `GET /health`
 
+### aiCollaborationRoutes  (10)
+
+- `GET /context`
+- `PUT /context`
+- `POST /log-work`
+- `GET /work-history/:aiSource`
+- `GET /continuable/:currentAI`
+- `POST /handoff`
+- `POST /handoff/:handoffId/accept`
+- `GET /handoffs/pending/:forAI`
+- `GET /stats`
+- `GET /report`
+
+### aiCollaborationRoutes  (10)
+
+- `GET /context`
+- `PUT /context`
+- `POST /log-work`
+- `GET /work-history/:aiSource`
+- `GET /continuable/:currentAI`
+- `POST /handoff`
+- `POST /handoff/:handoffId/accept`
+- `GET /handoffs/pending/:forAI`
+- `GET /stats`
+- `GET /report`
+
 ### ecommerceIntegrationRoutes  (10)
 
 - `POST /nutrition-score/:productId`
@@ -1384,18 +1311,18 @@
 - `POST /configuration/rollback`
 - `POST /configuration/validate`
 
-### unifiedLedgerRoutes  (10)
+### recoveredFinanceRoutes  (10)
 
-- `POST /entries`
-- `POST /cross-economy-transfer`
-- `GET /balance/unified`
-- `GET /balance/economy/:economy`
-- `GET /balance/all`
-- `POST /reconcile`
-- `GET /trial-balance`
-- `GET /economies`
-- `GET /entries`
-- `GET /transfers`
+- `GET /ledger/trial-balance`
+- `GET /ledger/verify`
+- `GET /schemes/match`
+- `POST /enwr/issue`
+- `GET /enwr/my-receipts`
+- `GET /freight/rate`
+- `GET /subsidy/equipment`
+- `POST /risk/event`
+- `GET /risk/:partyId`
+- `GET /certificates/expiring`
 
 ### buyingClubService  (9)
 
@@ -1469,6 +1396,18 @@
 - `POST /quotations/:quotationId/accept`
 - `POST /:orderId/cancel`
 
+### backendModuleBridge  (9)
+
+- `GET /:moduleId/:operation/:id`
+- `GET /:moduleId/:operation`
+- `POST /:moduleId/:operation/:id`
+- `POST /:moduleId/:operation`
+- `PUT /:moduleId/:operation/:id`
+- `PUT /:moduleId/:operation`
+- `DELETE /:moduleId/:operation/:id`
+- `DELETE /:moduleId/:operation`
+- `GET /:moduleId`
+
 ### decisionSupportRoutes  (9)
 
 - `POST /corp-credit-eligible`
@@ -1505,6 +1444,18 @@
 - `POST /calculate-commission/:orderId`
 - `GET /search`
 
+### productReviewRoutes  (9)
+
+- `POST /products/:productId`
+- `GET /products/:productId`
+- `GET /products/:productId/stats`
+- `GET /me`
+- `PUT /:reviewId`
+- `DELETE /:reviewId`
+- `POST /:reviewId/helpful`
+- `POST /:reviewId/report`
+- `PATCH /:reviewId/moderate`
+
 ### rfqRoutes  (9)
 
 - `POST /rfq`
@@ -1516,6 +1467,18 @@
 - `POST /qc/release`
 - `GET /qc/holds`
 - `GET /fpo/centre-pnl`
+
+### roleManagementRoutes  (9)
+
+- `POST /`
+- `GET /`
+- `GET /:id`
+- `PUT /:id`
+- `DELETE /:id`
+- `POST /:id/permissions/:permissionId`
+- `DELETE /:id/permissions/:permissionId`
+- `POST /optimize`
+- `GET /permissions/analysis`
 
 ### tenantManagementRoutes  (9)
 
@@ -1628,6 +1591,17 @@
 - `POST /rcm`
 - `GET /rcm/outstanding`
 
+### cropPlanningRoutes  (8)
+
+- `POST /`
+- `GET /`
+- `GET /recommend/:landRecordId`
+- `GET /suitable-crops`
+- `GET /market-demand`
+- `GET /weather-forecast`
+- `PATCH /:planId/status`
+- `GET /analytics`
+
 ### ecommerceAIRoutes  (8)
 
 - `POST /segment-customers-rfm`
@@ -1671,6 +1645,17 @@
 - `POST /timesheets/analyze-anomalies`
 - `GET /analytics/workforce`
 - `GET /analytics/predictions`
+
+### landRecordsRoutes  (8)
+
+- `POST /`
+- `GET /`
+- `GET /regional-statistics`
+- `GET /:recordId`
+- `PUT /:recordId`
+- `DELETE /:recordId`
+- `POST /:recordId/verify`
+- `POST /sync-government`
 
 ### systemAdministrationRoutes  (8)
 
@@ -1733,6 +1718,26 @@
 - `PUT /providers/:provider/disable`
 - `POST /stream`
 
+### libraryRoutes  (7)
+
+- `POST /initialize`
+- `GET /search`
+- `GET /statistics`
+- `GET /verify`
+- `GET /item/:filename`
+- `GET /modules`
+- `GET /components`
+
+### unifiedAIRoutes  (7)
+
+- `POST /unified`
+- `POST /conversational`
+- `POST /analytical`
+- `POST /automation`
+- `POST /governance`
+- `GET /agents`
+- `GET /usage`
+
 ### cooperativeShareRoutes  (7)
 
 - `POST /members`
@@ -1742,6 +1747,16 @@
 - `POST /distributions`
 - `GET /distributions`
 - `GET /distributions/:id`
+
+### gdprRoutes  (7)
+
+- `POST /consent`
+- `GET /consent/:userId`
+- `POST /rtbf`
+- `GET /export/:userId`
+- `GET /data-residency/:userId`
+- `POST /privacy-impact-assessment`
+- `GET /policy`
 
 ### farmerRoutes  (7)
 
@@ -1772,6 +1787,16 @@
 - `POST /safety/compliance-check`
 - `GET /batch/:batch_id`
 - `POST /certification/organic-recommend`
+
+### unifiedAIRoutes  (7)
+
+- `POST /unified`
+- `POST /conversational`
+- `POST /analytical`
+- `POST /automation`
+- `POST /governance`
+- `GET /agents`
+- `GET /usage`
 
 ### wearableIntegrationRoutes  (7)
 
@@ -1864,6 +1889,15 @@
 - `POST /agricultural-decision`
 - `POST /livestock-optimization`
 
+### moduleRegistryRoutes  (6)
+
+- `GET /discover`
+- `GET /stats`
+- `GET /loaded`
+- `POST /:moduleId/load`
+- `POST /:moduleId/execute`
+- `GET /:moduleId/health`
+
 ### ecommerceERPRoutes  (6)
 
 - `POST /post-gl`
@@ -1881,6 +1915,15 @@
 - `GET /metrics/:village_id`
 - `POST /productive/demand-forecast`
 - `POST /stack/compare`
+
+### engineeringProjectRoutes  (6)
+
+- `POST /projects`
+- `GET /projects`
+- `GET /projects/:id`
+- `PUT /projects/:id/phase`
+- `POST /projects/:id/cost-estimates`
+- `GET /projects/:id/cost-estimates`
 
 ### equipmentExchangeRoutes  (6)
 
@@ -1917,6 +1960,15 @@
 - `GET /live`
 - `GET /checks`
 - `POST /checks/:name`
+
+### fisheriesRoutes  (6)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `GET /:id/ponds`
+- `GET /:id/feed`
+- `GET /:id/harvest`
 
 ### marketDataRoutes  (6)
 
@@ -2000,6 +2052,30 @@
 - `POST /:id/resolve`
 - `GET /shipments/:shipmentId/risk`
 
+### climateMonitoringRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### communityManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### cropManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
 ### dprGenerationRoutes  (5)
 
 - `POST /preview`
@@ -2007,6 +2083,30 @@
 - `GET /`
 - `GET /:id`
 - `GET /:id/pdf`
+
+### mfaRoutes  (5)
+
+- `POST /setup`
+- `POST /verify`
+- `POST /disable`
+- `POST /backup/sms`
+- `GET /status`
+
+### farmerFamilyRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### fisheriesManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
 
 ### foluRoutes  (5)
 
@@ -2016,6 +2116,118 @@
 - `POST /carbon/estimate`
 - `GET /schemes/:farmerId`
 
+### horticultureManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### identityManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### inputSupplyManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### irrigationManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### landManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### apicultureRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `GET /:id/honey`
+- `GET /:id/hives`
+
+### forestryRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `GET /:id/timber`
+- `GET /:id/plantation`
+
+### mushroomRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `GET /:id/spawn`
+- `GET /:id/substrate`
+
+### sericultureRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `GET /:id/silk`
+- `GET /:id/mulberry`
+
+### vermicompostRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `GET /:id/earthworms`
+- `GET /:id/waste`
+
+### livestockManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### operationsManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### preventiveMaintenanceRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### realtimeMonitoringRoutes  (5)
+
+- `POST /monitors`
+- `GET /monitors`
+- `GET /monitors/:id`
+- `DELETE /monitors/:id`
+- `GET /health`
+
 ### regionalVarietyRoutes  (5)
 
 - `GET /`
@@ -2023,6 +2235,22 @@
 - `GET /:id`
 - `POST /:id/generate-image`
 - `POST /:id/create-listing`
+
+### soilManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
+
+### waterManagementRoutes  (5)
+
+- `GET /`
+- `GET /:id`
+- `POST /`
+- `PUT /:id`
+- `DELETE /:id`
 
 ### householdEconomyService  (4)
 
@@ -2098,6 +2326,11 @@
 - `GET /forecast`
 - `GET /heatmap`
 - `GET /mandi-signal`
+
+### analyticsReportRoutes  (2)
+
+- `GET /report-types`
+- `POST /reports/:reportType`
 
 ### costRoutes  (2)
 

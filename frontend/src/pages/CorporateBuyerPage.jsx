@@ -4,26 +4,37 @@ import { vendorsAPI } from '../services/api'
 import { Building2, ShoppingCart, TrendingUp, CheckCircle, FileText, Truck, DollarSign, Users, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Modal from '../components/common/Modal'
+import { useAuthStore } from '../store/authStore'
 
 function CorporateBuyerPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [showOrderModal, setShowOrderModal] = useState(false)
   const queryClient = useQueryClient()
+  const { user } = useAuthStore()
+
+  // Was hardcoded to the literal string 'current-buyer-id' for every visitor,
+  // so every corporate buyer landing here saw the same profile/orders instead
+  // of their own. Use the logged-in user's real id and don't fire the
+  // queries until we actually have one.
+  const buyerId = user?.id
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: buyerProfile } = useQuery({
-    queryKey: ['buyer-profile'],
-    queryFn: () => vendorsAPI.getBuyerProfile('current-buyer-id').then(r => r.data),
+    queryKey: ['buyer-profile', buyerId],
+    queryFn: () => vendorsAPI.getBuyerProfile(buyerId).then(r => r.data),
+    enabled: !!buyerId,
   })
 
   const { data: creditStatus } = useQuery({
-    queryKey: ['credit-status'],
-    queryFn: () => vendorsAPI.getCreditStatus('current-buyer-id').then(r => r.data),
+    queryKey: ['credit-status', buyerId],
+    queryFn: () => vendorsAPI.getCreditStatus(buyerId).then(r => r.data),
+    enabled: !!buyerId,
   })
 
   const { data: activeOrders } = useQuery({
-    queryKey: ['active-orders'],
-    queryFn: () => vendorsAPI.getActiveOrders('current-buyer-id').then(r => r.data),
+    queryKey: ['active-orders', buyerId],
+    queryFn: () => vendorsAPI.getActiveOrders(buyerId).then(r => r.data),
+    enabled: !!buyerId,
   })
 
   const createOrderMutation = useMutation({

@@ -1,6 +1,6 @@
 # Technical Debt Register
 
-**Generated:** 2026-08-17 by `tools/engineering-registry.js`
+**Generated:** 2026-08-30 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
@@ -8,12 +8,12 @@
 
 | Item | Measure | Severity |
 |---|---|---|
-| Fabricated AI output (`Math.random()`) | 69 calls | **Critical** — presented to users as analysis |
-| Services with routes but no auth guard | 22 | **High** |
-| Duplicate table definitions | 39 | High |
-| TODO/FIXME markers | 1 | Low |
-| Test files vs services | 30 / 267 | **High** — 11% |
-| Components with zero ARIA | 634 of 635 | **High** |
+| Fabricated AI output (`Math.random()`) | 68 calls | **Critical** — presented to users as analysis |
+| Services with routes but no auth guard | 24 | **High** |
+| Duplicate table definitions | 38 | High |
+| TODO/FIXME markers | 0 | Low |
+| Test files vs services | 31 / 329 | **High** — 9% |
+| Components with zero ARIA | 685 of 686 | **High** |
 | Error boundaries | 4 | **High** — one fault blanks the app |
 
 ## Unguarded services
@@ -24,11 +24,13 @@
 - whatsappService (1 routes)
 - aiAgentRoutes (10 routes)
 - aiBrainRoutes (14 routes)
+- aiCollaborationRoutes (10 routes)
 - aiGatewayRoutes (7 routes)
 - aiOperationIntelligenceRoutes (13 routes)
 - aiSelfHealingRoutes (11 routes)
 - bulkOrderRoutes (9 routes)
-- communityRoutes (26 routes)
+- aiCollaborationRoutes (10 routes)
+- libraryRoutes (7 routes)
 - completeAIIntegrationRoutes (15 routes)
 - completeERPIntegrationRoutes (15 routes)
 - demandRoutes (3 routes)

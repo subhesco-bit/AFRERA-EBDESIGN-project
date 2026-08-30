@@ -1,10 +1,10 @@
 # Gap Register
 
-**Generated:** 2026-08-17 by `tools/engineering-registry.js`
+**Generated:** 2026-08-30 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
-**Objects indexed:** 19
+**Objects indexed:** 18
 
 ---
 
@@ -21,7 +21,6 @@
 | CAP-GST_TAX | GST / tax | Testing Pending | 80 | ✓ | ✓ | ✓ | ✓ | · |
 | CAP-ACCOUNTING_DOUBLE_ENTRY_ | Accounting (double-entry) | Testing Pending | 80 | ✓ | ✓ | ✓ | ✓ | · |
 | CAP-LOGISTICS_SHIPMENT | Logistics / shipment | Testing Pending | 80 | ✓ | ✓ | ✓ | ✓ | · |
-| CAP-COLD_CHAIN_TEMPERATURE | Cold chain / temperature | Backend Complete / Frontend Missing | 80 | ✓ | ✓ | ✓ | · | ✓ |
 | CAP-WORKFLOW_APPROVALS | Workflow / approvals | Backend Complete / Frontend Missing | 80 | ✓ | ✓ | ✓ | · | ✓ |
 | CAP-CRM | CRM | Backend Complete / Frontend Missing | 80 | ✓ | ✓ | ✓ | · | ✓ |
 | CAP-RISK_MANAGEMENT | Risk management | Backend Complete / Frontend Missing | 80 | ✓ | ✓ | ✓ | · | ✓ |
@@ -35,4 +34,4 @@
 - Missing: **1**
 - Database Only: **1**
 - Testing Pending: **10**
-- Backend Complete / Frontend Missing: **7**
+- Backend Complete / Frontend Missing: **6**

@@ -1,17 +1,46 @@
-import { useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { productsAPI } from '../services/api'
-import { ShoppingCart, Star, Leaf, Award, Truck } from 'lucide-react'
+import { useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { productsAPI, productReviewsAPI, ordersAPI } from '../services/api'
+import { ShoppingCart, Star, Leaf, Award, Truck, ChevronLeft, Minus, Plus } from 'lucide-react'
+import toast from 'react-hot-toast'
 import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel'
 
 function ProductDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const [quantity, setQuantity] = useState(1)
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => (await productsAPI.getProduct(id)).data,
   })
+
+  // Real review stats (product_reviews table, migration
+  // 009_marketplace_enhancements.sql) — no rating is shown until this
+  // resolves, and nothing is shown at all if the product has zero reviews.
+  // Same honesty convention as MarketplacePage.jsx's average_rating handling.
+  const { data: reviewStats } = useQuery({
+    queryKey: ['productReviewStats', id],
+    queryFn: async () => (await productReviewsAPI.getStats(id)).data?.data,
+    enabled: !!id,
+  })
+
+  const addToCart = useMutation({
+    mutationFn: (qty) => ordersAPI.addToCart({ product_id: id, quantity: qty }),
+    onSuccess: () => toast.success('Added to cart'),
+    onError: (err) => toast.error(err.response?.data?.error || 'Failed to add to cart'),
+  })
+
+  const buyNow = async () => {
+    try {
+      await ordersAPI.addToCart({ product_id: id, quantity })
+      navigate('/cart')
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to start checkout')
+    }
+  }
 
   if (isLoading) {
     return (
@@ -44,6 +73,14 @@ function ProductDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Link
+        to="/marketplace"
+        className="inline-flex items-center gap-1 text-sm text-v42-mut hover:text-v42-forest mb-6 transition"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        Back to marketplace
+      </Link>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Images */}
         <div>
@@ -96,10 +133,18 @@ function ProductDetailPage() {
             {product.category_name} • {product.state_name}
           </p>
 
-          <div className="flex items-center mb-4">
-            <Star className="w-5 h-5 text-yellow-400 fill-current" />
-            <span className="ml-1 text-v42-ink2">4.5 (128 reviews)</span>
-          </div>
+          {/* Real rating, not a fixed placeholder — only shown once reviews
+              actually exist, matching MarketplacePage.jsx's convention. */}
+          {reviewStats?.totalReviews > 0 ? (
+            <div className="flex items-center mb-4">
+              <Star className="w-5 h-5 text-yellow-400 fill-current" />
+              <span className="ml-1 text-v42-ink2">
+                {reviewStats.averageRating.toFixed(1)} ({reviewStats.totalReviews} review{reviewStats.totalReviews === 1 ? '' : 's'})
+              </span>
+            </div>
+          ) : (
+            <div className="mb-4 text-sm text-v42-mut">No reviews yet</div>
+          )}
 
           <div className="mb-6">
             <span className="text-3xl font-bold text-v42-ink">
@@ -153,17 +198,28 @@ function ProductDetailPage() {
               Quantity
             </label>
             <div className="flex items-center gap-2">
-              <button className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2">
-                -
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+                className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2 flex items-center justify-center"
+              >
+                <Minus className="w-4 h-4" />
               </button>
               <input
                 type="number"
-                defaultValue="1"
+                value={quantity}
                 min="1"
+                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
                 className="w-20 text-center border border-v42-line rounded-lg"
               />
-              <button className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2">
-                +
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                aria-label="Increase quantity"
+                className="w-10 h-10 border border-v42-line rounded-lg hover:bg-v42-paddy2 flex items-center justify-center"
+              >
+                <Plus className="w-4 h-4" />
               </button>
               <span className="text-v42-mut">{product.unit_symbol}</span>
             </div>
@@ -171,16 +227,24 @@ function ProductDetailPage() {
 
           {/* Action Buttons */}
           <div className="flex gap-4 mb-6">
-            <button className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition flex items-center justify-center">
+            <button
+              onClick={() => addToCart.mutate(quantity)}
+              disabled={addToCart.isPending}
+              className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition flex items-center justify-center disabled:opacity-60"
+            >
               <ShoppingCart className="w-5 h-5 mr-2" />
-              Add to Cart
+              {addToCart.isPending ? 'Adding…' : 'Add to Cart'}
             </button>
-            <button className="px-6 py-3 border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-forest/10 transition">
+            <button
+              onClick={buyNow}
+              className="px-6 py-3 border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-forest/10 transition"
+            >
               Buy Now
             </button>
           </div>
 
-          {/* Delivery Info */}
+          {/* Delivery Info — ₹1,500 free-shipping threshold is the real value
+              used by orderService.js's shipping calculation, not invented. */}
           <div className="border-t pt-6">
             <div className="flex items-start gap-3 mb-3">
               <Truck className="w-5 h-5 text-v42-mut flex-shrink-0" />
