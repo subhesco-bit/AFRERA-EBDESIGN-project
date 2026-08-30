@@ -198,11 +198,13 @@ CREATE TRIGGER trigger_hydroponics_systems_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_horticulture_updated_at();
 
--- Insert sample data for demonstration
-INSERT INTO orchards (farmer_id, name, location, area, orchard_type, tree_count, planting_date, varieties, soil_type, irrigation_system) VALUES
-(1, 'Mango Orchard', 'North Field', 2.5, 'FRUIT', 150, '2020-03-15', '[{"variety": "Alphonso", "count": 100}, {"variety": "Kesar", "count": 50}]', 'LOAMY', 'DRIP'),
-(1, 'Coconut Grove', 'South Field', 1.8, 'FRUIT', 80, '2018-06-20', '[{"variety": "Tall", "count": 60}, {"variety": "Dwarf", "count": 20}]', 'SANDY', 'SPRINKLER')
-ON CONFLICT DO NOTHING;
+-- 2026-08-30: removed a fabricated demo-data INSERT that used a bare integer
+-- literal (1) for farmer_id, a UUID column referencing farmers(id) - fails
+-- "column farmer_id is of type uuid but expression is of type integer" on any
+-- real database, and there is no real farmer with that id to reference even
+-- if the type were fixed. Caught by tools/schema-collisions.js's CI gate
+-- actually running npm run migrate for real, which this repo had never done
+-- before this session.
 
 -- Grant permissions (adjust as needed for your setup)
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON orchards TO your_app_user;
