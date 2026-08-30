@@ -411,12 +411,22 @@ CREATE INDEX IF NOT EXISTS idx_retargeting_status ON retargeting_campaigns(statu
 CREATE TRIGGER update_customer_segments_updated_at BEFORE UPDATE ON customer_segments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- 2026-08-30: guarded with DROP TRIGGER IF EXISTS - demand_forecasts is a
+-- pre-existing (pre-dates this session) documented collision (see
+-- schema-decisions.json), and 030_institutional_procurement_schema.sql
+-- already creates a trigger of this exact name on the same real table,
+-- using the same self-healing DROP-then-CREATE pattern this fix now matches.
+DROP TRIGGER IF EXISTS update_demand_forecasts_updated_at ON demand_forecasts;
 CREATE TRIGGER update_demand_forecasts_updated_at BEFORE UPDATE ON demand_forecasts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_journal_entries_updated_at BEFORE UPDATE ON journal_entries
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- 2026-08-30: guarded with DROP TRIGGER IF EXISTS - gst_invoices is a
+-- pre-existing documented collision (schema-decisions.json), and
+-- 028_gst_schema.sql already creates a trigger of this exact name.
+DROP TRIGGER IF EXISTS update_gst_invoices_updated_at ON gst_invoices;
 CREATE TRIGGER update_gst_invoices_updated_at BEFORE UPDATE ON gst_invoices
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
