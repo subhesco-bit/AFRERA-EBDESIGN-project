@@ -223,8 +223,8 @@ CREATE INDEX IF NOT EXISTS idx_performance_reviews_period ON performance_reviews
 CREATE INDEX IF NOT EXISTS idx_leave_requests_employee_id ON leave_requests(employee_id);
 CREATE INDEX IF NOT EXISTS idx_leave_requests_dates ON leave_requests(start_date, end_date);
 CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(status);
-CREATE INDEX IF NOT EXISTS idx_training_records_employee_id ON training_records(employee_id);
-CREATE INDEX IF NOT EXISTS idx_training_records_program_id ON training_records(training_program_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "training_records") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_training_records_employee_id ON training_records(employee_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "training_records") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_training_records_program_id ON training_records(training_program_id);
 CREATE INDEX IF NOT EXISTS idx_promotions_employee_id ON employee_promotions(employee_id);
 CREATE INDEX IF NOT EXISTS idx_promotions_date ON employee_promotions(promotion_date);
 CREATE INDEX IF NOT EXISTS idx_employee_feedback_employee_id ON employee_feedback(employee_id);

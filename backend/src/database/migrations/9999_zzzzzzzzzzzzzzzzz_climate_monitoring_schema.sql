@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS climate_risk_assessments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS idx_climate_risk_assessments_region ON climate_risk_assessments(region);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "climate_risk_assessments") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_climate_risk_assessments_region ON climate_risk_assessments(region);
 
 CREATE TABLE IF NOT EXISTS agro_meteorology_readings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

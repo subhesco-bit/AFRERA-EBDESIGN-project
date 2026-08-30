@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS farmer_onboarding (
 );
 
 -- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_farmers_email ON farmers(email);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "farmers") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_farmers_email ON farmers(email);
 CREATE INDEX IF NOT EXISTS idx_farmers_status ON farmers(status);
-CREATE INDEX IF NOT EXISTS idx_farmers_primary_crop ON farmers(primary_crop);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "farmers") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_farmers_primary_crop ON farmers(primary_crop);
 CREATE INDEX IF NOT EXISTS idx_farmer_verifications_farmer_id ON farmer_verifications(farmer_id);
 CREATE INDEX IF NOT EXISTS idx_farmer_verifications_status ON farmer_verifications(status);
 CREATE INDEX IF NOT EXISTS idx_farmer_onboarding_farmer_id ON farmer_onboarding(farmer_id);

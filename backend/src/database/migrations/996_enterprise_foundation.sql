@@ -597,10 +597,11 @@ LEFT JOIN (
 -- 10. INDEXES
 -- ---------------------------------------------------------------------------
 
-CREATE INDEX IF NOT EXISTS idx_journal_entries_company_date
-    ON journal_entries (company_id, entry_date);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_status
-    ON journal_entries (status);
+-- 2026-08-30: removed idx_journal_entries_company_date and idx_journal_entries_status
+-- (deferred collision, see schema-decisions.json "journal_entries") - company_id,
+-- entry_date, and status all don't exist on the real (winner) journal_entries
+-- table (3102_ecommerce_ai_erp_business_marketing.sql's version is a flat
+-- debit/credit ledger line, not this file's header-row shape).
 CREATE INDEX IF NOT EXISTS idx_journal_entries_reference
     ON journal_entries (reference_type, reference_id);
 CREATE INDEX IF NOT EXISTS idx_journal_lines_entry

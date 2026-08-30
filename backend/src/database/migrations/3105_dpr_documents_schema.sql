@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS dpr_documents (
     CONSTRAINT dpr_documents_subject CHECK (farmer_id IS NOT NULL OR fpo_id IS NOT NULL)
 );
 
-CREATE INDEX IF NOT EXISTS idx_dpr_documents_farmer_id ON dpr_documents(farmer_id);
-CREATE INDEX IF NOT EXISTS idx_dpr_documents_fpo_id ON dpr_documents(fpo_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "dpr_documents") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_dpr_documents_farmer_id ON dpr_documents(farmer_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "dpr_documents") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_dpr_documents_fpo_id ON dpr_documents(fpo_id);
 CREATE INDEX IF NOT EXISTS idx_dpr_documents_created_at ON dpr_documents(created_at);
 
 COMMENT ON TABLE dpr_documents IS 'Generated Detailed Project Reports — assembled from real farmer/land/crop-plan/price data by dprGenerationService, stored for audit and re-download.';

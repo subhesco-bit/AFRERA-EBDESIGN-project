@@ -261,5 +261,5 @@ CREATE INDEX IF NOT EXISTS idx_hamper_occasion ON gift_hampers (occasion, is_act
 CREATE INDEX IF NOT EXISTS idx_hamper_orders_buyer ON gift_hamper_orders (buyer_id, status);
 CREATE INDEX IF NOT EXISTS idx_bay_village ON cold_storage_bays (village_centre_id);
 CREATE INDEX IF NOT EXISTS idx_bay_lat_lng ON cold_storage_bays (latitude, longitude);
-CREATE INDEX IF NOT EXISTS idx_bookings_bay_window ON cold_storage_bookings (bay_id, booked_from, booked_to);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "cold_storage_bookings") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_bookings_bay_window ON cold_storage_bookings (bay_id, booked_from, booked_to);
 CREATE INDEX IF NOT EXISTS idx_wallets_owner ON wallets (owner_type, owner_id);
