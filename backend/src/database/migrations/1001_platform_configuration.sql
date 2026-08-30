@@ -16,6 +16,6 @@
 ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS description TEXT;
 ALTER TABLE platform_configurations ADD COLUMN IF NOT EXISTS environment TEXT;
 
-INSERT INTO platform_configurations (config_key, config_value, config_type, description, environment) VALUES
-  ('feature_flags', '{}', 'json', 'Global feature flags', 'global')
+INSERT INTO platform_configurations (category, config_key, config_value, config_type, description, environment) VALUES
+  ('features', 'feature_flags', '{}', 'json', 'Global feature flags', 'global')
 ON CONFLICT (config_key) DO NOTHING;
