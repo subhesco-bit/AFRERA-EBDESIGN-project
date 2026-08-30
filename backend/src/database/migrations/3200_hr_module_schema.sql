@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS employees (
   last_name VARCHAR(100) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(20),
-  department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+  department_id INTEGER, -- FK added below, after `departments` exists (see the ALTER after its CREATE TABLE) - employees and departments reference each other (department_id here, manager_id there), so one side must be added later to break the ordering cycle
   department VARCHAR(100),
   role VARCHAR(100) NOT NULL,
   salary_level VARCHAR(50),
@@ -46,6 +46,15 @@ CREATE TABLE IF NOT EXISTS departments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 2026-08-30: employees.department_id -> departments and departments.manager_id
+-- -> employees form a circular FK dependency (a genuine pre-existing bug, not
+-- new tonight - "relation departments does not exist" the first time this
+-- repo's CI actually ran npm run migrate for real, since employees is created
+-- first and referenced departments before it existed). Adding the FK here,
+-- now that both tables exist.
+ALTER TABLE employees ADD CONSTRAINT employees_department_id_fkey
+  FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL;
 
 -- Performance reviews table
 CREATE TABLE IF NOT EXISTS performance_reviews (
