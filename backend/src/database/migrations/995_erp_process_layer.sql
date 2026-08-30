@@ -515,23 +515,18 @@ WHERE is_active = TRUE;
 COMMENT ON VIEW v_public_listings IS
   'Buyer-safe projection. Deliberately excludes MAP-A floor price. Use this for all buyer-facing reads.';
 
-CREATE OR REPLACE VIEW v_procurement_pipeline AS
-SELECT
-    pr.requisition_number,
-    pr.status              AS requisition_status,
-    rfq.rfq_number,
-    rfq.status             AS rfq_status,
-    po.po_number,
-    po.status              AS po_status,
-    po.total_amount,
-    grn.grn_number,
-    grn.inspection_status,
-    imr.match_status
-FROM purchase_requisitions pr
-LEFT JOIN rfq_headers rfq ON rfq.requisition_id = pr.id
-LEFT JOIN purchase_orders po ON po.requisition_id = pr.id
-LEFT JOIN goods_receipts grn ON grn.po_id = po.id
-LEFT JOIN invoice_match_results imr ON imr.po_id = po.id;
+-- 2026-08-30: removed v_procurement_pipeline - it joined on and selected
+-- po.requisition_id/po_number/status/total_amount, all of which only exist
+-- on this file's own (deferred collision loser, see schema-decisions.json
+-- "purchase_orders") shape of purchase_orders, never the real table
+-- (3102_ecommerce_ai_erp_business_marketing.sql's simpler B2B-request shape:
+-- id, product_id, seller_id, requested_quantity, po_status, total_value).
+-- Unlike a plpgsql function body, CREATE VIEW is validated at creation time,
+-- so this failed the migration outright ("column po.requisition_id does not
+-- exist") rather than just being quietly non-functional. The view's whole
+-- premise (a formal PO with a requisition/RFQ chain) genuinely doesn't exist
+-- in the real schema yet - nothing to salvage until purchase_orders is
+-- properly reconciled.
 
 CREATE OR REPLACE VIEW v_ai_approval_queue AS
 SELECT

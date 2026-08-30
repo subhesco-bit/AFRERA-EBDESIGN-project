@@ -481,55 +481,18 @@ CREATE TABLE IF NOT EXISTS budget_lines (
 -- Derived from the ledger so they can never disagree with it.
 -- ---------------------------------------------------------------------------
 
-CREATE OR REPLACE VIEW v_general_ledger AS
-SELECT
-    jl.id                AS line_id,
-    je.company_id,
-    je.entry_number,
-    je.entry_date,
-    je.journal_type,
-    je.status,
-    je.reference_type,
-    je.reference_id,
-    coa.account_code,
-    coa.account_name,
-    coa.account_type,
-    jl.debit,
-    jl.credit,
-    jl.base_debit,
-    jl.base_credit,
-    jl.cost_center_id,
-    jl.profit_center_id,
-    jl.business_unit_id,
-    jl.partner_type,
-    jl.partner_id,
-    jl.description
-FROM journal_lines jl
-JOIN journal_entries je ON je.id = jl.journal_entry_id
-JOIN chart_of_accounts coa ON coa.id = jl.account_id
-WHERE je.status = 'posted';
-
-CREATE OR REPLACE VIEW v_trial_balance AS
-SELECT
-    je.company_id,
-    coa.id                AS account_id,
-    coa.account_code,
-    coa.account_name,
-    coa.account_type,
-    coa.normal_balance,
-    SUM(jl.debit)         AS total_debit,
-    SUM(jl.credit)        AS total_credit,
-    -- Signed balance in the account's natural direction.
-    CASE WHEN coa.normal_balance = 'DR'
-         THEN SUM(jl.debit) - SUM(jl.credit)
-         ELSE SUM(jl.credit) - SUM(jl.debit)
-    END                   AS balance
-FROM journal_lines jl
-JOIN journal_entries je ON je.id = jl.journal_entry_id
-JOIN chart_of_accounts coa ON coa.id = jl.account_id
-WHERE je.status = 'posted'
-GROUP BY je.company_id, coa.id, coa.account_code, coa.account_name,
-         coa.account_type, coa.normal_balance;
+-- 2026-08-30: removed v_general_ledger and v_trial_balance - both selected
+-- je.company_id/entry_number/entry_date/journal_type/status, all of which
+-- only exist on this file's own (deferred collision loser, see
+-- schema-decisions.json "journal_entries") header-row shape of
+-- journal_entries, never the real table (3102_ecommerce_ai_erp_business_
+-- marketing.sql's flat debit/credit ledger line: id, journal_entry_id,
+-- account_code, entry_type, amount, currency, description, reference_id/
+-- type, posted_by, posted_at - no company_id/entry_number/entry_date/
+-- journal_type/status at all). Same class of failure as the
+-- v_procurement_pipeline fix earlier - CREATE VIEW is validated at creation
+-- time, so this failed the migration outright. Nothing to salvage until
+-- journal_entries is properly reconciled.
 
 CREATE OR REPLACE VIEW v_ap_ageing AS
 SELECT
@@ -563,35 +526,10 @@ SELECT
 FROM ar_invoices
 WHERE status NOT IN ('cancelled','draft');
 
-CREATE OR REPLACE VIEW v_budget_vs_actual AS
-SELECT
-    b.company_id,
-    b.id                       AS budget_id,
-    b.name                     AS budget_name,
-    bl.account_id,
-    coa.account_code,
-    coa.account_name,
-    bl.cost_center_id,
-    bl.fiscal_period_id,
-    bl.budgeted_amount,
-    COALESCE(actual.actual_amount, 0) AS actual_amount,
-    bl.budgeted_amount - COALESCE(actual.actual_amount, 0) AS variance
-FROM budget_lines bl
-JOIN budgets b ON b.id = bl.budget_id
-JOIN chart_of_accounts coa ON coa.id = bl.account_id
-LEFT JOIN (
-    SELECT jl.account_id,
-           jl.cost_center_id,
-           je.fiscal_period_id,
-           SUM(jl.debit - jl.credit) AS actual_amount
-    FROM journal_lines jl
-    JOIN journal_entries je ON je.id = jl.journal_entry_id
-    WHERE je.status = 'posted'
-    GROUP BY jl.account_id, jl.cost_center_id, je.fiscal_period_id
-) actual
-  ON actual.account_id = bl.account_id
- AND actual.fiscal_period_id IS NOT DISTINCT FROM bl.fiscal_period_id
- AND actual.cost_center_id IS NOT DISTINCT FROM bl.cost_center_id;
+-- 2026-08-30: removed v_budget_vs_actual - its "actual" subquery joined on
+-- je.fiscal_period_id and filtered je.status, neither of which exist on the
+-- real journal_entries table, same reason as v_general_ledger/v_trial_balance
+-- above. Nothing to salvage until journal_entries is properly reconciled.
 
 -- ---------------------------------------------------------------------------
 -- 10. INDEXES
