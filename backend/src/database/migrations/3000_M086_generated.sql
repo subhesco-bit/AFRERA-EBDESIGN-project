@@ -1,4 +1,4 @@
-﻿-- 3000_M086_generated.sql
+-- 3000_M086_generated.sql
 -- Auto-generated table for M086
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

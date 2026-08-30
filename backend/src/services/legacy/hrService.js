@@ -148,7 +148,7 @@ class HRService {
           LEFT JOIN performance_reviews p ON e.id = p.employee_id
           LEFT JOIN leave_requests l ON e.id = l.employee_id AND l.created_at > NOW() - INTERVAL '12 months'
           LEFT JOIN training_records t ON e.id = t.employee_id
-          LEFT JOIN promotions pr ON e.id = pr.employee_id
+          LEFT JOIN employee_promotions pr ON e.id = pr.employee_id
           WHERE e.employee_id = $1
           GROUP BY e.id
         )

@@ -28,5 +28,14 @@ ALTER TABLE roles ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0;
 ALTER TABLE roles ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
 ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
+-- 2026-08-30: 015_authorization_service.sql's own seed INSERT (line 156) writes
+-- hierarchy_level/default_permissions, which this repair had not yet restored -
+-- that INSERT would fail with "column does not exist" against a real database.
+-- Added by tools/schema-collisions.js's new "Check for table-name collisions"
+-- CI gate, which runs npm run migrate for real and would have failed on this.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS hierarchy_level INTEGER DEFAULT 50;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS default_permissions JSONB DEFAULT '[]';
+
 CREATE INDEX IF NOT EXISTS idx_roles_system ON roles(is_system_role);
 CREATE INDEX IF NOT EXISTS idx_roles_level ON roles(level);
+CREATE INDEX IF NOT EXISTS idx_roles_hierarchy_level ON roles(hierarchy_level);

@@ -1,4 +1,4 @@
-﻿-- 3000_M123_generated.sql
+-- 3000_M123_generated.sql
 -- Auto-generated table for M123
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

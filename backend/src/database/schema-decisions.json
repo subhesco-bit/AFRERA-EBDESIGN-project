@@ -15,7 +15,12 @@
     "  merged   - the losing columns were genuinely new and have been added to the",
     "             winning table by an explicit ALTER. Record where.",
     "  renamed  - the two tables were different concepts that happened to share a",
-    "             name. The later one was renamed. Record the new name."
+    "             name. The later one was renamed. Record the new name.",
+    "  deferred - genuinely different concepts sharing a name, or a same-concept",
+    "             table with real risk (mismatched FK types, heavy cross-references)",
+    "             not yet safe to merge or rename without a live database to verify",
+    "             against. Recorded so CI is not blocked on an open question, but this",
+    "             is NOT a completed decision - real reconciliation work remains."
   ],
   "decisions": [
     {
@@ -31,7 +36,7 @@
       "also_merged": [
         "eway_bill_number"
       ],
-      "rationale": "047 uses buyer/seller vocabulary, 028 uses customer/supplier. Same facts. 028 wins because it runs first and is the more normalised of the two (028 stores the tax split in columns; 047 stores it in a gst_calculation JSONB blob). eway_bill_number was genuinely absent from 028 and has been added \u2014 an e-way bill is legally required above Rs 50,000 and is asked for at inter-state check posts."
+      "rationale": "047 uses buyer/seller vocabulary, 028 uses customer/supplier. Same facts. 028 wins because it runs first and is the more normalised of the two (028 stores the tax split in columns; 047 stores it in a gst_calculation JSONB blob). eway_bill_number was genuinely absent from 028 and has been added — an e-way bill is legally required above Rs 50,000 and is asked for at inter-state check posts."
     },
     {
       "table": "gst_invoice_items",
@@ -75,7 +80,7 @@
       "loser": "990_ai_outcomes.sql",
       "kind": "renamed",
       "renamed_to": "ai_prediction_log",
-      "rationale": "000's ai_predictions logs ML model inferences (model_type, features_used, model_version). 990 needed a calibration ledger for agent forecasts (stated_confidence, ape_pct, input_quality) \u2014 a different thing that happened to want the same name. Merging them would have produced one table where most columns are null for most rows, which is how the other collisions in this list were created. Renamed instead. The view v_ai_calibration failed with 'column actor_id does not exist' until this was fixed; the error pointed at the view, not at the collision that caused it, which is exactly why the checker exists."
+      "rationale": "000's ai_predictions logs ML model inferences (model_type, features_used, model_version). 990 needed a calibration ledger for agent forecasts (stated_confidence, ape_pct, input_quality) — a different thing that happened to want the same name. Merging them would have produced one table where most columns are null for most rows, which is how the other collisions in this list were created. Renamed instead. The view v_ai_calibration failed with 'column actor_id does not exist' until this was fixed; the error pointed at the view, not at the collision that caused it, which is exactly why the checker exists."
     },
     {
       "table": "demand_forecasts",
@@ -89,8 +94,199 @@
         "forecast_qty",
         "confidence"
       ],
-      "rationale": "Three files declare demand_forecasts for three different things: 015 stores ML model output (forecast_data JSONB, accuracy, model_version), 030 stores institutional menu planning, and 052 stores a scalar regional quantity for a date. 015 wins because it runs first and other code already reads it. 052's four columns are additive scalars rather than competing spellings, so they are added by ALTER rather than dropped. Note that 015's 'accuracy' and 052's 'confidence' are NOT the same measure \u2014 accuracy is observed after the fact, confidence is claimed before it \u2014 and averaging them would produce a number that means nothing.",
+      "rationale": "Three files declare demand_forecasts for three different things: 015 stores ML model output (forecast_data JSONB, accuracy, model_version), 030 stores institutional menu planning, and 052 stores a scalar regional quantity for a date. 015 wins because it runs first and other code already reads it. 052's four columns are additive scalars rather than competing spellings, so they are added by ALTER rather than dropped. Note that 015's 'accuracy' and 052's 'confidence' are NOT the same measure — accuracy is observed after the fact, confidence is claimed before it — and averaging them would produce a number that means nothing.",
       "note": "Caught by tools/schema-collisions.js after 999_economic_layer.sql was added. The file was also renumbered from 999 to 052: it shared the 999_ prefix with 999_schema_reconciliation.sql, and reconciliation must run last."
+    },
+    {
+      "table": "promotions",
+      "winner": "3102_ecommerce_ai_erp_business_marketing.sql",
+      "loser": "3200_hr_module_schema.sql",
+      "kind": "renamed",
+      "renamed_to": "employee_promotions",
+      "rationale": "3102's promotions is a marketing/discount-code table; 3200's is an employee career-promotion history table (previous_role/new_role/promotion_date/approved_by) - unrelated concepts sharing a name. Renamed the HR table to employee_promotions and updated its one real caller, hrService.js's getEmployee() JOIN, and the file's own indexes."
+    },
+    {
+      "table": "departments",
+      "winner": "3200_hr_module_schema.sql",
+      "loser": "996_enterprise_foundation.sql",
+      "kind": "renamed",
+      "renamed_to": "enterprise_departments",
+      "rationale": "3200's departments is the live HR department table (department_name/department_code/manager_id, queried for real by hrService.js). 996's is an unused multi-tenant scaffold (company_id/business_unit_id/head_user_id UUID, parent_department_id self-FK) with zero real callers - confirmed via grep, the only other hit was a string literal in M004's array, not a SQL reference. Renamed 996's version and its 3 internal FK references to enterprise_departments to avoid inventing a UUID head_user_id column on a table hrService.js's INTEGER-keyed employees actually use."
+    },
+    {
+      "table": "roles",
+      "winner": "000_base_schema.sql",
+      "loser": "015_authorization_service.sql",
+      "kind": "merged",
+      "merged_by": "9999_zzzzzzzzzzzzzzzzzzz_roles_collision_repair.sql (extended 2026-08-30)",
+      "columns": [
+        "hierarchy_level",
+        "default_permissions"
+      ],
+      "rationale": "Same RBAC roles concept; 015's extra columns are genuinely additive. This file already had a repair migration recovering is_system_role/level/metadata/updated_at from a prior session - it just hadn't caught hierarchy_level/default_permissions yet, which is why 015's own seed INSERT (line 156) would have failed with 'column does not exist' against a real database. Extended the existing repair file rather than creating a new one."
+    },
+    {
+      "table": "platform_configurations",
+      "winner": "014_platform_foundation_modules.sql",
+      "loser": "1001_platform_configuration.sql",
+      "kind": "merged",
+      "merged_by": "1001_platform_configuration.sql (rewritten 2026-08-30)",
+      "columns": [
+        "description",
+        "environment"
+      ],
+      "also_synonym": {
+        "key": "config_key",
+        "value": "config_value"
+      },
+      "rationale": "1001's key/value are the same facts as 014's config_key/config_value under different names - NOT duplicated per this file's synonym rule. description/environment are genuinely new, added via ALTER. 1001's own seed INSERT referenced key/value/description/environment, none of which existed on the winning table, so it would fail 'column does not exist' against a real database; rewritten to target config_key/config_value/config_type instead."
+    },
+    {
+      "table": "users",
+      "winner": "000_base_schema.sql",
+      "loser": "1000_user_management.sql, 3000_M011_generated.sql",
+      "kind": "deferred",
+      "rationale": "Both losers' users tables are largely subsets/near-duplicates of the winner (same UUID id, same core fields) with only a couple of genuinely new columns (e.g. 1000's `name`). Low risk to merge, but not verified against a live database this session - deferred rather than guessed at 4am."
+    },
+    {
+      "table": "user_profiles",
+      "winner": "000_base_schema.sql",
+      "loser": "3019_m019_profile_management.sql",
+      "kind": "deferred",
+      "rationale": "Different concept AND a real pre-existing bug: 3019's version declares `user_id INTEGER REFERENCES users(id)` but users.id is UUID - that CREATE TABLE would fail a type check on any database where it actually ran, independent of the collision. Needs a real column-type fix, not a blind merge or rename."
+    },
+    {
+      "table": "user_roles",
+      "winner": "000_base_schema.sql",
+      "loser": "014_platform_foundation_modules.sql",
+      "kind": "deferred",
+      "rationale": "Same RBAC-assignment concept; loser adds id/expires_at/is_active as plain extra columns (not a PK change - winner keeps its own composite PK). Likely safe to merge but not verified against a live database this session."
+    },
+    {
+      "table": "farmers",
+      "winner": "000_base_schema.sql",
+      "loser": "3021_m021_farmer_registration.sql",
+      "kind": "deferred",
+      "rationale": "Different concept: winner is the platform's core farmer entity (UUID, FDI scoring, linked to users/fpos, referenced by iot_devices/training_records/dpr_documents/contract_milestones and many other tables). Loser is a standalone SERIAL-keyed registration-form table with no FK to users. Given how many other tables FK into farmers(id), a merge or rename here needs careful review with a live database, not a same-night guess."
+    },
+    {
+      "table": "training_records",
+      "winner": "000_base_schema.sql",
+      "loser": "3200_hr_module_schema.sql",
+      "kind": "deferred",
+      "rationale": "Different concept: winner tracks farmer agricultural training (UUID, farmer_id FK); loser tracks employee HR training (SERIAL, employee_id/training_program_id FK), used for real by hrService.js. A real table, needs an intentional rename (e.g. employee_training_records) with its own migration + service-reference update, not done this pass."
+    },
+    {
+      "table": "contract_milestones",
+      "winner": "000_base_schema.sql",
+      "loser": "3102_ecommerce_ai_erp_business_marketing.sql",
+      "kind": "deferred",
+      "rationale": "Different concept and different PK type (UUID vs VARCHAR(50)): winner is a general contract/escrow milestone table; loser is ecommerce-specific (contract_farming FK, quality_verified, payment_status), used for real by ecommerceBusinessSalesService.js. Needs an intentional rename with its own migration + service-reference update, not done this pass."
+    },
+    {
+      "table": "audit_logs",
+      "winner": "000_base_schema.sql",
+      "loser": "014_platform_foundation_modules.sql, 1002_system_administration.sql",
+      "kind": "deferred",
+      "rationale": "Same audit-logging concept across all three; the two losers each add 1-2 plain extra columns (error_message; entity/details). Likely safe to merge but not verified against a live database this session, and audit_logs is compliance-sensitive enough to want that verification first."
+    },
+    {
+      "table": "product_reviews",
+      "winner": "009_marketplace_enhancements.sql",
+      "loser": "3100_ecommerce_tables.sql",
+      "kind": "deferred",
+      "rationale": "Different PK type (SERIAL vs VARCHAR(50)) and part of a broader, already-documented review-system duplication (.ai/tasks/ACTIVE.md already flags M060 Review Management vs services/legacy/productReviewService.js as an unreconciled duplicate). Deferred to the same follow-up rather than adding a third variant of the reconciliation tonight."
+    },
+    {
+      "table": "review_reports",
+      "winner": "009_marketplace_enhancements.sql",
+      "loser": "3100_ecommerce_tables.sql",
+      "kind": "deferred",
+      "rationale": "Same 3100_ecommerce_tables.sql VARCHAR(50)-PK family as product_reviews above - deferred alongside it for the same reason."
+    },
+    {
+      "table": "bulk_orders",
+      "winner": "009_marketplace_enhancements.sql",
+      "loser": "3100_ecommerce_tables.sql",
+      "kind": "deferred",
+      "rationale": "Same 3100_ecommerce_tables.sql VARCHAR(50)-PK family as product_reviews above - deferred alongside it for the same reason."
+    },
+    {
+      "table": "warehouse_inventory",
+      "winner": "013_logistics_enhancements.sql",
+      "loser": "3102_ecommerce_ai_erp_business_marketing.sql",
+      "kind": "deferred",
+      "rationale": "Likely the same concept (only bin_location is genuinely lost per the checker), but the two versions use different product/warehouse FK types (products UUID vs product_listings VARCHAR(50)) suggesting they serve two different catalog subsystems that happen to share a table name. Deferred rather than assumed-safe without a live database to verify the ALTER against."
+    },
+    {
+      "table": "consents",
+      "winner": "014_platform_foundation_modules.sql",
+      "loser": "3017_m017_consent_management.sql",
+      "kind": "deferred",
+      "rationale": "Likely the same GDPR-consent concept with genuinely additive columns, but 3017's version declares user_id as INTEGER against a UUID users.id - the same latent type bug found in user_profiles. Needs the same real-column-type review before merging."
+    },
+    {
+      "table": "iot_devices",
+      "winner": "015_advanced_features.sql",
+      "loser": "3030_m030_farmer_advisory.sql",
+      "kind": "deferred",
+      "rationale": "Likely the same concept, but 3030's lost farmer_id column is declared INTEGER REFERENCES farmers(id) against a UUID farmers.id - same latent type bug pattern. A merge needs to add farmer_id as UUID, not copy the loser's literal (broken) type - not done this pass without a live database to confirm."
+    },
+    {
+      "table": "dpr_documents",
+      "winner": "023_engineering_schema.sql",
+      "loser": "3105_dpr_documents_schema.sql",
+      "kind": "deferred",
+      "rationale": "Different concept despite matching UUID PK: winner is a bank/investor engineering-project DPR (project_id, total_project_cost, target_institution); loser is a farmer-financing DPR (farmer_id, crop_plan_id, financing_ask_inr), used for real by dprGenerationService.js and foluBenchmarkService.js. Needs an intentional rename with its own migration + multi-file service-reference update, not done this pass."
+    },
+    {
+      "table": "gi_marketplace_listings",
+      "winner": "027_gi_intelligence_schema.sql",
+      "loser": "3100_ecommerce_tables.sql",
+      "kind": "deferred",
+      "rationale": "Same 3100_ecommerce_tables.sql VARCHAR(50)-PK family noted under product_reviews above - deferred for the same reason (different catalog subsystem, needs dedicated review)."
+    },
+    {
+      "table": "climate_risk_assessments",
+      "winner": "057_climate_weather_d14.sql",
+      "loser": "9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+      "kind": "deferred",
+      "rationale": "Different PK type (BIGSERIAL vs UUID) suggesting two independently-built climate subsystems sharing a name. Deferred pending a review of which is actually live."
+    },
+    {
+      "table": "mfa_secrets",
+      "winner": "3015_m015_mfa.sql",
+      "loser": "mfa_schema.sql",
+      "kind": "deferred",
+      "rationale": "Likely the same MFA-secret concept with genuinely additive columns (phone_number/enabled/enabled_at/disabled_at) and matching column types this time - lower risk than most of this list, but not verified against a live database this session."
+    },
+    {
+      "table": "journal_entries",
+      "winner": "3102_ecommerce_ai_erp_business_marketing.sql",
+      "loser": "996_enterprise_foundation.sql",
+      "kind": "deferred",
+      "rationale": "Different concept despite matching SERIAL PK: winner is a flat debit/credit ledger line (one row per DEBIT or CREDIT); loser is a formal multi-tenant journal-entry header (company_id, fiscal_period_id, journal_type, presumably paired with a separate lines table not in this collision). Part of the same 995/996 'recovered ERP' vs 3102 'ecommerce ERP' duplication as purchase_orders/production_orders below - needs a coordinated rename across all three, not done this pass."
+    },
+    {
+      "table": "purchase_orders",
+      "winner": "3102_ecommerce_ai_erp_business_marketing.sql",
+      "loser": "995_erp_process_layer.sql",
+      "kind": "deferred",
+      "rationale": "Different concept and different PK type (VARCHAR(50) vs SERIAL): winner is a simple B2B marketplace purchase request (seller_id, requested_quantity); loser is a formal procurement PO with requisition/RFQ chain (po_number, vendor_id, approved_by), used for real by ecommerceERPService.js under the SAME bare 'purchase_orders' name the winner also uses - meaning ecommerceERPService.js's own queries are ambiguous about which schema they expect. Needs careful review of ecommerceERPService.js against both table shapes before any rename, not done this pass."
+    },
+    {
+      "table": "production_orders",
+      "winner": "3102_ecommerce_ai_erp_business_marketing.sql",
+      "loser": "995_erp_process_layer.sql",
+      "kind": "deferred",
+      "rationale": "Same 995/996 vs 3102 ERP duplication as purchase_orders and journal_entries above - deferred alongside them pending a coordinated review."
+    },
+    {
+      "table": "cold_storage_bookings",
+      "winner": "3104_cold_storage_schema.sql",
+      "loser": "994_recovered_capabilities.sql",
+      "kind": "deferred",
+      "rationale": "Different PK type (UUID vs SERIAL) suggesting two independently-built cold-storage booking systems. Deferred pending a review of which is actually live."
     }
   ]
 }

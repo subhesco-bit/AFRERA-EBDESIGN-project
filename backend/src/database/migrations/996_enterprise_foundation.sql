@@ -99,13 +99,13 @@ CREATE TABLE IF NOT EXISTS branches (
     UNIQUE (company_id, code)
 );
 
-CREATE TABLE IF NOT EXISTS departments (
+CREATE TABLE IF NOT EXISTS enterprise_departments (
     id SERIAL PRIMARY KEY,
     company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     business_unit_id INTEGER REFERENCES business_units(id) ON DELETE SET NULL,
     code VARCHAR(20) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    parent_department_id INTEGER REFERENCES departments(id) ON DELETE RESTRICT,
+    parent_department_id INTEGER REFERENCES enterprise_departments(id) ON DELETE RESTRICT,
     head_user_id UUID,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS cost_centers (
     name VARCHAR(255) NOT NULL,
     parent_cost_center_id INTEGER REFERENCES cost_centers(id) ON DELETE RESTRICT,
     business_unit_id INTEGER REFERENCES business_units(id) ON DELETE SET NULL,
-    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    department_id INTEGER REFERENCES enterprise_departments(id) ON DELETE SET NULL,
     responsible_user_id UUID,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS journal_lines (
     profit_center_id INTEGER REFERENCES profit_centers(id) ON DELETE SET NULL,
     business_unit_id INTEGER REFERENCES business_units(id) ON DELETE SET NULL,
     branch_id INTEGER REFERENCES branches(id) ON DELETE SET NULL,
-    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    department_id INTEGER REFERENCES enterprise_departments(id) ON DELETE SET NULL,
     partner_type VARCHAR(20),    -- 'customer' | 'vendor' | 'employee' | 'farmer'
     partner_id VARCHAR(100),
     description TEXT,
