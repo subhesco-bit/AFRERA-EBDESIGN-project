@@ -47,7 +47,16 @@ CREATE TABLE IF NOT EXISTS ai_knowledge_base (
     source_id VARCHAR(255),
     knowledge_type VARCHAR(50),
     content TEXT NOT NULL,
-    embedding_vector VECTOR(1536),
+    -- 2026-08-30: VECTOR(1536) requires the pgvector extension, which isn't
+    -- installed on this repo's CI Postgres (postgres:15-alpine has no
+    -- extensions beyond the built-ins) or, per a repo-wide grep, used by any
+    -- application code yet ("type vector does not exist" - the first time
+    -- this repo's CI actually ran npm run migrate for real). Stored as a
+    -- plain float array for now so the column and its data are still real
+    -- and usable; switching back to VECTOR + CREATE EXTENSION IF NOT EXISTS
+    -- vector is a real option once something actually needs pgvector's
+    -- similarity-search indexing and the CI/prod Postgres image supports it.
+    embedding_vector DOUBLE PRECISION[],
     metadata JSONB,
     relevance_score DECIMAL(5, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
