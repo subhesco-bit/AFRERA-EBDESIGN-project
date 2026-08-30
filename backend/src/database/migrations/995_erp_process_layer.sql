@@ -162,7 +162,11 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
 
 CREATE TABLE IF NOT EXISTS purchase_order_lines (
     id SERIAL PRIMARY KEY,
-    po_id INTEGER NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+    -- 2026-08-30: dropped "REFERENCES purchase_orders(id)" - this file's own
+    -- purchase_orders (below) is a deferred collision loser (see
+    -- schema-decisions.json), the real table is 3102_ecommerce_ai_erp_
+    -- business_marketing.sql's, whose id is VARCHAR(50) not INTEGER.
+    po_id INTEGER NOT NULL,
     line_number SMALLINT NOT NULL,
     material_code VARCHAR(60),
     description TEXT NOT NULL,
@@ -178,7 +182,7 @@ CREATE TABLE IF NOT EXISTS purchase_order_lines (
 CREATE TABLE IF NOT EXISTS goods_receipts (
     id SERIAL PRIMARY KEY,
     grn_number VARCHAR(40) UNIQUE NOT NULL,
-    po_id INTEGER REFERENCES purchase_orders(id) ON DELETE SET NULL,
+    po_id INTEGER, -- 2026-08-30: FK to purchase_orders(id) dropped, same type-mismatch reason as above
     received_date DATE NOT NULL DEFAULT CURRENT_DATE,
     received_by UUID,
     warehouse_id VARCHAR(100),
@@ -206,7 +210,7 @@ CREATE TABLE IF NOT EXISTS goods_receipt_lines (
 CREATE TABLE IF NOT EXISTS invoice_match_results (
     id SERIAL PRIMARY KEY,
     ap_invoice_reference VARCHAR(100) NOT NULL,
-    po_id INTEGER REFERENCES purchase_orders(id) ON DELETE SET NULL,
+    po_id INTEGER, -- 2026-08-30: FK to purchase_orders(id) dropped, same type-mismatch reason as above
     grn_id INTEGER REFERENCES goods_receipts(id) ON DELETE SET NULL,
     po_amount NUMERIC(20,4),
     grn_amount NUMERIC(20,4),
