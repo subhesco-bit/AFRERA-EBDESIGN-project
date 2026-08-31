@@ -236,10 +236,10 @@ CREATE TABLE IF NOT EXISTS contract_farming_agreements (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_contract_farming_farmer ON contract_farming_agreements(farmer_id);
-CREATE INDEX idx_contract_farming_buyer ON contract_farming_agreements(buyer_id);
+CREATE INDEX idx_cf_agreements_farmer ON contract_farming_agreements(farmer_id);
+CREATE INDEX idx_cf_agreements_buyer ON contract_farming_agreements(buyer_id);
 CREATE INDEX idx_contract_farming_period ON contract_farming_agreements(contract_period_start, contract_period_end);
-CREATE INDEX idx_contract_farming_status ON contract_farming_agreements(dispute_status);
+CREATE INDEX idx_cf_agreements_dispute_status ON contract_farming_agreements(dispute_status);
 
 CREATE TABLE IF NOT EXISTS contract_quality_tests (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -496,8 +496,8 @@ CREATE TABLE IF NOT EXISTS government_subsidy_applications (
 );
 
 CREATE INDEX idx_subsidy_applications_program ON government_subsidy_applications(program_id);
-CREATE INDEX idx_subsidy_applications_farmer ON government_subsidy_applications(farmer_id);
-CREATE INDEX idx_subsidy_applications_status ON government_subsidy_applications(status);
+CREATE INDEX idx_gov_subsidy_applications_farmer ON government_subsidy_applications(farmer_id);
+CREATE INDEX idx_gov_subsidy_applications_status ON government_subsidy_applications(status);
 CREATE INDEX idx_subsidy_applications_date ON government_subsidy_applications(application_date);
 
 
@@ -524,8 +524,11 @@ CREATE TABLE IF NOT EXISTS buyers (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_buyers_type ON buyers(buyer_type);
-CREATE INDEX idx_buyers_status ON buyers(status);
+-- 2026-08-31: removed idx_buyers_type (duplicate name of 041_rural_life_os_
+-- schema.sql's already-IF-NOT-EXISTS-guarded index of the same name, on the
+-- real buyers table this file's own shadowed CREATE TABLE never creates) and
+-- idx_buyers_status (real buyers table has no status column, only is_active -
+-- see schema-decisions.json "buyers", kind: deferred).
 
 -- Add laboratories table if not exists
 CREATE TABLE IF NOT EXISTS laboratories (
@@ -549,7 +552,10 @@ CREATE TABLE IF NOT EXISTS laboratories (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_laboratories_type ON laboratories(laboratory_type);
+-- 2026-08-31: removed idx_laboratories_type - real laboratories table
+-- (033_laboratory_erp_schema.sql, the winner of a deferred collision, see
+-- schema-decisions.json) has no laboratory_type column, only
+-- accreditation_type. idx_laboratories_status kept - status exists there.
 CREATE INDEX idx_laboratories_status ON laboratories(status);
 
 -- Add crop_recommendations table if not exists
