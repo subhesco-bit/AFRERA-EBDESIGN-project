@@ -35,7 +35,10 @@ CREATE TABLE IF NOT EXISTS crop_plantings (
   farm_id UUID NOT NULL REFERENCES farms(id) ON DELETE CASCADE,
   farmer_id UUID NOT NULL REFERENCES farmers(id),
   crop_id UUID NOT NULL REFERENCES crops(id), -- the static catalog (041)
-  variety_id UUID REFERENCES regional_variety_directory(id),
+  -- 2026-08-31: variety_id was declared UUID, but regional_variety_directory.id
+  -- (9999_zzz_regional_variety_directory_schema.sql) is SERIAL/INTEGER - "foreign
+  -- key constraint cannot be implemented" against a real database. Fixed to match.
+  variety_id INTEGER REFERENCES regional_variety_directory(id),
   planting_date DATE,
   expected_harvest_date DATE,
   growth_stage VARCHAR(50) DEFAULT 'planted', -- 'planted'|'germination'|'vegetative'|'flowering'|'maturity'|'harvested'
