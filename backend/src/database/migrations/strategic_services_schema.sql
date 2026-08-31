@@ -630,5 +630,10 @@ CREATE TRIGGER update_suppliers_updated_at BEFORE UPDATE ON suppliers
 CREATE TRIGGER update_buyers_updated_at BEFORE UPDATE ON buyers
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- 2026-08-31: guarded with DROP TRIGGER IF EXISTS - laboratories is a
+-- pre-existing deferred collision (schema-decisions.json), and
+-- 033_laboratory_erp_schema.sql already creates a trigger of this exact
+-- name on the same real (winning) table, using the same guard pattern.
+DROP TRIGGER IF EXISTS update_laboratories_updated_at ON laboratories;
 CREATE TRIGGER update_laboratories_updated_at BEFORE UPDATE ON laboratories
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
