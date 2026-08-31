@@ -1,7 +1,7 @@
-﻿const backupService = require('./');
+﻿const backupService = require('../../services/legacy/backupService');
 
 // Mock dependencies
-jest.mock('../utils/logger');
+jest.mock('../../utils/logger');
 jest.mock('fs', () => ({
   promises: {
     mkdir: jest.fn(() => Promise.resolve()),

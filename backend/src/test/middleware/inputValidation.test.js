@@ -1,4 +1,4 @@
-﻿const { validateBody, sanitizeInput, sanitizeObject, validateSchema, commonSchemas } = require('./');
+﻿const { validateBody, sanitizeInput, sanitizeObject, validateSchema, commonSchemas } = require('../../middleware/inputValidation');
 
 describe('Input Validation Middleware', () => {
   describe('sanitizeInput', () => {
