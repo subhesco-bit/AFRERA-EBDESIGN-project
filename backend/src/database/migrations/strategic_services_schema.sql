@@ -1,6 +1,96 @@
 -- Strategic Services Database Schema
 -- Pre-Season Purchase, Contract Farming, Household Procurement, Government Subsidy Management
 -- Created: 31 August 2026
+-- 2026-08-31: moved technical_packages/households/suppliers up from later in
+-- this file to before their first reference (pre_season_agreements.input_supplier_id
+-- at what was originally line 30 etc.) - SQL executes top-to-bottom within a file,
+-- and "relation suppliers does not exist" fired against a real database the first
+-- time this file actually ran, since these tables were defined ~400 lines below
+-- their own foreign-key references. Content unchanged, position only.
+
+-- ============================================================
+-- TECHNICAL PACKAGES (for Contract Farming)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS technical_packages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  package_name VARCHAR(255) NOT NULL,
+  crop_type VARCHAR(100) NOT NULL,
+  region VARCHAR(100) DEFAULT 'all',
+  
+  -- Technical specifications
+  seed_variety VARCHAR(100),
+  fertilizer_schedule JSONB DEFAULT '{}',
+  irrigation_schedule JSONB DEFAULT '{}',
+  pest_management_protocol JSONB DEFAULT '{}',
+  quality_standards JSONB DEFAULT '{}',
+  
+  -- Expected outcomes
+  expected_yield_increase DECIMAL(5,2), -- percentage
+  quality_improvement DECIMAL(5,2), -- percentage
+  cost_efficiency_rating DECIMAL(3,2), -- 1-5 scale
+  
+  -- Provider information
+  provided_by VARCHAR(255), -- organization name
+  technical_advisor_id UUID REFERENCES users(id),
+  
+  status VARCHAR(50) DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_technical_packages_crop ON technical_packages(crop_type);
+CREATE INDEX idx_technical_packages_region ON technical_packages(region);
+
+-- ============================================================
+-- ADDITIONAL TABLES FOR EXISTING SCHEMA EXTENSIONS
+-- ============================================================
+
+-- Add households table if not exists
+CREATE TABLE IF NOT EXISTS households (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  head_of_household_id UUID REFERENCES users(id),
+  family_size INTEGER NOT NULL,
+  address TEXT NOT NULL,
+  district VARCHAR(100),
+  state VARCHAR(100),
+  pincode VARCHAR(10),
+  
+  income_level VARCHAR(50), -- 'low', 'middle', 'high'
+  preference_categories JSONB DEFAULT '[]',
+  
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_households_head ON households(head_of_household_id);
+CREATE INDEX idx_households_region ON households(district, state);
+
+-- Add suppliers table if not exists
+CREATE TABLE IF NOT EXISTS suppliers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  supplier_type VARCHAR(50) NOT NULL, -- 'seeds', 'fertilizer', 'pesticide', 'equipment', 'general'
+  
+  contact_person VARCHAR(255),
+  phone VARCHAR(20),
+  email VARCHAR(255),
+  address TEXT,
+  
+  service_regions JSONB DEFAULT '[]',
+  product_categories JSONB DEFAULT '[]',
+  
+  quality_rating DECIMAL(3,2),
+  reliability_score DECIMAL(3,2),
+  
+  status VARCHAR(50) DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_suppliers_type ON suppliers(supplier_type);
+CREATE INDEX idx_suppliers_status ON suppliers(status);
+
 
 -- ============================================================
 -- PRE-SEASON PURCHASE AGREEMENTS
@@ -410,88 +500,6 @@ CREATE INDEX idx_subsidy_applications_farmer ON government_subsidy_applications(
 CREATE INDEX idx_subsidy_applications_status ON government_subsidy_applications(status);
 CREATE INDEX idx_subsidy_applications_date ON government_subsidy_applications(application_date);
 
--- ============================================================
--- TECHNICAL PACKAGES (for Contract Farming)
--- ============================================================
-
-CREATE TABLE IF NOT EXISTS technical_packages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  package_name VARCHAR(255) NOT NULL,
-  crop_type VARCHAR(100) NOT NULL,
-  region VARCHAR(100) DEFAULT 'all',
-  
-  -- Technical specifications
-  seed_variety VARCHAR(100),
-  fertilizer_schedule JSONB DEFAULT '{}',
-  irrigation_schedule JSONB DEFAULT '{}',
-  pest_management_protocol JSONB DEFAULT '{}',
-  quality_standards JSONB DEFAULT '{}',
-  
-  -- Expected outcomes
-  expected_yield_increase DECIMAL(5,2), -- percentage
-  quality_improvement DECIMAL(5,2), -- percentage
-  cost_efficiency_rating DECIMAL(3,2), -- 1-5 scale
-  
-  -- Provider information
-  provided_by VARCHAR(255), -- organization name
-  technical_advisor_id UUID REFERENCES users(id),
-  
-  status VARCHAR(50) DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_technical_packages_crop ON technical_packages(crop_type);
-CREATE INDEX idx_technical_packages_region ON technical_packages(region);
-
--- ============================================================
--- ADDITIONAL TABLES FOR EXISTING SCHEMA EXTENSIONS
--- ============================================================
-
--- Add households table if not exists
-CREATE TABLE IF NOT EXISTS households (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  head_of_household_id UUID REFERENCES users(id),
-  family_size INTEGER NOT NULL,
-  address TEXT NOT NULL,
-  district VARCHAR(100),
-  state VARCHAR(100),
-  pincode VARCHAR(10),
-  
-  income_level VARCHAR(50), -- 'low', 'middle', 'high'
-  preference_categories JSONB DEFAULT '[]',
-  
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_households_head ON households(head_of_household_id);
-CREATE INDEX idx_households_region ON households(district, state);
-
--- Add suppliers table if not exists
-CREATE TABLE IF NOT EXISTS suppliers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  supplier_type VARCHAR(50) NOT NULL, -- 'seeds', 'fertilizer', 'pesticide', 'equipment', 'general'
-  
-  contact_person VARCHAR(255),
-  phone VARCHAR(20),
-  email VARCHAR(255),
-  address TEXT,
-  
-  service_regions JSONB DEFAULT '[]',
-  product_categories JSONB DEFAULT '[]',
-  
-  quality_rating DECIMAL(3,2),
-  reliability_score DECIMAL(3,2),
-  
-  status VARCHAR(50) DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX idx_suppliers_type ON suppliers(supplier_type);
-CREATE INDEX idx_suppliers_status ON suppliers(status);
 
 -- Add buyers table if not exists
 CREATE TABLE IF NOT EXISTS buyers (
