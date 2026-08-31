@@ -501,7 +501,7 @@ class HouseholdProcurementService {
         
         return {
           region,
-          delivery_date,
+          delivery_date: deliveryDate,
           total_households: households.length,
           total_quantities: totalQuantities,
           cost_analysis: {

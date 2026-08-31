@@ -364,11 +364,12 @@ class GovernmentSubsidyService {
           subsidyAmount = program.subsidy_amount;
           break;
           
-        case 'percentage':
+        case 'percentage': {
           // Calculate based on farmer's input costs or production value
           const baseValue = farmer.estimated_annual_input_cost || 50000; // Default fallback
           subsidyAmount = baseValue * (program.subsidy_percentage / 100);
           break;
+        }
           
         case 'input':
           // Calculate based on actual input purchases
@@ -951,7 +952,7 @@ class GovernmentSubsidyService {
           active_programs: activeProgramsResult.rows,
           disbursement_statistics: disbursementStatsResult.rows[0],
           application_statistics: applicationStatsResult.rows[0],
-          filters: { ministry, fiscal_year }
+          filters: { ministry, fiscal_year: fiscalYear }
         };
         
       } finally {
