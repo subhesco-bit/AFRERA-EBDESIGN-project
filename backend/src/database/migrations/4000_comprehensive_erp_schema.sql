@@ -551,7 +551,11 @@ CREATE INDEX IF NOT EXISTS idx_invoice_customer ON erp_invoices(customer_code);
 
 -- Production Planning Indexes
 CREATE INDEX IF NOT EXISTS idx_production_orders_material ON erp_production_orders(material_code);
-CREATE INDEX IF NOT EXISTS idx_production_orders_status ON erp_production_orders(status);
+-- 2026-08-31: renamed from idx_production_orders_status - 3102_ecommerce_ai_
+-- erp_business_marketing.sql already creates an index of that exact name on
+-- the unrelated production_orders table and runs first (without IF NOT
+-- EXISTS), so this table's own index silently never got created.
+CREATE INDEX IF NOT EXISTS idx_erp_production_orders_status ON erp_production_orders(status);
 
 -- Quality Management Indexes
 CREATE INDEX IF NOT EXISTS idx_inspection_lots_material ON erp_inspection_lots(material_code);
@@ -562,11 +566,20 @@ CREATE INDEX IF NOT EXISTS idx_maintenance_orders_equipment ON erp_maintenance_o
 CREATE INDEX IF NOT EXISTS idx_maintenance_orders_status ON erp_maintenance_orders(status);
 
 -- Human Resources Indexes
-CREATE INDEX IF NOT EXISTS idx_employees_status ON erp_employees(status);
+-- 2026-08-31: renamed from idx_employees_status - 3200_hr_module_schema.sql
+-- already creates an index of that exact name on the unrelated employees
+-- table and runs first, so this table's own index silently never got created.
+CREATE INDEX IF NOT EXISTS idx_erp_employees_status ON erp_employees(status);
 CREATE INDEX IF NOT EXISTS idx_payroll_items_employee ON erp_payroll_items(employee_code);
 
 -- Project System Indexes
-CREATE INDEX IF NOT EXISTS idx_projects_status ON erp_projects(status);
+-- 2026-08-31: renamed from idx_projects_status to avoid a future collision
+-- with 9996_project_systems_schema.sql's own idx_projects_status on the
+-- unrelated projects table (this file runs first, so 9996's index is the
+-- one that silently loses today - fixed there instead; renaming here too
+-- for a clear, permanently unique name matching the erp_ prefix convention
+-- already used for its sibling indexes above).
+CREATE INDEX IF NOT EXISTS idx_erp_projects_status ON erp_projects(status);
 CREATE INDEX IF NOT EXISTS idx_wbs_elements_project ON erp_wbs_elements(project_code);
 
 -- Treasury Indexes

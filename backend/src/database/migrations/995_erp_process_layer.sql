@@ -549,7 +549,11 @@ CREATE INDEX IF NOT EXISTS idx_po_lines_po ON purchase_order_lines (po_id);
 CREATE INDEX IF NOT EXISTS idx_grn_po ON goods_receipts (po_id);
 CREATE INDEX IF NOT EXISTS idx_grn_lines_grn ON goods_receipt_lines (grn_id);
 CREATE INDEX IF NOT EXISTS idx_match_po ON invoice_match_results (po_id);
-CREATE INDEX IF NOT EXISTS idx_listings_farmer ON sales_listings (farmer_id);
+-- 2026-08-31: renamed from idx_listings_farmer - 991_aeos_folu_ne_policy.sql
+-- already creates an index of that exact name on the unrelated
+-- farmer_listings table and runs first, so this table's own index silently
+-- never got created.
+CREATE INDEX IF NOT EXISTS idx_sales_listings_farmer ON sales_listings (farmer_id);
 CREATE INDEX IF NOT EXISTS idx_listings_product ON sales_listings (product_id);
 CREATE INDEX IF NOT EXISTS idx_dispatch_shipment ON dispatch_events (shipment_reference);
 CREATE INDEX IF NOT EXISTS idx_qi_reference ON qm_inspections (reference_type, reference_id);

@@ -544,11 +544,16 @@ CREATE INDEX IF NOT EXISTS idx_journal_entries_reference
     ON journal_entries (reference_type, reference_id);
 CREATE INDEX IF NOT EXISTS idx_journal_lines_entry
     ON journal_lines (journal_entry_id);
-CREATE INDEX IF NOT EXISTS idx_journal_lines_account
+-- 2026-08-31: renamed the next 3 indexes (idx_journal_lines_account/
+-- cost_center/profit_center - name collision with 4000_comprehensive_erp_
+-- schema.sql's identically-named indexes on the unrelated erp_journal_lines
+-- table, which runs first) so this table's own indexes actually get created
+-- instead of silently no-opping.
+CREATE INDEX IF NOT EXISTS idx_jl_account
     ON journal_lines (account_id);
-CREATE INDEX IF NOT EXISTS idx_journal_lines_cost_center
+CREATE INDEX IF NOT EXISTS idx_jl_cost_center
     ON journal_lines (cost_center_id);
-CREATE INDEX IF NOT EXISTS idx_journal_lines_profit_center
+CREATE INDEX IF NOT EXISTS idx_jl_profit_center
     ON journal_lines (profit_center_id);
 CREATE INDEX IF NOT EXISTS idx_journal_lines_partner
     ON journal_lines (partner_type, partner_id);

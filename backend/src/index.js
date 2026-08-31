@@ -215,6 +215,25 @@ const platformCoreRoutes = require('./routes/platformCoreRoutes');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
 const libraryRoutes = require('./routes/libraryRoutes');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
+// Unified AI Gateway - NEW single entry point for all AI services
+const unifiedAIGateway = require('./routes/unifiedAIGateway');
+// Claude AI-Ready Services (Phase 1 Core AI Services Conversion)
+const claudeAIDecisionService = require('./services/claude/aiDecisionService');
+const claudeAIStrategyService = require('./services/claude/aiStrategyService');
+const claudeAICopilotService = require('./services/claude/aiCopilotService');
+const claudeAIProviderService = require('./services/claude/aiProviderService');
+const claudeAICoordinationService = require('./services/claude/aiCoordinationService');
+const claudeAIAgentService = require('./services/claude/aiAgentService');
+const claudeAIOptimizationService = require('./services/claude/aiOptimizationService');
+const claudeAIRecoveryService = require('./services/claude/aiRecoveryService');
+// Claude AI-Ready Services (Phase 2 Business Logic Services Conversion)
+const claudeFinancialAIService = require('./services/claude/financialAIService');
+const claudeLogisticsAIService = require('./services/claude/logisticsAIService');
+const claudeInsuranceAIService = require('./services/claude/insuranceAIService');
+const claudeProductAIService = require('./services/claude/productAIService');
+const claudeOrderAIService = require('./services/claude/orderAIService');
+// Claude AI-Ready Routes
+const claudeAIDecisionRoutes = require('./routes/claude/aiDecisionRoutes');
 // Generic plug-and-play module discovery/load/execute bridge (backend/src/core/moduleRegistry.js)
 const moduleRegistryRoutes = require('./routes/claude/moduleRegistryRoutes');
 // REST bridge exposing backend/src/modules/M0XX's real functions over HTTP
@@ -478,7 +497,7 @@ const { responseFormatter } = require('./middleware/responseFormatter');
 const { requestLogger, errorLogger } = require('./middleware/requestLogger');
 const { validateBody, validateQuery, validateParams } = require('./middleware/validation');
 const { authMiddleware } = require('./middleware/auth');
-const { validateBody: validateBodyOld } = require('./middleware/inputValidation');
+const { sanitizeObject } = require('./middleware/inputValidation');
 const { requestId } = require('./middleware/requestId');
 const { securityHeaders, productionSecurityHeaders } = require('./middleware/securityHeaders');
 const { routeMonitoring, criticalRouteMonitoring, healthCheckMonitoring } = require('./middleware/routeMonitoring');
@@ -542,6 +561,24 @@ app.use(morgan('combined', { stream: { write: message => logger.info(message.tri
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// 2026-08-31: middleware/inputValidation.js's sanitizeInput/sanitizeObject
+// (strips HTML tags, javascript: protocol, inline event handlers from every
+// string in req.body) was written and tested but never actually applied
+// anywhere - validateBodyOld was imported and unused. Wiring a thin
+// sanitize-only pass globally so every route gets basic XSS-input
+// sanitization by default. Deliberately NOT using validateBodyOld() itself
+// here - it 400-rejects whenever req.body is falsy, which is every GET
+// request and every multipart/file-upload request (express.json()/
+// urlencoded() only populate req.body for matching content-types, leaving
+// it undefined otherwise) - wiring that globally would have 400'd nearly
+// the entire read-only API surface and all file uploads.
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === 'object') {
+    req.body = sanitizeObject(req.body);
+  }
+  next();
+});
+
 // Request ID middleware for distributed tracing (must come before other middleware)
 app.use(requestId);
 
@@ -580,7 +617,36 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-// CORRECTION: Consolidated AI routes - unifiedAIRoutes now serves as single AI gateway
+// UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
+// Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
+app.use('/api/v1/ai', unifiedAIGateway);
+// Claude AI-Ready Routes (Phase 1 Core AI Services)
+app.use('/api/v1/claude/ai-decision', claudeAIDecisionRoutes);
+const claudeAIStrategyRoutes = require('./routes/claude/aiStrategyRoutes');
+const claudeAICopilotRoutes = require('./routes/claude/aiCopilotRoutes');
+const claudeAIProviderRoutes = require('./routes/claude/aiProviderRoutes');
+const claudeAICoordinationRoutes = require('./routes/claude/aiCoordinationRoutes');
+const claudeAIAgentRoutes = require('./routes/claude/aiAgentRoutes');
+const claudeAIOptimizationRoutes = require('./routes/claude/aiOptimizationRoutes');
+const claudeAIRecoveryRoutes = require('./routes/claude/aiRecoveryRoutes');
+app.use('/api/v1/claude/ai-strategy', claudeAIStrategyRoutes);
+app.use('/api/v1/claude/ai-copilot', claudeAICopilotRoutes);
+app.use('/api/v1/claude/ai-provider', claudeAIProviderRoutes);
+app.use('/api/v1/claude/ai-coordination', claudeAICoordinationRoutes);
+app.use('/api/v1/claude/ai-agent', claudeAIAgentRoutes);
+app.use('/api/v1/claude/ai-optimization', claudeAIOptimizationRoutes);
+app.use('/api/v1/claude/ai-recovery', claudeAIRecoveryRoutes);
+// Claude AI-Ready Routes (Phase 2 Business Logic Services)
+const claudeFinancialAIRoutes = require('./routes/claude/financialAIRoutes');
+const claudeLogisticsAIRoutes = require('./routes/claude/logisticsAIRoutes');
+const claudeInsuranceAIRoutes = require('./routes/claude/insuranceAIRoutes');
+const claudeProductAIRoutes = require('./routes/claude/productAIRoutes');
+const claudeOrderAIRoutes = require('./routes/claude/orderAIRoutes');
+app.use('/api/v1/claude/financial-ai', claudeFinancialAIRoutes);
+app.use('/api/v1/claude/logistics-ai', claudeLogisticsAIRoutes);
+app.use('/api/v1/claude/insurance-ai', claudeInsuranceAIRoutes);
+app.use('/api/v1/claude/product-ai', claudeProductAIRoutes);
+app.use('/api/v1/claude/order-ai', claudeOrderAIRoutes);
 // Legacy aiService functionality preserved at /api/v1/ai-legacy for backward compatibility
 mountRoute('/api/v1/ai-legacy', aiService);
 mountRoute('/api/v1/erp', erpService);

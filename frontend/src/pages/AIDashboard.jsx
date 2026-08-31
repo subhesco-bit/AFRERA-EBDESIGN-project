@@ -32,62 +32,70 @@ const AIDashboard = () => {
   const [selectedProduct, setSelectedProduct] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
 
+  // 2026-08-31: every useQuery below was missing the .then(r => r.data) unwrap
+  // (ecommerceAIAPI.* returns the raw axios response, not the payload, so
+  // e.g. rfmSegments?.total_customers always read undefined) and every
+  // "Run ..." button called .refetch() directly on the *data* variable
+  // instead of the query result's own refetch function, which throws
+  // (data has no .refetch method) - fixed by unwrapping .data in queryFn and
+  // destructuring refetch separately from each useQuery call.
+
   // Customer Segmentation Data
-  const { data: rfmSegments, isLoading: rfmLoading } = useQuery({
+  const { data: rfmSegments, isLoading: rfmLoading, refetch: refetchRfmSegments } = useQuery({
     queryKey: ['rfmSegments'],
-    queryFn: () => ecommerceAIAPI.segmentCustomersRFM()
+    queryFn: () => ecommerceAIAPI.segmentCustomersRFM().then(r => r.data)
   });
 
-  const { data: behavioralSegments, isLoading: behavioralLoading } = useQuery({
+  const { data: behavioralSegments, isLoading: behavioralLoading, refetch: refetchBehavioralSegments } = useQuery({
     queryKey: ['behavioralSegments'],
-    queryFn: () => ecommerceAIAPI.segmentCustomersBehavioral()
+    queryFn: () => ecommerceAIAPI.segmentCustomersBehavioral().then(r => r.data)
   });
 
   // Demand Forecasting Data
-  const { data: demandForecast, isLoading: demandLoading } = useQuery({
+  const { data: demandForecast, isLoading: demandLoading, refetch: refetchDemandForecast } = useQuery({
     queryKey: ['demandForecast', selectedProduct],
-    queryFn: () => selectedProduct ? ecommerceAIAPI.forecastProductDemand(selectedProduct, 30) : null,
+    queryFn: () => selectedProduct ? ecommerceAIAPI.forecastProductDemand(selectedProduct, 30).then(r => r.data) : null,
     enabled: !!selectedProduct
   });
 
   // Inventory Optimization Data
-  const { data: inventoryOptimization, isLoading: inventoryLoading } = useQuery({
+  const { data: inventoryOptimization, isLoading: inventoryLoading, refetch: refetchInventoryOptimization } = useQuery({
     queryKey: ['inventoryOptimization', selectedProduct],
-    queryFn: () => selectedProduct ? ecommerceAIAPI.optimizeInventory(selectedProduct) : null,
+    queryFn: () => selectedProduct ? ecommerceAIAPI.optimizeInventory(selectedProduct).then(r => r.data) : null,
     enabled: !!selectedProduct
   });
 
   // Personalized Recommendations Data
-  const { data: recommendations, isLoading: recommendationsLoading } = useQuery({
+  const { data: recommendations, isLoading: recommendationsLoading, refetch: refetchRecommendations } = useQuery({
     queryKey: ['recommendations', selectedUser],
-    queryFn: () => selectedUser ? ecommerceAIAPI.getPersonalizedRecommendations(selectedUser, 10) : null,
+    queryFn: () => selectedUser ? ecommerceAIAPI.getPersonalizedRecommendations(selectedUser, 10).then(r => r.data) : null,
     enabled: !!selectedUser
   });
 
   // Sales Prediction Data
-  const { data: salesPrediction, isLoading: salesLoading } = useQuery({
+  const { data: salesPrediction, isLoading: salesLoading, refetch: refetchSalesPrediction } = useQuery({
     queryKey: ['salesPrediction'],
-    queryFn: () => ecommerceAIAPI.predictSales(null, 30)
+    queryFn: () => ecommerceAIAPI.predictSales(null, 30).then(r => r.data)
   });
 
   // Customer Lifetime Value Data
-  const { data: clvData, isLoading: clvLoading } = useQuery({
+  const { data: clvData, isLoading: clvLoading, refetch: refetchClvData } = useQuery({
     queryKey: ['clv', selectedUser],
-    queryFn: () => selectedUser ? ecommerceAIAPI.calculateCustomerLifetimeValue(selectedUser) : null,
+    queryFn: () => selectedUser ? ecommerceAIAPI.calculateCustomerLifetimeValue(selectedUser).then(r => r.data) : null,
     enabled: !!selectedUser
   });
 
   // Market Basket Analysis Data
-  const { data: marketBasket, isLoading: basketLoading } = useQuery({
+  const { data: marketBasket, isLoading: basketLoading, refetch: refetchMarketBasket } = useQuery({
     queryKey: ['marketBasket'],
-    queryFn: () => ecommerceAIAPI.analyzeMarketBasket()
+    queryFn: () => ecommerceAIAPI.analyzeMarketBasket().then(r => r.data)
   });
 
   const handleRunSegmentation = (type) => {
     if (type === 'rfm') {
-      rfmSegments.refetch();
+      refetchRfmSegments();
     } else if (type === 'behavioral') {
-      behavioralSegments.refetch();
+      refetchBehavioralSegments();
     }
   };
 
@@ -212,7 +220,7 @@ const AIDashboard = () => {
             </div>
           ) : (
             <button
-              onClick={() => salesPrediction.refetch()}
+              onClick={() => refetchSalesPrediction()}
               className="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 transition"
             >
               Generate Sales Prediction
@@ -249,7 +257,7 @@ const AIDashboard = () => {
               </div>
             ) : (
               <button
-                onClick={() => rfmSegments.refetch()}
+                onClick={() => refetchRfmSegments()}
                 className="w-full bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Generate RFM Segments
@@ -277,7 +285,7 @@ const AIDashboard = () => {
               </div>
             ) : (
               <button
-                onClick={() => behavioralSegments.refetch()}
+                onClick={() => refetchBehavioralSegments()}
                 className="w-full bg-green-500 text-white py-2 px-4 rounded"
               >
                 Generate Behavioral Segments
@@ -351,7 +359,7 @@ const AIDashboard = () => {
               </div>
             ) : (
               <button
-                onClick={() => demandForecast.refetch()}
+                onClick={() => refetchDemandForecast()}
                 className="w-full bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Generate Forecast
@@ -426,7 +434,7 @@ const AIDashboard = () => {
               </div>
             ) : (
               <button
-                onClick={() => inventoryOptimization.refetch()}
+                onClick={() => refetchInventoryOptimization()}
                 className="w-full bg-blue-500 text-white py-2 px-4 rounded"
               >
                 Optimize Inventory
@@ -489,7 +497,7 @@ const AIDashboard = () => {
             </div>
           ) : (
             <button
-              onClick={() => recommendations.refetch()}
+              onClick={() => refetchRecommendations()}
               className="w-full bg-purple-500 text-white py-2 px-4 rounded"
             >
               Get Recommendations
@@ -566,7 +574,7 @@ const AIDashboard = () => {
               </div>
             ) : (
               <button
-                onClick={() => clvData.refetch()}
+                onClick={() => refetchClvData()}
                 className="w-full bg-green-500 text-white py-2 px-4 rounded"
               >
                 Calculate CLV
@@ -621,7 +629,7 @@ const AIDashboard = () => {
           </div>
         ) : (
           <button
-            onClick={() => marketBasket.refetch()}
+            onClick={() => refetchMarketBasket()}
             className="w-full bg-purple-500 text-white py-2 px-4 rounded"
           >
             Analyze Market Basket
