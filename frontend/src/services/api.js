@@ -194,13 +194,74 @@ export const insuranceAPI = {
   generateQuote: (data) => api.post('/insurance/quotes', data),
 }
 
-// AI API
+// AI API - Unified AI Gateway Integration
 export const aiAPI = {
+  // Legacy AI endpoints (backward compatibility)
   predictDemand: (data) => api.post('/ai/predict/demand', data),
   optimizePrice: (data) => api.post('/ai/optimize/price', data),
   assessCreditRisk: (data) => api.post('/ai/assess/credit-risk', data),
   detectFraud: (data) => api.post('/ai/detect/fraud', data),
   generateRecommendations: (data) => api.post('/ai/recommend', data),
+  
+  // NEW Unified AI Gateway endpoints
+  // Smart routing - automatically routes to appropriate AI service
+  route: (request) => api.post('/ai/route', request),
+  
+  // Claude AI Coordinator
+  coordinate: (request) => api.post('/ai/coordinate', request),
+  
+  // AI Copilot Framework (16gm system)
+  copilot: {
+    createSession: (copilotType, context) => api.post('/ai/copilot/session', { copilot_type: copilotType, context }),
+    sendMessage: (sessionId, message, context) => api.post(`/ai/copilot/session/${sessionId}/message`, { message, context }),
+    getSessionHistory: (sessionId) => api.get(`/ai/copilot/session/${sessionId}/history`),
+    closeSession: (sessionId) => api.put(`/ai/copilot/session/${sessionId}/close`),
+    
+    // Domain-specific copilots
+    finance: (message, context) => api.post('/ai/copilot/session/finance/message', { message, context }),
+    logistics: (message, context) => api.post('/ai/copilot/session/logistics/message', { message, context }),
+    warehouse: (message, context) => api.post('/ai/copilot/session/warehouse/message', { message, context }),
+    insurance: (message, context) => api.post('/ai/copilot/session/insurance/message', { message, context }),
+    nutrition: (message, context) => api.post('/ai/copilot/session/nutrition/message', { message, context }),
+    marketplace: (message, context) => api.post('/ai/copilot/session/marketplace/message', { message, context }),
+  },
+  
+  // AI Backbone (multi-provider)
+  backbone: {
+    health: () => api.get('/ai/backbone/health'),
+    decide: (context, options) => api.post('/ai/backbone/decide', { context, options }),
+    strategize: (objectives, currentState) => api.post('/ai/backbone/strategize', { objectives, currentState }),
+    predict: (context) => api.post('/ai/backbone/predict', { context }),
+    intelligence: (query) => api.get('/ai/backbone/intelligence', { params: { query } }),
+  },
+  
+  // AI Collaboration (Devin-Claude tracking)
+  collaboration: {
+    getContext: () => api.get('/ai/collaboration/context'),
+    updateContext: (context) => api.put('/ai/collaboration/context', context),
+    logWork: (work) => api.post('/ai/collaboration/log-work', work),
+    getWorkHistory: (aiSource) => api.get(`/ai/collaboration/work-history/${aiSource}`),
+    getContinuable: (currentAI) => api.get(`/ai/collaboration/continuable/${currentAI}`),
+    createHandoff: (handoff) => api.post('/ai/collaboration/handoff', handoff),
+    acceptHandoff: (handoffId) => api.post(`/ai/collaboration/handoff/${handoffId}/accept`),
+    getPendingHandoffs: (forAI) => api.get(`/ai/collaboration/handoffs/pending/${forAI}`),
+    getStats: () => api.get('/ai/collaboration/stats'),
+    getReport: () => api.get('/ai/collaboration/report'),
+  },
+  
+  // AI Gateway (multi-provider routing)
+  gateway: {
+    chat: (request) => api.post('/ai/gateway/chat', request),
+    getStatistics: () => api.get('/ai/gateway/statistics'),
+    getProviders: () => api.get('/ai/gateway/providers'),
+    getModels: (provider) => api.get(`/ai/gateway/models/${provider}`),
+    setProviderEnabled: (provider, enabled) => api.put(`/ai/gateway/providers/${provider}/enable`, { enabled }),
+  },
+  
+  // System health and discovery
+  health: () => api.get('/ai/health'),
+  getServices: () => api.get('/ai/services'),
+  getArchitecture: () => api.get('/ai/architecture'),
 }
 
 // Product Media AI API — AI product-image generation, nutrient-comparison

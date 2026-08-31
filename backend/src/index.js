@@ -507,6 +507,9 @@ const { logger } = require('./utils/logger');
 // Database Enhancements Integration
 const { initializeDatabaseEnhancements, shutdownDatabaseEnhancements, getDatabaseEnhancements } = require('./database/database_enhancements');
 
+// WebSocket Service for Real-time Updates
+const websocketService = require('./services/websocketService');
+
 // Initialize Express app
 const app = express();
 const httpServer = createServer(app);
@@ -516,6 +519,9 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
+
+// Initialize WebSocket service
+websocketService.initialize(httpServer);
 
 // Trust proxy configuration for rate limiting security
 // Rate limiters key on req.ip, which is attacker-controlled via X-Forwarded-For
@@ -623,31 +629,9 @@ app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
 app.use('/api/v1/ai', unifiedAIGateway);
 // Claude AI-Ready Routes (Phase 1 Core AI Services)
 app.use('/api/v1/claude/ai-decision', claudeAIDecisionRoutes);
-const claudeAIStrategyRoutes = require('./routes/claude/aiStrategyRoutes');
-const claudeAICopilotRoutes = require('./routes/claude/aiCopilotRoutes');
-const claudeAIProviderRoutes = require('./routes/claude/aiProviderRoutes');
-const claudeAICoordinationRoutes = require('./routes/claude/aiCoordinationRoutes');
-const claudeAIAgentRoutes = require('./routes/claude/aiAgentRoutes');
-const claudeAIOptimizationRoutes = require('./routes/claude/aiOptimizationRoutes');
-const claudeAIRecoveryRoutes = require('./routes/claude/aiRecoveryRoutes');
-app.use('/api/v1/claude/ai-strategy', claudeAIStrategyRoutes);
-app.use('/api/v1/claude/ai-copilot', claudeAICopilotRoutes);
-app.use('/api/v1/claude/ai-provider', claudeAIProviderRoutes);
-app.use('/api/v1/claude/ai-coordination', claudeAICoordinationRoutes);
-app.use('/api/v1/claude/ai-agent', claudeAIAgentRoutes);
-app.use('/api/v1/claude/ai-optimization', claudeAIOptimizationRoutes);
-app.use('/api/v1/claude/ai-recovery', claudeAIRecoveryRoutes);
-// Claude AI-Ready Routes (Phase 2 Business Logic Services)
-const claudeFinancialAIRoutes = require('./routes/claude/financialAIRoutes');
-const claudeLogisticsAIRoutes = require('./routes/claude/logisticsAIRoutes');
-const claudeInsuranceAIRoutes = require('./routes/claude/insuranceAIRoutes');
-const claudeProductAIRoutes = require('./routes/claude/productAIRoutes');
-const claudeOrderAIRoutes = require('./routes/claude/orderAIRoutes');
-app.use('/api/v1/claude/financial-ai', claudeFinancialAIRoutes);
-app.use('/api/v1/claude/logistics-ai', claudeLogisticsAIRoutes);
-app.use('/api/v1/claude/insurance-ai', claudeInsuranceAIRoutes);
-app.use('/api/v1/claude/product-ai', claudeProductAIRoutes);
-app.use('/api/v1/claude/order-ai', claudeOrderAIRoutes);
+// All Claude AI routes (strategy, copilot, provider, coordination, agent, optimization, recovery,
+// financial, logistics, insurance, product, order) are mounted earlier at lines 633-650 from
+// their initial requires at lines 236-245. Lines 626-650 were duplicate dead weight - removed 2026-08-31
 // Legacy aiService functionality preserved at /api/v1/ai-legacy for backward compatibility
 mountRoute('/api/v1/ai-legacy', aiService);
 mountRoute('/api/v1/erp', erpService);
