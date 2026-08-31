@@ -1,6 +1,14 @@
 ﻿/**
  * Review Management Service (M060)
  * Product reviews and ratings with AI-powered sentiment analysis
+ *
+ * SUPERSEDED (2026-08-31) by services/legacy/productReviewService.js
+ * (product_reviews table, wired at /api/v1/product-reviews - the one the
+ * frontend actually calls). See README.md in this directory before adding
+ * a caller to this module. In particular: the "sentiment_analysis" task
+ * below is not real sentiment analysis - aiAPI.generateRecommendation()
+ * ignores the task field except to echo it back; it always runs the
+ * purchase-history recommendation engine and relabels the result.
  */
 
 const { logger } = require('../../utils/logger');
