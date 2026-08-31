@@ -1,5 +1,60 @@
 # ACTIVE TASKS
 
+## DONE — Resolved the 4 deferred Tier-1 schema/product decisions from 30 Aug (2026-08-31)
+
+User asked to validate the 4 deferred items from the 30 Aug batch and take decisions rather
+than leave them open indefinitely. Validated each against the actual code (not the stale
+framing) before deciding:
+
+1. **`crop_plantings` model / `farms` table** — confirmed real: `digitalTwinService.js`'s
+   farm+crop paths, `advancedAnalyticsService.js`, and `predictiveIntelligenceService.js` each
+   invent a DIFFERENT imagined shape for "a farmer's planted crop," none matching each other or
+   the real `crops` catalog (041: `crop_code`/`common_name`/`category`/`duration_days` only).
+   **Decision:** built `farms` + `crop_plantings`
+   (`9999_zzzz..._farms_crop_plantings_schema.sql`) sized to `digitalTwinService.js`'s actual
+   usage, and rewired its 4 methods (`verifyFarm`, `getFarmRealTimeData`, `verifyCrop`,
+   `getCropRealTimeData`) against them — verified via `node --check` + `require()` + full boot.
+   **Deliberately not extended** to `advancedAnalyticsService.js`/`predictiveIntelligenceService.js`
+   in the same pass: their crop queries are entangled with a second, unresolved question (a
+   `harvests` table that doesn't exist, and `order_items.crop_id` where the real column is
+   `product_id`) that would mean guessing at how orders relate to crops vs products — recorded
+   as still-deferred in `schema-decisions.json`, not silently fixed wrong.
+2. **`farms` table / digital twin duplicate service — found something bigger than the original
+   framing.** While validating this, found `services/legacy/digitalTwinService.js` was a second,
+   fully independent, live-mounted digital twin implementation — required directly in
+   `index.js`, initialized at boot, self-registering routes at the SAME `/api/v1/digital-twin`
+   prefix the real service uses. It was written against a `digital_twins` shape
+   (`farm_id`/`configuration`/`is_active`) that has never existed in any migration (the one real
+   table, from 072, uses `entity_type`/`entity_id`/`owner_id`/`current_state`) — broken since
+   the day it was written, not a regression. Most of its routes were silently shadowed by the
+   real router (mounted first); the non-colliding ones (bare `POST`/`GET /api/v1/digital-twin`,
+   `PUT /:twinId`, `POST /:twinId/sensor-data`, `GET /:twinId/simulations`) were reachable and
+   500ing on every call. **Decision:** un-mounted it (removed the `require`/`initialize()`/
+   `setupRoutes()` calls from `index.js`), left the source file on disk rather than deleting it
+   (its simulation-model functions may be worth porting into the real service later). Verified:
+   fresh boot clean, no `ReferenceError`, all other routes unaffected.
+3. **`iot_devices` ownership model conflict** — validated `digitalTwinService.js` really does
+   query a nonexistent `iot_devices.entity_id`. **Decision:** route through `farmer_id` instead
+   of adding a new, would-be-unused `entity_id`/`entity_type` pair — every `digital_twins` row
+   already has `owner_id` (the twin's farmer), so `getRealWorldData()` now passes
+   `twin.owner_id` into `getIoTDataForEntity()`, which queries `iot_devices WHERE farmer_id = $1`
+   (a column that already exists and is already populated by
+   `iotIntegrationService.registerDevice()`). No migration needed. Rejected the generic
+   `entity_id` alternative because nothing would ever populate it — would have been a second
+   unused column, the same fabrication-adjacent smell already flagged elsewhere in this repo.
+4. **`iot_sensor_data` vs `sensor_data`** — re-validated rather than re-guessed: confirmed
+   `services/legacy/iotIntegrationService.js` (the one actually built against 031's `sensor_data`,
+   INTEGER FK) is mounted separately and without collision at `/api/v1/iot-integration`, distinct
+   from the real `/api/v1/iot` (which uses `iot_sensor_data`, string device_id). Not a dead
+   duplicate like item 2 — two genuinely coexisting, differently-scoped systems. **Decision:
+   stays deferred**, correctly — forcing a merge here would mean picking a device-linking
+   strategy blind, exactly what this file's own rules warn against.
+
+All 4 recorded in `backend/src/database/schema-decisions.json` with `resolution_2026_08_31`
+(or `_partial`) fields. Verified via `node --check`, `require()` smoke tests, and 2 full fresh
+backend boots (both reach the expected `EADDRINUSE` against the already-running dev instance —
+proof every route including the changed ones mounts without throwing). Not committed yet.
+
 ## DONE — Devin's 31 Aug 2026 "Strategic Services" batch: verified, integrated, 2 harmless schema collisions flagged
 
 User asked to "integrate all devin work with claude ai work." Found an uncommitted batch on

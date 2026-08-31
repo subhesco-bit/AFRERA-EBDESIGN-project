@@ -180,8 +180,16 @@ const backupService = require('./services/legacy/backupService');
 const analyticsMonitoringService = require('./services/legacy/analyticsMonitoringService');
 // AI Agentic Companion Service
 const aiAgenticCompanionService = require('./services/legacy/aiAgenticCompanionService');
-// Digital Twin Service
-const digitalTwinService = require('./services/legacy/digitalTwinService');
+// NOTE: services/legacy/digitalTwinService.js is NOT required here - see
+// schema-decisions.json's "digital_twins" entry. It queries digital_twins.farm_id/
+// configuration/is_active and a `farms` table, none of which have ever existed;
+// the only real digital_twins table (072_tier1_m025_m030_schema.sql) uses
+// entity_type/entity_id/owner_id/current_state, which is what
+// services/digitalTwinService.js (mounted below via routes/digitalTwinRoutes.js
+// at /api/v1/digital-twin) actually targets. The legacy file was dead on arrival
+// and, where its routes didn't collide with the real ones, was 500ing on every
+// call. Left on disk, not deleted, in case its simulation-model logic
+// (cropGrowthSimulation etc.) is worth salvaging later.
 // AI Gateway Service - Real AI Backbone System
 const aiGatewayService = require('./services/legacy/aiGatewayService');
 // AI Agent Service - Agentic AI Capabilities
@@ -1152,19 +1160,16 @@ aiAgenticCompanionService.initialize().catch(error => {
   logger.warn('AI Agentic Companion service initialization failed', { error: error.message });
 });
 
-// Initialize Digital Twin service
-digitalTwinService.initialize().catch(error => {
-  logger.warn('Digital Twin service initialization failed', { error: error.message });
-});
+// Digital Twin service: services/legacy/digitalTwinService.js is not
+// initialized here - see the note near its require() above. The real digital
+// twin system is services/digitalTwinService.js, mounted via
+// routes/digitalTwinRoutes.js at /api/v1/digital-twin.
 
 // Setup analytics monitoring routes
 analyticsMonitoringService.setupRoutes(app);
 
 // Setup AI Agentic Companion routes
 aiAgenticCompanionService.setupRoutes(app);
-
-// Setup Digital Twin routes
-digitalTwinService.setupRoutes(app);
 
 // Observability for the decision layer.
 // ERP agent catalogue and evaluation.

@@ -283,22 +283,25 @@ class DigitalTwinService {
    * Get real-world data for sync
    */
   async getRealWorldData(twin) {
-    const { entity_type, entity_id, specifications } = twin;
-    
+    const { entity_type, entity_id, owner_id, specifications } = twin;
+
     let realWorldData = {};
-    
+
     if (entity_type === 'farm') {
       realWorldData = await this.getFarmRealTimeData(entity_id);
     } else if (entity_type === 'crop') {
       realWorldData = await this.getCropRealTimeData(entity_id);
     }
-    
-    // Integrate IoT data if available
-    const iotData = await this.getIoTDataForEntity(entity_id);
+
+    // Integrate IoT data if available. iot_devices has no entity_id column
+    // (see schema-decisions.json, "iot_devices" collision) - it links devices
+    // to their owning farmer via farmer_id, the same farmer digital_twins
+    // records as owner_id, so that's the real join, not a per-entity one.
+    const iotData = await this.getIoTDataForEntity(owner_id);
     if (iotData) {
       realWorldData = { ...realWorldData, iot: iotData };
     }
-    
+
     return realWorldData;
   }
 
@@ -307,14 +310,14 @@ class DigitalTwinService {
    */
   async getFarmRealTimeData(farmId) {
     const query = `
-      SELECT 
+      SELECT
         f.area,
         f.soil_type,
         f.current_status,
-        COUNT(DISTINCT c.id) as active_crops,
-        COALESCE(SUM(c.expected_yield_kg), 0) as total_expected_yield
+        COUNT(DISTINCT cp.id) as active_crops,
+        COALESCE(SUM(cp.expected_yield_kg), 0) as total_expected_yield
       FROM farms f
-      LEFT JOIN crops c ON f.id = c.farm_id AND c.status = 'active'
+      LEFT JOIN crop_plantings cp ON f.id = cp.farm_id AND cp.status = 'active'
       WHERE f.id = $1
       GROUP BY f.id
     `;
@@ -324,39 +327,45 @@ class DigitalTwinService {
   }
 
   /**
-   * Get crop real-time data
+   * Get crop real-time data. `cropPlantingId` is a crop_plantings row - a
+   * specific farmer's planted instance of a catalog crop - not the catalog
+   * crops.id itself (see schema-decisions.json's digital_twins entry).
    */
-  async getCropRealTimeData(cropId) {
+  async getCropRealTimeData(cropPlantingId) {
     const query = `
-      SELECT 
-        c.crop_type,
-        c.variety,
-        c.growth_stage,
-        c.current_health,
-        c.estimated_yield_kg,
-        c.planting_date,
-        c.expected_harvest_date
-      FROM crops c
-      WHERE c.id = $1
+      SELECT
+        cat.common_name as crop_type,
+        cp.growth_stage,
+        cp.current_health,
+        cp.expected_yield_kg as estimated_yield_kg,
+        cp.planting_date,
+        cp.expected_harvest_date
+      FROM crop_plantings cp
+      JOIN crops cat ON cp.crop_id = cat.id
+      WHERE cp.id = $1
     `;
 
-    const result = await db.query(query, [cropId]);
+    const result = await db.query(query, [cropPlantingId]);
     return result.rows[0] || {};
   }
 
   /**
-   * Get IoT data for entity
+   * Get IoT data for the twin's owning farmer
    */
-  async getIoTDataForEntity(entityId) {
+  async getIoTDataForEntity(farmerId) {
     try {
-      // Get devices associated with entity
+      if (!farmerId) return null;
+
+      // iot_devices links to its owner via farmer_id (see the note in
+      // getRealWorldData above) - not a generic entity_id, which does not
+      // exist on this table.
       const query = `
         SELECT device_id, device_type, last_active
         FROM iot_devices
-        WHERE entity_id = $1 AND status = 'active'
+        WHERE farmer_id = $1 AND status = 'active'
       `;
 
-      const result = await db.query(query, [entityId]);
+      const result = await db.query(query, [farmerId]);
       
       if (result.rows.length === 0) return null;
       
@@ -588,8 +597,10 @@ class DigitalTwinService {
       .then(result => result.rows[0]);
   }
 
+  // cropId here is a crop_plantings.id (a specific planted instance), not the
+  // crops catalog id - see the getCropRealTimeData comment above.
   verifyCrop(cropId) {
-    return db.query('SELECT id FROM crops WHERE id = $1', [cropId])
+    return db.query('SELECT id FROM crop_plantings WHERE id = $1', [cropId])
       .then(result => result.rows[0]);
   }
 
