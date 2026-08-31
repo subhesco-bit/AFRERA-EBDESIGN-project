@@ -130,6 +130,7 @@ const NAV_GROUPS = [
       { to: '/ai-operation-intelligence', label: 'AI Operation Intelligence' },
       { to: '/ai-self-healing', label: 'AI Self-Healing' },
       { to: '/ai/chat', label: 'AI Chat' },
+      { to: '/ai-copilots', label: 'AI Copilots' },
       { to: '/ai/collaboration', label: 'AI Collaboration' },
       { to: '/complete-ai-integration', label: 'Complete AI Integration' },
       { to: '/enterprise-ai', label: 'Enterprise AI' },

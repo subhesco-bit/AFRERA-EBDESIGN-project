@@ -208,6 +208,7 @@ const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'))
 const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'))
 const LogisticsMatchingPage = lazy(() => import('../pages/LogisticsMatchingPage'))
 const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'))
+const CopilotHubPage = lazy(() => import('../pages/CopilotHubPage'))
 
 /**
  * Public routes - no authentication required
@@ -343,6 +344,14 @@ export const publicRoutes = [
  * Protected routes - authentication required
  */
 export const protectedRoutes = [
+  {
+    path: '/ai-copilots',
+    component: CopilotHubPage,
+    title: 'AI Copilots - AFRERA',
+    description: 'Domain-specific AI assistants for finance, logistics, warehouse, insurance, nutrition, and marketplace',
+    keywords: 'ai, copilot, assistant, finance, logistics, warehouse, insurance, nutrition, marketplace',
+    transition: 'fade'
+  },
   {
     path: '/cart',
     component: CartPage,
