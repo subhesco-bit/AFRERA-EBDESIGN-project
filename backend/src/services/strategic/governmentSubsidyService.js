@@ -474,7 +474,7 @@ class GovernmentSubsidyService {
       
       // Check if application already exists for this program and farmer
       const existingApplication = await client.query(
-        `SELECT id FROM subsidy_applications 
+        `SELECT id FROM government_subsidy_applications 
          WHERE farmer_id = $1 AND program_id = $2 
          AND status IN ('submitted', 'under_review', 'approved')
          AND application_date >= NOW() - INTERVAL '1 year'`,
@@ -491,7 +491,7 @@ class GovernmentSubsidyService {
       
       // Create application
       const applicationResult = await client.query(
-        `INSERT INTO subsidy_applications 
+        `INSERT INTO government_subsidy_applications 
          (program_id, farmer_id, application_date, land_hectares, crop_variety,
           estimated_production, income_declaration, land_document_url, aadhaar_number,
           bank_account_number, bank_ifsc_code, status)
@@ -558,7 +558,7 @@ class GovernmentSubsidyService {
     try {
       // Update verification statuses
       await client.query(
-        `UPDATE subsidy_applications 
+        `UPDATE government_subsidy_applications 
          SET land_verification_status = 'pending',
              aadhaar_verification_status = 'pending',
              bank_verification_status = 'pending'
@@ -593,7 +593,7 @@ class GovernmentSubsidyService {
       // Get application details
       const applicationResult = await client.query(
         `SELECT sa.*, sp.subsidy_amount, sp.subsidy_percentage, sp.subsidy_type
-         FROM subsidy_applications sa
+         FROM government_subsidy_applications sa
          JOIN government_subsidy_programs sp ON sa.program_id = sp.id
          WHERE sa.id = $1`,
         [applicationId]
@@ -635,7 +635,7 @@ class GovernmentSubsidyService {
       
       // Update application status
       await client.query(
-        `UPDATE subsidy_applications 
+        `UPDATE government_subsidy_applications 
          SET status = 'disbursed', approval_date = $1
          WHERE id = $2`,
         [new Date(), applicationId]
@@ -694,7 +694,7 @@ class GovernmentSubsidyService {
               SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_applications,
               SUM(CASE WHEN status = 'disbursed' THEN 1 ELSE 0 END) as disbursed_applications,
               SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_applications
-           FROM subsidy_applications 
+           FROM government_subsidy_applications 
            WHERE program_id = $1`,
           [programId]
         );
@@ -772,7 +772,7 @@ class GovernmentSubsidyService {
       // Check for duplicate applications
       const duplicateResult = await client.query(
         `SELECT farmer_id, COUNT(*) as application_count
-         FROM subsidy_applications 
+         FROM government_subsidy_applications 
          WHERE program_id = $1 AND status IN ('approved', 'disbursed')
          GROUP BY farmer_id
          HAVING COUNT(*) > 1`,
@@ -792,7 +792,7 @@ class GovernmentSubsidyService {
       // Check for verification failures
       const verificationFailureResult = await client.query(
         `SELECT COUNT(*) as failed_verifications
-         FROM subsidy_applications 
+         FROM government_subsidy_applications 
          WHERE program_id = $1 
          AND (land_verification_status = 'failed' 
               OR aadhaar_verification_status = 'failed' 
@@ -939,7 +939,7 @@ class GovernmentSubsidyService {
               SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
               SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
               SUM(CASE WHEN status = 'disbursed' THEN 1 ELSE 0 END) as disbursed
-           FROM subsidy_applications sa
+           FROM government_subsidy_applications sa
            JOIN government_subsidy_programs sp ON sa.program_id = sp.id
            ${whereClause}`,
           params
@@ -992,7 +992,7 @@ class GovernmentSubsidyService {
         // Get farmer's applications
         const applicationsResult = await client.query(
           `SELECT sa.*, sp.program_name, sp.ministry, sp.fiscal_year
-           FROM subsidy_applications sa
+           FROM government_subsidy_applications sa
            JOIN government_subsidy_programs sp ON sa.program_id = sp.id
            WHERE sa.farmer_id = $1
            ORDER BY sa.application_date DESC

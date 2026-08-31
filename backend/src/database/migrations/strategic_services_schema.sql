@@ -372,7 +372,7 @@ CREATE INDEX idx_subsidy_disbursements_farmer ON subsidy_disbursements(farmer_id
 CREATE INDEX idx_subsidy_disbursements_status ON subsidy_disbursements(status);
 CREATE INDEX idx_subsidy_disbursements_date ON subsidy_disbursements(disbursement_date);
 
-CREATE TABLE IF NOT EXISTS subsidy_applications (
+CREATE TABLE IF NOT EXISTS government_subsidy_applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   program_id UUID NOT NULL REFERENCES government_subsidy_programs(id),
   farmer_id UUID NOT NULL REFERENCES farmers(id),
@@ -405,10 +405,10 @@ CREATE TABLE IF NOT EXISTS subsidy_applications (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_subsidy_applications_program ON subsidy_applications(program_id);
-CREATE INDEX idx_subsidy_applications_farmer ON subsidy_applications(farmer_id);
-CREATE INDEX idx_subsidy_applications_status ON subsidy_applications(status);
-CREATE INDEX idx_subsidy_applications_date ON subsidy_applications(application_date);
+CREATE INDEX idx_subsidy_applications_program ON government_subsidy_applications(program_id);
+CREATE INDEX idx_subsidy_applications_farmer ON government_subsidy_applications(farmer_id);
+CREATE INDEX idx_subsidy_applications_status ON government_subsidy_applications(status);
+CREATE INDEX idx_subsidy_applications_date ON government_subsidy_applications(application_date);
 
 -- ============================================================
 -- TECHNICAL PACKAGES (for Contract Farming)
@@ -601,7 +601,7 @@ CREATE TRIGGER update_government_subsidy_programs_updated_at BEFORE UPDATE ON go
 CREATE TRIGGER update_subsidy_disbursements_updated_at BEFORE UPDATE ON subsidy_disbursements
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_subsidy_applications_updated_at BEFORE UPDATE ON subsidy_applications
+CREATE TRIGGER update_subsidy_applications_updated_at BEFORE UPDATE ON government_subsidy_applications
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_technical_packages_updated_at BEFORE UPDATE ON technical_packages
