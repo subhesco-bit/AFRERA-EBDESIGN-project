@@ -396,6 +396,7 @@ const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
 const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
 const decisionSupportRoutes = require('./routes/decisionSupportRoutes');
+const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes');
 // Genuinely orphaned services found during the 2026-08-29 gap-index audit -
 // real, substantial code, zero prior route/index.js wiring. See .ai/tasks/ACTIVE.md.
 // (The 3 insurance-* route files originally added here were themselves a
@@ -981,6 +982,7 @@ app.use('/api/v1/erp/projects', projectSystemsRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/decision-support', decisionSupportRoutes);
+app.use('/api/v1/m400-ai-backbone', m400AiBackboneRoutes);
 app.use('/api/v1/crop-planning', cropPlanningRoutes);
 app.use('/api/v1/land-records', landRecordsRoutes);
 app.use('/api/v1/nutrition-intelligence', nutritionIntelligenceRoutes);
