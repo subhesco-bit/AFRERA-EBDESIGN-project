@@ -3677,4 +3677,58 @@ export const informationSharingAPI = {
   getHealthStatus: () => api.get('/information-sharing/health'),
 }
 
+/** Strategic Services API - Multi-Role Ecosystem Support
+ * Pre-season purchase, contract farming, household procurement, government subsidy
+ */
+export const strategicAPI = {
+  // Pre-Season Purchase
+  preSeason: {
+    createAgreement: (data) => api.post('/strategic/pre-season/agreements', data),
+    getAgreement: (id) => api.get(`/strategic/pre-season/agreements/${id}`),
+    updateMilestone: (id, milestoneId, data) => api.put(`/strategic/pre-season/agreements/${id}/milestones/${milestoneId}`, data),
+    settleAgreement: (id, data) => api.post(`/strategic/pre-season/agreements/${id}/settle`, data),
+    getOpportunities: (params) => api.get('/strategic/pre-season/opportunities', { params }),
+    getBuyerPortfolio: (params) => api.get('/strategic/pre-season/buyer-portfolio', { params }),
+    getFarmerAgreements: (params) => api.get('/strategic/pre-season/farmer-agreements', { params }),
+  },
+  
+  // Contract Farming
+  contractFarming: {
+    createContract: (data) => api.post('/strategic/contract-farming/contracts', data),
+    getContract: (id) => api.get(`/strategic/contract-farming/contracts/${id}`),
+    recordInputUsage: (id, data) => api.post(`/strategic/contract-farming/contracts/${id}/input-usage`, data),
+    recordQualityTest: (id, testId, data) => api.post(`/strategic/contract-farming/quality-tests/${testId}/result`, data),
+    getBuyerPortfolio: (params) => api.get('/strategic/contract-farming/buyer-portfolio', { params }),
+    getOpportunities: (params) => api.get('/strategic/contract-farming/opportunities', { params }),
+    getFarmerContracts: (params) => api.get('/strategic/contract-farming/farmer-contracts', { params }),
+  },
+  
+  // Household Procurement
+  household: {
+    createProcurementPlan: (data) => api.post('/strategic/household/procurement-plans', data),
+    getProcurementPlan: (id) => api.get(`/strategic/household/procurement-plans/${id}`),
+    updateProcurementPlan: (id, data) => api.put(`/strategic/household/procurement-plans/${id}`, data),
+    getAggregationGroups: (params) => api.get('/strategic/household/aggregation-groups', { params }),
+    createSubscription: (data) => api.post('/strategic/household/subscriptions', data),
+    getSubscriptions: (params) => api.get('/strategic/household/subscriptions', { params }),
+    getDashboard: (params) => api.get('/strategic/household/dashboard', { params }),
+    aggregateOrders: (data) => api.post('/strategic/household/aggregate-orders', data),
+    getAggregationGroup: (id) => api.get(`/strategic/household/aggregation-groups/${id}`),
+  },
+  
+  // Government Subsidy
+  government: {
+    createSubsidyProgram: (data) => api.post('/strategic/government/subsidy-programs', data),
+    getSubsidyProgram: (id) => api.get(`/strategic/government/subsidy-programs/${id}`),
+    updateSubsidyProgram: (id, data) => api.put(`/strategic/government/subsidy-programs/${id}`, data),
+    getSubsidyPrograms: (params) => api.get('/strategic/government/subsidy-programs', { params }),
+    submitApplication: (data) => api.post('/strategic/government/applications', data),
+    getApplication: (id) => api.get(`/strategic/government/applications/${id}`),
+    disburseSubsidy: (id, data) => api.post(`/strategic/government/applications/${id}/disburse`, data),
+    getProgramImpact: (id) => api.get(`/strategic/government/programs/${id}/impact`),
+    getFarmerDashboard: (params) => api.get('/strategic/government/farmer-dashboard', { params }),
+    getDashboard: (params) => api.get('/strategic/government/dashboard', { params }),
+  },
+}
+
 export default api

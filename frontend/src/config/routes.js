@@ -197,6 +197,12 @@ const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'))
 const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'))
 const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'))
 const PlatformManagementPage = lazy(() => import('../pages/PlatformManagementPage'))
+
+// Strategic Services Pages
+const PreSeasonPurchasePage = lazy(() => import('../pages/PreSeasonPurchasePage'))
+const ContractFarmingPage = lazy(() => import('../pages/ContractFarmingPage'))
+const HouseholdProcurementPage = lazy(() => import('../pages/HouseholdProcurementPage'))
+const GovernmentSubsidyPage = lazy(() => import('../pages/GovernmentSubsidyPage'))
 const RolePermissionPage = lazy(() => import('../pages/RolePermissionPage'))
 const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'))
 const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'))
@@ -448,6 +454,38 @@ export const farmerRoutes = [
     title: 'Field Management - AFRERA',
     description: 'Manage your agricultural fields',
     keywords: 'field, management, farmer',
+    transition: 'fade'
+  },
+  {
+    path: '/pre-season-purchase',
+    component: PreSeasonPurchasePage,
+    title: 'Pre-Season Purchase - AFRERA',
+    description: 'Manage pre-season purchase agreements for guaranteed income',
+    keywords: 'pre-season, purchase, agreements, advance',
+    transition: 'fade'
+  },
+  {
+    path: '/contract-farming',
+    component: ContractFarmingPage,
+    title: 'Contract Farming - AFRERA',
+    description: 'Manage long-term farming contracts with technical assistance',
+    keywords: 'contract, farming, technical, assistance',
+    transition: 'fade'
+  },
+  {
+    path: '/household-procurement',
+    component: HouseholdProcurementPage,
+    title: 'Household Procurement - AFRERA',
+    description: 'Plan household food procurement with budget optimization',
+    keywords: 'household, procurement, budget, delivery',
+    transition: 'fade'
+  },
+  {
+    path: '/government-subsidy',
+    component: GovernmentSubsidyPage,
+    title: 'Government Subsidy - AFRERA',
+    description: 'Apply for and track government agricultural subsidy programs',
+    keywords: 'subsidy, government, programs, applications',
     transition: 'fade'
   },
   {

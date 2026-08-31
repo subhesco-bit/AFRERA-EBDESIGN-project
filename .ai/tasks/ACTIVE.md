@@ -1,5 +1,62 @@
 # ACTIVE TASKS
 
+## DONE — Devin's 31 Aug 2026 "Strategic Services" batch: verified, integrated, 2 harmless schema collisions flagged
+
+User asked to "integrate all devin work with claude ai work." Found an uncommitted batch on
+this branch (`audit/ui-api-fix`): 4 new backend services + route files under
+`backend/src/services/strategic/` and `backend/src/routes/strategic/` (pre-season purchase,
+contract farming, household procurement, government subsidy — a "multi-role ecosystem" per
+`.ai/architecture/MODULE_STRATEGY_FRAMEWORK.md`), a 619-line migration
+(`strategic_services_schema.sql`, 19 tables), 4 new frontend pages, and edits to
+`backend/src/index.js`, `frontend/src/services/api.js`, `frontend/src/config/routes.js`,
+`frontend/src/components/ui/enhancedComponents.jsx`, `frontend/src/index.css`.
+
+The untracked `.ai/architecture/CRITICAL_INTEGRATION_TESTING_REPORT.md` and
+`CRITICAL_TESTING_CORRECTION_REWRITE_REPORT.md` (self-labeled "Audit-Ready, Litigation-Ready")
+already claimed this same batch was wired and corrected. Per this project's own
+`.ai/handoffs/DEVIN_WORK_PROTOCOL.md` ("no fake completion... verify by running the code, not
+by reading it"), did not trust those claims — re-verified independently:
+
+- `node --check` on all 8 new service/route files: clean.
+- `node -e "require(...)"` on all 4 new route files individually: all resolve clean (correct
+  `authMiddleware`/`requireRole` shim from `../../middleware/auth`, correct
+  `apiResponseHandler.sendSuccess`/`sendError` usage — both lessons from the 30 Aug batch,
+  applied correctly here).
+- Full backend boot (`node src/index.js`): reaches `EADDRINUSE` (an already-running dev
+  instance), meaning every route file including the 4 new ones mounted without throwing.
+  Confirmed `/api/v1/strategic/{pre-season,contract-farming,household,government}` are
+  actually mounted in `index.js` (not just claimed).
+- `npx vite build` in `frontend/`: 0 errors, all 4 new pages bundle.
+- Traced every SQL query in the 4 new services against `strategic_services_schema.sql`'s
+  actual column names by hand (per protocol step 8) — no live DB in this dev environment to
+  test against directly.
+- `frontend/src/components/ui/enhancedComponents.jsx`'s 1-line diff and `index.css`'s
+  `@import`-before-`@tailwind` reorder are both genuine bug fixes, not cosmetic: the former
+  removed a duplicate JSX `animate` prop (second one was silently shadowing the first,
+  breaking the pulse/non-pulse branch); the latter fixed a CSS spec violation (`@import` must
+  precede other rules) that some build tooling silently ignores and others don't.
+
+**Real bug found and recorded (not present in either untracked report above), harmless
+currently:** `strategic_services_schema.sql` declares `CREATE TABLE IF NOT EXISTS buyers` and
+`CREATE TABLE IF NOT EXISTS laboratories`, both of which already exist from earlier migrations
+(041, 033) that run first — so the strategic file's own versions silently no-op, same failure
+class as the earlier `roles` collision (see `schema-decisions.json`). Checked whether this
+actually breaks anything by tracing every query: it doesn't, yet — the strategic services only
+ever read/write columns the winning tables already have. Recorded as `deferred` in
+`backend/src/database/schema-decisions.json` rather than merged blind, since the extra columns
+(`credit_rating`, `nabl_accredited`, etc.) aren't used by any current caller — fixing this now
+would be speculative schema work with nothing to verify it against.
+
+**Not independently re-verified (inherited from the untracked reports, but consistent with
+what this session's own checks show):** the `/api/v1/ai` → `unifiedAIRoutes` /
+`/api/v1/ai-legacy` → `aiService` split, and the 6 Tier-1 routes' `/api/v1/` prefix
+standardization — both already present in the current `index.js` diff and both boot clean,
+so no reason to distrust them, but no live-database or live-request test was run against
+either (no Postgres/Redis in this dev environment, consistent with every prior session).
+
+Nothing committed — working tree left as-is per this session's git rules (commit only on
+explicit request).
+
 ## TODO — Devin's 30 Aug 2026 Tier 1 batch: integrated, blockers fixed, schema gaps remain (resume here, target 5pm 31 Aug)
 
 Devin landed a large uncommitted batch on 30 Aug 2026: 6 new "Tier 1" backend services

@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ---------------------------------------------------------------------
  * "NE Harvest" design system, adopted from the afrera_platform_v42.html
  * reference (2026-08-30) - real color palette and typography, not the
@@ -13,6 +9,10 @@
  * whole app in one pass.
  * --------------------------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   :root {

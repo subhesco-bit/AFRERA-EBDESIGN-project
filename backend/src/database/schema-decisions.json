@@ -311,6 +311,22 @@
       "kind": "deferred",
       "rationale": "advancedAnalyticsService.js and predictiveIntelligenceService.js query crops.farmer_id, crops.expected_yield_kg, crops.planting_date, crops.growth_stage, orders.farmer_id, orders.region, order_items.crop_id, order_items.price_per_kg, and a `harvests` table - none of which exist. The real crops table (041) is a static catalog (crop_code, common_name, category, duration_days), not a per-farmer planted-crop instance with yield/harvest tracking; orders.user_id and order_items.product_id are the real columns, with no crop_id. This is not a missing-migration gap, it's a schema design gap: a crop_plantings/crop_cycles table (farmer_id, crop_id FK to the catalog, planting_date, expected_yield_kg, growth_stage, harvest records) needs to be designed before either service can run. Not attempted in 072_tier1_m025_m030_schema.sql - bolting 10+ unrelated columns onto the catalog table was explicitly avoided per this file's own no-guessing convention.",
       "note": "Also blocks digitalTwinService.js's farm-twin path, which separately depends on a `farms` table that does not exist at all (no CREATE TABLE anywhere) and joins crops ON f.id = c.farm_id, a column crops does not have either. See .claude/audits/AUDIT_DB.md findings #1 and #6, and .ai/tasks/ACTIVE.md."
+    },
+    {
+      "table": "buyers",
+      "winner": "041_rural_life_os_schema.sql",
+      "loser": "strategic_services_schema.sql",
+      "kind": "deferred",
+      "rationale": "Same real-world concept (a marketplace buyer entity) declared twice; 041 runs first alphabetically/numerically so strategic_services_schema.sql's richer CREATE TABLE IF NOT EXISTS buyers (organization_type, credit_rating, annual_procurement_volume, status) silently no-ops against a live database. Verified NOT currently a runtime bug: the 4 strategic services (preSeasonPurchaseService.js, contractFarmingService.js) only ever SELECT b.name from the buyers JOIN, and 041's buyers already has a name column. Deferred rather than merged because the extra columns (credit_rating etc.) are unused by any current query - adding them now would be speculative, not verified against an actual need.",
+      "note": "Found while integrating the 31 Aug 2026 'Strategic Services' batch (pre-season purchase, contract farming, household procurement, government subsidy). If a future service starts reading strategic_services_schema.sql's buyers-specific columns, add them to 041's table via an ALTER repair migration (same pattern as the roles collision above), not by trying to make the second CREATE TABLE win."
+    },
+    {
+      "table": "laboratories",
+      "winner": "033_laboratory_erp_schema.sql",
+      "loser": "strategic_services_schema.sql",
+      "kind": "deferred",
+      "rationale": "Same collision shape as buyers above (033 runs first, its NABL-accreditation-focused laboratories table wins; strategic_services_schema.sql's simpler version no-ops). Verified NOT currently a runtime bug: the only reference is contract_quality_tests.laboratory_id UUID REFERENCES laboratories(id), and contractFarmingService.js only ever writes it as an optional value (testResult.laboratory_id || null) - it never queries laboratories' own columns, so which of the two column sets 'won' does not matter yet.",
+      "note": "Found in the same pass as the buyers collision above. Revisit if a future feature needs to read laboratory-specific fields (accreditation_number/quality_rating from the losing definition vs nabl_accredited/testing_capabilities from the winning one)."
     }
   ]
 }

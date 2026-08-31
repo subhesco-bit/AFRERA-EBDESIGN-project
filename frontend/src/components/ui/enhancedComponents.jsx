@@ -134,11 +134,10 @@ export const EnhancedBadge = ({
     <motion.span
       className={`inline-flex items-center rounded-full font-medium ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
       animate={pulse ? {
         scale: [1, 1.05, 1],
         transition: { duration: 2, repeat: Infinity }
-      } : {}}
+      } : { scale: 1, opacity: 1 }}
     >
       {children}
     </motion.span>

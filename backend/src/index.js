@@ -572,7 +572,9 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-mountRoute('/api/v1/ai', aiService);
+// CORRECTION: Consolidated AI routes - unifiedAIRoutes now serves as single AI gateway
+// Legacy aiService functionality preserved at /api/v1/ai-legacy for backward compatibility
+mountRoute('/api/v1/ai-legacy', aiService);
 mountRoute('/api/v1/erp', erpService);
 mountRoute('/api/v1/multilingual', multilingualService);
 mountRoute('/api/v1/organic-traceability', organicTraceabilityService);
@@ -723,12 +725,13 @@ const blockchainVerificationRoutes = require('./routes/blockchainVerificationRou
 const digitalTwinRoutes = require('./routes/digitalTwinRoutes');
 const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoutes');
 
-app.use('/api/analytics', advancedAnalyticsRoutes);
-app.use('/api/predictive', predictiveIntelligenceRoutes);
-app.use('/api/iot', iotIntegrationRoutes);
-app.use('/api/blockchain', blockchainVerificationRoutes);
-app.use('/api/digital-twin', digitalTwinRoutes);
-app.use('/api/enterprise', enterpriseIntegrationRoutes);
+// CORRECTION: Standardized Tier 1 routes to /api/v1/ prefix for consistency
+app.use('/api/v1/analytics', advancedAnalyticsRoutes);
+app.use('/api/v1/predictive', predictiveIntelligenceRoutes);
+app.use('/api/v1/iot', iotIntegrationRoutes);
+app.use('/api/v1/blockchain', blockchainVerificationRoutes);
+app.use('/api/v1/digital-twin', digitalTwinRoutes);
+app.use('/api/v1/enterprise', enterpriseIntegrationRoutes);
 
 // Routes that existed but were never mounted anywhere
 app.use('/api/v1/gst', gstRoutes);
@@ -849,6 +852,17 @@ app.use('/api/v1/hydroponics', hydroponicsRoutes);
 app.use('/api/v1/aeroponics', aeroponicsRoutes);
 app.use('/api/v1/precision-horticulture', precisionHorticultureRoutes);
 app.use('/api/v1/protected-cultivation', protectedCultivationRoutes);
+
+// Strategic Services Routes - Multi-Role Ecosystem Support
+const preSeasonPurchaseRoutes = require('./routes/strategic/preSeasonPurchaseRoutes');
+const contractFarmingRoutes = require('./routes/strategic/contractFarmingRoutes');
+const householdProcurementRoutes = require('./routes/strategic/householdProcurementRoutes');
+const governmentSubsidyRoutes = require('./routes/strategic/governmentSubsidyRoutes');
+
+app.use('/api/v1/strategic/pre-season', preSeasonPurchaseRoutes);
+app.use('/api/v1/strategic/contract-farming', contractFarmingRoutes);
+app.use('/api/v1/strategic/household', householdProcurementRoutes);
+app.use('/api/v1/strategic/government', governmentSubsidyRoutes);
 app.use('/api/v1/horticulture-analytics', horticultureAnalyticsRoutes);
 app.use('/api/v1/drought-monitoring', droughtMonitoringRoutes);
 app.use('/api/v1/flood-monitoring', floodMonitoringRoutes);
