@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS pre_season_agreements (
   farmer_id UUID NOT NULL REFERENCES farmers(id),
   buyer_id UUID NOT NULL REFERENCES buyers(id),
   crop_id UUID NOT NULL REFERENCES crops(id),
-  variety_id UUID NOT NULL REFERENCES regional_variety_directory(id),
+  variety_id INTEGER NOT NULL REFERENCES regional_variety_directory(id),
   
   -- Agreement terms
   agreed_quantity DECIMAL(10,2) NOT NULL, -- in tons
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS pre_season_opportunities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   buyer_id UUID NOT NULL REFERENCES buyers(id),
   crop_id UUID NOT NULL REFERENCES crops(id),
-  variety_id UUID NOT NULL REFERENCES regional_variety_directory(id),
+  variety_id INTEGER NOT NULL REFERENCES regional_variety_directory(id),
   
   quantity_required DECIMAL(10,2) NOT NULL,
   offered_price DECIMAL(10,2) NOT NULL,
@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS household_subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   household_id UUID NOT NULL REFERENCES households(id),
   product_id UUID NOT NULL REFERENCES products(id),
-  variety_id UUID REFERENCES regional_variety_directory(id),
+  variety_id INTEGER REFERENCES regional_variety_directory(id),
   quantity DECIMAL(10,2) NOT NULL,
   frequency VARCHAR(50) NOT NULL, -- 'weekly', 'biweekly', 'monthly'
   start_date DATE NOT NULL,
