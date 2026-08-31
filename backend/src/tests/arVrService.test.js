@@ -23,6 +23,11 @@ describe('AR/VR Experience Service', () => {
         password: 'Test123!@#',
         role: 'admin'
       });
+    // TEMP DIAGNOSTIC 2026-08-30: registerResponse.body.token has been coming
+    // back undefined in CI, causing every subsequent request to 401. Logging
+    // the actual status/body to find the real cause before guessing further.
+    // eslint-disable-next-line no-console
+    console.log('DIAG registerResponse', registerResponse.status, JSON.stringify(registerResponse.body));
 
     authToken = registerResponse.body.token;
   });
