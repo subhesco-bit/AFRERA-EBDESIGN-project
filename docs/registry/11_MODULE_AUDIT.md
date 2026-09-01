@@ -1,12 +1,12 @@
 # Per-Module Deep Audit
 
-**Generated:** 2026-08-28 by `tools/module-audit.js`
+**Generated:** 2026-08-30 by `tools/module-audit.js`
 **Status:** DESCRIPTIVE — read from source, comments stripped before analysis.
 **Do not edit by hand.**
 
 ---
 
-**Modules:** 327 · **Endpoints:** 1757 · **AI applications:** 265
+**Modules:** 329 · **Endpoints:** 1794 · **AI applications:** 268
 
 ## Control matrix
 
@@ -20,20 +20,21 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | governanceModule | 247 | 24 | AF-SEC | · | · | · | ✓ | ✓ | · | · | ✓ | · | ✓ | **4/7** |
 | marketplaceEnhancements | 252 | 23 | AF-SD | · | · | · | ✓ | ✓ | · | · | ✓ | · | ✓ | **4/7** |
 | researchAndDevelopmentRoutes | 502 | 23 | — | · | · | · | · | · | · | · | ✓ | · | · | **1/7** |
-| informationSharingRoutes | 470 | 22 | AF-MDM | 1 | · | · | · | · | · | · | ✓ | · | · | **1/7** |
+| informationSharingRoutes | 473 | 22 | AF-MDM | 1 | · | · | · | · | · | · | ✓ | · | · | **1/7** |
 | knowledgeRoutes | 478 | 22 | — | 1 | · | · | · | · | · | · | ✓ | · | · | **1/7** |
 | nervousSystemRoutes | 210 | 22 | — | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
-| sheepRoutes | 374 | 22 | — | 1 | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | foodSafetyService | 958 | 21 | AF-QM | 2 | 1 | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
-| goatRoutes | 420 | 21 | — | 1 | 4 | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | logisticsEnhancements | 225 | 21 | AF-TM | · | · | · | ✓ | ✓ | · | · | ✓ | · | ✓ | **4/7** |
-| pigRoutes | 359 | 21 | — | 1 | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
+| pigRoutes | 400 | 21 | — | 1 | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
+| sheepRoutes | 380 | 21 | — | 1 | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | farmerPortalEnhancements | 254 | 20 | — | 1 | · | · | ✓ | ✓ | · | · | ✓ | · | ✓ | **4/7** |
+| goatRoutes | 427 | 20 | — | 1 | 4 | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | indigenousKnowledgeService | 826 | 19 | AF-AGRI | · | · | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | institutionalProcurementService | 921 | 19 | AF-MM | 2 | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
+| animalHealthRoutes | 395 | 19 | AF-HCM | · | 4 | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
+| insuranceEnhancements | 206 | 19 | — | · | · | · | ✓ | ✓ | · | · | ✓ | · | ✓ | **4/7** |
 | poultryRoutes | 327 | 19 | — | · | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | sapModuleArchitectureRoutes | 458 | 19 | — | · | · | · | · | · | · | · | ✓ | · | · | **1/7** |
-| insuranceEnhancements | 194 | 18 | — | · | · | · | ✓ | ✓ | · | · | ✓ | · | ✓ | **4/7** |
 | biodiversityService | 897 | 17 | AF-AGRI | 2 | · | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | recipeIntelligenceService | 907 | 17 | AF-PP | 1 | · | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | shelfLifeService | 881 | 16 | AF-WM | 3 | 2 | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
@@ -44,8 +45,8 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | completeAIIntegrationRoutes | 123 | 15 | — | 1 | · | · | · | · | · | · | · | · | · | **0/7** |
 | completeERPIntegrationRoutes | 123 | 15 | — | · | · | · | · | · | · | · | · | · | · | **0/7** |
 | costControlRoutes | 158 | 15 | — | 1 | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
+| platformCoreRoutes | 152 | 15 | AF-MDM | 1 | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | aiBrainRoutes | 382 | 14 | — | · | · | · | · | · | · | · | ✓ | · | · | **1/7** |
-| animalHealthRoutes | 305 | 14 | AF-HCM | · | 4 | · | ✓ | · | · | · | ✓ | ✓ | ✓ | **4/7** |
 | experienceRoutes | 75 | 14 | — | · | · | · | ✓ | · | · | ✓ | ✓ | · | · | **3/7** |
 | projectSystemsRoutes | 153 | 14 | AF-PS | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | enterpriseControlService | 565 | 13 | AF-SEC AF-CRM | 1 | 2 | · | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | · | **6/7** |
@@ -67,14 +68,14 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | riskPricingRoutes | 181 | 11 | — | · | · | · | ✓ | · | · | ✓ | ✓ | · | · | **3/7** |
 | vendorRoutes | 298 | 11 | AF-MM | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | weatherRoutes | 57 | 11 | — | 2 | · | · | ✓ | · | · | ✓ | ✓ | · | · | **3/7** |
-| authService | 1309 | 10 | — | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | ✓ | **5/7** |
+| authService | 1316 | 10 | — | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | ✓ | **5/7** |
 | arVrService | 567 | 10 | — | · | · | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | blockchainTraceabilityService | 744 | 10 | — | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | conversationalAIService | 557 | 10 | AF-CS | 2 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | financialService | 805 | 10 | AF-FI | 2 | · | · | ✓ | · | ✓ | ✓ | ✓ | ✓ | · | **5/7** |
 | foodIntelligenceService | 791 | 10 | — | 2 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | merchandisingService | 461 | 10 | AF-SD | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
-| offlinePaymentService | 700 | 10 | AF-FI | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
+| offlinePaymentService | 717 | 10 | AF-FI | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | orderService | 882 | 10 | AF-SD | · | 1 | · | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | · | **6/7** |
 | sharedInfrastructureService | 505 | 10 | AF-PM | 1 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | voiceAIService | 495 | 10 | — | 1 | · | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
@@ -96,22 +97,25 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | decisionSupportRoutes | 196 | 9 | AF-CS | 1 | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | farmerTrainingRoutes | 35 | 9 | AF-HCM | 1 | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
 | nutrientValueSalesRoutes | 121 | 9 | AF-SD | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
+| productReviewRoutes | 101 | 9 | AF-MDM | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | rfqRoutes | 49 | 9 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | roleManagementRoutes | 111 | 9 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | tenantManagementRoutes | 156 | 9 | — | 1 | 3 | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | advancedAIService | 1607 | 8 | — | 8 | 2 | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | catalogIntelligenceService | 904 | 8 | AF-MDM | 3 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
-| formService | 439 | 8 | AF-MDM | 1 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
-| offlineSyncService | 852 | 8 | — | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | ✓ | **5/7** |
+| formService | 444 | 8 | AF-MDM | 1 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
+| offlineSyncService | 871 | 8 | — | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | ✓ | **5/7** |
 | procurementSubscriptionService | 383 | 8 | AF-MM | · | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | valueCommerceService | 511 | 8 | AF-SD | 2 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | auditRoutes | 98 | 8 | AF-SEC | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | coldStorageRoutes | 91 | 8 | — | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | complianceRoutes | 37 | 8 | AF-SEC | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| cropPlanningRoutes | 94 | 8 | AF-AGRI | 2 | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | ecommerceAIRoutes | 109 | 8 | — | 2 | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
 | ecommerceBusinessSalesRoutes | 95 | 8 | AF-SD | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
 | farmerHealthRoutes | 104 | 8 | AF-HCM | · | · | · | · | · | · | · | ✓ | · | · | **1/7** |
 | hrRoutes | 161 | 8 | AF-HCM | 4 | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| landRecordsRoutes | 94 | 8 | — | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | systemAdministrationRoutes | 151 | 8 | — | 2 | 3 | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | aiAdvisoryService | 326 | 7 | — | 2 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | erpService | 944 | 7 | — | 2 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
@@ -144,7 +148,7 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | freightPoolingRoutes | 69 | 6 | AF-TM | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | geofencingRoutes | 86 | 6 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | healthRoutes | 454 | 6 | AF-HCM | · | · | · | · | · | · | · | ✓ | ✓ | · | **2/7** |
-| fisheriesRoutes | 77 | 6 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| fisheriesRoutes | 79 | 6 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | marketDataRoutes | 39 | 6 | — | 1 | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | seedVaultRoutes | 84 | 6 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | aiService | 717 | 5 | — | 5 | · | · | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
@@ -168,14 +172,13 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | inputSupplyManagementRoutes | 62 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | irrigationManagementRoutes | 57 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | landManagementRoutes | 59 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
-| apicultureRoutes | 67 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
-| forestryRoutes | 67 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
-| mushroomRoutes | 67 | 5 | AF-HCM | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
-| sericultureRoutes | 67 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
-| vermicompostRoutes | 67 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| apicultureRoutes | 71 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| forestryRoutes | 69 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| mushroomRoutes | 69 | 5 | AF-HCM | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| sericultureRoutes | 69 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
+| vermicompostRoutes | 69 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | livestockManagementRoutes | 55 | 5 | AF-WM | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | operationsManagementRoutes | 62 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
-| platformCoreRoutes | 124 | 5 | AF-MDM | · | · | · | ✓ | ✓ | · | · | ✓ | · | · | **3/7** |
 | preventiveMaintenanceRoutes | 47 | 5 | AF-PM | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | realtimeMonitoringRoutes | 66 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | regionalVarietyRoutes | 63 | 5 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
@@ -187,12 +190,12 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | companyRoutes | 78 | 4 | — | · | · | · | ✓ | · | · | · | ✓ | ✓ | · | **3/7** |
 | cropValueResearchRoutes | 24 | 4 | AF-HCM AF-AGRI | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
 | defenseFitnessPrepRoutes | 22 | 4 | — | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
-| devinRoutes | 28 | 4 | — | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
 | productMediaAIRoutes | 22 | 4 | AF-MDM | · | · | · | ✓ | · | · | · | · | · | ✓ | **2/7** |
 | returnLoadBoardRoutes | 48 | 4 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | visionRoutes | 129 | 4 | — | 1 | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | enterpriseMemoryService | 382 | 3 | — | · | · | 1 | ✓ | · | · | ✓ | ✓ | ✓ | · | **4/7** |
 | demandRoutes | 28 | 3 | — | 1 | · | · | · | · | · | · | ✓ | · | · | **1/7** |
+| analyticsReportRoutes | 43 | 2 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | costRoutes | 28 | 2 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | foluBenchmarkRoutes | 26 | 2 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
 | glutWarningRoutes | 34 | 2 | — | · | · | · | ✓ | · | · | · | ✓ | · | · | **2/7** |
@@ -206,11 +209,10 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | aiCollaborationService | 8 | 0 | — | · | · | · | · | · | · | · | · | · | · | **0/7** |
 | aiCollaborationService | 389 | 0 | — | 1 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | enhancedLibraryKnowledgeService | 777 | 0 | — | 1 | · | · | · | · | · | · | ✓ | · | · | **1/7** |
-| unifiedConfigService | 288 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | · | ✓ | **3/7** |
-| devinService | 326 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
+| unifiedConfigService | 303 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | · | ✓ | **3/7** |
 | gdprService | 264 | 0 | AF-PS | · | · | · | · | · | ✓ | ✓ | ✓ | · | · | **3/7** |
 | mfaService | 149 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
-| platformCoreService | 153 | 0 | AF-MDM | 1 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
+| platformCoreService | 172 | 0 | AF-MDM | 1 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | EnergyCostCalculator | 299 | 0 | — | 2 | · | · | · | · | · | · | · | · | · | **0/7** |
 | FoodIntelligenceEngine | 446 | 0 | — | 2 | · | · | · | · | · | · | · | · | · | **0/7** |
 | advancedFeaturesService | 528 | 0 | — | 3 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
@@ -219,17 +221,17 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | aiBackboneService | 902 | 0 | — | 3 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | aiBrainService | 506 | 0 | — | 2 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | aiGatewayService | 428 | 0 | — | 3 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
-| aiOperationIntelligenceService | 591 | 0 | — | 3 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
+| aiOperationIntelligenceService | 607 | 0 | — | 3 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | aiOrchestrationService | 118 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | aiSelfHealingService | 685 | 0 | — | 2 | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | analyticsMonitoringService | 430 | 0 | — | · | · | · | · | · | · | · | ✓ | ✓ | · | **2/7** |
 | analyticsService | 644 | 0 | — | 5 | · | · | · | · | · | · | ✓ | ✓ | · | **2/7** |
-| animalHealthService | 492 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
+| animalHealthService | 544 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | apicultureService | 146 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | · | · | **2/7** |
 | assetAccountingService | 397 | 0 | AF-FI AF-PM AF-AA | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | auditService | 370 | 0 | AF-SEC | · | · | · | · | · | · | · | ✓ | ✓ | · | **2/7** |
 | backupService | 335 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
-| bulkOrderService | 518 | 0 | AF-SD | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
+| bulkOrderService | 535 | 0 | AF-SD | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | civilDisruptionService | 134 | 0 | — | · | 2 | · | · | · | · | ✓ | · | ✓ | · | **2/7** |
 | climateMonitoringService | 45 | 0 | — | 2 | · | · | · | · | · | · | · | · | · | **0/7** |
 | coldStorageService | 305 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
@@ -292,7 +294,7 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | irrigationManagementService | 34 | 0 | — | · | · | · | · | · | · | · | · | · | · | **0/7** |
 | knowledgeService | 835 | 0 | — | 3 | · | · | · | · | · | ✓ | · | · | · | **1/7** |
 | landManagementService | 50 | 0 | — | · | · | · | · | · | · | · | · | · | · | **0/7** |
-| landRecordsService | 469 | 0 | — | 1 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
+| landRecordsService | 490 | 0 | — | 1 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | libraryKnowledgeService | 347 | 0 | — | 1 | · | · | · | · | · | · | ✓ | · | · | **1/7** |
 | livestockManagementService | 64 | 0 | AF-WM | · | · | · | · | · | · | · | · | · | · | **0/7** |
 | logisticsEnhancementService | 807 | 0 | AF-TM | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
@@ -311,7 +313,7 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 | productMediaAIService | 195 | 0 | AF-MDM | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | productReviewService | 451 | 0 | AF-MDM | 1 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | projectSystemsService | 526 | 0 | AF-PS | 1 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
-| realtimeMonitoringService | 566 | 0 | — | 2 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
+| realtimeMonitoringService | 572 | 0 | — | 2 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | recoveredFinanceService | 307 | 0 | — | 1 | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | regionalVarietyService | 117 | 0 | — | · | · | · | · | · | · | ✓ | ✓ | ✓ | · | **3/7** |
 | researchAndDevelopmentService | 705 | 0 | — | 4 | · | · | · | · | · | ✓ | · | · | · | **1/7** |
@@ -359,6 +361,7 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 - **completeAIIntegrationRoutes** — 15 routes, 0/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Error handling, Logging, Rate limiting
 - **completeERPIntegrationRoutes** — 15 routes, 0/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Error handling, Logging, Rate limiting
 - **costControlRoutes** — 15 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
+- **platformCoreRoutes** — 15 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **aiBrainRoutes** — 14 routes, 1/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **experienceRoutes** — 14 routes, 3/7 controls, missing: Admin gate, Transactions, Logging, Rate limiting
 - **projectSystemsRoutes** — 14 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
@@ -389,6 +392,7 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 - **decisionSupportRoutes** — 9 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **farmerTrainingRoutes** — 9 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
 - **nutrientValueSalesRoutes** — 9 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
+- **productReviewRoutes** — 9 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **rfqRoutes** — 9 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **roleManagementRoutes** — 9 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **tenantManagementRoutes** — 9 routes, 3/7 controls, missing: Admin gate, Transactions, Input validation, Rate limiting
@@ -397,10 +401,12 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 - **auditRoutes** — 8 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **coldStorageRoutes** — 8 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **complianceRoutes** — 8 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
+- **cropPlanningRoutes** — 8 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **ecommerceAIRoutes** — 8 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
 - **ecommerceBusinessSalesRoutes** — 8 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
 - **farmerHealthRoutes** — 8 routes, 1/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **hrRoutes** — 8 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
+- **landRecordsRoutes** — 8 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **systemAdministrationRoutes** — 8 routes, 3/7 controls, missing: Admin gate, Transactions, Input validation, Rate limiting
 - **aiGatewayRoutes** — 7 routes, 0/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Error handling, Logging, Rate limiting
 - **libraryRoutes** — 7 routes, 1/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Logging, Rate limiting
@@ -447,7 +453,6 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 - **vermicompostRoutes** — 5 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **livestockManagementRoutes** — 5 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **operationsManagementRoutes** — 5 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
-- **platformCoreRoutes** — 5 routes, 3/7 controls, missing: Transactions, Input validation, Logging, Rate limiting
 - **preventiveMaintenanceRoutes** — 5 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **realtimeMonitoringRoutes** — 5 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **regionalVarietyRoutes** — 5 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
@@ -458,11 +463,11 @@ Auth · Adm(in) · Txn · Val(idation) · Err · Log · RL(rate limit). Score is
 - **companyRoutes** — 4 routes, 3/7 controls, missing: Admin gate, Transactions, Input validation, Rate limiting
 - **cropValueResearchRoutes** — 4 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
 - **defenseFitnessPrepRoutes** — 4 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
-- **devinRoutes** — 4 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
 - **productMediaAIRoutes** — 4 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Error handling, Logging
 - **returnLoadBoardRoutes** — 4 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **visionRoutes** — 4 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **demandRoutes** — 3 routes, 1/7 controls, missing: Authentication, Admin gate, Transactions, Input validation, Logging, Rate limiting
+- **analyticsReportRoutes** — 2 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **costRoutes** — 2 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **foluBenchmarkRoutes** — 2 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting
 - **glutWarningRoutes** — 2 routes, 2/7 controls, missing: Admin gate, Transactions, Input validation, Logging, Rate limiting

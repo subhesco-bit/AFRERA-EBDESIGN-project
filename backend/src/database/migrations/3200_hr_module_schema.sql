@@ -4,13 +4,13 @@
 -- Employees table
 CREATE TABLE IF NOT EXISTS employees (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   employee_id VARCHAR(20) UNIQUE NOT NULL,
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   phone VARCHAR(20),
-  department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+  department_id INTEGER, -- FK added below, after `departments` exists (see the ALTER after its CREATE TABLE) - employees and departments reference each other (department_id here, manager_id there), so one side must be added later to break the ordering cycle
   department VARCHAR(100),
   role VARCHAR(100) NOT NULL,
   salary_level VARCHAR(50),
@@ -46,6 +46,15 @@ CREATE TABLE IF NOT EXISTS departments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 2026-08-30: employees.department_id -> departments and departments.manager_id
+-- -> employees form a circular FK dependency (a genuine pre-existing bug, not
+-- new tonight - "relation departments does not exist" the first time this
+-- repo's CI actually ran npm run migrate for real, since employees is created
+-- first and referenced departments before it existed). Adding the FK here,
+-- now that both tables exist.
+ALTER TABLE employees ADD CONSTRAINT employees_department_id_fkey
+  FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL;
 
 -- Performance reviews table
 CREATE TABLE IF NOT EXISTS performance_reviews (
@@ -117,7 +126,7 @@ CREATE TABLE IF NOT EXISTS training_records (
 );
 
 -- Promotions table
-CREATE TABLE IF NOT EXISTS promotions (
+CREATE TABLE IF NOT EXISTS employee_promotions (
   id SERIAL PRIMARY KEY,
   employee_id INTEGER REFERENCES employees(id) ON DELETE CASCADE,
   previous_role VARCHAR(100),
@@ -223,10 +232,10 @@ CREATE INDEX IF NOT EXISTS idx_performance_reviews_period ON performance_reviews
 CREATE INDEX IF NOT EXISTS idx_leave_requests_employee_id ON leave_requests(employee_id);
 CREATE INDEX IF NOT EXISTS idx_leave_requests_dates ON leave_requests(start_date, end_date);
 CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(status);
-CREATE INDEX IF NOT EXISTS idx_training_records_employee_id ON training_records(employee_id);
-CREATE INDEX IF NOT EXISTS idx_training_records_program_id ON training_records(training_program_id);
-CREATE INDEX IF NOT EXISTS idx_promotions_employee_id ON promotions(employee_id);
-CREATE INDEX IF NOT EXISTS idx_promotions_date ON promotions(promotion_date);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "training_records") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_training_records_employee_id ON training_records(employee_id);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "training_records") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_training_records_program_id ON training_records(training_program_id);
+CREATE INDEX IF NOT EXISTS idx_promotions_employee_id ON employee_promotions(employee_id);
+CREATE INDEX IF NOT EXISTS idx_promotions_date ON employee_promotions(promotion_date);
 CREATE INDEX IF NOT EXISTS idx_employee_feedback_employee_id ON employee_feedback(employee_id);
 CREATE INDEX IF NOT EXISTS idx_employee_feedback_type ON employee_feedback(feedback_type);
 CREATE INDEX IF NOT EXISTS idx_timesheets_employee_id ON timesheets(employee_id);

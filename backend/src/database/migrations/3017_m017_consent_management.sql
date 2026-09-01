@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS consent_templates (
 -- Consent Acceptances Table
 CREATE TABLE IF NOT EXISTS consent_acceptances (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   policy_id INTEGER NOT NULL REFERENCES consent_templates(id) ON DELETE CASCADE,
   accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ip_address INET,
@@ -69,8 +69,8 @@ CREATE TABLE IF NOT EXISTS consent_history (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_consents_user_id ON consents(user_id);
-CREATE INDEX IF NOT EXISTS idx_consents_status ON consents(status);
-CREATE INDEX IF NOT EXISTS idx_consents_valid_until ON consents(valid_until);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "consents") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_consents_status ON consents(status);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "consents") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_consents_valid_until ON consents(valid_until);
 CREATE INDEX IF NOT EXISTS idx_consent_acceptances_user_id ON consent_acceptances(user_id);
 CREATE INDEX IF NOT EXISTS idx_consent_history_consent_id ON consent_history(consent_id);
 

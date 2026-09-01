@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS profile_activity (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON user_profiles(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_profiles_display_name ON user_profiles(display_name);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "user_profiles") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_user_profiles_display_name ON user_profiles(display_name);
 CREATE INDEX IF NOT EXISTS idx_profile_views_profile_user ON profile_views(profile_user_id);
 CREATE INDEX IF NOT EXISTS idx_profile_activity_user_id ON profile_activity(user_id);
 

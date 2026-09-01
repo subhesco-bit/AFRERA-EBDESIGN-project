@@ -1,0 +1,21 @@
+[
+  {
+    "id": "claude_1788007985630",
+    "ai_source": "claude",
+    "timestamp": "2026-08-29T12:53:05.630Z",
+    "work_type": "ai_coordination",
+    "description": "Coordinating general request",
+    "query": "test question",
+    "status": "in_progress"
+  },
+  {
+    "id": "claude_1788007987881",
+    "ai_source": "claude",
+    "timestamp": "2026-08-29T12:53:07.881Z",
+    "work_type": "ai_coordination",
+    "description": "Error in AI coordination",
+    "query": "test question",
+    "error": "Could not resolve authentication method. Expected either apiKey or authToken to be set. Or for one of the \"X-Api-Key\" or \"Authorization\" headers to be explicitly omitted",
+    "status": "error"
+  }
+]

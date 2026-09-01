@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS dietitian_collections (
     id VARCHAR(50) PRIMARY KEY,
     collection_name VARCHAR(255) NOT NULL,
     description TEXT,
-    dietitian_id VARCHAR(50) REFERENCES users(id),
+    dietitian_id UUID REFERENCES users(id),
     dietary_focus TEXT[] DEFAULT '{}',
     health_goals TEXT[] DEFAULT '{}',
     target_audience VARCHAR(100),
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS dietitian_collection_products (
     id VARCHAR(50) PRIMARY KEY,
     collection_id VARCHAR(50) NOT NULL REFERENCES dietitian_collections(id) ON DELETE CASCADE,
     product_id VARCHAR(50) NOT NULL REFERENCES product_listings(id) ON DELETE CASCADE,
-    added_by VARCHAR(50) REFERENCES users(id),
+    added_by UUID REFERENCES users(id),
     notes TEXT,
     position INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -86,7 +86,7 @@ CREATE INDEX IF NOT EXISTS idx_recipe_product_recommendations_relevance ON recip
 -- User Health-Product Interactions Table
 CREATE TABLE IF NOT EXISTS user_health_product_interactions (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     product_id VARCHAR(50) NOT NULL REFERENCES product_listings(id),
     interaction_type VARCHAR(50) NOT NULL,
     health_profile_context JSONB DEFAULT '{}',
@@ -104,7 +104,7 @@ CREATE INDEX IF NOT EXISTS idx_user_health_product_created ON user_health_produc
 -- Shopping Cart Nutrition History Table
 CREATE TABLE IF NOT EXISTS cart_nutrition_history (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     cart_id VARCHAR(50),
     total_nutrition JSONB NOT NULL,
     item_count INTEGER NOT NULL,
@@ -156,7 +156,7 @@ CREATE INDEX IF NOT EXISTS idx_product_recipe_compatibility_score ON product_rec
 -- Allergen Alert Configuration Table
 CREATE TABLE IF NOT EXISTS allergen_alert_config (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     allergen VARCHAR(100) NOT NULL,
     severity VARCHAR(20) DEFAULT 'high',
     alert_method VARCHAR(20) DEFAULT 'banner',
@@ -174,7 +174,7 @@ CREATE INDEX IF NOT EXISTS idx_allergen_alert_config_active ON allergen_alert_co
 -- Dietary Preference Config Table
 CREATE TABLE IF NOT EXISTS dietary_preference_config (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     dietary_preference VARCHAR(50) NOT NULL,
     strictness_level VARCHAR(20) DEFAULT 'moderate',
     allow_substitutions BOOLEAN DEFAULT TRUE,

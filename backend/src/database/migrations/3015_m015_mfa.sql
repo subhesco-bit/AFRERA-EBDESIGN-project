@@ -6,7 +6,7 @@
 -- MFA Secrets Table
 CREATE TABLE IF NOT EXISTS mfa_secrets (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   method VARCHAR(50) NOT NULL, -- 'totp', 'sms', 'email'
   secret TEXT NOT NULL,
   is_active BOOLEAN DEFAULT true,
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS mfa_secrets (
 -- MFA OTP Table
 CREATE TABLE IF NOT EXISTS mfa_otp (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   method VARCHAR(50) NOT NULL,
   phone_number VARCHAR(20),
   email VARCHAR(255),
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS mfa_otp (
 -- MFA Biometrics Table
 CREATE TABLE IF NOT EXISTS mfa_biometrics (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   biometric_type VARCHAR(50) NOT NULL,
   biometric_hash TEXT NOT NULL,
   device_info JSONB,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS mfa_biometrics (
 -- Trusted Devices Table
 CREATE TABLE IF NOT EXISTS trusted_devices (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   device_fingerprint TEXT NOT NULL,
   trust_level VARCHAR(20) DEFAULT 'trusted', -- 'trusted', 'verified', 'unknown'
   expires_at TIMESTAMP NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS trusted_devices (
 -- MFA Recovery Codes Table
 CREATE TABLE IF NOT EXISTS mfa_recovery_codes (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   codes_hash JSONB NOT NULL,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS mfa_recovery_codes (
 -- MFA Events Table
 CREATE TABLE IF NOT EXISTS mfa_events (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   method VARCHAR(50) NOT NULL,
   event_type VARCHAR(50) NOT NULL, -- 'setup_initiated', 'verification_success', 'verification_failed', 'disabled'
   ip_address INET,

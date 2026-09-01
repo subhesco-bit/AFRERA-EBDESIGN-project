@@ -187,15 +187,35 @@ class GreenhouseManagementService {
     };
   }
 
+  /**
+   * (2026-08-29) Was unconditionally returning one hardcoded fabricated
+   * reading (25.5C/75%/450ppm/etc.) for every device regardless of what
+   * device_id was passed - a fake IoT feed dressed up as "fetching." No
+   * real IoT/MQTT/GSM sensor gateway is configured anywhere in this
+   * codebase. Reads real logged readings from greenhouse_sensor_readings
+   * if the table/rows exist; returns an explicit empty result with a
+   * reason otherwise, rather than fabricating one.
+   */
   async fetchGreenhouseSensorData(deviceId, startTime, endTime) {
-    logger.info(`Fetching greenhouse sensor data for device ${deviceId}`);
-    
-    return {
-      deviceId,
-      readings: [
-        { timestamp: new Date(), temperature: 25.5, humidity: 75, co2: 450, lightLevel: 12000, soilMoisture: 65 }
-      ]
-    };
+    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    try {
+      const params = [deviceId];
+      let query = `SELECT * FROM greenhouse_sensor_readings WHERE device_id = $1`;
+      if (startTime) { params.push(startTime); query += ` AND recorded_at >= $${params.length}`; }
+      if (endTime) { params.push(endTime); query += ` AND recorded_at <= $${params.length}`; }
+      query += ' ORDER BY recorded_at DESC LIMIT 100';
+      const res = await pg.query(query, params);
+      return { deviceId, readings: res.rows, configured: true };
+    } catch (error) {
+      // greenhouse_sensor_readings has no migration in this codebase yet -
+      // no real IoT gateway writes to it. Honest empty result, not fake data.
+      return {
+        deviceId,
+        readings: [],
+        configured: false,
+        reason: 'No IoT sensor gateway is configured in this deployment; no live or logged reading exists for this device.',
+      };
+    }
   }
 
   async processGreenhouseSensorData(sensorDataArray) {
@@ -414,11 +434,35 @@ class GreenhouseManagementService {
     };
   }
 
+  /**
+   * (2026-08-29) Was unconditionally `return true` - every automation rule
+   * would fire on every check regardless of trigger condition, a silent
+   * always-on bug, not a real evaluation. Evaluates real, simple threshold
+   * conditions (field/operator/value) against the greenhouse's latest
+   * logged sensor reading; honestly returns false (does not fire) if no
+   * reading exists yet, rather than defaulting to true.
+   */
   async evaluateTrigger(triggerCondition) {
-    // Evaluate trigger condition against current sensor data
-    // This would integrate with real-time sensor data
-    logger.info(`Evaluating trigger: ${JSON.stringify(triggerCondition)}`);
-    return true; // Placeholder
+    const { greenhouseId, field, operator, value } = triggerCondition || {};
+    if (!greenhouseId || !field || !operator || value === undefined) {
+      logger.warn(`Trigger condition missing required fields: ${JSON.stringify(triggerCondition)}`);
+      return false;
+    }
+    const sensorData = await this.getGreenhouseSensorData(greenhouseId);
+    const latest = sensorData.data?.[0]?.readings?.[0];
+    if (!latest || latest[field] === undefined) return false;
+
+    const actual = latest[field];
+    switch (operator) {
+      case '>': return actual > value;
+      case '<': return actual < value;
+      case '>=': return actual >= value;
+      case '<=': return actual <= value;
+      case '==': return actual === value;
+      default:
+        logger.warn(`Unknown trigger operator: ${operator}`);
+        return false;
+    }
   }
 
   async executeAction(action, parameters) {
@@ -444,10 +488,16 @@ class GreenhouseManagementService {
       resourceOptimization: await this.optimizeResources(sensorData)
     };
     
+    // (2026-08-29) Was a hardcoded confidence:0.89 regardless of input -
+    // the same fabricated-confidence-score pattern already found and fixed
+    // in core/ai/aiOrchestratorCore.js this session. These insights are
+    // deterministic rule-based calculations (see calculateCropSuitability/
+    // calculateGrowthSuitability above), not a scored ML prediction - no
+    // confidence figure honestly applies. Removed rather than faked.
     return {
       greenhouseId,
       insights,
-      confidence: 0.89
+      method: 'rule_based_calculation',
     };
   }
 

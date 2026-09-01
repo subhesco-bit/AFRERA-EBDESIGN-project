@@ -1,6 +1,14 @@
 ﻿/**
  * Review Management Service (M060)
  * Product reviews and ratings with AI-powered sentiment analysis
+ *
+ * SUPERSEDED (2026-08-31) by services/legacy/productReviewService.js
+ * (product_reviews table, wired at /api/v1/product-reviews - the one the
+ * frontend actually calls). See README.md in this directory before adding
+ * a caller to this module. In particular: the "sentiment_analysis" task
+ * below is not real sentiment analysis - aiAPI.generateRecommendation()
+ * ignores the task field except to echo it back; it always runs the
+ * purchase-history recommendation engine and relabels the result.
  */
 
 const { logger } = require('../../utils/logger');
@@ -80,8 +88,27 @@ function generateId() {
   return `REV-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
+/**
+ * (2026-08-29) Was a hardcoded {category: 'grains', average_rating: 4.2}
+ * returned for every product regardless of ID - fed straight into the
+ * "AI sentiment analysis" call above as fabricated context. Queries the
+ * real products table instead; returns null fields honestly if the
+ * product isn't found rather than a fabricated default.
+ */
 async function getProductContext(productId) {
-  return { category: 'grains', average_rating: 4.2 };
+  try {
+    const res = await pool.query(
+      `SELECT c.name AS category, COALESCE(p.average_rating, 0) AS average_rating
+       FROM products p LEFT JOIN categories c ON c.id = p.category_id
+       WHERE p.id = $1`,
+      [productId]
+    );
+    if (res.rows.length === 0) return { category: null, average_rating: null };
+    return res.rows[0];
+  } catch (error) {
+    logger.error('Error getting product context', { error: error.message });
+    return { category: null, average_rating: null };
+  }
 }
 
 module.exports = { createReview, getReview, getProductReviews, updateReviewStatus };

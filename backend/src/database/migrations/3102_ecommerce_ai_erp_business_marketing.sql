@@ -20,7 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_product_listings_ai_visibility ON product_listing
 -- Customer Segmentation Table
 CREATE TABLE IF NOT EXISTS customer_segments (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     segment_type VARCHAR(50) NOT NULL,
     segment_data JSONB DEFAULT '{}',
     confidence_score DECIMAL(3, 2),
@@ -75,7 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_sales_forecasts_category ON sales_forecasts(categ
 -- Customer Lifetime Value Table
 CREATE TABLE IF NOT EXISTS customer_ltv (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id),
     ltv_data JSONB NOT NULL,
     calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     description TEXT,
     reference_id VARCHAR(50),
     reference_type VARCHAR(50),
-    posted_by VARCHAR(50) REFERENCES users(id),
+    posted_by UUID REFERENCES users(id),
     posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -168,7 +168,7 @@ CREATE INDEX IF NOT EXISTS idx_inventory_adjustments_product ON inventory_adjust
 CREATE TABLE IF NOT EXISTS purchase_orders (
     id VARCHAR(50) PRIMARY KEY,
     product_id VARCHAR(50) REFERENCES product_listings(id),
-    seller_id VARCHAR(50) REFERENCES users(id),
+    seller_id UUID REFERENCES users(id),
     requested_quantity DECIMAL(15, 2) NOT NULL,
     unit VARCHAR(20) NOT NULL,
     unit_price DECIMAL(15, 2) NOT NULL,
@@ -185,7 +185,7 @@ CREATE INDEX IF NOT EXISTS idx_purchase_orders_status ON purchase_orders(po_stat
 -- CRM Customers Table (Customer ERP)
 CREATE TABLE IF NOT EXISTS crm_customers (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(50) UNIQUE NOT NULL REFERENCES users(id),
+    user_id UUID UNIQUE NOT NULL REFERENCES users(id),
     customer_data JSONB NOT NULL,
     synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -197,7 +197,7 @@ CREATE INDEX IF NOT EXISTS idx_crm_customers_user ON crm_customers(user_id);
 CREATE TABLE IF NOT EXISTS production_orders (
     id VARCHAR(50) PRIMARY KEY,
     product_id VARCHAR(50) REFERENCES product_listings(id),
-    seller_id VARCHAR(50) REFERENCES users(id),
+    seller_id UUID REFERENCES users(id),
     requested_quantity DECIMAL(15, 2) NOT NULL,
     production_quantity DECIMAL(15, 2) NOT NULL,
     start_date DATE,
@@ -217,8 +217,8 @@ CREATE INDEX IF NOT EXISTS idx_production_orders_status ON production_orders(ord
 -- Contract Farming Table
 CREATE TABLE IF NOT EXISTS contract_farming (
     id VARCHAR(50) PRIMARY KEY,
-    buyer_id VARCHAR(50) REFERENCES users(id),
-    farmer_id VARCHAR(50) REFERENCES users(id),
+    buyer_id UUID REFERENCES users(id),
+    farmer_id UUID REFERENCES users(id),
     crop_type VARCHAR(100) NOT NULL,
     variety VARCHAR(100),
     contract_quantity DECIMAL(15, 2) NOT NULL,
@@ -257,7 +257,7 @@ CREATE INDEX IF NOT EXISTS idx_contract_milestones_contract ON contract_mileston
 -- Platform Commissions Table
 CREATE TABLE IF NOT EXISTS platform_commissions (
     id SERIAL PRIMARY KEY,
-    order_id VARCHAR(50) REFERENCES orders(id),
+    order_id UUID REFERENCES orders(id),
     total_amount DECIMAL(15, 2) NOT NULL,
     commission_rate DECIMAL(5, 2) NOT NULL,
     commission_amount DECIMAL(15, 2) NOT NULL,
@@ -276,7 +276,7 @@ CREATE INDEX IF NOT EXISTS idx_platform_commissions_calculated ON platform_commi
 -- Marketing Campaigns Table
 CREATE TABLE IF NOT EXISTS marketing_campaigns (
     id VARCHAR(50) PRIMARY KEY,
-    created_by VARCHAR(50) REFERENCES users(id),
+    created_by UUID REFERENCES users(id),
     campaign_name VARCHAR(255) NOT NULL,
     campaign_type VARCHAR(50) NOT NULL,
     objective TEXT,
@@ -326,7 +326,7 @@ CREATE INDEX IF NOT EXISTS idx_ad_placements_status ON ad_placements(status);
 -- Sponsored Products Table
 CREATE TABLE IF NOT EXISTS sponsored_products (
     id VARCHAR(50) PRIMARY KEY,
-    seller_id VARCHAR(50) REFERENCES users(id),
+    seller_id UUID REFERENCES users(id),
     product_id VARCHAR(50) REFERENCES product_listings(id),
     sponsor_tier VARCHAR(20) NOT NULL,
     bid_amount DECIMAL(15, 2) NOT NULL,
@@ -348,7 +348,7 @@ CREATE INDEX IF NOT EXISTS idx_sponsored_products_status ON sponsored_products(s
 -- Promotions Table
 CREATE TABLE IF NOT EXISTS promotions (
     id VARCHAR(50) PRIMARY KEY,
-    created_by VARCHAR(50) REFERENCES users(id),
+    created_by UUID REFERENCES users(id),
     promotion_name VARCHAR(255) NOT NULL,
     promotion_type VARCHAR(50) NOT NULL,
     discount_type VARCHAR(20) NOT NULL CHECK (discount_type IN ('percentage', 'fixed', 'buy_x_get_y')),
@@ -375,8 +375,8 @@ CREATE INDEX IF NOT EXISTS idx_promotions_dates ON promotions(start_date, end_da
 CREATE TABLE IF NOT EXISTS discount_records (
     id VARCHAR(50) PRIMARY KEY,
     promotion_id VARCHAR(50) REFERENCES promotions(id),
-    order_id VARCHAR(50) REFERENCES orders(id),
-    user_id VARCHAR(50) REFERENCES users(id),
+    order_id UUID REFERENCES orders(id),
+    user_id UUID REFERENCES users(id),
     discount_amount DECIMAL(15, 2) NOT NULL,
     original_amount DECIMAL(15, 2) NOT NULL,
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -389,7 +389,7 @@ CREATE INDEX IF NOT EXISTS idx_discount_records_user ON discount_records(user_id
 -- Retargeting Campaigns Table
 CREATE TABLE IF NOT EXISTS retargeting_campaigns (
     id VARCHAR(50) PRIMARY KEY,
-    user_id VARCHAR(50) REFERENCES users(id),
+    user_id UUID REFERENCES users(id),
     campaign_type VARCHAR(50) NOT NULL,
     product_id VARCHAR(50) REFERENCES product_listings(id),
     cart_items JSONB DEFAULT '{}',
@@ -411,12 +411,22 @@ CREATE INDEX IF NOT EXISTS idx_retargeting_status ON retargeting_campaigns(statu
 CREATE TRIGGER update_customer_segments_updated_at BEFORE UPDATE ON customer_segments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- 2026-08-30: guarded with DROP TRIGGER IF EXISTS - demand_forecasts is a
+-- pre-existing (pre-dates this session) documented collision (see
+-- schema-decisions.json), and 030_institutional_procurement_schema.sql
+-- already creates a trigger of this exact name on the same real table,
+-- using the same self-healing DROP-then-CREATE pattern this fix now matches.
+DROP TRIGGER IF EXISTS update_demand_forecasts_updated_at ON demand_forecasts;
 CREATE TRIGGER update_demand_forecasts_updated_at BEFORE UPDATE ON demand_forecasts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_journal_entries_updated_at BEFORE UPDATE ON journal_entries
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- 2026-08-30: guarded with DROP TRIGGER IF EXISTS - gst_invoices is a
+-- pre-existing documented collision (schema-decisions.json), and
+-- 028_gst_schema.sql already creates a trigger of this exact name.
+DROP TRIGGER IF EXISTS update_gst_invoices_updated_at ON gst_invoices;
 CREATE TRIGGER update_gst_invoices_updated_at BEFORE UPDATE ON gst_invoices
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

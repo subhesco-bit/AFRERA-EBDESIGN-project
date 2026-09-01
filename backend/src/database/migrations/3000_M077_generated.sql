@@ -1,4 +1,4 @@
-﻿-- 3000_M077_generated.sql
+-- 3000_M077_generated.sql
 -- Auto-generated table for M077
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

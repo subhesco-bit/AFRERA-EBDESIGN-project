@@ -254,9 +254,16 @@ router.post('/herd/:femaleId/breeding', async (req, res, next) => {
 
 /**
  * PUT /api/v1/goat/breeding/:id
+ * PUT /api/v1/goat/breeding/:id/kidding-outcome
  * Update kidding outcome for a breeding record.
+ *
+ * F3 fix (2026-08-30): frontend (frontend/src/services/api.js:567,
+ * updateKiddingOutcome) calls the `/kidding-outcome` suffixed path; the
+ * bare `/breeding/:id` route below was the only one registered. Both paths
+ * now delegate to the same handler/service call - same body shape, no
+ * behavior change for existing callers of the bare path.
  */
-router.put('/breeding/:id', async (req, res, next) => {
+router.put(['/breeding/:id', '/breeding/:id/kidding-outcome'], async (req, res, next) => {
   try {
     const record = await updateKiddingOutcome(req.params.id, req.body);
     if (!record) {

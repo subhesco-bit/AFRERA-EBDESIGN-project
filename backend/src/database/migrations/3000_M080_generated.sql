@@ -1,4 +1,4 @@
-﻿-- 3000_M080_generated.sql
+-- 3000_M080_generated.sql
 -- Auto-generated table for M080
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

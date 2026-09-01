@@ -101,7 +101,8 @@ router.get('/stats', authMiddleware, adminMiddleware, async (req, res) => {
 
 /**
  * GET /api/v1/platform/optimizations
- * Get AI-powered platform optimization recommendations
+ * Get static best-practice platform optimization recommendations (not
+ * AI-generated - see platformCoreService.js's getPlatformOptimizations()).
  */
 router.get('/optimizations', authMiddleware, adminMiddleware, async (req, res) => {
   try {
@@ -119,5 +120,32 @@ router.get('/optimizations', authMiddleware, adminMiddleware, async (req, res) =
     });
   }
 });
+
+/**
+ * F1 fix (2026-08-30) — frontend `platformCoreAPI` (frontend/src/services/api.js:416-426)
+ * calls 9 endpoints below that have no backend route at all, and
+ * services/dual-use/platformCoreService.js has no backing methods for any of
+ * them (checked: only getPlatformConfig/updatePlatformConfig/getPlatformHealth/
+ * getPlatformStats/getPlatformOptimizations exist - no initialize, scaling,
+ * capacity, disaster-recovery, performance-monitor, self-healing, optimized-
+ * configuration, metrics, or system-state method anywhere in that file or any
+ * sibling service). Rather than fabricate scaling/capacity/DR/self-healing
+ * logic that doesn't exist, these fail honestly with 501, same pattern as
+ * aiGatewayRoutes.js's notImplemented() helper.
+ */
+const notImplemented = (feature) => (req, res) => {
+  res.status(501).json({ success: false, error: `${feature} is not implemented`, code: 'NOT_IMPLEMENTED' });
+};
+
+router.post('/initialize', authMiddleware, adminMiddleware, notImplemented('Platform initialize'));
+router.get('/scaling/recommendations', authMiddleware, adminMiddleware, notImplemented('Platform scaling recommendations'));
+router.get('/capacity/predict', authMiddleware, adminMiddleware, notImplemented('Platform capacity prediction'));
+router.post('/disaster-recovery', authMiddleware, adminMiddleware, notImplemented('Platform disaster recovery trigger'));
+router.get('/performance/monitor', authMiddleware, adminMiddleware, notImplemented('Platform performance monitoring'));
+router.post('/self-healing', authMiddleware, adminMiddleware, notImplemented('Platform self-healing trigger'));
+router.get('/configuration/optimized', authMiddleware, adminMiddleware, notImplemented('Optimized configuration retrieval'));
+router.post('/configuration/apply', authMiddleware, adminMiddleware, notImplemented('Configuration apply'));
+router.get('/metrics', authMiddleware, adminMiddleware, notImplemented('Platform metrics'));
+router.get('/state', authMiddleware, adminMiddleware, notImplemented('Platform system state'));
 
 module.exports = router;

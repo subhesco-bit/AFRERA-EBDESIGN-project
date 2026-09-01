@@ -238,11 +238,51 @@ async function getEquipmentHistory(equipmentId) {
   }
 }
 
+// Honest-degradation pattern (matches services/dual-use/platformCoreService.js):
+// classify against the reported symptoms/equipmentType via keyword rules; only
+// fall back to the generic default when nothing in the input matches a known
+// pattern, and label the source instead of carrying a fabricated confidence.
+const SYMPTOM_RULES = [
+  { keywords: ['overheat', 'temperature', 'hot'], cause: 'cooling_system_failure', components: ['radiator', 'coolant_system', 'engine'] },
+  { keywords: ['noise', 'rattle', 'knock', 'vibrat'], cause: 'mechanical_wear', components: ['engine', 'transmission'] },
+  { keywords: ['leak', 'oil', 'fluid'], cause: 'seal_or_gasket_failure', components: ['engine', 'hydraulic_system'] },
+  { keywords: ['won\'t start', 'not starting', 'no start', 'battery', 'electrical'], cause: 'electrical_failure', components: ['battery', 'starter', 'wiring'] },
+  { keywords: ['hydraulic', 'lift', 'pressure'], cause: 'hydraulic_system_failure', components: ['hydraulic_pump', 'hoses'] },
+  { keywords: ['brake'], cause: 'brake_system_failure', components: ['brakes'] },
+  { keywords: ['tire', 'tyre', 'wheel'], cause: 'tire_or_wheel_damage', components: ['tires', 'wheels'] }
+];
+
 async function analyzeSymptoms(symptoms, equipmentType) {
+  const symptomText = Array.isArray(symptoms)
+    ? symptoms.join(' ').toLowerCase()
+    : String(symptoms || '').toLowerCase();
+
+  if (!symptomText.trim()) {
+    return {
+      likely_cause: 'unknown',
+      source: 'static',
+      affected_components: [],
+      note: 'No symptoms provided to analyze'
+    };
+  }
+
+  const matched = SYMPTOM_RULES.filter(rule => rule.keywords.some(k => symptomText.includes(k)));
+
+  if (matched.length === 0) {
+    return {
+      likely_cause: 'undetermined',
+      source: 'static',
+      affected_components: [],
+      note: `Symptoms did not match a known pattern for equipment type ${equipmentType || 'unknown'}; manual inspection recommended`
+    };
+  }
+
+  const affected_components = [...new Set(matched.flatMap(r => r.components))];
   return {
-    likely_cause: 'mechanical_failure',
-    confidence: 0.85,
-    affected_components: ['engine', 'transmission']
+    likely_cause: matched[0].cause,
+    source: 'rule_based',
+    matched_patterns: matched.length,
+    affected_components
   };
 }
 
@@ -291,10 +331,22 @@ async function checkPartsAvailability(requiredParts) {
   };
 }
 
+// Real estimate driven by how many parts the repair actually needs (base labor
+// hours + a per-part fitting overhead), rather than a fixed constant. Still a
+// heuristic, not a data-driven model, so it's labeled source: 'rule_based'
+// instead of carrying a fabricated confidence score.
 async function estimateRepairTime(breakdownId, requiredParts) {
+  const partsList = Array.isArray(requiredParts) ? requiredParts : (requiredParts ? [requiredParts] : []);
+  const BASE_HOURS = 4;
+  const HOURS_PER_PART = 1.5;
+  const estimated_hours = partsList.length === 0
+    ? BASE_HOURS
+    : BASE_HOURS + partsList.length * HOURS_PER_PART;
+
   return {
-    estimated_hours: 8,
-    confidence: 0.8
+    estimated_hours,
+    source: partsList.length === 0 ? 'static' : 'rule_based',
+    parts_count: partsList.length
   };
 }
 

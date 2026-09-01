@@ -38,7 +38,6 @@ const emptyForm = {
   tags: '',
   organic: false,
   gi_status: false,
-  featured: false,
 }
 
 export default function SellerProductFormPage() {
@@ -114,20 +113,28 @@ export default function SellerProductFormPage() {
       tags: form.tags ? form.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
       organic: form.organic,
       gi_status: form.gi_status,
-      featured: form.featured,
     })
   }
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
       <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-        <PackagePlus className="h-6 w-6" /> Add Product
+        <PackagePlus className="h-6 w-6" /> List a product to sell
       </h1>
-      <p className="mt-1 flex items-start gap-2 text-sm text-muted-foreground">
+      <p className="mt-2 text-sm text-muted-foreground">
+        Fill in the details below — it only takes a few minutes. Fields marked * are required;
+        everything else can be added or edited later.
+      </p>
+      <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
         <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
         Since you're not attaching an image below, AFRERA will automatically attempt to
         generate one via the AI backbone once you save (falls back honestly if no image
         provider is configured — see the AI Backbone page).
+      </p>
+      <p className="mt-2 text-sm text-muted-foreground">
+        <strong className="text-foreground">What happens after you submit:</strong> your product
+        goes live on the marketplace immediately — there's no waiting for approval. You can come
+        back and edit or remove it any time from your seller listings.
       </p>
 
       <Section title="Details">
@@ -136,17 +143,20 @@ export default function SellerProductFormPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="name">Product name *</Label>
-                <Input id="name" value={form.name} onChange={update('name')} required />
+                <Input id="name" value={form.name} onChange={update('name')} required placeholder="e.g. Sikkim Large Cardamom" />
               </div>
 
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea id="description" value={form.description} onChange={update('description')} rows={3} />
+                <Textarea id="description" value={form.description} onChange={update('description')} rows={3}
+                  placeholder="Tell buyers about your product — how it's grown, harvested, and what makes it good." />
               </div>
 
               <div>
-                <Label htmlFor="usp">Why this product? (USP)</Label>
-                <Textarea id="usp" value={form.usp} onChange={update('usp')} rows={2} />
+                <Label htmlFor="usp">Why this product? (optional)</Label>
+                <Textarea id="usp" value={form.usp} onChange={update('usp')} rows={2}
+                  placeholder="What makes yours stand out — organic, GI-certified, family farm, etc." />
+                <p className="mt-1 text-xs text-muted-foreground">A short, honest reason buyers should pick your listing.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -170,27 +180,31 @@ export default function SellerProductFormPage() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="base_price">Base price (₹) *</Label>
-                  <Input id="base_price" type="number" min="0" step="0.01" value={form.base_price} onChange={update('base_price')} required />
+                  <Label htmlFor="base_price">Your price (₹) *</Label>
+                  <Input id="base_price" type="number" min="0" step="0.01" value={form.base_price} onChange={update('base_price')} required placeholder="0.00" />
+                  <p className="mt-1 text-xs text-muted-foreground">Per unit, before GST.</p>
                 </div>
                 <div>
                   <Label htmlFor="map_price">MAP price (₹)</Label>
-                  <Input id="map_price" type="number" min="0" step="0.01" value={form.map_price} onChange={update('map_price')} />
+                  <Input id="map_price" type="number" min="0" step="0.01" value={form.map_price} onChange={update('map_price')} placeholder="Optional" />
+                  <p className="mt-1 text-xs text-muted-foreground">Minimum advertised price, if you set one.</p>
                 </div>
                 <div>
                   <Label htmlFor="retail_price">Retail price (₹)</Label>
-                  <Input id="retail_price" type="number" min="0" step="0.01" value={form.retail_price} onChange={update('retail_price')} />
+                  <Input id="retail_price" type="number" min="0" step="0.01" value={form.retail_price} onChange={update('retail_price')} placeholder="Optional" />
+                  <p className="mt-1 text-xs text-muted-foreground">Typical shelf price, for comparison.</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="weight_per_unit">Weight per unit (kg)</Label>
-                  <Input id="weight_per_unit" type="number" min="0" step="0.01" value={form.weight_per_unit} onChange={update('weight_per_unit')} />
+                  <Input id="weight_per_unit" type="number" min="0" step="0.01" value={form.weight_per_unit} onChange={update('weight_per_unit')} placeholder="Optional" />
                 </div>
                 <div>
                   <Label htmlFor="tags">Tags (comma-separated)</Label>
                   <Input id="tags" value={form.tags} onChange={update('tags')} placeholder="spices, organic, turmeric" />
+                  <p className="mt-1 text-xs text-muted-foreground">Helps buyers find you when searching.</p>
                 </div>
               </div>
 
@@ -201,10 +215,10 @@ export default function SellerProductFormPage() {
                 <label className="flex items-center gap-2">
                   <input type="checkbox" checked={form.gi_status} onChange={update('gi_status')} /> GI Certified
                 </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={form.featured} onChange={update('featured')} /> Featured
-                </label>
               </div>
+              <p className="text-xs text-muted-foreground -mt-2">
+                Only check these if you can back them up — they're shown to buyers as certifications.
+              </p>
 
               {formError && (
                 <div role="alert" className="rounded-md border border-sev-critical/30 bg-sev-critical/10 p-3 text-sm text-sev-critical">
@@ -219,8 +233,8 @@ export default function SellerProductFormPage() {
                 </div>
               )}
 
-              <Button type="submit" disabled={createMutation.isPending || queuedOffline}>
-                {createMutation.isPending ? 'Saving…' : queuedOffline ? 'Queued for sync' : 'Create Product'}
+              <Button type="submit" disabled={createMutation.isPending || queuedOffline} className="w-full sm:w-auto">
+                {createMutation.isPending ? 'Publishing…' : queuedOffline ? 'Queued for sync' : 'Publish Listing'}
               </Button>
             </form>
           </CardContent>

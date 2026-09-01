@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS mfa_secrets (
 -- Backup codes table
 CREATE TABLE IF NOT EXISTS mfa_backup_codes (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     code VARCHAR(10) NOT NULL,
     used BOOLEAN DEFAULT false,
     used_at TIMESTAMP,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS mfa_backup_codes (
 -- MFA verification attempts table for rate limiting and audit
 CREATE TABLE IF NOT EXISTS mfa_verification_attempts (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     ip_address VARCHAR(45),
     user_agent TEXT,
     success BOOLEAN DEFAULT false,
@@ -38,7 +38,10 @@ CREATE TABLE IF NOT EXISTS mfa_verification_attempts (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_mfa_secrets_user_id ON mfa_secrets(user_id);
+-- 2026-08-30: added IF NOT EXISTS - 3015_m015_mfa.sql (the real, winning
+-- mfa_secrets table per schema-decisions.json) already creates an index of
+-- this exact name.
+CREATE INDEX IF NOT EXISTS idx_mfa_secrets_user_id ON mfa_secrets(user_id);
 CREATE INDEX idx_mfa_backup_codes_user_id ON mfa_backup_codes(user_id);
 CREATE INDEX idx_mfa_backup_codes_used ON mfa_backup_codes(used);
 CREATE INDEX idx_mfa_verification_attempts_user_id ON mfa_verification_attempts(user_id);

@@ -4,7 +4,15 @@
 
 'use strict';
 
-const express = require('express');
+// This file lives outside backend/ (a "plug-and-play module" per
+// backend/src/routes/libraryRoutes.js), so a bare require('express') can't
+// find backend/node_modules from here via normal upward resolution -
+// "Cannot find module 'express'" the first time any test actually required
+// this file transitively (via src/index.js -> libraryRoutes.js), which was
+// most of the 21 failing Jest suites in this repo's first real CI run.
+// Resolve explicitly from backend/, where express is actually installed.
+const path = require('path');
+const express = require(require.resolve('express', { paths: [path.join(__dirname, '..', '..', '..', 'backend')] }));
 const { singleton: libraryKnowledgeService } = require('../backend/service');
 
 const router = express.Router();

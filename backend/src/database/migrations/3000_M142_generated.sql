@@ -1,4 +1,4 @@
-﻿-- 3000_M142_generated.sql
+-- 3000_M142_generated.sql
 -- Auto-generated table for M142
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

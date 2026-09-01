@@ -338,16 +338,7 @@ function makeTestPool() {
       // Very small, conservative parser for the queries used in tests.
       const t = (text || '').toLowerCase();
 
-      // Trace all queries in test-mode to help align handlers (temporary)
-      if (process.env.NODE_ENV === 'test') {
-      }
 
-      // Debug: log any blockchain-related queries when running tests
-      if (process.env.NODE_ENV === 'test' && (t.includes('blockchain') || t.includes('chain_of_custody') || t.includes('traceability'))) {
-      }
-      // Debug: also log AR/VR and nutrition and conversational queries to help align handlers
-      if (process.env.NODE_ENV === 'test' && (t.includes('ar_vr') || t.includes('arvr') || t.includes('nutrition') || t.includes('conversation') || t.includes('conversational') || t.includes('voice'))) {
-      }
 
       // INSERT INTO health_profiles ... RETURNING *
       if (t.includes('insert into health_profiles')) {
@@ -505,11 +496,6 @@ function makeTestPool() {
         return { rows: row ? [row] : [] };
       }
 
-      // DEBUG: any query touching gi_marketplace_listings
-      if (t.includes('gi_marketplace_listings')) {
-        if (process.env.NODE_ENV === 'test') {
-        }
-      }
 
       // INSERT into gi_marketplace_listings
       if (t.includes('insert into gi_marketplace_listings')) {
@@ -545,9 +531,6 @@ function makeTestPool() {
           listing_status: 'active',
           created_at: new Date().toISOString()
         };
-        // debug: log params when running tests
-        if (process.env.NODE_ENV === 'test') {
-        }
         testStores.gi_marketplace.set(row.id, row);
         return { rows: [row] };
       }
@@ -599,16 +582,12 @@ function makeTestPool() {
         };
         // Store with the exact transaction hash as key
         testStores.blockchain_transactions.set(txHash, row);
-        if (process.env.NODE_ENV === 'test') {
-        }
         return { rows: [row] };
       }
 
       // SELECT * FROM blockchain_transactions WHERE transaction_hash = $1
       if (t.includes('from blockchain_transactions')) {
         const txHash = params[0];
-        if (process.env.NODE_ENV === 'test') {
-        }
         // Direct key lookup first
         let row = testStores.blockchain_transactions.get(txHash);
         
@@ -622,9 +601,6 @@ function makeTestPool() {
             const candidate = normalize(r.transaction_hash);
             return candidate === targetNorm || candidate === ('0x'+targetNorm) || ('0x'+candidate) === targetNorm;
           });
-        }
-        
-        if (process.env.NODE_ENV === 'test') {
         }
         return { rows: row ? [row] : [] };
       }
@@ -668,19 +644,13 @@ function makeTestPool() {
           is_revoked: false
         };
         testStores.blockchain_certificates.set(row.certificate_number, row);
-        if (process.env.NODE_ENV === 'test') {
-        }
         return { rows: [row] };
       }
 
       // SELECT * FROM blockchain_certificates WHERE certificate_number = $1 AND is_revoked = false
       if (t.includes('from blockchain_certificates')) {
         const certNum = params[0];
-        if (process.env.NODE_ENV === 'test') {
-        }
         const row = testStores.blockchain_certificates.get(certNum);
-        if (process.env.NODE_ENV === 'test') {
-        }
         return { rows: row ? [row] : [] };
       }
 
@@ -1357,8 +1327,6 @@ function makeTestPool() {
         testStores.conversation_sessions = testStores.conversation_sessions || new Map();
         // store by session_id so lookups that query by session_id succeed
         testStores.conversation_sessions.set(sessionIdValue, row);
-        if (process.env.NODE_ENV === 'test') {
-        }
         return { rows: [row] };
       }
 
@@ -1405,8 +1373,6 @@ function makeTestPool() {
         const arr = testStores.conversation_messages.get(sessionId) || [];
         arr.push(row);
         testStores.conversation_messages.set(sessionId, arr);
-        if (process.env.NODE_ENV === 'test') {
-        }
         return { rows: [row] };
       }
 
@@ -1888,8 +1854,6 @@ function makeTestPool() {
         };
         testStores.product_nutrition = testStores.product_nutrition || new Map();
         testStores.product_nutrition.set(row.product_id, row);
-        if (process.env.NODE_ENV === 'test') {
-        }
         return { rows: [row] };
       }
 
@@ -1906,11 +1870,7 @@ function makeTestPool() {
               row.food_name = profile.food_name;
             }
           }
-          if (process.env.NODE_ENV === 'test') {
-          }
           return { rows: [row] };
-        }
-        if (process.env.NODE_ENV === 'test') {
         }
         return { rows: [] };
       }

@@ -41,7 +41,7 @@ const TABS = [
   { id: 'block', label: 'Block', icon: Building2 },
   { id: 'district', label: 'District', icon: MapPin },
   { id: 'state', label: 'State', icon: Flag },
-  { id: 'cooperative', label: 'Cooperative', icon: Handshake },
+  { id: 'cooperative', label: 'Cooperative', icon: HeartHandshake },
   { id: 'producer-group', label: 'Producer Group', icon: Users },
   { id: 'community-asset', label: 'Community Asset', icon: Home },
   { id: 'rural-development', label: 'Rural Development', icon: TreePine },

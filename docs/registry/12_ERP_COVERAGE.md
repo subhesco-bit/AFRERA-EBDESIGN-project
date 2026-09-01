@@ -1,6 +1,6 @@
 # ERP Domain Coverage
 
-**Generated:** 2026-08-28 by `tools/module-audit.js`
+**Generated:** 2026-08-30 by `tools/module-audit.js`
 **Status:** DESCRIPTIVE — read from source, comments stripped before analysis.
 **Do not edit by hand.**
 
@@ -21,14 +21,14 @@ is an ERP function the platform cannot perform at all.
 | AF-PP | Production Planning | PP | 1 | 17 | 1 | Covered |
 | AF-PM | Plant Maintenance | PM | 9 | 30 | 6 | Covered |
 | AF-AA | Asset Accounting | AA | 2 | 9 | 0 | No AI |
-| AF-HCM | Human Capital Management | HCM | 10 | 54 | 15 | Covered |
+| AF-HCM | Human Capital Management | HCM | 10 | 59 | 15 | Covered |
 | AF-PS | Project Systems | PS | 8 | 32 | 2 | Covered |
 | AF-CS | Customer Service | CS | 3 | 19 | 5 | Covered |
-| AF-MDM | Master Data Management | MDM | 17 | 105 | 16 | Covered |
+| AF-MDM | Master Data Management | MDM | 18 | 124 | 17 | Covered |
 | AF-SEC | Governance / Risk / Compliance | GRC | 7 | 53 | 2 | Covered |
 | AF-CRM | Customer Relationship Mgmt | CRM | 1 | 13 | 1 | Covered |
 | AF-TR | Treasury | TR | 2 | 0 | 2 | No endpoints |
-| AF-AGRI | Agronomy (AFRERA-specific) | — | 15 | 98 | 15 | Covered |
+| AF-AGRI | Agronomy (AFRERA-specific) | — | 16 | 106 | 17 | Covered |
 
 ## Domain detail
 
@@ -143,12 +143,13 @@ _No module serves this domain._
 
 - digitalProductPassportService
 - informationSharingRoutes
+- platformCoreRoutes
 - productService
 - platformConfigurationRoutes
+- productReviewRoutes
 - catalogIntelligenceService
 - formService
 - neProductIntelligenceService
-- platformCoreRoutes
 - moduleCatalogService
 - productMediaAIRoutes
 - platformTelemetryRoutes
@@ -186,6 +187,7 @@ _No module serves this domain._
 - organicTraceabilityService
 - giIntelligenceService
 - agriculturalIntelligenceRoutes
+- cropPlanningRoutes
 - cropManagementRoutes
 - soilManagementRoutes
 - cropValueResearchRoutes

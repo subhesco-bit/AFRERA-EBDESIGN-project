@@ -98,13 +98,25 @@ CREATE TABLE IF NOT EXISTS enterprise_memory_entries (
 -- Full-text index. The expression here MUST match the WHERE-clause expression
 -- in enterpriseMemoryService.recallSimilar() exactly, or Postgres will not use
 -- it and every search becomes a sequential scan.
+-- 2026-08-30: to_tsvector(regconfig, text) is STABLE, not IMMUTABLE (the text
+-- search config it depends on isn't guaranteed constant), so Postgres refuses
+-- it directly in an index expression ("functions in index expression must be
+-- marked IMMUTABLE") - the first time this repo's CI actually ran npm run
+-- migrate for real. Standard fix: wrap in a function explicitly asserted
+-- IMMUTABLE (safe here since 'english' is a hardcoded literal, not a
+-- parameter that could vary row to row).
+CREATE OR REPLACE FUNCTION enterprise_memory_search_vector(what_happened TEXT, resolution TEXT, tags TEXT[])
+RETURNS tsvector AS $$
+  SELECT to_tsvector('english',
+    what_happened || ' ' || COALESCE(resolution, '') || ' ' ||
+    COALESCE(array_to_string(tags, ' '), '')
+  );
+$$ LANGUAGE sql IMMUTABLE;
+
 CREATE INDEX IF NOT EXISTS idx_enterprise_memory_fts
   ON enterprise_memory_entries
   USING GIN (
-    (to_tsvector('english',
-      what_happened || ' ' || COALESCE(resolution, '') || ' ' ||
-      COALESCE(array_to_string(tags, ' '), '')
-    ))
+    (enterprise_memory_search_vector(what_happened, resolution, tags))
   );
 
 CREATE INDEX IF NOT EXISTS idx_enterprise_memory_entity

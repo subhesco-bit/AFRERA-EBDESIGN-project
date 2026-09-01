@@ -14,7 +14,31 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ['"Bricolage Grotesque"', 'Georgia', 'serif'],
+        body: ['"Public Sans"', 'system-ui', 'sans-serif'],
+        data: ['"IBM Plex Mono"', 'monospace'],
+      },
       colors: {
+        // NE Harvest palette (afrera_platform_v42.html reference) - scoped
+        // to v42-* so it doesn't collide with the tokens ~140 other pages
+        // already use. See src/index.css for the token values.
+        v42: {
+          paddy: 'hsl(var(--v42-paddy))',
+          paddy2: 'hsl(var(--v42-paddy-2))',
+          ink: 'hsl(var(--v42-ink))',
+          ink2: 'hsl(var(--v42-ink-2))',
+          mut: 'hsl(var(--v42-mut))',
+          forest: 'hsl(var(--v42-forest))',
+          forestd: 'hsl(var(--v42-forest-d))',
+          turmeric: 'hsl(var(--v42-turmeric))',
+          turmerictint: 'hsl(var(--v42-turmeric-tint))',
+          turmericink: 'hsl(var(--v42-turmeric-ink))',
+          chilli: 'hsl(var(--v42-chilli))',
+          indigo: 'hsl(var(--v42-indigo))',
+          mist: 'hsl(var(--v42-mist))',
+          line: 'hsl(var(--v42-line))',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

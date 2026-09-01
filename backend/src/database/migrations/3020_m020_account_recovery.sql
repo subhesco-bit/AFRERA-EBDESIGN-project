@@ -6,7 +6,7 @@
 -- Password Reset Tokens Table
 CREATE TABLE IF NOT EXISTS password_reset_tokens (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token VARCHAR(255) NOT NULL UNIQUE,
   expires_at TIMESTAMP NOT NULL,
   used BOOLEAN DEFAULT false,
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
 -- Security Questions Table
 CREATE TABLE IF NOT EXISTS security_questions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   question_id INTEGER NOT NULL,
   answer_hash VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS security_questions (
 -- Recovery Attempts Table
 CREATE TABLE IF NOT EXISTS recovery_attempts (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   recovery_type VARCHAR(50) NOT NULL, -- 'password_reset', 'security_questions', 'temp_password'
   status VARCHAR(20) NOT NULL, -- 'initiated', 'verified', 'failed', 'completed'
   details JSONB,

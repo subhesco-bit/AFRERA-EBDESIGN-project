@@ -3,6 +3,7 @@ import { ShoppingCart, User, Menu, Search, LogOut, ChevronDown, Sprout, DollarSi
 import { useAuthStore } from '../store/authStore'
 import { useState, useRef, useEffect } from 'react'
 import LanguageSelector from './Multilingual/LanguageSelector'
+import NotificationBell from './NotificationBell'
 
 function Header() {
   const { user, isAuthenticated, logout } = useAuthStore()
@@ -45,15 +46,15 @@ function Header() {
   }
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-sticky">
+    <header className="bg-v42-forestd shadow-md sticky top-0 z-sticky font-body border-b-4 border-v42-turmeric">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">A</span>
+            <div className="w-10 h-10 bg-v42-turmeric rounded-lg flex items-center justify-center">
+              <span className="text-v42-forestd font-bold text-xl">A</span>
             </div>
-            <span className="text-xl font-bold text-gray-800">AFRERA</span>
+            <span className="text-xl font-bold text-v42-paddy font-display">AFRERA</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -64,7 +65,7 @@ function Header() {
               ref={(el) => dropdownRefs.current.marketplace = el}
             >
               <button 
-                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'marketplace'}
                 onClick={() => toggleDropdown('marketplace')}
@@ -130,7 +131,7 @@ function Header() {
               ref={(el) => dropdownRefs.current.farmer = el}
             >
               <button 
-                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'farmer'}
                 onClick={() => toggleDropdown('farmer')}
@@ -228,7 +229,7 @@ function Header() {
               ref={(el) => dropdownRefs.current.pricing = el}
             >
               <button 
-                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'pricing'}
                 onClick={() => toggleDropdown('pricing')}
@@ -282,7 +283,7 @@ function Header() {
               ref={(el) => dropdownRefs.current.finance = el}
             >
               <button 
-                className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'finance'}
                 onClick={() => toggleDropdown('finance')}
@@ -350,19 +351,19 @@ function Header() {
               )}
             </div>
 
-            <Link to="/logistics" className="text-gray-700 hover:text-green-600 transition">
+            <Link to="/logistics" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Logistics
             </Link>
-            <Link to="/insurance" className="text-gray-700 hover:text-green-600 transition">
+            <Link to="/insurance" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Insurance
             </Link>
-            <Link to="/forms" className="text-gray-700 hover:text-green-600 transition">
+            <Link to="/forms" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Forms
             </Link>
-            <Link to="/analytics" className="text-gray-700 hover:text-green-600 transition">
+            <Link to="/analytics" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Analytics
             </Link>
-            <Link to="/modules" className="text-gray-700 hover:text-green-600 transition">
+            <Link to="/modules" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Modules
             </Link>
 
@@ -373,7 +374,7 @@ function Header() {
                 ref={(el) => dropdownRefs.current.vendor = el}
               >
                 <button 
-                  className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'vendor'}
                   onClick={() => toggleDropdown('vendor')}
@@ -421,7 +422,7 @@ function Header() {
                 ref={(el) => dropdownRefs.current.admin = el}
               >
                 <button 
-                  className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'admin'}
                   onClick={() => toggleDropdown('admin')}
@@ -481,7 +482,7 @@ function Header() {
                 ref={(el) => dropdownRefs.current.enterprise = el}
               >
                 <button 
-                  className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'enterprise'}
                   onClick={() => toggleDropdown('enterprise')}
@@ -538,8 +539,12 @@ function Header() {
                 anywhere in the UI to actually change language. */}
             <LanguageSelector />
 
+            {/* Notifications — real M010 notificationAPI, only rendered for
+                logged-in users (backend requires auth). */}
+            <NotificationBell />
+
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 text-gray-700 hover:text-green-600 transition" aria-label="Cart, 0 items">
+            <Link to="/cart" className="relative p-2 text-v42-paddy/90 hover:text-v42-turmeric transition" aria-label="Cart, 0 items">
               <ShoppingCart className="w-6 h-6" />
               <span aria-hidden="true" className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 0
@@ -553,7 +558,7 @@ function Header() {
                 ref={(el) => dropdownRefs.current.user = el}
               >
                 <button 
-                  className="flex items-center space-x-2 p-2 text-gray-700 hover:text-green-600 transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
+                  className="flex items-center space-x-2 p-2 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'user'}
                   aria-label={`User menu for ${user?.firstName || user?.email || 'account'}`}
@@ -611,13 +616,13 @@ function Header() {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-gray-700 hover:text-green-600 transition"
+                  className="px-4 py-2 text-v42-paddy/90 hover:text-v42-turmeric transition"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                  className="px-4 py-2 bg-v42-turmeric text-v42-forestd font-semibold rounded-lg hover:bg-v42-turmerictint transition"
                 >
                   Register
                 </Link>
@@ -626,7 +631,7 @@ function Header() {
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 text-gray-700"
+              className="md:hidden p-2 text-v42-paddy"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
@@ -639,46 +644,46 @@ function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div id="mobile-nav-menu" className="md:hidden py-4 border-t">
+          <div id="mobile-nav-menu" className="md:hidden py-4 border-t border-v42-forest">
             <nav aria-label="Mobile" className="flex flex-col space-y-2">
-              <div className="font-semibold text-gray-800 px-4 py-2">Marketplace</div>
+              <div className="font-semibold text-v42-turmerictint px-4 py-2">Marketplace</div>
               <Link
                 to="/marketplace"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Browse Products
               </Link>
               <Link
                 to="/discover"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Discover
               </Link>
               <Link
                 to="/price-check"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Price Check
               </Link>
               <Link
                 to="/compare"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Compare Products
               </Link>
               <Link
                 to="/pre-order"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pre-Orders
               </Link>
 
-              <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Farmer Portal</div>
+              <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Farmer Portal</div>
               <Link
                 to="/farmer-entrance"
                 className="text-green-700 font-medium hover:text-green-800 transition px-4 py-2"
@@ -688,160 +693,160 @@ function Header() {
               </Link>
               <Link
                 to="/farmerhome"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Farmer Home
               </Link>
               <Link
                 to="/farmer-sell"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sell Produce
               </Link>
               <Link
                 to="/farmer-field"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 My Fields
               </Link>
               <Link
                 to="/harvest-plan"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Harvest Plan
               </Link>
               <Link
                 to="/harvest-score"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Harvest Score
               </Link>
               <Link
                 to="/what-grow"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 What to Grow
               </Link>
               <Link
                 to="/seed-vault"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Seed Vault
               </Link>
               <Link
                 to="/farm-advisor"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Farm Advisor
               </Link>
 
-              <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Pricing Tools</div>
+              <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Pricing Tools</div>
               <Link
                 to="/price-build"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Price Builder
               </Link>
               <Link
                 to="/dynamic-pricing"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dynamic Pricing
               </Link>
               <Link
                 to="/sell-timing"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sell Timing
               </Link>
 
-              <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Finance / ERP</div>
+              <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Finance / ERP</div>
               <Link
                 to="/ledger"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 General Ledger
               </Link>
               <Link
                 to="/compliance"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Tax Compliance
               </Link>
               <Link
                 to="/procurement"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Procurement &amp; QC
               </Link>
               <Link
                 to="/asset-accounting"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Asset Accounting
               </Link>
               <Link
                 to="/cost-control"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Cost Control
               </Link>
               <Link
                 to="/project-systems"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Project Systems
               </Link>
 
-              <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Other</div>
+              <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Other</div>
               <Link
                 to="/logistics"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Logistics
               </Link>
               <Link
                 to="/insurance"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Insurance
               </Link>
               <Link
                 to="/forms"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Forms
               </Link>
               <Link
                 to="/analytics"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Analytics
               </Link>
               <Link
                 to="/modules"
-                className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Modules
@@ -850,11 +855,11 @@ function Header() {
               {/* Vendor Portal Mobile */}
               {isAuthenticated && (user?.role === 'corporate' || user?.role === 'logistics') && (
                 <>
-                  <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Vendor Portal</div>
+                  <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Vendor Portal</div>
                   {user?.role === 'corporate' && (
                     <Link
                       to="/corporate-buyer"
-                      className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                      className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Corporate Buyer
@@ -863,7 +868,7 @@ function Header() {
                   {user?.role === 'logistics' && (
                     <Link
                       to="/logistics-provider"
-                      className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                      className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Logistics Provider
@@ -875,10 +880,10 @@ function Header() {
               {/* Admin Portal Mobile */}
               {isAuthenticated && user?.role === 'admin' && (
                 <>
-                  <div className="font-semibold text-gray-800 px-4 py-2 mt-4">Admin Portal</div>
+                  <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Admin Portal</div>
                   <Link
                     to="/admin/settings"
-                    className="text-gray-700 hover:text-green-600 transition px-4 py-2"
+                    className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Admin Dashboard

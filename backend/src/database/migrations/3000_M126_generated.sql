@@ -1,4 +1,4 @@
-﻿-- 3000_M126_generated.sql
+-- 3000_M126_generated.sql
 -- Auto-generated table for M126
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;

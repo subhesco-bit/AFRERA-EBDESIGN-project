@@ -209,9 +209,15 @@ router.post('/flock/:femaleId/breeding', async (req, res, next) => {
 
 /**
  * PUT /api/v1/sheep/breeding/:id
+ * PUT /api/v1/sheep/breeding/:id/lambing-outcome
  * Update lambing outcome for a breeding record.
+ *
+ * F3 fix (2026-08-30): frontend (frontend/src/services/api.js:588,
+ * updateLambingOutcome) calls the `/lambing-outcome` suffixed path; both
+ * paths now delegate to the same handler - no behavior change for the bare
+ * path's existing callers.
  */
-router.put('/breeding/:id', async (req, res, next) => {
+router.put(['/breeding/:id', '/breeding/:id/lambing-outcome'], async (req, res, next) => {
   try {
     const record = await updateLambingOutcome(req.params.id, req.body);
     if (!record) {

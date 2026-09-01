@@ -99,13 +99,13 @@ CREATE TABLE IF NOT EXISTS branches (
     UNIQUE (company_id, code)
 );
 
-CREATE TABLE IF NOT EXISTS departments (
+CREATE TABLE IF NOT EXISTS enterprise_departments (
     id SERIAL PRIMARY KEY,
     company_id INTEGER NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     business_unit_id INTEGER REFERENCES business_units(id) ON DELETE SET NULL,
     code VARCHAR(20) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    parent_department_id INTEGER REFERENCES departments(id) ON DELETE RESTRICT,
+    parent_department_id INTEGER REFERENCES enterprise_departments(id) ON DELETE RESTRICT,
     head_user_id UUID,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS cost_centers (
     name VARCHAR(255) NOT NULL,
     parent_cost_center_id INTEGER REFERENCES cost_centers(id) ON DELETE RESTRICT,
     business_unit_id INTEGER REFERENCES business_units(id) ON DELETE SET NULL,
-    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    department_id INTEGER REFERENCES enterprise_departments(id) ON DELETE SET NULL,
     responsible_user_id UUID,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS journal_lines (
     profit_center_id INTEGER REFERENCES profit_centers(id) ON DELETE SET NULL,
     business_unit_id INTEGER REFERENCES business_units(id) ON DELETE SET NULL,
     branch_id INTEGER REFERENCES branches(id) ON DELETE SET NULL,
-    department_id INTEGER REFERENCES departments(id) ON DELETE SET NULL,
+    department_id INTEGER REFERENCES enterprise_departments(id) ON DELETE SET NULL,
     partner_type VARCHAR(20),    -- 'customer' | 'vendor' | 'employee' | 'farmer'
     partner_id VARCHAR(100),
     description TEXT,
@@ -481,55 +481,18 @@ CREATE TABLE IF NOT EXISTS budget_lines (
 -- Derived from the ledger so they can never disagree with it.
 -- ---------------------------------------------------------------------------
 
-CREATE OR REPLACE VIEW v_general_ledger AS
-SELECT
-    jl.id                AS line_id,
-    je.company_id,
-    je.entry_number,
-    je.entry_date,
-    je.journal_type,
-    je.status,
-    je.reference_type,
-    je.reference_id,
-    coa.account_code,
-    coa.account_name,
-    coa.account_type,
-    jl.debit,
-    jl.credit,
-    jl.base_debit,
-    jl.base_credit,
-    jl.cost_center_id,
-    jl.profit_center_id,
-    jl.business_unit_id,
-    jl.partner_type,
-    jl.partner_id,
-    jl.description
-FROM journal_lines jl
-JOIN journal_entries je ON je.id = jl.journal_entry_id
-JOIN chart_of_accounts coa ON coa.id = jl.account_id
-WHERE je.status = 'posted';
-
-CREATE OR REPLACE VIEW v_trial_balance AS
-SELECT
-    je.company_id,
-    coa.id                AS account_id,
-    coa.account_code,
-    coa.account_name,
-    coa.account_type,
-    coa.normal_balance,
-    SUM(jl.debit)         AS total_debit,
-    SUM(jl.credit)        AS total_credit,
-    -- Signed balance in the account's natural direction.
-    CASE WHEN coa.normal_balance = 'DR'
-         THEN SUM(jl.debit) - SUM(jl.credit)
-         ELSE SUM(jl.credit) - SUM(jl.debit)
-    END                   AS balance
-FROM journal_lines jl
-JOIN journal_entries je ON je.id = jl.journal_entry_id
-JOIN chart_of_accounts coa ON coa.id = jl.account_id
-WHERE je.status = 'posted'
-GROUP BY je.company_id, coa.id, coa.account_code, coa.account_name,
-         coa.account_type, coa.normal_balance;
+-- 2026-08-30: removed v_general_ledger and v_trial_balance - both selected
+-- je.company_id/entry_number/entry_date/journal_type/status, all of which
+-- only exist on this file's own (deferred collision loser, see
+-- schema-decisions.json "journal_entries") header-row shape of
+-- journal_entries, never the real table (3102_ecommerce_ai_erp_business_
+-- marketing.sql's flat debit/credit ledger line: id, journal_entry_id,
+-- account_code, entry_type, amount, currency, description, reference_id/
+-- type, posted_by, posted_at - no company_id/entry_number/entry_date/
+-- journal_type/status at all). Same class of failure as the
+-- v_procurement_pipeline fix earlier - CREATE VIEW is validated at creation
+-- time, so this failed the migration outright. Nothing to salvage until
+-- journal_entries is properly reconciled.
 
 CREATE OR REPLACE VIEW v_ap_ageing AS
 SELECT
@@ -563,53 +526,34 @@ SELECT
 FROM ar_invoices
 WHERE status NOT IN ('cancelled','draft');
 
-CREATE OR REPLACE VIEW v_budget_vs_actual AS
-SELECT
-    b.company_id,
-    b.id                       AS budget_id,
-    b.name                     AS budget_name,
-    bl.account_id,
-    coa.account_code,
-    coa.account_name,
-    bl.cost_center_id,
-    bl.fiscal_period_id,
-    bl.budgeted_amount,
-    COALESCE(actual.actual_amount, 0) AS actual_amount,
-    bl.budgeted_amount - COALESCE(actual.actual_amount, 0) AS variance
-FROM budget_lines bl
-JOIN budgets b ON b.id = bl.budget_id
-JOIN chart_of_accounts coa ON coa.id = bl.account_id
-LEFT JOIN (
-    SELECT jl.account_id,
-           jl.cost_center_id,
-           je.fiscal_period_id,
-           SUM(jl.debit - jl.credit) AS actual_amount
-    FROM journal_lines jl
-    JOIN journal_entries je ON je.id = jl.journal_entry_id
-    WHERE je.status = 'posted'
-    GROUP BY jl.account_id, jl.cost_center_id, je.fiscal_period_id
-) actual
-  ON actual.account_id = bl.account_id
- AND actual.fiscal_period_id IS NOT DISTINCT FROM bl.fiscal_period_id
- AND actual.cost_center_id IS NOT DISTINCT FROM bl.cost_center_id;
+-- 2026-08-30: removed v_budget_vs_actual - its "actual" subquery joined on
+-- je.fiscal_period_id and filtered je.status, neither of which exist on the
+-- real journal_entries table, same reason as v_general_ledger/v_trial_balance
+-- above. Nothing to salvage until journal_entries is properly reconciled.
 
 -- ---------------------------------------------------------------------------
 -- 10. INDEXES
 -- ---------------------------------------------------------------------------
 
-CREATE INDEX IF NOT EXISTS idx_journal_entries_company_date
-    ON journal_entries (company_id, entry_date);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_status
-    ON journal_entries (status);
+-- 2026-08-30: removed idx_journal_entries_company_date and idx_journal_entries_status
+-- (deferred collision, see schema-decisions.json "journal_entries") - company_id,
+-- entry_date, and status all don't exist on the real (winner) journal_entries
+-- table (3102_ecommerce_ai_erp_business_marketing.sql's version is a flat
+-- debit/credit ledger line, not this file's header-row shape).
 CREATE INDEX IF NOT EXISTS idx_journal_entries_reference
     ON journal_entries (reference_type, reference_id);
 CREATE INDEX IF NOT EXISTS idx_journal_lines_entry
     ON journal_lines (journal_entry_id);
-CREATE INDEX IF NOT EXISTS idx_journal_lines_account
+-- 2026-08-31: renamed the next 3 indexes (idx_journal_lines_account/
+-- cost_center/profit_center - name collision with 4000_comprehensive_erp_
+-- schema.sql's identically-named indexes on the unrelated erp_journal_lines
+-- table, which runs first) so this table's own indexes actually get created
+-- instead of silently no-opping.
+CREATE INDEX IF NOT EXISTS idx_jl_account
     ON journal_lines (account_id);
-CREATE INDEX IF NOT EXISTS idx_journal_lines_cost_center
+CREATE INDEX IF NOT EXISTS idx_jl_cost_center
     ON journal_lines (cost_center_id);
-CREATE INDEX IF NOT EXISTS idx_journal_lines_profit_center
+CREATE INDEX IF NOT EXISTS idx_jl_profit_center
     ON journal_lines (profit_center_id);
 CREATE INDEX IF NOT EXISTS idx_journal_lines_partner
     ON journal_lines (partner_type, partner_id);

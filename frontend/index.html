@@ -73,18 +73,12 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <script>
-      // Register the service worker. Guarded on production + support so local
-      // development is not served stale assets from cache.
-      if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/sw.js').catch(function (err) {
-            // Registration failure must never break the app - it only means
-            // the user loses offline capability, not the site.
-            console.warn('Service worker registration failed:', err);
-          });
-        });
-      }
-    </script>
+    <!-- (2026-08-30) Removed this inline service-worker registration - its
+         comment claimed a "production + support" guard that the actual
+         condition below never implemented (plain <script> tags can't see
+         import.meta.env), so it was registering the cache-first worker in
+         `vite dev` too, same as the App.jsx effect duplicated it. That
+         effect now carries the real import.meta.env.PROD guard and is the
+         single registration point. -->
   </body>
 </html>

@@ -248,6 +248,10 @@ export function DataTable({ caption, columns, rows, rowKey = (r, i) => i, emptyM
     return <p role="status" style={{ color: 'var(--muted,#888)' }}>{emptyMessage || 'No rows.'}</p>
   }
   return (
+    // A wide table on a narrow screen must scroll inside this wrapper, not
+    // push the whole page body sideways - without it every DataTable on
+    // every page built on this file breaks the same way on a phone.
+    <div style={{ overflowX: 'auto' }}>
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
       {/* A caption is what a screen-reader user hears first; without it a table
           is announced as "table with 8 columns" and nothing else. */}
@@ -286,6 +290,7 @@ export function DataTable({ caption, columns, rows, rowKey = (r, i) => i, emptyM
         ))}
       </tbody>
     </table>
+    </div>
   )
 }
 
@@ -295,7 +300,9 @@ export function DataTable({ caption, columns, rows, rowKey = (r, i) => i, emptyM
 
 export function ModulePage({ title, subtitle, migration, children }) {
   return (
-    <main style={{ padding: '20px 24px', maxWidth: 1100, margin: '0 auto' }}>
+    // clamp() side padding shrinks gracefully on a narrow phone instead of a
+    // fixed 24px eating a disproportionate share of a 320px viewport.
+    <main style={{ padding: '20px clamp(12px, 4vw, 24px)', maxWidth: 1100, margin: '0 auto' }}>
       {/* One h1 per page. Screen-reader users navigate by heading level, and
           multiple h1s make that ordering meaningless. */}
       <h1 style={{ marginBottom: 4 }}>{title}</h1>

@@ -6,7 +6,7 @@
 -- Farmer Advisories Table
 CREATE TABLE IF NOT EXISTS farmer_advisories (
   id SERIAL PRIMARY KEY,
-  farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+  farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
   advisory_type VARCHAR(50) NOT NULL, -- 'crop_recommendation', 'weather_advisory', 'market_advisory', 'pest_alert', 'government_scheme'
   content JSONB NOT NULL,
   priority VARCHAR(20) DEFAULT 'medium', -- 'low', 'medium', 'high', 'critical'
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS iot_devices (
 -- Farmer Alerts Table
 CREATE TABLE IF NOT EXISTS farmer_alerts (
   id SERIAL PRIMARY KEY,
-  farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+  farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
   alert_type VARCHAR(50) NOT NULL, -- 'weather', 'pest', 'disease', 'market', 'system'
   severity VARCHAR(20) DEFAULT 'info', -- 'info', 'warning', 'critical'
   message TEXT NOT NULL,

@@ -525,26 +525,33 @@ const ENGINES = {
       + 'rationale, a named human approves or rejects it" gate (see core/erpAgents.js '
       + 'proposal()), not a multi-step process. Kept separate rather than merged. Wired to '
       + 'core/erpAgents.js runAgent()/runDomain()/runAll(), which is real and already live '
-      + '(index.js POST /.../:agentId). WHAT THIS ENTRY DOES NOT DO, stated plainly: it does '
-      + 'not persist the returned proposal to the ai_proposals table — no `INSERT INTO '
-      + 'ai_proposals` exists anywhere in src/ yet, so proposals are in-memory JS objects '
-      + 'only until something writes them; it does not approve, reject, or execute anything. '
+      + '(index.js POST /.../:agentId). (2026-08-29) Persistence gap closed: '
+      + 'core/erpAgents.js persistProposals() now does a real `INSERT INTO ai_proposals` '
+      + '(migration 995) — pass payload.persist:true to write proposals there and get back '
+      + 'real row ids a human can later approve/reject through whatever surface reads that '
+      + 'table. Defaults to false (unchanged in-memory-only behavior) so this stays backward '
+      + "compatible with any existing caller that relied on the old semantics. This entry "
+      + 'still does not approve, reject, or execute anything — that stays a named human\'s job. '
       + 'If a multi-step, threshold-based approval chain is what is actually needed, call '
       + 'services/enterpriseControlService.js startWorkflow() directly — that is the real '
       + 'engine for that job, not this one.',
     invoke: async (payload = {}) => {
       const erpAgents = require('./erpAgents');
-      const { agentId, domain, context = {} } = payload;
-      const note = 'In-memory proposal(s) only — not written to ai_proposals (no INSERT '
-        + 'exists in src/ yet) and not approved, rejected, or executed. A named human must '
-        + 'review this through whatever surface consumes it.';
-      if (agentId) {
-        return { proposal: erpAgents.runAgent(agentId, context), persisted: false, note };
-      }
-      if (domain) {
-        return { proposals: erpAgents.runDomain(domain, context), persisted: false, note };
-      }
-      return { proposals: erpAgents.runAll(context), persisted: false, note };
+      const { agentId, domain, context = {}, persist = false } = payload;
+      const note = persist
+        ? 'Persisted to ai_proposals — see proposalIds. Still not approved, rejected, or '
+          + 'executed; a named human must act on these through whatever surface reads that table.'
+        : 'In-memory proposal(s) only — pass payload.persist:true to write these to '
+          + 'ai_proposals. Not approved, rejected, or executed either way.';
+
+      const proposals = agentId ? [erpAgents.runAgent(agentId, context)].filter(Boolean)
+        : domain ? erpAgents.runDomain(domain, context)
+        : erpAgents.runAll(context);
+
+      const proposalIds = persist && proposals.length ? await erpAgents.persistProposals(proposals) : [];
+      const result = { proposals, persisted: persist, proposalIds, note };
+      if (agentId) result.proposal = proposals[0] ?? null; // preserve prior single-agent response shape
+      return result;
     },
   },
 
@@ -596,6 +603,49 @@ const ENGINES = {
         'module_dispatch requires either { moduleId, operation } to execute a known module, '
         + 'or { query } / { requiredCapabilities } to discover one first'
       );
+    },
+  },
+
+  claude_coordinator: {
+    label: 'Claude AI Coordinator',
+    status: 'real',
+    citation: '(2026-08-29) core/claudeAICoordinator.js — a separate, real, independently-live '
+      + 'AI orchestration entry point (constructs an actual @anthropic-ai/sdk client,'
+      + ' session-context tracking, library-knowledge enrichment, agent selection). Reachable '
+      + 'today via routes/unifiedAIRoutes.js AND its duplicate routes/claude/unifiedAIRoutes.js '
+      + "(both call coordinateAIRequest() directly) - this file's own ENGINES never routed to "
+      + "it, so the orchestrator's audit trail (ai_invocations) and guardrail pipeline never "
+      + "saw Claude-coordinator traffic even though it's real, live production code. This entry "
+      + "closes that gap without touching the existing routes (still call it directly, unaffected) "
+      + '- it just gives module_dispatch-style callers (and this file\'s own classifyAndRoute()) '
+      + 'a path to the same coordinator.',
+    invoke: async (payload = {}) => {
+      const claudeAICoordinator = require('./claudeAICoordinator');
+      const { requestType = 'general', query, context = {}, userId, sessionId, agentPreference } = payload;
+      if (!query) throw new Error('claude_coordinator requires payload.query');
+      return claudeAICoordinator.coordinateAIRequest({ requestType, query, context, userId, sessionId, agentPreference });
+    },
+  },
+
+  model_registry: {
+    label: 'AI Model Registry',
+    status: 'real',
+    citation: 'services/legacy/aiOrchestrationService.js — real Postgres-backed CRUD over '
+      + 'ai_model_registry (migration 058: which LLM vendor slot, cost, whether enabled) and '
+      + 'ai_routing_rules\' unserved-intent list. Config management, not task dispatch - this '
+      + 'is what tells an operator or the `llm` engine above which providers are actually '
+      + 'enabled before attempting a call, not a second competing orchestrator despite the '
+      + 'name. Already live via routes/enterpriseAIRoutes.js; this entry adds the same '
+      + 'orchestrator-reachable path the other real engines have.',
+    invoke: async (payload = {}) => {
+      const aiOrchestrationService = require('../services/legacy/aiOrchestrationService');
+      const { action = 'listModelSlots', slotData } = payload;
+      if (action === 'listUnservedIntents') return aiOrchestrationService.listUnservedIntents();
+      if (action === 'upsertModelSlot') {
+        if (!slotData) throw new Error('model_registry upsertModelSlot requires payload.slotData');
+        return aiOrchestrationService.upsertModelSlot(slotData);
+      }
+      return aiOrchestrationService.listModelSlots();
     },
   },
 
@@ -732,6 +782,8 @@ const CLASSIFY_KEYWORDS = {
   speech_engine: ['voice', 'speech', 'audio', 'transcribe', 'spoken'],
   workflow_engine: ['workflow', 'approval step', 'process step'],
   module_dispatch: ['module', 'plug-and-play', 'registry', 'discover module', 'run module'],
+  claude_coordinator: ['coordinate', 'claude session', 'agent selection', 'library-enriched'],
+  model_registry: ['model slot', 'model registry', 'llm provider config', 'unserved intent'],
 };
 
 function keywordScore(text, words) {

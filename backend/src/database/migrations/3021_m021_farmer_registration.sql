@@ -26,12 +26,12 @@ CREATE TABLE IF NOT EXISTS farmers (
 -- Farmer Verifications Table
 CREATE TABLE IF NOT EXISTS farmer_verifications (
   id SERIAL PRIMARY KEY,
-  farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE UNIQUE,
+  farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE UNIQUE,
   documents JSONB,
   identity_proof JSONB,
   land_proof JSONB,
   status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
-  approved_by INTEGER REFERENCES users(id),
+  approved_by UUID REFERENCES users(id),
   notes TEXT,
   approved_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS farmer_verifications (
 -- Farmer Onboarding Table
 CREATE TABLE IF NOT EXISTS farmer_onboarding (
   id SERIAL PRIMARY KEY,
-  farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE UNIQUE,
+  farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE UNIQUE,
   checklist JSONB NOT NULL,
   current_step INTEGER DEFAULT 1,
   status VARCHAR(20) DEFAULT 'in_progress', -- 'in_progress', 'completed'
@@ -50,9 +50,9 @@ CREATE TABLE IF NOT EXISTS farmer_onboarding (
 );
 
 -- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_farmers_email ON farmers(email);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "farmers") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_farmers_email ON farmers(email);
 CREATE INDEX IF NOT EXISTS idx_farmers_status ON farmers(status);
-CREATE INDEX IF NOT EXISTS idx_farmers_primary_crop ON farmers(primary_crop);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "farmers") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_farmers_primary_crop ON farmers(primary_crop);
 CREATE INDEX IF NOT EXISTS idx_farmer_verifications_farmer_id ON farmer_verifications(farmer_id);
 CREATE INDEX IF NOT EXISTS idx_farmer_verifications_status ON farmer_verifications(status);
 CREATE INDEX IF NOT EXISTS idx_farmer_onboarding_farmer_id ON farmer_onboarding(farmer_id);

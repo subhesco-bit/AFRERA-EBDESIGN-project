@@ -15,6 +15,19 @@ CREATE TABLE IF NOT EXISTS roles (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 2026-08-30: the CREATE TABLE above is a silent no-op on any real database -
+-- 000_base_schema.sql already declares a narrower `roles` (id, name,
+-- description, permissions, created_at only) and runs first. Without this,
+-- the indexes below and this file's own seed INSERT further down both fail
+-- with "column ... does not exist". Self-healing ALTER, idempotent either
+-- way. See schema-decisions.json ("roles", kind: merged) for the full
+-- collision writeup.
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS hierarchy_level INTEGER NOT NULL DEFAULT 50;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS default_permissions JSONB DEFAULT '[]';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
 -- Indexes for roles
 CREATE INDEX IF NOT EXISTS idx_roles_hierarchy_level ON roles(hierarchy_level);
 CREATE INDEX IF NOT EXISTS idx_roles_is_system_role ON roles(is_system_role);
@@ -22,7 +35,7 @@ CREATE INDEX IF NOT EXISTS idx_roles_is_system_role ON roles(is_system_role);
 -- Authorizations Table
 CREATE TABLE IF NOT EXISTS authorizations (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     role_id INTEGER REFERENCES roles(id) ON DELETE SET NULL,
     permissions JSONB NOT NULL DEFAULT '[]',
     context JSONB DEFAULT '{}',
@@ -43,7 +56,7 @@ CREATE INDEX IF NOT EXISTS idx_authorizations_expires_at ON authorizations(expir
 -- Authorization Audit Logs Table
 CREATE TABLE IF NOT EXISTS authorization_audit_logs (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     event VARCHAR(50) NOT NULL, -- 'PERMISSION_CHECK', 'GRANT', 'REVOKE', 'ROLE_ASSIGN', 'ACCESS_DENIED'
     resource VARCHAR(255),
     action VARCHAR(100),

@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS ai_session_context (
     id SERIAL PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     query TEXT NOT NULL,
     response TEXT NOT NULL,
     agent VARCHAR(50),
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS ai_session_context (
 -- AI usage tracking table for monitoring and cost optimization
 CREATE TABLE IF NOT EXISTS ai_usage_tracking (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     request_type VARCHAR(50) NOT NULL,
     agent VARCHAR(50) NOT NULL,
     input_tokens INTEGER,
@@ -47,7 +47,16 @@ CREATE TABLE IF NOT EXISTS ai_knowledge_base (
     source_id VARCHAR(255),
     knowledge_type VARCHAR(50),
     content TEXT NOT NULL,
-    embedding_vector VECTOR(1536),
+    -- 2026-08-30: VECTOR(1536) requires the pgvector extension, which isn't
+    -- installed on this repo's CI Postgres (postgres:15-alpine has no
+    -- extensions beyond the built-ins) or, per a repo-wide grep, used by any
+    -- application code yet ("type vector does not exist" - the first time
+    -- this repo's CI actually ran npm run migrate for real). Stored as a
+    -- plain float array for now so the column and its data are still real
+    -- and usable; switching back to VECTOR + CREATE EXTENSION IF NOT EXISTS
+    -- vector is a real option once something actually needs pgvector's
+    -- similarity-search indexing and the CI/prod Postgres image supports it.
+    embedding_vector DOUBLE PRECISION[],
     metadata JSONB,
     relevance_score DECIMAL(5, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -81,7 +90,7 @@ CREATE TABLE IF NOT EXISTS ai_tool_execution (
 CREATE TABLE IF NOT EXISTS ai_safety_events (
     id SERIAL PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     event_type VARCHAR(50) NOT NULL,
     severity VARCHAR(20),
     description TEXT,

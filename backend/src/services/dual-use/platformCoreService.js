@@ -82,31 +82,38 @@ class PlatformCoreService {
   }
 
   /**
-   * Get platform statistics
+   * Get platform statistics.
+   *
+   * (2026-08-29) active_sessions/api_calls_today were hardcoded to 0 and
+   * labeled a "placeholder" in a comment that never surfaced to the API
+   * response - callers had no way to tell a real zero from "not tracked".
+   * No session-store or request-counter table exists anywhere in this
+   * codebase to compute real values for these two fields (checked:
+   * no such table in backend/src/database/migrations/). Reporting that
+   * absence explicitly (null + a note) instead of a fabricated 0, same
+   * discipline core/aiOrchestrator.js holds itself to.
    */
   async getPlatformStats() {
     try {
       const stats = {
         users: 0,
         organizations: 0,
-        active_sessions: 0,
-        api_calls_today: 0
+        active_sessions: null,
+        api_calls_today: null,
+        untracked_fields_note: 'active_sessions and api_calls_today are not '
+          + 'currently tracked anywhere in this codebase (no session-store or '
+          + 'request-counter table exists) - reported as null rather than a '
+          + 'fabricated 0.',
       };
-      
+
       // Get user count
       const userCount = await this.pool.query('SELECT COUNT(*) FROM users WHERE deleted_at IS NULL');
       stats.users = parseInt(userCount.rows[0].count);
-      
+
       // Get organization count
       const orgCount = await this.pool.query('SELECT COUNT(*) FROM organizations');
       stats.organizations = parseInt(orgCount.rows[0].count);
-      
-      // Get active sessions (placeholder)
-      stats.active_sessions = 0;
-      
-      // Get API calls today (placeholder)
-      stats.api_calls_today = 0;
-      
+
       return stats;
     } catch (error) {
       console.error('Error getting platform stats:', error);
@@ -115,32 +122,44 @@ class PlatformCoreService {
   }
 
   /**
-   * AI Integration - Platform optimization recommendations
+   * Platform optimization recommendations.
+   *
+   * (2026-08-29) Was labeled "AI Integration" / "AI-powered ... recommendations"
+   * despite being a static, hardcoded list with no AI call anywhere in this
+   * method - a real instance of the same "fabricated confident answer"
+   * pattern found and fixed in core/ai/aiOrchestratorCore.js this session.
+   * Relabeled honestly as static best-practice guidance. Wiring this through
+   * the real AI backbone (core/aiOrchestrator.js's `module_dispatch` or
+   * `llm` engines) to generate recommendations from actual platform metrics
+   * is real future work, not something to fake here.
    */
   async getPlatformOptimizations() {
     try {
-      // AI-powered platform optimization recommendations
+      // Static best-practice recommendations, NOT AI-generated - see note above.
       const optimizations = [
         {
           category: 'Performance',
           recommendation: 'Enable Redis caching for frequently accessed data',
           impact: 'HIGH',
-          effort: 'MEDIUM'
+          effort: 'MEDIUM',
+          source: 'static',
         },
         {
           category: 'Security',
           recommendation: 'Implement rate limiting on all public endpoints',
           impact: 'HIGH',
-          effort: 'LOW'
+          effort: 'LOW',
+          source: 'static',
         },
         {
           category: 'Scalability',
           recommendation: 'Implement horizontal scaling for API services',
           impact: 'HIGH',
-          effort: 'HIGH'
-        }
+          effort: 'HIGH',
+          source: 'static',
+        },
       ];
-      
+
       return optimizations;
     } catch (error) {
       console.error('Error getting platform optimizations:', error);

@@ -5,6 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
+const apiResponseHandler = require('../middleware/apiResponseHandler');
 const gstService = require('../services/legacy/gstService');
 const productReviewService = require('../services/legacy/productReviewService');
 const bulkOrderService = require('../services/legacy/bulkOrderService');
@@ -17,18 +18,18 @@ router.post('/gst/calculate/order/:orderId', authMiddleware, async (req, res) =>
   try {
     const { orderId } = req.params;
     const gstCalculation = await gstService.calculateOrderGST(orderId);
-    res.json({ success: true, data: gstCalculation });
+    return apiResponseHandler.sendSuccess(res, gstCalculation, 'GST calculated successfully');
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return apiResponseHandler.sendError(res, 'Failed to calculate GST', 500, 'SERVER_ERROR', error.message);
   }
 });
 
 router.post('/gst/calculate/product', authMiddleware, async (req, res) => {
   try {
     const gstCalculation = await gstService.calculateProductGST(req.body);
-    res.json({ success: true, data: gstCalculation });
+    return apiResponseHandler.sendSuccess(res, gstCalculation, 'Product GST calculated successfully');
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    return apiResponseHandler.sendError(res, 'Failed to calculate product GST', 500, 'SERVER_ERROR', error.message);
   }
 });
 

@@ -287,13 +287,22 @@ class LandRecordsService {
       const farmerResult = await this.pool.query(farmerQuery, [farmerId]);
       const farmer = farmerResult.rows[0];
 
-      // Simulate government API response
-      const governmentRecords = await this.fetchGovernmentLandRecords(farmer.aadhar_number);
+      const govResult = await this.fetchGovernmentLandRecords(farmer.aadhar_number);
+      if (!govResult.configured) {
+        return {
+          farmerId,
+          syncedCount: 0,
+          newRecords: [],
+          configured: false,
+          reason: govResult.reason,
+          syncedAt: new Date(),
+        };
+      }
 
       let syncedCount = 0;
       const newRecords = [];
 
-      for (const govRecord of governmentRecords) {
+      for (const govRecord of govResult.records) {
         // Check if record already exists
         const existingQuery = `
           SELECT id FROM land_records
@@ -345,12 +354,24 @@ class LandRecordsService {
   }
 
   /**
-   * Fetch government land records (simulated)
+   * Fetch government land records.
+   *
+   * (2026-08-29) Was silently returning [] disguised as "simulate the sync
+   * process" - syncWithGovernmentLandRecords() would report a successful
+   * "0 records synced" forever, indistinguishable from a real sync that
+   * genuinely found nothing new. No real government land-records API
+   * (DILRMP/state revenue department) is configured anywhere in this
+   * codebase. Reporting that honestly instead - matches the same
+   * not_configured discipline used for LLM/speech providers elsewhere in
+   * this codebase, rather than a silent empty-array no-op.
    */
   async fetchGovernmentLandRecords(aadharNumber) {
-    // In production, this would call actual government APIs
-    // For now, return simulated data
-    return [];
+    return {
+      configured: false,
+      records: [],
+      reason: 'No government land-records API (e.g. DILRMP) is configured in this deployment. '
+        + 'No live call was attempted.',
+    };
   }
 
   /**

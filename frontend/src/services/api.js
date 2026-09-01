@@ -93,6 +93,20 @@ export const productsAPI = {
   getCategories: () => api.get('/products/categories/list'),
   getStates: () => api.get('/products/states/list'),
   searchProducts: (query) => api.get('/products/search', { params: { q: query } }),
+  // Real provider-adapter pipeline (services/productMediaAIService.js), mounted
+  // at /api/v1/product-media-ai - honestly reports not_configured with no
+  // image-gen API key present, rather than inventing an image.
+  requestImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
+}
+
+// Product Reviews API — real table-backed reviews (product_reviews, migration
+// 009_marketplace_enhancements.sql), mounted at /api/v1/product-reviews.
+// getStats is unauthenticated: used to show a real average rating on the
+// product detail page instead of a fabricated one.
+export const productReviewsAPI = {
+  getReviews: (productId, params = {}) => api.get(`/product-reviews/products/${productId}`, { params }),
+  getStats: (productId) => api.get(`/product-reviews/products/${productId}/stats`),
+  createReview: (productId, data) => api.post(`/product-reviews/products/${productId}`, data),
 }
 
 // Orders API
@@ -180,13 +194,74 @@ export const insuranceAPI = {
   generateQuote: (data) => api.post('/insurance/quotes', data),
 }
 
-// AI API
+// AI API - Unified AI Gateway Integration
 export const aiAPI = {
+  // Legacy AI endpoints (backward compatibility)
   predictDemand: (data) => api.post('/ai/predict/demand', data),
   optimizePrice: (data) => api.post('/ai/optimize/price', data),
   assessCreditRisk: (data) => api.post('/ai/assess/credit-risk', data),
   detectFraud: (data) => api.post('/ai/detect/fraud', data),
   generateRecommendations: (data) => api.post('/ai/recommend', data),
+  
+  // NEW Unified AI Gateway endpoints
+  // Smart routing - automatically routes to appropriate AI service
+  route: (request) => api.post('/ai/route', request),
+  
+  // Claude AI Coordinator
+  coordinate: (request) => api.post('/ai/coordinate', request),
+  
+  // AI Copilot Framework (16gm system)
+  copilot: {
+    createSession: (copilotType, context) => api.post('/ai/copilot/session', { copilot_type: copilotType, context }),
+    sendMessage: (sessionId, message, context) => api.post(`/ai/copilot/session/${sessionId}/message`, { message, context }),
+    getSessionHistory: (sessionId) => api.get(`/ai/copilot/session/${sessionId}/history`),
+    closeSession: (sessionId) => api.put(`/ai/copilot/session/${sessionId}/close`),
+    
+    // Domain-specific copilots
+    finance: (message, context) => api.post('/ai/copilot/session/finance/message', { message, context }),
+    logistics: (message, context) => api.post('/ai/copilot/session/logistics/message', { message, context }),
+    warehouse: (message, context) => api.post('/ai/copilot/session/warehouse/message', { message, context }),
+    insurance: (message, context) => api.post('/ai/copilot/session/insurance/message', { message, context }),
+    nutrition: (message, context) => api.post('/ai/copilot/session/nutrition/message', { message, context }),
+    marketplace: (message, context) => api.post('/ai/copilot/session/marketplace/message', { message, context }),
+  },
+  
+  // AI Backbone (multi-provider)
+  backbone: {
+    health: () => api.get('/ai/backbone/health'),
+    decide: (context, options) => api.post('/ai/backbone/decide', { context, options }),
+    strategize: (objectives, currentState) => api.post('/ai/backbone/strategize', { objectives, currentState }),
+    predict: (context) => api.post('/ai/backbone/predict', { context }),
+    intelligence: (query) => api.get('/ai/backbone/intelligence', { params: { query } }),
+  },
+  
+  // AI Collaboration (Devin-Claude tracking)
+  collaboration: {
+    getContext: () => api.get('/ai/collaboration/context'),
+    updateContext: (context) => api.put('/ai/collaboration/context', context),
+    logWork: (work) => api.post('/ai/collaboration/log-work', work),
+    getWorkHistory: (aiSource) => api.get(`/ai/collaboration/work-history/${aiSource}`),
+    getContinuable: (currentAI) => api.get(`/ai/collaboration/continuable/${currentAI}`),
+    createHandoff: (handoff) => api.post('/ai/collaboration/handoff', handoff),
+    acceptHandoff: (handoffId) => api.post(`/ai/collaboration/handoff/${handoffId}/accept`),
+    getPendingHandoffs: (forAI) => api.get(`/ai/collaboration/handoffs/pending/${forAI}`),
+    getStats: () => api.get('/ai/collaboration/stats'),
+    getReport: () => api.get('/ai/collaboration/report'),
+  },
+  
+  // AI Gateway (multi-provider routing)
+  gateway: {
+    chat: (request) => api.post('/ai/gateway/chat', request),
+    getStatistics: () => api.get('/ai/gateway/statistics'),
+    getProviders: () => api.get('/ai/gateway/providers'),
+    getModels: (provider) => api.get(`/ai/gateway/models/${provider}`),
+    setProviderEnabled: (provider, enabled) => api.put(`/ai/gateway/providers/${provider}/enable`, { enabled }),
+  },
+  
+  // System health and discovery
+  health: () => api.get('/ai/health'),
+  getServices: () => api.get('/ai/services'),
+  getArchitecture: () => api.get('/ai/architecture'),
 }
 
 // Product Media AI API — AI product-image generation, nutrient-comparison
@@ -1243,7 +1318,10 @@ export const vendorsAPI = {
   createCorporateOrder: (body) => api.post('/vendors/corporate/orders', body),
   getLogisticsProfile: (providerId) => api.get(`/vendors/logistics/${providerId}/profile`),
   getActiveShipments: (providerId) => api.get(`/vendors/logistics/${providerId}/shipments`),
-  getColdChainNodes: () => api.get('/vendors/logistics/cold-chain/nodes'),
+  // Path must match backend's actual route name: 'coldchain-nodes', not
+  // 'cold-chain/nodes' - the old path always 404'd since vendorRoutes.js
+  // was added (see backend/src/routes/vendorRoutes.js).
+  getColdChainNodes: () => api.get('/vendors/logistics/coldchain-nodes'),
   getReturnTruckOpportunities: () => api.get('/vendors/logistics/return-trucks'),
   createLogisticsBooking: (body) => api.post('/vendors/logistics/bookings', body),
 }
@@ -1494,7 +1572,11 @@ export const voiceAIAPI = {
 // frontend rewrite. See each module's README.md for the specific gap.
 // ---------------------------------------------------------------------------
 
-/** M067 — Sowing Management (Crop domain). No backend route found for sowing records. */
+/** M067 — Sowing Management (Crop domain). Real backend: sowingManagementRoutes
+ *  (via cropManagementRoutes.js's crudRouter) mounted at
+ *  /api/v1/sowing/records in index.js (line 827) - GET/POST '/', GET/PUT/
+ *  DELETE '/:id' all match the client below exactly. (F7 fix, 2026-08-30:
+ *  comment was stale, written before this was wired.) */
 export const sowingAPI = {
   getRecords: (params) => api.get('/sowing/records', { params }),
   getRecord: (id) => api.get(`/sowing/records/${id}`),
@@ -2548,7 +2630,10 @@ export const vegetableProductionAPI = {
   deleteRecord: (id) => api.delete(`/vegetable-production/${id}`),
 }
 
-/** M143 — Floriculture Management (Horticulture). No backend route found. */
+/** M143 — Floriculture Management (Horticulture). Real backend:
+ *  floricultureRoutes mounted at /api/v1/floriculture in index.js
+ *  (line 831) - matching CRUD. (F7 fix, 2026-08-30: comment was stale,
+ *  written before this was wired.) */
 export const floricultureAPI = {
   getRecords: (params) => api.get('/floriculture', { params }),
   createRecord: (data) => api.post('/floriculture', data),
@@ -3651,6 +3736,60 @@ export const informationSharingAPI = {
   getActivityLogs: (resourceId) => api.get(`/information-sharing/activity-logs/${resourceId}`),
   getAnalytics: () => api.get('/information-sharing/analytics'),
   getHealthStatus: () => api.get('/information-sharing/health'),
+}
+
+/** Strategic Services API - Multi-Role Ecosystem Support
+ * Pre-season purchase, contract farming, household procurement, government subsidy
+ */
+export const strategicAPI = {
+  // Pre-Season Purchase
+  preSeason: {
+    createAgreement: (data) => api.post('/strategic/pre-season/agreements', data),
+    getAgreement: (id) => api.get(`/strategic/pre-season/agreements/${id}`),
+    updateMilestone: (id, milestoneId, data) => api.put(`/strategic/pre-season/agreements/${id}/milestones/${milestoneId}`, data),
+    settleAgreement: (id, data) => api.post(`/strategic/pre-season/agreements/${id}/settle`, data),
+    getOpportunities: (params) => api.get('/strategic/pre-season/opportunities', { params }),
+    getBuyerPortfolio: (params) => api.get('/strategic/pre-season/buyer-portfolio', { params }),
+    getFarmerAgreements: (params) => api.get('/strategic/pre-season/farmer-agreements', { params }),
+  },
+  
+  // Contract Farming
+  contractFarming: {
+    createContract: (data) => api.post('/strategic/contract-farming/contracts', data),
+    getContract: (id) => api.get(`/strategic/contract-farming/contracts/${id}`),
+    recordInputUsage: (id, data) => api.post(`/strategic/contract-farming/contracts/${id}/input-usage`, data),
+    recordQualityTest: (id, testId, data) => api.post(`/strategic/contract-farming/quality-tests/${testId}/result`, data),
+    getBuyerPortfolio: (params) => api.get('/strategic/contract-farming/buyer-portfolio', { params }),
+    getOpportunities: (params) => api.get('/strategic/contract-farming/opportunities', { params }),
+    getFarmerContracts: (params) => api.get('/strategic/contract-farming/farmer-contracts', { params }),
+  },
+  
+  // Household Procurement
+  household: {
+    createProcurementPlan: (data) => api.post('/strategic/household/procurement-plans', data),
+    getProcurementPlan: (id) => api.get(`/strategic/household/procurement-plans/${id}`),
+    updateProcurementPlan: (id, data) => api.put(`/strategic/household/procurement-plans/${id}`, data),
+    getAggregationGroups: (params) => api.get('/strategic/household/aggregation-groups', { params }),
+    createSubscription: (data) => api.post('/strategic/household/subscriptions', data),
+    getSubscriptions: (params) => api.get('/strategic/household/subscriptions', { params }),
+    getDashboard: (params) => api.get('/strategic/household/dashboard', { params }),
+    aggregateOrders: (data) => api.post('/strategic/household/aggregate-orders', data),
+    getAggregationGroup: (id) => api.get(`/strategic/household/aggregation-groups/${id}`),
+  },
+  
+  // Government Subsidy
+  government: {
+    createSubsidyProgram: (data) => api.post('/strategic/government/subsidy-programs', data),
+    getSubsidyProgram: (id) => api.get(`/strategic/government/subsidy-programs/${id}`),
+    updateSubsidyProgram: (id, data) => api.put(`/strategic/government/subsidy-programs/${id}`, data),
+    getSubsidyPrograms: (params) => api.get('/strategic/government/subsidy-programs', { params }),
+    submitApplication: (data) => api.post('/strategic/government/applications', data),
+    getApplication: (id) => api.get(`/strategic/government/applications/${id}`),
+    disburseSubsidy: (id, data) => api.post(`/strategic/government/applications/${id}/disburse`, data),
+    getProgramImpact: (id) => api.get(`/strategic/government/programs/${id}/impact`),
+    getFarmerDashboard: (params) => api.get('/strategic/government/farmer-dashboard', { params }),
+    getDashboard: (params) => api.get('/strategic/government/dashboard', { params }),
+  },
 }
 
 export default api

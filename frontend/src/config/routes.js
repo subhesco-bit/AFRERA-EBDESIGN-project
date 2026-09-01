@@ -19,6 +19,7 @@ import { lazy } from 'react'
  * Lazy load page components
  */
 const HomePage = lazy(() => import('../pages/HomePage'))
+const AboutPage = lazy(() => import('../pages/AboutPage'))
 const MarketplacePage = lazy(() => import('../pages/MarketplacePage'))
 const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'))
 const CartPage = lazy(() => import('../pages/CartPage'))
@@ -47,6 +48,23 @@ const InsurancePage = lazy(() => import('../pages/InsurancePage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const WalletPage = lazy(() => import('../pages/WalletPage'))
 const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
+
+// Tier 1 Advanced Services Pages (M025-M030)
+const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'))
+const PredictiveIntelligencePage = lazy(() => import('../pages/PredictiveIntelligencePage'))
+const IoTMonitoringDashboard = lazy(() => import('../pages/IoTMonitoringDashboard'))
+const BlockchainVerificationPage = lazy(() => import('../pages/BlockchainVerificationPage'))
+const DigitalTwinPage = lazy(() => import('../pages/DigitalTwinPage'))
+const EnterpriseIntegrationPage = lazy(() => import('../pages/EnterpriseIntegrationPage'))
+
+// Additional Dashboard Pages
+const FinancialServicesDashboard = lazy(() => import('../pages/FinancialServicesDashboard'))
+const OperationalDashboard = lazy(() => import('../pages/OperationalDashboard'))
+
+// Financial Services Pages
+const LoanManagementPage = lazy(() => import('../pages/LoanManagementPage'))
+const InsuranceManagementPage = lazy(() => import('../pages/InsuranceManagementPage'))
+const PaymentProcessingPage = lazy(() => import('../pages/PaymentProcessingPage'))
 const FarmerEntranceHubPage = lazy(() => import('../pages/FarmerEntranceHubPage'))
 const FarmerSellDoorPage = lazy(() => import('../pages/FarmerSellDoorPage'))
 const FarmerHouseholdDoorPage = lazy(() => import('../pages/FarmerHouseholdDoorPage'))
@@ -135,6 +153,20 @@ const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'))
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'))
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'))
 
+// Report pages
+const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
+const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
+const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
+const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
+const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
+const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
+const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
+const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
+const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
+const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
+const CreditScorePage = lazy(() => import('../pages/CreditScorePage'))
+const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'))
+
 // Additional management pages
 const FarmerProfilePage = lazy(() => import('../pages/FarmerProfilePage'))
 const FarmerFamilyPage = lazy(() => import('../pages/FarmerFamilyPage'))
@@ -179,22 +211,37 @@ const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'))
 const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'))
 const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'))
 const PlatformManagementPage = lazy(() => import('../pages/PlatformManagementPage'))
+
+// Strategic Services Pages
+const PreSeasonPurchasePage = lazy(() => import('../pages/PreSeasonPurchasePage'))
+const ContractFarmingPage = lazy(() => import('../pages/ContractFarmingPage'))
+const HouseholdProcurementPage = lazy(() => import('../pages/HouseholdProcurementPage'))
+const GovernmentSubsidyPage = lazy(() => import('../pages/GovernmentSubsidyPage'))
 const RolePermissionPage = lazy(() => import('../pages/RolePermissionPage'))
 const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'))
 const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'))
 const LogisticsMatchingPage = lazy(() => import('../pages/LogisticsMatchingPage'))
 const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'))
+const CopilotHubPage = lazy(() => import('../pages/CopilotHubPage'))
 
 /**
  * Public routes - no authentication required
  */
-export const publicRoutes = undefined[
+export const publicRoutes = [
   {
     path: '/',
     component: HomePage,
     title: 'Home - AFRERA Agriculture Platform',
     description: 'Welcome to AFRERA - Your comprehensive agriculture and rural economy platform',
     keywords: 'agriculture, farming, rural economy, marketplace',
+    transition: 'fade'
+  },
+  {
+    path: '/about',
+    component: AboutPage,
+    title: 'About AFRERA - Who The Platform Is For',
+    description: 'AFRERA connects farmers, buyers, government, financial institutions and service providers on one platform',
+    keywords: 'about, stakeholders, mission, agriculture platform',
     transition: 'fade'
   },
   {
@@ -312,6 +359,14 @@ export const publicRoutes = undefined[
  */
 export const protectedRoutes = [
   {
+    path: '/ai-copilots',
+    component: CopilotHubPage,
+    title: 'AI Copilots - AFRERA',
+    description: 'Domain-specific AI assistants for finance, logistics, warehouse, insurance, nutrition, and marketplace',
+    keywords: 'ai, copilot, assistant, finance, logistics, warehouse, insurance, nutrition, marketplace',
+    transition: 'fade'
+  },
+  {
     path: '/cart',
     component: CartPage,
     title: 'Shopping Cart - AFRERA',
@@ -379,6 +434,102 @@ export const protectedRoutes = [
     transition: 'fade'
   },
   {
+    path: '/reports',
+    component: ReportsDashboardPage,
+    title: 'Reports Dashboard - AFRERA',
+    description: 'Generate and manage comprehensive reports',
+    keywords: 'reports, dashboard, analytics',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/sales',
+    component: SalesReportPage,
+    title: 'Sales Report - AFRERA',
+    description: 'Sales performance analysis and metrics',
+    keywords: 'sales, report, performance',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/inventory',
+    component: InventoryReportPage,
+    title: 'Inventory Report - AFRERA',
+    description: 'Inventory status and analysis',
+    keywords: 'inventory, report, stock',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/farmer',
+    component: FarmerReportPage,
+    title: 'Farmer Report - AFRERA',
+    description: 'Farmer performance and demographics',
+    keywords: 'farmer, report, performance',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/financial',
+    component: FinancialReportPage,
+    title: 'Financial Report - AFRERA',
+    description: 'Financial performance analysis',
+    keywords: 'financial, report, profit',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/operations',
+    component: OperationsReportPage,
+    title: 'Operations Report - AFRERA',
+    description: 'Logistics and warehouse performance',
+    keywords: 'operations, report, logistics',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/audit',
+    component: AuditReportPage,
+    title: 'Audit Report - AFRERA',
+    description: 'System compliance and security audit',
+    keywords: 'audit, report, compliance',
+    transition: 'fade'
+  },
+  {
+    path: '/marketplace/bulk-purchase',
+    component: BulkPurchasePage,
+    title: 'Bulk Purchase - AFRERA',
+    description: 'Order agricultural products in bulk',
+    keywords: 'bulk, purchase, wholesale',
+    transition: 'fade'
+  },
+  {
+    path: 'marketplace/contract-listing',
+    component: ContractListingPage,
+    title: 'Contract Listings - AFRERA',
+    description: 'Browse farming contracts',
+    keywords: 'contract, farming, agreement',
+    transition: 'fade'
+  },
+  {
+    path: '/marketplace/group-buying',
+    component: GroupBuyingPage,
+    title: 'Group Buying - AFRERA',
+    description: 'Join group purchases for discounts',
+    keywords: 'group, buying, discount',
+    transition: 'fade'
+  },
+  {
+    path: '/financial/credit-score',
+    component: CreditScorePage,
+    title: 'Credit Score - AFRERA',
+    description: 'Your creditworthiness assessment',
+    keywords: 'credit, score, assessment',
+    transition: 'fade'
+  },
+  {
+    path: '/financial/emi-calculator',
+    component: EMICalculatorPage,
+    title: 'EMI Calculator - AFRERA',
+    description: 'Calculate loan repayments',
+    keywords: 'emi, calculator, loan',
+    transition: 'fade'
+  },
+  {
     path: '/modules',
     component: ModuleHubPage,
     title: 'Module Hub - AFRERA',
@@ -422,6 +573,38 @@ export const farmerRoutes = [
     title: 'Field Management - AFRERA',
     description: 'Manage your agricultural fields',
     keywords: 'field, management, farmer',
+    transition: 'fade'
+  },
+  {
+    path: '/pre-season-purchase',
+    component: PreSeasonPurchasePage,
+    title: 'Pre-Season Purchase - AFRERA',
+    description: 'Manage pre-season purchase agreements for guaranteed income',
+    keywords: 'pre-season, purchase, agreements, advance',
+    transition: 'fade'
+  },
+  {
+    path: '/contract-farming',
+    component: ContractFarmingPage,
+    title: 'Contract Farming - AFRERA',
+    description: 'Manage long-term farming contracts with technical assistance',
+    keywords: 'contract, farming, technical, assistance',
+    transition: 'fade'
+  },
+  {
+    path: '/household-procurement',
+    component: HouseholdProcurementPage,
+    title: 'Household Procurement - AFRERA',
+    description: 'Plan household food procurement with budget optimization',
+    keywords: 'household, procurement, budget, delivery',
+    transition: 'fade'
+  },
+  {
+    path: '/government-subsidy',
+    component: GovernmentSubsidyPage,
+    title: 'Government Subsidy - AFRERA',
+    description: 'Apply for and track government agricultural subsidy programs',
+    keywords: 'subsidy, government, programs, applications',
     transition: 'fade'
   },
   {
@@ -696,10 +879,112 @@ export const dashboardRoutes = [
     path: '/corporate-buyer',
     component: CorporateBuyerPage,
     title: 'Corporate Buyer - AFRERA',
-    description: 'Corporate buyer portal',
+    description: 'Corporate procurement dashboard',
     keywords: 'corporate, buyer, procurement',
     transition: 'fade',
     role: 'corporate'
+  },
+  // Tier 1 Advanced Services Dashboards
+  {
+    path: '/advanced-analytics',
+    component: AdvancedAnalyticsDashboard,
+    title: 'Advanced Analytics - AFRERA',
+    description: 'Production-level analytics and business intelligence',
+    keywords: 'analytics, business intelligence, data',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/predictive-intelligence',
+    component: PredictiveIntelligencePage,
+    title: 'Predictive Intelligence - AFRERA',
+    description: 'AI-powered predictions and forecasting',
+    keywords: 'AI, predictions, forecasting, intelligence',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/iot-monitoring',
+    component: IoTMonitoringDashboard,
+    title: 'IoT Monitoring - AFRERA',
+    description: 'IoT device monitoring and management',
+    keywords: 'IoT, sensors, monitoring, devices',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/blockchain-verification',
+    component: BlockchainVerificationPage,
+    title: 'Blockchain Verification - AFRERA',
+    description: 'Blockchain-based product verification and traceability',
+    keywords: 'blockchain, verification, traceability, supply chain',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/digital-twin',
+    component: DigitalTwinPage,
+    title: 'Digital Twin - AFRERA',
+    description: 'Digital twin management and simulation',
+    keywords: 'digital twin, simulation, modeling',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/enterprise-integration',
+    component: EnterpriseIntegrationPage,
+    title: 'Enterprise Integration - AFRERA',
+    description: 'Enterprise system integration management',
+    keywords: 'enterprise, integration, ERP, API',
+    transition: 'fade',
+    role: 'admin'
+  },
+  // Additional Production Dashboards
+  {
+    path: '/financial-services',
+    component: FinancialServicesDashboard,
+    title: 'Financial Services - AFRERA',
+    description: 'Financial services overview and management',
+    keywords: 'financial, services, loans, insurance',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/operational-dashboard',
+    component: OperationalDashboard,
+    title: 'Operations Dashboard - AFRERA',
+    description: 'Operational monitoring and management',
+    keywords: 'operations, monitoring, management',
+    transition: 'fade',
+    role: 'admin'
+  },
+  // Financial Services Pages
+  {
+    path: '/loan-management',
+    component: LoanManagementPage,
+    title: 'Loan Management - AFRERA',
+    description: 'Loan application and management',
+    keywords: 'loan, credit, finance',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/insurance-management',
+    component: InsuranceManagementPage,
+    title: 'Insurance Management - AFRERA',
+    description: 'Insurance policy management',
+    keywords: 'insurance, policy, coverage',
+    transition: 'fade',
+    role: 'farmer'
+  },
+  {
+    path: '/payment-processing',
+    component: PaymentProcessingPage,
+    title: 'Payment Processing - AFRERA',
+    description: 'Payment processing and transaction management',
+    keywords: 'payment, transaction, finance',
+    transition: 'fade',
+    role: 'farmer'
   },
   {
     path: '/logistics-provider',

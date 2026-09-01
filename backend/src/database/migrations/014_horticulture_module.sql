@@ -5,7 +5,7 @@
 -- Orchards Table (M141)
 CREATE TABLE IF NOT EXISTS orchards (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     area DECIMAL(10, 2), -- in hectares
@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS idx_orchard_production_variety ON orchard_production(
 -- Vegetable Crops Table (M142)
 CREATE TABLE IF NOT EXISTS vegetable_crops (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     variety VARCHAR(100),
     location VARCHAR(255),
@@ -72,7 +72,7 @@ CREATE INDEX IF NOT EXISTS idx_vegetable_crops_cultivation_method ON vegetable_c
 -- Floriculture Table (M143)
 CREATE TABLE IF NOT EXISTS floriculture (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     flower_type VARCHAR(100) NOT NULL,
     variety VARCHAR(100),
     location VARCHAR(255),
@@ -95,7 +95,7 @@ CREATE INDEX IF NOT EXISTS idx_floriculture_purpose ON floriculture(purpose);
 -- Greenhouses Table (M144)
 CREATE TABLE IF NOT EXISTS greenhouses (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     area DECIMAL(10, 2),
@@ -119,7 +119,7 @@ CREATE INDEX IF NOT EXISTS idx_greenhouses_usage ON greenhouses(current_usage);
 -- Hydroponics Systems Table (M146)
 CREATE TABLE IF NOT EXISTS hydroponics_systems (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     system_type VARCHAR(50), -- 'NFT', 'DWC', 'EBB_AND_FLOW', 'DRIP', 'AEROPONIC'
@@ -144,7 +144,7 @@ CREATE INDEX IF NOT EXISTS idx_hydroponics_systems_crop_type ON hydroponics_syst
 -- Horticulture Analytics Table (M150)
 CREATE TABLE IF NOT EXISTS horticulture_analytics (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     module_type VARCHAR(50) NOT NULL, -- 'ORCHARD', 'VEGETABLE', 'FLORICULTURE', 'GREENHOUSE', 'HYDROPONICS'
     module_id INTEGER NOT NULL,
     analytics_date DATE NOT NULL,
@@ -198,11 +198,13 @@ CREATE TRIGGER trigger_hydroponics_systems_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_horticulture_updated_at();
 
--- Insert sample data for demonstration
-INSERT INTO orchards (farmer_id, name, location, area, orchard_type, tree_count, planting_date, varieties, soil_type, irrigation_system) VALUES
-(1, 'Mango Orchard', 'North Field', 2.5, 'FRUIT', 150, '2020-03-15', '[{"variety": "Alphonso", "count": 100}, {"variety": "Kesar", "count": 50}]', 'LOAMY', 'DRIP'),
-(1, 'Coconut Grove', 'South Field', 1.8, 'FRUIT', 80, '2018-06-20', '[{"variety": "Tall", "count": 60}, {"variety": "Dwarf", "count": 20}]', 'SANDY', 'SPRINKLER')
-ON CONFLICT DO NOTHING;
+-- 2026-08-30: removed a fabricated demo-data INSERT that used a bare integer
+-- literal (1) for farmer_id, a UUID column referencing farmers(id) - fails
+-- "column farmer_id is of type uuid but expression is of type integer" on any
+-- real database, and there is no real farmer with that id to reference even
+-- if the type were fixed. Caught by tools/schema-collisions.js's CI gate
+-- actually running npm run migrate for real, which this repo had never done
+-- before this session.
 
 -- Grant permissions (adjust as needed for your setup)
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON orchards TO your_app_user;

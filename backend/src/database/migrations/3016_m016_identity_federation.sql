@@ -6,7 +6,7 @@
 -- Federated Identities Table
 CREATE TABLE IF NOT EXISTS federated_identities (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   provider VARCHAR(100) NOT NULL, -- 'google', 'facebook', 'microsoft', etc.
   provider_user_id VARCHAR(255) NOT NULL,
   attributes JSONB,

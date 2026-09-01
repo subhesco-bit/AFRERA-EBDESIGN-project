@@ -21,7 +21,12 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL
 );
-CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+-- 2026-08-31: renamed from idx_sessions_user - 014_platform_foundation_
+-- modules.sql already creates an index of that exact name on the unrelated
+-- user_sessions table and runs first; since this file's CREATE INDEX uses
+-- IF NOT EXISTS, the name collision meant this table's own index silently
+-- never got created.
+CREATE INDEX IF NOT EXISTS idx_m012_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token);
 
 CREATE TABLE IF NOT EXISTS device_fingerprints (

@@ -8,6 +8,7 @@ const { getPostgreSQL } = require('../database/connection');
 const libraryKnowledgeService = require('../services/libraryKnowledgeService');
 const unifiedConfigService = require('../services/unifiedConfigService');
 const aiCollaborationService = require('../services/aiCollaborationService');
+const aiFeedbackService = require('../services/aiFeedbackService');
 
 class ClaudeAICoordinator {
   constructor() {
@@ -23,6 +24,9 @@ class ClaudeAICoordinator {
     
     // Initialize collaboration integration
     this.aiCollaboration = aiCollaborationService;
+    
+    // Initialize feedback integration
+    this.aiFeedback = aiFeedbackService;
   }
 
   get pool() {
@@ -386,6 +390,52 @@ class ClaudeAICoordinator {
   isValidAgent(agent) {
     const validAgents = ['farmer-advisor', 'business-analyst', 'operations-manager', 'governance-agent'];
     return validAgents.includes(agent);
+  }
+
+  /**
+   * Record user feedback on AI response
+   */
+  async recordAIResponseFeedback(feedbackData) {
+    try {
+      const result = await this.aiFeedback.recordFeedback(feedbackData);
+      
+      // Log feedback with collaboration system
+      await this.aiCollaboration.logWork('claude', {
+        work_type: 'ai_feedback',
+        description: `User feedback recorded: ${feedbackData.feedbackType}`,
+        feedback_type: feedbackData.feedbackType,
+        feedback_rating: feedbackData.feedbackRating,
+        status: 'completed'
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('Error recording AI feedback:', error);
+      throw new Error('Failed to record feedback');
+    }
+  }
+
+  /**
+   * Get AI performance metrics for learning loop
+   */
+  async getAIPerformanceMetrics() {
+    try {
+      const metrics = await this.aiFeedback.getOverallMetrics();
+      const suggestions = await this.aiFeedback.generateImprovementSuggestions();
+      
+      return {
+        metrics,
+        suggestions,
+        lastUpdated: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('Error getting AI performance metrics:', error);
+      return {
+        metrics: [],
+        suggestions: [],
+        lastUpdated: new Date().toISOString()
+      };
+    }
   }
 }
 

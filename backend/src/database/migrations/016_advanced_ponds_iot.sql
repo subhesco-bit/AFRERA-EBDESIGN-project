@@ -5,7 +5,7 @@
 -- Ponds Table (Enhanced)
 CREATE TABLE IF NOT EXISTS ponds (
     id SERIAL PRIMARY KEY,
-    farmer_id INTEGER NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+    farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     location VARCHAR(255),
     area DECIMAL(10, 2), -- in square meters
@@ -198,13 +198,11 @@ CREATE TRIGGER trigger_create_sensor_alerts
     FOR EACH ROW
     EXECUTE FUNCTION create_sensor_alerts();
 
--- Insert sample sensor configurations
-INSERT INTO pond_sensors (pond_id, sensor_type, device_id, sensor_id, calibration, battery_level, signal_strength) VALUES
-(1, 'PH', 'PH-SENSOR-001', 'SENSOR-1-PH-001', '{"optimal_min": 6.5, "optimal_max": 8.5, "calibration_date": "2026-08-12"}', 85, 92),
-(1, 'TEMPERATURE', 'TEMP-SENSOR-001', 'SENSOR-1-TEMP-001', '{"optimal_min": 25, "optimal_max": 30, "calibration_date": "2026-08-12"}', 90, 88),
-(1, 'DISSOLVED_OXYGEN', 'DO-SENSOR-001', 'SENSOR-1-DO-001', '{"optimal_min": 6, "optimal_max": 8, "calibration_date": "2026-08-12"}', 78, 95),
-(1, 'TURBIDITY', 'TURB-SENSOR-001', 'SENSOR-1-TURB-001', '{"optimal_max": 20, "calibration_date": "2026-08-12"}', 82, 91)
-ON CONFLICT (sensor_id) DO NOTHING;
+-- 2026-08-30: removed a fabricated sample-sensor INSERT that used a bare
+-- pond_id of 1 - fails its own FK constraint (pond_sensors_pond_id_fkey) on
+-- any real database, since no pond with id=1 is ever created by this
+-- migration or seeded elsewhere. Caught by the same real npm run migrate CI
+-- gate as the horticulture/roles fixes in prior commits.
 
 -- Grant permissions (adjust as needed for your setup)
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON ponds TO your_app_user;

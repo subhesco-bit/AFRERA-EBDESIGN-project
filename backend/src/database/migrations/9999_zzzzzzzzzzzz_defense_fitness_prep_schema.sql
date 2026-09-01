@@ -20,7 +20,12 @@ CREATE TABLE IF NOT EXISTS defense_fitness_standards (
     category VARCHAR(50) NOT NULL,    -- 'army_agniveer_gd' | 'bsf_constable_gd' | 'delhi_police_constable' | 'up_police_constable'
     gender VARCHAR(10) NOT NULL CHECK (gender IN ('male', 'female', 'any')),
     test_component VARCHAR(50) NOT NULL, -- 'run_1.6km' | 'run_4.8km' | 'run_2.4km' | 'run_800m' | 'height_cm' | 'chest_expanded_cm' | 'chest_expansion_cm'
-    threshold_value NUMERIC(8,2) NOT NULL,
+    -- 2026-08-30: NOT NULL relaxed - the BSF rows below intentionally use NULL
+    -- rather than fabricate a number ("Exact time threshold varies by
+    -- recruitment cycle — check the official BSF notification"), which is the
+    -- correct honest choice per this file's own stated discipline, not a bug
+    -- in the seed data. The NOT NULL constraint was the actual mistake.
+    threshold_value NUMERIC(8,2),
     threshold_type VARCHAR(20) NOT NULL CHECK (threshold_type IN ('max_time_seconds', 'min_value')),
     unit VARCHAR(20) NOT NULL,
     notes TEXT,

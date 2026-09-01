@@ -1,18 +1,18 @@
 # Database Registry
 
-**Generated:** 2026-08-17 by `tools/engineering-registry.js`
+**Generated:** 2026-08-30 by `tools/engineering-registry.js`
 **Status:** DESCRIPTIVE — derived from code, not authored.
 **Do not edit by hand.** Regenerate instead: `node tools/engineering-registry.js`
 
-**Objects indexed:** 952
+**Objects indexed:** 1254
 
 ---
 
-- Migrations: **271**
-- Tables: **952**
+- Migrations: **344**
+- Tables: **1254**
 - Views: **71**
-- CHECK constraints: **758**
-- Foreign keys: **834**
+- CHECK constraints: **761**
+- Foreign keys: **941**
 - Triggers: **242**
 
 ## Tables
@@ -26,8 +26,10 @@
 | admin_settings | backend/src/database/migrations/1002_system_administration.sql |
 | advances | backend/src/database/migrations/000_base_schema.sql |
 | advisory_attachments | backend/src/database/migrations/041_rural_life_os_schema.sql |
+| aeroponic_systems | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | affiliate_partners | backend/src/database/migrations/056_named_missing_modules.sql |
 | agri_input_issues | backend/src/database/migrations/056_named_missing_modules.sql |
+| agro_meteorology_readings | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql |
 | agromet_advisories | backend/src/database/migrations/057_climate_weather_d14.sql |
 | agronomist_m031_items | backend/src/database/migrations/3000_M031_generated.sql |
 | agronomist_m032_items | backend/src/database/migrations/3000_M032_generated.sql |
@@ -38,9 +40,13 @@
 | agronomist_m072_items | backend/src/database/migrations/3000_M072_generated.sql |
 | agronomist_m073_items | backend/src/database/migrations/3000_M073_generated.sql |
 | ai_advisories | backend/src/database/migrations/041_rural_life_os_schema.sql |
+| ai_agent_performance | backend/src/database/migrations/unified_ai_schema.sql |
 | ai_agent_scorecard | backend/src/database/migrations/990_ai_outcomes.sql |
 | ai_analysis_results | backend/src/database/migrations/023_engineering_schema.sql |
+| ai_context_enrichment | backend/src/database/migrations/unified_ai_schema.sql |
+| ai_cost_optimization | backend/src/database/migrations/unified_ai_schema.sql |
 | ai_invocations | backend/src/database/migrations/058_sam_ai_orchestration.sql |
+| ai_knowledge_base | backend/src/database/migrations/unified_ai_schema.sql |
 | ai_model_registry | backend/src/database/migrations/058_sam_ai_orchestration.sql |
 | ai_models | backend/src/database/migrations/021_conversational_ai_schema.sql |
 | ai_outcomes | backend/src/database/migrations/990_ai_outcomes.sql |
@@ -50,14 +56,29 @@
 | ai_recommendations | backend/src/database/migrations/015_advanced_features.sql |
 | ai_resolution_rules | backend/src/database/migrations/990_ai_outcomes.sql |
 | ai_routing_rules | backend/src/database/migrations/058_sam_ai_orchestration.sql |
+| ai_safety_events | backend/src/database/migrations/unified_ai_schema.sql |
+| ai_session_context | backend/src/database/migrations/unified_ai_schema.sql |
+| ai_tool_execution | backend/src/database/migrations/unified_ai_schema.sql |
+| ai_usage_tracking | backend/src/database/migrations/unified_ai_schema.sql |
+| alert_escalations | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_history | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_incidents | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_maintenance_windows | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_notifications | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_rules | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_statistics | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
+| alert_suppressions | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql |
 | allergen_alert_config | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
 | analytics_events | backend/src/database/migrations/000_base_schema.sql |
 | android_ai_integration | backend/src/database/migrations/037_omnichannel_ai_schema.sql |
 | android_push_notifications | backend/src/database/migrations/037_omnichannel_ai_schema.sql |
 | animal_health_examinations | backend/src/database/migrations/071_animal_health_schema.sql |
+| animal_health_records | backend/src/database/migrations/9543_m127_m127.sql |
+| animal_registry | backend/src/database/migrations/9543_m127_m127.sql |
 | animal_treatments | backend/src/database/migrations/071_animal_health_schema.sql |
 | anomaly_detection | backend/src/database/migrations/039_predictive_analytics_schema.sql |
 | ap_invoices | backend/src/database/migrations/996_enterprise_foundation.sql |
+| aquaculture_analytics_metrics | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
 | ar_invoices | backend/src/database/migrations/996_enterprise_foundation.sql |
 | ar_vr_analytics | backend/src/database/migrations/017_ar_vr_schema.sql |
 | ar_vr_assets | backend/src/database/migrations/017_ar_vr_schema.sql |
@@ -68,8 +89,11 @@
 | arp_crop_parameters | backend/src/database/migrations/051_arp_forward_pricing.sql |
 | arp_district_calibration | backend/src/database/migrations/051_arp_forward_pricing.sql |
 | arp_publications | backend/src/database/migrations/051_arp_forward_pricing.sql |
+| assessment_results | backend/src/database/migrations/9506_m023_farmer_training.sql |
 | asset_bookings | backend/src/database/migrations/000_base_schema.sql |
 | asset_depreciation_schedule | backend/src/database/migrations/056_named_missing_modules.sql |
+| asset_lifecycle | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql |
+| asset_lifecycle_stages | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql |
 | asset_types | backend/src/database/migrations/000_base_schema.sql |
 | assets | backend/src/database/migrations/000_base_schema.sql |
 | audit_alert_log | backend/src/database/migrations/014_audit_system.sql |
@@ -82,13 +106,18 @@
 | bank_reconciliation | backend/src/database/migrations/056_named_missing_modules.sql |
 | batch_tracking | backend/src/database/migrations/022_digital_product_passport_schema.sql |
 | bim_models | backend/src/database/migrations/023_engineering_schema.sql |
+| bio_pesticide_stock | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
+| biodiversity_inventory | backend/src/database/migrations/9525_m079_m079.sql |
 | biodiversity_risk_predictions | backend/src/database/migrations/018_biodiversity_schema.sql |
+| biofertilizer_stock | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
+| biofloc_farm_tanks | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
 | blockchain_analytics | backend/src/database/migrations/019_blockchain_traceability_schema.sql |
 | blockchain_certificates | backend/src/database/migrations/019_blockchain_traceability_schema.sql |
 | blockchain_transactions | backend/src/database/migrations/019_blockchain_traceability_schema.sql |
 | booking_curve_observations | backend/src/database/migrations/059_yield_management_pricing.sql |
 | boq_items | backend/src/database/migrations/023_engineering_schema.sql |
 | branches | backend/src/database/migrations/996_enterprise_foundation.sql |
+| breeding_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
 | budget_lines | backend/src/database/migrations/996_enterprise_foundation.sql |
 | budgets | backend/src/database/migrations/996_enterprise_foundation.sql |
 | bulk_order_quotations | backend/src/database/migrations/009_marketplace_enhancements.sql |
@@ -103,6 +132,10 @@
 | cart_nutrition_history | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
 | cart_price_locks | backend/src/database/migrations/054_v8_v9_commerce_recovery.sql |
 | categories | backend/src/database/migrations/000_base_schema.sql |
+| cattle_breed_characteristics | backend/src/database/migrations/9541_m122_m122.sql |
+| cattle_health_records | backend/src/database/migrations/9541_m122_m122.sql |
+| cattle_performance_tracking | backend/src/database/migrations/9541_m122_m122.sql |
+| cattle_registry | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
 | certification_information | backend/src/database/migrations/022_digital_product_passport_schema.sql |
 | certification_reports | backend/src/database/migrations/033_laboratory_erp_schema.sql |
 | certifications | backend/src/database/migrations/000_base_schema.sql |
@@ -119,10 +152,15 @@
 | climate_m087_items | backend/src/database/migrations/3000_M087_generated.sql |
 | climate_m088_items | backend/src/database/migrations/3000_M088_generated.sql |
 | climate_m089_items | backend/src/database/migrations/3000_M089_generated.sql |
-| climate_risk_assessments | backend/src/database/migrations/057_climate_weather_d14.sql |
+| climate_risk_assessments | backend/src/database/migrations/057_climate_weather_d14.sql + backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql **DUPLICATE** |
+| cold_fish_chain_shipments | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
 | cold_storage_bays | backend/src/database/migrations/994_recovered_capabilities.sql |
 | cold_storage_bookings | backend/src/database/migrations/3104_cold_storage_schema.sql + backend/src/database/migrations/994_recovered_capabilities.sql **DUPLICATE** |
 | cold_storage_facilities | backend/src/database/migrations/3104_cold_storage_schema.sql |
+| collection_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| community_assets | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql |
+| community_blocks | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql |
+| community_districts | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql |
 | community_m041_items | backend/src/database/migrations/3000_M041_generated.sql |
 | community_m046_items | backend/src/database/migrations/3000_M046_generated.sql |
 | community_m049_items | backend/src/database/migrations/3000_M049_generated.sql |
@@ -133,15 +171,29 @@
 | community_manager_m047_items | backend/src/database/migrations/3000_M047_generated.sql |
 | community_manager_m048_items | backend/src/database/migrations/3000_M048_generated.sql |
 | community_manager_m050_items | backend/src/database/migrations/3000_M050_generated.sql |
+| community_states | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql |
 | companies | backend/src/database/migrations/996_enterprise_foundation.sql |
+| comparison_alerts | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| comparison_benchmarks | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| comparison_configs | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| comparison_groups | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| comparison_results | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| comparison_snapshots | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| comparison_trends | backend/src/database/migrations/9531_m085_comparison_groups.sql |
+| competitor_pricing | backend/src/database/migrations/9517_m055_m055.sql |
 | complaints | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | compliance_records | backend/src/database/migrations/000_base_schema.sql |
 | compliance_reports | backend/src/database/migrations/012_governance_module.sql |
+| configuration_history | backend/src/database/migrations/9501_m002_platform_configuration.sql |
+| configuration_templates | backend/src/database/migrations/9501_m002_platform_configuration.sql |
+| configuration_updates | backend/src/database/migrations/9500_m001_platform_core.sql |
 | consent_acceptances | backend/src/database/migrations/3017_m017_consent_management.sql |
 | consent_categories | backend/src/database/migrations/3017_m017_consent_management.sql |
 | consent_history | backend/src/database/migrations/3017_m017_consent_management.sql |
+| consent_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql |
 | consent_templates | backend/src/database/migrations/3017_m017_consent_management.sql |
 | consents | backend/src/database/migrations/014_platform_foundation_modules.sql + backend/src/database/migrations/3017_m017_consent_management.sql **DUPLICATE** |
+| conservation_implementations | backend/src/database/migrations/9525_m079_m079.sql |
 | conservation_tracking | backend/src/database/migrations/018_biodiversity_schema.sql |
 | construction_progress | backend/src/database/migrations/023_engineering_schema.sql |
 | consumer_value_preferences | backend/src/database/migrations/044_value_commerce_schema.sql |
@@ -150,6 +202,7 @@
 | contract_farming | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
 | contract_milestones | backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql **DUPLICATE** |
 | contract_offers | backend/src/database/migrations/9995_scheme_verification_map_protection.sql |
+| contractors | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
 | contracts | backend/src/database/migrations/000_base_schema.sql |
 | conversation_analytics | backend/src/database/migrations/021_conversational_ai_schema.sql |
 | conversation_context | backend/src/database/migrations/021_conversational_ai_schema.sql |
@@ -202,8 +255,12 @@
 | crop_m068_items | backend/src/database/migrations/3000_M068_generated.sql |
 | crop_m069_items | backend/src/database/migrations/3000_M069_generated.sql |
 | crop_m070_items | backend/src/database/migrations/3000_M070_generated.sql |
+| crop_monitoring_observations | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql |
+| crop_patterns | backend/src/database/migrations/9522_m076_m076.sql |
 | crop_plans | backend/src/database/migrations/011_farmer_portal_enhancements.sql |
+| crop_registrations | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql |
 | crop_value_compound_reference | backend/src/database/migrations/9999_zzzzzzzzzzzzz_crop_value_compound_reference_schema.sql |
+| crop_varieties | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql |
 | crops | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | cross_economy_transfers | backend/src/database/migrations/9999_zzzzzzzzzz_unified_ledger_schema.sql |
 | cross_system_orders | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
@@ -213,21 +270,37 @@
 | csr_contributions | backend/src/database/migrations/012_governance_module.sql |
 | csr_projects | backend/src/database/migrations/012_governance_module.sql |
 | custody_chain_events | backend/src/database/migrations/014_custody_chain_events.sql |
+| customer_insights | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
 | customer_ltv | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
+| customer_preferences | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
+| customer_segment_assignments | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
 | customer_segments | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
+| customers | backend/src/database/migrations/9516_m054_customer_segmentation.sql |
 | dairy_animals | backend/src/database/migrations/065_dairy_management_schema.sql |
 | dairy_milk_records | backend/src/database/migrations/065_dairy_management_schema.sql |
+| dashboard_data_sources | backend/src/database/migrations/9527_m081_dashboard.sql |
+| dashboard_filters | backend/src/database/migrations/9527_m081_dashboard.sql |
+| dashboard_shares | backend/src/database/migrations/9527_m081_dashboard.sql |
+| dashboard_snapshots | backend/src/database/migrations/9527_m081_dashboard.sql |
+| dashboard_usage_logs | backend/src/database/migrations/9527_m081_dashboard.sql |
+| dashboard_widgets | backend/src/database/migrations/9527_m081_dashboard.sql |
+| dashboards | backend/src/database/migrations/9527_m081_dashboard.sql |
 | data_access_policies | backend/src/database/migrations/3018_m018_privacy_controls.sql |
+| data_breach_notifications | backend/src/database/migrations/gdpr_schema.sql |
+| data_processing_activities | backend/src/database/migrations/gdpr_schema.sql |
+| data_subject_requests | backend/src/database/migrations/gdpr_schema.sql |
 | defense_fitness_prep_attempts | backend/src/database/migrations/9999_zzzzzzzzzzzz_defense_fitness_prep_schema.sql |
 | defense_fitness_standards | backend/src/database/migrations/9999_zzzzzzzzzzzz_defense_fitness_prep_schema.sql |
 | delivery_schedules | backend/src/database/migrations/034_logistics_enhancement_schema.sql |
 | demand_forecasts | backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/030_institutional_procurement_schema.sql + backend/src/database/migrations/052_economic_layer.sql + backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql **DUPLICATE** |
-| departments | backend/src/database/migrations/3200_hr_module_schema.sql + backend/src/database/migrations/996_enterprise_foundation.sql **DUPLICATE** |
+| departments | backend/src/database/migrations/3200_hr_module_schema.sql |
+| deployment_logs | backend/src/database/migrations/9504_m005_environment_management.sql |
 | depreciation_schedule | backend/src/database/migrations/996_enterprise_foundation.sql |
 | design_documents | backend/src/database/migrations/023_engineering_schema.sql |
 | design_tokens | backend/src/database/migrations/060_experience_layer_dxp.sql |
 | device_alerts | backend/src/database/migrations/031_iot_integration_schema.sql |
 | device_commands | backend/src/database/migrations/031_iot_integration_schema.sql |
+| device_fingerprints | backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql |
 | device_group_members | backend/src/database/migrations/031_iot_integration_schema.sql |
 | device_groups | backend/src/database/migrations/031_iot_integration_schema.sql |
 | dietary_preference_config | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
@@ -235,18 +308,25 @@
 | dietary_recommendations | backend/src/database/migrations/020_consumer_health_schema.sql |
 | dietitian_collection_products | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
 | dietitian_collections | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
+| digital_identities | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql |
 | digital_twin_data | backend/src/database/migrations/023_engineering_schema.sql |
 | digital_twin_sensors | backend/src/database/migrations/023_engineering_schema.sql |
 | discount_records | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
+| discounts | backend/src/database/migrations/9520_m059_m059.sql |
+| disease_forecasts | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql |
 | disease_outbreaks | backend/src/database/migrations/071_animal_health_schema.sql |
 | dispatch_events | backend/src/database/migrations/995_erp_process_layer.sql |
 | dispatch_passes | backend/src/database/migrations/995_erp_process_layer.sql |
 | dispute_kinds | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
+| distribution_points | backend/src/database/migrations/9524_m078_m078.sql |
+| downtime_logs | backend/src/database/migrations/9538_m107_equipment_breakdowns.sql |
 | dpr_documents | backend/src/database/migrations/023_engineering_schema.sql + backend/src/database/migrations/3105_dpr_documents_schema.sql **DUPLICATE** |
 | dpr_schemes | backend/src/database/migrations/053_v42_recovered_finance.sql |
 | driver_location | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | drivers | backend/src/database/migrations/000_base_schema.sql |
 | drone_surveys | backend/src/database/migrations/023_engineering_schema.sql |
+| drought_observations | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql |
+| ecological_assessments | backend/src/database/migrations/9525_m079_m079.sql |
 | economy_balances | backend/src/database/migrations/9999_zzzzzzzzzz_unified_ledger_schema.sql |
 | economy_rules | backend/src/database/migrations/9999_zzzzzzzzzz_unified_ledger_schema.sql |
 | einvoice_irn | backend/src/database/migrations/056_named_missing_modules.sql |
@@ -255,9 +335,11 @@
 | emergency_contacts | backend/src/database/migrations/993_enterprise_control_layer.sql |
 | emergency_escalations | backend/src/database/migrations/993_enterprise_control_layer.sql |
 | emergency_incidents | backend/src/database/migrations/993_enterprise_control_layer.sql |
+| emergency_repairs | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
 | emergency_types | backend/src/database/migrations/993_enterprise_control_layer.sql |
 | emi_schedule | backend/src/database/migrations/000_base_schema.sql |
 | employee_feedback | backend/src/database/migrations/3200_hr_module_schema.sql |
+| employee_promotions | backend/src/database/migrations/3200_hr_module_schema.sql |
 | employees | backend/src/database/migrations/3200_hr_module_schema.sql |
 | energy_generation_data | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | engineering_audit_log | backend/src/database/migrations/023_engineering_schema.sql |
@@ -265,14 +347,27 @@
 | engineering_maintenance_records | backend/src/database/migrations/023_engineering_schema.sql |
 | engineering_projects | backend/src/database/migrations/023_engineering_schema.sql |
 | engineering_tender_bids | backend/src/database/migrations/023_engineering_schema.sql |
+| enterprise_departments | backend/src/database/migrations/996_enterprise_foundation.sql |
 | enterprise_feasibility_analysis | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | enterprise_memory_entries | backend/src/database/migrations/9997_enterprise_memory_schema.sql |
+| environment_configs | backend/src/database/migrations/9501_m002_platform_configuration.sql |
+| environment_metrics | backend/src/database/migrations/9504_m005_environment_management.sql |
+| environment_variables | backend/src/database/migrations/9504_m005_environment_management.sql |
 | environments | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | enwr_receipts | backend/src/database/migrations/053_v42_recovered_finance.sql |
+| equipment_breakdowns | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
 | equipment_calibration | backend/src/database/migrations/033_laboratory_erp_schema.sql |
 | equipment_exchange_listings | backend/src/database/migrations/9999_zzzzzzzzz_equipment_exchange_schema.sql |
+| equipment_inventory | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql |
+| equipment_maintenance_records | backend/src/database/migrations/9535_m103_m103.sql |
 | equipment_rates | backend/src/database/migrations/023_engineering_schema.sql |
+| equipment_rental_bookings | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| equipment_rental_listings | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| equipment_schedules | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
+| equipment_status_history | backend/src/database/migrations/9535_m103_m103.sql |
 | equipment_subsidy_bands | backend/src/database/migrations/053_v42_recovered_finance.sql |
+| equipment_usage_log | backend/src/database/migrations/9512_m042_m042.sql |
+| equipment_usage_logs | backend/src/database/migrations/9535_m103_m103.sql |
 | erp_bank_accounts | backend/src/database/migrations/4000_comprehensive_erp_schema.sql |
 | erp_cash_flows | backend/src/database/migrations/4000_comprehensive_erp_schema.sql |
 | erp_chart_of_accounts | backend/src/database/migrations/4000_comprehensive_erp_schema.sql |
@@ -315,16 +410,26 @@
 | experience_assets | backend/src/database/migrations/017_ar_vr_schema.sql |
 | facility_bookings | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | facility_operations | backend/src/database/migrations/023_engineering_schema.sql |
+| farm_activities | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
 | farm_consumables | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | farm_information | backend/src/database/migrations/022_digital_product_passport_schema.sql |
+| farm_operations_kpis | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
 | farm_plots | backend/src/database/migrations/056_named_missing_modules.sql |
+| farm_productivity_metrics | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
+| farm_tasks | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
 | farmer_advisories | backend/src/database/migrations/3030_m030_farmer_advisory.sql |
 | farmer_alerts | backend/src/database/migrations/3030_m030_farmer_advisory.sql |
 | farmer_bank_accounts | backend/src/database/migrations/011_farmer_portal_enhancements.sql |
 | farmer_cash_flow | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | farmer_certifications | backend/src/database/migrations/000_base_schema.sql |
+| farmer_contact_info | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
 | farmer_contract_readiness | backend/src/database/migrations/054_v8_v9_commerce_recovery.sql |
+| farmer_education | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
+| farmer_enrollments | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| farmer_family_members | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
+| farmer_groups | backend/src/database/migrations/9507_m024_farmer_groups.sql |
 | farmer_health_records | backend/src/database/migrations/013_farmer_health_welfare_module.sql |
+| farmer_household | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
 | farmer_information | backend/src/database/migrations/022_digital_product_passport_schema.sql |
 | farmer_listings | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | farmer_m021_items | backend/src/database/migrations/3000_M021_generated.sql |
@@ -338,19 +443,27 @@
 | farmer_m029_items | backend/src/database/migrations/3000_M029_generated.sql |
 | farmer_m030_items | backend/src/database/migrations/3000_M030_generated.sql |
 | farmer_onboarding | backend/src/database/migrations/3021_m021_farmer_registration.sql |
+| farmer_profiles | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
 | farmer_revenue | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
+| farmer_skills | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
 | farmer_value_index | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | farmer_verifications | backend/src/database/migrations/3021_m021_farmer_registration.sql |
 | farmer_wallets | backend/src/database/migrations/011_farmer_portal_enhancements.sql |
 | farmers | backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/3021_m021_farmer_registration.sql **DUPLICATE** |
+| feature_flags | backend/src/database/migrations/9500_m001_platform_core.sql |
 | federated_identities | backend/src/database/migrations/3016_m016_identity_federation.sql |
 | federation_trust | backend/src/database/migrations/3016_m016_identity_federation.sql |
+| fertility_management_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql |
 | fertilizer_inventory | backend/src/database/migrations/066_fertilizer_inventory_schema.sql |
 | finance_copilot_data | backend/src/database/migrations/016_ai_copilot_schema.sql |
 | financial_needs_assessment | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | financial_transactions | backend/src/database/migrations/000_base_schema.sql |
 | fiscal_periods | backend/src/database/migrations/996_enterprise_foundation.sql |
 | fiscal_years | backend/src/database/migrations/996_enterprise_foundation.sql |
+| fish_feed_logs | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
+| fish_health_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
+| fish_processing_batches | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
+| fisheries_harvest_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
 | fisheries_m131_items | backend/src/database/migrations/3000_M131_generated.sql |
 | fisheries_m132_items | backend/src/database/migrations/3000_M132_generated.sql |
 | fisheries_m133_items | backend/src/database/migrations/3000_M133_generated.sql |
@@ -359,9 +472,16 @@
 | fisheries_m136_items | backend/src/database/migrations/3000_M136_generated.sql |
 | fisheries_m138_items | backend/src/database/migrations/3000_M138_generated.sql |
 | fisheries_m140_items | backend/src/database/migrations/3000_M140_generated.sql |
+| fisheries_water_quality_readings | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
 | fixed_assets | backend/src/database/migrations/996_enterprise_foundation.sql |
+| fleet_dispatches | backend/src/database/migrations/9537_m105_m105.sql |
+| fleet_fuel_logs | backend/src/database/migrations/9537_m105_m105.sql |
+| fleet_maintenance_records | backend/src/database/migrations/9537_m105_m105.sql |
+| fleet_routes | backend/src/database/migrations/9537_m105_m105.sql |
 | fleet_vehicles | backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql **DUPLICATE** |
+| flood_observations | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql |
 | floriculture | backend/src/database/migrations/014_horticulture_module.sql |
+| floriculture_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | folu_carbon_estimates | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | folu_land_parcels | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
 | folu_land_use_change | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
@@ -386,6 +506,7 @@
 | form_submissions | backend/src/database/migrations/026_form_management_schema.sql |
 | fpo_centre_transactions | backend/src/database/migrations/056_named_missing_modules.sql |
 | fpo_cost_centres | backend/src/database/migrations/056_named_missing_modules.sql |
+| fpo_financial_transactions | backend/src/database/migrations/9513_m051_m051.sql |
 | fpo_inventory_items | backend/src/database/migrations/3000_M056_generated.sql |
 | fpo_ledger_entries | backend/src/database/migrations/9995_scheme_verification_map_protection.sql |
 | fpo_m051_items | backend/src/database/migrations/3000_M051_generated.sql |
@@ -404,6 +525,8 @@
 | fpo_m119_items | backend/src/database/migrations/3000_M119_generated.sql |
 | fpo_m120_items | backend/src/database/migrations/3000_M120_generated.sql |
 | fpo_member_shares | backend/src/database/migrations/3106_fpo_member_shares_schema.sql |
+| fpo_memberships | backend/src/database/migrations/9513_m051_m051.sql |
+| fpo_performance_reports | backend/src/database/migrations/9513_m051_m051.sql |
 | fpo_procurement_orders | backend/src/database/migrations/3000_M055_generated.sql |
 | fpo_profit_distribution_lines | backend/src/database/migrations/3106_fpo_member_shares_schema.sql |
 | fpo_profit_distributions | backend/src/database/migrations/3106_fpo_member_shares_schema.sql |
@@ -416,8 +539,13 @@
 | freight_utilisation_slabs | backend/src/database/migrations/053_v42_recovered_finance.sql |
 | freshness_indicators | backend/src/database/migrations/024_food_intelligence_schema.sql |
 | fssai_compliance | backend/src/database/migrations/025_food_safety_schema.sql |
+| fuel_consumption | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql |
+| fuel_inventory | backend/src/database/migrations/9539_m108_m108.sql |
+| fuel_purchases | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql |
+| fuel_suppliers | backend/src/database/migrations/9539_m108_m108.sql |
 | gate_passes | backend/src/database/migrations/995_erp_process_layer.sql |
 | generic_entities | backend/src/database/migrations/049_offline_sync_tables.sql |
+| geo_boundaries | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
 | geofence_events | backend/src/database/migrations/9997_geofencing.sql |
 | geofences | backend/src/database/migrations/9997_geofencing.sql |
 | gi_analytics | backend/src/database/migrations/027_gi_intelligence_schema.sql |
@@ -433,8 +561,10 @@
 | gi_verifications | backend/src/database/migrations/027_gi_intelligence_schema.sql |
 | gift_hamper_orders | backend/src/database/migrations/994_recovered_capabilities.sql |
 | gift_hampers | backend/src/database/migrations/994_recovered_capabilities.sql |
+| gis_land_mapping_parcels | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
 | gl_ledger_chain | backend/src/database/migrations/053_v42_recovered_finance.sql |
 | goat_breeding_records | backend/src/database/migrations/068_goat_farming_schema.sql |
+| goat_farming_animals | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
 | goat_feed_consumption | backend/src/database/migrations/068_goat_farming_schema.sql |
 | goat_herd | backend/src/database/migrations/068_goat_farming_schema.sql |
 | goat_milk_production | backend/src/database/migrations/068_goat_farming_schema.sql |
@@ -444,6 +574,10 @@
 | government_schemes | backend/src/database/migrations/9995_scheme_verification_map_protection.sql |
 | graph_queries | backend/src/database/migrations/032_knowledge_graph_schema.sql |
 | greenhouses | backend/src/database/migrations/014_horticulture_module.sql |
+| groundwater_levels | backend/src/database/migrations/9522_m076_m076.sql |
+| group_finances | backend/src/database/migrations/9507_m024_farmer_groups.sql |
+| group_meetings | backend/src/database/migrations/9507_m024_farmer_groups.sql |
+| group_memberships | backend/src/database/migrations/9507_m024_farmer_groups.sql |
 | gst_audit_logs | backend/src/database/migrations/028_gst_schema.sql |
 | gst_calculations | backend/src/database/migrations/028_gst_schema.sql |
 | gst_category_rules | backend/src/database/migrations/053_v42_recovered_finance.sql |
@@ -462,12 +596,15 @@
 | haccp_plans | backend/src/database/migrations/025_food_safety_schema.sql |
 | handling_engine_rules | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
 | handling_engines | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
+| hatchery_batches | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql |
 | health_alerts | backend/src/database/migrations/020_consumer_health_schema.sql |
 | health_analytics | backend/src/database/migrations/020_consumer_health_schema.sql |
 | health_goals | backend/src/database/migrations/020_consumer_health_schema.sql |
 | health_metrics | backend/src/database/migrations/020_consumer_health_schema.sql |
 | health_profiles | backend/src/database/migrations/020_consumer_health_schema.sql |
+| herd_health_monitoring | backend/src/database/migrations/9543_m127_m127.sql |
 | horticulture_analytics | backend/src/database/migrations/014_horticulture_module.sql |
+| horticulture_analytics_metrics | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | horticulture_m141_items | backend/src/database/migrations/3000_M141_generated.sql |
 | horticulture_m142_items | backend/src/database/migrations/3000_M142_generated.sql |
 | horticulture_m143_items | backend/src/database/migrations/3000_M143_generated.sql |
@@ -481,6 +618,8 @@
 | hr_sentiment_analysis | backend/src/database/migrations/3200_hr_module_schema.sql |
 | hsn_gst_mapping | backend/src/database/migrations/047_gst_tables.sql |
 | humidity_monitoring | backend/src/database/migrations/043_shelf_life_schema.sql |
+| hydrological_data | backend/src/database/migrations/9525_m079_m079.sql |
+| hydroponic_systems | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | hydroponics_systems | backend/src/database/migrations/014_horticulture_module.sql |
 | identity_attribute_mappings | backend/src/database/migrations/3016_m016_identity_federation.sql |
 | identity_m014_items | backend/src/database/migrations/3000_M014_generated.sql |
@@ -488,6 +627,11 @@
 | identity_m018_items | backend/src/database/migrations/3000_M018_generated.sql |
 | identity_m019_items | backend/src/database/migrations/3000_M019_generated.sql |
 | identity_m020_items | backend/src/database/migrations/3000_M020_generated.sql |
+| identity_permissions | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql |
+| implement_condition_assessments | backend/src/database/migrations/9534_m102_m102.sql |
+| implement_maintenance_records | backend/src/database/migrations/9534_m102_m102.sql |
+| implement_registry | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql |
+| implement_usage_logs | backend/src/database/migrations/9534_m102_m102.sql |
 | incentive_pool_cycles | backend/src/database/migrations/054_v8_v9_commerce_recovery.sql |
 | incentive_pool_redemptions | backend/src/database/migrations/054_v8_v9_commerce_recovery.sql |
 | incentive_pool_transactions | backend/src/database/migrations/994_recovered_capabilities.sql |
@@ -498,9 +642,13 @@
 | indigenous_protection | backend/src/database/migrations/029_indigenous_knowledge_schema.sql |
 | ingredient_pricing | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
 | ingredient_substitutions | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
+| input_consumption_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
+| input_distribution_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
+| input_procurement_orders | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
 | input_supply_m112_items | backend/src/database/migrations/3000_M112_generated.sql |
 | input_supply_m113_items | backend/src/database/migrations/3000_M113_generated.sql |
 | input_supply_m116_items | backend/src/database/migrations/3000_M116_generated.sql |
+| input_traceability_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
 | institutional_ingredient_substitutions | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
 | institutional_nutrition_requirements | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
 | institutional_recipes | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
@@ -511,6 +659,7 @@
 | intents | backend/src/database/migrations/021_conversational_ai_schema.sql |
 | interaction_points | backend/src/database/migrations/017_ar_vr_schema.sql |
 | inventory_adjustments | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
+| inventory_logs | backend/src/database/migrations/9514_m052_m052.sql |
 | inventory_movements | backend/src/database/migrations/034_logistics_enhancement_schema.sql |
 | inventory_optimization | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
 | invoice_match_results | backend/src/database/migrations/995_erp_process_layer.sql |
@@ -520,6 +669,9 @@
 | iot_automation_rules | backend/src/database/migrations/015_advanced_features.sql |
 | iot_devices | backend/src/database/migrations/015_advanced_features.sql + backend/src/database/migrations/031_iot_integration_schema.sql + backend/src/database/migrations/3030_m030_farmer_advisory.sql **DUPLICATE** |
 | iot_readings | backend/src/database/migrations/015_advanced_features.sql |
+| irrigation_logs | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql |
+| irrigation_schedules | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql |
+| irrigation_water_sources | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_irrigation_management_schema.sql |
 | iso22000_compliance | backend/src/database/migrations/025_food_safety_schema.sql |
 | ivr_ai_integration | backend/src/database/migrations/037_omnichannel_ai_schema.sql |
 | ivr_call_flows | backend/src/database/migrations/037_omnichannel_ai_schema.sql |
@@ -533,16 +685,28 @@
 | knowledge_graphs | backend/src/database/migrations/032_knowledge_graph_schema.sql |
 | knowledge_nodes | backend/src/database/migrations/032_knowledge_graph_schema.sql |
 | knowledge_relationships | backend/src/database/migrations/032_knowledge_graph_schema.sql |
+| kpi_aggregations | backend/src/database/migrations/9528_m082_kpi.sql |
+| kpi_alerts | backend/src/database/migrations/9528_m082_kpi.sql |
+| kpi_definitions | backend/src/database/migrations/9528_m082_kpi.sql |
+| kpi_dimensions | backend/src/database/migrations/9528_m082_kpi.sql |
+| kpi_measurements | backend/src/database/migrations/9528_m082_kpi.sql |
+| kpi_scores | backend/src/database/migrations/9528_m082_kpi.sql |
+| kpi_targets | backend/src/database/migrations/9528_m082_kpi.sql |
 | labor_rates | backend/src/database/migrations/023_engineering_schema.sql |
 | laboratories | backend/src/database/migrations/033_laboratory_erp_schema.sql |
 | laboratory_analysts | backend/src/database/migrations/033_laboratory_erp_schema.sql |
 | laboratory_invoices | backend/src/database/migrations/033_laboratory_erp_schema.sql |
+| land_leases | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
 | land_m034_items | backend/src/database/migrations/3000_M034_generated.sql |
 | land_m035_items | backend/src/database/migrations/3000_M035_generated.sql |
 | land_m037_items | backend/src/database/migrations/3000_M037_generated.sql |
 | land_m038_items | backend/src/database/migrations/3000_M038_generated.sql |
 | land_m039_items | backend/src/database/migrations/3000_M039_generated.sql |
+| land_parcels | backend/src/database/migrations/9509_m031_land_parcels_b.sql |
 | land_records | backend/src/database/migrations/011_farmer_portal_enhancements.sql |
+| land_surveys | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
+| land_transfers | backend/src/database/migrations/9509_m031_land_parcels_b.sql |
+| land_use_patterns | backend/src/database/migrations/9525_m079_m079.sql |
 | landed_cost_components | backend/src/database/migrations/055_business_report_recovery.sql |
 | language_detection_logs | backend/src/database/migrations/035_multilingual_schema.sql |
 | languages | backend/src/database/migrations/035_multilingual_schema.sql |
@@ -553,6 +717,8 @@
 | legal_obligations | backend/src/database/migrations/993_enterprise_control_layer.sql |
 | lenders | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | listing_floor_private | backend/src/database/migrations/995_erp_process_layer.sql |
+| livestock_analytics_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
+| livestock_feed_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
 | livestock_m121_items | backend/src/database/migrations/3000_M121_generated.sql |
 | livestock_m122_items | backend/src/database/migrations/3000_M122_generated.sql |
 | livestock_m123_items | backend/src/database/migrations/3000_M123_generated.sql |
@@ -586,6 +752,7 @@
 | machinery_m108_items | backend/src/database/migrations/3000_M108_generated.sql |
 | machinery_m109_items | backend/src/database/migrations/3000_M109_generated.sql |
 | machinery_m110_items | backend/src/database/migrations/3000_M110_generated.sql |
+| machinery_operations | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql |
 | maintenance_records | backend/src/database/migrations/000_base_schema.sql |
 | maintenance_tickets | backend/src/database/migrations/995_erp_process_layer.sql |
 | mandi_prices | backend/src/database/migrations/056_named_missing_modules.sql |
@@ -607,17 +774,27 @@
 | media_delivery_profiles | backend/src/database/migrations/060_experience_layer_dxp.sql |
 | medicinal_plants_database | backend/src/database/migrations/018_biodiversity_schema.sql |
 | menu_plans | backend/src/database/migrations/030_institutional_procurement_schema.sql |
+| metric_benchmarks | backend/src/database/migrations/9528_m082_kpi.sql |
+| mfa_backup_codes | backend/src/database/migrations/mfa_schema.sql |
 | mfa_biometrics | backend/src/database/migrations/3015_m015_mfa.sql |
+| mfa_devices | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql |
 | mfa_events | backend/src/database/migrations/3015_m015_mfa.sql |
 | mfa_otp | backend/src/database/migrations/3015_m015_mfa.sql |
 | mfa_recovery_codes | backend/src/database/migrations/3015_m015_mfa.sql |
-| mfa_secrets | backend/src/database/migrations/3015_m015_mfa.sql |
+| mfa_secrets | backend/src/database/migrations/3015_m015_mfa.sql + backend/src/database/migrations/mfa_schema.sql **DUPLICATE** |
+| mfa_verification_attempts | backend/src/database/migrations/mfa_schema.sql |
+| micronutrient_stock | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
 | mill_circuit_bookings | backend/src/database/migrations/9995_scheme_verification_map_protection.sql |
 | mill_circuit_slots | backend/src/database/migrations/9995_scheme_verification_map_protection.sql |
 | mobility_rides | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
 | mobility_vehicles | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
 | model_performance | backend/src/database/migrations/039_predictive_analytics_schema.sql |
 | model_training_history | backend/src/database/migrations/039_predictive_analytics_schema.sql |
+| monitoring_alerts | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| monitoring_dashboards | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| monitoring_events | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| monitoring_metrics | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
+| monitoring_sources | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
 | motion_presets | backend/src/database/migrations/060_experience_layer_dxp.sql |
 | native_crops_database | backend/src/database/migrations/018_biodiversity_schema.sql |
 | ne_organic_enrolment | backend/src/database/migrations/991_aeos_folu_ne_policy.sql |
@@ -625,11 +802,17 @@
 | network_status_tracking | backend/src/database/migrations/049_offline_sync_tables.sql |
 | nfc_payment_cards | backend/src/database/migrations/048_offline_payment_tables.sql |
 | non_conformances | backend/src/database/migrations/995_erp_process_layer.sql |
+| notification_deliveries | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| notification_preferences | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| notification_templates | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| notifications | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| nurseries | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql |
 | nutrient_based_commissions | backend/src/database/migrations/3103_nutrient_value_sales.sql |
 | nutrient_benchmarks | backend/src/database/migrations/3103_nutrient_value_sales.sql |
 | nutrient_categories | backend/src/database/migrations/036_nutrition_intelligence_schema.sql |
 | nutrient_certificates | backend/src/database/migrations/3103_nutrient_value_sales.sql |
 | nutrient_content_verification | backend/src/database/migrations/3103_nutrient_value_sales.sql |
+| nutrient_management_plans | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql |
 | nutrient_value_pricing | backend/src/database/migrations/3103_nutrient_value_sales.sql |
 | nutrients | backend/src/database/migrations/036_nutrition_intelligence_schema.sql |
 | nutrition_comparisons | backend/src/database/migrations/036_nutrition_intelligence_schema.sql |
@@ -655,8 +838,14 @@
 | oral_history | backend/src/database/migrations/029_indigenous_knowledge_schema.sql |
 | orchard_production | backend/src/database/migrations/014_horticulture_module.sql |
 | orchards | backend/src/database/migrations/014_horticulture_module.sql |
+| order_fulfillment | backend/src/database/migrations/9515_m053_m053.sql |
 | order_items | backend/src/database/migrations/000_base_schema.sql |
+| order_tracking | backend/src/database/migrations/9515_m053_m053.sql |
 | orders | backend/src/database/migrations/000_base_schema.sql |
+| org_departments | backend/src/database/migrations/9503_m004_organization_management.sql |
+| org_hierarchy | backend/src/database/migrations/9503_m004_organization_management.sql |
+| org_teams | backend/src/database/migrations/9503_m004_organization_management.sql |
+| org_users | backend/src/database/migrations/9503_m004_organization_management.sql |
 | organic_audits | backend/src/database/migrations/038_organic_traceability_schema.sql |
 | organic_chain_of_custody | backend/src/database/migrations/038_organic_traceability_schema.sql |
 | organic_consumer_transparency | backend/src/database/migrations/038_organic_traceability_schema.sql |
@@ -665,6 +854,7 @@
 | organic_fraud_alerts | backend/src/database/migrations/038_organic_traceability_schema.sql |
 | organic_harvests | backend/src/database/migrations/038_organic_traceability_schema.sql |
 | organic_input_rates | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
+| organic_input_stock | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
 | organic_input_types | backend/src/database/migrations/038_organic_traceability_schema.sql |
 | organic_input_usage | backend/src/database/migrations/038_organic_traceability_schema.sql |
 | organic_inputs | backend/src/database/migrations/038_organic_traceability_schema.sql |
@@ -683,24 +873,38 @@
 | packing_units | backend/src/database/migrations/995_erp_process_layer.sql |
 | panchayat_schemes | backend/src/database/migrations/012_governance_module.sql |
 | panchayats | backend/src/database/migrations/012_governance_module.sql |
+| parts_suppliers | backend/src/database/migrations/9540_m109_m109.sql |
 | party_risk_events | backend/src/database/migrations/053_v42_recovered_finance.sql |
 | password_reset_tokens | backend/src/database/migrations/3020_m020_account_recovery.sql |
 | payment_allocations | backend/src/database/migrations/996_enterprise_foundation.sql |
 | payments | backend/src/database/migrations/000_base_schema.sql |
 | pending_registrations | backend/src/database/migrations/050_sms_auth_tables.sql |
+| performance_alerts | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| performance_benchmarks | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| performance_comparisons | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| performance_drivers | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| performance_metrics | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| performance_reports | backend/src/database/migrations/9529_m083_performance_metrics.sql |
 | performance_reviews | backend/src/database/migrations/3200_hr_module_schema.sql |
+| performance_targets | backend/src/database/migrations/9529_m083_performance_metrics.sql |
+| performance_trends | backend/src/database/migrations/9529_m083_performance_metrics.sql |
 | permission_templates | backend/src/database/migrations/015_authorization_service.sql |
 | permissions | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | pest_disease_forecasts | backend/src/database/migrations/057_climate_weather_d14.sql |
+| pesticide_inventory | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql |
 | pick_lists | backend/src/database/migrations/995_erp_process_layer.sql |
 | pig_breeding_records | backend/src/database/migrations/070_pig_farming_schema.sql |
+| pig_farming_animals | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
 | pig_feed_consumption | backend/src/database/migrations/070_pig_farming_schema.sql |
 | pig_herd | backend/src/database/migrations/070_pig_farming_schema.sql |
 | pig_vaccination_records | backend/src/database/migrations/070_pig_farming_schema.sql |
 | pig_weight_records | backend/src/database/migrations/070_pig_farming_schema.sql |
+| platform_alerts | backend/src/database/migrations/9500_m001_platform_core.sql |
 | platform_commissions | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
 | platform_compliance_record | backend/src/database/migrations/061_decision_support_data_gaps.sql |
-| platform_configurations | backend/src/database/migrations/014_platform_foundation_modules.sql + backend/src/database/migrations/1001_platform_configuration.sql **DUPLICATE** |
+| platform_config | backend/src/database/migrations/m001_platform_core_schema.sql |
+| platform_configurations | backend/src/database/migrations/014_platform_foundation_modules.sql |
+| platform_events | backend/src/database/migrations/m001_platform_core_schema.sql |
 | platform_foundation_m001_items | backend/src/database/migrations/3000_M001_generated.sql |
 | platform_foundation_m002_items | backend/src/database/migrations/3000_M002_generated.sql |
 | platform_foundation_m003_items | backend/src/database/migrations/3000_M003_generated.sql |
@@ -711,8 +915,13 @@
 | platform_foundation_m008_items | backend/src/database/migrations/3000_M008_generated.sql |
 | platform_foundation_m009_items | backend/src/database/migrations/3000_M009_generated.sql |
 | platform_foundation_m010_items | backend/src/database/migrations/3000_M010_generated.sql |
+| platform_health_logs | backend/src/database/migrations/9500_m001_platform_core.sql |
+| platform_maintenance | backend/src/database/migrations/m001_platform_core_schema.sql |
+| platform_metrics | backend/src/database/migrations/9500_m001_platform_core.sql |
+| platform_versions | backend/src/database/migrations/m001_platform_core_schema.sql |
 | policies | backend/src/database/migrations/000_base_schema.sql |
 | policy_documents | backend/src/database/migrations/010_insurance_enhancements.sql |
+| polyhouse_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | pond_ai_insights | backend/src/database/migrations/016_advanced_ponds_iot.sql |
 | pond_alerts | backend/src/database/migrations/016_advanced_ponds_iot.sql |
 | pond_health_index | backend/src/database/migrations/016_advanced_ponds_iot.sql |
@@ -720,17 +929,28 @@
 | pond_sensors | backend/src/database/migrations/016_advanced_ponds_iot.sql |
 | ponds | backend/src/database/migrations/016_advanced_ponds_iot.sql |
 | portal_roles | backend/src/database/migrations/994_recovered_capabilities.sql |
+| poultry_batches | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
+| poultry_breed_characteristics | backend/src/database/migrations/9542_m123_poultry_registry.sql |
 | poultry_egg_production | backend/src/database/migrations/067_poultry_management_schema.sql |
 | poultry_feed_consumption | backend/src/database/migrations/067_poultry_management_schema.sql |
 | poultry_flocks | backend/src/database/migrations/067_poultry_management_schema.sql |
+| poultry_health_records | backend/src/database/migrations/9542_m123_poultry_registry.sql |
 | poultry_mortality | backend/src/database/migrations/067_poultry_management_schema.sql |
+| poultry_performance_tracking | backend/src/database/migrations/9542_m123_poultry_registry.sql |
+| poultry_registry | backend/src/database/migrations/9542_m123_poultry_registry.sql |
 | poultry_vaccination_records | backend/src/database/migrations/067_poultry_management_schema.sql |
+| precision_horticulture_readings | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | predictions | backend/src/database/migrations/039_predictive_analytics_schema.sql |
 | predictive_models | backend/src/database/migrations/039_predictive_analytics_schema.sql |
+| preventive_maintenance_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preventive_maintenance_schema.sql |
+| price_elasticity | backend/src/database/migrations/9517_m055_m055.sql |
+| price_history | backend/src/database/migrations/9517_m055_m055.sql |
 | price_intelligence | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
 | price_windows | backend/src/database/migrations/054_v8_v9_commerce_recovery.sql |
 | pricing_buckets | backend/src/database/migrations/059_yield_management_pricing.sql |
 | pricing_lots | backend/src/database/migrations/059_yield_management_pricing.sql |
+| pricing_rules | backend/src/database/migrations/9517_m055_m055.sql |
+| privacy_impact_assessments | backend/src/database/migrations/gdpr_schema.sql |
 | privacy_policies | backend/src/database/migrations/3018_m018_privacy_controls.sql |
 | privacy_policy_acceptances | backend/src/database/migrations/3018_m018_privacy_controls.sql |
 | processing_history | backend/src/database/migrations/022_digital_product_passport_schema.sql |
@@ -738,12 +958,15 @@
 | procurement_orders | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
 | procurement_subscriptions | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
 | procurement_tenders | backend/src/database/migrations/030_institutional_procurement_schema.sql |
+| producer_groups | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql |
+| product_categories | backend/src/database/migrations/9514_m052_m052.sql |
 | product_ids | backend/src/database/migrations/022_digital_product_passport_schema.sql |
 | product_listings | backend/src/database/migrations/3100_ecommerce_tables.sql |
 | product_nutrition | backend/src/database/migrations/036_nutrition_intelligence_schema.sql |
 | product_nutrition_pricing | backend/src/database/migrations/036_nutrition_intelligence_schema.sql |
 | product_nutrition_scores | backend/src/database/migrations/036_nutrition_intelligence_schema.sql |
 | product_recipe_compatibility | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
+| product_recommendations | backend/src/database/migrations/9514_m052_m052.sql |
 | product_reviews | backend/src/database/migrations/009_marketplace_enhancements.sql + backend/src/database/migrations/3100_ecommerce_tables.sql **DUPLICATE** |
 | product_value_pricing | backend/src/database/migrations/044_value_commerce_schema.sql |
 | product_value_scores | backend/src/database/migrations/044_value_commerce_schema.sql |
@@ -751,6 +974,7 @@
 | production_orders | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql + backend/src/database/migrations/995_erp_process_layer.sql **DUPLICATE** |
 | products | backend/src/database/migrations/000_base_schema.sql |
 | profile_activity | backend/src/database/migrations/3018_m018_privacy_controls.sql + backend/src/database/migrations/3019_m019_profile_management.sql **DUPLICATE** |
+| profile_enrichment_log | backend/src/database/migrations/9505_m022_farmer_profiles.sql |
 | profile_views | backend/src/database/migrations/3018_m018_privacy_controls.sql + backend/src/database/migrations/3019_m019_profile_management.sql **DUPLICATE** |
 | profit_centers | backend/src/database/migrations/996_enterprise_foundation.sql |
 | project_milestones | backend/src/database/migrations/9996_project_systems_schema.sql |
@@ -758,8 +982,9 @@
 | project_wbs | backend/src/database/migrations/9996_project_systems_schema.sql |
 | projects | backend/src/database/migrations/9996_project_systems_schema.sql |
 | promo_codes | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
-| promotions | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql + backend/src/database/migrations/3200_hr_module_schema.sql **DUPLICATE** |
+| promotions | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
 | pronunciation_guides | backend/src/database/migrations/035_multilingual_schema.sql |
+| protected_cultivation_structures | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | purchase_order_lines | backend/src/database/migrations/995_erp_process_layer.sql |
 | purchase_orders | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql + backend/src/database/migrations/995_erp_process_layer.sql **DUPLICATE** |
 | purchase_requisition_lines | backend/src/database/migrations/995_erp_process_layer.sql |
@@ -767,6 +992,7 @@
 | qc_holds | backend/src/database/migrations/056_named_missing_modules.sql |
 | qm_inspections | backend/src/database/migrations/995_erp_process_layer.sql |
 | qr_codes | backend/src/database/migrations/022_digital_product_passport_schema.sql |
+| quality_alerts | backend/src/database/migrations/9523_m077_m077.sql |
 | quality_checks | backend/src/database/migrations/023_engineering_schema.sql |
 | quality_control_samples | backend/src/database/migrations/033_laboratory_erp_schema.sql |
 | quality_inspections | backend/src/database/migrations/030_institutional_procurement_schema.sql |
@@ -775,24 +1001,38 @@
 | query_results | backend/src/database/migrations/032_knowledge_graph_schema.sql |
 | quotations | backend/src/database/migrations/3100_ecommerce_tables.sql |
 | quote_outcomes | backend/src/database/migrations/056_named_missing_modules.sql |
+| rainfall_patterns | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| rainfall_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| rainwater_harvesting_structures | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql |
+| rainwater_harvesting_systems | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
 | rcm_liabilities | backend/src/database/migrations/056_named_missing_modules.sql |
+| real_time_data | backend/src/database/migrations/9532_m086_monitoring_alerts.sql |
 | recall_status | backend/src/database/migrations/022_digital_product_passport_schema.sql |
 | recipe_database | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
 | recipe_product_recommendations | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
 | recommendations | backend/src/database/migrations/000_base_schema.sql |
 | recovery_attempts | backend/src/database/migrations/3020_m020_account_recovery.sql |
+| refunds | backend/src/database/migrations/9518_m056_m056.sql |
+| regional_cattle_health_patterns | backend/src/database/migrations/9541_m122_m122.sql |
 | regional_cuisine | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
+| regional_disease_patterns | backend/src/database/migrations/9543_m127_m127.sql |
+| regional_poultry_health_patterns | backend/src/database/migrations/9542_m123_poultry_registry.sql |
 | regional_variety_directory | backend/src/database/migrations/9999_zzz_regional_variety_directory_schema.sql |
 | renewable_energy_systems | backend/src/database/migrations/041_rural_life_os_schema.sql |
+| rental_reviews | backend/src/database/migrations/9536_m104_m104.sql |
+| rental_transactions | backend/src/database/migrations/9536_m104_m104.sql |
+| repair_parts_inventory | backend/src/database/migrations/9538_m107_equipment_breakdowns.sql |
 | resource_groups | backend/src/database/migrations/015_authorization_service.sql |
 | retargeting_campaigns | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
 | return_load_postings | backend/src/database/migrations/9999_zzzzzzzz_return_load_board_schema.sql |
 | return_reasons | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
+| returns | backend/src/database/migrations/9519_m058_m058.sql |
 | revenue_contracts | backend/src/database/migrations/052_economic_layer.sql |
 | reverse_logistics | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
 | review_helpful | backend/src/database/migrations/009_marketplace_enhancements.sql |
 | review_helpful_votes | backend/src/database/migrations/3100_ecommerce_tables.sql |
 | review_reports | backend/src/database/migrations/009_marketplace_enhancements.sql + backend/src/database/migrations/3100_ecommerce_tables.sql **DUPLICATE** |
+| reviews | backend/src/database/migrations/9521_m060_m060.sql |
 | rfq_bids | backend/src/database/migrations/056_named_missing_modules.sql |
 | rfq_headers | backend/src/database/migrations/995_erp_process_layer.sql |
 | rfq_requests | backend/src/database/migrations/056_named_missing_modules.sql |
@@ -804,6 +1044,7 @@
 | role_permissions | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | roles | backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/014_platform_foundation_modules.sql + backend/src/database/migrations/015_authorization_service.sql + backend/src/database/migrations/1000_user_management.sql **DUPLICATE** |
 | route_optimization | backend/src/database/migrations/034_logistics_enhancement_schema.sql |
+| rural_development_projects | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql |
 | rural_economic_units | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | rural_enterprises | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | rural_finance | backend/src/database/migrations/041_rural_life_os_schema.sql |
@@ -818,15 +1059,21 @@
 | scheme_funding_map | backend/src/database/migrations/055_business_report_recovery.sql |
 | schemes | backend/src/database/migrations/000_base_schema.sql |
 | seasonal_ingredients | backend/src/database/migrations/040_recipe_intelligence_schema.sql |
+| security_events | backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql |
 | security_questions | backend/src/database/migrations/3020_m020_account_recovery.sql |
+| seed_planning_plans | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql |
 | seed_vault_items | backend/src/database/migrations/9999_zzzzzz_seed_vault_schema.sql |
+| seedling_batches | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql |
+| seedling_health_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql |
 | seller_analytics_summary | backend/src/database/migrations/3100_ecommerce_tables.sql |
 | semantic_search_index | backend/src/database/migrations/032_knowledge_graph_schema.sql |
 | sensor_data | backend/src/database/migrations/031_iot_integration_schema.sql |
+| sessions | backend/src/database/migrations/9999_zzzzzzzzzzzzzzz_m012_session_security_schema.sql |
 | settlement_instructions | backend/src/database/migrations/014_custody_chain_events.sql |
 | settlement_records | backend/src/database/migrations/030_institutional_procurement_schema.sql |
 | shared_infrastructure_access | backend/src/database/migrations/041_rural_life_os_schema.sql |
 | sheep_breeding_records | backend/src/database/migrations/069_sheep_farming_schema.sql |
+| sheep_farming_animals | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql |
 | sheep_feed_consumption | backend/src/database/migrations/069_sheep_farming_schema.sql |
 | sheep_flock | backend/src/database/migrations/069_sheep_farming_schema.sql |
 | sheep_vaccination_records | backend/src/database/migrations/069_sheep_farming_schema.sql |
@@ -844,17 +1091,29 @@
 | sms_otps | backend/src/database/migrations/050_sms_auth_tables.sql |
 | sod_rules | backend/src/database/migrations/995_erp_process_layer.sql |
 | sod_violations | backend/src/database/migrations/995_erp_process_layer.sql |
+| soil_health_cards | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql |
+| soil_health_reports | backend/src/database/migrations/9510_m032_land_records_extra.sql |
 | soil_m074_items | backend/src/database/migrations/3000_M074_generated.sql |
+| soil_mapping_zones | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
+| soil_samples | backend/src/database/migrations/9510_m032_land_records_extra.sql |
+| sowing_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzz_crop_management_schema.sql |
+| spare_parts_consumption | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql |
+| spare_parts_inventory | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_machinery_action_modules_schema.sql |
+| spare_parts_procurement | backend/src/database/migrations/9540_m109_m109.sql |
 | species_database | backend/src/database/migrations/018_biodiversity_schema.sql |
 | speech_recognition_logs | backend/src/database/migrations/045_voice_ai_schema.sql |
 | spoilage_risk_predictions | backend/src/database/migrations/043_shelf_life_schema.sql |
 | sponsored_listings | backend/src/database/migrations/056_named_missing_modules.sql |
 | sponsored_products | backend/src/database/migrations/3102_ecommerce_ai_erp_business_marketing.sql |
 | sso_configurations | backend/src/database/migrations/014_platform_foundation_modules.sql |
+| sso_providers | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_identity_management_schema.sql |
 | staple_subscriptions | backend/src/database/migrations/056_named_missing_modules.sql |
 | states | backend/src/database/migrations/000_base_schema.sql |
 | storage_analysis | backend/src/database/migrations/043_shelf_life_schema.sql |
+| storage_tanks | backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql |
+| subsidy_applications | backend/src/database/migrations/9508_m025_land_parcels_a.sql |
 | subsidy_claims | backend/src/database/migrations/000_base_schema.sql |
+| subsidy_schemes | backend/src/database/migrations/9508_m025_land_parcels_a.sql |
 | supply_contracts | backend/src/database/migrations/030_institutional_procurement_schema.sql |
 | sustainability_data | backend/src/database/migrations/022_digital_product_passport_schema.sql |
 | sync_audit_log | backend/src/database/migrations/049_offline_sync_tables.sql |
@@ -868,6 +1127,10 @@
 | temperature_alerts | backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql **DUPLICATE** |
 | temperature_monitoring | backend/src/database/migrations/043_shelf_life_schema.sql |
 | temperature_readings | backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql **DUPLICATE** |
+| tenant_billing | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| tenant_settings | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| tenant_usage_logs | backend/src/database/migrations/9502_m003_tenant_management.sql |
+| tenant_users | backend/src/database/migrations/9502_m003_tenant_management.sql |
 | tenants | backend/src/database/migrations/014_platform_foundation_modules.sql |
 | tender_bids | backend/src/database/migrations/030_institutional_procurement_schema.sql + backend/src/database/migrations/999_zz_tender_bids_collision_repair.sql **DUPLICATE** |
 | tender_documents | backend/src/database/migrations/023_engineering_schema.sql |
@@ -879,18 +1142,35 @@
 | timesheet_entries | backend/src/database/migrations/3200_hr_module_schema.sql |
 | timesheets | backend/src/database/migrations/3200_hr_module_schema.sql |
 | traceability_events | backend/src/database/migrations/019_blockchain_traceability_schema.sql |
+| tractor_insurance_records | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| tractor_maintenance_records | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| tractor_performance_logs | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| tractor_registry | backend/src/database/migrations/9533_m101_tractor_registry.sql |
+| tractor_usage_logs | backend/src/database/migrations/9533_m101_tractor_registry.sql |
 | traditional_medicine | backend/src/database/migrations/029_indigenous_knowledge_schema.sql |
 | traditional_recipes | backend/src/database/migrations/029_indigenous_knowledge_schema.sql |
 | traditional_varieties_database | backend/src/database/migrations/018_biodiversity_schema.sql |
+| training_assessments | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| training_attendance | backend/src/database/migrations/9506_m023_farmer_training.sql |
+| training_materials | backend/src/database/migrations/9506_m023_farmer_training.sql |
 | training_programs | backend/src/database/migrations/3200_hr_module_schema.sql |
 | training_records | backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/3200_hr_module_schema.sql **DUPLICATE** |
+| training_sessions | backend/src/database/migrations/9506_m023_farmer_training.sql |
 | transactions | backend/src/database/migrations/048_offline_payment_tables.sql |
 | translation_memory | backend/src/database/migrations/035_multilingual_schema.sql |
 | translation_requests | backend/src/database/migrations/035_multilingual_schema.sql |
 | transport_analysis | backend/src/database/migrations/043_shelf_life_schema.sql |
 | transport_classes | backend/src/database/migrations/053_v42_recovered_finance.sql |
 | transport_modes | backend/src/database/migrations/992_v42_recovered_intelligence.sql |
+| treatment_recommendations | backend/src/database/migrations/9523_m077_m077.sql |
+| trend_alerts | backend/src/database/migrations/9530_m084_m084.sql |
 | trend_analysis | backend/src/database/migrations/039_predictive_analytics_schema.sql |
+| trend_breakpoints | backend/src/database/migrations/9530_m084_m084.sql |
+| trend_correlations | backend/src/database/migrations/9530_m084_m084.sql |
+| trend_data_points | backend/src/database/migrations/9530_m084_m084.sql |
+| trend_definitions | backend/src/database/migrations/9530_m084_m084.sql |
+| trend_forecasts | backend/src/database/migrations/9530_m084_m084.sql |
+| trend_seasonality | backend/src/database/migrations/9530_m084_m084.sql |
 | tribal_knowledge | backend/src/database/migrations/029_indigenous_knowledge_schema.sql |
 | trust_score_history | backend/src/database/migrations/3016_m016_identity_federation.sql |
 | trust_scores | backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql |
@@ -902,6 +1182,8 @@
 | unified_balances | backend/src/database/migrations/9999_zzzzzzzzzz_unified_ledger_schema.sql |
 | unified_ledger | backend/src/database/migrations/9999_zzzzzzzzzz_unified_ledger_schema.sql |
 | units | backend/src/database/migrations/000_base_schema.sql |
+| user_consent | backend/src/database/migrations/gdpr_schema.sql |
+| user_data_residency | backend/src/database/migrations/gdpr_schema.sql |
 | user_experience_preferences | backend/src/database/migrations/060_experience_layer_dxp.sql |
 | user_health_product_interactions | backend/src/database/migrations/3101_ecommerce_integration_tables.sql |
 | user_language_preferences | backend/src/database/migrations/035_multilingual_schema.sql |
@@ -913,6 +1195,7 @@
 | user_wallets | backend/src/database/migrations/048_offline_payment_tables.sql |
 | users | backend/src/database/migrations/000_base_schema.sql + backend/src/database/migrations/1000_user_management.sql + backend/src/database/migrations/3000_M011_generated.sql **DUPLICATE** |
 | ussd_payment_requests | backend/src/database/migrations/048_offline_payment_tables.sql |
+| vaccination_schedules | backend/src/database/migrations/9543_m127_m127.sql |
 | value_calculation_models | backend/src/database/migrations/044_value_commerce_schema.sql |
 | value_commerce_analytics | backend/src/database/migrations/044_value_commerce_schema.sql |
 | value_factors | backend/src/database/migrations/044_value_commerce_schema.sql |
@@ -920,11 +1203,13 @@
 | value_recommendations | backend/src/database/migrations/044_value_commerce_schema.sql |
 | value_tiers | backend/src/database/migrations/044_value_commerce_schema.sql |
 | vegetable_crops | backend/src/database/migrations/014_horticulture_module.sql |
+| vegetable_production_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql |
 | vehicle_maintenance | backend/src/database/migrations/013_logistics_enhancements.sql + backend/src/database/migrations/034_logistics_enhancement_schema.sql **DUPLICATE** |
 | vehicles | backend/src/database/migrations/000_base_schema.sql |
 | vendors | backend/src/database/migrations/023_engineering_schema.sql |
 | verification_requests | backend/src/database/migrations/019_blockchain_traceability_schema.sql |
 | village_profiles | backend/src/database/migrations/052_economic_layer.sql |
+| village_resources | backend/src/database/migrations/9511_m041_m041.sql |
 | villages | backend/src/database/migrations/012_governance_module.sql |
 | voice_ai_integration | backend/src/database/migrations/037_omnichannel_ai_schema.sql |
 | voice_analytics | backend/src/database/migrations/045_voice_ai_schema.sql |
@@ -947,12 +1232,29 @@
 | warehouse_performance | backend/src/database/migrations/034_logistics_enhancement_schema.sql |
 | warehouse_shipments | backend/src/database/migrations/013_logistics_enhancements.sql |
 | warehouses | backend/src/database/migrations/013_logistics_enhancements.sql |
+| water_analytics | backend/src/database/migrations/9526_m080_m080.sql |
+| water_analytics_records | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql |
+| water_anomaly_alerts | backend/src/database/migrations/9526_m080_m080.sql |
+| water_budgets | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql |
+| water_dashboards | backend/src/database/migrations/9526_m080_m080.sql |
 | water_m075_items | backend/src/database/migrations/3000_M075_generated.sql |
 | water_m076_items | backend/src/database/migrations/3000_M076_generated.sql |
 | water_m077_items | backend/src/database/migrations/3000_M077_generated.sql |
 | water_m078_items | backend/src/database/migrations/3000_M078_generated.sql |
 | water_m079_items | backend/src/database/migrations/3000_M079_generated.sql |
 | water_m080_items | backend/src/database/migrations/3000_M080_generated.sql |
+| water_performance_comparisons | backend/src/database/migrations/9526_m080_m080.sql |
+| water_predictions | backend/src/database/migrations/9526_m080_m080.sql |
+| water_quality_measurements | backend/src/database/migrations/9523_m077_m077.sql |
+| water_quality_readings | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql |
+| water_resource_mapping | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql |
+| water_sources | backend/src/database/migrations/9523_m077_m077.sql |
+| water_usage_context | backend/src/database/migrations/9523_m077_m077.sql |
+| water_usage_history | backend/src/database/migrations/9522_m076_m076.sql |
+| water_usage_records | backend/src/database/migrations/9522_m076_m076.sql |
+| watershed_health_monitoring | backend/src/database/migrations/9525_m079_m079.sql |
+| watershed_plans | backend/src/database/migrations/9525_m079_m079.sql |
+| watersheds | backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql |
 | wearable_activity_data | backend/src/database/migrations/9999_zzzzzzzzzzz_wearable_integration_schema.sql |
 | wearable_connections | backend/src/database/migrations/9999_zzzzzzzzzzz_wearable_integration_schema.sql |
 | weather_forecasts | backend/src/database/migrations/057_climate_weather_d14.sql |

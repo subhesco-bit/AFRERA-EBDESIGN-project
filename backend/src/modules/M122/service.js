@@ -1,6 +1,22 @@
 ﻿/**
  * Cattle Registry Service (M122)
  * Comprehensive livestock management and cattle registry system
+ *
+ * DATA-SOURCE DISCLOSURE (2026-08-29)
+ * registerCattle/updateCattleHealth/getCattleBreed/getCattleLocation/
+ * getCattleCount/getBreedDistribution are real: they read and write the real
+ * `cattle_registry` table. getBreedCharacteristics/getVaccinationSchedule/
+ * getBreedHealthStandards are legitimate static reference tables, not
+ * fabrication. But getRegionalHealthPatterns, getNutritionalRequirements,
+ * getEnvironmentalFactors, calculateWeightGain, calculateFeedEfficiency,
+ * getHealthMetrics, getReproductivePerformance, getMilkProductionMetrics,
+ * getHealthSummary, getProductionMetrics and getVaccinationStatus are static
+ * placeholders returning the same numbers regardless of the specific
+ * animal/farmer. Reachable live from
+ * `frontend/src/pages/CattleRegistryPage.jsx` via the generic
+ * `moduleId="M122"` operation panel. Needs real herd-record/weighing/health
+ * telemetry, not better-looking fake numbers - tracked in
+ * .ai/tasks/ACTIVE.md.
  */
 
 const { logger } = require('../../utils/logger');

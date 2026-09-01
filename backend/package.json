@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.js",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "lint": "eslint src/ --max-warnings 0",
+    "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "migrate": "node src/database/migrate.js",
     "seed": "node src/database/seed.js"

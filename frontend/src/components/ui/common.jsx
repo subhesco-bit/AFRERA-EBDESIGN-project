@@ -227,6 +227,10 @@ export const Progress = ({ value, max = 100, color = 'blue', showLabel = true })
     purple: 'bg-purple-600'
   };
   
+  const progressStyle = {
+    width: `${percentage}%`
+  };
+  
   return (
     <div className="w-full">
       {showLabel && (
@@ -238,7 +242,7 @@ export const Progress = ({ value, max = 100, color = 'blue', showLabel = true })
       <div className="w-full bg-gray-200 rounded-full h-2.5">
         <div 
           className={`${colorClasses[color]} h-2.5 rounded-full transition-all`}
-          style={{ width: `${percentage}%` }}
+          style={progressStyle}
         ></div>
       </div>
     </div>
@@ -279,7 +283,7 @@ export const Breadcrumb = ({ items }) => {
     <nav className="flex mb-4" aria-label="Breadcrumb">
       <ol className="flex items-center space-x-2">
         {items.map((item, index) => (
-          <li key={index} className="flex items-center">
+          <li key={`breadcrumb-${index}-${item.label}`} className="flex items-center">
             {index > 0 && <span className="mx-2 text-gray-400">/</span>}
             {item.href ? (
               <a 
@@ -375,7 +379,7 @@ export const DataTable = ({ columns, data, onRowClick, loading }) => {
           <tr className="border-b bg-gray-50">
             {columns.map((column, index) => (
               <th 
-                key={index} 
+                key={`header-${column.header || index}`}
                 className="text-left py-3 px-4 text-sm font-semibold text-gray-700"
               >
                 {column.header}
@@ -386,13 +390,13 @@ export const DataTable = ({ columns, data, onRowClick, loading }) => {
         <tbody>
           {data.map((row, rowIndex) => (
             <tr 
-              key={rowIndex}
+              key={`row-${rowIndex}-${row.id || rowIndex}`}
               onClick={() => onRowClick && onRowClick(row)}
               className={`border-b hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
             >
               {columns.map((column, colIndex) => (
-                <td key={colIndex} className="py-3 px-4 text-sm text-gray-900">
-                  {column.render ? column.render(row[column.accessor], row) : row[column.accessor]}
+                <td key={`col-${colIndex}`} className="py-3 px-4 text-sm text-gray-900">
+                  {(column.cell || column.render) ? (column.cell || column.render)(row[column.accessor], row) : row[column.accessor]}
                 </td>
               ))}
             </tr>

@@ -615,11 +615,45 @@ async function getRegionalCharacteristics(state) {
   };
 }
 
+const REGIONAL_LANGUAGE_DEFAULTS = {
+  assam: 'assamese', meghalaya: 'khasi', tripura: 'bengali',
+  manipur: 'manipuri', mizoram: 'mizo', nagaland: 'english',
+  'arunachal pradesh': 'hindi', sikkim: 'nepali'
+};
+
+// Honest-degradation pattern (matches services/dual-use/platformCoreService.js):
+// suggestions are derived from the fields actually missing on profileData and
+// from whatever regional signal profileData provides, not a fixed constant.
+// Any suggestion without a real per-farmer signal is labeled source: 'static'
+// instead of carrying a fabricated confidence score.
 async function generateEnrichmentSuggestions(profileData) {
-  return [
-    { field: 'occupation', suggested_value: 'farming', confidence: 0.9 },
-    { field: 'language', suggested_value: 'hindi', confidence: 0.8 }
-  ];
+  const profile = profileData || {};
+  const missing = identifyMissingFields(profile);
+  const suggestions = [];
+
+  if (missing.includes('occupation')) {
+    suggestions.push({
+      field: 'occupation',
+      suggested_value: 'farming',
+      source: 'static',
+      reason: 'Most common occupation among registered farmer profiles; no per-farmer signal available'
+    });
+  }
+
+  if (missing.includes('language')) {
+    const state = String(profile.state || '').trim().toLowerCase();
+    const regionalDefault = REGIONAL_LANGUAGE_DEFAULTS[state];
+    suggestions.push({
+      field: 'language',
+      suggested_value: regionalDefault || 'hindi',
+      source: regionalDefault ? 'regional_default' : 'static',
+      reason: regionalDefault
+        ? `Default language for ${profile.state}`
+        : 'No matching state on file; falling back to national default'
+    });
+  }
+
+  return suggestions;
 }
 
 async function getDemographicData(state, district) {

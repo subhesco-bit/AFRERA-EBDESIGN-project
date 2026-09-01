@@ -311,15 +311,16 @@ async function getActiveUsers(tenantId) {
 }
 
 async function getBandwidthUsage(tenantId) {
-  return 1000; // MB
+  // Was a hardcoded 1000 MB for every tenant regardless of ID, fed into
+  // getTenantUsageMetrics() as if measured. No bandwidth-monitoring
+  // integration exists in this deployment.
+  return null;
 }
 
 async function getResourceUtilization(tenantId) {
-  return {
-    cpu: 45,
-    memory: 60,
-    disk: 50
-  };
+  // Was a hardcoded {cpu:45, memory:60, disk:50} for every tenant regardless
+  // of ID. No resource-monitoring integration exists in this deployment.
+  return { configured: false, reason: 'No resource-monitoring integration is configured for this deployment.' };
 }
 
 module.exports = {

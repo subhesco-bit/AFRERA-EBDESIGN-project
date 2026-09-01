@@ -171,12 +171,17 @@ CREATE INDEX IF NOT EXISTS idx_credit_scores_farmer_id
     ON credit_scores (farmer_id);
 CREATE INDEX IF NOT EXISTS idx_delivery_schedules_route_id
     ON delivery_schedules (route_id);
+-- 2026-08-30: retargeted from `departments` to `enterprise_departments` -
+-- business_unit_id/company_id/parent_department_id only exist on the
+-- multi-tenant table (renamed from a name collision with the real, live HR
+-- `departments` table - see 996_enterprise_foundation.sql and
+-- schema-decisions.json "departments").
 CREATE INDEX IF NOT EXISTS idx_departments_business_unit_id
-    ON departments (business_unit_id);
+    ON enterprise_departments (business_unit_id);
 CREATE INDEX IF NOT EXISTS idx_departments_company_id
-    ON departments (company_id);
+    ON enterprise_departments (company_id);
 CREATE INDEX IF NOT EXISTS idx_departments_parent_department_id
-    ON departments (parent_department_id);
+    ON enterprise_departments (parent_department_id);
 CREATE INDEX IF NOT EXISTS idx_depreciation_schedule_fiscal_period_id
     ON depreciation_schedule (fiscal_period_id);
 CREATE INDEX IF NOT EXISTS idx_depreciation_schedule_fixed_asset_id
@@ -317,12 +322,10 @@ CREATE INDEX IF NOT EXISTS idx_invoice_match_results_grn_id
     ON invoice_match_results (grn_id);
 CREATE INDEX IF NOT EXISTS idx_iot_devices_location_id
     ON iot_devices (location_id);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_fiscal_period_id
-    ON journal_entries (fiscal_period_id);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_reversed_by_entry_id
-    ON journal_entries (reversed_by_entry_id);
-CREATE INDEX IF NOT EXISTS idx_journal_entries_reverses_entry_id
-    ON journal_entries (reverses_entry_id);
+-- 2026-08-30: removed 3 indexes on journal_entries(fiscal_period_id/
+-- reversed_by_entry_id/reverses_entry_id) - none exist on the real (winner)
+-- journal_entries table, a deferred collision loser situation (see
+-- schema-decisions.json "journal_entries").
 CREATE INDEX IF NOT EXISTS idx_journal_lines_branch_id
     ON journal_lines (branch_id);
 CREATE INDEX IF NOT EXISTS idx_journal_lines_business_unit_id
@@ -478,10 +481,9 @@ CREATE INDEX IF NOT EXISTS idx_profit_centers_parent_profit_center_id
     ON profit_centers (parent_profit_center_id);
 CREATE INDEX IF NOT EXISTS idx_project_schedules_created_by
     ON project_schedules (created_by);
-CREATE INDEX IF NOT EXISTS idx_purchase_orders_requisition_id
-    ON purchase_orders (requisition_id);
-CREATE INDEX IF NOT EXISTS idx_purchase_orders_rfq_id
-    ON purchase_orders (rfq_id);
+-- 2026-08-30: removed 2 indexes on purchase_orders(requisition_id/rfq_id) -
+-- neither exists on the real (winner) purchase_orders table, same deferred-
+-- collision situation as journal_entries above.
 CREATE INDEX IF NOT EXISTS idx_quality_checks_approved_by
     ON quality_checks (approved_by);
 CREATE INDEX IF NOT EXISTS idx_quality_checks_inspected_by

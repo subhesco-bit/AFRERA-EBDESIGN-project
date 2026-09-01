@@ -34,6 +34,9 @@
 **Devin:**
 1. Read `.ai/PROJECT_CONTEXT.md`
 2. Read `.ai/AGENT_PROTOCOL.md`
+2a. Read `.ai/handoffs/DEVIN_WORK_PROTOCOL.md` — mandatory self-verification checklist and
+    report format. Follow it exactly; a narrative "production completion report" without it
+    triggers a full re-audit before anything is merged.
 3. Read Claude's latest decisions/reviews
 4. Check `.ai/tasks/ACTIVE.md`
 5. Check `.ai/handoffs/` for pending work

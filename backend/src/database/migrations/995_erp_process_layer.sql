@@ -162,7 +162,11 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
 
 CREATE TABLE IF NOT EXISTS purchase_order_lines (
     id SERIAL PRIMARY KEY,
-    po_id INTEGER NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+    -- 2026-08-30: dropped "REFERENCES purchase_orders(id)" - this file's own
+    -- purchase_orders (below) is a deferred collision loser (see
+    -- schema-decisions.json), the real table is 3102_ecommerce_ai_erp_
+    -- business_marketing.sql's, whose id is VARCHAR(50) not INTEGER.
+    po_id INTEGER NOT NULL,
     line_number SMALLINT NOT NULL,
     material_code VARCHAR(60),
     description TEXT NOT NULL,
@@ -178,7 +182,7 @@ CREATE TABLE IF NOT EXISTS purchase_order_lines (
 CREATE TABLE IF NOT EXISTS goods_receipts (
     id SERIAL PRIMARY KEY,
     grn_number VARCHAR(40) UNIQUE NOT NULL,
-    po_id INTEGER REFERENCES purchase_orders(id) ON DELETE SET NULL,
+    po_id INTEGER, -- 2026-08-30: FK to purchase_orders(id) dropped, same type-mismatch reason as above
     received_date DATE NOT NULL DEFAULT CURRENT_DATE,
     received_by UUID,
     warehouse_id VARCHAR(100),
@@ -206,7 +210,7 @@ CREATE TABLE IF NOT EXISTS goods_receipt_lines (
 CREATE TABLE IF NOT EXISTS invoice_match_results (
     id SERIAL PRIMARY KEY,
     ap_invoice_reference VARCHAR(100) NOT NULL,
-    po_id INTEGER REFERENCES purchase_orders(id) ON DELETE SET NULL,
+    po_id INTEGER, -- 2026-08-30: FK to purchase_orders(id) dropped, same type-mismatch reason as above
     grn_id INTEGER REFERENCES goods_receipts(id) ON DELETE SET NULL,
     po_amount NUMERIC(20,4),
     grn_amount NUMERIC(20,4),
@@ -511,23 +515,18 @@ WHERE is_active = TRUE;
 COMMENT ON VIEW v_public_listings IS
   'Buyer-safe projection. Deliberately excludes MAP-A floor price. Use this for all buyer-facing reads.';
 
-CREATE OR REPLACE VIEW v_procurement_pipeline AS
-SELECT
-    pr.requisition_number,
-    pr.status              AS requisition_status,
-    rfq.rfq_number,
-    rfq.status             AS rfq_status,
-    po.po_number,
-    po.status              AS po_status,
-    po.total_amount,
-    grn.grn_number,
-    grn.inspection_status,
-    imr.match_status
-FROM purchase_requisitions pr
-LEFT JOIN rfq_headers rfq ON rfq.requisition_id = pr.id
-LEFT JOIN purchase_orders po ON po.requisition_id = pr.id
-LEFT JOIN goods_receipts grn ON grn.po_id = po.id
-LEFT JOIN invoice_match_results imr ON imr.po_id = po.id;
+-- 2026-08-30: removed v_procurement_pipeline - it joined on and selected
+-- po.requisition_id/po_number/status/total_amount, all of which only exist
+-- on this file's own (deferred collision loser, see schema-decisions.json
+-- "purchase_orders") shape of purchase_orders, never the real table
+-- (3102_ecommerce_ai_erp_business_marketing.sql's simpler B2B-request shape:
+-- id, product_id, seller_id, requested_quantity, po_status, total_value).
+-- Unlike a plpgsql function body, CREATE VIEW is validated at creation time,
+-- so this failed the migration outright ("column po.requisition_id does not
+-- exist") rather than just being quietly non-functional. The view's whole
+-- premise (a formal PO with a requisition/RFQ chain) genuinely doesn't exist
+-- in the real schema yet - nothing to salvage until purchase_orders is
+-- properly reconciled.
 
 CREATE OR REPLACE VIEW v_ai_approval_queue AS
 SELECT
@@ -545,17 +544,21 @@ ORDER BY created_at ASC;
 CREATE INDEX IF NOT EXISTS idx_pr_status ON purchase_requisitions (status);
 CREATE INDEX IF NOT EXISTS idx_pr_lines_req ON purchase_requisition_lines (requisition_id);
 CREATE INDEX IF NOT EXISTS idx_rfq_responses_rfq ON rfq_responses (rfq_id);
-CREATE INDEX IF NOT EXISTS idx_po_vendor_status ON purchase_orders (vendor_id, status);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "purchase_orders") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_po_vendor_status ON purchase_orders (vendor_id, status);
 CREATE INDEX IF NOT EXISTS idx_po_lines_po ON purchase_order_lines (po_id);
 CREATE INDEX IF NOT EXISTS idx_grn_po ON goods_receipts (po_id);
 CREATE INDEX IF NOT EXISTS idx_grn_lines_grn ON goods_receipt_lines (grn_id);
 CREATE INDEX IF NOT EXISTS idx_match_po ON invoice_match_results (po_id);
-CREATE INDEX IF NOT EXISTS idx_listings_farmer ON sales_listings (farmer_id);
+-- 2026-08-31: renamed from idx_listings_farmer - 991_aeos_folu_ne_policy.sql
+-- already creates an index of that exact name on the unrelated
+-- farmer_listings table and runs first, so this table's own index silently
+-- never got created.
+CREATE INDEX IF NOT EXISTS idx_sales_listings_farmer ON sales_listings (farmer_id);
 CREATE INDEX IF NOT EXISTS idx_listings_product ON sales_listings (product_id);
 CREATE INDEX IF NOT EXISTS idx_dispatch_shipment ON dispatch_events (shipment_reference);
 CREATE INDEX IF NOT EXISTS idx_qi_reference ON qm_inspections (reference_type, reference_id);
 CREATE INDEX IF NOT EXISTS idx_ncr_status ON non_conformances (status);
-CREATE INDEX IF NOT EXISTS idx_prod_orders_status ON production_orders (status);
+-- 2026-08-30: removed (deferred collision, see schema-decisions.json "production_orders") - indexes column that does not exist on the real (winner) table: CREATE INDEX IF NOT EXISTS idx_prod_orders_status ON production_orders (status);
 CREATE INDEX IF NOT EXISTS idx_maint_asset ON maintenance_tickets (asset_reference);
 CREATE INDEX IF NOT EXISTS idx_maint_cold_gate ON maintenance_tickets (blocks_cold_dispatch, status);
 CREATE INDEX IF NOT EXISTS idx_ai_proposals_status ON ai_proposals (status, domain);

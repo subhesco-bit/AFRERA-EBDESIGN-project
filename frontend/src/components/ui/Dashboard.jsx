@@ -47,49 +47,42 @@ const Dashboard = ({
     }
   };
 
-  const fetchWidgetData = async (widget, period) => {
-    // Mock data fetching - replace with actual API calls
+  // 2026-08-31: this used to invent Math.random() numbers for every widget
+  // regardless of what the caller passed in, discarding real data callers
+  // (e.g. PlatformManagementPage.jsx) compute from real API responses and
+  // hand down via widget.value/widget.data. Widgets are now real-data-in,
+  // real-data-out: use whatever the widget prop actually carries, and only
+  // fall back to an honest "no data" render (handled by each *Widget
+  // component below) rather than a fabricated number.
+  const fetchWidgetData = async (widget, _period) => {
     switch (widget.type) {
       case 'metric':
+        if (widget.value === undefined) return null;
         return {
-          value: Math.random() * 1000,
-          change: (Math.random() - 0.5) * 20,
-          trend: Math.random() > 0.5 ? 'up' : 'down'
+          value: widget.value,
+          change: widget.change,
         };
       case 'chart':
-        return {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          datasets: [{
-            data: Array.from({ length: 6 }, () => Math.random() * 100)
-          }]
-        };
+        if (!widget.data) return null;
+        return widget.data;
       case 'table':
+        if (!widget.rows) return null;
         return {
           headers: widget.columns || ['Name', 'Value', 'Status'],
-          rows: Array.from({ length: 5 }, (_, i) => ({
-            id: i,
-            name: `Item ${i + 1}`,
-            value: Math.random() * 100,
-            status: Math.random() > 0.5 ? 'active' : 'inactive'
-          }))
+          rows: widget.rows,
         };
       case 'gauge':
+        if (widget.value === undefined) return null;
         return {
-          value: Math.random() * 100,
-          min: 0,
-          max: 100,
-          thresholds: [33, 66, 100]
+          value: widget.value,
+          min: widget.min ?? 0,
+          max: widget.max ?? 100,
         };
       case 'map':
-        return {
-          markers: Array.from({ length: 10 }, () => ({
-            lat: (Math.random() - 0.5) * 180,
-            lng: (Math.random() - 0.5) * 360,
-            value: Math.random() * 100
-          }))
-        };
+        if (!widget.markers) return null;
+        return { markers: widget.markers };
       default:
-        return {};
+        return null;
     }
   };
 
@@ -222,20 +215,25 @@ const Dashboard = ({
 
 // Widget Components
 const MetricWidget = ({ widget, data }) => {
-  if (!data) return null;
-  
-  const isPositive = data.change >= 0;
-  
+  if (!data || data.value === undefined || data.value === null) {
+    return <div className="metric-widget text-sm text-gray-500">No data available</div>;
+  }
+
+  const hasChange = typeof data.change === 'number';
+  const isPositive = hasChange && data.change >= 0;
+
   return (
     <div className="metric-widget">
       <div className="text-4xl font-bold text-gray-900">
         {widget.prefix}{typeof data.value === 'number' ? data.value.toFixed(2) : data.value}{widget.suffix}
       </div>
-      <div className={`flex items-center mt-2 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-        <span>{isPositive ? '↑' : '↓'}</span>
-        <span className="ml-1">{Math.abs(data.change).toFixed(1)}%</span>
-        <span className="ml-2 text-gray-500 text-sm">vs last period</span>
-      </div>
+      {hasChange && (
+        <div className={`flex items-center mt-2 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+          <span>{isPositive ? '↑' : '↓'}</span>
+          <span className="ml-1">{Math.abs(data.change).toFixed(1)}%</span>
+          <span className="ml-2 text-gray-500 text-sm">vs last period</span>
+        </div>
+      )}
       {widget.description && (
         <p className="text-sm text-gray-600 mt-2">{widget.description}</p>
       )}
