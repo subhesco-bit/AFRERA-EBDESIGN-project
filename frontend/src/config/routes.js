@@ -62,6 +62,21 @@ const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
 const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
 const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
 const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
+// Additional Advanced Features Pages
+const AdvancedSearchPage = lazy(() => import('../pages/AdvancedSearchPage'))
+const WeatherAnalyticsPage = lazy(() => import('../pages/WeatherAnalyticsPage'))
+const MarketIntelligencePage = lazy(() => import('../pages/MarketIntelligencePage'))
+const SupplyChainAnalyticsPage = lazy(() => import('../pages/SupplyChainAnalyticsPage'))
+const RiskManagementPage = lazy(() => import('../pages/RiskManagementPage'))
+const SustainabilityDashboardPage = lazy(() => import('../pages/SustainabilityDashboardPage'))
+const ComplianceDashboardPage = lazy(() => import('../pages/ComplianceDashboardPage'))
+const QualityControlPage = lazy(() => import('../pages/QualityControlPage'))
+const ExportDocumentationPage = lazy(() => import('../pages/ExportDocumentationPage'))
+const TraceabilityPage = lazy(() => import('../pages/TraceabilityPage'))
+const KnowledgeBasePage = lazy(() => import('../pages/KnowledgeBasePage'))
+const TrainingAcademyPage = lazy(() => import('../pages/TrainingAcademyPage'))
+const CommunityForumPage = lazy(() => import('../pages/CommunityForumPage'))
+const SupportCenterPage = lazy(() => import('../pages/SupportCenterPage'))
 
 // Tier 1 Advanced Services Pages (M025-M030)
 const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'))
@@ -525,6 +540,118 @@ export const protectedRoutes = [
     title: 'Contracts - AFRERA',
     description: 'Contract listings and management',
     keywords: 'contracts, listings, management',
+    transition: 'fade'
+  },
+  {
+    path: '/analytics/advanced-search',
+    component: AdvancedSearchPage,
+    title: 'Advanced Search - AFRERA',
+    description: 'Comprehensive search across products, farmers, and market data',
+    keywords: 'search, advanced, analytics',
+    transition: 'fade'
+  },
+  {
+    path: '/analytics/weather',
+    component: WeatherAnalyticsPage,
+    title: 'Weather Analytics - AFRERA',
+    description: 'Weather monitoring and agricultural planning',
+    keywords: 'weather, analytics, monitoring',
+    transition: 'fade'
+  },
+  {
+    path: '/analytics/market-intelligence',
+    component: MarketIntelligencePage,
+    title: 'Market Intelligence - AFRERA',
+    description: 'Market trends, price analysis, and demand forecasting',
+    keywords: 'market, intelligence, trends',
+    transition: 'fade'
+  },
+  {
+    path: '/analytics/supply-chain',
+    component: SupplyChainAnalyticsPage,
+    title: 'Supply Chain Analytics - AFRERA',
+    description: 'End-to-end supply chain visibility and analytics',
+    keywords: 'supply, chain, analytics',
+    transition: 'fade'
+  },
+  {
+    path: '/risk/management',
+    component: RiskManagementPage,
+    title: 'Risk Management - AFRERA',
+    description: 'Risk assessment, mitigation, and monitoring',
+    keywords: 'risk, management, assessment',
+    transition: 'fade'
+  },
+  {
+    path: '/sustainability/dashboard',
+    component: SustainabilityDashboardPage,
+    title: 'Sustainability Dashboard - AFRERA',
+    description: 'Environmental impact and sustainability metrics',
+    keywords: 'sustainability, environment, metrics',
+    transition: 'fade'
+  },
+  {
+    path: '/compliance/dashboard',
+    component: ComplianceDashboardPage,
+    title: 'Compliance Dashboard - AFRERA',
+    description: 'Regulatory compliance and certification tracking',
+    keywords: 'compliance, regulatory, certification',
+    transition: 'fade'
+  },
+  {
+    path: '/quality/control',
+    component: QualityControlPage,
+    title: 'Quality Control - AFRERA',
+    description: 'Quality assurance and product quality management',
+    keywords: 'quality, control, assurance',
+    transition: 'fade'
+  },
+  {
+    path: '/export/documentation',
+    component: ExportDocumentationPage,
+    title: 'Export Documentation - AFRERA',
+    description: 'Export documentation and international trade compliance',
+    keywords: 'export, documentation, trade',
+    transition: 'fade'
+  },
+  {
+    path: '/traceability/product',
+    component: TraceabilityPage,
+    title: 'Product Traceability - AFRERA',
+    description: 'Product traceability and origin verification',
+    keywords: 'traceability, origin, verification',
+    transition: 'fade'
+  },
+  {
+    path: '/knowledge/base',
+    component: KnowledgeBasePage,
+    title: 'Knowledge Base - AFRERA',
+    description: 'Agricultural knowledge repository and best practices',
+    keywords: 'knowledge, base, practices',
+    transition: 'fade'
+  },
+  {
+    path: '/training/academy',
+    component: TrainingAcademyPage,
+    title: 'Training Academy - AFRERA',
+    description: 'Farmer training and educational resources',
+    keywords: 'training, academy, education',
+    transition: 'fade'
+  },
+  {
+    path: '/community/forum',
+    component: CommunityForumPage,
+    title: 'Community Forum - AFRERA',
+    description: 'Farmer community and discussion platform',
+    keywords: 'community, forum, discussion',
+    transition: 'fade'
+  },
+  {
+    path: '/support/center',
+    component: SupportCenterPage,
+    title: 'Support Center - AFRERA',
+    description: 'Help desk and customer support',
+    keywords: 'support, help, assistance',
     transition: 'fade'
   },
   {
