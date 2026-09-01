@@ -49,6 +49,19 @@ const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const WalletPage = lazy(() => import('../pages/WalletPage'))
 const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
 const DisruptionPage = lazy(() => import('../pages/DisruptionPage'))
+// Financial and Reporting Pages
+const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
+const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
+const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
+const CreditScorePage = lazy(() => import('../pages/CreditScorePage'))
+const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'))
+const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
+const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
+const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
+const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
+const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
+const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
+const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
 
 // Tier 1 Advanced Services Pages (M025-M030)
 const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'))
@@ -416,6 +429,102 @@ export const protectedRoutes = [
     title: 'Civil Disruption Management - AFRERA',
     description: 'Report and manage civil disruptions affecting agricultural logistics',
     keywords: 'disruption, blockade, bandh, logistics, crisis',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/dashboard',
+    component: ReportsDashboardPage,
+    title: 'Reports Dashboard - AFRERA',
+    description: 'Central hub for all reports and analytics',
+    keywords: 'reports, dashboard, analytics',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/financial',
+    component: FinancialReportPage,
+    title: 'Financial Report - AFRERA',
+    description: 'Financial performance and revenue reports',
+    keywords: 'financial, report, revenue',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/sales',
+    component: SalesReportPage,
+    title: 'Sales Report - AFRERA',
+    description: 'Sales performance and transaction reports',
+    keywords: 'sales, report, transactions',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/inventory',
+    component: InventoryReportPage,
+    title: 'Inventory Report - AFRERA',
+    description: 'Inventory levels and stock reports',
+    keywords: 'inventory, report, stock',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/operations',
+    component: OperationsReportPage,
+    title: 'Operations Report - AFRERA',
+    description: 'Operational efficiency and process reports',
+    keywords: 'operations, report, efficiency',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/audit',
+    component: AuditReportPage,
+    title: 'Audit Report - AFRERA',
+    description: 'Audit trail and compliance reports',
+    keywords: 'audit, report, compliance',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/farmer',
+    component: FarmerReportPage,
+    title: 'Farmer Report - AFRERA',
+    description: 'Farmer performance and engagement reports',
+    keywords: 'farmer, report, engagement',
+    transition: 'fade'
+  },
+  {
+    path: '/financial/credit-score',
+    component: CreditScorePage,
+    title: 'Credit Score - AFRERA',
+    description: 'Credit score assessment and monitoring',
+    keywords: 'credit, score, assessment',
+    transition: 'fade'
+  },
+  {
+    path: '/financial/emi-calculator',
+    component: EMICalculatorPage,
+    title: 'EMI Calculator - AFRERA',
+    description: 'EMI calculator for loans and financing',
+    keywords: 'emi, calculator, loan',
+    transition: 'fade'
+  },
+  {
+    path: '/marketplace/bulk-purchase',
+    component: BulkPurchasePage,
+    title: 'Bulk Purchase - AFRERA',
+    description: 'Bulk purchase orders and wholesale buying',
+    keywords: 'bulk, purchase, wholesale',
+    transition: 'fade'
+  },
+  {
+    path: '/marketplace/group-buying',
+    component: GroupBuyingPage,
+    title: 'Group Buying - AFRERA',
+    description: 'Group buying initiatives and collective purchasing',
+    keywords: 'group, buying, collective',
+    transition: 'fade'
+  },
+  {
+    path: '/marketplace/contracts',
+    component: ContractListingPage,
+    title: 'Contracts - AFRERA',
+    description: 'Contract listings and management',
+    keywords: 'contracts, listings, management',
     transition: 'fade'
   },
   {

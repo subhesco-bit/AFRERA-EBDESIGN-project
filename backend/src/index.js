@@ -234,6 +234,16 @@ const claudeProductAIService = require('./services/claude/productAIService');
 const claudeOrderAIService = require('./services/claude/orderAIService');
 // Claude AI-Ready Routes
 const claudeAIDecisionRoutes = require('./routes/claude/aiDecisionRoutes');
+const claudeAgentRoutes = require('./routes/claude/aiAgentRoutes');
+const claudeCoordinationRoutes = require('./routes/claude/aiCoordinationRoutes');
+const claudeCopilotRoutes = require('./routes/claude/aiCopilotRoutes');
+const claudeProviderRoutes = require('./routes/claude/aiProviderRoutes');
+const claudeStrategyRoutes = require('./routes/claude/aiStrategyRoutes');
+const claudeFinancialAIRoutes = require('./routes/claude/financialAIRoutes');
+const claudeInsuranceAIRoutes = require('./routes/claude/insuranceAIRoutes');
+const claudeLogisticsAIRoutes = require('./routes/claude/logisticsAIRoutes');
+const claudeOrderAIRoutes = require('./routes/claude/orderAIRoutes');
+const claudeProductAIRoutes = require('./routes/claude/productAIRoutes');
 // Generic plug-and-play module discovery/load/execute bridge (backend/src/core/moduleRegistry.js)
 const moduleRegistryRoutes = require('./routes/claude/moduleRegistryRoutes');
 // REST bridge exposing backend/src/modules/M0XX's real functions over HTTP
@@ -629,6 +639,16 @@ app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
 app.use('/api/v1/ai', unifiedAIGateway);
 // Claude AI-Ready Routes (Phase 1 Core AI Services)
 app.use('/api/v1/claude/ai-decision', claudeAIDecisionRoutes);
+app.use('/api/v1/claude/agent', claudeAgentRoutes);
+app.use('/api/v1/claude/coordination', claudeCoordinationRoutes);
+app.use('/api/v1/claude/copilot', claudeCopilotRoutes);
+app.use('/api/v1/claude/provider', claudeProviderRoutes);
+app.use('/api/v1/claude/strategy', claudeStrategyRoutes);
+app.use('/api/v1/claude/financial', claudeFinancialAIRoutes);
+app.use('/api/v1/claude/insurance', claudeInsuranceAIRoutes);
+app.use('/api/v1/claude/logistics', claudeLogisticsAIRoutes);
+app.use('/api/v1/claude/order', claudeOrderAIRoutes);
+app.use('/api/v1/claude/product', claudeProductAIRoutes);
 // All Claude AI routes (strategy, copilot, provider, coordination, agent, optimization, recovery,
 // financial, logistics, insurance, product, order) are mounted earlier at lines 633-650 from
 // their initial requires at lines 236-245. Lines 626-650 were duplicate dead weight - removed 2026-08-31
