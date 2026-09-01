@@ -48,6 +48,7 @@ const InsurancePage = lazy(() => import('../pages/InsurancePage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const WalletPage = lazy(() => import('../pages/WalletPage'))
 const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
+const DisruptionPage = lazy(() => import('../pages/DisruptionPage'))
 
 // Tier 1 Advanced Services Pages (M025-M030)
 const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'))
@@ -407,6 +408,14 @@ export const protectedRoutes = [
     title: 'Wallet - AFRERA',
     description: 'Manage your digital wallet and payments',
     keywords: 'wallet, payments, digital',
+    transition: 'fade'
+  },
+  {
+    path: '/disruption',
+    component: DisruptionPage,
+    title: 'Civil Disruption Management - AFRERA',
+    description: 'Report and manage civil disruptions affecting agricultural logistics',
+    keywords: 'disruption, blockade, bandh, logistics, crisis',
     transition: 'fade'
   },
   {

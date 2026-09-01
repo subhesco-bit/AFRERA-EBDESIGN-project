@@ -554,14 +554,18 @@ class ResearchAndDevelopmentService {
    * Generate AI response for research query
    */
   generateAIResponse(query, context) {
-    const responses = [
-      `Based on current research trends in ${context.category || 'agriculture'}, I recommend exploring machine learning approaches for ${query}.`,
-      `Recent studies suggest that integrating IoT sensors with AI models can significantly improve ${query} outcomes.`,
-      `For optimal results in ${query}, consider implementing a hybrid approach combining traditional methods with deep learning.`,
-      `The latest research indicates that ${query} can be enhanced through data-driven decision making and predictive analytics.`
-    ];
-
-    return responses[Math.floor(Math.random() * responses.length)];
+    // FIXED 2026-09-01: Previously selected random response with Math.random
+    // No real research AI is connected in this environment; honestly report
+    // unavailable state instead of fabricating plausible-looking research responses.
+    return {
+      status: 'unavailable',
+      reason: 'Research AI service not configured. Implement Claude AI integration or provide ANTHROPIC_API_KEY.',
+      query: query,
+      context: context,
+      available_features: ['AI research assistant', 'literature review', 'experimental design'],
+      configuration_required: 'ANTHROPIC_API_KEY',
+      suggested_approach: 'Claude AI coordinator can provide research assistance when configured'
+    };
   }
 
   /**
