@@ -1,8 +1,88 @@
 ---
 agent: code-auditor
-status: warn
-findings: 10
+status: fail
+findings: 6
 ---
+
+> Current read-only completeness audit. The historical code-quality findings below are superseded by the evidence in this report.
+
+# Code Completeness Audit
+
+## Summary
+
+The repository's declared completeness counts are not reproducible from the current tree. Filesystem inventory found 230 production service files, 174 route files, 302 page files, 292 component files, 86 module directories, and 81 module service files. Concrete incomplete behavior also exists: `backend/src/routes/aiGatewayRoutes.js` returns HTTP 501 for every endpoint, and 16 Atomic frontend components contain literal `TODO: Implement` returns.
+
+## Current Findings
+
+### 1. [Critical] Mounted AI gateway endpoints are explicitly unimplemented
+
+- **Location:** `backend/src/routes/aiGatewayRoutes.js:17-29`
+- **Evidence:** `notImplemented()` always sends status `501`; seven routes use it: chat, statistics, providers, model listing, provider enable/disable, and stream.
+- **Impact:** Exposed API routes advertise unavailable capabilities. Route presence is being counted as implementation.
+- **Remediation:** Remove or gate these routes until the matching service exists, or implement and test the declared contract.
+
+### 2. [High] The module inventory is incomplete and conflicts with declarations
+
+- **Locations:** `backend/src/modules/`, `TRUTHPACK.json`, `.ai/architecture/CURRENT_IMPLEMENTATION.md`
+- **Evidence:** Only 86 module directories and 81 `service.js` files exist; numbered modules are selective and stop at M144, with non-numbered directories also present. The truthpack declares M001-M150 and 150 module services. The architecture matrix presents M031-M150 as a declared range despite this incomplete tree.
+- **Impact:** The 150-module surface does not exist as a complete filesystem inventory; completeness percentages based on it are unreliable.
+- **Remediation:** Generate per-module status from the tree and distinguish absent modules from skeletons and implemented modules.
+
+### 3. [High] Frontend contains literal placeholder components
+
+- **Locations:** `frontend/src/components/Atomic/Avatar.jsx:4`, `frontend/src/components/Atomic/Badge.jsx:4`, `frontend/src/components/Atomic/Button.jsx:4`, and 13 other Atomic files
+- **Evidence:** Representative `Button.jsx` returns only `<div className="button">{/* TODO: Implement */}</div>` and ignores `props`. The source scan found 294 TODO occurrences; 16 Atomic files contain `TODO: Implement`.
+- **Impact:** Component file counts overstate usable UI completeness and shared primitives may render empty markup.
+- **Remediation:** Implement and test these primitives or remove them from the import surface; classify placeholders separately from file counts.
+
+### 4. [High] Truthpack and implementation documentation report unsupported counts
+
+- **Locations:** `TRUTHPACK.json`, `.ai/architecture/CURRENT_IMPLEMENTATION.md`, `backend/src/services/`, `backend/src/routes/`, `frontend/src/pages/`, `frontend/src/components/`
+- **Evidence:** Observed counts are 230 production services (231 including test/support), 174 route files (165 with router signatures), 302 page files, and 292 component files. Declared counts are 200, 100, 150, and 80. The architecture document separately reports 123/150 frontend pages.
+- **Impact:** Counting units are undocumented and inconsistent, so the reported completion state cannot be independently verified.
+- **Remediation:** Define production/reachable/functional counting rules, publish the commands, and regenerate both documents from those rules.
+
+### 5. [Medium] Orphan and mount checks are only heuristic
+
+- **Locations:** `backend/src/index.js`, `backend/src/routes/`, `backend/src/services/`, `backend/src/services/loggingService.js`
+- **Evidence:** `backend/src/index.js` is 899 lines and contains broad `app.use`/`mountRoute` wiring. A basename scan found all route names somewhere in source, but comments and dynamic wiring can produce false positives. The same scan found `loggingService.js` with no basename reference.
+- **Impact:** Static text presence does not prove runtime mounting; the architecture claim that all routes are mounted remains unverified.
+- **Remediation:** Use AST or runtime route discovery to resolve imports and mounts, report dynamic registrations separately, and assign each service an explicit integration role.
+
+### 6. [Medium] Incompleteness markers require production classification
+
+- **Locations:** `backend/src/core/moduleRegistry.js:405`, `backend/src/middleware/compliance.js:116-149`, `backend/src/routes/aiGatewayRoutes.js:17-29`
+- **Evidence:** Scans found 16 `not implemented` matches, 32 `NotImplemented` matches, 1,733 `throw new Error` occurrences, and 294 TODO occurrences. Some markers are intentional unavailable-feature responses, but the AI gateway and Atomic components are confirmed incomplete behavior.
+- **Impact:** Raw marker counts are noisy and current documents do not distinguish honest failure handling from production stubs.
+- **Remediation:** Classify markers into intentional unavailable behavior, tests, and production stubs; gate new production 501/TODO paths in CI with an allowlist.
+
+## Metrics
+
+| Surface | Observed | Declared |
+|---|---:|---:|
+| Backend service files | 231 total / 230 production | 200 |
+| Backend route files | 174; 165 router signatures | 100 |
+| Backend module directories | 86 | 150 numbered modules |
+| Module service files | 81 | 150 |
+| Frontend component files | 292 | 80 |
+| Frontend page files | 302 | 150 |
+| TODO occurrences | 294 | Not documented |
+| Atomic `TODO: Implement` files | 16 | 0 implied |
+| `not implemented` / `NotImplemented` matches | 16 / 32 | Not documented |
+| Backend entry point | 899 lines | Not documented |
+
+## Checks Run
+
+- Read `TRUTHPACK.json` and `.ai/architecture/CURRENT_IMPLEMENTATION.md`.
+- Recursively counted service, module, route, component, and page files; counted module directories and `service.js` files.
+- Scanned router/export signatures, TODO/FIXME/XXX/HACK/not-implemented markers, and thrown errors.
+- Inspected the AI gateway, representative Atomic components, bootstrap, module registry, and logging service.
+- Ran basename-based route/service reference analysis; this is heuristic, not AST/runtime proof.
+- No source files were modified; no database, external services, or runtime route discovery were started.
+
+## Limitations
+
+File totals mix legacy, generated, test, and production surfaces. Reachability was not proven for dynamic imports or runtime registrations. A final git status capture was attempted but terminal-session interference prevented reliable output.
 
 # Code Quality Audit — AFRERA Platform
 

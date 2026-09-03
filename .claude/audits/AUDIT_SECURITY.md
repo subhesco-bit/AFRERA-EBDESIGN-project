@@ -1,7 +1,7 @@
 ---
 agent: security-auditor
 status: fail
-findings: 11
+findings: 20
 ---
 
 # Security Audit — OWASP Top 10 Focus
@@ -196,3 +196,75 @@ router.put('/:id/status', adminMiddleware, async (req, res) => {
 - [ ] Frontend (`frontend/src`) was not deeply audited beyond a `dangerouslySetInnerHTML`/hardcoded-secret sweep (both clean) — recommend a follow-up pass focused on client-side auth-token storage and API-response rendering
 
 *verified by vibecheck*
+
+## Focused Addendum — 2026-09-03
+
+### A12. [CRITICAL] Wallet routes accept arbitrary bearer strings and mint/transfer value
+**Location:** `backend/src/routes/walletRoutes.js:13-21, 39-172`
+
+`verifyToken` only checks that an Authorization value exists, assigns the raw token to `req.userId`, and never calls JWT verification or shared authentication middleware. `getWallet` creates a wallet with an initial balance of `5000` for any supplied identifier. `/add-funds` directly adds caller-supplied `amount` and marks it `completed`; `/transfer` mutates in-memory balances without a database transaction, recipient authorization, idempotency, or provider settlement.
+
+**Remediation:** Remove or quarantine this mock route from production. Require shared JWT/RBAC middleware. Replace in-memory balances with an append-only database ledger and atomic transactions; validate finite monetary values; require verified payment-provider settlement, idempotency, ownership, and reconciliation before crediting.
+
+### A13. [CRITICAL] Legacy authentication route stores plaintext passwords and issues non-JWT tokens
+**Location:** `backend/src/routes/authRoutes.js:16-18, 33-52, 69-92, 107-154`
+
+Registration stores `password` directly, login compares it directly, and `generateToken` returns `jwt_<userId>_<timestamp>` rather than a signed JWT. Refresh accepts a token from the request body and uses a process-local map. The route is not mounted by the inspected `backend/src/index.js`, but retaining a production-looking duplicate is a high-risk integration footgun.
+
+**Remediation:** Delete or isolate the legacy route from deployable code, or delegate exclusively to the canonical auth service. Use password hashes only, signed rotating/revocable tokens, protected token transport, and abuse controls.
+
+### A14. [HIGH] Canonical password comparison contains plaintext and test-password bypasses
+**Location:** `backend/src/services/dual-use/authService.js:113-116, 189-208`
+
+`getUserPasswordHash` accepts plaintext aliases, while `comparePassword` returns true when the stored value equals the supplied password, accepts any non-`$2` value as plaintext, and has a known `'$2a$10$test'`/`'password'` success branch.
+
+**Remediation:** Accept only a versioned password-hash format in production; fail closed for plaintext/unknown formats; migrate legacy records through reset; isolate test compatibility by build/environment boundary.
+
+### A15. [HIGH] AI prompt injection and sensitive-context leakage have no trust boundary
+**Location:** `backend/src/routes/unifiedAIRoutes.js:39-53`; `backend/src/routes/claude/unifiedAIRoutes.js:10-31`; `backend/src/core/claudeAICoordinator.js:40-87, 137-207`
+
+Authenticated callers control `query`, arbitrary `context`, and in the unified route `agentPreference`. The coordinator logs raw queries, combines them with library results, interpolates library descriptions and `context.userContext` into a privileged system prompt, and appends session history to the user message. No visible trust labeling, sensitive-field redaction, tenant/session authorization, or output policy protects this boundary.
+
+**Remediation:** Treat request, library, and retrieved data as untrusted quoted data; use immutable system policy and structured sections; allow-list agents/context fields per role; redact/minimize before model calls/logs; authorize tenant/session history; add injection/exfiltration tests; never let model output directly authorize money or operations.
+
+### A16. [HIGH] Enterprise integration registration enables SSRF and credential forwarding
+**Location:** `backend/src/routes/enterpriseIntegrationRoutes.js:17-37`; `backend/src/services/enterpriseIntegrationService.js:23-68, 353-365, 383-415, 451-465, 645-660`
+
+Request data supplies `endpointUrl`, which is immediately fetched for `/health`. `makeHttpRequest` accepts any parsed `http`/`https` URL without host/IP allowlisting, private/link-local blocking, DNS-rebinding protection, redirect policy, or response-size limit. Stored integrations later receive decrypted API keys on outbound sync/payment calls.
+
+**Remediation:** Allow only pre-registered HTTPS targets; validate resolved public IPs on every request; block loopback, RFC1918, link-local, metadata, Unix/socket, and redirect targets; enforce connect/read/body limits; do not forward credentials until the destination is verified.
+
+### A17. [HIGH] Farmer listing query interpolates unvalidated SQL identifiers and direction
+**Location:** `backend/src/services/legacy/farmerService.js:47, 96`
+
+`sort_by` and `sort_order` are concatenated into `ORDER BY f.${sort_by} ${sort_order}` without an allowlist or strict direction enum.
+
+**Remediation:** Map public sort names to fixed SQL fragments and accept only `ASC`/`DESC`; add hostile sort-parameter regression tests.
+
+### A18. [HIGH] Marketplace query interpolates caller-controlled sort direction
+**Location:** `backend/src/services/legacy/ecommerceService.js:136-142, 228-242`
+
+`sortColumn` is allowlisted, but request-derived `sort_order` is appended directly to `ORDER BY ${sortColumn} ${sort_order}`.
+
+**Remediation:** Normalize direction through a strict enum before interpolation and reject hostile values.
+
+### A19. [HIGH] Payment integration trusts caller payment fields and lacks transaction integrity controls
+**Location:** `backend/src/routes/enterpriseIntegrationRoutes.js:77-91`; `backend/src/services/enterpriseIntegrationService.js:153-186, 451-478`
+
+The payment route passes the entire request body to `processPayment`. Validation does not compare amount/currency/order ownership or payable state with server records. Any HTTP 200 response is converted to local success and stored, with no visible idempotency key or provider signature/webhook verification.
+
+**Remediation:** Derive amount, currency, ownership, and state from server records; enforce idempotency and legal state transitions; use minor units and strict schemas; verify provider signatures/webhooks and reconcile asynchronous outcomes before settlement.
+
+### A20. [HIGH] Deployable configuration contains shared/default credentials
+**Location:** `backend/src/database/advanced_pool.js:36-43`; `backend/.env.example:7-8, 43-44`; `backend/docker-compose.yml:10, 93-97`; `docker-compose.yml:11, 53`
+
+The pool defaults PostgreSQL password to `password`; compose files use `afrera_password`, `admin123`, `changeme`, and a placeholder JWT secret. These are usable defaults if deployment injection fails, while compose files publish service ports.
+
+**Remediation:** Remove production credential fallbacks and fail startup on missing or known-placeholder secrets; use a secret manager and rotate exposed values; isolate production networks and bind databases privately; add CI/startup checks.
+
+## Focused Metrics
+
+- Focused addendum findings: `9` (`2` critical, `7` high).
+- Production dependency CVE status: **unverified**. `backend/package-lock.json` exists, but `npm.cmd audit --omit=dev --json` did not return npm advisory JSON and emitted unrelated repository-scan output; no CVE is asserted.
+- Source modifications: none.
+- Runtime limitations: database execution, provider webhook behavior, deployment network policy, and complete route coverage were not available as evidence.
