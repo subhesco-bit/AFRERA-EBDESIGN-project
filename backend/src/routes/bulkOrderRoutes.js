@@ -6,6 +6,11 @@
 const express = require('express');
 const router = express.Router();
 const bulkOrderController = require('../controllers/bulkOrderController');
+const { authMiddleware } = require('../middleware/auth');
+const { protectRouter } = require('./enterpriseRouteSupport');
+
+router.use(authMiddleware);
+protectRouter(router, { signal: 'commerce.bulk_order.changed', params: { userId: true, orderId: true, quotationId: true } });
 
 /**
  * Create bulk order request

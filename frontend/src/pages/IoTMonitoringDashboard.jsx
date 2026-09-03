@@ -10,6 +10,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 import { useAuthStore } from '../store/authStore';
+import api from '../services/api';
 
 const IoTMonitoringDashboard = () => {
   const { user } = useAuthStore();
@@ -19,9 +20,7 @@ const IoTMonitoringDashboard = () => {
   // Get farmer's devices
   const { data: devicesData, isLoading: devicesLoading } = useQuery({
     queryKey: ['farmerDevices', user?.id],
-    queryFn: () => fetch(`/api/iot/farmers/${user.id}/devices`)
-      .then(res => res.json())
-      .then(res => res.data),
+    queryFn: () => api.get(`/iot/farmers/${user.id}/devices`).then(res => res.data.data),
     enabled: !!user?.id,
     refetchInterval: 60000 // 1 minute
   });
@@ -29,18 +28,14 @@ const IoTMonitoringDashboard = () => {
   // Get system status
   const { data: systemStatus } = useQuery({
     queryKey: ['iotSystemStatus'],
-    queryFn: () => fetch('/api/iot/system/status')
-      .then(res => res.json())
-      .then(res => res.data),
+    queryFn: () => api.get('/iot/system/status').then(res => res.data.data),
     refetchInterval: 300000 // 5 minutes
   });
 
   // Get device details when selected
   const { data: deviceDetails } = useQuery({
     queryKey: ['deviceDetails', selectedDevice],
-    queryFn: () => fetch(`/api/iot/devices/${selectedDevice}/status`)
-      .then(res => res.json())
-      .then(res => res.data),
+    queryFn: () => api.get(`/iot/devices/${selectedDevice}/status`).then(res => res.data.data),
     enabled: !!selectedDevice
   });
 

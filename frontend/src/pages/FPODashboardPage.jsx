@@ -1,10 +1,50 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Users, DollarSign, BarChart3, PieChart, Activity, Building2, ShoppingCart } from 'lucide-react'
 import { fpoAPI } from '../services/api'
+import AIInsightsPanel from '../components/ui/AIInsightsPanel'
+import { aiDecisionService } from '../services/aiDecisionService'
 
 function FPODashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
+
+  const aiInsights = useMemo(
+    () => [
+      aiDecisionService.buildDecision({
+        id: 'fpo-aggregation',
+        title: 'Collective buying opportunity',
+        description: 'Combined member demand is high enough to secure a better bulk rate this cycle. Negotiating this week could reduce input cost by 12-15%.',
+        status: 'pending',
+        confidence: 0.88,
+        impact: 'high',
+        category: 'fpo',
+        icon: '🤝',
+        severity: 'info',
+        metadata: { source: 'fallback', module: 'fpo' },
+        context: { members: 450, savings: '12-15%' },
+        timestamp: new Date().toISOString()
+      }),
+      aiDecisionService.buildDecision({
+        id: 'fpo-inventory-shift',
+        title: 'Inventory reallocation suggestion',
+        description: 'Cold storage utilization is high in one warehouse. Rebalancing ginger and mandarin stock to the packhouse would improve quality retention.',
+        status: 'pending',
+        confidence: 0.8,
+        impact: 'medium',
+        category: 'fpo',
+        icon: '🏪',
+        severity: 'warning',
+        metadata: { source: 'fallback', module: 'inventory' },
+        context: { warehouse: 'central', adjustment: 'rebalance' },
+        timestamp: new Date().toISOString()
+      })
+    ],
+    []
+  )
+
+  const handleApplyRecommendation = (insight) => {
+    alert(`Applied recommendation: ${insight.title}`)
+  }
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: fpoStats } = useQuery({
@@ -91,29 +131,13 @@ function FPODashboardPage() {
             </div>
           </div>
 
-          {/* AI Insights */}
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-6 border border-amber-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-amber-600" />
-              AI-Powered FPO Insights
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4">
-                <div className="text-sm text-gray-600 mb-1">Volume Aggregation</div>
-                <div className="text-2xl font-bold text-amber-600">+45%</div>
-                <div className="text-xs text-gray-500">Through collective buying</div>
-              </div>
-              <div className="bg-white rounded-lg p-4">
-                <div className="text-sm text-gray-600 mb-1">Price Negotiation</div>
-                <div className="text-2xl font-bold text-green-600">-18%</div>
-                <div className="text-xs text-gray-500">Average cost reduction</div>
-              </div>
-              <div className="bg-white rounded-lg p-4">
-                <div className="text-sm text-gray-600 mb-1">Credit Opportunity</div>
-                <div className="text-2xl font-bold text-blue-600">₹1.5Cr</div>
-                <div className="text-xs text-gray-500">Group loan capacity</div>
-              </div>
-            </div>
+          <div className="mb-6">
+            <AIInsightsPanel
+              insights={aiInsights}
+              loading={false}
+              onRefresh={() => window.location.reload()}
+              onApplyRecommendation={handleApplyRecommendation}
+            />
           </div>
 
           {/* Member Activity */}

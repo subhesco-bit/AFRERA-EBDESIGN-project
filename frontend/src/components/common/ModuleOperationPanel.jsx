@@ -31,7 +31,7 @@ export default function ModuleOperationPanel({ moduleId, title, description }) {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800 mb-2">{title || moduleId}</h1>
         {description && <p className="text-gray-600">{description}</p>}
-        <p className="text-xs text-gray-400 mt-1 font-mono">backend/src/modules/{moduleId}</p>
+        <p className="text-xs text-gray-500 mt-1">Operational workspace</p>
       </div>
 
       {loadError && (

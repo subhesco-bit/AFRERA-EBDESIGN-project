@@ -590,10 +590,19 @@ class AISelfHealingService {
    * Start health monitoring
    */
   startHealthMonitoring() {
+    if (this._healthInterval) return;
+
     // Monitor system health every 30 seconds
-    setInterval(() => {
+    this._healthInterval = setInterval(() => {
       this.updateHealthMetrics();
     }, 30000);
+  }
+
+  stopHealthMonitoring() {
+    if (this._healthInterval) {
+      clearInterval(this._healthInterval);
+      this._healthInterval = null;
+    }
   }
   
   /**

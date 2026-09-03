@@ -2,6 +2,15 @@
 const service = require('./service');
 const { logger } = require('../../utils/logger');
 
+function sendError(res, error) {
+  const status = error.statusCode || (error.code === 'VALIDATION_ERROR' ? 400 : 500);
+  return res.status(status).json({ success: false, error: { code: error.code || 'INTERNAL_ERROR', message: error.message } });
+}
+
+function isAdmin(req) {
+  return ['admin', 'superadmin'].includes(req.user?.role);
+}
+
 // Federated identity management
 async function createFederatedIdentity(req, res) {
   try {
@@ -9,18 +18,19 @@ async function createFederatedIdentity(req, res) {
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     logger.error('createFederatedIdentity error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
 async function getFederatedIdentities(req, res) {
   try {
     const userId = req.params.userId;
+    if (!isAdmin(req) && req.user.id !== userId) return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'You may only read your own identities' } });
     const identities = await service.getFederatedIdentities(userId);
     res.json({ success: true, data: identities });
   } catch (error) {
     logger.error('getFederatedIdentities error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -28,10 +38,11 @@ async function getFederatedIdentity(req, res) {
   try {
     const identity = await service.getFederatedIdentity(req.params.identityId);
     if (!identity) return res.status(404).json({ success: false, error: 'Identity not found' });
+    if (!isAdmin(req) && identity.user_id !== req.user.id) return res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'You may only read your own identities' } });
     res.json({ success: true, data: identity });
   } catch (error) {
     logger.error('getFederatedIdentity error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -42,7 +53,7 @@ async function updateFederatedIdentity(req, res) {
     res.json({ success: true, data: identity });
   } catch (error) {
     logger.error('updateFederatedIdentity error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -53,7 +64,7 @@ async function revokeFederatedIdentity(req, res) {
     res.json({ success: true, data: identity });
   } catch (error) {
     logger.error('revokeFederatedIdentity error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -64,7 +75,7 @@ async function createAttributeMapping(req, res) {
     res.status(201).json({ success: true, data: mapping });
   } catch (error) {
     logger.error('createAttributeMapping error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -75,7 +86,7 @@ async function getAttributeMappings(req, res) {
     res.json({ success: true, data: mappings });
   } catch (error) {
     logger.error('getAttributeMappings error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -86,7 +97,7 @@ async function applyAttributeMapping(req, res) {
     res.json({ success: true, data: mapped });
   } catch (error) {
     logger.error('applyAttributeMapping error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -97,7 +108,7 @@ async function createTrustRelationship(req, res) {
     res.status(201).json({ success: true, data: trust });
   } catch (error) {
     logger.error('createTrustRelationship error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -107,7 +118,7 @@ async function getTrustRelationships(req, res) {
     res.json({ success: true, data: relationships });
   } catch (error) {
     logger.error('getTrustRelationships error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -119,7 +130,7 @@ async function updateTrustScore(req, res) {
     res.json({ success: true, data: trust });
   } catch (error) {
     logger.error('updateTrustScore error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 
@@ -130,7 +141,7 @@ async function searchIdentities(req, res) {
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('searchIdentities error', { error: error.message });
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 }
 

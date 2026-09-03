@@ -4,7 +4,9 @@
  */
 
 const express = require('express');
+const { protectLivestockRouter } = require('../livestockRouteSupport');
 const router = express.Router();
+protectLivestockRouter(router);
 const fisheriesService = require('../../services/legacy/fisheriesService');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.

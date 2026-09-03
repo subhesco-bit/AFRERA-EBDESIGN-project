@@ -363,9 +363,6 @@ function Header() {
             <Link to="/analytics" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Analytics
             </Link>
-            <Link to="/modules" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
-              Modules
-            </Link>
 
             {/* Vendor Portal Dropdown */}
             {isAuthenticated && (user?.role === 'corporate' || user?.role === 'logistics') && (
@@ -843,13 +840,6 @@ function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Analytics
-              </Link>
-              <Link
-                to="/modules"
-                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Modules
               </Link>
 
               {/* Vendor Portal Mobile */}

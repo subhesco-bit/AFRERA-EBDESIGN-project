@@ -23,11 +23,17 @@ const { getBuyerCreditEligibility, farmerCreditRiskScore } = require('../service
 const governmentSchemeService = require('../services/legacy/governmentSchemeService');
 const aiOrchestrationService = require('../services/legacy/aiOrchestrationService');
 const aiOrchestrator = require('../core/aiOrchestrator');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
 
 const router = express.Router();
 
 router.use(authMiddleware);
+protectRouter(router, { advisory: true, signal: 'enterprise.ai.configuration.changed', params: { nodeId: true } });
+router.use((req, res, next) => {
+  if (req.method !== 'POST' || req.path !== '/model-slots') return next();
+  requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
+});
 
 /**
  * Credit scoring. The old fake `calculateCreditScore()` invented a score

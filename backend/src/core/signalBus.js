@@ -72,6 +72,11 @@ const SIGNAL = Object.freeze({
 
   // Agronomy
   SOIL_RESULT_READY: 'agronomy.soil.result_ready',
+  SOIL_RECORD_CHANGED: 'agronomy.soil.record_changed',
+  WATER_RECORD_CHANGED: 'agronomy.water.record_changed',
+  OPERATIONS_RECORD_CHANGED: 'operations.record_changed',
+  MAINTENANCE_RECORD_CHANGED: 'operations.maintenance.record_changed',
+  EQUIPMENT_EXCHANGE_CHANGED: 'operations.equipment_exchange.changed',
   CROP_DISEASE_DETECTED: 'agronomy.disease.detected',
   WEATHER_ALERT: 'agronomy.weather.alert',
 
@@ -86,6 +91,8 @@ const SIGNAL = Object.freeze({
   VACCINATION_ADMINISTERED: 'livestock.vaccination.administered',
   FEED_CONSUMPTION_RECORDED: 'livestock.feed.consumption_recorded',
   HERD_PERFORMANCE_UPDATED: 'livestock.herd.performance_updated',
+  LIVESTOCK_RECORD_CHANGED: 'livestock.record.changed',
+  FISHERIES_RECORD_CHANGED: 'fisheries.record.changed',
 
   // Platform Foundation
   TENANT_CREATED: 'platform.tenant.created',

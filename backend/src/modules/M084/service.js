@@ -6,6 +6,41 @@
 const { logger } = require('../../utils/logger');
 const { aiAPI } = require('../../services/legacy/aiService');
 const pool = require('../../database/pool');
+const { signalBus } = require('../../core/signalBus');
+
+const ALERT_TYPES = new Set(['heavy_rain', 'flood', 'landslide', 'drought', 'hailstorm', 'cold_wave', 'heat_wave', 'cyclone', 'earthquake', 'frost', 'pest_outbreak']);
+const SEVERITIES = new Set(['advisory', 'watch', 'warning', 'severe', 'extreme']);
+function alertError(message) { const error = new Error(message); error.code = 'VALIDATION_ERROR'; error.statusCode = 400; return error; }
+function alertId(id) { if (!/^[1-9][0-9]*$/.test(String(id))) throw alertError('alert id must be a positive integer'); return Number(id); }
+function requiredText(value, name, max) { if (typeof value !== 'string' || value.trim().length === 0 || value.length > max) throw alertError(`${name} is required and must be at most ${max} characters`); return value.trim(); }
+
+async function createDisasterAlert(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) throw alertError('alert payload is required');
+  const { alert_code, alert_type, severity, state, districts = [], headline, detail, recommended_action, effective_from, effective_until, source = 'operator', source_ref, blocks_dispatch = false, affects_routes = [], ai_advisory_metadata } = data;
+  requiredText(alert_code, 'alert_code', 40); requiredText(headline, 'headline', 200); requiredText(recommended_action, 'recommended_action', 10000);
+  if (!ALERT_TYPES.has(alert_type) || !SEVERITIES.has(severity)) throw alertError('alert_type or severity is invalid');
+  if (!Array.isArray(districts) || districts.some(item => typeof item !== 'string')) throw alertError('districts must be an array of strings');
+  if (!Array.isArray(affects_routes) || affects_routes.some(item => typeof item !== 'string')) throw alertError('affects_routes must be an array of strings');
+  if (typeof blocks_dispatch !== 'boolean' || (ai_advisory_metadata !== undefined && (!ai_advisory_metadata || typeof ai_advisory_metadata !== 'object' || Array.isArray(ai_advisory_metadata)))) throw alertError('alert flags or advisory metadata are invalid');
+  const from = new Date(effective_from); const until = new Date(effective_until);
+  if (!effective_from || Number.isNaN(from.valueOf()) || !effective_until || Number.isNaN(until.valueOf()) || until < from) throw alertError('effective alert window is invalid');
+  if ((severity === 'severe' || severity === 'extreme') && !blocks_dispatch && !detail) throw alertError('severe alerts require detail or blocks_dispatch');
+  const result = await pool.query(`INSERT INTO climate_alerts (alert_code, alert_type, severity, state, districts, headline, detail, recommended_action, effective_from, effective_until, source, source_ref, blocks_dispatch, affects_routes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`, [alert_code, alert_type, severity, state || null, districts, headline, detail || null, recommended_action, from.toISOString(), until.toISOString(), source, source_ref || null, blocks_dispatch, affects_routes]);
+  signalBus.emitSignal('climate.disaster_alert.created', { alertId: result.rows[0].id, alertCode: alert_code, severity }, { source: 'M084', entityId: String(result.rows[0].id) });
+  return { ...result.rows[0], ai_advisory_metadata: ai_advisory_metadata || { status: 'not_generated', source: 'operator_authored' } };
+}
+
+async function listDisasterAlerts(filters = {}) {
+  if (!filters || typeof filters !== 'object' || Array.isArray(filters)) throw alertError('alert filters are invalid');
+  const params = []; const clauses = [];
+  for (const field of ['state', 'alert_type', 'severity']) { if (filters[field] !== undefined) { requiredText(filters[field], field, 60); params.push(filters[field]); clauses.push(`${field} = $${params.length}`); } }
+  const query = `SELECT * FROM climate_alerts${clauses.length ? ` WHERE ${clauses.join(' AND ')}` : ''} ORDER BY issued_at DESC LIMIT 100`;
+  return (await pool.query(query, params)).rows;
+}
+
+async function getDisasterAlert(id) { return (await pool.query('SELECT * FROM climate_alerts WHERE id = $1', [alertId(id)])).rows[0] || null; }
+async function cancelDisasterAlert(id, data) { const reason = requiredText(data?.cancellation_reason, 'cancellation_reason', 1000); return (await pool.query('UPDATE climate_alerts SET cancelled_at = CURRENT_TIMESTAMP, cancellation_reason = $1 WHERE id = $2 AND cancelled_at IS NULL RETURNING *', [reason, alertId(id)])).rows[0] || null; }
+async function getDisasterAlertAdvisory(id) { const alert = await getDisasterAlert(id); return alert ? { alert_id: alert.id, alert_code: alert.alert_code, advisory: { status: 'metadata_only', source: alert.source, source_ref: alert.source_ref, generated: false, message: 'No external alert was generated; review the operator-authored alert and recommended action.' } } : null; }
 
 /**
  * Create trend definition
@@ -601,5 +636,10 @@ module.exports = {
   calculateCorrelation,
   detectBreakpoints,
   createTrendAlert,
-  getTrendAlerts
+  getTrendAlerts,
+  createDisasterAlert,
+  listDisasterAlerts,
+  getDisasterAlert,
+  cancelDisasterAlert,
+  getDisasterAlertAdvisory
 };

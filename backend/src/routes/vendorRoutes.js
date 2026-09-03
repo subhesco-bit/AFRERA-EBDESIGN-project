@@ -12,6 +12,9 @@ const express = require('express');
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
+const { protectRouter } = require('./enterpriseRouteSupport');
+
+protectRouter(router, { signal: 'commerce.vendor.changed', params: { buyerId: true, providerId: true, processorId: true, retailerId: true } });
 
 /**
  * Corporate Buyer Endpoints

@@ -8,6 +8,18 @@
 const express = require('express');
 const router = express.Router();
 const completeERPIntegrationController = require('../controllers/completeERPIntegrationController');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
+
+router.use(authMiddleware);
+protectRouter(router, { signal: 'enterprise.erp.integration.changed', params: {
+	farmerId: true, cropId: true, livestockId: true, dairyId: true, poultryId: true,
+	goatId: true, sheepId: true, pigId: true
+} });
+router.use((req, res, next) => {
+	if (req.method === 'GET') return next();
+	requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
+});
 
 // ============================================================================
 // FARMER MODULE ERP INTEGRATION ROUTES

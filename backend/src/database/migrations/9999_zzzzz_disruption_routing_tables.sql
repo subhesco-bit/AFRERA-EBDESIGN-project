@@ -1,0 +1,90 @@
+-- Disruption Routing Agent Support Tables
+-- These tables support the disruption routing agent's crisis handling capabilities
+
+-- Table to track disruption notifications sent to stakeholders
+CREATE TABLE IF NOT EXISTS disruption_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  disruption_id UUID NOT NULL REFERENCES civil_disruption_events(id) ON DELETE CASCADE,
+  notification_type VARCHAR(50) NOT NULL, -- 'stakeholder_alert', 'resolution_alert', 'rerouting_notice'
+  recipient_count INTEGER NOT NULL DEFAULT 0,
+  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- 'pending', 'sent', 'failed'
+  sent_at TIMESTAMP,
+  error_message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_disruption_notifications_disruption ON disruption_notifications(disruption_id);
+CREATE INDEX IF NOT EXISTS idx_disruption_notifications_status ON disruption_notifications(status);
+CREATE INDEX IF NOT EXISTS idx_disruption_notifications_type ON disruption_notifications(notification_type);
+
+-- Table to track emergency procurement activations
+CREATE TABLE IF NOT EXISTS emergency_procurement_activations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  disruption_id UUID NOT NULL REFERENCES civil_disruption_events(id) ON DELETE CASCADE,
+  affected_state VARCHAR(100) NOT NULL,
+  activation_status VARCHAR(20) NOT NULL DEFAULT 'active', -- 'active', 'inactive'
+  alternative_sourcing_enabled BOOLEAN DEFAULT true,
+  priority_shipping_enabled BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_emergency_procurement_disruption ON emergency_procurement_activations(disruption_id);
+CREATE INDEX IF NOT EXISTS idx_emergency_procurement_status ON emergency_procurement_activations(activation_status);
+CREATE INDEX IF NOT EXISTS idx_emergency_procurement_state ON emergency_procurement_activations(affected_state);
+
+-- Table to log disruption impact assessments
+CREATE TABLE IF NOT EXISTS disruption_impact_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  disruption_id UUID NOT NULL REFERENCES civil_disruption_events(id) ON DELETE CASCADE,
+  affected_shipment_count INTEGER,
+  affected_stakeholder_count INTEGER,
+  economic_impact_estimate DECIMAL(15,2),
+  impact_assessment VARCHAR(50) NOT NULL, -- 'initial_assessment', 'ongoing_monitoring', 'resolution_completed'
+  impact_details JSONB,
+  logged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_disruption_impact_disruption ON disruption_impact_log(disruption_id);
+CREATE INDEX IF NOT EXISTS idx_disruption_implog_assessment ON disruption_impact_log(impact_assessment);
+CREATE INDEX IF NOT EXISTS idx_disruption_implog_logged ON disruption_impact_log(logged_at);
+
+-- Add routing-related columns to shipments table if they don't exist
+ALTER TABLE shipments 
+ADD COLUMN IF NOT EXISTS rerouting_required BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS rerouting_reason VARCHAR(100),
+ADD COLUMN IF NOT EXISTS rerouting_disruption_id UUID REFERENCES civil_disruption_events(id),
+ADD COLUMN IF NOT EXISTS rerouting_alternative_route TEXT,
+ADD COLUMN IF NOT EXISTS rerouting_estimated_delay_hours INTEGER;
+
+CREATE INDEX IF NOT EXISTS idx_shipments_rerouting ON shipments(rerouting_required) WHERE rerouting_required = true;
+CREATE INDEX IF NOT EXISTS idx_shipments_rerouting_disruption ON shipments(rerouting_disruption_id);
+
+-- Add expedited processing columns to insurance_claims table if they don't exist
+ALTER TABLE insurance_claims
+ADD COLUMN IF NOT EXISTS priority_level VARCHAR(20) DEFAULT 'normal', -- 'normal', 'expedited', 'urgent'
+ADD COLUMN IF NOT EXISTS expedited_reason VARCHAR(200),
+ADD COLUMN IF NOT EXISTS expedited_disruption_id UUID REFERENCES civil_disruption_events(id);
+
+CREATE INDEX IF NOT EXISTS idx_insurance_claims_priority ON insurance_claims(priority_level);
+CREATE INDEX IF NOT EXISTS idx_insurance_claims_expedited_disruption ON insurance_claims(expedited_disruption_id);
+
+-- Trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_disruption_routing_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_disruption_notifications_updated_at
+  BEFORE UPDATE ON disruption_notifications
+  FOR EACH ROW
+  EXECUTE FUNCTION update_disruption_routing_updated_at();
+
+CREATE TRIGGER trigger_update_emergency_procurement_updated_at
+  BEFORE UPDATE ON emergency_procurement_activations
+  FOR EACH ROW
+  EXECUTE FUNCTION update_disruption_routing_updated_at();

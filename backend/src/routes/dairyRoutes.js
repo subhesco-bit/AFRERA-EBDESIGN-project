@@ -12,6 +12,10 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
+
+protectLivestockRouter(router);
+router.use(authMiddleware);
 
 router.get('/animals', async (req, res) => {
   try {

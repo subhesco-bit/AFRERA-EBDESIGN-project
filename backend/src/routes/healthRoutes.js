@@ -27,6 +27,17 @@ const pool = require('../database/pool');
 const fs = require('fs');
 const os = require('os');
 
+function requireDiagnosticsAccess(req, res, next) {
+  if (process.env.NODE_ENV !== 'production') return next();
+
+  const expected = process.env.HEALTHCHECK_TOKEN;
+  const supplied = req.get('x-healthcheck-token');
+  if (!expected || supplied !== expected) {
+    return res.status(404).json({ status: 'not_found' });
+  }
+  return next();
+}
+
 /**
  * Health check registry for custom checks
  */
@@ -291,7 +302,7 @@ router.get('/', async (req, res) => {
  * GET /health/detailed
  * Detailed health check with all service dependencies
  */
-router.get('/detailed', async (req, res) => {
+router.get('/detailed', requireDiagnosticsAccess, async (req, res) => {
   const startTime = Date.now();
   const healthStatus = {
     status: 'healthy',
@@ -352,7 +363,7 @@ router.get('/ready', async (req, res) => {
       logger.error('Readiness check failed', { error: databaseCheck.message });
       return res.status(503).json({
         status: 'not_ready',
-        error: databaseCheck.message,
+        error: 'critical dependency unavailable',
         timestamp: new Date().toISOString()
       });
     }
@@ -368,7 +379,7 @@ router.get('/ready', async (req, res) => {
     logger.error('Readiness check failed', { error: error.message });
     res.status(503).json({
       status: 'not_ready',
-      error: error.message,
+      error: 'readiness check failed',
       timestamp: new Date().toISOString()
     });
   }
@@ -393,7 +404,7 @@ router.get('/live', (req, res) => {
  * GET /health/checks
  * List all registered health checks
  */
-router.get('/checks', (req, res) => {
+router.get('/checks', requireDiagnosticsAccess, (req, res) => {
   const checks = healthRegistry.getAll();
   
   res.json({

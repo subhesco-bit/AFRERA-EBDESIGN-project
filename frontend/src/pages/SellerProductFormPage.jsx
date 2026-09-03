@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { PackagePlus, Sparkles } from 'lucide-react'
 import { productsAPI } from '../services/api'
+import { buildProductImagePrompt } from '../utils/aiStudio'
 import { Section } from '../components/common/DataPrimitives'
 import { Card, CardContent } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -36,6 +37,7 @@ const emptyForm = {
   retail_price: '',
   weight_per_unit: '',
   tags: '',
+  imagePrompt: '',
   organic: false,
   gi_status: false,
 }
@@ -75,7 +77,8 @@ export default function SellerProductFormPage() {
         setQueuedOffline(true)
         return
       }
-      navigate(`/products/${res.data.id}`)
+      const prompt = form.imagePrompt?.trim() || buildProductImagePrompt(form.name, form.description, states?.find((s) => String(s.id) === String(form.state_id))?.name)
+      navigate(`/products/${res.data.id}?autoAI=1&prompt=${encodeURIComponent(prompt)}`)
     },
     onError: (err, payload) => {
       const isNetworkError = !err.response
@@ -157,6 +160,13 @@ export default function SellerProductFormPage() {
                 <Textarea id="usp" value={form.usp} onChange={update('usp')} rows={2}
                   placeholder="What makes yours stand out — organic, GI-certified, family farm, etc." />
                 <p className="mt-1 text-xs text-muted-foreground">A short, honest reason buyers should pick your listing.</p>
+              </div>
+
+              <div>
+                <Label htmlFor="imagePrompt">AI product image prompt (optional)</Label>
+                <Textarea id="imagePrompt" value={form.imagePrompt} onChange={update('imagePrompt')} rows={2}
+                  placeholder="e.g. premium organic produce with clean background, bright natural colours, Northeast India farm branding" />
+                <p className="mt-1 text-xs text-muted-foreground">If left blank, AFRERA will generate a default storefront image prompt after listing.</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

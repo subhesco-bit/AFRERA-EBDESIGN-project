@@ -90,6 +90,35 @@ function main() {
   const routes = walk(path.join(ROOT, 'backend', 'src', 'routes'), ['.js']);
   const components = walk(path.join(ROOT, 'frontend', 'src'), ['.jsx', '.tsx', '.js']);
 
+  // Generated MXXX packages are a first-class implementation surface. They
+  // were previously invisible here because their service files all share the
+  // generic basename `service.js`, causing implemented modules to be reported
+  // ABSENT. Use each package's README heading and exported function names as
+  // semantic evidence while retaining the real service/route/component kinds.
+  const generatedModulesRoot = path.join(ROOT, 'backend', 'src', 'modules');
+  const generatedModules = fs.existsSync(generatedModulesRoot)
+    ? fs.readdirSync(generatedModulesRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && /^M\d{3}$/.test(entry.name))
+      .flatMap((entry) => {
+        const moduleDir = path.join(generatedModulesRoot, entry.name);
+        const files = walk(moduleDir, ['.js', '.md']);
+        const text = files.map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+        const headings = [...text.matchAll(/^#\s+(.+)$/gm)].map((match) => match[1]).join(' ');
+        const functions = [...text.matchAll(/(?:async\s+)?function\s+([A-Za-z0-9_]+)/g)]
+          .map((match) => match[1]).join(' ');
+        const serviceFile = path.join(moduleDir, 'service.js');
+        const routeFile = path.join(moduleDir, 'routes.js');
+        const entries = [];
+        if (fs.existsSync(serviceFile)) {
+          entries.push({ kind: 'service', key: `${entry.name} ${headings} ${functions}`, where: rel(serviceFile) });
+        }
+        if (fs.existsSync(routeFile)) {
+          entries.push({ kind: 'route', key: `${entry.name} ${headings} ${functions}`, where: rel(routeFile) });
+        }
+        return entries;
+      })
+    : [];
+
   const agentsFile = path.join(ROOT, 'backend', 'src', 'core', 'agents.js');
   const agentNames = [];
   if (fs.existsSync(agentsFile)) {
@@ -102,6 +131,7 @@ function main() {
     ...services.map((p) => ({ kind: 'service', key: path.basename(p, '.js'), where: rel(p) })),
     ...routes.map((p) => ({ kind: 'route', key: path.basename(p, '.js'), where: rel(p) })),
     ...components.map((p) => ({ kind: 'component', key: path.basename(p).replace(/\.(jsx|tsx|js)$/, ''), where: rel(p) })),
+    ...generatedModules,
     ...agentNames.map((a) => ({ kind: 'agent', key: a, where: 'core/agents.js' })),
   ].map((c) => ({ ...c, toks: new Set(tokens(c.key.replace(/([a-z])([A-Z])/g, '$1 $2'))) }));
 
@@ -121,9 +151,13 @@ function main() {
    * evidence but weaker evidence, and the index says which it is rather than
    * flattening both into "built".
    */
-  function evidenceFor(name) {
+  function evidenceFor(name, moduleId) {
     const want = tokens(name);
-    if (!want.length) return [];
+    if (!want.length) {
+      return generatedModules
+        .filter((entry) => entry.where.includes(`/modules/${moduleId}/`))
+        .map((entry) => ({ ...entry, quality: 'module', matched: moduleId }));
+    }
     const subject = want[0];              // head noun: Soil Health Mgmt -> soil
     const hits = [];
     for (const c of corpus) {
@@ -141,12 +175,17 @@ function main() {
     }
     // strongest evidence first, so the index shows the best proof available
     const rank = { strong: 0, partial: 1, subject: 2 };
+    if (hits.length === 0) {
+      return generatedModules
+        .filter((entry) => entry.where.includes(`/modules/${moduleId}/`))
+        .map((entry) => ({ ...entry, quality: 'module', matched: moduleId }));
+    }
     return hits.sort((a, b) => rank[a.quality] - rank[b.quality]);
   }
 
   const results = [];
   for (const [id, m] of Object.entries(cat.modules)) {
-    const ev = evidenceFor(m.name);
+    const ev = evidenceFor(m.name, id);
     const kinds = new Set(ev.map((e) => e.kind));
     const best = ev.length ? ev[0].quality : null;
     let status;

@@ -1,8 +1,7 @@
 import axios from 'axios'
+import config from '../config/env'
 
-// API_BASE_URL defaults to localhost for development
-// Production should set VITE_API_URL environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1'
+const API_BASE_URL = config.API_URL
 
 // Create axios instance
 const api = axios.create({
@@ -18,6 +17,17 @@ api.interceptors.request.use(
     const token = localStorage.getItem('access_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    try {
+      const storedModes = JSON.parse(localStorage.getItem('afrera.a11y') || '{}')
+      const modes = Object.entries({ ...storedModes, sms: storedModes.sms === undefined ? true : storedModes.sms })
+        .filter(([, enabled]) => enabled)
+        .map(([mode]) => mode)
+      config.headers['X-A11y-Modes'] = modes.length ? modes.join(',') : 'none'
+      config.headers['X-Low-Bandwidth'] = storedModes.sms ? '1' : '0'
+    } catch {
+      config.headers['X-A11y-Modes'] = 'none'
+      config.headers['X-Low-Bandwidth'] = '0'
     }
     return config
   },
@@ -36,6 +46,9 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refresh_token')
+        if (!refreshToken) {
+          throw new Error('No refresh token available')
+        }
         const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refresh_token: refreshToken,
         })
@@ -51,6 +64,7 @@ api.interceptors.response.use(
         // Refresh failed, logout user
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
         window.location.href = '/login'
         return Promise.reject(refreshError)
       }
@@ -570,7 +584,8 @@ export const weatherAPI = {
   activeAlerts: () => api.get('/weather/alerts/active'),
   dispatchCheck: (districts) =>
     api.get('/weather/alerts/dispatch-check', { params: { districts: districts.join(',') } }),
-  pestForecast: (params) => api.get('/weather/pest-forecast', { params }),
+  pestForecast: (params) => api.get('/weather/pest-forecast', { params })
+    .then((res) => ({ ...res, data: { ...res.data, data: res.data?.data?.forecasts ?? [] } })),
   forecastAccuracy: () => api.get('/weather/forecast-accuracy'),
   recordObservation: (body) => api.post('/weather/observations', body),
   recordForecast: (body) => api.post('/weather/forecasts', body),
@@ -1455,6 +1470,14 @@ export const farmerPortalAPI = {
   syncGovernmentLandRecords: () => api.post('/farmer-portal/land-records/sync-government'),
 }
 
+/** Farmer Value Engine — revenue ledger and FVI calculations (services/legacy/farmerValueService.js). */
+export const farmerValueAPI = {
+  getSeasonLedger: (params) => api.get('/farmer-value/season-ledger', { params }),
+  calculateFVI: (farmerId, params) => api.get(`/farmer-value/${farmerId}/fvi`, { params }),
+  detectUnclaimedSubsidy: (farmerId) => api.get(`/farmer-value/${farmerId}/unclaimed-subsidy`),
+  getFVIHistory: (farmerId) => api.get(`/farmer-value/${farmerId}/fvi-history`),
+}
+
 /** Farmer wallet — real, DB-backed, transactional (see services/farmerService.js). */
 export const walletAPI = {
   getWallet: () => api.get('/farmer-portal/wallet'),
@@ -1464,6 +1487,16 @@ export const walletAPI = {
   withdraw: (data) => api.post('/farmer-portal/wallet/withdraw', data),
   transfer: (data) => api.post('/farmer-portal/wallet/transfer', data),
   linkBank: (data) => api.post('/farmer-portal/wallet/link-bank', data),
+}
+
+/** Escrow management — real, DB-backed fund holding (see services/legacy/escrowService.js). */
+export const escrowAPI = {
+  list: () => api.get('/escrow'),
+  create: (data) => api.post('/escrow', data),
+  get: (id) => api.get(`/escrow/${id}`),
+  release: (id, data) => api.post(`/escrow/${id}/release`, data),
+  refund: (id) => api.post(`/escrow/${id}/refund`),
+  getStatus: (id) => api.get(`/escrow/${id}/status`),
 }
 
 /** Food intelligence recalls (components/FoodIntelligence/FoodSafetyDashboard.jsx). */
@@ -1539,6 +1572,31 @@ export const nutritionAPI = {
   // ASTA color, etc.) actually differentiates this product. See
   // nutritionIntelligenceService.calculateValuePerNutrient.
   getValuePerNutrient: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
+}
+
+export const dietTherapyAPI = {
+  createPlan: (profile, options = {}) => api.post('/diet-therapy/plan', { profile, options }),
+  getRegionalFoodGroups: (region) => api.get('/diet-therapy/regional-food-groups', { params: { region } })
+}
+
+export const moduleAPI = {
+  getContract: (moduleId) => api.get(`/backend-modules/${moduleId}/contract`),
+  getOperations: (moduleId) => api.get(`/backend-modules/${moduleId}`),
+  execute: (moduleId, operation, id, payload) => api.post(`/backend-modules/${moduleId}/${operation}${id ? `/${id}` : ''}`, payload),
+  askAI: (moduleId, question, context = {}) => api.post(`/backend-modules/${moduleId}/ai-advisory`, { question, context })
+}
+
+export const searchAPI = {
+  search: (params = {}) => api.get('/search', { params }),
+  suggestions: (query, limit = 10) => api.get('/search/suggestions', { params: { query, limit } })
+}
+
+export const dprAPI = {
+  preview: (data) => api.post('/dpr/preview', data),
+  generate: (data) => api.post('/dpr', data),
+  list: (params = {}) => api.get('/dpr', { params }),
+  get: (id) => api.get(`/dpr/${id}`),
+  pdf: (id) => api.get(`/dpr/${id}/pdf`, { responseType: 'blob' })
 }
 
 /** Organic traceability — farm registration, standards, consumer QR lookup. */
@@ -2423,7 +2481,7 @@ export const waterAnalyticsRecordsAPI = {
 // IdentityManagementPage.jsx, PlatformFoundationPage.jsx.
 // ---------------------------------------------------------------------------
 
-/** M085 — Drought Monitoring (Climate). No backend route found. */
+/** M085 — Drought Monitoring (Climate). */
 export const droughtMonitoringAPI = {
   getRecords: (params) => api.get('/drought-monitoring', { params }),
   createRecord: (data) => api.post('/drought-monitoring', data),
@@ -2431,7 +2489,7 @@ export const droughtMonitoringAPI = {
   deleteRecord: (id) => api.delete(`/drought-monitoring/${id}`),
 }
 
-/** M086 — Flood Monitoring (Climate). No backend route found. */
+/** M086 — Flood Monitoring (Climate). */
 export const floodMonitoringAPI = {
   getRecords: (params) => api.get('/flood-monitoring', { params }),
   createRecord: (data) => api.post('/flood-monitoring', data),
@@ -2443,10 +2501,11 @@ export const floodMonitoringAPI = {
  *  (migration 057, same feed weatherAPI.pestForecast already reads). No
  *  create/update/delete route exists for it, so only a read is exposed here. */
 export const pestForecastingAPI = {
-  getForecasts: (params) => api.get('/weather/pest-forecast', { params }),
+  getForecasts: (params) => api.get('/weather/pest-forecast', { params })
+    .then((res) => ({ ...res, data: { ...res.data, data: res.data?.data?.forecasts ?? [] } })),
 }
 
-/** M088 — Disease Forecasting (Climate). No backend route found. */
+/** M088 — Disease Forecasting (Climate). */
 export const diseaseForecastingAPI = {
   getForecasts: (params) => api.get('/disease-forecasting', { params }),
   createForecast: (data) => api.post('/disease-forecasting', data),
@@ -2454,7 +2513,7 @@ export const diseaseForecastingAPI = {
   deleteForecast: (id) => api.delete(`/disease-forecasting/${id}`),
 }
 
-/** M089 — Climate Risk Assessment (Climate). No backend route found. */
+/** M089 — Climate Risk Assessment (Climate). */
 export const climateRiskAPI = {
   getAssessments: (params) => api.get('/climate-risk', { params }),
   createAssessment: (data) => api.post('/climate-risk', data),
@@ -2462,7 +2521,7 @@ export const climateRiskAPI = {
   deleteAssessment: (id) => api.delete(`/climate-risk/${id}`),
 }
 
-/** M090 — Agro-Meteorology (Climate). No backend route found. */
+/** M090 — Agro-Meteorology (Climate). */
 export const agroMeteorologyAPI = {
   getRecords: (params) => api.get('/agro-meteorology', { params }),
   createRecord: (data) => api.post('/agro-meteorology', data),

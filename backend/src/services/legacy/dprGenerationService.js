@@ -313,17 +313,24 @@ class DprGenerationService {
     }
   }
 
-  async getById(dprId) {
-    const result = await this.pool.query('SELECT * FROM dpr_documents WHERE id = $1', [dprId]);
+  async getById(dprId, access = {}) {
+    const params = [dprId];
+    let accessClause = '';
+    if (!access.isAdmin) {
+      params.push(access.userId);
+      accessClause = ` AND (generated_by = $${params.length} OR farmer_id IN (SELECT id FROM farmers WHERE user_id = $${params.length}))`;
+    }
+    const result = await this.pool.query(`SELECT * FROM dpr_documents WHERE id = $1${accessClause}`, params);
     if (result.rows.length === 0) throw new Error('DPR not found');
     return result.rows[0];
   }
 
-  async list(filters = {}) {
+  async list(filters = {}, access = {}) {
     let query = 'SELECT id, farmer_id, fpo_id, crop_plan_id, purpose, financing_ask_inr, created_at FROM dpr_documents WHERE 1=1';
     const params = [];
     if (filters.farmerId) { params.push(filters.farmerId); query += ` AND farmer_id = $${params.length}`; }
     if (filters.fpoId) { params.push(filters.fpoId); query += ` AND fpo_id = $${params.length}`; }
+    if (!access.isAdmin) { params.push(access.userId); query += ` AND (generated_by = $${params.length} OR farmer_id IN (SELECT id FROM farmers WHERE user_id = $${params.length}))`; }
     query += ' ORDER BY created_at DESC';
     const result = await this.pool.query(query, params);
     return result.rows;
@@ -333,8 +340,8 @@ class DprGenerationService {
    * Stream a formatted PDF of a stored DPR directly to an HTTP response.
    * pdfkit is already a backend dependency (package.json) — no new library added.
    */
-  async streamPdf(dprId, res) {
-    const row = await this.getById(dprId);
+  async streamPdf(dprId, res, access = {}) {
+    const row = await this.getById(dprId, access);
     const doc = row.document_json;
 
     await this.pool.query('UPDATE dpr_documents SET pdf_downloaded_at = NOW() WHERE id = $1', [dprId]);

@@ -9,6 +9,9 @@
 const express = require('express');
 const router = express.Router();
 const informationSharingService = require('../services/legacy/informationSharingService');
+const { authMiddleware } = require('../middleware/auth');
+
+router.use(authMiddleware);
 
 /**
  * Document Management Routes

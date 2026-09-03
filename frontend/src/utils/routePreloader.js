@@ -43,6 +43,7 @@ const preloadCache = new Map()
  * Preload a route component
  */
 async function preloadRoute(routePath, priority = PreloadPriority.MEDIUM) {
+  if (!routePath) return null
   // Check if already preloaded
   if (preloadCache.has(routePath)) {
     return preloadCache.get(routePath)
@@ -274,12 +275,12 @@ export function useNetworkAwarePreloader(routes = []) {
         // Only preload critical routes on slow connections
         const criticalRoutes = routes.filter(r => r.priority === PreloadPriority.CRITICAL)
         for (const route of criticalRoutes) {
-          await preloadRoute(route.component.name, PreloadPriority.CRITICAL)
+          await preloadRoute(route.preloadPath, PreloadPriority.CRITICAL)
         }
       } else {
         // Preload all routes on fast connections
         for (const route of routes) {
-          await preloadRoute(route.component.name, route.priority || PreloadPriority.MEDIUM)
+          await preloadRoute(route.preloadPath, route.priority || PreloadPriority.MEDIUM)
         }
       }
     }

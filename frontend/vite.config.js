@@ -139,10 +139,9 @@ export default defineConfig(async () => {
               return 'vendor';
             }
 
-            // App chunks
-            if (id.includes('/pages/')) {
-              return 'pages';
-            }
+            // Keep lazily imported pages in their own Rollup chunks. Grouping
+            // every page into one manual chunk defeats route-level code
+            // splitting and creates a large first-navigation payload.
             if (id.includes('/components/')) {
               return 'components';
             }

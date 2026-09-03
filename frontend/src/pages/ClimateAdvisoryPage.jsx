@@ -84,7 +84,7 @@ function ClimateAdvisoryPage() {
       {isLoading && <div className="animate-pulse h-40 bg-gray-200 rounded-lg" />}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
-          Error loading advisories: {error.message}. Backend endpoint /climate-advisory/advisories has not been built yet — the underlying agromet_advisories table exists (migration 057) but no route reads or writes it. This page is wired and ready once one exists.
+          Error loading advisories: {error.message}. The climate advisory service is temporarily unavailable. Request correlation details are available from the API response.
         </div>
       )}
       {!isLoading && !error && (

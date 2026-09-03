@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Cpu, Sparkles, ArrowRight, ShieldCheck, Workflow } from 'lucide-react';
+import { Bot, Cpu, Sparkles, ArrowRight, ShieldCheck, Workflow, DatabaseZap } from 'lucide-react';
 import { modulesAPI } from '../services/api';
 
 function ModuleHubPage() {

@@ -10,6 +10,9 @@ const router = express.Router();
 const decisionSupportService = require('../services/legacy/decisionSupportService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
+const { protectRouter } = require('./enterpriseRouteSupport');
+
+protectRouter(router, { signal: 'enterprise.decision_support.changed' });
 
 /**
  * 1. Corporate Credit Eligibility Check

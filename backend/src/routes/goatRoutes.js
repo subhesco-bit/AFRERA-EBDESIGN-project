@@ -33,8 +33,10 @@ const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
+protectLivestockRouter(router);
 
 router.use(authMiddleware);
 router.use(rateLimiter);

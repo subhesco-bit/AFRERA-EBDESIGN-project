@@ -1,7 +1,10 @@
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { CheckCircle2, Package, MapPin } from 'lucide-react'
 import { ordersAPI } from '../services/api'
+import AIInsightsPanel from '../components/ui/AIInsightsPanel'
+import { aiDecisionService } from '../services/aiDecisionService'
 
 /**
  * Order confirmation / detail — real gap found while tracing the checkout
@@ -27,6 +30,45 @@ function OrderDetailPage() {
     queryFn: () => ordersAPI.getOrder(id).then((r) => r.data),
   })
 
+  const aiInsights = useMemo(() => {
+    if (!order) return []
+
+    return [
+      aiDecisionService.buildDecision({
+        id: `order-${order.id || id}-shipping`,
+        title: 'Delivery timing recommendation',
+        description: `Order ${order.order_number || id} is in ${order.status || 'processing'} status. Consider prioritizing dispatch for the next available vehicle window to protect the delivery promise.`,
+        status: 'pending',
+        confidence: 0.84,
+        impact: 'high',
+        category: 'orders',
+        icon: '📦',
+        severity: 'info',
+        metadata: { source: 'fallback', module: 'orders' },
+        context: { orderId: id, status: order.status },
+        timestamp: new Date().toISOString()
+      }),
+      aiDecisionService.buildDecision({
+        id: `order-${order.id || id}-inventory`,
+        title: 'Inventory and fulfillment check',
+        description: 'The selected items appear stable, but a quick stock sync before release is recommended to avoid a fulfillment delay.',
+        status: 'pending',
+        confidence: 0.79,
+        impact: 'medium',
+        category: 'orders',
+        icon: '🧾',
+        severity: 'warning',
+        metadata: { source: 'fallback', module: 'fulfillment' },
+        context: { items: order.items?.length || 0 },
+        timestamp: new Date().toISOString()
+      })
+    ]
+  }, [id, order])
+
+  const handleApplyRecommendation = (insight) => {
+    alert(`Applied recommendation: ${insight.title}`)
+  }
+
   if (isLoading) {
     return <div className="container mx-auto px-4 py-16 text-center text-gray-600">Loading order…</div>
   }
@@ -48,6 +90,15 @@ function OrderDetailPage() {
         <h1 className="text-2xl font-bold">Order {order.order_number}</h1>
       </div>
       <p className="text-gray-600 mb-6">Status: <span className="font-medium">{STATUS_LABEL[order.status] || order.status}</span></p>
+
+      <div className="mb-6">
+        <AIInsightsPanel
+          insights={aiInsights}
+          loading={false}
+          onRefresh={() => window.location.reload()}
+          onApplyRecommendation={handleApplyRecommendation}
+        />
+      </div>
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h2 className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-4">

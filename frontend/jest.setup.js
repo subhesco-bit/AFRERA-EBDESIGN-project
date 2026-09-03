@@ -1,8 +1,23 @@
 // Jest setup file for frontend
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
+globalThis.__VITE_ENV__ = {
+  env: {
+    MODE: 'test',
+    DEV: false,
+    PROD: true,
+    VITE_API_BASE_URL: 'http://localhost:3001'
+  }
+};
+window.PushManager = function PushManager() {};
 
 // Mock API calls
-jest.mock('../src/services/api', () => ({
+jest.mock('./src/services/api', () => ({
+  default: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn()
+  },
   authAPI: {
     login: jest.fn(),
     register: jest.fn(),
@@ -11,6 +26,10 @@ jest.mock('../src/services/api', () => ({
   productsAPI: {
     getProducts: jest.fn(),
     getProduct: jest.fn()
+  },
+  analyticsAPI: {
+    getPlatformStats: jest.fn(),
+    getInsights: jest.fn()
   }
 }));
 
@@ -37,3 +56,7 @@ global.IntersectionObserver = class IntersectionObserver {
   takeRecords() { return []; }
   unobserve() {}
 };
+
+afterAll(() => {
+  require('./src/utils/errorMonitoring').errorMonitoring.destroy();
+});

@@ -1,14 +1,11 @@
 ﻿import React, { useEffect, useState } from 'react';
+import api from '../../services/api';
 import './styles.css';
 
 export default function M084Page(){
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  useEffect(()=>{ setLoading(true); fetch('/api/v1/').then(r=>r.json()).then(b=>{ if(b.success) setItems(b.data.items||[]); setLoading(false); }).catch(()=>setLoading(false)); }, []);
-  return (<div className='module-M084 p-4'>
-    <h1>M084 Module</h1>
-    {loading? <div>Loading…</div> : (
-      <ul>{items.map(it => <li key={it.id}>{JSON.stringify(it.data)}</li>)}</ul>
-    )}
-  </div>);
+  const [items, setItems] = useState([]); const [loading, setLoading] = useState(false); const [message, setMessage] = useState(''); const [form, setForm] = useState({ alert_code: '', alert_type: 'heavy_rain', severity: 'watch', headline: '', recommended_action: '', effective_from: '', effective_until: '' });
+  const load = async () => { setLoading(true); try { const response = await api.get('/modules/m084/disaster-alerts'); setItems(response.data?.data || []); } catch (error) { setMessage(error.response?.data?.error?.message || 'Unable to load alerts'); } finally { setLoading(false); } };
+  useEffect(() => { load(); }, []);
+  const create = async event => { event.preventDefault(); try { await api.post('/modules/m084/disaster-alerts', { ...form, districts: [], affects_routes: [] }); setMessage('Alert created'); setForm({ ...form, alert_code: '', headline: '', recommended_action: '' }); load(); } catch (error) { setMessage(error.response?.data?.error?.message || 'Unable to create alert'); } };
+  return (<div className='module-M084'><header><p className='eyebrow'>M084 / Climate operations</p><h1>Disaster Alerts</h1><p>Publish and review operator-authored alerts backed by the climate alert register.</p></header><form className='m084-form' onSubmit={create}><div className='m084-fields'>{[['alert_code','Alert code'],['headline','Headline'],['recommended_action','Recommended action'],['effective_from','Effective from'],['effective_until','Effective until']].map(([name, label]) => <label key={name}>{label}<input required value={form[name]} type={name.startsWith('effective') ? 'datetime-local' : 'text'} onChange={e => setForm({ ...form, [name]: e.target.value })} /></label>)}<label>Type<select value={form.alert_type} onChange={e => setForm({ ...form, alert_type: e.target.value })}><option>heavy_rain</option><option>flood</option><option>landslide</option><option>drought</option><option>heat_wave</option></select></label><label>Severity<select value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}><option>advisory</option><option>watch</option><option>warning</option><option>severe</option><option>extreme</option></select></label></div><button type='submit'>Create alert</button>{message && <p role='status'>{message}</p>}</form><section className='m084-list'><h2>Alert register</h2>{loading ? <p>Loading alerts...</p> : items.length ? items.map(item => <article key={item.id}><div><strong>{item.headline}</strong><span>{item.alert_code} / {item.alert_type}</span></div><b className={`severity-${item.severity}`}>{item.severity}</b><small>{item.cancelled_at ? 'Cancelled' : 'Active'}</small></article>) : <p>No alerts recorded.</p>}</section></div>);
 }

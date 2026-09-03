@@ -47,6 +47,8 @@ const LogisticsPage = lazy(() => import('../pages/LogisticsPage'))
 const InsurancePage = lazy(() => import('../pages/InsurancePage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const WalletPage = lazy(() => import('../pages/WalletPage'))
+const EscrowPage = lazy(() => import('../pages/EscrowPage'))
+const FarmerRevenueLedgerPage = lazy(() => import('../pages/FarmerRevenueLedgerPage'))
 const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
 const DisruptionPage = lazy(() => import('../pages/DisruptionPage'))
 // Financial and Reporting Pages
@@ -181,20 +183,7 @@ const ERPDashboard = lazy(() => import('../pages/ERPDashboard'))
 const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'))
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'))
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'))
-
-// Report pages
-const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
-const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
-const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
-const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
-const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
-const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
-const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
-const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
-const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
-const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
-const CreditScorePage = lazy(() => import('../pages/CreditScorePage'))
-const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'))
+const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'))
 
 // Additional management pages
 const FarmerProfilePage = lazy(() => import('../pages/FarmerProfilePage'))
@@ -396,6 +385,14 @@ export const protectedRoutes = [
     transition: 'fade'
   },
   {
+    path: '/ai/copilot',
+    component: CopilotHubPage,
+    title: 'AI Copilot - AFRERA',
+    description: 'AI-powered agricultural assistance with intelligent advisory and decision support',
+    keywords: 'ai, copilot, advisory, decision support, agricultural assistance',
+    transition: 'fade'
+  },
+  {
     path: '/cart',
     component: CartPage,
     title: 'Shopping Cart - AFRERA',
@@ -436,6 +433,22 @@ export const protectedRoutes = [
     title: 'Wallet - AFRERA',
     description: 'Manage your digital wallet and payments',
     keywords: 'wallet, payments, digital',
+    transition: 'fade'
+  },
+  {
+    path: '/escrow',
+    component: EscrowPage,
+    title: 'Escrow Management - AFRERA',
+    description: 'Manage escrow transactions between buyers and farmers',
+    keywords: 'escrow, secure payments, fund holding',
+    transition: 'fade'
+  },
+  {
+    path: '/farmer-revenue-ledger',
+    component: FarmerRevenueLedgerPage,
+    title: 'Farmer Revenue Ledger - AFRERA',
+    description: 'View farmer revenue data and Farmer Value Engine calculations',
+    keywords: 'revenue, ledger, farmer value, FVI',
     transition: 'fade'
   },
   {
@@ -780,7 +793,8 @@ export const protectedRoutes = [
     title: 'Module Hub - AFRERA',
     description: 'Access all available modules',
     keywords: 'modules, hub, features',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin'
   }
 ]
 
@@ -1692,6 +1706,14 @@ export const managementRoutes = [
     title: 'AI Backbone - AFRERA',
     description: 'Unified multi-provider AI integration: Claude, ChatGPT, Gemini, Azure OpenAI, Hugging Face',
     keywords: 'ai, backbone, claude, chatgpt, gemini, azure, huggingface',
+    transition: 'fade'
+  },
+  {
+    path: '/ai-product-studio',
+    component: AIProductStudioPage,
+    title: 'AI Product Studio - AFRERA',
+    description: 'Image generation, cartoon storytelling, nutrient diagnosis, and natural therapist guidance for product marketing and wellness',
+    keywords: 'ai, product image, cartoon generator, nutrient diagnosis, wellness, therapist',
     transition: 'fade'
   },
   {

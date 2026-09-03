@@ -34,7 +34,7 @@ const configSchema = {
   // API Configuration
   API_URL: {
     required: true,
-    default: 'import.meta.env.VITE_API_BASE_URL/api/v1',
+    default: `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/api/v1`,
     validate: (value) => {
       try {
         new URL(value)

@@ -12,14 +12,6 @@ function adminMiddleware(req, res, next) {
       return res.status(401).json({ success: false, error: 'Authentication required' });
     }
 
-    // In the repository test suite, admin-only endpoints are exercised with a
-    // farmer-authenticated test user. Keep the production restriction intact,
-    // while allowing the existing integration contract tests to exercise the
-    // business logic without a separate admin bootstrap flow.
-    if (process.env.NODE_ENV === 'test') {
-      return next();
-    }
-
     // Check if user has admin role
     if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
       return res.status(403).json({ success: false, error: 'Admin privileges required' });

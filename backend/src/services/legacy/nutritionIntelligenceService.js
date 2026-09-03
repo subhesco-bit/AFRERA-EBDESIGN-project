@@ -12,6 +12,51 @@ const aiBackboneService = require('./aiBackboneService');
 
 const router = express.Router();
 
+const DAILY_VALUES = Object.freeze({
+  CAL: 2000, PRO: 50, CARB: 275, FIB: 28, FAT: 78, SAT_FAT: 20,
+  SOD: 2300, IRON: 18, VIT_A: 900, VIT_C: 90
+});
+
+function calculateNutrientTotals(items, servings = 1) {
+  if (!Array.isArray(items) || items.length === 0) throw new Error('items must be a non-empty array');
+  if (!Number.isFinite(Number(servings)) || Number(servings) <= 0 || Number(servings) > 100) {
+    throw new Error('servings must be between 1 and 100');
+  }
+
+  const totals = {};
+  for (const item of items) {
+    if (!item || typeof item !== 'object' || !item.nutrients || typeof item.nutrients !== 'object') {
+      throw new Error('each item must include a nutrients object');
+    }
+    const quantity = Number(item.quantity ?? 1);
+    if (!Number.isFinite(quantity) || quantity < 0 || quantity > 100000) throw new Error('item quantity is invalid');
+    for (const [key, rawValue] of Object.entries(item.nutrients)) {
+      const value = Number(rawValue);
+      if (!Number.isFinite(value) || value < 0) throw new Error(`nutrient ${key} must be a non-negative number`);
+      totals[key] = (totals[key] || 0) + value * quantity;
+    }
+  }
+
+  const perServing = Object.fromEntries(Object.entries(totals).map(([key, value]) => [key, Number((value / Number(servings)).toFixed(2))]));
+  const dailyValue = Object.fromEntries(Object.entries(perServing).map(([key, value]) => [key, DAILY_VALUES[key] ? Number(((value / DAILY_VALUES[key]) * 100).toFixed(1)) : null]));
+  return {
+    servings: Number(servings),
+    totals,
+    per_serving: perServing,
+    daily_value_percent: dailyValue,
+    provenance: 'calculated from caller-supplied ingredient values; values require verified food or laboratory sources',
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+  };
+}
+
+router.post('/calculate', authMiddleware, async (req, res) => {
+  try {
+    res.json({ success: true, data: calculateNutrientTotals(req.body.items, req.body.servings) });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
 if (process.env.NODE_ENV === 'test') {
   // Deliberately reassigns the async function declarations below (hoisted
@@ -1161,5 +1206,6 @@ module.exports = {
   getPersonalizedProductRecommendations,
   generateDietBasedRecipe,
   getWellnessPractices,
+  calculateNutrientTotals,
   isHealthy
 };

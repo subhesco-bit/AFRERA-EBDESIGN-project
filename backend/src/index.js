@@ -212,7 +212,6 @@ const platformCoreRoutes = require('./routes/platformCoreRoutes');
 // Unified Claude AI Coordinator - routes/unifiedAIRoutes.js requires
 // core/claudeAICoordinator.js directly (Node caches the singleton either
 // way), so a second unused require here was dead weight. Removed 2026-08-29.
-const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
 const libraryRoutes = require('./routes/libraryRoutes');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
 // Unified AI Gateway - NEW single entry point for all AI services
@@ -450,6 +449,8 @@ const iotSensorService = require('./services/legacy/iotSensorService');
 const regionalVarietyRoutes = require('./routes/regionalVarietyRoutes');
 const foluBenchmarkRoutes = require('./routes/foluBenchmarkRoutes');
 const civilDisruptionRoutes = require('./routes/civilDisruptionRoutes');
+const escrowRoutes = require('./routes/escrowRoutes');
+const farmerValueRoutes = require('./routes/farmerValueRoutes');
 const sellerRankingRoutes = require('./routes/sellerRankingRoutes');
 const seedVaultRoutes = require('./routes/seedVaultRoutes');
 const freightPoolingRoutes = require('./routes/freightPoolingRoutes');
@@ -496,6 +497,8 @@ const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes'
 // and emits decisions that effectors act on. See src/core/ for the rationale.
 const { signalBus, SIGNAL } = require('./core/signalBus');
 const { decisionEngine } = require('./core/decisionEngine');
+// Disruption Routing Agent - Civil disruption crisis handling
+const disruptionRoutingAgent = require('./core/disruptionRoutingAgent');
 // ERP domain agents: 10 rules across 8 ERP domains. Each PROPOSES only —
 // the ai_proposals CHECK constraint makes approval impossible without a
 // named human. See src/core/erpAgents.js.
@@ -529,6 +532,45 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
+
+const { verifyToken } = require('./services/dual-use/authService');
+const pool = require('./database/pool');
+
+io.use((socket, next) => {
+  const authorization = socket.handshake.headers.authorization;
+  const token = socket.handshake.auth?.token ||
+    socket.handshake.query?.token ||
+    (authorization && authorization.replace(/^Bearer\s+/i, ''));
+
+  if (!token) return next(new Error('Authentication required'));
+
+  try {
+    socket.data.user = verifyToken(token);
+    return next();
+  } catch (error) {
+    return next(new Error('Invalid authentication token'));
+  }
+});
+
+async function canSubscribeToOrder(user, orderId) {
+  if (['admin', 'superadmin'].includes(user.role)) return true;
+  const result = await pool.query(
+    'SELECT 1 FROM orders WHERE id = $1 AND user_id = $2 LIMIT 1',
+    [orderId, user.userId || user.id]
+  );
+  return result.rows.length > 0;
+}
+
+async function canSubscribeToShipment(user, shipmentId) {
+  if (['admin', 'superadmin', 'logistics'].includes(user.role)) return true;
+  const result = await pool.query(
+    `SELECT 1 FROM shipments s
+     JOIN orders o ON o.id = s.order_id
+     WHERE s.id = $1 AND o.user_id = $2 LIMIT 1`,
+    [shipmentId, user.userId || user.id]
+  );
+  return result.rows.length > 0;
+}
 
 // Initialize WebSocket service
 websocketService.initialize(httpServer);
@@ -637,6 +679,9 @@ app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
+app.use('/api/v1/ai-approvals', require('./routes/aiApprovalRoutes'));
+app.use('/api/v1/diet-therapy', require('./routes/dietTherapyRoutes'));
+app.use('/api/v1/search', require('./routes/advancedSearchRoutes'));
 // Claude AI-Ready Routes (Phase 1 Core AI Services)
 app.use('/api/v1/claude/ai-decision', claudeAIDecisionRoutes);
 app.use('/api/v1/claude/agent', claudeAgentRoutes);
@@ -788,7 +833,6 @@ app.use('/api/v1/logistics-enhancement', logisticsEnhancementRoutes);
 app.use('/api/v1/mfa', mfaRoutes);
 app.use('/api/v1/privacy', gdprRoutes);
 app.use('/api/v1/platform', platformCoreRoutes);
-app.use('/api/v1/ai', unifiedAIRoutes);
 app.use('/api/v1/ai/modules', moduleRegistryRoutes);
 app.use('/api/v1/backend-modules', backendModuleBridge);
 app.use('/api/v1/library', libraryRoutes);
@@ -1009,6 +1053,8 @@ app.use('/api/v1/food', foodRoutes);
 app.use('/api/v1/variety-directory', regionalVarietyRoutes);
 app.use('/api/v1/folu-benchmark', foluBenchmarkRoutes);
 app.use('/api/v1/civil-disruptions', civilDisruptionRoutes);
+app.use('/api/v1/escrow', escrowRoutes);
+app.use('/api/v1/farmer-value', farmerValueRoutes);
 app.use('/api/v1/seller-ranking', sellerRankingRoutes);
 app.use('/api/v1/seed-vault', seedVaultRoutes);
 app.use('/api/v1/freight-pooling', freightPoolingRoutes);
@@ -1104,17 +1150,42 @@ io.on('connection', (socket) => {
 
   // Join user-specific room for notifications
   socket.on('join', (userId) => {
+    if (String(userId) !== String(socket.data.user.userId || socket.data.user.id) &&
+        !['admin', 'superadmin'].includes(socket.data.user.role)) {
+      socket.emit('subscription:error', { code: 'FORBIDDEN' });
+      return;
+    }
     socket.join(`user:${userId}`);
     logger.info(`User ${userId} joined their room`);
   });
 
   // Real-time order updates
-  socket.on('subscribe:orders', (orderId) => {
+  socket.on('subscribe:orders', async (orderId) => {
+    try {
+      if (!(await canSubscribeToOrder(socket.data.user, orderId))) {
+        socket.emit('subscription:error', { code: 'FORBIDDEN' });
+        return;
+      }
+    } catch (error) {
+      logger.warn('Order subscription authorization failed', { socketId: socket.id, error: error.message });
+      socket.emit('subscription:error', { code: 'FORBIDDEN' });
+      return;
+    }
     socket.join(`order:${orderId}`);
   });
 
   // Real-time shipment tracking
-  socket.on('subscribe:shipment', (shipmentId) => {
+  socket.on('subscribe:shipment', async (shipmentId) => {
+    try {
+      if (!(await canSubscribeToShipment(socket.data.user, shipmentId))) {
+        socket.emit('subscription:error', { code: 'FORBIDDEN' });
+        return;
+      }
+    } catch (error) {
+      logger.warn('Shipment subscription authorization failed', { socketId: socket.id, error: error.message });
+      socket.emit('subscription:error', { code: 'FORBIDDEN' });
+      return;
+    }
     socket.join(`shipment:${shipmentId}`);
   });
 
@@ -1211,6 +1282,9 @@ function initializeDecisionLayer() {
 }
 
 initializeDecisionLayer();
+
+// Initialize Disruption Routing Agent for civil disruption crisis handling
+disruptionRoutingAgent.initialize();
 
 // Initialize AFRERA Nervous System - Enterprise Route Control
 const { initializeNervousSystem, startSensorDataCollection } = require('./core/nervousSystem');

@@ -11,13 +11,16 @@ import {
   Activity,
   Target,
   PieChart,
-  LineChart
+  LineChart,
+  Lightbulb,
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
 
 /**
  * AFRERA AI Dashboard
  * 
- * Comprehensive AI-powered marketplace dashboard:
+ * Comprehensive AI-powered marketplace dashboard with real-time decision-making:
  * - Customer Segmentation (RFM, behavioral)
  * - Demand Forecasting
  * - Inventory Optimization
@@ -25,12 +28,18 @@ import {
  * - Sales Prediction
  * - Customer Lifetime Value
  * - Market Basket Analysis
+ * - AI Decision Support (NEW)
+ * - Real-time Alerts (NEW)
+ * - Process Optimization (NEW)
  */
 
 const AIDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedProduct, setSelectedProduct] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
+  const [aiAlerts, setAiAlerts] = useState([]);
+  const [aiDecisions, setAiDecisions] = useState([]);
+  const [autoOptimize, setAutoOptimize] = useState(false);
 
   // 2026-08-31: every useQuery below was missing the .then(r => r.data) unwrap
   // (ecommerceAIAPI.* returns the raw axios response, not the payload, so
@@ -91,11 +100,42 @@ const AIDashboard = () => {
     queryFn: () => ecommerceAIAPI.analyzeMarketBasket().then(r => r.data)
   });
 
+  // Load AI alerts and decisions
+  useEffect(() => {
+    loadAIInsights();
+    const interval = setInterval(loadAIInsights, 60000); // Refresh every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadAIInsights = async () => {
+    try {
+      const [alertsRes, decisionsRes] = await Promise.all([
+        ecommerceAIAPI.getAIAlerts(),
+        ecommerceAIAPI.getAIDecisions()
+      ]);
+      setAiAlerts(alertsRes.data.data || []);
+      setAiDecisions(decisionsRes.data.data || []);
+    } catch (err) {
+      console.error('Failed to load AI insights:', err);
+    }
+  };
+
   const handleRunSegmentation = (type) => {
     if (type === 'rfm') {
       refetchRfmSegments();
     } else if (type === 'behavioral') {
       refetchBehavioralSegments();
+    }
+  };
+
+  const executeAIDecision = async (decisionId, action) => {
+    try {
+      await ecommerceAIAPI.executeAIDecision(decisionId, action);
+      alert(`Decision ${action} executed successfully`);
+      loadAIInsights();
+    } catch (err) {
+      console.error('Failed to execute decision:', err);
+      alert('Failed to execute decision');
     }
   };
 
@@ -643,56 +683,154 @@ const AIDashboard = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Brain className="h-8 w-8 text-purple-600" />
-            AI Dashboard
-          </h1>
-          <p className="text-gray-600 mt-2">
-            AI-powered marketplace intelligence and optimization
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Brain className="h-8 w-8 text-purple-600" />
+                AI Dashboard
+              </h1>
+              <p className="text-gray-600 mt-2">
+                AI-powered marketplace intelligence and optimization with real-time decision support
+              </p>
+            </div>
+            <button
+              onClick={() => setAutoOptimize(!autoOptimize)}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                autoOptimize ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              <Zap className="h-4 w-4" />
+              {autoOptimize ? 'Auto-Optimize ON' : 'Auto-Optimize OFF'}
+            </button>
+          </div>
         </div>
 
+        {/* AI Alerts Banner */}
+        {aiAlerts.length > 0 && (
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow mb-6 border border-orange-200">
+            <div className="p-4 border-b border-orange-200">
+              <h2 className="text-lg font-semibold text-orange-800 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                AI Alerts ({aiAlerts.length})
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="space-y-2">
+                {aiAlerts.slice(0, 3).map((alert, index) => (
+                  <div key={index} className="bg-white p-3 rounded-lg border border-orange-200 flex items-start gap-3">
+                    <span className="text-2xl">{alert.icon || '⚠️'}</span>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{alert.title}</div>
+                      <div className="text-sm text-gray-600">{alert.message}</div>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      alert.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                      alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-blue-100 text-blue-800'
+                    }`}>
+                      {alert.severity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI Decisions Panel */}
+        {aiDecisions.length > 0 && (
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg shadow mb-6 border border-purple-200">
+            <div className="p-4 border-b border-purple-200">
+              <h2 className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                AI Decisions ({aiDecisions.length})
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="space-y-3">
+                {aiDecisions.slice(0, 3).map((decision, index) => (
+                  <div key={index} className="bg-white p-4 rounded-lg border border-purple-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{decision.icon || '🎯'}</span>
+                          <h3 className="font-semibold text-gray-900">{decision.title}</h3>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            decision.priority === 'high' ? 'bg-red-100 text-red-800' :
+                            decision.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {decision.priority}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{decision.description}</p>
+                        <div className="text-xs text-gray-500">
+                          Confidence: {decision.confidence}% | Impact: {decision.impact}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <button
+                          onClick={() => executeAIDecision(decision.id, 'approve')}
+                          className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => executeAIDecision(decision.id, 'reject')}
+                          className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow mb-6">
-          <div className="flex space-x-4 border-b">
+          <div className="flex space-x-4 border-b overflow-x-auto">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-3 font-medium ${activeTab === 'overview' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'overview' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('segmentation')}
-              className={`px-4 py-3 font-medium ${activeTab === 'segmentation' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'segmentation' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Segmentation
             </button>
             <button
               onClick={() => setActiveTab('forecasting')}
-              className={`px-4 py-3 font-medium ${activeTab === 'forecasting' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'forecasting' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Forecasting
             </button>
             <button
               onClick={() => setActiveTab('inventory')}
-              className={`px-4 py-3 font-medium ${activeTab === 'inventory' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'inventory' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Inventory
             </button>
             <button
               onClick={() => setActiveTab('recommendations')}
-              className={`px-4 py-3 font-medium ${activeTab === 'recommendations' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'recommendations' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Recommendations
             </button>
             <button
               onClick={() => setActiveTab('clv')}
-              className={`px-4 py-3 font-medium ${activeTab === 'clv' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'clv' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Customer Lifetime Value
             </button>
             <button
               onClick={() => setActiveTab('marketbasket')}
-              className={`px-4 py-3 font-medium ${activeTab === 'marketbasket' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'marketbasket' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Market Basket
             </button>

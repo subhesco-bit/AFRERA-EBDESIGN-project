@@ -11,6 +11,8 @@
 const express = require('express');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
+const { SIGNAL } = require('../core/signalBus');
 const {
   biofloccFarm, hatcheryManagement, fishFeed, fisheriesWaterQuality, fishHealth,
   fisheriesHarvest, fishProcessing, coldFishChain, aquacultureAnalytics,
@@ -18,6 +20,7 @@ const {
 
 function crudRouter(service) {
   const router = express.Router();
+  protectLivestockRouter(router, { requireWriteRole: true, signal: SIGNAL.FISHERIES_RECORD_CHANGED });
   router.get('/', async (req, res) => {
     try { res.json({ success: true, data: (await service.list(req.query)).items }); }
     catch (e) { res.status(500).json({ success: false, error: e.message }); }

@@ -4,6 +4,7 @@
  */
 
 const { Pool } = require('pg');
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const { logger } = require('../utils/logger');
@@ -11,6 +12,10 @@ const { logger } = require('../utils/logger');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL
 });
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL must be configured before running migrations');
+}
 
 const migrationsDir = path.join(__dirname, 'migrations');
 

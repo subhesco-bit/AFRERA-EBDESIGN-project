@@ -21,12 +21,17 @@ const {
   businessIntelligenceController
 } = require('../controllers/comprehensiveERPController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { requireRole } = require('../middleware/auth');
+const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteSupport');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+protectRouter(router, { signal: 'enterprise.erp.changed' });
+router.use((req, res, next) => {
+  if (req.method === 'GET') return next();
+  requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
+});
 
 // ============================================================================
 // FINANCIAL ACCOUNTING (FI) / GENERAL LEDGER (GL) ROUTES

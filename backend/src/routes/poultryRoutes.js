@@ -30,11 +30,13 @@ const {
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
 
 router.use(authMiddleware);
 router.use(rateLimiter);
+protectLivestockRouter(router);
 
 /**
  * GET /api/v1/poultry/flocks

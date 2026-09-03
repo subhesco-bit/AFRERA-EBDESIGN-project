@@ -53,9 +53,9 @@ export function ProtectedRoute({ children, requiredRole, requiredPermissions, re
       }
 
       // Check permissions
-      if (requiredPermissions && user?.permissions) {
-        const hasPermission = requiredPermissions.every(perm => 
-          user.permissions.includes(perm)
+      if (requiredPermissions?.length) {
+        const hasPermission = requiredPermissions.every((perm) =>
+          user?.permissions?.includes(perm)
         )
         if (!hasPermission) {
           navigate('/unauthorized')
@@ -114,10 +114,14 @@ export function PublicRoute({ children, redirectTo = '/dashboard' }) {
  * Requires specific role
  */
 export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthorized' }) {
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, initialized, initializeAuth } = useAuthStore()
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (!initialized) {
+      initializeAuth()
+      return
+    }
     if (!isAuthenticated) {
       navigate('/login')
       return
@@ -126,9 +130,9 @@ export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthor
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
       navigate(redirectTo)
     }
-  }, [isAuthenticated, user, allowedRoles, navigate, redirectTo])
+  }, [initialized, initializeAuth, isAuthenticated, user, allowedRoles, navigate, redirectTo])
 
-  if (!isAuthenticated) {
+  if (!initialized || !isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="xl" />
@@ -148,10 +152,14 @@ export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthor
  * Requires specific permissions
  */
 export function PermissionRoute({ children, requiredPermissions = [], redirectTo = '/unauthorized' }) {
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, initialized, initializeAuth } = useAuthStore()
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (!initialized) {
+      initializeAuth()
+      return
+    }
     if (!isAuthenticated) {
       navigate('/login')
       return
@@ -165,9 +173,9 @@ export function PermissionRoute({ children, requiredPermissions = [], redirectTo
         navigate(redirectTo)
       }
     }
-  }, [isAuthenticated, user, requiredPermissions, navigate, redirectTo])
+  }, [initialized, initializeAuth, isAuthenticated, user, requiredPermissions, navigate, redirectTo])
 
-  if (!isAuthenticated) {
+  if (!initialized || !isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <LoadingSpinner size="xl" />

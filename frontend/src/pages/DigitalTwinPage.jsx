@@ -12,6 +12,7 @@ import { Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 import { useAuthStore } from '../store/authStore';
+import api from '../services/api';
 
 const DigitalTwinPage = () => {
   const { user } = useAuthStore();
@@ -22,9 +23,7 @@ const DigitalTwinPage = () => {
   // Get farmer's digital twins
   const { data: twinsData, isLoading: twinsLoading } = useQuery({
     queryKey: ['farmerTwins', user?.id],
-    queryFn: () => fetch(`/api/digital-twin/farmers/${user.id}`)
-      .then(res => res.json())
-      .then(res => res.data),
+    queryFn: () => api.get(`/digital-twin/farmers/${user.id}`).then(res => res.data.data),
     enabled: !!user?.id,
     refetchInterval: 120000 // 2 minutes
   });
@@ -32,18 +31,14 @@ const DigitalTwinPage = () => {
   // Get system status
   const { data: systemStatus } = useQuery({
     queryKey: ['digitalTwinSystemStatus'],
-    queryFn: () => fetch('/api/digital-twin/system/status')
-      .then(res => res.json())
-      .then(res => res.data),
+    queryFn: () => api.get('/digital-twin/system/status').then(res => res.data.data),
     refetchInterval: 300000 // 5 minutes
   });
 
   // Get twin details when selected
   const { data: twinDetails } = useQuery({
     queryKey: ['twinDetails', selectedTwin],
-    queryFn: () => fetch(`/api/digital-twin/${selectedTwin}`)
-      .then(res => res.json())
-      .then(res => res.data),
+    queryFn: () => api.get(`/digital-twin/${selectedTwin}`).then(res => res.data.data),
     enabled: !!selectedTwin
   });
 

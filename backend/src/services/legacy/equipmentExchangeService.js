@@ -13,10 +13,11 @@ const pool = require('../../database/pool');
 class EquipmentExchangeService {
   async createListing(listedBy, data) {
     const { equipmentName, equipmentType, conditionGrade, description, images, pricingType, priceInr, locationAddress, stateId } = data || {};
-    if (!equipmentName) throw new Error('equipmentName is required');
-    if (!conditionGrade) throw new Error('conditionGrade is required');
+    if (!equipmentName || typeof equipmentName !== 'string' || equipmentName.length > 200) throw new Error('equipmentName is required and must be at most 200 characters');
+    if (!conditionGrade || typeof conditionGrade !== 'string' || conditionGrade.length > 50) throw new Error('conditionGrade is required and must be at most 50 characters');
     const resolvedPricingType = pricingType || 'priced';
-    if (resolvedPricingType === 'priced' && !(Number(priceInr) >= 0)) throw new Error('priceInr is required and must be >= 0 for a priced listing');
+    if (!['free', 'priced'].includes(resolvedPricingType)) throw new Error('pricingType must be free or priced');
+    if (resolvedPricingType === 'priced' && (!Number.isFinite(Number(priceInr)) || Number(priceInr) < 0 || Number(priceInr) > 1000000000)) throw new Error('priceInr is required and must be between 0 and 1000000000 for a priced listing');
 
     const result = await pool.query(
       `INSERT INTO equipment_exchange_listings
@@ -33,8 +34,8 @@ class EquipmentExchangeService {
     const conditions = [`status = 'available'`];
     const params = [];
     if (equipmentType) { params.push(equipmentType); conditions.push(`equipment_type = $${params.length}`); }
-    if (stateId) { params.push(stateId); conditions.push(`state_id = $${params.length}`); }
-    if (pricingType) { params.push(pricingType); conditions.push(`pricing_type = $${params.length}`); }
+    if (stateId) { if (!Number.isInteger(stateId) || stateId < 1 || stateId > 100000) throw new Error('stateId is outside the allowed range'); params.push(stateId); conditions.push(`state_id = $${params.length}`); }
+    if (pricingType) { if (!['free', 'priced'].includes(pricingType)) throw new Error('pricingType must be free or priced'); params.push(pricingType); conditions.push(`pricing_type = $${params.length}`); }
 
     const result = await pool.query(
       `SELECT eel.*, u.name AS listed_by_name

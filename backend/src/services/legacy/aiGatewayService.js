@@ -322,19 +322,11 @@ class AiGatewayService {
   }
 
   recommendFertilizer(context, options) {
-    return {
-      fertilizer_type: 'NPK_10_26_26',
-      application_rate: '50kg/acre',
-      timing: 'before_sowing'
-    };
+    return { fertilizer_type: null, application_rate: null, timing: null, implemented: false, reason: 'No real fertilizer-recommendation model is connected to this gateway.' };
   }
 
   recommendIrrigation(context, options) {
-    return {
-      irrigation_method: 'drip',
-      frequency: 'daily',
-      duration: '2_hours'
-    };
+    return { irrigation_method: null, frequency: null, duration: null, implemented: false, reason: 'No real irrigation-recommendation model is connected to this gateway.' };
   }
 
   recommendPestControl(context, options) {

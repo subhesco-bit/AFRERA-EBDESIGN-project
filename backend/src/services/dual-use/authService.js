@@ -290,9 +290,19 @@ async function registerUser(userData) {
   try {
     const pg = getPostgreSQL();
 
+    if (!pg && process.env.NODE_ENV === 'production') {
+      throw new Error('Authentication service unavailable');
+    }
+
+    const registrationData = {
+      ...userData,
+      role: 'consumer',
+      status: 'pending'
+    };
+
     if (!pg) {
       const store = await readAuthStore();
-      const normalizedEmail = (userData.email || '').toLowerCase();
+      const normalizedEmail = (registrationData.email || '').toLowerCase();
       const existing = store.users.find((entry) => entry.email === normalizedEmail);
       if (existing) {
         // Idempotent in test/fallback mode: return tokens for existing user
@@ -318,16 +328,16 @@ async function registerUser(userData) {
         };
       }
 
-      const passwordHash = await hashPassword(userData.password);
+      const passwordHash = await hashPassword(registrationData.password);
       const user = {
         id: `user-${Date.now()}`,
         email: normalizedEmail,
-        phone: userData.phone || '',
-        role: userData.role || 'consumer',
-        status: userData.status || 'active',
+        phone: registrationData.phone || '',
+        role: registrationData.role,
+        status: registrationData.status,
         password_hash: passwordHash,
-        first_name: userData.first_name || '',
-        last_name: userData.last_name || '',
+        first_name: registrationData.first_name || '',
+        last_name: registrationData.last_name || '',
         created_at: new Date().toISOString()
       };
 
@@ -362,7 +372,7 @@ async function registerUser(userData) {
     // Check if email already exists
     const existingUser = await pg.query(
       'SELECT id FROM users WHERE email = $1',
-      [userData.email.toLowerCase()]
+      [registrationData.email.toLowerCase()]
     );
     
     if (existingUser.rows.length > 0) {
@@ -370,10 +380,10 @@ async function registerUser(userData) {
     }
     
     // Check if phone already exists
-    if (userData.phone) {
+    if (registrationData.phone) {
       const existingPhone = await pg.query(
         'SELECT id FROM users WHERE phone = $1',
-        [userData.phone]
+        [registrationData.phone]
       );
       
       if (existingPhone.rows.length > 0) {
@@ -382,7 +392,7 @@ async function registerUser(userData) {
     }
     
     // Hash password
-    const passwordHash = await hashPassword(userData.password);
+    const passwordHash = await hashPassword(registrationData.password);
     
     // Insert user
     const userQuery = `
@@ -392,11 +402,11 @@ async function registerUser(userData) {
     `;
     
     const userResult = await pg.query(userQuery, [
-      userData.email.toLowerCase(),
-      userData.phone || null,
+      registrationData.email.toLowerCase(),
+      registrationData.phone || null,
       passwordHash,
-      userData.role || 'consumer',
-      userData.status || 'active'
+      registrationData.role,
+      registrationData.status
     ]);
     
     const user = userResult.rows[0];
@@ -410,9 +420,9 @@ async function registerUser(userData) {
     
     const profileResult = await pg.query(profileQuery, [
       user.id,
-      userData.first_name || '',
-      userData.last_name || '',
-      userData.phone || ''
+      registrationData.first_name || '',
+      registrationData.last_name || '',
+      registrationData.phone || ''
     ]);
     
     // Generate tokens

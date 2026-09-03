@@ -4,7 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { insuranceAPI } from '../services/api';
+import toast from 'react-hot-toast';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -13,27 +15,65 @@ import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 
 const InsuranceManagementPage = () => {
+  const queryClient = useQueryClient();
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
+  const [showClaimForm, setShowClaimForm] = useState(false);
   const [activeTab, setActiveTab] = useState('my-policies');
+  const [policyForm, setPolicyForm] = useState({ insurance_type: 'crop', coverage_amount: '', asset_details: '', duration_years: 1 });
+  const [claimForm, setClaimForm] = useState({ policy_id: '', claim_amount: '', incident_date: '', description: '' });
 
   // Get user's insurance policies
-  const { data: policiesData, isLoading: policiesLoading } = useQuery({
+  const { data: policiesData, isLoading: policiesLoading, error: policiesError } = useQuery({
     queryKey: ['userPolicies'],
-    queryFn: () => fetch('/api/financial/insurance')
-      .then(res => res.json())
+    queryFn: () => insuranceAPI.getPolicies({ scope: 'mine' }, { page: 1, limit: 50 })
       .then(res => res.data),
     refetchInterval: 180000 // 3 minutes
   });
 
-  // Get insurance products
   const { data: insuranceProducts } = useQuery({
     queryKey: ['insuranceProducts'],
-    queryFn: () => fetch('/api/financial/insurance-products')
-      .then(res => res.json())
-      .then(res => res.data)
+    queryFn: () => insuranceAPI.getInsuranceProducts()
+      .then(res => res.data),
   });
 
-  const policies = policiesData?.policies || [];
+  const { data: claimsData } = useQuery({
+    queryKey: ['insuranceClaims'],
+    queryFn: () => insuranceAPI.getClaims({ scope: 'mine' }, { page: 1, limit: 50 }).then(res => res.data),
+  });
+
+  const policies = policiesData?.policies || policiesData?.items || [];
+  const products = insuranceProducts?.products || insuranceProducts?.items || [];
+  const claims = claimsData?.claims || claimsData?.items || [];
+
+  const createPolicyMutation = useMutation({
+    mutationFn: (data) => insuranceAPI.createPolicy(data),
+    onSuccess: () => {
+      toast.success('Policy application submitted');
+      setShowPurchaseForm(false);
+      queryClient.invalidateQueries({ queryKey: ['userPolicies'] });
+    },
+    onError: (error) => toast.error(error.response?.data?.error || 'Policy application failed'),
+  });
+
+  const submitClaimMutation = useMutation({
+    mutationFn: (data) => insuranceAPI.submitClaim(data),
+    onSuccess: () => {
+      toast.success('Claim submitted for assessment');
+      setShowClaimForm(false);
+      queryClient.invalidateQueries({ queryKey: ['insuranceClaims'] });
+    },
+    onError: (error) => toast.error(error.response?.data?.error || 'Claim submission failed'),
+  });
+
+  const submitPolicy = (event) => {
+    event.preventDefault();
+    createPolicyMutation.mutate(policyForm);
+  };
+
+  const submitClaim = (event) => {
+    event.preventDefault();
+    submitClaimMutation.mutate(claimForm);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -48,10 +88,10 @@ const InsuranceManagementPage = () => {
       {showPurchaseForm && (
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Purchase Insurance Policy</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={submitPolicy} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Insurance Type</label>
-              <Select>
+              <Select value={policyForm.insurance_type} onChange={(event) => setPolicyForm({ ...policyForm, insurance_type: event.target.value })}>
                 <option value="crop">Crop Insurance</option>
                 <option value="equipment">Equipment Insurance</option>
                 <option value="livestock">Livestock Insurance</option>
@@ -61,23 +101,23 @@ const InsuranceManagementPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Coverage Amount</label>
-              <Input type="number" placeholder="Enter coverage amount" />
+              <Input type="number" min="1" required value={policyForm.coverage_amount} onChange={(event) => setPolicyForm({ ...policyForm, coverage_amount: event.target.value })} placeholder="Enter coverage amount" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Asset/Crop Details</label>
-              <Input placeholder="Enter asset or crop details" />
+              <Input required value={policyForm.asset_details} onChange={(event) => setPolicyForm({ ...policyForm, asset_details: event.target.value })} placeholder="Enter asset or crop details" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Duration (years)</label>
-              <Input type="number" placeholder="Enter duration" />
+              <Input type="number" min="1" required value={policyForm.duration_years} onChange={(event) => setPolicyForm({ ...policyForm, duration_years: event.target.value })} placeholder="Enter duration" />
             </div>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <Button>Purchase Policy</Button>
-            <Button variant="outline" onClick={() => setShowPurchaseForm(false)}>
+          <div className="mt-4 flex gap-2 md:col-span-2">
+            <Button type="submit" disabled={createPolicyMutation.isPending}>{createPolicyMutation.isPending ? 'Submitting...' : 'Submit policy application'}</Button>
+            <Button type="button" variant="outline" onClick={() => setShowPurchaseForm(false)}>
               Cancel
             </Button>
           </div>
+          </form>
         </Card>
       )}
 
@@ -96,6 +136,8 @@ const InsuranceManagementPage = () => {
 
       {policiesLoading ? (
         <LoadingSkeleton variant="rectangular" lines={4} />
+      ) : policiesError ? (
+        <Card className="p-6"><p className="text-red-700">Unable to load insurance records: {policiesError.message}</p></Card>
       ) : (
         <>
           {/* My Policies Tab */}
@@ -145,38 +187,16 @@ const InsuranceManagementPage = () => {
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Available Insurance Products</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Crop Insurance</h3>
-                  <p className="text-sm text-gray-600 mb-2">Protection against crop failure due to natural calamities</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">From ₹2,500/year</span>
-                    <Button size="sm">Purchase</Button>
+                {products.length === 0 ? <p className="text-sm text-gray-500">No insurance products are currently available.</p> : products.map((product) => (
+                  <div key={product.id} className="p-4 border rounded">
+                    <h3 className="font-semibold">{product.name || product.product_name || product.type || 'Insurance product'}</h3>
+                    <p className="text-sm text-gray-600 mb-2">{product.description || 'Coverage details are provided in the policy terms.'}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">{product.premium ? `From ₹${Number(product.premium).toLocaleString('en-IN')}` : 'Quote required'}</span>
+                      <Button size="sm" onClick={() => { setPolicyForm({ ...policyForm, insurance_type: product.type || product.product_type || 'crop' }); setShowPurchaseForm(true) }}>Request quote</Button>
+                    </div>
                   </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Equipment Insurance</h3>
-                  <p className="text-sm text-gray-600 mb-2">Coverage for agricultural machinery and tools</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">From ₹1,800/year</span>
-                    <Button size="sm">Purchase</Button>
-                  </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Livestock Insurance</h3>
-                  <p className="text-sm text-gray-600 mb-2">Protection for cattle, poultry, and other livestock</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">From ₹3,200/year</span>
-                    <Button size="sm">Purchase</Button>
-                  </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <h3 className="font-semibold">Health Insurance</h3>
-                  <p className="text-sm text-gray-600 mb-2">Medical coverage for farmers and families</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">From ₹4,500/year</span>
-                    <Button size="sm">Purchase</Button>
-                  </div>
-                </div>
+                ))}
               </div>
             </Card>
           )}
@@ -186,55 +206,41 @@ const InsuranceManagementPage = () => {
             <Card className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Insurance Claims</h2>
-                <Button>File New Claim</Button>
+                <Button onClick={() => setShowClaimForm(!showClaimForm)}>{showClaimForm ? 'Close claim form' : 'File New Claim'}</Button>
               </div>
+              {showClaimForm && (
+                <form onSubmit={submitClaim} className="mb-5 grid gap-4 rounded-lg border border-v42-line bg-v42-paddy2 p-4 md:grid-cols-2">
+                  <div><label className="block text-sm font-medium mb-2">Policy</label><Select required value={claimForm.policy_id} onChange={(event) => setClaimForm({ ...claimForm, policy_id: event.target.value })}><option value="">Select policy</option>{policies.map((policy) => <option key={policy.id} value={policy.id}>{policy.policy_number || policy.policyId || policy.id}</option>)}</Select></div>
+                  <div><label className="block text-sm font-medium mb-2">Claim amount</label><Input type="number" min="1" required value={claimForm.claim_amount} onChange={(event) => setClaimForm({ ...claimForm, claim_amount: event.target.value })} /></div>
+                  <div><label className="block text-sm font-medium mb-2">Incident date</label><Input type="date" required value={claimForm.incident_date} onChange={(event) => setClaimForm({ ...claimForm, incident_date: event.target.value })} /></div>
+                  <div><label className="block text-sm font-medium mb-2">Description</label><Input required value={claimForm.description} onChange={(event) => setClaimForm({ ...claimForm, description: event.target.value })} /></div>
+                  <div className="flex gap-2 md:col-span-2"><Button type="submit" disabled={submitClaimMutation.isPending}>{submitClaimMutation.isPending ? 'Submitting...' : 'Submit claim'}</Button><Button type="button" variant="outline" onClick={() => setShowClaimForm(false)}>Cancel</Button></div>
+                </form>
+              )}
               <div className="space-y-3">
-                <div className="p-4 border rounded">
+                {claims.length === 0 ? <p className="text-sm text-gray-500">No claims filed for this account.</p> : claims.map((claim) => <div key={claim.id} className="p-4 border rounded">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <p className="font-medium">Crop Damage Claim</p>
-                      <p className="text-sm text-gray-600">Claim ID: CLM-2024-001</p>
+                      <p className="font-medium">{claim.claim_type || claim.type || 'Insurance claim'}</p>
+                      <p className="text-sm text-gray-600">Claim ID: {claim.claim_number || claim.claimId || claim.id}</p>
                     </div>
                     <Badge variant="outline">In Review</Badge>
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
                       <p className="text-gray-600">Claim Amount</p>
-                      <p className="font-medium">₹25,000</p>
+                      <p className="font-medium">₹{Number(claim.claim_amount || claim.amount || 0).toLocaleString('en-IN')}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">Filed Date</p>
-                      <p className="font-medium">20 August 2026</p>
+                      <p className="font-medium">{claim.filed_date ? new Date(claim.filed_date).toLocaleDateString('en-IN') : 'Date unavailable'}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">Status</p>
-                      <p className="font-medium">Under Investigation</p>
+                      <p className="font-medium">{claim.status || 'Under review'}</p>
                     </div>
                   </div>
-                </div>
-                <div className="p-4 border rounded">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-medium">Equipment Damage Claim</p>
-                      <p className="text-sm text-gray-600">Claim ID: CLM-2024-002</p>
-                    </div>
-                    <Badge variant="default">Approved</Badge>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-600">Claim Amount</p>
-                      <p className="font-medium">₹15,000</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Filed Date</p>
-                      <p className="font-medium">10 August 2026</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600">Settlement</p>
-                      <p className="font-medium">₹12,750 paid</p>
-                    </div>
-                  </div>
-                </div>
+                </div>) }
               </div>
             </Card>
           )}

@@ -113,7 +113,7 @@ function App() {
                     key={route.path}
                     path={route.path}
                     element={
-                      <ProtectedRoute>
+                      <ProtectedRoute requiredRole={route.role}>
                         <PageTransition transition={route.transition}>
                           <RouteSuspense route={route}>
                             <route.component />
@@ -215,13 +215,13 @@ function App() {
                       key={`/module/M${String(moduleNum).padStart(3, '0')}`}
                       path={`/module/M${String(moduleNum).padStart(3, '0')}`}
                       element={
-                        <ProtectedRoute>
+                        <RoleRoute allowedRoles={['admin']}>
                           <PageTransition transition="fade">
                             <RouteSuspense>
                               <ModulePage />
                             </RouteSuspense>
                           </PageTransition>
-                        </ProtectedRoute>
+                        </RoleRoute>
                       }
                     />
                   )

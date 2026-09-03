@@ -6,6 +6,83 @@ findings: 11
 
 # Security Audit — OWASP Top 10 Focus
 
+## Current-State Addendum (2026-09-02)
+
+The findings below supersede stale locations and conclusions in the historical report that follows. They are based on the current checkout and focus on production-impacting issues requested by this audit.
+
+### A1. [CRITICAL] Public registration permits self-assigned privileged roles
+**Location:** [backend/src/services/dual-use/authService.js](backend/src/services/dual-use/authService.js#L322-L329), [backend/src/services/dual-use/authService.js](backend/src/services/dual-use/authService.js#L388-L401), route [backend/src/services/dual-use/authService.js](backend/src/services/dual-use/authService.js#L1144-L1150)
+
+The public registration route passes the request body to `registerUser`, which persists caller-controlled `userData.role` and `userData.status` in both fallback and PostgreSQL paths, then immediately mints JWTs. Supplying `role: "admin"` and `status: "active"` can create an active administrator; admin permissions include `*`.
+
+**Remediation:** Ignore role/status on public registration and force a least-privileged role. Use a separate authenticated admin-provisioning flow with an allowlist and audit event. Add a regression test for attempted admin registration.
+
+### A2. [HIGH] Unauthenticated Socket.IO room joins expose cross-user/resource events
+**Location:** [backend/src/index.js](backend/src/index.js#L1108-L1124)
+
+The Socket.IO connection has no handshake authentication. `join`, `subscribe:orders`, and `subscribe:shipment` accept arbitrary IDs and call `socket.join` directly, allowing an unauthenticated client to subscribe to another user, order, or shipment room.
+
+**Remediation:** Authenticate the handshake with JWT, derive the user room from the verified subject, and authorize order/shipment membership before joining.
+
+### A3. [HIGH] Detailed health and readiness diagnostics are public
+**Location:** [backend/src/index.js](backend/src/index.js#L1068-L1070), [backend/src/routes/healthRoutes.js](backend/src/routes/healthRoutes.js#L264-L321), [backend/src/routes/healthRoutes.js](backend/src/routes/healthRoutes.js#L340-L365)
+
+`/health` is mounted without auth. Detailed and readiness responses disclose runtime version, platform, architecture, hostname, pool metrics, resource data, environment/version, and database error messages.
+
+**Remediation:** Keep only minimal liveness public. Protect detailed/readiness/check endpoints internally or with authentication and return generic external failure messages.
+
+### A4. [HIGH] Production auth fallback makes refresh tokens non-revocable during DB outages
+**Location:** [backend/src/services/dual-use/authService.js](backend/src/services/dual-use/authService.js#L591-L606), [backend/src/services/dual-use/authService.js](backend/src/services/dual-use/authService.js#L675-L684)
+
+When PostgreSQL is unavailable, refresh validation finds a user and issues new tokens without checking a persisted token record; fallback logout returns success without revoking tokens. A stolen refresh token remains usable until expiry, and a DB outage silently changes security semantics.
+
+**Remediation:** Disable fallback auth in production and fail closed when the authoritative token store is unavailable. Gate fallback explicitly to non-production.
+
+### A5. [HIGH] Contract reads/amendments lack party or tenant authorization
+**Location:** [backend/src/routes/strategic/contractFarmingRoutes.js](backend/src/routes/strategic/contractFarmingRoutes.js#L47-L59), [backend/src/routes/strategic/contractFarmingRoutes.js](backend/src/routes/strategic/contractFarmingRoutes.js#L73-L82)
+
+These endpoints authenticate callers but pass arbitrary contract IDs to `trackCompliance` and `amendContract`. No visible party, tenant, role, or approval check limits access to the contract participants.
+
+**Remediation:** Enforce party/tenant ownership in service queries and require the correct role plus an explicit approval transition for amendments. Add unrelated-user access tests.
+
+### A6. [MEDIUM] Validation is inconsistent and does not prevent mass assignment
+**Location:** [backend/src/index.js](backend/src/index.js#L576-L596), [backend/src/middleware/inputValidation.js](backend/src/middleware/inputValidation.js#L44-L75), [backend/src/middleware/validation.js](backend/src/middleware/validation.js#L58-L91)
+
+The live global middleware only strips a small set of strings. It does not enforce schemas, reject unknown fields, or bound nested structures. Schema validation is not a universal request boundary, enabling issues such as A1.
+
+**Remediation:** Add per-route schemas, reject unknown fields, validate finite numbers/dates, and bound arrays/depth/body size before business logic.
+
+### A7. [MEDIUM] Rate limiting is process-local and proxy trust is not validated
+**Location:** [backend/src/middleware/rateLimiter.js](backend/src/middleware/rateLimiter.js#L8-L29), [backend/src/middleware/rateLimiter.js](backend/src/middleware/rateLimiter.js#L35-L37), [backend/src/index.js](backend/src/index.js#L544-L546)
+
+`RateLimiterMemory` resets per process and multiplies limits across instances. Limits key on `req.ip`, while `TRUST_PROXY_HOPS` is parsed without validating range or deployment topology, weakening abuse controls when misconfigured.
+
+**Remediation:** Use a Redis-backed limiter in production, combine account/device/IP keys for auth and MFA, and validate proxy settings at startup.
+
+### A8. [MEDIUM] Handlers return raw exception messages outside the central error policy
+**Location:** [backend/src/services/dual-use/authService.js](backend/src/services/dual-use/authService.js#L1144-L1218), [backend/src/routes/healthRoutes.js](backend/src/routes/healthRoutes.js#L292-L306), [backend/src/routes/auditRoutes.js](backend/src/routes/auditRoutes.js#L19-L23)
+
+Several local catch blocks serialize `error.message`, bypassing the production-safe centralized handler and potentially exposing provider/database implementation details.
+
+**Remediation:** Route failures through one production-safe handler, expose stable public codes/messages, and retain detailed causes only in server logs.
+
+### Current Metrics
+
+| Metric | Value |
+|---|---:|
+| Current findings | 8 |
+| Critical | 1 |
+| High | 4 |
+| Medium | 3 |
+| Application source files modified | 0 |
+| Method | Static source review and route/middleware cross-reference |
+
+### Current What's left
+- [ ] Remove public role/status mass assignment before production.
+- [ ] Authenticate and authorize Socket.IO subscriptions.
+- [ ] Restrict detailed health/readiness endpoints.
+- [ ] Disable production auth fallback and add object-level authorization tests.
+
 Scope: `backend/` (Express/Node API, 818 JS files across 150 `src/modules/M0xx` domains plus `src/services`, `src/middleware`, `src/routes`), `frontend/`, and the Tauri desktop shell (`tauri.conf.json`). Audit-only — no files were modified. Given the scale of the backend (818 files), this was a targeted review of the shared auth/security infrastructure (`authService.js`, `middleware/auth.js`, `middleware/admin.js`, `middleware/security.js`, `middleware/rateLimiter.js`, `index.js` bootstrap) plus representative sampling of route handlers (`productService.js`, `orderService.js`, `formService.js`) rather than an exhaustive pass over every one of the 150 modules. The patterns found in the sampled files (missing ownership checks, unwired security middleware) should be assumed to recur elsewhere and merit a follow-up sweep before launch.
 
 ## Summary
