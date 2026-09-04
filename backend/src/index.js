@@ -724,6 +724,28 @@ app.use('/api/v1', climateAdvisoryRouterNew);
 app.use('/api/v1', greenhouseRouterNew);
 app.use('/api/v1', horticultureRouterNew);
 app.use('/api/v1', livestockRouterNew);
+// P2 Phase 5: Analytics (5 services)
+const farmAnalyticsRouter = require('./routes/farmAnalytics');
+const marketAnalyticsRouter = require('./routes/marketAnalytics');
+const financialAnalyticsRouter = require('./routes/financialAnalytics');
+const supplyChainAnalyticsRouter = require('./routes/supplyChainAnalytics');
+const predictiveAnalyticsRouterNew = require('./routes/predictiveAnalytics');
+app.use('/api/v1', farmAnalyticsRouter);
+app.use('/api/v1', marketAnalyticsRouter);
+app.use('/api/v1', financialAnalyticsRouter);
+app.use('/api/v1', supplyChainAnalyticsRouter);
+app.use('/api/v1', predictiveAnalyticsRouterNew);
+// P2 Phase 6: Compliance (5 services)
+const qualityAssuranceRouter = require('./routes/qualityAssurance');
+const complianceTrackingRouter = require('./routes/complianceTracking');
+const auditTrailRouter = require('./routes/auditTrail');
+const certificationRouter = require('./routes/certificationManagement');
+const riskAssessmentRouter = require('./routes/riskAssessment');
+app.use('/api/v1', qualityAssuranceRouter);
+app.use('/api/v1', complianceTrackingRouter);
+app.use('/api/v1', auditTrailRouter);
+app.use('/api/v1', certificationRouter);
+app.use('/api/v1', riskAssessmentRouter);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
