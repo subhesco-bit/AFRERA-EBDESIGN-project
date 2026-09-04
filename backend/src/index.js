@@ -678,6 +678,9 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
+// P0 Phase 1: Marketplace Trust Services - Seller Verification
+const sellerVerificationsRouter = require('./routes/sellerVerifications');
+app.use('/api/v1', sellerVerificationsRouter);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
