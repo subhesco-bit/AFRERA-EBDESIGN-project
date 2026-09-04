@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { dashboardAPI } from '../../services/api';
 
 /**
  * DashboardPage Component
@@ -13,28 +14,21 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
-    if (!token || !userData) {
+    if (!userData) {
       navigate('/auth/login');
       return;
     }
 
     setUser(JSON.parse(userData));
-    loadStats(token);
+    loadStats();
   }, [navigate]);
 
-  const loadStats = async (token) => {
+  const loadStats = async () => {
     try {
-      const response = await fetch('/api/v1/dashboard/stats', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to load stats');
-
-      const data = await response.json();
-      setStats(data.data);
+      const response = await dashboardAPI.getStats();
+      setStats(response.data.data);
     } catch (err) {
       setError(err.message);
     } finally {
