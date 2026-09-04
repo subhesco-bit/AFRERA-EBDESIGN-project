@@ -10,7 +10,7 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Star } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import { marketplaceAPI } from '../../services/api';
+import { marketplaceAPI } from '../../services/componentApi';
 
 // FE-02 note: the read-only reviews/stats fetched on mount now accept
 // optional `initialReviews`/`initialStats` props (fallback self-fetch when
@@ -26,7 +26,7 @@ const ProductReview = ({ productId, userId, initialReviews, initialStats }) => {
   const [userReview, setUserReview] = useState({
     rating: 5,
     title: '',
-    comment: ''
+    comment: '',
   });
   const [hasReviewed, setHasReviewed] = useState(false);
 
@@ -69,7 +69,7 @@ const ProductReview = ({ productId, userId, initialReviews, initialStats }) => {
     try {
       const response = await marketplaceAPI.submitReview({
         productId,
-        ...userReview
+        ...userReview,
       });
       if (response.data.success) {
         setUserReview({ rating: 5, title: '', comment: '' });

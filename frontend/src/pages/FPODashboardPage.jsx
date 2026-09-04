@@ -1,12 +1,12 @@
-import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Users, DollarSign, BarChart3, PieChart, Activity, Building2, ShoppingCart } from 'lucide-react'
-import { fpoAPI } from '../services/api'
-import AIInsightsPanel from '../components/ui/AIInsightsPanel'
-import { aiDecisionService } from '../services/aiDecisionService'
+import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Users, DollarSign, BarChart3, PieChart, Activity, Building2, ShoppingCart } from 'lucide-react';
+import { fpoAPI } from '../services/api';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 function FPODashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   const aiInsights = useMemo(
     () => [
@@ -22,7 +22,7 @@ function FPODashboardPage() {
         severity: 'info',
         metadata: { source: 'fallback', module: 'fpo' },
         context: { members: 450, savings: '12-15%' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: 'fpo-inventory-shift',
@@ -36,21 +36,21 @@ function FPODashboardPage() {
         severity: 'warning',
         metadata: { source: 'fallback', module: 'inventory' },
         context: { warehouse: 'central', adjustment: 'rebalance' },
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     ],
-    []
-  )
+    [],
+  );
 
   const handleApplyRecommendation = (insight) => {
-    alert(`Applied recommendation: ${insight.title}`)
-  }
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: fpoStats } = useQuery({
     queryKey: ['fpo-stats'],
     queryFn: () => fpoAPI.getStats().then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -67,15 +67,15 @@ function FPODashboardPage() {
           { id: 'collective', label: 'Collective Orders', icon: ShoppingCart },
           { id: 'inventory', label: 'Inventory', icon: Building2 },
           { id: 'finance', label: 'Finance', icon: DollarSign },
-          { id: 'distribution', label: 'Profit Distribution', icon: PieChart }
+          { id: 'distribution', label: 'Profit Distribution', icon: PieChart },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-amber-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-amber-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -147,7 +147,7 @@ function FPODashboardPage() {
               {[
                 { name: 'Bornali Gogoi', contribution: 150000, share: 12, status: 'active' },
                 { name: 'Rimon Lyngdoh', contribution: 120000, share: 10, status: 'active' },
-                { name: 'Ramcharan Naga', contribution: 100000, share: 8, status: 'active' }
+                { name: 'Ramcharan Naga', contribution: 100000, share: 8, status: 'active' },
               ].map((member) => (
                 <div key={member.name} className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
@@ -213,7 +213,7 @@ function FPODashboardPage() {
             {[
               { id: 'ORD-001', product: 'Joha Rice', volume: 5000, unit: 'kg', buyers: 45, savings: 45000, status: 'negotiating' },
               { id: 'ORD-002', product: 'Karbi Anglong Ginger', volume: 2000, unit: 'kg', buyers: 32, savings: 32000, status: 'confirmed' },
-              { id: 'ORD-003', product: 'Khasi Mandarin', volume: 3000, unit: 'kg', buyers: 28, savings: 28000, status: 'completed' }
+              { id: 'ORD-003', product: 'Khasi Mandarin', volume: 3000, unit: 'kg', buyers: 28, savings: 28000, status: 'completed' },
             ].map((order) => (
               <div key={order.id} className="border rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
@@ -223,8 +223,8 @@ function FPODashboardPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                    order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      order.status === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                        'bg-yellow-100 text-yellow-800'
                   }`}>
                     {order.status}
                   </span>
@@ -247,7 +247,7 @@ function FPODashboardPage() {
             {[
               { product: 'Joha Rice', quantity: 25000, unit: 'kg', quality: 'Grade A', location: 'Central Warehouse' },
               { product: 'Karbi Anglong Ginger', quantity: 8000, unit: 'kg', quality: 'Grade A', location: 'Cold Storage' },
-              { product: 'Khasi Mandarin', quantity: 15000, unit: 'kg', quality: 'Grade A', location: 'Packhouse' }
+              { product: 'Khasi Mandarin', quantity: 15000, unit: 'kg', quality: 'Grade A', location: 'Packhouse' },
             ].map((item) => (
               <div key={item.product} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
@@ -315,7 +315,7 @@ function FPODashboardPage() {
             {[
               { member: 'Bornali Gogoi', share: 12, profit: 280000, status: 'pending' },
               { member: 'Rimon Lyngdoh', share: 10, profit: 233000, status: 'pending' },
-              { member: 'Ramcharan Naga', share: 8, profit: 186000, status: 'distributed' }
+              { member: 'Ramcharan Naga', share: 8, profit: 186000, status: 'distributed' },
             ].map((dist) => (
               <div key={dist.member} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
@@ -329,7 +329,7 @@ function FPODashboardPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     dist.status === 'distributed' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {dist.status}
                   </span>
@@ -340,7 +340,7 @@ function FPODashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default FPODashboardPage
+export default FPODashboardPage;

@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Route Loading States
- * 
+ *
  * Production-ready loading states for routes with:
  * - Skeleton screens
  * - Progress indicators
@@ -10,10 +10,10 @@
  * - Accessibility support
  */
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react';
 
-import { useLocation } from 'react-router-dom'
-import { LoadingSpinner, PageSkeleton, CardSkeleton } from './ui/Skeleton'
+import { useLocation } from 'react-router-dom';
+import { LoadingSpinner, PageSkeleton, CardSkeleton } from './ui/Skeleton';
 
 /**
  * Default Route Loading Component
@@ -26,7 +26,7 @@ export function RouteLoadingFallback() {
         <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -38,7 +38,7 @@ export function PageLoadingFallback({ route }) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
       <PageSkeleton />
     </div>
-  )
+  );
 }
 
 /**
@@ -54,7 +54,7 @@ export function CardLoadingFallback({ count = 3 }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -62,34 +62,34 @@ export function CardLoadingFallback({ count = 3 }) {
  * Selects appropriate loading UI based on route type
  */
 export function SmartRouteLoading({ route }) {
-  const location = useLocation()
+  const location = useLocation();
 
   // Determine loading type based on route
   const getLoadingType = () => {
     if (route?.path?.startsWith('/marketplace')) {
-      return 'card'
+      return 'card';
     }
     if (route?.path?.startsWith('/products/')) {
-      return 'page'
+      return 'page';
     }
     if (route?.path?.startsWith('/dashboard')) {
-      return 'page'
+      return 'page';
     }
     if (route?.path?.startsWith('/farmer-')) {
-      return 'page'
+      return 'page';
     }
-    return 'default'
-  }
+    return 'default';
+  };
 
-  const loadingType = getLoadingType()
+  const loadingType = getLoadingType();
 
   switch (loadingType) {
     case 'card':
-      return <CardLoadingFallback count={6} />
+      return <CardLoadingFallback count={6} />;
     case 'page':
-      return <PageLoadingFallback route={route} />
+      return <PageLoadingFallback route={route} />;
     default:
-      return <RouteLoadingFallback />
+      return <RouteLoadingFallback />;
   }
 }
 
@@ -98,13 +98,13 @@ export function SmartRouteLoading({ route }) {
  * Wraps routes with Suspense and custom loading fallback
  */
 export function RouteSuspense({ children, fallback, route }) {
-  const loadingFallback = fallback || <SmartRouteLoading route={route} />
+  const loadingFallback = fallback || <SmartRouteLoading route={route} />;
 
   return (
     <Suspense fallback={loadingFallback}>
       {children}
     </Suspense>
-  )
+  );
 }
 
 /**
@@ -112,21 +112,21 @@ export function RouteSuspense({ children, fallback, route }) {
  * Shows incremental loading states
  */
 export function ProgressiveLoading({ steps = ['Loading', 'Preparing', 'Almost there'] }) {
-  const [currentStep, setCurrentStep] = useState(0)
+  const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentStep((prev) => {
         if (prev < steps.length - 1) {
-          return prev + 1
+          return prev + 1;
         }
-        clearInterval(interval)
-        return prev
-      })
-    }, 800)
+        clearInterval(interval);
+        return prev;
+      });
+    }, 800);
 
-    return () => clearInterval(interval)
-  }, [steps])
+    return () => clearInterval(interval);
+  }, [steps]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -147,7 +147,7 @@ export function ProgressiveLoading({ steps = ['Loading', 'Preparing', 'Almost th
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -163,13 +163,13 @@ export function RoutePreloader({ preloadRoutes = [] }) {
           // Trigger lazy import
           import(`../pages/${route}.jsx`).catch(() => {
             // Ignore preload errors
-          })
-        })
-      })
+          });
+        });
+      });
     }
-  }, [preloadRoutes])
+  }, [preloadRoutes]);
 
-  return null
+  return null;
 }
 
 /**
@@ -184,7 +184,7 @@ export function LoadingOverlay({ message = 'Loading...' }) {
         <p className="mt-4 text-gray-600 dark:text-gray-400">{message}</p>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -201,5 +201,5 @@ export function InlineLoading({ size = 'md', message }) {
         )}
       </div>
     </div>
-  )
+  );
 }

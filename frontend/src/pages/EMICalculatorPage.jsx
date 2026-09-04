@@ -1,38 +1,38 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Calculator, DollarSign, Calendar, Info } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Calculator, DollarSign, Calendar, Info } from 'lucide-react';
 
 const EMICalculatorPage = () => {
   const [loanDetails, setLoanDetails] = useState({
     amount: 100000,
     interestRate: 8.5,
-    tenure: 12
-  })
-  const [emi, setEMI] = useState(0)
+    tenure: 12,
+  });
+  const [emi, setEMI] = useState(0);
 
   const calculateEMI = () => {
-    const { amount, interestRate, tenure } = loanDetails
-    const monthlyRate = interestRate / 12 / 100
-    const months = tenure * 12
-    
-    const emi = (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) / 
-                (Math.pow(1 + monthlyRate, months) - 1)
-    
-    setEMI(Math.round(emi))
-  }
+    const { amount, interestRate, tenure } = loanDetails;
+    const monthlyRate = interestRate / 12 / 100;
+    const months = tenure * 12;
+
+    const emi = (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+                (Math.pow(1 + monthlyRate, months) - 1);
+
+    setEMI(Math.round(emi));
+  };
 
   const handleInputChange = (field, value) => {
-    setLoanDetails(prev => ({ ...prev, [field]: value }))
-  }
+    setLoanDetails(prev => ({ ...prev, [field]: value }));
+  };
 
   React.useEffect(() => {
-    calculateEMI()
-  }, [loanDetails])
+    calculateEMI();
+  }, [loanDetails]);
 
-  const totalPayment = emi * loanDetails.tenure * 12
-  const totalInterest = totalPayment - loanDetails.amount
+  const totalPayment = emi * loanDetails.tenure * 12;
+  const totalInterest = totalPayment - loanDetails.amount;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -116,7 +116,7 @@ const EMICalculatorPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EMICalculatorPage
+export default EMICalculatorPage;

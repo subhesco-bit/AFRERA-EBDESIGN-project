@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { 
-  FileText, 
-  Download, 
-  Calendar, 
-  Filter, 
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import {
+  FileText,
+  Download,
+  Calendar,
+  Filter,
   TrendingUp,
   Users,
   DollarSign,
   Package,
-  BarChart3
-} from 'lucide-react'
+  BarChart3,
+} from 'lucide-react';
 
 const ReportsDashboardPage = () => {
-  const [selectedReport, setSelectedReport] = useState(null)
-  const [dateRange, setDateRange] = useState({ start: '', end: '' })
-  const [loading, setLoading] = useState(false)
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [loading, setLoading] = useState(false);
 
   const reportCategories = [
     {
@@ -28,8 +28,8 @@ const ReportsDashboardPage = () => {
         { id: 'daily-sales', name: 'Daily Sales Report', description: 'Daily sales performance metrics' },
         { id: 'weekly-sales', name: 'Weekly Sales Report', description: 'Weekly sales trends and analysis' },
         { id: 'monthly-sales', name: 'Monthly Sales Report', description: 'Monthly sales comprehensive report' },
-        { id: 'quarterly-sales', name: 'Quarterly Sales Report', description: 'Quarterly sales performance review' }
-      ]
+        { id: 'quarterly-sales', name: 'Quarterly Sales Report', description: 'Quarterly sales performance review' },
+      ],
     },
     {
       id: 'inventory',
@@ -39,8 +39,8 @@ const ReportsDashboardPage = () => {
         { id: 'stock-level', name: 'Stock Level Report', description: 'Current inventory status' },
         { id: 'stock-movement', name: 'Stock Movement Report', description: 'Inventory flow analysis' },
         { id: 'low-stock', name: 'Low Stock Alert', description: 'Items below minimum threshold' },
-        { id: 'valuation', name: 'Inventory Valuation', description: 'Total inventory value' }
-      ]
+        { id: 'valuation', name: 'Inventory Valuation', description: 'Total inventory value' },
+      ],
     },
     {
       id: 'farmer',
@@ -50,8 +50,8 @@ const ReportsDashboardPage = () => {
         { id: 'farmer-performance', name: 'Farmer Performance', description: 'Individual farmer metrics' },
         { id: 'fpo-summary', name: 'FPO Summary', description: 'FPO collective performance' },
         { id: 'crop-yield', name: 'Crop Yield Analysis', description: 'Yield statistics by crop' },
-        { id: 'quality-report', name: 'Quality Report', description: 'Product quality metrics' }
-      ]
+        { id: 'quality-report', name: 'Quality Report', description: 'Product quality metrics' },
+      ],
     },
     {
       id: 'financial',
@@ -61,8 +61,8 @@ const ReportsDashboardPage = () => {
         { id: 'revenue', name: 'Revenue Report', description: 'Revenue breakdown and analysis' },
         { id: 'expense', name: 'Expense Report', description: 'Operating expenses detail' },
         { id: 'profit-loss', name: 'Profit & Loss', description: 'P&L statement' },
-        { id: 'cash-flow', name: 'Cash Flow', description: 'Cash flow analysis' }
-      ]
+        { id: 'cash-flow', name: 'Cash Flow', description: 'Cash flow analysis' },
+      ],
     },
     {
       id: 'operations',
@@ -72,24 +72,24 @@ const ReportsDashboardPage = () => {
         { id: 'logistics', name: 'Logistics Report', description: 'Supply chain performance' },
         { id: 'warehouse', name: 'Warehouse Report', description: 'Storage and operations' },
         { id: 'delivery', name: 'Delivery Report', description: 'Delivery performance metrics' },
-        { id: 'returns', name: 'Returns Report', description: 'Product returns analysis' }
-      ]
-    }
-  ]
+        { id: 'returns', name: 'Returns Report', description: 'Product returns analysis' },
+      ],
+    },
+  ];
 
   const handleGenerateReport = (reportId) => {
-    setLoading(true)
+    setLoading(true);
     // Simulate report generation
     setTimeout(() => {
-      setLoading(false)
-      setSelectedReport(reportId)
-    }, 1500)
-  }
+      setLoading(false);
+      setSelectedReport(reportId);
+    }, 1500);
+  };
 
   const handleDownload = (format) => {
     // Simulate download
-    console.log(`Downloading report in ${format} format`)
-  }
+    console.log(`Downloading report in ${format} format`);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -180,7 +180,7 @@ const ReportsDashboardPage = () => {
         </Card>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ReportsDashboardPage
+export default ReportsDashboardPage;

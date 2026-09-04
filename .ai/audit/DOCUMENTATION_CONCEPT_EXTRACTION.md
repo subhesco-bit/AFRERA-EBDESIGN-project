@@ -1,6 +1,6 @@
 # DOCUMENTATION CONCEPT EXTRACTION
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Audit Date:** 1 September 2026  
 **Purpose:** Extract all concepts from documentation volumes
 
@@ -339,3 +339,4 @@ Volumes 3-8, 10, 12, 14, 15 contain additional concepts for:
 ---
 
 *This is an ongoing extraction process. More concepts will be added as documentation analysis continues.*
+

@@ -1,5 +1,18 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight, Leaf, Truck, Shield, TrendingUp, Users, Award, Sprout, ShoppingBag, Landmark, Building2, Wheat } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Leaf, Truck, Shield, TrendingUp, Users, Award, Sprout, ShoppingBag, Landmark, Building2, Wheat } from 'lucide-react';
+import { productsAPI } from '../services/api';
+
+const CATEGORY_ICONS = {
+  'Grains & Millets': '🌾',
+  Spices: '🌶️',
+  Fruits: '🍊',
+  Vegetables: '🥬',
+  'Tea & Beverages': '🍵',
+  Honey: '🍯',
+  'Bamboo Foods': '🎋',
+  Mushrooms: '🍄',
+};
 
 const doors = [
   { icon: Sprout, label: 'Farmer', to: '/farmer-entrance', blurb: 'Sell produce, plan harvests' },
@@ -8,9 +21,28 @@ const doors = [
   { icon: Landmark, label: 'Bank', to: '/banker-dashboard', blurb: 'Farmer credit & repayment data' },
   { icon: Wheat, label: 'Government', to: '/government-dashboard', blurb: 'Scheme & subsidy tracking' },
   { icon: Truck, label: 'Logistics partner', to: '/logistics-provider', blurb: 'Coordinate pickup & cold chain' },
-]
+];
 
 function HomePage() {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    productsAPI
+      .getCategories()
+      .then((res) => {
+        if (cancelled) return;
+        const rows = Array.isArray(res.data) ? res.data : res.data?.categories || [];
+        setCategories(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setCategories([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="font-body">
       {/* Hero Section — NE Harvest design system (afrera_platform_v42.html) */}
@@ -173,24 +205,19 @@ function HomePage() {
             Explore Categories
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { name: 'Grains & Millets', icon: '🌾', count: 120 },
-              { name: 'Spices', icon: '🌶️', count: 85 },
-              { name: 'Fruits', icon: '🍊', count: 65 },
-              { name: 'Vegetables', icon: '🥬', count: 95 },
-              { name: 'Tea & Beverages', icon: '🍵', count: 45 },
-              { name: 'Honey', icon: '🍯', count: 30 },
-              { name: 'Bamboo Foods', icon: '🎋', count: 25 },
-              { name: 'Mushrooms', icon: '🍄', count: 20 },
-            ].map((category) => (
+            {(categories.length > 0 ? categories : Object.keys(CATEGORY_ICONS).map((name) => ({ name }))).map((category) => (
               <Link
-                key={category.name}
-                to="/marketplace"
+                key={category.id || category.name}
+                to={`/marketplace${category.id ? `?category=${category.id}` : ''}`}
                 className="bg-v42-paddy border border-v42-line rounded-lg p-6 text-center hover:shadow-lg hover:border-v42-turmeric transition cursor-pointer"
               >
-                <div className="text-4xl mb-3">{category.icon}</div>
+                <div className="text-4xl mb-3">{CATEGORY_ICONS[category.name] || '🌱'}</div>
                 <h3 className="font-display font-semibold text-v42-ink">{category.name}</h3>
-                <p className="text-sm text-v42-mut mt-1">{category.count} products</p>
+                <p className="text-sm text-v42-mut mt-1">
+                  {typeof category.product_count !== 'undefined'
+                    ? `${category.product_count} products`
+                    : 'Browse'}
+                </p>
               </Link>
             ))}
           </div>
@@ -257,7 +284,7 @@ function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { knowledgeGraphAPI } from '../../services/api';
+import { knowledgeGraphAPI } from '../../services/componentApi';
 
 /**
  * Knowledge Explorer Component
@@ -29,7 +29,7 @@ const KnowledgeExplorer = ({ initialNodeId = null }) => {
     try {
       // In a real implementation, this would fetch node details
       setSelectedNode({ id: nodeId, name: 'Sample Node', type: 'product' });
-      
+
       // Fetch related nodes
       const response = await knowledgeGraphAPI.getRelatedNodes(nodeId);
       setRelatedNodes(response.data);
@@ -62,7 +62,7 @@ const KnowledgeExplorer = ({ initialNodeId = null }) => {
       location: 'bg-purple-500',
       nutrient: 'bg-orange-500',
       disease: 'bg-red-500',
-      practice: 'bg-teal-500'
+      practice: 'bg-teal-500',
     };
     return colors[nodeType] || 'bg-gray-500';
   };

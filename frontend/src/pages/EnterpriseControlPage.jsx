@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Workflow, Briefcase, Scale, ShieldAlert, Siren, CheckCircle2, XCircle } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { enterpriseControlAPI } from '../services/api'
-import { Section, AsyncState, DataTable } from '../components/common/DataPrimitives'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Workflow, Briefcase, Scale, ShieldAlert, Siren, CheckCircle2, XCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { enterpriseControlAPI } from '../services/api';
+import { Section, AsyncState, DataTable } from '../components/common/DataPrimitives';
 
 /**
  * Enterprise Control Layer (migration 993) — backend/src/services/enterpriseControlService.js,
@@ -38,15 +38,15 @@ import { Section, AsyncState, DataTable } from '../components/common/DataPrimiti
  */
 
 const SEVERITY_STYLE = {
-  critical: { text: '#cf222e', bg: '#ffebe9', border: '#cf222e' },
-  high: { text: '#bc4c00', bg: '#fff1e5', border: '#bc4c00' },
-  medium: { text: '#9a6700', bg: '#fff8c5', border: '#9a6700' },
-  low: { text: '#1a7f37', bg: '#e6f4ea', border: '#1a7f37' },
-}
+  critical: { text: 'hsl(var(--sev-emergency))', bg: 'color-mix(in srgb, hsl(var(--sev-emergency)) 12%, transparent)', border: 'hsl(var(--sev-emergency))' },
+  high: { text: 'hsl(var(--sev-critical))', bg: 'color-mix(in srgb, hsl(var(--sev-critical)) 12%, transparent)', border: 'hsl(var(--sev-critical))' },
+  medium: { text: 'hsl(var(--sev-warning))', bg: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)', border: 'hsl(var(--sev-warning))' },
+  low: { text: 'hsl(var(--data-real))', bg: 'color-mix(in srgb, hsl(var(--data-real)) 12%, transparent)', border: 'hsl(var(--data-real))' },
+};
 
 /** Severity badge — colour reinforces, the printed word carries the meaning. */
 function SeverityBadge({ severity }) {
-  const s = SEVERITY_STYLE[severity] || { text: '#57606a', bg: '#f6f8fa', border: '#57606a' }
+  const s = SEVERITY_STYLE[severity] || { text: 'hsl(var(--data-assumed))', bg: 'hsl(var(--muted))', border: 'hsl(var(--data-assumed))' };
   return (
     <span
       style={{
@@ -57,36 +57,36 @@ function SeverityBadge({ severity }) {
     >
       {severity || 'unknown'}
     </span>
-  )
+  );
 }
 
 function SlaBadge({ status }) {
   const map = {
-    breached: { text: '#cf222e', bg: '#ffebe9', label: 'SLA breached' },
-    within_sla: { text: '#1a7f37', bg: '#e6f4ea', label: 'within SLA' },
-    no_sla: { text: '#57606a', bg: '#f6f8fa', label: 'no SLA' },
-  }
-  const s = map[status] || map.no_sla
+    breached: { text: 'hsl(var(--destructive))', bg: 'color-mix(in srgb, hsl(var(--destructive)) 12%, transparent)', label: 'SLA breached' },
+    within_sla: { text: 'hsl(var(--data-real))', bg: 'color-mix(in srgb, hsl(var(--data-real)) 12%, transparent)', label: 'within SLA' },
+    no_sla: { text: 'hsl(var(--data-assumed))', bg: 'hsl(var(--muted))', label: 'no SLA' },
+  };
+  const s = map[status] || map.no_sla;
   return (
     <span style={{ color: s.text, background: s.bg, borderRadius: 4, padding: '1px 8px', fontSize: 11, fontWeight: 600 }}>
       {s.label}
     </span>
-  )
+  );
 }
 
 function FlagBadge({ on, label, offLabel }) {
   return (
     <span style={{
-      color: on ? '#cf222e' : '#57606a', background: on ? '#ffebe9' : 'transparent',
+      color: on ? 'hsl(var(--destructive))' : 'hsl(var(--data-assumed))', background: on ? 'color-mix(in srgb, hsl(var(--destructive)) 12%, transparent)' : 'transparent',
       borderRadius: 4, padding: on ? '1px 8px' : 0, fontSize: 11, fontWeight: on ? 700 : 400,
     }}>
       {on ? label : (offLabel || '—')}
     </span>
-  )
+  );
 }
 
 function inputClass() {
-  return 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 text-sm'
+  return 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 text-sm';
 }
 
 const TABS = [
@@ -95,10 +95,10 @@ const TABS = [
   { id: 'legal', label: 'Legal', icon: Scale },
   { id: 'risk', label: 'Risk Register', icon: ShieldAlert },
   { id: 'emergency', label: 'Emergency', icon: Siren },
-]
+];
 
 export default function EnterpriseControlPage() {
-  const [activeTab, setActiveTab] = useState('workflow')
+  const [activeTab, setActiveTab] = useState('workflow');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -135,7 +135,7 @@ export default function EnterpriseControlPage() {
       {activeTab === 'risk' && <RiskTab />}
       {activeTab === 'emergency' && <EmergencyTab />}
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -143,41 +143,41 @@ export default function EnterpriseControlPage() {
 /* ------------------------------------------------------------------ */
 
 function WorkflowTab() {
-  const queryClient = useQueryClient()
-  const [roleFilter, setRoleFilter] = useState('')
-  const [startForm, setStartForm] = useState({ workflowCode: '', entityType: '', entityId: '', amount: '' })
-  const [rejectingCode, setRejectingCode] = useState(null)
-  const [rejectComment, setRejectComment] = useState('')
+  const queryClient = useQueryClient();
+  const [roleFilter, setRoleFilter] = useState('');
+  const [startForm, setStartForm] = useState({ workflowCode: '', entityType: '', entityId: '', amount: '' });
+  const [rejectingCode, setRejectingCode] = useState(null);
+  const [rejectComment, setRejectComment] = useState('');
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['control-pending-approvals', roleFilter],
     queryFn: () => enterpriseControlAPI
       .pendingApprovals(roleFilter ? { role: roleFilter } : {})
       .then((r) => r.data?.data ?? []),
-  })
+  });
 
   const startMutation = useMutation({
     mutationFn: (body) => enterpriseControlAPI.startWorkflow(body),
     onSuccess: () => {
-      toast.success('Workflow instance started')
-      queryClient.invalidateQueries({ queryKey: ['control-pending-approvals'] })
-      setStartForm({ workflowCode: '', entityType: '', entityId: '', amount: '' })
+      toast.success('Workflow instance started');
+      queryClient.invalidateQueries({ queryKey: ['control-pending-approvals'] });
+      setStartForm({ workflowCode: '', entityType: '', entityId: '', amount: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to start workflow'),
-  })
+  });
 
   const actMutation = useMutation({
     mutationFn: ({ instanceCode, body }) => enterpriseControlAPI.actOnWorkflow(instanceCode, body),
     onSuccess: (_res, vars) => {
-      toast.success(vars.body.action === 'approved' ? 'Approved' : 'Recorded')
-      queryClient.invalidateQueries({ queryKey: ['control-pending-approvals'] })
-      setRejectingCode(null)
-      setRejectComment('')
+      toast.success(vars.body.action === 'approved' ? 'Approved' : 'Recorded');
+      queryClient.invalidateQueries({ queryKey: ['control-pending-approvals'] });
+      setRejectingCode(null);
+      setRejectComment('');
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record action'),
-  })
+  });
 
-  const rows = data || []
+  const rows = data || [];
 
   return (
     <div className="space-y-6">
@@ -221,14 +221,14 @@ function WorkflowTab() {
                       />
                       <button
                         onClick={() => {
-                          if (!rejectComment.trim()) { toast.error('A rejection must carry a reason'); return }
-                          actMutation.mutate({ instanceCode: r.instance_code, body: { action: 'rejected', comment: rejectComment } })
+                          if (!rejectComment.trim()) { toast.error('A rejection must carry a reason'); return; }
+                          actMutation.mutate({ instanceCode: r.instance_code, body: { action: 'rejected', comment: rejectComment } });
                         }}
                         className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
                       >
                         Confirm reject
                       </button>
-                      <button onClick={() => { setRejectingCode(null); setRejectComment('') }} className="px-2 py-1 text-xs text-gray-600 hover:underline">
+                      <button onClick={() => { setRejectingCode(null); setRejectComment(''); }} className="px-2 py-1 text-xs text-gray-600 hover:underline">
                         Cancel
                       </button>
                     </div>
@@ -260,17 +260,17 @@ function WorkflowTab() {
       <Section title="Start a workflow instance" description="Enters at the first step whose amount threshold the value clears.">
         <form
           onSubmit={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             if (!startForm.workflowCode || !startForm.entityType || !startForm.entityId) {
-              toast.error('Workflow code, entity type and entity ID are required')
-              return
+              toast.error('Workflow code, entity type and entity ID are required');
+              return;
             }
             startMutation.mutate({
               workflowCode: startForm.workflowCode,
               entityType: startForm.entityType,
               entityId: startForm.entityId,
               amount: startForm.amount === '' ? undefined : Number(startForm.amount),
-            })
+            });
           }}
           className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white rounded-lg shadow p-4"
         >
@@ -289,7 +289,7 @@ function WorkflowTab() {
         </form>
       </Section>
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -297,50 +297,50 @@ function WorkflowTab() {
 /* ------------------------------------------------------------------ */
 
 function CrmClientsTab() {
-  const queryClient = useQueryClient()
-  const [leadForm, setLeadForm] = useState({ source: '', organisationName: '', contactName: '', email: '', phone: '', segment: '', estimatedValue: '' })
-  const [convertForm, setConvertForm] = useState({ leadCode: '', name: '', amount: '', probabilityPct: '', expectedCloseDate: '', createClient: false })
-  const [clientIdInput, setClientIdInput] = useState('')
-  const [clientHealth, setClientHealth] = useState(null)
-  const [healthLoading, setHealthLoading] = useState(false)
-  const [healthError, setHealthError] = useState(null)
+  const queryClient = useQueryClient();
+  const [leadForm, setLeadForm] = useState({ source: '', organisationName: '', contactName: '', email: '', phone: '', segment: '', estimatedValue: '' });
+  const [convertForm, setConvertForm] = useState({ leadCode: '', name: '', amount: '', probabilityPct: '', expectedCloseDate: '', createClient: false });
+  const [clientIdInput, setClientIdInput] = useState('');
+  const [clientHealth, setClientHealth] = useState(null);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [healthError, setHealthError] = useState(null);
 
   const { data: pipeline, isLoading: pipelineLoading, error: pipelineError } = useQuery({
     queryKey: ['control-pipeline'],
     queryFn: () => enterpriseControlAPI.pipeline().then((r) => r.data?.data),
-  })
+  });
 
   const leadMutation = useMutation({
     mutationFn: (body) => enterpriseControlAPI.createLead(body),
     onSuccess: (res) => {
-      toast.success(`Lead ${res.data?.data?.lead_code || ''} created`)
-      setLeadForm({ source: '', organisationName: '', contactName: '', email: '', phone: '', segment: '', estimatedValue: '' })
+      toast.success(`Lead ${res.data?.data?.lead_code || ''} created`);
+      setLeadForm({ source: '', organisationName: '', contactName: '', email: '', phone: '', segment: '', estimatedValue: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to create lead'),
-  })
+  });
 
   const convertMutation = useMutation({
     mutationFn: ({ leadCode, body }) => enterpriseControlAPI.convertLead(leadCode, body),
     onSuccess: () => {
-      toast.success('Lead converted')
-      queryClient.invalidateQueries({ queryKey: ['control-pipeline'] })
-      setConvertForm({ leadCode: '', name: '', amount: '', probabilityPct: '', expectedCloseDate: '', createClient: false })
+      toast.success('Lead converted');
+      queryClient.invalidateQueries({ queryKey: ['control-pipeline'] });
+      setConvertForm({ leadCode: '', name: '', amount: '', probabilityPct: '', expectedCloseDate: '', createClient: false });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to convert lead'),
-  })
+  });
 
   const lookupHealth = async () => {
-    if (!clientIdInput) { toast.error('Enter a client ID'); return }
-    setHealthLoading(true); setHealthError(null); setClientHealth(null)
+    if (!clientIdInput) { toast.error('Enter a client ID'); return; }
+    setHealthLoading(true); setHealthError(null); setClientHealth(null);
     try {
-      const res = await enterpriseControlAPI.clientHealth(clientIdInput)
-      setClientHealth(res.data?.data)
+      const res = await enterpriseControlAPI.clientHealth(clientIdInput);
+      setClientHealth(res.data?.data);
     } catch (e) {
-      setHealthError(e.response?.data?.error || e.message)
+      setHealthError(e.response?.data?.error || e.message);
     } finally {
-      setHealthLoading(false)
+      setHealthLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -375,11 +375,11 @@ function CrmClientsTab() {
       <Section title="New lead">
         <form
           onSubmit={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             leadMutation.mutate({
               ...leadForm,
               estimatedValue: leadForm.estimatedValue === '' ? undefined : Number(leadForm.estimatedValue),
-            })
+            });
           }}
           className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white rounded-lg shadow p-4"
         >
@@ -400,9 +400,9 @@ function CrmClientsTab() {
       <Section title="Convert a qualified lead" description="Runs in a transaction — a lead marked converted always has an opportunity to show for it.">
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            if (!convertForm.leadCode) { toast.error('Lead code is required'); return }
-            const { leadCode, ...rest } = convertForm
+            e.preventDefault();
+            if (!convertForm.leadCode) { toast.error('Lead code is required'); return; }
+            const { leadCode, ...rest } = convertForm;
             convertMutation.mutate({
               leadCode,
               body: {
@@ -410,7 +410,7 @@ function CrmClientsTab() {
                 amount: rest.amount === '' ? undefined : Number(rest.amount),
                 probabilityPct: rest.probabilityPct === '' ? undefined : Number(rest.probabilityPct),
               },
-            })
+            });
           }}
           className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white rounded-lg shadow p-4"
         >
@@ -461,7 +461,7 @@ function CrmClientsTab() {
         </AsyncState>
       </Section>
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -469,14 +469,14 @@ function CrmClientsTab() {
 /* ------------------------------------------------------------------ */
 
 function LegalTab() {
-  const [withinDays, setWithinDays] = useState(60)
+  const [withinDays, setWithinDays] = useState(60);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['control-legal-calendar', withinDays],
     queryFn: () => enterpriseControlAPI.legalCalendar({ days: withinDays }).then((r) => r.data?.data ?? []),
-  })
+  });
 
-  const rows = data || []
+  const rows = data || [];
 
   return (
     <Section title="Legal calendar" description="Hearings and obligations due within the selected window (admin only). Read-only — no create route exists for legal matters or obligations on the backend.">
@@ -504,7 +504,7 @@ function LegalTab() {
         />
       </AsyncState>
     </Section>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -512,25 +512,25 @@ function LegalTab() {
 /* ------------------------------------------------------------------ */
 
 function RiskTab() {
-  const queryClient = useQueryClient()
-  const [assessForm, setAssessForm] = useState({ riskCode: '', residualLikelihood: '', residualImpact: '' })
+  const queryClient = useQueryClient();
+  const [assessForm, setAssessForm] = useState({ riskCode: '', residualLikelihood: '', residualImpact: '' });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['control-risk-heatmap'],
     queryFn: () => enterpriseControlAPI.riskHeatmap().then((r) => r.data?.data ?? []),
-  })
+  });
 
   const assessMutation = useMutation({
     mutationFn: ({ riskCode, body }) => enterpriseControlAPI.assessRisk(riskCode, body),
     onSuccess: () => {
-      toast.success('Risk assessment recorded')
-      queryClient.invalidateQueries({ queryKey: ['control-risk-heatmap'] })
-      setAssessForm({ riskCode: '', residualLikelihood: '', residualImpact: '' })
+      toast.success('Risk assessment recorded');
+      queryClient.invalidateQueries({ queryKey: ['control-risk-heatmap'] });
+      setAssessForm({ riskCode: '', residualLikelihood: '', residualImpact: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record assessment'),
-  })
+  });
 
-  const rows = data || []
+  const rows = data || [];
 
   return (
     <div className="space-y-6">
@@ -541,7 +541,7 @@ function RiskTab() {
             caption="Risk heatmap by category"
             columns={[
               { key: 'category', label: 'Category' },
-              { key: 'critical', label: 'Critical', numeric: true, render: (r) => <span style={{ color: r.critical > 0 ? '#cf222e' : undefined, fontWeight: r.critical > 0 ? 700 : 400 }}>{r.critical}</span> },
+              { key: 'critical', label: 'Critical', numeric: true, render: (r) => <span style={{ color: r.critical > 0 ? 'hsl(var(--destructive))' : undefined, fontWeight: r.critical > 0 ? 700 : 400 }}>{r.critical}</span> },
               { key: 'high', label: 'High', numeric: true },
               { key: 'medium', label: 'Medium', numeric: true },
               { key: 'low', label: 'Low', numeric: true },
@@ -557,10 +557,10 @@ function RiskTab() {
       <Section title="Assess a risk" description="Records the residual likelihood/impact (1-5 each) after controls. Admin only on the backend; the risk must already exist in the register.">
         <form
           onSubmit={(e) => {
-            e.preventDefault()
+            e.preventDefault();
             if (!assessForm.riskCode || !assessForm.residualLikelihood || !assessForm.residualImpact) {
-              toast.error('Risk code, likelihood and impact are all required')
-              return
+              toast.error('Risk code, likelihood and impact are all required');
+              return;
             }
             assessMutation.mutate({
               riskCode: assessForm.riskCode,
@@ -568,7 +568,7 @@ function RiskTab() {
                 residualLikelihood: Number(assessForm.residualLikelihood),
                 residualImpact: Number(assessForm.residualImpact),
               },
-            })
+            });
           }}
           className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-white rounded-lg shadow p-4"
         >
@@ -588,58 +588,58 @@ function RiskTab() {
         </form>
       </Section>
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
 /* Emergency — the reflex arc                                          */
 /* ------------------------------------------------------------------ */
 
-const SEVERITY_OPTIONS = ['', 'low', 'medium', 'high', 'critical']
+const SEVERITY_OPTIONS = ['', 'low', 'medium', 'high', 'critical'];
 
 function EmergencyTab() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     typeCode: '', severity: '', title: '', description: '',
     affectedEntityType: '', affectedEntityIds: '', peopleAtRisk: false,
-  })
-  const [lastRaised, setLastRaised] = useState(null)
+  });
+  const [lastRaised, setLastRaised] = useState(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['control-active-incidents'],
     queryFn: () => enterpriseControlAPI.activeIncidents().then((r) => r.data?.data ?? []),
     refetchInterval: 30000,
-  })
+  });
 
   const raiseMutation = useMutation({
     mutationFn: (body) => enterpriseControlAPI.raiseIncident(body),
     onSuccess: (res) => {
-      const payload = res.data?.data
-      setLastRaised(payload)
-      toast.success(`Incident ${payload?.incident?.incident_code || ''} raised`)
-      queryClient.invalidateQueries({ queryKey: ['control-active-incidents'] })
-      setForm({ typeCode: '', severity: '', title: '', description: '', affectedEntityType: '', affectedEntityIds: '', peopleAtRisk: false })
+      const payload = res.data?.data;
+      setLastRaised(payload);
+      toast.success(`Incident ${payload?.incident?.incident_code || ''} raised`);
+      queryClient.invalidateQueries({ queryKey: ['control-active-incidents'] });
+      setForm({ typeCode: '', severity: '', title: '', description: '', affectedEntityType: '', affectedEntityIds: '', peopleAtRisk: false });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to raise incident'),
-  })
+  });
 
   const ackMutation = useMutation({
     mutationFn: (incidentCode) => enterpriseControlAPI.acknowledgeIncident(incidentCode),
     onSuccess: () => {
-      toast.success('Acknowledged')
-      queryClient.invalidateQueries({ queryKey: ['control-active-incidents'] })
+      toast.success('Acknowledged');
+      queryClient.invalidateQueries({ queryKey: ['control-active-incidents'] });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to acknowledge'),
-  })
+  });
 
-  const rows = data || []
+  const rows = data || [];
 
   return (
     <div className="space-y-6">
       {lastRaised && (
         <div role="alert" style={{
-          border: '1px solid #cf222e', borderLeft: '4px solid #cf222e',
-          background: '#ffebe9', borderRadius: 6, padding: '14px 16px',
+          border: '1px solid hsl(var(--destructive))', borderLeft: '4px solid hsl(var(--destructive))',
+          background: 'color-mix(in srgb, hsl(var(--destructive)) 12%, transparent)', borderRadius: 6, padding: '14px 16px',
         }}>
           <div className="flex items-center justify-between">
             <strong>Standing instruction — {lastRaised.incident?.incident_code}</strong>
@@ -687,9 +687,9 @@ function EmergencyTab() {
               { key: 'status', label: 'Status' },
               { key: 'minutes_open', label: 'Minutes open', numeric: true, render: (r) => Number(r.minutes_open || 0).toFixed(0) },
               { key: 'acknowledgement_overdue', label: 'Ack.', render: (r) => (
-                r.acknowledged
-                  ? <span style={{ color: '#1a7f37', fontSize: 12 }}>acknowledged</span>
-                  : <FlagBadge on={r.acknowledgement_overdue} label="OVERDUE" offLabel="pending" />
+                r.acknowledged ?
+                  <span style={{ color: 'hsl(var(--data-real))', fontSize: 12 }}>acknowledged</span> :
+                  <FlagBadge on={r.acknowledgement_overdue} label="OVERDUE" offLabel="pending" />
               ) },
               { key: 'actions', label: 'Actions', render: (r) => (
                 <button
@@ -710,19 +710,19 @@ function EmergencyTab() {
       <Section title="Raise an incident" description="Returns the standing instruction immediately. People at risk always forces severity to critical, regardless of what is selected below.">
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            if (!form.title || !form.description) { toast.error('Title and description are required'); return }
+            e.preventDefault();
+            if (!form.title || !form.description) { toast.error('Title and description are required'); return; }
             raiseMutation.mutate({
               typeCode: form.typeCode || undefined,
               severity: form.severity || undefined,
               title: form.title,
               description: form.description,
               affectedEntityType: form.affectedEntityType || undefined,
-              affectedEntityIds: form.affectedEntityIds
-                ? form.affectedEntityIds.split(',').map((s) => s.trim()).filter(Boolean)
-                : undefined,
+              affectedEntityIds: form.affectedEntityIds ?
+                form.affectedEntityIds.split(',').map((s) => s.trim()).filter(Boolean) :
+                undefined,
               peopleAtRisk: form.peopleAtRisk,
-            })
+            });
           }}
           className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white rounded-lg shadow p-4"
         >
@@ -746,5 +746,5 @@ function EmergencyTab() {
         </form>
       </Section>
     </div>
-  )
+  );
 }

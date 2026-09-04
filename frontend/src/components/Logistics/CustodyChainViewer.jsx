@@ -10,7 +10,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { ShieldCheck, ShieldAlert, Link2 } from 'lucide-react';
-import { custodyAPI } from '../../services/api';
+import { custodyAPI } from '../../services/componentApi';
 
 const EVENT_LABELS = {
   job_offered: 'Job Offered',

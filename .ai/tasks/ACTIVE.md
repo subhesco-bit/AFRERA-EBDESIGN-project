@@ -1,5 +1,167 @@
 # ACTIVE TASKS
 
+## DONE — Multi-persona homepage fork + page-by-page honesty/functionality sweep (2026-09-04)
+
+User asked to stop producing strategy documents and actually fix pages, then to
+work through every page "as a strategist" and rectify shortcomings, then
+specifically flagged the ecommerce/revenue funnel as critical for farmer
+income, then asked for a multi-role evaluation (UNEP/UNDP/Government of
+India/Tata-Reliance-Birla-scale corporate buyers/Central PSEs/contract
+farming/household pre-season purchase).
+
+**Delivered, real edits verified with `npx vite build` after each batch:**
+
+1. **Homepage persona fork** (`HomePage.jsx`) — added a "Find your door"
+   section linking directly to 6 already-built-but-undiscoverable persona
+   dashboards (`/farmer-entrance`, `/marketplace`, `/corporate-buyer`,
+   `/banker-dashboard`, `/government-dashboard`, `/logistics-provider`).
+   These routes existed with real components before this session but had
+   zero path to them from the homepage.
+2. **`AboutPage.jsx` (new)** — `/about` was a dead link from both
+   `HomePage.jsx` and `Footer.jsx`; built a real page using the stakeholder
+   taxonomy already written in `DOCUMENTATION/Volume_1_Platform_Architecture.md`
+   (not invented), each card linking to the real dashboard for that
+   stakeholder type. Registered in `routes.js`.
+3. **Persona dashboards batch** — fixed 2 real bugs: `CorporateBuyerPage.jsx`
+   and `LogisticsProviderPage.jsx` were both calling their APIs with the
+   *literal hardcoded string* `'current-buyer-id'`/`'current-provider-id'`
+   instead of the real authenticated user's id (every visitor saw the same
+   profile) — wired to `useAuthStore()`. Fixed a wrong endpoint path in
+   `vendorsAPI.getColdChainNodes()` that 404'd every call. Labeled fabricated
+   "AI insight" numbers (₹2.5Cr portfolio opportunity, named loan
+   applicants, etc.) on Banker/CA/Government dashboards as "Example — not
+   live" rather than deleting the illustrative content; wired CA's tax tab
+   to a real, previously-unused `complianceAPI.tdsSummary()` endpoint; fully
+   rewrote `ResearchDashboardPage.jsx` onto a real, fully-built
+   `researchAndDevelopmentService` that had zero UI consumer before this.
+4. **Farmer-entrance funnel batch** — ~10 dead links across the 4 door
+   pages (`/pricecheck`→`/price-check`, `/dynamicpricing`→`/dynamic-pricing`,
+   `/seedvault`→`/seed-vault`, etc.), plus 2 false "no sign-in needed"
+   labels on routes that are actually role-gated. `FarmerPortalPage.jsx` had
+   4 "Quick Action" tiles with no `onClick`/`Link` at all (pure dead ends);
+   3 now route to the real pages that handle that function, and
+   "Certifications" (no backing route exists anywhere) is now honestly
+   marked "Coming soon" instead of a fake working button.
+   `FarmerHomePage.jsx` had a "Today's Market Prices" panel with hardcoded
+   Rice/Wheat/Mustard/Potato prices and fake trend arrows presented as live
+   — replaced with an honest empty state linking to the real price-check
+   tool.
+5. **Public discovery batch** — `ProductDetailPage.jsx` had **no `onClick`
+   at all** on "Add to Cart"/"Buy Now" (fully dead) and a hardcoded
+   "4.5 (128 reviews)" on every product; fixed both and wired a real,
+   previously-unused review-stats endpoint. `MarketplacePage.jsx`'s same
+   hardcoded-4.5 pattern fixed earlier the same way.
+   `CorridorEconomicsPage.jsx`/`ClimateWeatherPage.jsx`/`LandUseCarbonPage.jsx`/
+   `ForwardPricingPage.jsx` were audited and found already rigorous (every
+   number traces to a real backend call, forecasts shown as bands not false
+   precision, honest refusal when a district isn't calibrated) — no changes
+   needed. Flagged, not fixed (cross-cutting, 21 files): `DataPrimitives.jsx`
+   (shared by many "recovered module" pages) uses inline hex colors instead
+   of the `v42-*` token system used on marketing pages — a real but
+   deliberately out-of-scope design-system split.
+6. **Ecommerce/revenue funnel batch** (flagged by user as highest-priority —
+   "revenue part for farmers") — `B2BMarketplace.jsx` and
+   `NutrientValueMarketplace.jsx` had **entirely fabricated** "recent bulk
+   orders"/"active contracts"/"pending verifications" lists (hardcoded
+   `[1,2,3].map(...)` with invented products/amounts) and several submit
+   buttons with no `onClick` at all. Rewired every form to the real,
+   already-mounted `ecommerceBusinessSalesAPI`/`nutrientValueSalesAPI`
+   endpoints; replaced fake history rows with honest post-submit
+   confirmations (no list/read endpoint exists yet for either).
+   `EcommerceMarketplacePage.jsx`'s GI tab was rendering `undefined` on
+   every card — it read `product_name`/`base_price` but the real
+   `gi_marketplace_listings` schema uses `listing_title`/`price_per_unit`;
+   fixed and enriched with real seller/rating/region fields confirmed
+   present in the API response. `SellerProductFormPage.jsx` (where a farmer
+   actually starts earning) — confirmed via `productService.js` that
+   listings go live with no approval step and now says so explicitly;
+   removed a self-service "Featured" checkbox after confirming `featured`
+   drives a real curated section shown to buyers (letting any seller
+   self-tick it would let them game that trust signal). `CartPage.jsx`/
+   `CheckoutPage.jsx` reskinned to `v42-*` tokens, fixed a crash-on-error
+   path and a duplicate-`id="payment"` bug across payment radio labels.
+7. **Institutional-buyer / contract-farming / pre-season batch** —
+   `SubsidyManagementPage.jsx` was the worst fabrication found this session:
+   nearly every tab invented (fake named beneficiaries "Bornali Gogoi",
+   "Rimon Lyngdoh"; a fabricated "12 fraud attempts blocked this month"
+   counter; invented budget/utilization numbers), and even its top stats
+   called backend routes that don't exist at all. Rebuilt around the real,
+   verified `subsidyService` (eligibility checks, scheme lookup, application
+   submit + tracking, GST calc), disclosing that the tracking endpoint
+   itself is currently a backend stub rather than hiding it.
+   `PreOrderPage.jsx` (pre-season purchase — directly relevant to household
+   and institutional advance buying) called 3 `farmersAPI` methods that
+   don't exist at all, and its "Submit Pre-Order" modal had **no submit
+   handler** — on a page whose whole job is taking money in advance of
+   harvest. Rewired to the real, already-mounted `preSeasonOrderService`.
+   `RfqPage.jsx`'s own code was fine, but `rfqAPI` in `api.js` was out of
+   sync with the backend (3 called methods didn't exist as client keys,
+   1 pointed at an unmounted path) — silently killing the whole "Active QC
+   holds / cost-centre P&L" screen; fixed the client. `BulkOrderPage.jsx`/
+   `CooperativeSharePage.jsx` already solid, no changes.
+   `InsurancePage.jsx`→`InsuranceManagementPage.jsx` had one leftover fake
+   "Documents" tab with 2 hardcoded policy documents and dead
+   download/upload buttons — replaced with an honest state.
+
+**Multi-role evaluation delivered as an artifact** (not code — a strategic
+read, grounded only in what's actually built/fixed above, not aspirational):
+"Seven Reviewers, One Platform" — walks UNEP, UNDP, Government of India,
+Tata/Reliance/Birla-scale corporate buyers, Central Public Sector
+Enterprises, contract farming, and household pre-season purchase through
+what each would actually find in due diligence today. Verdicts: Contract
+Farming = Ready (the write path just got fixed this session); UNEP,
+Government of India, Tata-scale buyers, Central PSEs, household pre-season =
+Partial; UNDP = Gap (real backend services exist —
+`householdEconomyService`, `indigenousKnowledgeService` — with no
+outcomes-reporting UI at all, a genuine P1 build, not a quick fix).
+
+### TODO — carried forward from the multi-role evaluation, not yet started
+1. **Government DPI/ONDC integration is marked 0%/Missing in the module
+   registry.** Don't let outward-facing copy claim government-DPI
+   readiness anywhere until this is real — the same honesty discipline
+   applied to every fabricated-data fix above should extend to platform
+   claims, not just in-page numbers.
+2. **Mandi/reference-price capability is "Database Only — 20%"** per the
+   module registry — schema exists, nothing serves it. This is the first
+   thing a Central PSE (FCI/NAFED-style) reviewer would ask for and get
+   nothing back. Small, contained backend work (wire a route onto the
+   existing table) with an outsized credibility payoff for that audience.
+3. **No household-outcomes reporting UI exists** (UNDP lens) despite real
+   backing services (`householdEconomyService`, `villageProfileService`,
+   `indigenousKnowledgeService`, `ruralEnterpriseService`). Scope as a real
+   P1 project — income-before/after, gender/community disaggregation,
+   SDG-mappable — built only on real captured household data, never
+   modeled estimates presented as fact.
+4. **Contract farming has a write path but no read path.** This session
+   fixed `B2BMarketplace.jsx`'s contract-farming tab to actually call
+   `createContractFarming` instead of faking it, but there's still no
+   list/status endpoint for either the farmer or buyer to check "where does
+   my contract stand" after submitting.
+5. **Household pre-season purchase needs a visible contingency policy.**
+   `PreOrderPage.jsx` now has a real submit path (see above), but a
+   household paying before harvest has no visible answer to "what happens
+   if the harvest fails/is delayed" — state the fallback policy in plain
+   language at the point of pre-payment, and surface the same FOLU/GI trust
+   badge treatment used on the main marketplace card here too.
+6. **Three separate, inconsistent marketplace implementations** (retail
+   `/marketplace`, `/ecommerce-marketplace`, `/b2b-marketplace`,
+   `/nutrient-marketplace`) — every enterprise-buyer-lens read in the
+   multi-role evaluation flagged this exact fragmentation as reading like
+   immaturity to a serious procurement/legal diligence team. Consolidating
+   into one system with a mode toggle is a bigger project than this
+   session's page-by-page fixes; scope separately.
+7. **~85 of 172 backend services still have no mounted route** (per the
+   engineering registry, unchanged by this session's page-level work) —
+   audit each: wire a real route + UI, or confirm genuinely dead and
+   remove. This is the same "backend outruns frontend" shape as items 1-3
+   above, at platform scale.
+8. **`DataPrimitives.jsx` design-token split** (flagged during the public-
+   discovery batch, item 5 above) — 21 pages render through inline hex
+   colors instead of `v42-*` tokens. Real, but a 21-file cross-cutting
+   change large enough to warrant its own scoped pass.
+
+Not committed yet — working tree left as-is per this session's git rules.
+
 ## DONE — Resolved the 4 deferred Tier-1 schema/product decisions from 30 Aug (2026-08-31)
 
 User asked to validate the 4 deferred items from the 30 Aug batch and take decisions rather
@@ -622,7 +784,7 @@ it doesn't need re-deriving next time.
 
 
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System
 **Last Updated:** 28 August 2026
 **Status:** In Progress — rewritten to reflect verified current state, not the
 2026-08-24 Devin-handoff snapshot below. Everything under "Closed" was
@@ -1709,3 +1871,4 @@ modified.
 ---
 
 *This document must be updated after every task completion or status change.*
+

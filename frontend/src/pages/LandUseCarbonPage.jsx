@@ -13,42 +13,42 @@
  * fallow no longer restores what the clearing removed — that is degradation,
  * and that is the number this page puts in front of you.
  */
-import React, { useState, useEffect } from 'react'
-import { foluAPI } from '../services/api'
+import React, { useState, useEffect } from 'react';
+import { foluAPI } from '../services/api';
 import {
   ModulePage, Section, Field, Value, ProvenanceBadge, AsyncState, DataTable,
-} from '../components/common/DataPrimitives'
+} from '../components/common/DataPrimitives';
 
 export default function LandUseCarbonPage() {
-  const [summary, setSummary] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [filter, setFilter] = useState({ state: '', district: '' })
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState({ state: '', district: '' });
 
-  const [farmerId, setFarmerId] = useState('')
-  const [scheme, setScheme] = useState(null)
-  const [schemeLoading, setSchemeLoading] = useState(false)
-  const [schemeError, setSchemeError] = useState(null)
+  const [farmerId, setFarmerId] = useState('');
+  const [scheme, setScheme] = useState(null);
+  const [schemeLoading, setSchemeLoading] = useState(false);
+  const [schemeError, setSchemeError] = useState(null);
 
   const load = async (params = {}) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const r = await foluAPI.landUseSummary(params)
-      setSummary(r.data?.data)
-    } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-  }
-  useEffect(() => { load() }, [])
+      const r = await foluAPI.landUseSummary(params);
+      setSummary(r.data?.data);
+    } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, []);
 
   const loadSchemeStatus = async (e) => {
-    e.preventDefault()
-    if (!farmerId) return
-    setSchemeLoading(true)
-    setSchemeError(null)
+    e.preventDefault();
+    if (!farmerId) return;
+    setSchemeLoading(true);
+    setSchemeError(null);
     try {
-      const r = await foluAPI.schemeStatus(farmerId)
-      setScheme(r.data?.data)
-    } catch (e2) { setSchemeError(e2.response?.data?.error || e2.message) } finally { setSchemeLoading(false) }
-  }
+      const r = await foluAPI.schemeStatus(farmerId);
+      setScheme(r.data?.data);
+    } catch (e2) { setSchemeError(e2.response?.data?.error || e2.message); } finally { setSchemeLoading(false); }
+  };
 
   return (
     <ModulePage
@@ -57,7 +57,7 @@ export default function LandUseCarbonPage() {
       migration="991 (FOLU)"
     >
       <Section title="Filter">
-        <form onSubmit={(e) => { e.preventDefault(); load(filter) }}
+        <form onSubmit={(e) => { e.preventDefault(); load(filter); }}
           style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <Field label="State" id="folu-state">
             <input id="folu-state" value={filter.state}
@@ -75,8 +75,8 @@ export default function LandUseCarbonPage() {
         <>
           {summary?.jhumNote && (
             <div role="note" style={{
-              border: '1px solid #0969da', borderLeft: '4px solid #0969da',
-              background: '#ddf4ff', borderRadius: 6, padding: '12px 14px', marginTop: 18,
+              border: '1px solid hsl(var(--sev-info))', borderLeft: '4px solid hsl(var(--sev-info))',
+              background: 'color-mix(in srgb, hsl(var(--sev-info)) 12%, transparent)', borderRadius: 6, padding: '12px 14px', marginTop: 18,
             }}>
               <p style={{ margin: 0, fontWeight: 600 }}>On jhum cultivation</p>
               <p style={{ margin: '6px 0 0', fontSize: 14 }}>{summary.jhumNote}</p>
@@ -136,7 +136,7 @@ export default function LandUseCarbonPage() {
             </form>
 
             {schemeError && (
-              <p role="alert" style={{ color: '#cf222e' }}>{schemeError}</p>
+              <p role="alert" style={{ color: 'hsl(var(--destructive))' }}>{schemeError}</p>
             )}
 
             {scheme && (
@@ -163,5 +163,5 @@ export default function LandUseCarbonPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

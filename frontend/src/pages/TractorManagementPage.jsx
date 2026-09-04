@@ -1,83 +1,83 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { machineryAPI } from '../services/api'
-import { Truck, Plus, X, Trash2, Edit, CalendarClock } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { machineryAPI } from '../services/api';
+import { Truck, Plus, X, Trash2, Edit, CalendarClock } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const STATUSES = ['Available', 'Booked', 'Under Maintenance', 'Out of Service']
+const STATUSES = ['Available', 'Booked', 'Under Maintenance', 'Out of Service'];
 
-const emptyForm = { registration_no: '', model: '', horsepower: '', owner_name: '', status: 'Available', hourly_rate: '' }
-const emptyBooking = { tractor_id: '', booked_by: '', start_date: '', end_date: '', purpose: '' }
+const emptyForm = { registration_no: '', model: '', horsepower: '', owner_name: '', status: 'Available', hourly_rate: '' };
+const emptyBooking = { tractor_id: '', booked_by: '', start_date: '', end_date: '', purpose: '' };
 
 function TractorManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyForm)
-  const [showBooking, setShowBooking] = useState(false)
-  const [bookingForm, setBookingForm] = useState(emptyBooking)
-  const [tab, setTab] = useState('fleet')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [showBooking, setShowBooking] = useState(false);
+  const [bookingForm, setBookingForm] = useState(emptyBooking);
+  const [tab, setTab] = useState('fleet');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: fleetData, isLoading, error } = useQuery({
     queryKey: ['machinery-tractors'],
     queryFn: async () => (await machineryAPI.getTractors()).data?.data ?? [],
-  })
+  });
 
   const { data: bookingsData, isLoading: bookingsLoading, error: bookingsError } = useQuery({
     queryKey: ['machinery-bookings'],
     queryFn: async () => (await machineryAPI.getBookings()).data?.data ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? machineryAPI.updateTractor(editingId, payload) : machineryAPI.createTractor(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Tractor updated' : 'Tractor registered')
-      queryClient.invalidateQueries({ queryKey: ['machinery-tractors'] })
-      closeForm()
+      toast.success(editingId ? 'Tractor updated' : 'Tractor registered');
+      queryClient.invalidateQueries({ queryKey: ['machinery-tractors'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save tractor'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => machineryAPI.deleteTractor(id),
-    onSuccess: () => { toast.success('Tractor removed'); queryClient.invalidateQueries({ queryKey: ['machinery-tractors'] }) },
+    onSuccess: () => { toast.success('Tractor removed'); queryClient.invalidateQueries({ queryKey: ['machinery-tractors'] }); },
     onError: () => toast.error('Failed to remove tractor'),
-  })
+  });
 
   const bookMutation = useMutation({
     mutationFn: (payload) => machineryAPI.createBooking(payload),
     onSuccess: () => {
-      toast.success('Booking created')
-      queryClient.invalidateQueries({ queryKey: ['machinery-bookings'] })
-      setShowBooking(false)
-      setBookingForm(emptyBooking)
+      toast.success('Booking created');
+      queryClient.invalidateQueries({ queryKey: ['machinery-bookings'] });
+      setShowBooking(false);
+      setBookingForm(emptyBooking);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to create booking'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm); };
 
   const openEdit = (t) => {
     setForm({
       registration_no: t.registration_no || '', model: t.model || '', horsepower: t.horsepower ?? '',
       owner_name: t.owner_name || '', status: t.status || 'Available', hourly_rate: t.hourly_rate ?? '',
-    })
-    setEditingId(t.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(t.id);
+    setShowForm(true);
+  };
 
-  const fleet = fleetData || []
-  const bookings = bookingsData || []
-  const available = fleet.filter((t) => t.status === 'Available').length
+  const fleet = fleetData || [];
+  const bookings = bookingsData || [];
+  const available = fleet.filter((t) => t.status === 'Available').length;
 
   const statusColor = (s) => ({
     Available: 'bg-green-100 text-green-800',
     Booked: 'bg-blue-100 text-blue-800',
     'Under Maintenance': 'bg-yellow-100 text-yellow-800',
     'Out of Service': 'bg-red-100 text-red-800',
-  }[s] || 'bg-gray-100 text-gray-700')
+  }[s] || 'bg-gray-100 text-gray-700');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -96,7 +96,7 @@ function TractorManagementPage() {
             </button>
           )}
           {tab === 'fleet' && (
-            <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }}
+            <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }}
               className="px-4 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition flex items-center">
               <Plus className="w-5 h-5 mr-2" />Register Tractor
             </button>
@@ -160,7 +160,7 @@ function TractorManagementPage() {
                       <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full ${statusColor(t.status)}`}>{t.status}</span></td>
                       <td className="px-4 py-3 text-right space-x-2">
                         <button onClick={() => openEdit(t)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => { if (confirm('Remove this tractor?')) deleteMutation.mutate(t.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => { if (confirm('Remove this tractor?')) deleteMutation.mutate(t.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -217,13 +217,13 @@ function TractorManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.registration_no) { toast.error('Registration number is required'); return }
+                  e.preventDefault();
+                  if (!form.registration_no) { toast.error('Registration number is required'); return; }
                   saveMutation.mutate({
                     ...form,
                     horsepower: form.horsepower === '' ? null : Number(form.horsepower),
                     hourly_rate: form.hourly_rate === '' ? null : Number(form.hourly_rate),
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -285,9 +285,9 @@ function TractorManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!bookingForm.tractor_id || !bookingForm.start_date) { toast.error('Tractor and start date are required'); return }
-                  bookMutation.mutate(bookingForm)
+                  e.preventDefault();
+                  if (!bookingForm.tractor_id || !bookingForm.start_date) { toast.error('Tractor and start date are required'); return; }
+                  bookMutation.mutate(bookingForm);
                 }}
                 className="space-y-4"
               >
@@ -333,7 +333,7 @@ function TractorManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default TractorManagementPage
+export default TractorManagementPage;

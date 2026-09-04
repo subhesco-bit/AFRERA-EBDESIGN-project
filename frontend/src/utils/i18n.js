@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Internationalization (i18n) Support
- * 
+ *
  * Production-ready i18n with:
  * - Translation management
  * - Language detection and switching
@@ -15,8 +15,7 @@
  * - Context-aware translations
  */
 
-import config from '../config/env'
-
+import config from '../config/env';
 
 /**
  * Supported languages
@@ -26,63 +25,63 @@ const SUPPORTED_LANGUAGES = {
     name: 'English',
     nativeName: 'English',
     dir: 'ltr',
-    locale: 'en-US'
+    locale: 'en-US',
   },
   hi: {
     name: 'Hindi',
     nativeName: 'हिंदी',
     dir: 'ltr',
-    locale: 'hi-IN'
+    locale: 'hi-IN',
   },
   ta: {
     name: 'Tamil',
     nativeName: 'தமிழ்',
     dir: 'ltr',
-    locale: 'ta-IN'
+    locale: 'ta-IN',
   },
   te: {
     name: 'Telugu',
     nativeName: 'తెలుగు',
     dir: 'ltr',
-    locale: 'te-IN'
+    locale: 'te-IN',
   },
   kn: {
     name: 'Kannada',
     nativeName: 'ಕನ್ನಡ',
     dir: 'ltr',
-    locale: 'kn-IN'
+    locale: 'kn-IN',
   },
   mr: {
     name: 'Marathi',
     nativeName: 'मराठी',
     dir: 'ltr',
-    locale: 'mr-IN'
+    locale: 'mr-IN',
   },
   bn: {
     name: 'Bengali',
     nativeName: 'বাংলা',
     dir: 'ltr',
-    locale: 'bn-IN'
+    locale: 'bn-IN',
   },
   gu: {
     name: 'Gujarati',
     nativeName: 'ગુજરાતી',
     dir: 'ltr',
-    locale: 'gu-IN'
+    locale: 'gu-IN',
   },
   pa: {
     name: 'Punjabi',
     nativeName: 'ਪੰਜਾਬੀ',
     dir: 'ltr',
-    locale: 'pa-IN'
+    locale: 'pa-IN',
   },
   ar: {
     name: 'Arabic',
     nativeName: 'العربية',
     dir: 'rtl',
-    locale: 'ar-SA'
-  }
-}
+    locale: 'ar-SA',
+  },
+};
 
 /**
  * Default translations (English)
@@ -130,7 +129,7 @@ const DEFAULT_TRANSLATIONS = {
     on: 'on',
     by: 'by',
     with: 'with',
-    without: 'without'
+    without: 'without',
   },
   auth: {
     login: 'Login',
@@ -156,7 +155,7 @@ const DEFAULT_TRANSLATIONS = {
     passwordMismatch: 'Passwords do not match',
     weakPassword: 'Password is too weak',
     emailRequired: 'Email is required',
-    passwordRequired: 'Password is required'
+    passwordRequired: 'Password is required',
   },
   navigation: {
     home: 'Home',
@@ -168,7 +167,7 @@ const DEFAULT_TRANSLATIONS = {
     about: 'About',
     contact: 'Contact',
     terms: 'Terms of Service',
-    privacy: 'Privacy Policy'
+    privacy: 'Privacy Policy',
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
@@ -178,7 +177,7 @@ const DEFAULT_TRANSLATIONS = {
     unauthorized: 'You are not authorized to access this resource',
     forbidden: 'Access forbidden',
     validation: 'Please check your input and try again',
-    timeout: 'Request timed out. Please try again.'
+    timeout: 'Request timed out. Please try again.',
   },
   validation: {
     required: 'This field is required',
@@ -191,25 +190,25 @@ const DEFAULT_TRANSLATIONS = {
     numeric: 'Must be a number',
     integer: 'Must be an integer',
     url: 'Please enter a valid URL',
-    phone: 'Please enter a valid phone number'
-  }
-}
+    phone: 'Please enter a valid phone number',
+  },
+};
 
 /**
  * Translation cache
  */
-const translationCache = new Map()
+const translationCache = new Map();
 
 /**
  * Current language state
  */
-let currentLanguage = config.DEFAULT_LANGUAGE || 'en'
+let currentLanguage = config.DEFAULT_LANGUAGE || 'en';
 
 /**
  * Get current language
  */
 function getCurrentLanguage() {
-  return currentLanguage
+  return currentLanguage;
 }
 
 /**
@@ -217,24 +216,24 @@ function getCurrentLanguage() {
  */
 function setLanguage(languageCode) {
   if (!SUPPORTED_LANGUAGES[languageCode]) {
-    
-    return false
+
+    return false;
   }
 
-  currentLanguage = languageCode
-  
+  currentLanguage = languageCode;
+
   // Update document direction
   if (typeof document !== 'undefined') {
-    document.documentElement.lang = languageCode
-    document.documentElement.dir = SUPPORTED_LANGUAGES[languageCode].dir
+    document.documentElement.lang = languageCode;
+    document.documentElement.dir = SUPPORTED_LANGUAGES[languageCode].dir;
   }
 
   // Save to localStorage
   if (typeof localStorage !== 'undefined') {
-    localStorage.setItem('preferred_language', languageCode)
+    localStorage.setItem('preferred_language', languageCode);
   }
 
-  return true
+  return true;
 }
 
 /**
@@ -243,52 +242,52 @@ function setLanguage(languageCode) {
 function detectLanguage() {
   // Check localStorage first
   if (typeof localStorage !== 'undefined') {
-    const saved = localStorage.getItem('preferred_language')
+    const saved = localStorage.getItem('preferred_language');
     if (saved && SUPPORTED_LANGUAGES[saved]) {
-      return saved
+      return saved;
     }
   }
 
   // Check browser language
   if (typeof navigator !== 'undefined') {
-    const browserLang = navigator.language.split('-')[0]
+    const browserLang = navigator.language.split('-')[0];
     if (SUPPORTED_LANGUAGES[browserLang]) {
-      return browserLang
+      return browserLang;
     }
   }
 
   // Return default
-  return config.DEFAULT_LANGUAGE || 'en'
+  return config.DEFAULT_LANGUAGE || 'en';
 }
 
 /**
  * Get translation for a key
  */
 function t(key, options = {}) {
-  const { namespace = 'common', defaultValue, interpolate = {} } = options
-  
+  const { namespace = 'common', defaultValue, interpolate = {} } = options;
+
   // Get translations for current language
-  const translations = translationCache.get(currentLanguage) || DEFAULT_TRANSLATIONS
-  
+  const translations = translationCache.get(currentLanguage) || DEFAULT_TRANSLATIONS;
+
   // Get value from namespace
-  let value = translations[namespace]?.[key]
-  
+  let value = translations[namespace]?.[key];
+
   // Fallback to common namespace
   if (!value && namespace !== 'common') {
-    value = translations.common?.[key]
+    value = translations.common?.[key];
   }
-  
+
   // Fallback to default value
   if (!value) {
-    value = defaultValue || key
+    value = defaultValue || key;
   }
-  
+
   // Interpolate variables
   if (Object.keys(interpolate).length > 0) {
-    value = interpolateVariables(value, interpolate)
+    value = interpolateVariables(value, interpolate);
   }
-  
-  return value
+
+  return value;
 }
 
 /**
@@ -296,167 +295,167 @@ function t(key, options = {}) {
  */
 function interpolateVariables(str, variables) {
   return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-    return variables[key] !== undefined ? variables[key] : match
-  })
+    return variables[key] !== undefined ? variables[key] : match;
+  });
 }
 
 /**
  * Pluralize translation
  */
 function pluralize(key, count, options = {}) {
-  const { namespace = 'common' } = options
-  
+  const { namespace = 'common' } = options;
+
   // Get translations
-  const translations = translationCache.get(currentLanguage) || DEFAULT_TRANSLATIONS
-  const namespaceTranslations = translations[namespace] || {}
-  
+  const translations = translationCache.get(currentLanguage) || DEFAULT_TRANSLATIONS;
+  const namespaceTranslations = translations[namespace] || {};
+
   // Try to get pluralized form
-  let value
-  
+  let value;
+
   if (count === 0 && namespaceTranslations[`${key}_zero`]) {
-    value = namespaceTranslations[`${key}_zero`]
+    value = namespaceTranslations[`${key}_zero`];
   } else if (count === 1 && namespaceTranslations[`${key}_one`]) {
-    value = namespaceTranslations[`${key}_one`]
+    value = namespaceTranslations[`${key}_one`];
   } else if (namespaceTranslations[`${key}_other`]) {
-    value = namespaceTranslations[`${key}_other`]
+    value = namespaceTranslations[`${key}_other`];
   } else {
-    value = namespaceTranslations[key] || key
+    value = namespaceTranslations[key] || key;
   }
-  
+
   // Interpolate count
-  value = value.replace('{{count}}', count)
-  
-  return value
+  value = value.replace('{{count}}', count);
+
+  return value;
 }
 
 /**
  * Format date according to locale
  */
 function formatDate(date, options = {}) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
   const defaultOptions = {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
-  }
-  
-  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(date)
+    day: 'numeric',
+  };
+
+  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(date);
 }
 
 /**
  * Format time according to locale
  */
 function formatTime(date, options = {}) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
   const defaultOptions = {
     hour: '2-digit',
-    minute: '2-digit'
-  }
-  
-  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(date)
+    minute: '2-digit',
+  };
+
+  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(date);
 }
 
 /**
  * Format date and time according to locale
  */
 function formatDateTime(date, options = {}) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
   const defaultOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
-  }
-  
-  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(date)
+    minute: '2-digit',
+  };
+
+  return new Intl.DateTimeFormat(locale, { ...defaultOptions, ...options }).format(date);
 }
 
 /**
  * Format number according to locale
  */
 function formatNumber(number, options = {}) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
-  return new Intl.NumberFormat(locale, options).format(number)
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
+  return new Intl.NumberFormat(locale, options).format(number);
 }
 
 /**
  * Format currency according to locale
  */
 function formatCurrency(amount, currency = 'INR', options = {}) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
   const defaultOptions = {
     style: 'currency',
-    currency
-  }
-  
-  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(amount)
+    currency,
+  };
+
+  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(amount);
 }
 
 /**
  * Format percentage according to locale
  */
 function formatPercent(value, options = {}) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
   const defaultOptions = {
     style: 'percent',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  }
-  
-  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(value)
+    maximumFractionDigits: 2,
+  };
+
+  return new Intl.NumberFormat(locale, { ...defaultOptions, ...options }).format(value);
 }
 
 /**
  * Format relative time (e.g., "2 hours ago")
  */
 function formatRelativeTime(date) {
-  const language = currentLanguage
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US'
-  
-  const now = new Date()
-  const diff = now - date
-  const seconds = Math.floor(diff / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-  const months = Math.floor(days / 30)
-  const years = Math.floor(days / 365)
-  
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
-  
-  if (years > 0) return rtf.format(-years, 'year')
-  if (months > 0) return rtf.format(-months, 'month')
-  if (days > 0) return rtf.format(-days, 'day')
-  if (hours > 0) return rtf.format(-hours, 'hour')
-  if (minutes > 0) return rtf.format(-minutes, 'minute')
-  return rtf.format(-seconds, 'second')
+  const language = currentLanguage;
+  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+
+  const now = new Date();
+  const diff = now - date;
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+
+  if (years > 0) return rtf.format(-years, 'year');
+  if (months > 0) return rtf.format(-months, 'month');
+  if (days > 0) return rtf.format(-days, 'day');
+  if (hours > 0) return rtf.format(-hours, 'hour');
+  if (minutes > 0) return rtf.format(-minutes, 'minute');
+  return rtf.format(-seconds, 'second');
 }
 
 /**
  * Check if current language is RTL
  */
 function isRTL() {
-  return SUPPORTED_LANGUAGES[currentLanguage]?.dir === 'rtl'
+  return SUPPORTED_LANGUAGES[currentLanguage]?.dir === 'rtl';
 }
 
 /**
  * Get text direction for current language
  */
 function getTextDirection() {
-  return SUPPORTED_LANGUAGES[currentLanguage]?.dir || 'ltr'
+  return SUPPORTED_LANGUAGES[currentLanguage]?.dir || 'ltr';
 }
 
 /**
@@ -464,18 +463,18 @@ function getTextDirection() {
  */
 async function loadTranslations(languageCode) {
   if (translationCache.has(languageCode)) {
-    return translationCache.get(languageCode)
+    return translationCache.get(languageCode);
   }
 
   try {
     // Try to load from file
-    const translations = await import(`../locales/${languageCode}.json`)
-    translationCache.set(languageCode, translations.default || translations)
-    return translations.default || translations
+    const translations = await import(`../locales/${languageCode}.json`);
+    translationCache.set(languageCode, translations.default || translations);
+    return translations.default || translations;
   } catch (error) {
-    
+
     // Return default translations as fallback
-    return DEFAULT_TRANSLATIONS
+    return DEFAULT_TRANSLATIONS;
   }
 }
 
@@ -483,22 +482,22 @@ async function loadTranslations(languageCode) {
  * Add translations dynamically
  */
 function addTranslations(languageCode, translations) {
-  const existing = translationCache.get(languageCode) || {}
-  translationCache.set(languageCode, { ...existing, ...translations })
+  const existing = translationCache.get(languageCode) || {};
+  translationCache.set(languageCode, { ...existing, ...translations });
 }
 
 /**
  * Get all supported languages
  */
 function getSupportedLanguages() {
-  return SUPPORTED_LANGUAGES
+  return SUPPORTED_LANGUAGES;
 }
 
 /**
  * Get language info
  */
 function getLanguageInfo(languageCode) {
-  return SUPPORTED_LANGUAGES[languageCode]
+  return SUPPORTED_LANGUAGES[languageCode];
 }
 
 /**
@@ -506,18 +505,18 @@ function getLanguageInfo(languageCode) {
  */
 function init() {
   // Detect and set language
-  const detectedLanguage = detectLanguage()
-  setLanguage(detectedLanguage)
-  
+  const detectedLanguage = detectLanguage();
+  setLanguage(detectedLanguage);
+
   // Load default translations
-  translationCache.set('en', DEFAULT_TRANSLATIONS)
-  
+  translationCache.set('en', DEFAULT_TRANSLATIONS);
+
   // Load translations for detected language if not English
   if (detectedLanguage !== 'en') {
-    loadTranslations(detectedLanguage)
+    loadTranslations(detectedLanguage);
   }
-  
-  return currentLanguage
+
+  return currentLanguage;
 }
 
 /**
@@ -543,7 +542,7 @@ const i18n = {
   addTranslations,
   getSupportedLanguages,
   getLanguageInfo,
-  init
-}
+  init,
+};
 
-export default i18n
+export default i18n;

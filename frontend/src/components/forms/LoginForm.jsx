@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../../services/componentApi';
 
 /**
  * LoginForm Component
@@ -18,17 +19,8 @@ export default function LoginForm({ onSuccess }) {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/v1/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
+      const response = await authAPI.login({ email, password });
+      const data = response.data;
 
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('user', JSON.stringify(data.data.user));
@@ -36,7 +28,7 @@ export default function LoginForm({ onSuccess }) {
       if (onSuccess) onSuccess(data.data.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }

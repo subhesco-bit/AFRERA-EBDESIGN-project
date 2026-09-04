@@ -1,6 +1,6 @@
-import { Sprout } from 'lucide-react'
-import { agriculturalIntelligenceAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Sprout } from 'lucide-react';
+import { agriculturalIntelligenceAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/agriculturalIntelligenceRoutes.js +
@@ -86,7 +86,7 @@ function AgriculturalIntelligencePage() {
         onRun={() => agriculturalIntelligenceAPI.healthCheck()}
       />
     </div>
-  )
+  );
 }
 
-export default AgriculturalIntelligencePage
+export default AgriculturalIntelligencePage;

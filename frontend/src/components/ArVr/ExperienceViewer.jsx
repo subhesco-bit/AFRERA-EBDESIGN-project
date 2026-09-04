@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { arVrAPI } from '../../services/api';
+import { arVrAPI } from '../../services/componentApi';
 
 /**
  * Experience Viewer Component
@@ -61,7 +61,7 @@ const ExperienceViewer = ({ productId, experiences: experiencesProp }) => {
       hotspot: '📍',
       marker: '🏷️',
       trigger: '▶️',
-      info_point: 'ℹ️'
+      info_point: 'ℹ️',
     };
     return icons[type] || '•';
   };
@@ -92,18 +92,18 @@ const ExperienceViewer = ({ productId, experiences: experiencesProp }) => {
             {experiences.map((exp) => (
               <div
                 key={exp.id}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
                 // Enter and Space are what a native <button> responds to.
                 // Without this the card is unreachable by keyboard entirely.
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click() }
-              }}
+                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); }
+                }}
                 onClick={() => selectExperience(exp)}
                 className={`cursor-pointer rounded-lg border-2 p-4 transition-colors ${
-                  selectedExperience?.id === exp.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                  selectedExperience?.id === exp.id ?
+                    'border-blue-500 bg-blue-50' :
+                    'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 {exp.thumbnail_url && (

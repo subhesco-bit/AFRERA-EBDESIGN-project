@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { multilingualAPI } from '../../services/api';
+import { multilingualAPI } from '../../services/componentApi';
 
 /**
  * Multilingual Context Provider
@@ -100,7 +100,7 @@ export const MultilingualProvider = ({ children }) => {
       const response = await multilingualAPI.translate({
         text,
         source_language: 'en', // Assuming source is English
-        target_language: targetLanguage
+        target_language: targetLanguage,
       });
 
       return response.data.translated_text;
@@ -134,7 +134,7 @@ export const MultilingualProvider = ({ children }) => {
     translate,
     detectLanguage,
     t,
-    loadTranslations
+    loadTranslations,
   };
 
   return (

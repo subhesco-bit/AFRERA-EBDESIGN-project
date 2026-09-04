@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ecommerceMarketingAPI } from '../services/api';
-import { 
-  Megaphone, 
-  Target, 
-  TrendingUp, 
-  DollarSign, 
+import {
+  Megaphone,
+  Target,
+  TrendingUp,
+  DollarSign,
   Eye,
   MousePointer,
   BarChart3,
@@ -13,12 +13,12 @@ import {
   Users,
   Sparkles,
   Tag,
-  Zap
+  Zap,
 } from 'lucide-react';
 
 /**
  * AFRERA Marketing Center
- * 
+ *
  * Marketing and advertising platform:
  * - Campaign Management
  * - Sponsored Products
@@ -33,13 +33,13 @@ const MarketingCenter = () => {
   // Marketing Analytics
   const { data: marketingAnalytics, isLoading: analyticsLoading } = useQuery({
     queryKey: ['marketingAnalytics'],
-    queryFn: () => ecommerceMarketingAPI.getMarketingAnalytics({})
+    queryFn: () => ecommerceMarketingAPI.getMarketingAnalytics({}),
   });
 
   // Sponsored Products
   const { data: sponsoredProducts, isLoading: sponsoredLoading } = useQuery({
     queryKey: ['sponsoredProducts'],
-    queryFn: () => ecommerceMarketingAPI.getSponsoredProducts({})
+    queryFn: () => ecommerceMarketingAPI.getSponsoredProducts({}),
   });
 
   const renderOverview = () => (
@@ -56,7 +56,7 @@ const MarketingCenter = () => {
             <Megaphone className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between">
             <div>
@@ -68,7 +68,7 @@ const MarketingCenter = () => {
             <DollarSign className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
           <div className="flex items-center justify-between">
             <div>
@@ -80,7 +80,7 @@ const MarketingCenter = () => {
             <Eye className="h-8 w-8 text-purple-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
           <div className="flex items-center justify-between">
             <div>
@@ -161,7 +161,7 @@ const MarketingCenter = () => {
           <Megaphone className="h-5 w-5" />
           Campaign Management
         </h3>
-        
+
         <div className="p-4 bg-blue-50 rounded mb-4">
           <h4 className="font-medium mb-3">Create New Campaign</h4>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -244,7 +244,7 @@ const MarketingCenter = () => {
           <Sparkles className="h-5 w-5" />
           Sponsored Products
         </h3>
-        
+
         <div className="p-4 bg-green-50 rounded mb-4">
           <h4 className="font-medium mb-3">Sponsor Product</h4>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -327,7 +327,7 @@ const MarketingCenter = () => {
           <Tag className="h-5 w-5" />
           Promotion Management
         </h3>
-        
+
         <div className="p-4 bg-purple-50 rounded mb-4">
           <h4 className="font-medium mb-3">Create Promotion</h4>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -402,7 +402,7 @@ const MarketingCenter = () => {
           <Zap className="h-5 w-5" />
           Retargeting Campaigns
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-4 bg-orange-50 rounded">
             <h4 className="font-medium mb-3">Cart Abandonment</h4>
@@ -425,7 +425,7 @@ const MarketingCenter = () => {
               View Abandoned Carts
             </button>
           </div>
-          
+
           <div className="p-4 bg-blue-50 rounded">
             <h4 className="font-medium mb-3">Product View Retargeting</h4>
             <p className="text-sm text-gray-600 mb-3">Show ads to users who viewed specific products</p>
@@ -459,7 +459,7 @@ const MarketingCenter = () => {
           <BarChart3 className="h-5 w-5" />
           Marketing Analytics
         </h3>
-        
+
         {analyticsLoading ? (
           <p className="text-gray-500">Loading analytics...</p>
         ) : marketingAnalytics ? (
@@ -482,7 +482,7 @@ const MarketingCenter = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-green-50 rounded">
                 <h4 className="font-medium mb-2">Budget & Spend</h4>
                 <div className="space-y-2 text-sm">
@@ -500,7 +500,7 @@ const MarketingCenter = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-purple-50 rounded">
                 <h4 className="font-medium mb-2">Engagement Metrics</h4>
                 <div className="space-y-2 text-sm">
@@ -518,7 +518,7 @@ const MarketingCenter = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-4 bg-orange-50 rounded">
                 <h4 className="font-medium mb-2">Conversion Metrics</h4>
                 <div className="space-y-2 text-sm">

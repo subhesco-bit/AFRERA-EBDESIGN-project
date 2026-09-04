@@ -6,19 +6,145 @@
     "jest": true
   },
   "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "script"
+    "ecmaVersion": "latest",
+    "sourceType": "module"
   },
-  "extends": ["eslint:recommended"],
+  "extends": [
+    "eslint:recommended"
+  ],
   "rules": {
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_|^next$|^req$|^res$" }],
-    "no-console": "off",
-    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_|req|res|next|err"
+      }
+    ],
+    "no-undef": "error",
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
     "prefer-const": "warn",
-    "eqeqeq": ["warn", "smart"],
-    "no-throw-literal": "error",
-    "no-return-await": "warn",
-    "require-atomic-updates": "off"
+    "eqeqeq": [
+      "warn",
+      "smart"
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "no-var": "error",
+    "object-shorthand": "warn",
+    "quote-props": [
+      "warn",
+      "as-needed"
+    ],
+    "prefer-template": "warn",
+    "prefer-arrow-callback": "warn",
+    "arrow-spacing": "warn",
+    "no-implicit-coercion": "warn",
+    "no-floating-decimal": "error",
+    "no-multi-spaces": "warn",
+    "space-before-blocks": "warn",
+    "keyword-spacing": "warn",
+    "space-before-function-paren": [
+      "warn",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "indent": [
+      "warn",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "warn",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "comma-spacing": "warn",
+    "comma-dangle": [
+      "warn",
+      "always-multiline"
+    ],
+    "no-multiple-empty-lines": [
+      "warn",
+      {
+        "max": 1
+      }
+    ],
+    "no-trailing-spaces": "warn",
+    "eol-last": [
+      "warn",
+      "always"
+    ],
+    "operator-linebreak": [
+      "warn",
+      "after"
+    ],
+    "space-infix-ops": "warn",
+    "space-unary-ops": "warn",
+    "no-process-exit": "warn",
+    "no-path-concat": "warn",
+    "no-sync": "warn",
+    "handle-callback-err": "warn",
+    "callback-return": "warn"
   },
-  "ignorePatterns": ["node_modules/", "coverage/", "dist/", "*.sql"]
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.js",
+        "**/*.spec.js",
+        "src/test/**/*.js"
+      ],
+      "env": {
+        "jest": true
+      },
+      "rules": {
+        "no-undef": "off"
+      }
+    },
+    {
+      "files": [
+        "*.config.js"
+      ],
+      "env": {
+        "node": true
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "coverage/",
+    ".next/",
+    "*.min.js",
+    "vendor/",
+    "migrations/",
+    "seeds/",
+    "logs/"
+  ]
 }

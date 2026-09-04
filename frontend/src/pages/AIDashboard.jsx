@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ecommerceAIAPI } from '../services/api';
-import { 
-  Users, 
-  TrendingUp, 
-  Package, 
-  DollarSign, 
-  BarChart3, 
+import {
+  Users,
+  TrendingUp,
+  Package,
+  DollarSign,
+  BarChart3,
   Brain,
   Activity,
   Target,
@@ -14,12 +14,12 @@ import {
   LineChart,
   Lightbulb,
   Zap,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 
 /**
  * AFRERA AI Dashboard
- * 
+ *
  * Comprehensive AI-powered marketplace dashboard with real-time decision-making:
  * - Customer Segmentation (RFM, behavioral)
  * - Demand Forecasting
@@ -52,52 +52,52 @@ const AIDashboard = () => {
   // Customer Segmentation Data
   const { data: rfmSegments, isLoading: rfmLoading, refetch: refetchRfmSegments } = useQuery({
     queryKey: ['rfmSegments'],
-    queryFn: () => ecommerceAIAPI.segmentCustomersRFM().then(r => r.data)
+    queryFn: () => ecommerceAIAPI.segmentCustomersRFM().then(r => r.data),
   });
 
   const { data: behavioralSegments, isLoading: behavioralLoading, refetch: refetchBehavioralSegments } = useQuery({
     queryKey: ['behavioralSegments'],
-    queryFn: () => ecommerceAIAPI.segmentCustomersBehavioral().then(r => r.data)
+    queryFn: () => ecommerceAIAPI.segmentCustomersBehavioral().then(r => r.data),
   });
 
   // Demand Forecasting Data
   const { data: demandForecast, isLoading: demandLoading, refetch: refetchDemandForecast } = useQuery({
     queryKey: ['demandForecast', selectedProduct],
     queryFn: () => selectedProduct ? ecommerceAIAPI.forecastProductDemand(selectedProduct, 30).then(r => r.data) : null,
-    enabled: !!selectedProduct
+    enabled: Boolean(selectedProduct),
   });
 
   // Inventory Optimization Data
   const { data: inventoryOptimization, isLoading: inventoryLoading, refetch: refetchInventoryOptimization } = useQuery({
     queryKey: ['inventoryOptimization', selectedProduct],
     queryFn: () => selectedProduct ? ecommerceAIAPI.optimizeInventory(selectedProduct).then(r => r.data) : null,
-    enabled: !!selectedProduct
+    enabled: Boolean(selectedProduct),
   });
 
   // Personalized Recommendations Data
   const { data: recommendations, isLoading: recommendationsLoading, refetch: refetchRecommendations } = useQuery({
     queryKey: ['recommendations', selectedUser],
     queryFn: () => selectedUser ? ecommerceAIAPI.getPersonalizedRecommendations(selectedUser, 10).then(r => r.data) : null,
-    enabled: !!selectedUser
+    enabled: Boolean(selectedUser),
   });
 
   // Sales Prediction Data
   const { data: salesPrediction, isLoading: salesLoading, refetch: refetchSalesPrediction } = useQuery({
     queryKey: ['salesPrediction'],
-    queryFn: () => ecommerceAIAPI.predictSales(null, 30).then(r => r.data)
+    queryFn: () => ecommerceAIAPI.predictSales(null, 30).then(r => r.data),
   });
 
   // Customer Lifetime Value Data
   const { data: clvData, isLoading: clvLoading, refetch: refetchClvData } = useQuery({
     queryKey: ['clv', selectedUser],
     queryFn: () => selectedUser ? ecommerceAIAPI.calculateCustomerLifetimeValue(selectedUser).then(r => r.data) : null,
-    enabled: !!selectedUser
+    enabled: Boolean(selectedUser),
   });
 
   // Market Basket Analysis Data
   const { data: marketBasket, isLoading: basketLoading, refetch: refetchMarketBasket } = useQuery({
     queryKey: ['marketBasket'],
-    queryFn: () => ecommerceAIAPI.analyzeMarketBasket().then(r => r.data)
+    queryFn: () => ecommerceAIAPI.analyzeMarketBasket().then(r => r.data),
   });
 
   // Load AI alerts and decisions
@@ -111,7 +111,7 @@ const AIDashboard = () => {
     try {
       const [alertsRes, decisionsRes] = await Promise.all([
         ecommerceAIAPI.getAIAlerts(),
-        ecommerceAIAPI.getAIDecisions()
+        ecommerceAIAPI.getAIDecisions(),
       ]);
       setAiAlerts(alertsRes.data.data || []);
       setAiDecisions(decisionsRes.data.data || []);
@@ -153,7 +153,7 @@ const AIDashboard = () => {
             <Users className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between">
             <div>
@@ -165,7 +165,7 @@ const AIDashboard = () => {
             <TrendingUp className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
           <div className="flex items-center justify-between">
             <div>
@@ -177,7 +177,7 @@ const AIDashboard = () => {
             <Activity className="h-8 w-8 text-purple-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
           <div className="flex items-center justify-between">
             <div>
@@ -211,7 +211,7 @@ const AIDashboard = () => {
               Run Behavioral Segmentation
             </button>
           </div>
-          
+
           {rfmSegments?.segments && (
             <div className="mt-4">
               <h4 className="font-medium mb-2">RFM Segments</h4>
@@ -275,7 +275,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Customer Segmentation Analysis</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 className="font-medium mb-3">RFM Segmentation</h4>
@@ -304,7 +304,7 @@ const AIDashboard = () => {
               </button>
             )}
           </div>
-          
+
           <div>
             <h4 className="font-medium mb-3">Behavioral Segmentation</h4>
             {behavioralLoading ? (
@@ -341,7 +341,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Demand Forecasting</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Product
@@ -354,7 +354,7 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedProduct && (
           <div>
             {demandLoading ? (
@@ -384,7 +384,7 @@ const AIDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-green-50 rounded">
                   <h4 className="font-medium mb-2">7-Day Forecast</h4>
                   <div className="space-y-2">
@@ -415,7 +415,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Inventory Optimization</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Product
@@ -428,7 +428,7 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedProduct && (
           <div>
             {inventoryLoading ? (
@@ -459,7 +459,7 @@ const AIDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {inventoryOptimization.optimization.order_recommendation === 'ORDER NOW' && (
                   <div className="p-4 bg-orange-50 rounded border-2 border-orange-500">
                     <h4 className="font-medium mb-2 text-orange-800">⚠️ Action Required</h4>
@@ -490,7 +490,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Personalized Recommendations</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select User ID
@@ -503,48 +503,48 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedUser && (
           <div>
             {recommendationsLoading ? (
               <p className="text-gray-500">Loading recommendations...</p>
             ) : recommendations ? (
-            <div className="space-y-4">
-              <div className="p-4 bg-purple-50 rounded">
-                <h4 className="font-medium mb-2">User Segment: {recommendations.user_segment}</h4>
-                <p className="text-sm text-gray-600">
-                  {recommendations.recommendations.length} personalized recommendations
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendations.recommendations.map((product, index) => (
-                  <div key={index} className="p-4 border rounded hover:shadow-md transition">
-                    <div className="flex justify-between items-start mb-2">
-                      <h5 className="font-medium">{product.product_name}</h5>
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        {product.recommendation_score.toFixed(2)}
-                      </span>
+              <div className="space-y-4">
+                <div className="p-4 bg-purple-50 rounded">
+                  <h4 className="font-medium mb-2">User Segment: {recommendations.user_segment}</h4>
+                  <p className="text-sm text-gray-600">
+                    {recommendations.recommendations.length} personalized recommendations
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendations.recommendations.map((product, index) => (
+                    <div key={index} className="p-4 border rounded hover:shadow-md transition">
+                      <div className="flex justify-between items-start mb-2">
+                        <h5 className="font-medium">{product.product_name}</h5>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {product.recommendation_score.toFixed(2)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{product.recommendation_reason}</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Price: ₹{product.base_price}</span>
+                        <span className="text-gray-500">Nutrition: {product.nutrition_grade}</span>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{product.recommendation_reason}</p>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Price: ₹{product.base_price}</span>
-                      <span className="text-gray-500">Nutrition: {product.nutrition_grade}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => refetchRecommendations()}
-              className="w-full bg-purple-500 text-white py-2 px-4 rounded"
-            >
+            ) : (
+              <button
+                onClick={() => refetchRecommendations()}
+                className="w-full bg-purple-500 text-white py-2 px-4 rounded"
+              >
               Get Recommendations
-            </button>
-          )}
-        </div>
-      )}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -553,7 +553,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Customer Lifetime Value</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select User ID
@@ -566,7 +566,7 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedUser && (
           <div>
             {clvLoading ? (
@@ -633,7 +633,7 @@ const AIDashboard = () => {
           <PieChart className="h-5 w-5" />
           Market Basket Analysis
         </h3>
-        
+
         {basketLoading ? (
           <p className="text-gray-500">Loading market basket data...</p>
         ) : marketBasket?.recommendations ? (
@@ -641,7 +641,7 @@ const AIDashboard = () => {
             <p className="text-sm text-gray-600">
               {marketBasket.recommendations.length} cross-sell opportunities found
             </p>
-            
+
             <div className="space-y-3">
               {marketBasket.recommendations.map((pair, index) => (
                 <div key={index} className="p-4 border rounded hover:shadow-md transition">
@@ -725,8 +725,8 @@ const AIDashboard = () => {
                     </div>
                     <span className={`text-xs px-2 py-1 rounded ${
                       alert.severity === 'critical' ? 'bg-red-100 text-red-800' :
-                      alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-blue-100 text-blue-800'
+                        alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-blue-100 text-blue-800'
                     }`}>
                       {alert.severity}
                     </span>
@@ -757,8 +757,8 @@ const AIDashboard = () => {
                           <h3 className="font-semibold text-gray-900">{decision.title}</h3>
                           <span className={`text-xs px-2 py-1 rounded ${
                             decision.priority === 'high' ? 'bg-red-100 text-red-800' :
-                            decision.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
+                              decision.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-green-100 text-green-800'
                           }`}>
                             {decision.priority}
                           </span>

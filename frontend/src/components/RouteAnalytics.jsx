@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Route Analytics Tracker
- * 
+ *
  * Production-ready route analytics with:
  * - Automatic page view tracking
  * - Route change detection
@@ -10,107 +10,107 @@
  * - Integration with analytics providers
  */
 
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-import { useLocation, useNavigationType } from 'react-router-dom'
-import analytics from '../utils/analytics'
-import monitoring from '../utils/monitoring'
+import { useLocation, useNavigationType } from 'react-router-dom';
+import analytics from '../utils/analytics';
+import monitoring from '../utils/monitoring';
 
 /**
  * Route Analytics Component
  * Automatically tracks route changes and page views
  */
 export function RouteAnalytics({ routeConfig }) {
-  const location = useLocation()
-  const navigationType = useNavigationType()
+  const location = useLocation();
+  const navigationType = useNavigationType();
 
   useEffect(() => {
     // Track page view
     const trackPageView = () => {
-      const path = location.pathname
-      const route = routeConfig?.getRouteByPath(path)
-      
+      const path = location.pathname;
+      const route = routeConfig?.getRouteByPath(path);
+
       // Track with analytics
       analytics.trackPageView(route?.title || path, {
         path,
         navigationType: navigationType === 'POP' ? 'back' : navigationType === 'REPLACE' ? 'replace' : 'navigate',
-        referrer: document.referrer
-      })
+        referrer: document.referrer,
+      });
 
       // Track with monitoring
       monitoring.trackPageView(route?.title || path, {
         path,
-        navigationType
-      })
+        navigationType,
+      });
 
       // Update document title for SEO
       if (route?.title) {
-        document.title = route.title
+        document.title = route.title;
       }
 
       // Update meta description
       if (route?.description) {
-        updateMetaDescription(route.description)
+        updateMetaDescription(route.description);
       }
 
       // Update meta keywords
       if (route?.keywords) {
-        updateMetaKeywords(route.keywords)
+        updateMetaKeywords(route.keywords);
       }
-    }
+    };
 
-    trackPageView()
+    trackPageView();
 
     // Track navigation performance
-    const performance = monitoring.performance.measurePageLoad()
+    const performance = monitoring.performance.measurePageLoad();
     if (performance) {
       monitoring.trackPerformance('page_load', performance.pageLoadTime, {
         path: location.pathname,
-        domReady: performance.domReadyTime
-      })
+        domReady: performance.domReadyTime,
+      });
     }
-  }, [location, navigationType, routeConfig])
+  }, [location, navigationType, routeConfig]);
 
-  return null
+  return null;
 }
 
 /**
  * Update meta description tag
  */
 function updateMetaDescription(description) {
-  let metaTag = document.querySelector('meta[name="description"]')
+  let metaTag = document.querySelector('meta[name="description"]');
   if (!metaTag) {
-    metaTag = document.createElement('meta')
-    metaTag.name = 'description'
-    document.head.appendChild(metaTag)
+    metaTag = document.createElement('meta');
+    metaTag.name = 'description';
+    document.head.appendChild(metaTag);
   }
-  metaTag.content = description
+  metaTag.content = description;
 }
 
 /**
  * Update meta keywords tag
  */
 function updateMetaKeywords(keywords) {
-  let metaTag = document.querySelector('meta[name="keywords"]')
+  let metaTag = document.querySelector('meta[name="keywords"]');
   if (!metaTag) {
-    metaTag = document.createElement('meta')
-    metaTag.name = 'keywords'
-    document.head.appendChild(metaTag)
+    metaTag = document.createElement('meta');
+    metaTag.name = 'keywords';
+    document.head.appendChild(metaTag);
   }
-  metaTag.content = keywords
+  metaTag.content = keywords;
 }
 
 /**
  * Update canonical URL
  */
 function updateCanonicalUrl(url) {
-  let linkTag = document.querySelector('link[rel="canonical"]')
+  let linkTag = document.querySelector('link[rel="canonical"]');
   if (!linkTag) {
-    linkTag = document.createElement('link')
-    linkTag.rel = 'canonical'
-    document.head.appendChild(linkTag)
+    linkTag = document.createElement('link');
+    linkTag.rel = 'canonical';
+    document.head.appendChild(linkTag);
   }
-  linkTag.href = url
+  linkTag.href = url;
 }
 
 /**
@@ -122,18 +122,18 @@ function updateOpenGraphTags(title, description, image, url) {
     { property: 'og:description', content: description },
     { property: 'og:image', content: image },
     { property: 'og:url', content: url },
-    { property: 'og:type', content: 'website' }
-  ]
+    { property: 'og:type', content: 'website' },
+  ];
 
   ogTags.forEach(({ property, content }) => {
-    let metaTag = document.querySelector(`meta[property="${property}"]`)
+    let metaTag = document.querySelector(`meta[property="${property}"]`);
     if (!metaTag) {
-      metaTag = document.createElement('meta')
-      metaTag.setAttribute('property', property)
-      document.head.appendChild(metaTag)
+      metaTag = document.createElement('meta');
+      metaTag.setAttribute('property', property);
+      document.head.appendChild(metaTag);
     }
-    metaTag.content = content
-  })
+    metaTag.content = content;
+  });
 }
 
 /**
@@ -144,18 +144,18 @@ function updateTwitterCardTags(title, description, image) {
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: title },
     { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: image }
-  ]
+    { name: 'twitter:image', content: image },
+  ];
 
   twitterTags.forEach(({ name, content }) => {
-    let metaTag = document.querySelector(`meta[name="${name}"]`)
+    let metaTag = document.querySelector(`meta[name="${name}"]`);
     if (!metaTag) {
-      metaTag = document.createElement('meta')
-      metaTag.name = name
-      document.head.appendChild(metaTag)
+      metaTag = document.createElement('meta');
+      metaTag.name = name;
+      document.head.appendChild(metaTag);
     }
-    metaTag.content = content
-  })
+    metaTag.content = content;
+  });
 }
 
 /**
@@ -164,25 +164,25 @@ function updateTwitterCardTags(title, description, image) {
  */
 export function RouteMetadata({ route }) {
   useEffect(() => {
-    if (!route) return
+    if (!route) return;
 
-    const url = `${window.location.origin}${route.path}`
+    const url = `${window.location.origin}${route.path}`;
 
     // Update basic meta tags
     if (route.title) {
-      document.title = route.title
+      document.title = route.title;
     }
 
     if (route.description) {
-      updateMetaDescription(route.description)
+      updateMetaDescription(route.description);
     }
 
     if (route.keywords) {
-      updateMetaKeywords(route.keywords)
+      updateMetaKeywords(route.keywords);
     }
 
     // Update canonical URL
-    updateCanonicalUrl(url)
+    updateCanonicalUrl(url);
 
     // Update Open Graph tags
     if (route.title || route.description) {
@@ -190,8 +190,8 @@ export function RouteMetadata({ route }) {
         route.title,
         route.description,
         route.image || '/og-image.png',
-        url
-      )
+        url,
+      );
     }
 
     // Update Twitter Card tags
@@ -199,23 +199,23 @@ export function RouteMetadata({ route }) {
       updateTwitterCardTags(
         route.title,
         route.description,
-        route.image || '/twitter-image.png'
-      )
+        route.image || '/twitter-image.png',
+      );
     }
 
     // Add noindex if specified
     if (route.noIndex) {
-      let metaTag = document.querySelector('meta[name="robots"]')
+      let metaTag = document.querySelector('meta[name="robots"]');
       if (!metaTag) {
-        metaTag = document.createElement('meta')
-        metaTag.name = 'robots'
-        document.head.appendChild(metaTag)
+        metaTag = document.createElement('meta');
+        metaTag.name = 'robots';
+        document.head.appendChild(metaTag);
       }
-      metaTag.content = 'noindex, nofollow'
+      metaTag.content = 'noindex, nofollow';
     }
-  }, [route])
+  }, [route]);
 
-  return null
+  return null;
 }
 
 /**
@@ -223,30 +223,30 @@ export function RouteMetadata({ route }) {
  * Tracks user's navigation path through the application
  */
 export function UserJourneyTracker() {
-  const location = useLocation()
+  const location = useLocation();
 
   useEffect(() => {
     // Track user journey in localStorage
-    const journey = JSON.parse(localStorage.getItem('user_journey') || '[]')
-    
+    const journey = JSON.parse(localStorage.getItem('user_journey') || '[]');
+
     // Add current path to journey
     journey.push({
       path: location.pathname,
-      timestamp: Date.now()
-    })
+      timestamp: Date.now(),
+    });
 
     // Keep only last 50 entries
     if (journey.length > 50) {
-      journey.shift()
+      journey.shift();
     }
 
-    localStorage.setItem('user_journey', JSON.stringify(journey))
+    localStorage.setItem('user_journey', JSON.stringify(journey));
 
     // Track funnel events
-    trackFunnelEvents(location.pathname)
-  }, [location])
+    trackFunnelEvents(location.pathname);
+  }, [location]);
 
-  return null
+  return null;
 }
 
 /**
@@ -255,22 +255,22 @@ export function UserJourneyTracker() {
 function trackFunnelEvents(path) {
   // Marketplace funnel
   if (path === '/marketplace') {
-    analytics.trackEvent('marketplace_view', { category: 'funnel' })
+    analytics.trackEvent('marketplace_view', { category: 'funnel' });
   } else if (path.startsWith('/products/')) {
-    analytics.trackEvent('product_view', { category: 'funnel' })
+    analytics.trackEvent('product_view', { category: 'funnel' });
   } else if (path === '/cart') {
-    analytics.trackEvent('cart_view', { category: 'funnel' })
+    analytics.trackEvent('cart_view', { category: 'funnel' });
   } else if (path === '/checkout') {
-    analytics.trackEvent('checkout_start', { category: 'funnel' })
+    analytics.trackEvent('checkout_start', { category: 'funnel' });
   }
 
   // Farmer onboarding funnel
   if (path === '/farmer-entrance') {
-    analytics.trackEvent('farmer_portal_entry', { category: 'funnel' })
+    analytics.trackEvent('farmer_portal_entry', { category: 'funnel' });
   } else if (path === '/farmer-entrance/sell') {
-    analytics.trackEvent('sell_door_entry', { category: 'funnel' })
+    analytics.trackEvent('sell_door_entry', { category: 'funnel' });
   } else if (path === '/farmer-entrance/field') {
-    analytics.trackEvent('field_door_entry', { category: 'funnel' })
+    analytics.trackEvent('field_door_entry', { category: 'funnel' });
   }
 }
 
@@ -280,34 +280,34 @@ function trackFunnelEvents(path) {
  */
 export function ScrollTracker() {
   useEffect(() => {
-    let maxScroll = 0
+    let maxScroll = 0;
 
     const handleScroll = () => {
       const scrollPercent = Math.round(
-        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
-      )
-      
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100,
+      );
+
       if (scrollPercent > maxScroll) {
-        maxScroll = scrollPercent
-        
+        maxScroll = scrollPercent;
+
         // Track scroll depth milestones
         if (maxScroll === 25) {
-          analytics.trackEvent('scroll_25', { category: 'engagement' })
+          analytics.trackEvent('scroll_25', { category: 'engagement' });
         } else if (maxScroll === 50) {
-          analytics.trackEvent('scroll_50', { category: 'engagement' })
+          analytics.trackEvent('scroll_50', { category: 'engagement' });
         } else if (maxScroll === 75) {
-          analytics.trackEvent('scroll_75', { category: 'engagement' })
+          analytics.trackEvent('scroll_75', { category: 'engagement' });
         } else if (maxScroll === 100) {
-          analytics.trackEvent('scroll_100', { category: 'engagement' })
+          analytics.trackEvent('scroll_100', { category: 'engagement' });
         }
       }
-    }
+    };
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  return null
+  return null;
 }
 
 /**
@@ -316,41 +316,41 @@ export function ScrollTracker() {
  */
 export function EngagementTracker() {
   useEffect(() => {
-    let startTime = Date.now()
-    let isActive = true
+    let startTime = Date.now();
+    let isActive = true;
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        isActive = false
-        const duration = Date.now() - startTime
+        isActive = false;
+        const duration = Date.now() - startTime;
         analytics.trackEvent('page_engagement', {
           category: 'engagement',
-          value: Math.round(duration / 1000) // seconds
-        })
+          value: Math.round(duration / 1000), // seconds
+        });
       } else {
-        isActive = true
-        startTime = Date.now()
+        isActive = true;
+        startTime = Date.now();
       }
-    }
+    };
 
     const handleBeforeUnload = () => {
       if (isActive) {
-        const duration = Date.now() - startTime
+        const duration = Date.now() - startTime;
         analytics.trackEvent('page_duration', {
           category: 'engagement',
-          value: Math.round(duration / 1000)
-        })
+          value: Math.round(duration / 1000),
+        });
       }
-    }
+    };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [])
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
-  return null
+  return null;
 }

@@ -1,6 +1,6 @@
 # Frontend Wireframe — layers and permitted dependencies
 
-**Generated:** 2026-09-02 by `tools/frontend-boundaries.js`
+**Generated:** 2026-09-03 by `tools/frontend-boundaries.js`
 **Status:** DESCRIPTIVE — measured from source.
 **Do not edit by hand.**
 
@@ -30,11 +30,11 @@
 | Layer | Files | Owns | May import |
 |---|---|---|---|
 | **app** | 1 | Routing, provider composition | pages, components, store, services, hooks |
-| **pages** | 213 | Route-level composition. Fetches, arranges, delegates. | components, store, services, hooks |
-| **components** | 75 | Presentation and local interaction only | components, store, hooks |
+| **pages** | 370 | Route-level composition. Fetches, arranges, delegates. | components, store, services, hooks |
+| **components** | 315 | Presentation and local interaction only | components, store, hooks |
 | **store** | 1 | Cross-page state (zustand) | services |
 | **hooks** | 2 | Reusable stateful logic | services, store |
-| **services** | 4 | ALL network I/O. The only layer that talks to the API. | _nothing_ |
+| **services** | 5 | ALL network I/O. The only layer that talks to the API. | _nothing_ |
 
 ## Rules
 

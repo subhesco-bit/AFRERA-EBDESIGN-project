@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { Download, Package, AlertTriangle, TrendingUp, Warehouse } from 'lucide-react'
-import AIInsightsPanel from '../components/ui/AIInsightsPanel'
-import { aiDecisionService } from '../services/aiDecisionService'
+import React, { useMemo, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Download, Package, AlertTriangle, TrendingUp, Warehouse } from 'lucide-react';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 const InventoryReportPage = () => {
-  const [view, setView] = useState('overview')
+  const [view, setView] = useState('overview');
 
   const aiInsights = useMemo(
     () => [
@@ -23,7 +23,7 @@ const InventoryReportPage = () => {
         severity: 'warning',
         metadata: { source: 'fallback', module: 'inventory' },
         context: { stock: 'below target', horizon: '72h' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: 'inventory-pace-risk',
@@ -37,15 +37,15 @@ const InventoryReportPage = () => {
         severity: 'info',
         metadata: { source: 'fallback', module: 'demand' },
         context: { category: 'produce', trend: '+18%' },
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     ],
-    []
-  )
+    [],
+  );
 
   const handleApplyRecommendation = (insight) => {
-    alert(`Applied recommendation: ${insight.title}`)
-  }
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   const inventoryData = {
     totalItems: 1520,
@@ -56,14 +56,14 @@ const InventoryReportPage = () => {
       { name: 'Grains', items: 450, value: 850000 },
       { name: 'Vegetables', items: 380, value: 620000 },
       { name: 'Dairy', items: 320, value: 580000 },
-      { name: 'Fruits', items: 370, value: 400000 }
+      { name: 'Fruits', items: 370, value: 400000 },
     ],
     lowStockAlerts: [
       { name: 'Organic Wheat', current: 15, minimum: 50, unit: 'kg' },
       { name: 'Fresh Tomatoes', current: 8, minimum: 30, unit: 'kg' },
-      { name: 'Milk', current: 20, minimum: 40, unit: 'liters' }
-    ]
-  }
+      { name: 'Milk', current: 20, minimum: 40, unit: 'liters' },
+    ],
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -185,7 +185,7 @@ const InventoryReportPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default InventoryReportPage
+export default InventoryReportPage;

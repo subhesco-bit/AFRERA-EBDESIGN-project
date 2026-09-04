@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Security Utilities
- * 
+ *
  * Production-ready security with:
  * - XSS protection and sanitization
  * - Content Security Policy helpers
@@ -16,24 +16,24 @@
  * Sanitize HTML to prevent XSS attacks
  */
 function sanitizeHTML(html) {
-  const div = document.createElement('div')
-  div.textContent = html
-  return div.innerHTML
+  const div = document.createElement('div');
+  div.textContent = html;
+  return div.innerHTML;
 }
 
 /**
  * Sanitize user input for safe display
  */
 function sanitizeInput(input) {
-  if (typeof input !== 'string') return input
-  
+  if (typeof input !== 'string') return input;
+
   return input
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;')
+    .replace(/\//g, '&#x2F;');
 }
 
 /**
@@ -41,21 +41,21 @@ function sanitizeInput(input) {
  */
 function sanitizeURL(url) {
   try {
-    const parsed = new URL(url, window.location.origin)
-    
+    const parsed = new URL(url, window.location.origin);
+
     // Only allow http/https protocols
     if (!['http:', 'https:'].includes(parsed.protocol)) {
-      return '#'
+      return '#';
     }
-    
+
     // Remove javascript: protocol
     if (parsed.protocol === 'javascript:') {
-      return '#'
+      return '#';
     }
-    
-    return parsed.toString()
+
+    return parsed.toString();
   } catch {
-    return '#'
+    return '#';
   }
 }
 
@@ -63,23 +63,23 @@ function sanitizeURL(url) {
  * Generate secure random string
  */
 function generateSecureRandom(length = 32) {
-  const array = new Uint8Array(length)
-  crypto.getRandomValues(array)
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
  * Generate CSRF token
  */
 function generateCSRFToken() {
-  return generateSecureRandom(32)
+  return generateSecureRandom(32);
 }
 
 /**
  * Validate CSRF token
  */
 function validateCSRFToken(token, storedToken) {
-  return token && storedToken && token === storedToken
+  return token && storedToken && token === storedToken;
 }
 
 /**
@@ -94,13 +94,13 @@ const secureStorage = {
       const data = JSON.stringify({
         value,
         timestamp: Date.now(),
-        version: 1
-      })
-      localStorage.setItem(key, data)
-      return true
+        version: 1,
+      });
+      localStorage.setItem(key, data);
+      return true;
     } catch (error) {
-      
-      return false
+
+      return false;
     }
   },
 
@@ -109,21 +109,21 @@ const secureStorage = {
    */
   getItem(key) {
     try {
-      const data = localStorage.getItem(key)
-      if (!data) return null
-      
-      const parsed = JSON.parse(data)
-      
+      const data = localStorage.getItem(key);
+      if (!data) return null;
+
+      const parsed = JSON.parse(data);
+
       // Check if data is expired (24 hours)
       if (parsed.timestamp && Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
-        this.removeItem(key)
-        return null
+        this.removeItem(key);
+        return null;
       }
-      
-      return parsed.value
+
+      return parsed.value;
     } catch (error) {
-      
-      return null
+
+      return null;
     }
   },
 
@@ -132,11 +132,11 @@ const secureStorage = {
    */
   removeItem(key) {
     try {
-      localStorage.removeItem(key)
-      return true
+      localStorage.removeItem(key);
+      return true;
     } catch (error) {
-      
-      return false
+
+      return false;
     }
   },
 
@@ -145,14 +145,14 @@ const secureStorage = {
    */
   clear() {
     try {
-      localStorage.clear()
-      return true
+      localStorage.clear();
+      return true;
     } catch (error) {
-      
-      return false
+
+      return false;
     }
-  }
-}
+  },
+};
 
 /**
  * Token management utilities
@@ -162,51 +162,51 @@ const tokenManager = {
    * Store access token securely
    */
   setAccessToken(token) {
-    return secureStorage.setItem('access_token', token)
+    return secureStorage.setItem('access_token', token);
   },
 
   /**
    * Get access token
    */
   getAccessToken() {
-    return secureStorage.getItem('access_token')
+    return secureStorage.getItem('access_token');
   },
 
   /**
    * Store refresh token securely
    */
   setRefreshToken(token) {
-    return secureStorage.setItem('refresh_token', token)
+    return secureStorage.setItem('refresh_token', token);
   },
 
   /**
    * Get refresh token
    */
   getRefreshToken() {
-    return secureStorage.getItem('refresh_token')
+    return secureStorage.getItem('refresh_token');
   },
 
   /**
    * Clear all tokens
    */
   clearTokens() {
-    secureStorage.removeItem('access_token')
-    secureStorage.removeItem('refresh_token')
-    secureStorage.removeItem('csrf_token')
+    secureStorage.removeItem('access_token');
+    secureStorage.removeItem('refresh_token');
+    secureStorage.removeItem('csrf_token');
   },
 
   /**
    * Check if token is expired
    */
   isTokenExpired(token) {
-    if (!token) return true
-    
+    if (!token) return true;
+
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      const now = Date.now() / 1000
-      return payload.exp < now
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const now = Date.now() / 1000;
+      return payload.exp < now;
     } catch {
-      return true
+      return true;
     }
   },
 
@@ -214,16 +214,16 @@ const tokenManager = {
    * Get token expiration time
    */
   getTokenExpiration(token) {
-    if (!token) return null
-    
+    if (!token) return null;
+
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      return payload.exp ? new Date(payload.exp * 1000) : null
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp ? new Date(payload.exp * 1000) : null;
     } catch {
-      return null
+      return null;
     }
-  }
-}
+  },
+};
 
 /**
  * Content Security Policy helpers
@@ -233,16 +233,16 @@ const cspHelper = {
    * Generate nonce for inline scripts/styles
    */
   generateNonce() {
-    return generateSecureRandom(16)
+    return generateSecureRandom(16);
   },
 
   /**
    * Validate nonce
    */
   validateNonce(nonce, expectedNonce) {
-    return nonce === expectedNonce
-  }
-}
+    return nonce === expectedNonce;
+  },
+};
 
 /**
  * Input validation helpers
@@ -252,8 +252,8 @@ const inputValidator = {
    * Validate email format
    */
   isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   },
 
   /**
@@ -261,10 +261,10 @@ const inputValidator = {
    */
   isValidURL(url) {
     try {
-      new URL(url)
-      return true
+      new URL(url);
+      return true;
     } catch {
-      return false
+      return false;
     }
   },
 
@@ -272,24 +272,24 @@ const inputValidator = {
    * Validate phone number
    */
   isValidPhone(phone) {
-    const phoneRegex = /^\+?[\d\s-()]+$/
-    return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10
+    const phoneRegex = /^\+?[\d\s-()]+$/;
+    return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
   },
 
   /**
    * Validate password strength
    */
   getPasswordStrength(password) {
-    let strength = 0
-    
-    if (password.length >= 8) strength++
-    if (password.length >= 12) strength++
-    if (/[a-z]/.test(password)) strength++
-    if (/[A-Z]/.test(password)) strength++
-    if (/\d/.test(password)) strength++
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++
-    
-    return strength
+    let strength = 0;
+
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
+
+    return strength;
   },
 
   /**
@@ -299,9 +299,9 @@ const inputValidator = {
     return filename
       .replace(/[^a-zA-Z0-9._-]/g, '_')
       .replace(/_{2,}/g, '_')
-      .replace(/^_+|_+$/g, '')
-  }
-}
+      .replace(/^_+|_+$/g, '');
+  },
+};
 
 /**
  * Security headers helper
@@ -313,17 +313,17 @@ const securityHeaders = {
   getHeaders() {
     const headers = {
       'X-Requested-With': 'XMLHttpRequest',
-      'X-Content-Type-Options': 'nosniff'
-    }
-    
-    const csrfToken = secureStorage.getItem('csrf_token')
+      'X-Content-Type-Options': 'nosniff',
+    };
+
+    const csrfToken = secureStorage.getItem('csrf_token');
     if (csrfToken) {
-      headers['X-CSRF-Token'] = csrfToken
+      headers['X-CSRF-Token'] = csrfToken;
     }
-    
-    return headers
-  }
-}
+
+    return headers;
+  },
+};
 
 /**
  * Rate limiting helper (client-side)
@@ -333,57 +333,57 @@ const rateLimiter = {
    * Check if action is rate limited
    */
   isRateLimited(actionKey, maxRequests = 10, windowMs = 60000) {
-    const key = `rate_limit_${actionKey}`
-    const data = secureStorage.getItem(key)
-    
+    const key = `rate_limit_${actionKey}`;
+    const data = secureStorage.getItem(key);
+
     if (!data) {
       secureStorage.setItem(key, {
         count: 1,
-        resetTime: Date.now() + windowMs
-      })
-      return false
+        resetTime: Date.now() + windowMs,
+      });
+      return false;
     }
-    
-    const parsed = JSON.parse(data)
-    
+
+    const parsed = JSON.parse(data);
+
     // Reset if window expired
     if (Date.now() > parsed.resetTime) {
       secureStorage.setItem(key, {
         count: 1,
-        resetTime: Date.now() + windowMs
-      })
-      return false
+        resetTime: Date.now() + windowMs,
+      });
+      return false;
     }
-    
+
     // Check if limit exceeded
     if (parsed.count >= maxRequests) {
-      return true
+      return true;
     }
-    
+
     // Increment count
-    parsed.count++
-    secureStorage.setItem(key, parsed)
-    return false
+    parsed.count++;
+    secureStorage.setItem(key, parsed);
+    return false;
   },
 
   /**
    * Get remaining requests
    */
   getRemainingRequests(actionKey, maxRequests = 10) {
-    const key = `rate_limit_${actionKey}`
-    const data = secureStorage.getItem(key)
-    
-    if (!data) return maxRequests
-    
-    const parsed = JSON.parse(data)
-    
+    const key = `rate_limit_${actionKey}`;
+    const data = secureStorage.getItem(key);
+
+    if (!data) return maxRequests;
+
+    const parsed = JSON.parse(data);
+
     if (Date.now() > parsed.resetTime) {
-      return maxRequests
+      return maxRequests;
     }
-    
-    return Math.max(0, maxRequests - parsed.count)
-  }
-}
+
+    return Math.max(0, maxRequests - parsed.count);
+  },
+};
 
 /**
  * Security audit logging
@@ -398,11 +398,11 @@ const securityLogger = {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href,
-      ...data
-    }
-    
+      ...data,
+    };
+
     if (import.meta.env.DEV) {
-      console.warn('[security]', logData)
+      console.warn('[security]', logData);
     }
 
     // In production, send to security monitoring service
@@ -416,8 +416,8 @@ const securityLogger = {
     this.logEvent('AUTH', {
       action,
       success,
-      userId
-    })
+      userId,
+    });
   },
 
   /**
@@ -426,10 +426,10 @@ const securityLogger = {
   logSuspiciousActivity(type, details) {
     this.logEvent('SUSPICIOUS', {
       type,
-      details
-    })
-  }
-}
+      details,
+    });
+  },
+};
 
 export {
   sanitizeHTML,
@@ -444,5 +444,5 @@ export {
   inputValidator,
   securityHeaders,
   rateLimiter,
-  securityLogger
-}
+  securityLogger,
+};

@@ -11,7 +11,7 @@ import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
-import { marketplaceAPI } from '../../services/api';
+import { marketplaceAPI } from '../../services/componentApi';
 
 // FE-02 note: not resolved here. All three calculations are triggered by a
 // user clicking a button over form state or an orderId prop already passed
@@ -24,7 +24,7 @@ const GSTCalculator = ({ orderId, productId }) => {
   const [product, setProduct] = useState({
     name: '',
     price: 0,
-    category: 'vegetables'
+    category: 'vegetables',
   });
 
   const categories = [
@@ -36,12 +36,12 @@ const GSTCalculator = ({ orderId, productId }) => {
     { value: 'spices', label: 'Spices (5%)', rate: 5 },
     { value: 'dairy_products', label: 'Dairy Products (12%)', rate: 12 },
     { value: 'packaged_food', label: 'Packaged Food (18%)', rate: 18 },
-    { value: 'beverages', label: 'Beverages (18%)', rate: 18 }
+    { value: 'beverages', label: 'Beverages (18%)', rate: 18 },
   ];
 
   // All three GST endpoints are protected by authMiddleware on the backend.
   // This component previously sent no Authorization header (-> 401), so none
-  // of them could ever succeed. Routing through marketplaceAPI (services/api.js)
+  // of them could ever succeed. Routing through the named marketplace client
   // fixes that.
   const calculateProductGST = async () => {
     setLoading(true);

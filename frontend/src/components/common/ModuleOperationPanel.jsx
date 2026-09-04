@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import api from '../../services/api'
+import { useEffect, useState } from 'react';
+import { moduleAPI } from '../../services/componentApi';
 
 /**
  * Generic UI for any backend/src/modules/M0XX module exposed through
@@ -15,16 +15,16 @@ import api from '../../services/api'
  * Usage: <ModuleOperationPanel moduleId="M073" title="Nutrient Management" />
  */
 export default function ModuleOperationPanel({ moduleId, title, description }) {
-  const [operations, setOperations] = useState(null)
-  const [loadError, setLoadError] = useState('')
+  const [operations, setOperations] = useState(null);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
-    let cancelled = false
-    api.get(`/backend-modules/${moduleId}`)
-      .then((res) => { if (!cancelled) setOperations(res.data?.operations || []) })
-      .catch((e) => { if (!cancelled) setLoadError(e?.response?.data?.error || e.message || 'Failed to load module') })
-    return () => { cancelled = true }
-  }, [moduleId])
+    let cancelled = false;
+    moduleAPI.getOperations(moduleId)
+      .then((res) => { if (!cancelled) setOperations(res.data?.operations || []); })
+      .catch((e) => { if (!cancelled) setLoadError(e?.response?.data?.error || e.message || 'Failed to load module'); });
+    return () => { cancelled = true; };
+  }, [moduleId]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -46,39 +46,39 @@ export default function ModuleOperationPanel({ moduleId, title, description }) {
         <OperationCard key={op} moduleId={moduleId} operation={op} />
       ))}
     </div>
-  )
+  );
 }
 
 function OperationCard({ moduleId, operation }) {
-  const [jsonText, setJsonText] = useState('')
-  const [jsonError, setJsonError] = useState('')
-  const [result, setResult] = useState(null)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [jsonText, setJsonText] = useState('');
+  const [jsonError, setJsonError] = useState('');
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const run = async () => {
-    setError('')
-    setResult(null)
-    let payload = {}
+    setError('');
+    setResult(null);
+    let payload = {};
     if (jsonText.trim()) {
       try {
-        payload = JSON.parse(jsonText)
-        setJsonError('')
+        payload = JSON.parse(jsonText);
+        setJsonError('');
       } catch {
-        setJsonError('Not valid JSON')
-        return
+        setJsonError('Not valid JSON');
+        return;
       }
     }
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await api.post(`/backend-modules/${moduleId}/${operation}`, payload)
-      setResult(res.data?.data ?? res.data)
+      const res = await moduleAPI.execute(moduleId, operation, undefined, payload);
+      setResult(res.data?.data ?? res.data);
     } catch (e) {
-      setError(e?.response?.data?.error || e.message || 'Request failed')
+      setError(e?.response?.data?.error || e.message || 'Request failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5 mb-4">
@@ -112,5 +112,5 @@ function OperationCard({ moduleId, operation }) {
         </pre>
       )}
     </div>
-  )
+  );
 }

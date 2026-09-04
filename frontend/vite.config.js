@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import viteCompression from 'vite-plugin-compression'
 
@@ -9,6 +10,7 @@ export default defineConfig(async () => {
   return {
     plugins: [
       react(),
+      tailwindcss(),
       // Bundle analyzer for development
       visualizer && visualizer({
         open: true,

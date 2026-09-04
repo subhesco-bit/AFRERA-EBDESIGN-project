@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { voiceAIAPI } from '../../services/api';
+import { voiceAIAPI } from '../../services/componentApi';
 
 /**
  * Voice Assistant Component
@@ -24,7 +24,7 @@ const VoiceAssistant = ({ language = 'en' }) => {
   useEffect(() => {
     initializeSession();
     fetchPreferences();
-    
+
     // Initialize speech recognition if available
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -104,7 +104,7 @@ const VoiceAssistant = ({ language = 'en' }) => {
         session_id: sessionId,
         transcript: transcriptText,
         command_type: 'general',
-        parameters: {}
+        parameters: {},
       });
 
       const data = response.data;
@@ -166,9 +166,9 @@ const VoiceAssistant = ({ language = 'en' }) => {
           onClick={isListening ? stopListening : startListening}
           disabled={isProcessing}
           className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-            isListening
-              ? 'bg-red-500 hover:bg-red-600 animate-pulse'
-              : 'bg-blue-600 hover:bg-blue-700'
+            isListening ?
+              'bg-red-500 hover:bg-red-600 animate-pulse' :
+              'bg-blue-600 hover:bg-blue-700'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {isListening ? (

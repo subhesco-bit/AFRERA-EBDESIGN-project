@@ -185,9 +185,9 @@ CREATE INDEX idx_permissions_resource ON permissions(resource);
 -- User Roles Table
 CREATE TABLE IF NOT EXISTS user_roles (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   role_id INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-  assigned_by INTEGER REFERENCES users(id),
+  assigned_by UUID REFERENCES users(id),
   assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   expires_at TIMESTAMP,
   is_active BOOLEAN DEFAULT true,
@@ -272,7 +272,7 @@ CREATE INDEX idx_sessions_expires ON user_sessions(expires_at);
 -- Audit Log Table
 CREATE TABLE IF NOT EXISTS audit_logs (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  user_id UUID REFERENCES users(id),
   action VARCHAR(100) NOT NULL,
   entity_type VARCHAR(100),
   entity_id INTEGER,

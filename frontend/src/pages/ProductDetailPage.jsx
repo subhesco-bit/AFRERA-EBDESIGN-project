@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { productsAPI, productReviewsAPI, ordersAPI, productMediaAIAPI } from '../services/api'
-import { ShoppingCart, Star, Leaf, Award, Truck, ChevronLeft, Minus, Plus, Sparkles } from 'lucide-react'
-import toast from 'react-hot-toast'
-import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel'
-import { buildProductImagePrompt } from '../utils/aiStudio'
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { productsAPI, productReviewsAPI, ordersAPI, productMediaAIAPI } from '../services/api';
+import { ShoppingCart, Star, Leaf, Award, Truck, ChevronLeft, Minus, Plus, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
+import NutritionLabel from '../components/NutritionIntelligence/NutritionLabel';
+import { buildProductImagePrompt } from '../utils/aiStudio';
 
 function ProductDetailPage() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const [quantity, setQuantity] = useState(1)
-  const [aiImage, setAiImage] = useState(null)
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [quantity, setQuantity] = useState(1);
+  const [aiImage, setAiImage] = useState(null);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => (await productsAPI.getProduct(id)).data,
-  })
+  });
 
   // Real review stats (product_reviews table, migration
   // 009_marketplace_enhancements.sql) — no rating is shown until this
@@ -27,48 +27,48 @@ function ProductDetailPage() {
   const { data: reviewStats } = useQuery({
     queryKey: ['productReviewStats', id],
     queryFn: async () => (await productReviewsAPI.getStats(id)).data?.data,
-    enabled: !!id,
-  })
+    enabled: Boolean(id),
+  });
 
   const addToCart = useMutation({
     mutationFn: (qty) => ordersAPI.addToCart({ product_id: id, quantity: qty }),
     onSuccess: () => toast.success('Added to cart'),
     onError: (err) => toast.error(err.response?.data?.error || 'Failed to add to cart'),
-  })
+  });
 
   const buyNow = async () => {
     try {
-      await ordersAPI.addToCart({ product_id: id, quantity })
-      navigate('/cart')
+      await ordersAPI.addToCart({ product_id: id, quantity });
+      navigate('/cart');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to start checkout')
+      toast.error(err.response?.data?.error || 'Failed to start checkout');
     }
-  }
+  };
 
   const generateAiImage = useMutation({
     mutationFn: () => {
-      const prompt = searchParams.get('prompt') || buildProductImagePrompt(product?.name, product?.description, product?.state_name)
-      return productMediaAIAPI.generateImage(id, prompt)
+      const prompt = searchParams.get('prompt') || buildProductImagePrompt(product?.name, product?.description, product?.state_name);
+      return productMediaAIAPI.generateImage(id, prompt);
     },
     onSuccess: (res) => {
-      const payload = res.data?.data || res.data || {}
+      const payload = res.data?.data || res.data || {};
       if (payload?.status === 'not_configured') {
-        toast('AI image generation is not configured in this environment yet. The listing remains live.', { icon: 'ℹ️' })
-        return
+        toast('AI image generation is not configured in this environment yet. The listing remains live.', { icon: 'ℹ️' });
+        return;
       }
       if (payload?.imageUrl) {
-        setAiImage(payload.imageUrl)
-        toast.success('AI image generated')
+        setAiImage(payload.imageUrl);
+        toast.success('AI image generated');
       }
     },
     onError: (err) => toast.error(err.response?.data?.error || 'AI image generation failed'),
-  })
+  });
 
   useEffect(() => {
     if (product && searchParams.get('autoAI') === '1') {
-      generateAiImage.mutate()
+      generateAiImage.mutate();
     }
-  }, [product, searchParams])
+  }, [product, searchParams]);
 
   if (isLoading) {
     return (
@@ -80,7 +80,7 @@ function ProductDetailPage() {
           <div className="h-12 bg-v42-paddy2 rounded w-1/4"></div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -88,7 +88,7 @@ function ProductDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-red-600">Error loading product: {error.message}</div>
       </div>
-    )
+    );
   }
 
   if (!product) {
@@ -96,7 +96,7 @@ function ProductDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-v42-mut">Product not found</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -300,7 +300,7 @@ function ProductDetailPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ProductDetailPage
+export default ProductDetailPage;

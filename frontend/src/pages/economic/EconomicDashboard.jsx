@@ -1,32 +1,32 @@
-import { ArrowUpRight, BarChart3, CircleDollarSign, Landmark, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
-import { Button } from '../../components/ui/button'
+import { ArrowUpRight, BarChart3, CircleDollarSign, Landmark, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
 
 const stats = [
   { label: 'Gross margin', value: '₹42.8L', trend: '+14.6%', tone: 'emerald' },
   { label: 'Market value', value: '₹91.2L', trend: '+8.9%', tone: 'blue' },
   { label: 'Cash flow', value: '₹26.4L', trend: '+5.3%', tone: 'violet' },
   { label: 'Exposure risk', value: 'Low', trend: '-2.4%', tone: 'amber' },
-]
+];
 
 const priorities = [
   { label: 'Procurement efficiency', value: 88, tone: 'bg-emerald-500' },
   { label: 'Risk control', value: 81, tone: 'bg-sky-500' },
   { label: 'Policy adoption', value: 76, tone: 'bg-violet-500' },
   { label: 'Working capital', value: 69, tone: 'bg-amber-500' },
-]
+];
 
 const insights = [
   'B2B agricultural trade momentum remains stable across the corridor with improved liquidity.',
   'The region is outperforming target pricing in rice and cardamom procurement clusters.',
   'Treasury controls remain healthy with a manageable hedging exposure for seasonal volatility.',
-]
+];
 
 const feed = [
   { title: 'Segment growth improved', detail: 'High-value crop channels outperformed baseline by 11.7% this cycle.', time: '1h ago' },
   { title: 'Procurement plan updated', detail: 'Transit and storage costs were recalibrated against current market rates.', time: '3h ago' },
   { title: 'Policy alerts cleared', detail: 'Subsidy and compliance checks were reviewed and approved for release.', time: 'Today' },
-]
+];
 
 export default function EconomicDashboard() {
   return (
@@ -194,6 +194,6 @@ export default function EconomicDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 

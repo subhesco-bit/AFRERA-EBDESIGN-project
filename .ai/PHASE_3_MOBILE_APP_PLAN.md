@@ -1,6 +1,6 @@
 # PHASE 3: MOBILE APP DEVELOPMENT PLAN
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Phase:** 3 - Mobile Application Development  
 **Timeline:** 3-6 months  
 **Status:** Planning Phase  
@@ -8,7 +8,7 @@
 
 ## EXECUTIVE SUMMARY
 
-This document outlines the comprehensive plan for developing native mobile applications for the SVESCO/EBDESIGN platform. The mobile apps will extend the platform's reach to farmers and consumers on-the-go, providing real-time access to marketplace, financial services, and AI advisory features.
+This document outlines the comprehensive plan for developing native mobile applications for the Subhesco/EBDESIGN platform. The mobile apps will extend the platform's reach to farmers and consumers on-the-go, providing real-time access to marketplace, financial services, and AI advisory features.
 
 ## PROJECT OBJECTIVES
 

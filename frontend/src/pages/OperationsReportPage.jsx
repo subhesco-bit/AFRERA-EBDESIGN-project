@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { Download, Truck, Warehouse, Package, Clock } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Download, Truck, Warehouse, Package, Clock } from 'lucide-react';
 
 const OperationsReportPage = () => {
-  const [view, setView] = useState('logistics')
+  const [view, setView] = useState('logistics');
 
   const operationsData = {
     totalShipments: 1250,
@@ -13,8 +13,8 @@ const OperationsReportPage = () => {
     averageDeliveryTime: 2.8,
     warehouseCapacity: 85,
     returns: 45,
-    damaged: 12
-  }
+    damaged: 12,
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -141,7 +141,7 @@ const OperationsReportPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default OperationsReportPage
+export default OperationsReportPage;

@@ -8,7 +8,7 @@ describe('StatCard Component', () => {
       <StatCard
         title="Account Balance"
         value="₹5,250"
-      />
+      />,
     );
 
     expect(screen.getByText('Account Balance')).toBeTruthy();
@@ -21,7 +21,7 @@ describe('StatCard Component', () => {
         title="Orders"
         value="12"
         icon="📦"
-      />
+      />,
     );
 
     expect(screen.getByText('📦')).toBeTruthy();
@@ -33,7 +33,7 @@ describe('StatCard Component', () => {
         title="Growth"
         value="150%"
         trend={{ positive: true, percentage: 15 }}
-      />
+      />,
     );
 
     expect(screen.getByText(/15%/)).toBeTruthy();
@@ -45,7 +45,7 @@ describe('StatCard Component', () => {
         title="Decline"
         value="50%"
         trend={{ positive: false, percentage: 5 }}
-      />
+      />,
     );
 
     expect(screen.getByText(/5%/)).toBeTruthy();
@@ -58,7 +58,7 @@ describe('StatCard Component', () => {
         title="Clickable"
         value="100"
         onClick={handleClick}
-      />
+      />,
     );
 
     const card = screen.getByText('Clickable').parentElement.parentElement;
@@ -72,7 +72,7 @@ describe('StatCard Component', () => {
       <StatCard
         title="No Icon"
         value="999"
-      />
+      />,
     );
 
     expect(container.querySelector('.stat-icon')).toBeFalsy();
@@ -83,7 +83,7 @@ describe('StatCard Component', () => {
       <StatCard
         title="No Trend"
         value="500"
-      />
+      />,
     );
 
     expect(container.querySelector('.stat-trend')).toBeFalsy();

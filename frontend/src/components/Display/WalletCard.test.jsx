@@ -1,11 +1,18 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import WalletCard from './WalletCard';
+import { walletAPI } from '../../services/api';
+
+jest.mock('../../services/api', () => ({
+  walletAPI: {
+    getBalance: jest.fn(),
+  },
+}));
 
 describe('WalletCard Component', () => {
   beforeEach(() => {
     localStorage.setItem('token', 'test_token_123');
-    global.fetch = jest.fn();
+    walletAPI.getBalance.mockResolvedValue({ data: { data: { balance: 1000 } } });
   });
 
   afterEach(() => {
@@ -14,23 +21,14 @@ describe('WalletCard Component', () => {
   });
 
   it('should render loading state initially', () => {
-    global.fetch.mockImplementationOnce(() =>
-      new Promise(() => {}) // Never resolves to keep loading state
-    );
+    walletAPI.getBalance.mockImplementationOnce(() => new Promise(() => {}));
 
     render(<WalletCard />);
     expect(screen.getByText('Loading...')).toBeTruthy();
   });
 
   it('should load and display wallet balance', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: {
-          balance: 5250.5,
-        },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 5250.5 } } });
 
     render(<WalletCard />);
 
@@ -40,12 +38,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should display wallet status as Active', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: { balance: 1000 },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 
     render(<WalletCard />);
 
@@ -55,12 +48,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should display currency as INR', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: { balance: 1000 },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 
     render(<WalletCard />);
 
@@ -72,12 +60,7 @@ describe('WalletCard Component', () => {
   it('should call onAddFunds when Add Funds button is clicked', async () => {
     const handleAddFunds = jest.fn();
 
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: { balance: 1000 },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 
     render(<WalletCard onAddFunds={handleAddFunds} />);
 
@@ -92,12 +75,7 @@ describe('WalletCard Component', () => {
   it('should call onTransfer when Transfer button is clicked', async () => {
     const handleTransfer = jest.fn();
 
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: { balance: 1000 },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 
     render(<WalletCard onTransfer={handleTransfer} />);
 
@@ -110,10 +88,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should display error if fetch fails', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
+    walletAPI.getBalance.mockRejectedValueOnce(new Error('Failed to load balance'));
 
     render(<WalletCard />);
 
@@ -123,12 +98,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should not render action buttons if callbacks not provided', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: { balance: 1000 },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 1000 } } });
 
     render(<WalletCard />);
 
@@ -139,12 +109,7 @@ describe('WalletCard Component', () => {
   });
 
   it('should format balance with 2 decimal places', async () => {
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        data: { balance: 5250.5 },
-      }),
-    });
+    walletAPI.getBalance.mockResolvedValueOnce({ data: { data: { balance: 5250.5 } } });
 
     render(<WalletCard />);
 

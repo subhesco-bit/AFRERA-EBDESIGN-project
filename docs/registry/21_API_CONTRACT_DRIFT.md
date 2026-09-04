@@ -1,13 +1,13 @@
 # Frontend ↔ Backend API Contract Drift
 
-**Generated:** 2026-09-02 by `tools/frontend-boundaries.js`
+**Generated:** 2026-09-03 by `tools/frontend-boundaries.js`
 **Status:** DESCRIPTIVE — measured from source.
 **Do not edit by hand.**
 
 ---
 
-The frontend calls **27** distinct API endpoints by raw fetch().
-**25** have no matching backend route.
+The frontend calls **0** distinct API endpoints by raw fetch().
+**0** have no matching backend route.
 
 A call to a route that does not exist returns 404. The page renders empty
 and logs to a console nobody is watching — so the screen looks "built"
@@ -15,31 +15,7 @@ while showing nothing. This is the most expensive kind of gap to find late.
 
 ## Endpoints with no backend route
 
-- `/api/v1/admin/settings`
-- `/api/v1/admin/settings/${name}`
-- `/api/blockchain/stats`
-- `/api/blockchain/products/${productId}/verify`
-- `/api/digital-twin/farmers/${user.id}`
-- `/api/digital-twin/system/status`
-- `/api/digital-twin/${selectedTwin}`
-- `/api/v1/civil-disruption/active`
-- `/api/v1/civil-disruption`
-- `/api/enterprise/organizations/current/integrations`
-- `/api/enterprise/system/status`
-- `/api/enterprise/integrations/${selectedIntegration}/health`
-- `/api/financial/overview`
-- `/api/iot/farmers/${user.id}/devices`
-- `/api/iot/system/status`
-- `/api/iot/devices/${selectedDevice}/status`
-- `/api/financial/loans`
-- `/api/financial/loan-products`
-- `/api/operations/overview`
-- `/api/predictive/demand/${cropType}`
-- `/api/predictive/pricing/${cropType}`
-- `/api/v1/${resource}`
-- `/api/v1/errors/log`
-- `/api/v1/notifications/subscribe`
-- `/api/v1/notifications/unsubscribe`
+_none_
 
 ## Mounted API prefixes (backend)
 
@@ -94,6 +70,7 @@ while showing nothing. This is the most expensive kind of gap to find late.
 - `/api/v1/auth`
 - `/api/v1/`
 - `/api/v1/auth`
+- `/api/v1/dashboard`
 - `/api/v1/orders`
 - `/api/v1/financial`
 - `/api/v1/logistics`
@@ -155,6 +132,7 @@ while showing nothing. This is the most expensive kind of gap to find late.
 - `/api/v1/blockchain`
 - `/api/v1/digital-twin`
 - `/api/v1/enterprise`
+- `/api/v1`
 - `/api/v1/gst`
 - `/api/v1/logistics-ops`
 - `/api/v1/farmers`

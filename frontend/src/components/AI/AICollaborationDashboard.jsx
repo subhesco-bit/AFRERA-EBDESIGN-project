@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { authAPI } from '../../services/api';
+import api, { aiAPI } from '../../services/componentApi';
 
 /**
  * AI Collaboration Dashboard Component
@@ -26,17 +26,17 @@ export default function AICollaborationDashboard() {
     try {
       setLoading(true);
       const [contextRes, statsRes, devinRes, claudeRes, decisionsRes] = await Promise.all([
-        authAPI.get('/ai-collaboration/context'),
-        authAPI.get('/ai-collaboration/stats'),
-        authAPI.get('/ai-collaboration/work-history/devin?limit=5'),
-        authAPI.get('/ai-collaboration/work-history/claude?limit=5'),
-        authAPI.get('/ai/decisions/pending')
+        aiAPI.collaboration.getContext(),
+        aiAPI.collaboration.getStats(),
+        aiAPI.collaboration.getWorkHistory('devin'),
+        aiAPI.collaboration.getWorkHistory('claude'),
+        api.get('/ai/decisions/pending'),
       ]);
 
       setContext(contextRes.data.data);
       setStats(statsRes.data.data);
-      setDevinWork(devinRes.data.data.work_history);
-      setClaudeWork(claudeRes.data.data.work_history);
+      setDevinWork((devinRes.data.data.work_history || []).slice(0, 5));
+      setClaudeWork((claudeRes.data.data.work_history || []).slice(0, 5));
       setAIDecisions(decisionsRes.data.data || []);
     } catch (err) {
       console.error('Failed to load collaboration data:', err);
@@ -47,10 +47,10 @@ export default function AICollaborationDashboard() {
 
   const createHandoff = async (fromAI, toAI, workData) => {
     try {
-      await authAPI.post('/ai-collaboration/handoff', {
+      await aiAPI.collaboration.createHandoff({
         from_ai: fromAI,
         to_ai: toAI,
-        work_data: workData
+        work_data: workData,
       });
       alert('Handoff created successfully');
       loadCollaborationData();
@@ -62,9 +62,9 @@ export default function AICollaborationDashboard() {
 
   const executeAIDecision = async (decisionId, action) => {
     try {
-      await authAPI.post('/ai/decision/execute', {
+      await api.post('/ai/decision/execute', {
         decision_id: decisionId,
-        action: action
+        action,
       });
       alert(`Decision ${action} executed successfully`);
       loadCollaborationData();
@@ -76,9 +76,9 @@ export default function AICollaborationDashboard() {
 
   const generateReport = async () => {
     try {
-      const response = await authAPI.get('/ai-collaboration/report');
+      const response = await aiAPI.collaboration.getReport();
       const report = response.data.data;
-      
+
       const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -139,8 +139,8 @@ export default function AICollaborationDashboard() {
                         <h3 className="font-semibold text-gray-900">{decision.title}</h3>
                         <span className={`text-xs px-2 py-1 rounded ${
                           decision.priority === 'high' ? 'bg-red-100 text-red-800' :
-                          decision.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
+                            decision.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
                         }`}>
                           {decision.priority}
                         </span>
@@ -229,7 +229,7 @@ export default function AICollaborationDashboard() {
                 <div className="font-semibold">{autoMode ? 'Enabled' : 'Disabled'}</div>
               </div>
             </div>
-            
+
             <div className="mt-4">
               <div className="text-sm text-gray-600 mb-2">Shared Goals</div>
               <ul className="list-disc list-inside text-sm">
@@ -260,8 +260,8 @@ export default function AICollaborationDashboard() {
                       <span className="font-medium">{work.work_type}</span>
                       <span className={`text-xs px-2 py-1 rounded ${
                         work.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        work.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
+                          work.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
                       }`}>
                         {work.status}
                       </span>
@@ -293,8 +293,8 @@ export default function AICollaborationDashboard() {
                       <span className="font-medium">{work.work_type}</span>
                       <span className={`text-xs px-2 py-1 rounded ${
                         work.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        work.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
+                          work.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
                       }`}>
                         {work.status}
                       </span>

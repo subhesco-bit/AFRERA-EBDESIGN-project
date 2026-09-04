@@ -143,7 +143,8 @@ const validatePassword = (password) => {
 
   return (
     password.length >= minLength &&
-    (hasUpperCase || hasLowerCase) &&
+    hasUpperCase &&
+    hasLowerCase &&
     hasNumbers
   );
 };

@@ -9,7 +9,7 @@ import { ordersAPI } from '../services/api';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 
@@ -25,7 +25,7 @@ const PaymentProcessingPage = () => {
     queryKey: ['paymentTransactions'],
     queryFn: () => ordersAPI.getOrders({}, { page: 1, limit: 50 })
       .then(res => res.data),
-    refetchInterval: 120000 // 2 minutes
+    refetchInterval: 120000, // 2 minutes
   });
 
   const paymentMutation = useMutation({

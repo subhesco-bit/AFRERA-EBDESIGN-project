@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { Download, Users, TrendingUp, Award, MapPin } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Download, Users, TrendingUp, Award, MapPin } from 'lucide-react';
 
 const FarmerReportPage = () => {
-  const [region, setRegion] = useState('all')
+  const [region, setRegion] = useState('all');
 
   const farmerData = {
     totalFarmers: 1250,
@@ -15,16 +15,16 @@ const FarmerReportPage = () => {
     topPerformers: [
       { name: 'Rajesh Kumar', fdi: 95, village: 'Green Valley', revenue: 450000 },
       { name: 'Priya Singh', fdi: 92, village: 'Sunrise Farm', revenue: 420000 },
-      { name: 'Amit Patel', fdi: 89, village: 'Organic Fields', revenue: 380000 }
+      { name: 'Amit Patel', fdi: 89, village: 'Organic Fields', revenue: 380000 },
     ],
     regionalBreakdown: [
       { region: 'Assam', farmers: 320, avgFDI: 75 },
       { region: 'Meghalaya', farmers: 280, avgFDI: 70 },
       { region: 'Nagaland', farmers: 250, avgFDI: 68 },
       { region: 'Manipur', farmers: 220, avgFDI: 72 },
-      { region: 'Mizoram', farmers: 180, avgFDI: 78 }
-    ]
-  }
+      { region: 'Mizoram', farmers: 180, avgFDI: 78 },
+    ],
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -140,7 +140,7 @@ const FarmerReportPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FarmerReportPage
+export default FarmerReportPage;

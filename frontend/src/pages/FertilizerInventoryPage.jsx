@@ -1,70 +1,70 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fertilizerAPI } from '../services/api'
-import { Package, Plus, X, Trash2, Edit, AlertTriangle, PackageMinus } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fertilizerAPI } from '../services/api';
+import { Package, Plus, X, Trash2, Edit, AlertTriangle, PackageMinus } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const CATEGORIES = ['Urea', 'DAP', 'MOP', 'NPK Complex', 'Organic/Compost', 'Micronutrient', 'Bio-fertilizer']
-const UNITS = ['kg', 'bag (50kg)', 'litre', 'tonne']
+const CATEGORIES = ['Urea', 'DAP', 'MOP', 'NPK Complex', 'Organic/Compost', 'Micronutrient', 'Bio-fertilizer'];
+const UNITS = ['kg', 'bag (50kg)', 'litre', 'tonne'];
 
-const emptyItem = { name: '', category: 'Urea', unit: 'bag (50kg)', quantity: '', reorder_level: '', unit_price: '' }
+const emptyItem = { name: '', category: 'Urea', unit: 'bag (50kg)', quantity: '', reorder_level: '', unit_price: '' };
 
 function FertilizerInventoryPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyItem)
-  const [issueTarget, setIssueTarget] = useState(null)
-  const [issueForm, setIssueForm] = useState({ quantity: '', issued_to: '', purpose: '' })
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyItem);
+  const [issueTarget, setIssueTarget] = useState(null);
+  const [issueForm, setIssueForm] = useState({ quantity: '', issued_to: '', purpose: '' });
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['fertilizer-inventory'],
     queryFn: async () => (await fertilizerAPI.getInventory()).data?.data ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? fertilizerAPI.updateInventoryItem(editingId, payload) : fertilizerAPI.createInventoryItem(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Item updated' : 'Item added to inventory')
-      queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] })
-      closeForm()
+      toast.success(editingId ? 'Item updated' : 'Item added to inventory');
+      queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save item'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => fertilizerAPI.deleteInventoryItem(id),
-    onSuccess: () => { toast.success('Item removed'); queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] }) },
+    onSuccess: () => { toast.success('Item removed'); queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] }); },
     onError: () => toast.error('Failed to remove item'),
-  })
+  });
 
   const issueMutation = useMutation({
     mutationFn: ({ id, payload }) => fertilizerAPI.issueStock(id, payload),
     onSuccess: () => {
-      toast.success('Stock issued')
-      queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] })
-      setIssueTarget(null)
-      setIssueForm({ quantity: '', issued_to: '', purpose: '' })
+      toast.success('Stock issued');
+      queryClient.invalidateQueries({ queryKey: ['fertilizer-inventory'] });
+      setIssueTarget(null);
+      setIssueForm({ quantity: '', issued_to: '', purpose: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to issue stock'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyItem) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyItem); };
 
   const openEdit = (i) => {
     setForm({
       name: i.name || '', category: i.category || 'Urea', unit: i.unit || 'bag (50kg)',
       quantity: i.quantity ?? '', reorder_level: i.reorder_level ?? '', unit_price: i.unit_price ?? '',
-    })
-    setEditingId(i.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(i.id);
+    setShowForm(true);
+  };
 
-  const items = data || []
-  const lowStock = items.filter((i) => Number(i.quantity) <= Number(i.reorder_level ?? 0))
-  const totalValue = items.reduce((s, i) => s + (Number(i.quantity) || 0) * (Number(i.unit_price) || 0), 0)
+  const items = data || [];
+  const lowStock = items.filter((i) => Number(i.quantity) <= Number(i.reorder_level ?? 0));
+  const totalValue = items.reduce((s, i) => s + (Number(i.quantity) || 0) * (Number(i.unit_price) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -76,7 +76,7 @@ function FertilizerInventoryPage() {
           </h1>
           <p className="text-gray-600">Track fertilizer stock levels, reorder points and issues to fields</p>
         </div>
-        <button onClick={() => { setForm(emptyItem); setEditingId(null); setShowForm(true) }}
+        <button onClick={() => { setForm(emptyItem); setEditingId(null); setShowForm(true); }}
           className="px-4 py-2 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition flex items-center">
           <Plus className="w-5 h-5 mr-2" />Add Stock Item
         </button>
@@ -119,7 +119,7 @@ function FertilizerInventoryPage() {
             <tbody className="divide-y divide-gray-100">
               {items.length === 0 && <tr><td colSpan={6} className="px-4 py-10 text-center text-gray-500">No stock items yet.</td></tr>}
               {items.map((i) => {
-                const low = Number(i.quantity) <= Number(i.reorder_level ?? 0)
+                const low = Number(i.quantity) <= Number(i.reorder_level ?? 0);
                 return (
                   <tr key={i.id} className={`hover:bg-gray-50 ${low ? 'bg-red-50/40' : ''}`}>
                     <td className="px-4 py-3 font-medium text-gray-800">{i.name}</td>
@@ -132,10 +132,10 @@ function FertilizerInventoryPage() {
                     <td className="px-4 py-3 text-right space-x-2">
                       <button onClick={() => setIssueTarget(i)} className="p-2 text-amber-600 hover:bg-amber-50 rounded" title="Issue stock"><PackageMinus className="w-4 h-4" /></button>
                       <button onClick={() => openEdit(i)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                      <button onClick={() => { if (confirm('Remove this item?')) deleteMutation.mutate(i.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                      <button onClick={() => { if (confirm('Remove this item?')) deleteMutation.mutate(i.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                     </td>
                   </tr>
-                )
+                );
               })}
             </tbody>
           </table>
@@ -152,14 +152,14 @@ function FertilizerInventoryPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.name || form.quantity === '') { toast.error('Name and quantity are required'); return }
+                  e.preventDefault();
+                  if (!form.name || form.quantity === '') { toast.error('Name and quantity are required'); return; }
                   saveMutation.mutate({
                     ...form,
                     quantity: Number(form.quantity),
                     reorder_level: form.reorder_level === '' ? null : Number(form.reorder_level),
                     unit_price: form.unit_price === '' ? null : Number(form.unit_price),
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -223,9 +223,9 @@ function FertilizerInventoryPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!issueForm.quantity) { toast.error('Quantity is required'); return }
-                  issueMutation.mutate({ id: issueTarget.id, payload: { ...issueForm, quantity: Number(issueForm.quantity) } })
+                  e.preventDefault();
+                  if (!issueForm.quantity) { toast.error('Quantity is required'); return; }
+                  issueMutation.mutate({ id: issueTarget.id, payload: { ...issueForm, quantity: Number(issueForm.quantity) } });
                 }}
                 className="space-y-4"
               >
@@ -256,7 +256,7 @@ function FertilizerInventoryPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default FertilizerInventoryPage
+export default FertilizerInventoryPage;

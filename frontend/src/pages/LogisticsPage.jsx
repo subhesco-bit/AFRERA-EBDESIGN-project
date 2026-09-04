@@ -1,14 +1,14 @@
-import { useMemo, useState } from 'react'
-import { Truck, Package, MapPin, Clock, Search } from 'lucide-react'
-import DeviceMonitor from '../components/IoTIntegration/DeviceMonitor'
-import RealTimeTracking from '../components/Logistics/RealTimeTracking'
-import CustodyChainViewer from '../components/Logistics/CustodyChainViewer'
-import AIInsightsPanel from '../components/ui/AIInsightsPanel'
-import { aiDecisionService } from '../services/aiDecisionService'
+import { useMemo, useState } from 'react';
+import { Truck, Package, MapPin, Clock, Search } from 'lucide-react';
+import DeviceMonitor from '../components/IoTIntegration/DeviceMonitor';
+import RealTimeTracking from '../components/Logistics/RealTimeTracking';
+import CustodyChainViewer from '../components/Logistics/CustodyChainViewer';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 function LogisticsPage() {
-  const [shipmentIdInput, setShipmentIdInput] = useState('')
-  const [trackedShipmentId, setTrackedShipmentId] = useState(null)
+  const [shipmentIdInput, setShipmentIdInput] = useState('');
+  const [trackedShipmentId, setTrackedShipmentId] = useState(null);
 
   const aiInsights = useMemo(
     () => [
@@ -24,7 +24,7 @@ function LogisticsPage() {
         severity: 'warning',
         metadata: { source: 'fallback', module: 'logistics' },
         context: { route: 'north-corridor', loads: 2 },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: 'logistics-cold-chain-risk',
@@ -38,7 +38,7 @@ function LogisticsPage() {
         severity: 'critical',
         metadata: { source: 'fallback', module: 'cold-chain' },
         context: { reeferBatch: 'RF-104', variance: '4.2C' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: 'logistics-capacity-planning',
@@ -52,15 +52,15 @@ function LogisticsPage() {
         severity: 'info',
         metadata: { source: 'fallback', module: 'fleet' },
         context: { utilization: '88%' },
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     ],
-    []
-  )
+    [],
+  );
 
   const handleApplyRecommendation = (insight) => {
-    alert(`Applied recommendation: ${insight.title}`)
-  }
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -128,8 +128,8 @@ function LogisticsPage() {
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Track a Shipment</h2>
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            if (shipmentIdInput.trim()) setTrackedShipmentId(shipmentIdInput.trim())
+            e.preventDefault();
+            if (shipmentIdInput.trim()) setTrackedShipmentId(shipmentIdInput.trim());
           }}
           className="flex gap-3 mb-4"
         >
@@ -161,7 +161,7 @@ function LogisticsPage() {
         <DeviceMonitor />
       </div>
     </div>
-  )
+  );
 }
 
-export default LogisticsPage
+export default LogisticsPage;

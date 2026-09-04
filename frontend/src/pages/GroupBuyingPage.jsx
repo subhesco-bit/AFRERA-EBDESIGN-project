@@ -1,18 +1,18 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Users, Clock, Target, CheckCircle } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Users, Clock, Target, CheckCircle } from 'lucide-react';
 
 const GroupBuyingPage = () => {
   const [groupBuys, setGroupBuys] = useState([
     { id: 1, title: 'Organic Fertilizers Group Buy', targetQuantity: 5000, currentQuantity: 3200, endDate: '2026-09-15', discount: 15, status: 'active' },
     { id: 2, title: 'Seeds Bulk Purchase', targetQuantity: 2000, currentQuantity: 1800, endDate: '2026-09-20', discount: 20, status: 'active' },
-    { id: 3, title: 'Farm Equipment Group Buy', targetQuantity: 50, currentQuantity: 25, endDate: '2026-09-30', discount: 10, status: 'active' }
-  ])
+    { id: 3, title: 'Farm Equipment Group Buy', targetQuantity: 50, currentQuantity: 25, endDate: '2026-09-30', discount: 10, status: 'active' },
+  ]);
 
   const getProgress = (current, target) => {
-    return Math.round((current / target) * 100)
-  }
+    return Math.round((current / target) * 100);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -44,7 +44,7 @@ const GroupBuyingPage = () => {
                     <span>{getProgress(groupBuy.currentQuantity, groupBuy.targetQuantity)}%</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-primary h-2 rounded-full transition-all"
                       style={{ width: `${getProgress(groupBuy.currentQuantity, groupBuy.targetQuantity)}%` }}
                     />
@@ -67,7 +67,7 @@ const GroupBuyingPage = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default GroupBuyingPage
+export default GroupBuyingPage;

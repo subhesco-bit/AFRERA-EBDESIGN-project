@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Brain, Zap, Network, Activity } from 'lucide-react'
-import { aiBrainAPI } from '../services/api'
-import { aiDecisionService } from '../services/aiDecisionService'
-import ActionCard from '../components/common/ActionCard'
+import { useState, useEffect } from 'react';
+import { Brain, Zap, Network, Activity } from 'lucide-react';
+import { aiBrainAPI } from '../services/api';
+import { aiDecisionService } from '../services/aiDecisionService';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/aiBrainRoutes.js +
@@ -19,54 +19,54 @@ const TABS = [
   ['processes', 'Cognitive Processes'],
   ['knowledge', 'Knowledge Graph'],
   ['memory', 'Memory & State'],
-]
+];
 
 function AIBrainPage() {
-  const [tab, setTab] = useState('processes')
-  const [autoCognitive, setAutoCognitive] = useState(false)
+  const [tab, setTab] = useState('processes');
+  const [autoCognitive, setAutoCognitive] = useState(false);
   const [neuralDecisions, setNeuralDecisions] = useState(() => aiDecisionService.getFallbackDecisions('brain', {
     count: 3,
-    baseTitle: 'Cognitive recommendation'
-  }))
-  const [cognitiveState, setCognitiveState] = useState(null)
+    baseTitle: 'Cognitive recommendation',
+  }));
+  const [cognitiveState, setCognitiveState] = useState(null);
 
   useEffect(() => {
-    loadCognitiveState()
-    const interval = setInterval(loadCognitiveState, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    loadCognitiveState();
+    const interval = setInterval(loadCognitiveState, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loadCognitiveState = async () => {
     try {
-      const response = await aiBrainAPI.getCognitiveState()
-      setCognitiveState(response.data.data)
+      const response = await aiBrainAPI.getCognitiveState();
+      setCognitiveState(response.data.data);
     } catch (err) {
-      console.error('Failed to load cognitive state:', err)
+      console.error('Failed to load cognitive state:', err);
     }
-  }
+  };
 
   const executeNeuralDecision = async (decisionId, action) => {
     try {
-      const decision = neuralDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Neural decision' }
+      const decision = neuralDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Neural decision' };
       const result = await aiDecisionService.executeDecisionAction({
         decision,
         action,
         callback: async (id, nextAction) => {
           if (typeof aiBrainAPI.executeDecision === 'function') {
-            return aiBrainAPI.executeDecision(id, nextAction)
+            return aiBrainAPI.executeDecision(id, nextAction);
           }
-          return { ok: true, action: nextAction, decisionId: id }
-        }
-      })
+          return { ok: true, action: nextAction, decisionId: id };
+        },
+      });
 
-      alert(`Neural decision ${action} executed successfully`)
-      console.info('Neural decision result:', result)
-      loadCognitiveState()
+      alert(`Neural decision ${action} executed successfully`);
+      console.info('Neural decision result:', result);
+      loadCognitiveState();
     } catch (err) {
-      console.error('Failed to execute neural decision:', err)
-      alert('Failed to execute decision')
+      console.error('Failed to execute neural decision:', err);
+      alert('Failed to execute decision');
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -111,8 +111,8 @@ function AIBrainPage() {
                         <h3 className="font-semibold text-gray-900">{decision.title}</h3>
                         <span className={`text-xs px-2 py-1 rounded ${
                           decision.confidence > 80 ? 'bg-green-100 text-green-800' :
-                          decision.confidence > 50 ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
+                            decision.confidence > 50 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
                         }`}>
                           {decision.confidence}% confidence
                         </span>
@@ -280,7 +280,7 @@ function AIBrainPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default AIBrainPage
+export default AIBrainPage;

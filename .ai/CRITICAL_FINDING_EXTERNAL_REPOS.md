@@ -26,7 +26,7 @@ status: REQUIRES CLARIFICATION
 - **Finding:** Repository exists but contains no actual code
 
 ### Repository 2: sve
-**URL:** https://github.com/svesco2024-lgtm/sve.git
+**URL:** https://github.com/Subhesco2024-lgtm/sve.git
 - **Status:** ⚠️ EMPTY REPOSITORY
 - **Clone Result:** Successfully cloned
 - **Content:** Only .git metadata (18 files)
@@ -68,7 +68,7 @@ status: REQUIRES CLARIFICATION
 | Repository | URL | Status | Content | Code |
 |------------|-----|--------|---------|------|
 | DEEP | deepak94ic-afk/DEEP | ⚠️ Exists | Empty | None |
-| sve | svesco2024-lgtm/sve | ⚠️ Exists | Empty | None |
+| sve | Subhesco2024-lgtm/sve | ⚠️ Exists | Empty | None |
 | dkg123 | ethnoverdedynamics-tech/dkg123 | ❌ Not Found | N/A | N/A |
 | dkg | ethnoverdedynamics-tech/dkg | ⚠️ Exists | Empty | None |
 | EBDESIGN (Ext) | ethnoverdedynamics-tech/EBDESIGN | ❌ Not Found | N/A | N/A |
@@ -139,7 +139,7 @@ Current Status:
 
 2. **Correct URLs:** Are these the correct GitHub URLs?
    - https://github.com/deepak94ic-afk/DEEP.git
-   - https://github.com/svesco2024-lgtm/sve.git
+   - https://github.com/Subhesco2024-lgtm/sve.git
    - https://github.com/ethnoverdedynamics-tech/dkg123.git
    - https://github.com/ethnoverdedynamics-tech/dkg.git
    - https://github.com/ethnoverdedynamics-tech/EBDESIGN.git
@@ -183,4 +183,5 @@ Current Status:
 3. Clarification on where to source the missing code
 
 **Local EBDESIGN remains launch-ready and can proceed independently.**
+
 

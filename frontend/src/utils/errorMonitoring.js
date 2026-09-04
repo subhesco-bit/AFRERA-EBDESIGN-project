@@ -1,9 +1,11 @@
 /**
  * Error Monitoring and Logging Utility
- * 
+ *
  * Provides comprehensive error tracking, logging, and monitoring
  * for production-ready error handling and debugging
  */
+
+import { errorMonitoringAPI } from '../services/api';
 
 class ErrorMonitoring {
   constructor() {
@@ -18,7 +20,7 @@ class ErrorMonitoring {
     this.handleOffline = () => {
       this.isOnline = false;
     };
-    
+
     // Initialize event listeners
     this.initializeErrorHandlers();
     this.initializeNetworkListeners();
@@ -36,7 +38,7 @@ class ErrorMonitoring {
         stack: error?.stack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     };
 
@@ -48,7 +50,7 @@ class ErrorMonitoring {
         stack: event.reason?.stack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     };
 
@@ -61,7 +63,7 @@ class ErrorMonitoring {
         componentStack: errorInfo.componentStack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     };
     window.onerror = this.handleWindowError;
@@ -77,7 +79,7 @@ class ErrorMonitoring {
   logError(errorData) {
     // Add to queue
     this.errorQueue.push(errorData);
-    
+
     // Trim queue if too large
     if (this.errorQueue.length > this.maxQueueSize) {
       this.errorQueue = this.errorQueue.slice(-this.maxQueueSize);
@@ -98,15 +100,7 @@ class ErrorMonitoring {
     if (import.meta.env.DEV) return;
 
     try {
-      // In production, send to your error monitoring service
-      // For now, we'll use a local endpoint
-      await fetch('/api/v1/errors/log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(errorData),
-      });
+      await errorMonitoringAPI.log(errorData);
     } catch (error) {
       console.warn('Failed to send error to server:', error);
     }
@@ -128,7 +122,7 @@ class ErrorMonitoring {
       totalErrors: this.errorQueue.length,
       isOnline: this.isOnline,
       activeUser: this.activeUser,
-      recentErrors: this.errorQueue.slice(-10)
+      recentErrors: this.errorQueue.slice(-10),
     };
   }
 

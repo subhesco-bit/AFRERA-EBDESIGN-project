@@ -9,7 +9,7 @@ export const InputModal = ({
   onCancel,
   submitLabel = 'Submit',
   cancelLabel = 'Cancel',
-  required = false
+  required = false,
 }) => {
   const [value, setValue] = useState('');
 

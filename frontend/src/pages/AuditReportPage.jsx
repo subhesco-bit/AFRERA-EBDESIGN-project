@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Download, Shield, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Download, Shield, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
 
 const AuditReportPage = () => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const auditData = {
     totalAudits: 156,
@@ -13,13 +13,13 @@ const AuditReportPage = () => {
     pendingAudits: 6,
     securityScore: 95,
     complianceScore: 92,
-    performanceScore: 88
-  }
+    performanceScore: 88,
+  };
 
   const handleGenerate = () => {
-    setLoading(true)
-    setTimeout(() => setLoading(false), 1500)
-  }
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1500);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -115,7 +115,7 @@ const AuditReportPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AuditReportPage
+export default AuditReportPage;

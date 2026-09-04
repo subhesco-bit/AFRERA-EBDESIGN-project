@@ -1,9 +1,9 @@
-import { Leaf } from 'lucide-react'
-import { cropVarietyAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { Leaf } from 'lucide-react';
+import { cropVarietyAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const YIELD_POTENTIAL = ['Low', 'Medium', 'High']
-const RESISTANCE = ['Susceptible', 'Moderate', 'Resistant']
+const YIELD_POTENTIAL = ['Low', 'Medium', 'High'];
+const RESISTANCE = ['Susceptible', 'Moderate', 'Resistant'];
 
 const initialForm = {
   crop_name: '',
@@ -13,7 +13,7 @@ const initialForm = {
   disease_resistance: 'Moderate',
   maturity_days: '',
   notes: '',
-}
+};
 
 function CropVarietyPage() {
   return (
@@ -57,7 +57,7 @@ function CropVarietyPage() {
         { label: 'High yield potential', value: items.filter((i) => i.yield_potential === 'High').length },
       ]}
     />
-  )
+  );
 }
 
-export default CropVarietyPage
+export default CropVarietyPage;

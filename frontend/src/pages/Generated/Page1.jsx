@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { productsAPI } from '../../services/api';
 
 /**
  * ProductsPage Component
@@ -16,17 +17,8 @@ export default function ProductsPage() {
 
   const loadProducts = async () => {
     try {
-      let url = '/api/v1/products';
-      const params = [];
-      if (search) params.push(`search=${search}`);
-      if (category) params.push(`category=${category}`);
-      if (params.length) url += '?' + params.join('&');
-
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to load products');
-
-      const data = await response.json();
-      setProducts(data.data.products);
+      const response = await productsAPI.getProducts({ search, category });
+      setProducts(response.data.data.products);
     } catch (error) {
       console.error('Failed to load products:', error);
     } finally {

@@ -14,7 +14,7 @@ class ErrorBoundary extends Component {
   componentDidCatch(error, errorInfo) {
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     // Log error to monitoring service
@@ -25,7 +25,7 @@ class ErrorBoundary extends Component {
       componentStack: errorInfo.componentStack,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      url: window.location.href
+      url: window.location.href,
     });
   }
 
@@ -48,7 +48,7 @@ class ErrorBoundary extends Component {
               <p className="text-gray-600 mb-6">
                 We're sorry for the inconvenience. An error has been logged and our team will look into it.
               </p>
-              
+
               {import.meta.env.DEV && this.state.error && (
                 <div className="bg-gray-100 rounded-lg p-4 mb-6 text-left">
                   <p className="text-sm font-mono text-red-600 mb-2">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { userAPI } from '../../services/api';
 
 /**
  * ProfilePage Component
@@ -17,23 +18,12 @@ export default function ProfilePage() {
 
   const loadProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-
-      const profileRes = await fetch('/api/v1/users/profile', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!profileRes.ok) throw new Error('Failed to load profile');
-
-      const profileData = await profileRes.json();
-      setProfile(profileData.data);
-
-      const addressRes = await fetch('/api/v1/users/addresses', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!addressRes.ok) throw new Error('Failed to load addresses');
-
-      const addressData = await addressRes.json();
-      setAddresses(addressData.data.addresses);
+      const [profileRes, addressRes] = await Promise.all([
+        userAPI.getProfile(),
+        userAPI.getAddresses(),
+      ]);
+      setProfile(profileRes.data.data);
+      setAddresses(addressRes.data.data.addresses);
     } catch (error) {
       console.error('Failed to load profile:', error);
     } finally {
@@ -43,49 +33,27 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: profile.name,
-          phone: profile.phone,
-        }),
+      const response = await userAPI.updateProfile({
+        name: profile.name,
+        phone: profile.phone,
       });
-
-      if (!response.ok) throw new Error('Failed to update profile');
-
-      const data = await response.json();
-      setProfile(data.data);
+      setProfile(response.data.data);
       setEditing(false);
       alert('Profile updated successfully');
     } catch (error) {
-      alert('Failed to update profile: ' + error.message);
+      alert(`Failed to update profile: ${ error.message}`);
     }
   };
 
   const handleAddAddress = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/users/addresses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newAddress),
-      });
-
-      if (!response.ok) throw new Error('Failed to add address');
+      await userAPI.addAddress(newAddress);
 
       setNewAddress({});
       loadProfile();
       alert('Address added successfully');
     } catch (error) {
-      alert('Failed to add address: ' + error.message);
+      alert(`Failed to add address: ${ error.message}`);
     }
   };
 

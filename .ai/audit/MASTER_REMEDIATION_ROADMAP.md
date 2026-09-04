@@ -1,6 +1,6 @@
 # MASTER REMEDIATION ROADMAP
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Audit Date:** 1 September 2026  
 **Purpose:** Comprehensive remediation roadmap for production readiness
 
@@ -699,4 +699,5 @@ This remediation roadmap provides a comprehensive 88-week (22-month) plan to ach
 
 ---
 
-*This remediation roadmap provides a comprehensive plan to address all identified gaps and achieve production readiness for the SVESCO/EBDESIGN system.*
+*This remediation roadmap provides a comprehensive plan to address all identified gaps and achieve production readiness for the Subhesco/EBDESIGN system.*
+

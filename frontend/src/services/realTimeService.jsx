@@ -1,7 +1,7 @@
 /**
  * Real-Time Updates and Notification System
  * Production-level real-time functionality with WebSocket integration
- * 
+ *
  * Features:
  * - WebSocket connection management
  * - Real-time data synchronization
@@ -24,7 +24,7 @@ export const CONNECTION_STATE = {
   CONNECTED: 'connected',
   DISCONNECTED: 'disconnected',
   RECONNECTING: 'reconnecting',
-  ERROR: 'error'
+  ERROR: 'error',
 };
 
 // Notification types
@@ -32,7 +32,7 @@ export const NOTIFICATION_TYPES = {
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
-  INFO: 'info'
+  INFO: 'info',
 };
 
 // Notification priorities
@@ -40,7 +40,7 @@ export const NOTIFICATION_PRIORITY = {
   LOW: 'low',
   NORMAL: 'normal',
   HIGH: 'high',
-  URGENT: 'urgent'
+  URGENT: 'urgent',
 };
 
 // Real-time service class
@@ -69,7 +69,7 @@ class RealTimeService {
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
       reconnectionDelay: this.reconnectDelay,
-      ...options
+      ...options,
     });
 
     this.socket.on('connect', () => {
@@ -177,7 +177,7 @@ export const useRealTimeConnection = (url, options = {}) => {
 
   useEffect(() => {
     const service = realTimeService.connect(url, options);
-    
+
     const unsubscribe = realTimeService.onConnectionStateChange((state) => {
       setConnectionState(state);
       setReconnectAttempts(realTimeService.reconnectAttempts);
@@ -247,7 +247,7 @@ class NotificationSystem {
       id,
       ...notification,
       timestamp: new Date(),
-      read: false
+      read: false,
     };
 
     this.notifications.push(enhancedNotification);
@@ -258,7 +258,7 @@ class NotificationSystem {
       new Notification(notification.title, {
         body: notification.message,
         icon: notification.icon || '/favicon.ico',
-        tag: notification.type
+        tag: notification.type,
       });
     }
 
@@ -322,7 +322,7 @@ class NotificationSystem {
       message,
       priority: NOTIFICATION_PRIORITY.NORMAL,
       duration: 3000,
-      ...options
+      ...options,
     });
   }
 
@@ -333,7 +333,7 @@ class NotificationSystem {
       message,
       priority: NOTIFICATION_PRIORITY.HIGH,
       duration: 5000,
-      ...options
+      ...options,
     });
   }
 
@@ -344,7 +344,7 @@ class NotificationSystem {
       message,
       priority: NOTIFICATION_PRIORITY.NORMAL,
       duration: 4000,
-      ...options
+      ...options,
     });
   }
 
@@ -355,7 +355,7 @@ class NotificationSystem {
       message,
       priority: NOTIFICATION_PRIORITY.LOW,
       duration: 3000,
-      ...options
+      ...options,
     });
   }
 }
@@ -384,7 +384,7 @@ export const useNotifications = () => {
     success: notificationSystem.success.bind(notificationSystem),
     error: notificationSystem.error.bind(notificationSystem),
     warning: notificationSystem.warning.bind(notificationSystem),
-    info: notificationSystem.info.bind(notificationSystem)
+    info: notificationSystem.info.bind(notificationSystem),
   };
 };
 
@@ -418,8 +418,12 @@ export const useRealTimeSync = (resource, initialData, syncInterval = 30000) => 
   const syncData = useCallback(async () => {
     setIsSyncing(true);
     try {
-      // Fetch latest data from API
-      const response = await fetch(`/api/v1/${resource}`);
+      // Callers provide a verified canonical API path; there is no generic
+      // backend resource endpoint.
+      if (typeof resource !== 'string' || !resource.startsWith('/api/v1/')) {
+        throw new Error('useRealTimeSync requires a canonical /api/v1/ resource path');
+      }
+      const response = await fetch(resource);
       const newData = await response.json();
       setData(newData);
       setLastSync(new Date());
@@ -461,7 +465,7 @@ export const ConnectionStatusIndicator = () => {
     [CONNECTION_STATE.CONNECTED]: { color: 'green', text: 'Connected' },
     [CONNECTION_STATE.DISCONNECTED]: { color: 'red', text: 'Disconnected' },
     [CONNECTION_STATE.RECONNECTING]: { color: 'yellow', text: 'Reconnecting...' },
-    [CONNECTION_STATE.ERROR]: { color: 'red', text: 'Connection Error' }
+    [CONNECTION_STATE.ERROR]: { color: 'red', text: 'Connection Error' },
   };
 
   const config = statusConfig[connectionState] || statusConfig[CONNECTION_STATE.DISCONNECTED];
@@ -504,5 +508,5 @@ export default {
   useEventBus,
   CONNECTION_STATE,
   NOTIFICATION_TYPES,
-  NOTIFICATION_PRIORITY
+  NOTIFICATION_PRIORITY,
 };

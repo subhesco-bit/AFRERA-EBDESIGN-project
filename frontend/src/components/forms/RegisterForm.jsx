@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../../services/componentApi';
 
 /**
  * RegisterForm Component
@@ -38,21 +39,12 @@ export default function RegisterForm({ onSuccess }) {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/v1/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }),
+      const response = await authAPI.register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
-      }
+      const data = response.data;
 
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('user', JSON.stringify(data.data.user));
@@ -60,7 +52,7 @@ export default function RegisterForm({ onSuccess }) {
       if (onSuccess) onSuccess(data.data.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }

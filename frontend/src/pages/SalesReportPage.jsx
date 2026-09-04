@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { Download, Calendar, TrendingUp, DollarSign, Package, Users } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Download, Calendar, TrendingUp, DollarSign, Package, Users } from 'lucide-react';
 
 const SalesReportPage = () => {
-  const [period, setPeriod] = useState('monthly')
-  const [loading, setLoading] = useState(false)
+  const [period, setPeriod] = useState('monthly');
+  const [loading, setLoading] = useState(false);
 
   const salesData = {
     totalRevenue: 1250000,
@@ -17,19 +17,19 @@ const SalesReportPage = () => {
     topProducts: [
       { name: 'Organic Rice', sales: 45000, revenue: 225000 },
       { name: 'Fresh Vegetables', sales: 38000, revenue: 190000 },
-      { name: 'Dairy Products', sales: 32000, revenue: 160000 }
+      { name: 'Dairy Products', sales: 32000, revenue: 160000 },
     ],
     topFarmers: [
       { name: 'Green Valley Co-op', orders: 120, revenue: 85000 },
       { name: 'Organic Farms Ltd', orders: 95, revenue: 72000 },
-      { name: 'Sunrise Agriculture', orders: 88, revenue: 68000 }
-    ]
-  }
+      { name: 'Sunrise Agriculture', orders: 88, revenue: 68000 },
+    ],
+  };
 
   const handleGenerate = () => {
-    setLoading(true)
-    setTimeout(() => setLoading(false), 1500)
-  }
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1500);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -145,7 +145,7 @@ const SalesReportPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SalesReportPage
+export default SalesReportPage;

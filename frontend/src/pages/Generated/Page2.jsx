@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ordersAPI } from '../../services/api';
 
 /**
  * OrdersPage Component
@@ -15,18 +16,8 @@ export default function OrdersPage() {
 
   const loadOrders = async () => {
     try {
-      const token = localStorage.getItem('token');
-      let url = '/api/v1/orders';
-      if (filter) url += `?status=${filter}`;
-
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to load orders');
-
-      const data = await response.json();
-      setOrders(data.data.orders);
+      const response = await ordersAPI.getOrders(filter ? { status: filter } : undefined);
+      setOrders(response.data.data.orders);
     } catch (error) {
       console.error('Failed to load orders:', error);
     } finally {
@@ -40,18 +31,12 @@ export default function OrdersPage() {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/v1/orders/${orderId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to cancel order');
+      await ordersAPI.cancelOrder(orderId);
 
       loadOrders();
       alert('Order cancelled successfully');
     } catch (error) {
-      alert('Failed to cancel order: ' + error.message);
+      alert(`Failed to cancel order: ${ error.message}`);
     }
   };
 

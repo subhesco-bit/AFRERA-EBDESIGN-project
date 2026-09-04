@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import CopilotChat, { COPILOT_META } from '../components/AI/CopilotChat'
+import { useState } from 'react';
+import CopilotChat, { COPILOT_META } from '../components/AI/CopilotChat';
 
 /**
  * Copilot Hub
@@ -13,8 +13,8 @@ import CopilotChat, { COPILOT_META } from '../components/AI/CopilotChat'
  * for Warehouse, etc.) remain a real follow-up, not delivered here.
  */
 function CopilotHubPage() {
-  const [active, setActive] = useState('finance')
-  const types = Object.keys(COPILOT_META)
+  const [active, setActive] = useState('finance');
+  const types = Object.keys(COPILOT_META);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -25,27 +25,27 @@ function CopilotHubPage() {
 
       <div className="flex flex-wrap gap-2 mb-4">
         {types.map((type) => {
-          const meta = COPILOT_META[type]
+          const meta = COPILOT_META[type];
           return (
             <button
               key={type}
               onClick={() => setActive(type)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition ${
-                active === type
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                active === type ?
+                  'bg-blue-600 text-white border-blue-600' :
+                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
             >
               <span>{meta.icon}</span>
               {meta.label}
             </button>
-          )
+          );
         })}
       </div>
 
       <CopilotChat copilotType={active} />
     </div>
-  )
+  );
 }
 
-export default CopilotHubPage
+export default CopilotHubPage;

@@ -16,7 +16,7 @@ function ModuleHubPage() {
       try {
         const [modulesResponse, overviewResponse] = await Promise.all([
           modulesAPI.getModules(),
-          modulesAPI.getOverview()
+          modulesAPI.getOverview(),
         ]);
 
         setModules(modulesResponse.data.modules || []);

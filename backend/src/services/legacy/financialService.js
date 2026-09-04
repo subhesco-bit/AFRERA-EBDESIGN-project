@@ -684,6 +684,16 @@ function generateAdvanceNumber() {
  */
 const express = require('express');
 const router = express.Router();
+const revenueService = require('./revenueService');
+
+router.get('/overview', authMiddleware, async (req, res) => {
+  try {
+    const overview = await revenueService.getOverview(req.query);
+    res.json({ success: true, data: overview });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Apply for loan
 router.post('/loans', authMiddleware, async (req, res) => {

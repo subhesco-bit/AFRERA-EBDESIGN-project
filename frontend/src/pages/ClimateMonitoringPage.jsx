@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { CloudDrizzle, Waves, Bug, Stethoscope, ShieldAlert, Thermometer } from 'lucide-react'
+import { useState } from 'react';
+import { CloudDrizzle, Waves, Bug, Stethoscope, ShieldAlert, Thermometer } from 'lucide-react';
 import {
   droughtMonitoringAPI,
   floodMonitoringAPI,
@@ -7,8 +7,8 @@ import {
   diseaseForecastingAPI,
   climateRiskAPI,
   agroMeteorologyAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Climate domain sub-modules, batch 4: M085 (Drought Monitoring),
@@ -30,14 +30,14 @@ const TABS = [
   { id: 'disease', label: 'Disease Forecasting', icon: Stethoscope },
   { id: 'risk', label: 'Climate Risk', icon: ShieldAlert },
   { id: 'agromet', label: 'Agro-Meteorology', icon: CloudDrizzle },
-]
+];
 
-const SEVERITY = ['Mild', 'Moderate', 'Severe', 'Extreme']
-const RISK_TYPES = ['Drought', 'Flood', 'Heatwave', 'Cyclone', 'Frost', 'Hailstorm']
-const RISK_LEVELS = ['Low', 'Medium', 'High', 'Critical']
+const SEVERITY = ['Mild', 'Moderate', 'Severe', 'Extreme'];
+const RISK_TYPES = ['Drought', 'Flood', 'Heatwave', 'Cyclone', 'Frost', 'Hailstorm'];
+const RISK_LEVELS = ['Low', 'Medium', 'High', 'Critical'];
 
 function ClimateMonitoringPage() {
-  const [activeTab, setActiveTab] = useState('drought')
+  const [activeTab, setActiveTab] = useState('drought');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -273,7 +273,7 @@ function ClimateMonitoringPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default ClimateMonitoringPage
+export default ClimateMonitoringPage;

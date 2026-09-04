@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Bot, Zap, AlertCircle, CheckCircle } from 'lucide-react'
-import { aiAgentAPI } from '../services/api'
-import { aiDecisionService } from '../services/aiDecisionService'
-import ActionCard from '../components/common/ActionCard'
+import { useState, useEffect } from 'react';
+import { Bot, Zap, AlertCircle, CheckCircle } from 'lucide-react';
+import { aiAgentAPI } from '../services/api';
+import { aiDecisionService } from '../services/aiDecisionService';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/aiAgentRoutes.js + services/aiAgentService.js
@@ -14,50 +14,50 @@ import ActionCard from '../components/common/ActionCard'
  * Enhanced with autonomous decision-making capabilities and real-time monitoring.
  */
 function AIAgentPage() {
-  const [autoMode, setAutoMode] = useState(false)
+  const [autoMode, setAutoMode] = useState(false);
   const [agentDecisions, setAgentDecisions] = useState(() => aiDecisionService.getFallbackDecisions('agent', {
     count: 3,
-    baseTitle: 'Agent recommendation'
-  }))
-  const [agentStatus, setAgentStatus] = useState(null)
+    baseTitle: 'Agent recommendation',
+  }));
+  const [agentStatus, setAgentStatus] = useState(null);
 
   useEffect(() => {
-    loadAgentStatus()
-    const interval = setInterval(loadAgentStatus, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    loadAgentStatus();
+    const interval = setInterval(loadAgentStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loadAgentStatus = async () => {
     try {
-      const response = await aiAgentAPI.getHealth()
-      setAgentStatus(response.data.data)
+      const response = await aiAgentAPI.getHealth();
+      setAgentStatus(response.data.data);
     } catch (err) {
-      console.error('Failed to load agent status:', err)
+      console.error('Failed to load agent status:', err);
     }
-  }
+  };
 
   const executeAIDecision = async (decisionId, action) => {
     try {
-      const decision = agentDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Agent decision' }
+      const decision = agentDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Agent decision' };
       const result = await aiDecisionService.executeDecisionAction({
         decision,
         action,
         callback: async (id, nextAction) => {
           if (typeof aiAgentAPI.executeDecision === 'function') {
-            return aiAgentAPI.executeDecision(id, nextAction)
+            return aiAgentAPI.executeDecision(id, nextAction);
           }
-          return { ok: true, action: nextAction, decisionId: id }
-        }
-      })
+          return { ok: true, action: nextAction, decisionId: id };
+        },
+      });
 
-      alert(`Decision ${action} executed successfully`)
-      console.info('Agent decision result:', result)
-      loadAgentStatus()
+      alert(`Decision ${action} executed successfully`);
+      console.info('Agent decision result:', result);
+      loadAgentStatus();
     } catch (err) {
-      console.error('Failed to execute decision:', err)
-      alert('Failed to execute decision')
+      console.error('Failed to execute decision:', err);
+      alert('Failed to execute decision');
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -102,8 +102,8 @@ function AIAgentPage() {
                         <h3 className="font-semibold text-gray-900">{decision.title}</h3>
                         <span className={`text-xs px-2 py-1 rounded ${
                           decision.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          decision.status === 'approved' ? 'bg-green-100 text-green-800' :
-                          'bg-red-100 text-red-800'
+                            decision.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'
                         }`}>
                           {decision.status}
                         </span>
@@ -226,7 +226,7 @@ function AIAgentPage() {
         onRun={() => aiAgentAPI.getHealth()}
       />
     </div>
-  )
+  );
 }
 
-export default AIAgentPage
+export default AIAgentPage;

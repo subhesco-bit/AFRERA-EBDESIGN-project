@@ -1,7 +1,7 @@
 /**
  * Enhanced Error Boundary System
  * Production-level error handling with graceful degradation
- * 
+ *
  * Features:
  * - Comprehensive error catching
  * - User-friendly error messages
@@ -21,7 +21,7 @@ const ErrorContext = createContext({
   error: null,
   setError: () => {},
   clearError: () => {},
-  errorHistory: []
+  errorHistory: [],
 });
 
 export const useError = () => useContext(ErrorContext);
@@ -35,7 +35,7 @@ export const ERROR_TYPES = {
   NOT_FOUND: 'not_found',
   SERVER: 'server',
   CLIENT: 'client',
-  UNKNOWN: 'unknown'
+  UNKNOWN: 'unknown',
 };
 
 // Error severity levels
@@ -43,7 +43,7 @@ export const ERROR_SEVERITY = {
   LOW: 'low',
   MEDIUM: 'medium',
   HIGH: 'high',
-  CRITICAL: 'critical'
+  CRITICAL: 'critical',
 };
 
 // Error classification helper
@@ -90,7 +90,7 @@ export const RECOVERY_STRATEGIES = {
   REFRESH: 'refresh',
   REDIRECT: 'redirect',
   FALLBACK: 'fallback',
-  IGNORE: 'ignore'
+  IGNORE: 'ignore',
 };
 
 // Enhanced Error Boundary Component
@@ -102,7 +102,7 @@ export class EnhancedErrorBoundary extends Component {
       error: null,
       errorInfo: null,
       errorHistory: [],
-      recoveryAttempted: false
+      recoveryAttempted: false,
     };
   }
 
@@ -120,7 +120,7 @@ export class EnhancedErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     const { type, severity } = classifyError(error);
-    
+
     this.setState({
       errorInfo,
       errorHistory: [
@@ -130,9 +130,9 @@ export class EnhancedErrorBoundary extends Component {
           type,
           severity,
           timestamp: new Date().toISOString(),
-          componentStack: errorInfo.componentStack
-        }
-      ].slice(-10) // Keep last 10 errors
+          componentStack: errorInfo.componentStack,
+        },
+      ].slice(-10), // Keep last 10 errors
     }, () => {
       // Log error to monitoring service after state update
       this.logError(error, errorInfo, type, severity);
@@ -153,7 +153,7 @@ export class EnhancedErrorBoundary extends Component {
       severity,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
-      url: window.location.href
+      url: window.location.href,
     };
 
     // Console logging in development
@@ -164,7 +164,7 @@ export class EnhancedErrorBoundary extends Component {
     // Send to error monitoring service (Sentry, LogRocket, etc.)
     if (window.Sentry) {
       window.Sentry.captureException(error, {
-        extra: errorData
+        extra: errorData,
       });
     }
 
@@ -175,7 +175,7 @@ export class EnhancedErrorBoundary extends Component {
         const existingErrors = JSON.parse(existingErrorsStr);
         localStorage.setItem('errorHistory', JSON.stringify([
           ...existingErrors.slice(-9),
-          errorData
+          errorData,
         ]));
       } else {
         localStorage.setItem('errorHistory', JSON.stringify([errorData]));
@@ -191,7 +191,7 @@ export class EnhancedErrorBoundary extends Component {
       hasError: false,
       error: null,
       errorInfo: null,
-      recoveryAttempted: true
+      recoveryAttempted: true,
     });
   };
 
@@ -206,26 +206,26 @@ export class EnhancedErrorBoundary extends Component {
   getRecoveryStrategy = () => {
     const { error } = this.state;
     const { type, severity } = classifyError(error);
-    
+
     if (type === ERROR_TYPES.NETWORK && severity === ERROR_SEVERITY.MEDIUM) {
       return RECOVERY_STRATEGIES.RETRY;
     }
-    
+
     if (type === ERROR_TYPES.SERVER && severity === ERROR_SEVERITY.HIGH) {
       return RECOVERY_STRATEGIES.REFRESH;
     }
-    
+
     if (type === ERROR_TYPES.NOT_FOUND) {
       return RECOVERY_STRATEGIES.REDIRECT;
     }
-    
+
     return this.props.recoveryStrategy || RECOVERY_STRATEGIES.FALLBACK;
   };
 
   getErrorMessage = () => {
     const { error } = this.state;
     const { type } = classifyError(error);
-    
+
     const messages = {
       [ERROR_TYPES.NETWORK]: 'Network connection error. Please check your internet connection.',
       [ERROR_TYPES.VALIDATION]: 'There was an error with the data provided.',
@@ -234,7 +234,7 @@ export class EnhancedErrorBoundary extends Component {
       [ERROR_TYPES.NOT_FOUND]: 'The requested resource was not found.',
       [ERROR_TYPES.SERVER]: 'Server error occurred. Please try again later.',
       [ERROR_TYPES.CLIENT]: 'An unexpected error occurred.',
-      [ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred.'
+      [ERROR_TYPES.UNKNOWN]: 'An unexpected error occurred.',
     };
 
     return this.props.customMessage || messages[type] || messages[ERROR_TYPES.UNKNOWN];
@@ -252,7 +252,7 @@ export class EnhancedErrorBoundary extends Component {
           errorInfo: this.state.errorInfo,
           retry: this.handleRetry,
           refresh: this.handleRefresh,
-          goHome: this.handleGoHome
+          goHome: this.handleGoHome,
         });
       }
 
@@ -273,11 +273,11 @@ export class EnhancedErrorBoundary extends Component {
               >
                 ⚠️
               </motion.div>
-              
+
               <h2 className="text-2xl font-bold text-gray-800 mb-2">
                 Something went wrong
               </h2>
-              
+
               <p className="text-gray-600 mb-6">
                 {message}
               </p>
@@ -307,7 +307,7 @@ export class EnhancedErrorBoundary extends Component {
                     Try Again
                   </EnhancedButton>
                 )}
-                
+
                 {strategy === RECOVERY_STRATEGIES.REFRESH && (
                   <EnhancedButton
                     onClick={this.handleRefresh}
@@ -316,7 +316,7 @@ export class EnhancedErrorBoundary extends Component {
                     Refresh Page
                   </EnhancedButton>
                 )}
-                
+
                 {strategy === RECOVERY_STRATEGIES.REDIRECT && (
                   <EnhancedButton
                     onClick={this.handleGoHome}
@@ -325,7 +325,7 @@ export class EnhancedErrorBoundary extends Component {
                     Go to Home
                   </EnhancedButton>
                 )}
-                
+
                 <EnhancedButton
                   onClick={() => window.history.back()}
                   variant="ghost"
@@ -364,9 +364,9 @@ export const ErrorProvider = ({ children }) => {
       error: err,
       type,
       severity,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     setErrorHistory(prev => [...prev.slice(-9), errorEntry]);
     setError(errorEntry);
   }, []);
@@ -419,17 +419,17 @@ export const useErrorHandler = () => {
     errorHistory,
     handleError,
     handleAsyncError,
-    clearError
+    clearError,
   };
 };
 
 // Fallback component for specific feature failures
-export const FeatureFallback = ({ 
-  featureName, 
-  message, 
-  onRetry, 
+export const FeatureFallback = ({
+  featureName,
+  message,
+  onRetry,
   onDismiss,
-  isDismissible = true 
+  isDismissible = true,
 }) => {
   return (
     <motion.div
@@ -460,11 +460,11 @@ export const FeatureFallback = ({
 };
 
 // Graceful degradation wrapper
-export const GracefulDegradation = ({ 
-  children, 
-  fallbackUI, 
+export const GracefulDegradation = ({
+  children,
+  fallbackUI,
   featureName,
-  isFeatureEnabled = true 
+  isFeatureEnabled = true,
 }) => {
   const [hasFailed, setHasFailed] = useState(false);
 
@@ -475,8 +475,8 @@ export const GracefulDegradation = ({
   return (
     <EnhancedErrorBoundary
       fallbackUI={({ retry }) => (
-        <FeatureFallback 
-          featureName={featureName} 
+        <FeatureFallback
+          featureName={featureName}
           message="This feature encountered an error."
           onRetry={retry}
         />
@@ -539,5 +539,5 @@ export default {
   ERROR_TYPES,
   ERROR_SEVERITY,
   RECOVERY_STRATEGIES,
-  classifyError
+  classifyError,
 };

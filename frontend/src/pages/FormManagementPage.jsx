@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import FormBuilderPanel from '../components/forms/FormBuilderPanel'
-import FormPreviewPanel from '../components/forms/FormPreviewPanel'
-import { formsAPI } from '../services/api'
+import { useEffect, useMemo, useState } from 'react';
+import FormBuilderPanel from '../components/forms/FormBuilderPanel';
+import FormPreviewPanel from '../components/forms/FormPreviewPanel';
+import { formsAPI } from '../services/api';
 
 function createTemplateDraft(template = null) {
   const baseField = {
@@ -11,8 +11,8 @@ function createTemplateDraft(template = null) {
     required: true,
     placeholder: 'Enter details',
     defaultValue: '',
-    helpText: 'Capture the main information for this record.'
-  }
+    helpText: 'Capture the main information for this record.',
+  };
 
   return {
     id: '',
@@ -26,84 +26,84 @@ function createTemplateDraft(template = null) {
       stages: [
         { name: 'Draft', role: 'submitter' },
         { name: 'Review', role: 'manager' },
-        { name: 'Approval', role: 'approver' }
-      ]
+        { name: 'Approval', role: 'approver' },
+      ],
     },
     metadata: {
       owner: 'system',
       department: template?.category || 'operations',
       compliance: 'standard',
-      tags: []
+      tags: [],
     },
     aiInsights: {
       score: 74,
       summary: ['The form is ready for pilot deployment.'],
-      generatedAt: new Date().toISOString()
-    }
-  }
+      generatedAt: new Date().toISOString(),
+    },
+  };
 }
 
 function FormManagementPage() {
-  const [forms, setForms] = useState([])
-  const [draft, setDraft] = useState(createTemplateDraft())
-  const [selectedFormId, setSelectedFormId] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState('')
+  const [forms, setForms] = useState([]);
+  const [draft, setDraft] = useState(createTemplateDraft());
+  const [selectedFormId, setSelectedFormId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
 
   const loadForms = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await formsAPI.getForms()
-      const nextForms = response.data.forms || []
-      setForms(nextForms)
+      const response = await formsAPI.getForms();
+      const nextForms = response.data.forms || [];
+      setForms(nextForms);
       if (nextForms.length && !selectedFormId) {
-        setDraft(createTemplateDraft(nextForms[0]))
-        setSelectedFormId(nextForms[0].id)
+        setDraft(createTemplateDraft(nextForms[0]));
+        setSelectedFormId(nextForms[0].id);
       }
     } catch (error) {
-      setMessage('Unable to load forms right now. The form service is running locally with file-backed storage.')
+      setMessage('Unable to load forms right now. The form service is running locally with file-backed storage.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    loadForms()
-  }, [])
+    loadForms();
+  }, []);
 
   const stats = useMemo(() => ({
     total: forms.length,
     drafts: forms.filter((form) => form.status === 'draft').length,
-    active: forms.filter((form) => form.status === 'active').length
-  }), [forms])
+    active: forms.filter((form) => form.status === 'active').length,
+  }), [forms]);
 
   const updateDraftValue = (path, value) => {
     setDraft((current) => {
-      const next = JSON.parse(JSON.stringify(current))
+      const next = JSON.parse(JSON.stringify(current));
       if (path === 'title' || path === 'description' || path === 'category' || path === 'status') {
-        next[path] = value
-        return next
+        next[path] = value;
+        return next;
       }
 
       if (path.startsWith('metadata.')) {
-        const [, key] = path.split('.')
-        next.metadata[key] = value
-        return next
+        const [, key] = path.split('.');
+        next.metadata[key] = value;
+        return next;
       }
 
       if (path.startsWith('fields.')) {
-        const [, fieldIndex, key] = path.split('.')
-        const index = Number(fieldIndex)
-        const fields = [...(next.fields || [])]
-        fields[index] = { ...(fields[index] || {}), [key]: value }
-        next.fields = fields
-        return next
+        const [, fieldIndex, key] = path.split('.');
+        const index = Number(fieldIndex);
+        const fields = [...(next.fields || [])];
+        fields[index] = { ...(fields[index] || {}), [key]: value };
+        next.fields = fields;
+        return next;
       }
 
-      return next
-    })
-  }
+      return next;
+    });
+  };
 
   const handleAddField = (type) => {
     setDraft((current) => ({
@@ -117,90 +117,90 @@ function FormManagementPage() {
           required: false,
           placeholder: '',
           defaultValue: '',
-          helpText: ''
-        }
-      ]
-    }))
-  }
+          helpText: '',
+        },
+      ],
+    }));
+  };
 
   const handleRemoveField = (index) => {
     setDraft((current) => ({
       ...current,
-      fields: (current.fields || []).filter((_, currentIndex) => currentIndex !== index)
-    }))
-  }
+      fields: (current.fields || []).filter((_, currentIndex) => currentIndex !== index),
+    }));
+  };
 
   const handleLoadTemplate = async (template) => {
-    const nextDraft = createTemplateDraft(template)
-    setDraft(nextDraft)
-    setSelectedFormId('')
-    setMessage(`Loaded template: ${template.title}`)
-  }
+    const nextDraft = createTemplateDraft(template);
+    setDraft(nextDraft);
+    setSelectedFormId('');
+    setMessage(`Loaded template: ${template.title}`);
+  };
 
   const handleSave = async () => {
-    setSaving(true)
+    setSaving(true);
     try {
       const payload = {
         ...draft,
         fields: draft.fields || [],
         metadata: draft.metadata || {},
-        workflow: draft.workflow || {}
-      }
+        workflow: draft.workflow || {},
+      };
 
-      const response = draft.id
-        ? await formsAPI.updateForm(draft.id, payload)
-        : await formsAPI.createForm(payload)
+      const response = draft.id ?
+        await formsAPI.updateForm(draft.id, payload) :
+        await formsAPI.createForm(payload);
 
-      const savedForm = response.data
-      setDraft(savedForm)
-      setSelectedFormId(savedForm.id)
-      setForms((current) => (draft.id ? current.map((form) => (form.id === savedForm.id ? savedForm : form)) : [savedForm, ...current]))
-      setMessage(`Saved form “${savedForm.title}” successfully.`)
+      const savedForm = response.data;
+      setDraft(savedForm);
+      setSelectedFormId(savedForm.id);
+      setForms((current) => (draft.id ? current.map((form) => (form.id === savedForm.id ? savedForm : form)) : [savedForm, ...current]));
+      setMessage(`Saved form “${savedForm.title}” successfully.`);
     } catch (error) {
-      setMessage('Unable to save the form. Please try again.')
+      setMessage('Unable to save the form. Please try again.');
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const handleSubmitDraft = async () => {
     if (!draft.id) {
-      setMessage('Save the form first so the submission can be recorded.')
-      return
+      setMessage('Save the form first so the submission can be recorded.');
+      return;
     }
 
     try {
       const values = (draft.fields || []).reduce((accumulator, field) => ({
         ...accumulator,
-        [field.label]: field.defaultValue || ''
-      }), {})
-      const response = await formsAPI.submitForm(draft.id, { submittedBy: 'demo-user', values })
-      setMessage(`Submission recorded with id ${response.data.id}.`)
+        [field.label]: field.defaultValue || '',
+      }), {});
+      const response = await formsAPI.submitForm(draft.id, { submittedBy: 'demo-user', values });
+      setMessage(`Submission recorded with id ${response.data.id}.`);
     } catch (error) {
-      setMessage('Submission could not be recorded.')
+      setMessage('Submission could not be recorded.');
     }
-  }
+  };
 
   const templates = [
     {
       id: 'template-packhouse-dpr',
       title: 'Packhouse DPR',
       category: 'operations',
-      description: 'Daily reporting process with approval workflow and operational checks.'
+      description: 'Daily reporting process with approval workflow and operational checks.',
     },
     {
       id: 'template-inspection',
       title: 'Inspection Checklist',
       category: 'quality',
-      description: 'Quality inspection flow with digital signature support.'
+      description: 'Quality inspection flow with digital signature support.',
     },
     {
       id: 'template-shipment',
       title: 'Shipment Declaration',
       category: 'logistics',
-      description: 'Shipment declaration with embedded GIS metadata.'
-    }
-  ]
+      description: 'Shipment declaration with embedded GIS metadata.',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
@@ -276,9 +276,9 @@ function FormManagementPage() {
                       key={form.id}
                       type="button"
                       onClick={() => {
-                        setDraft(form)
-                        setSelectedFormId(form.id)
-                        setMessage(`Loaded form “${form.title}”.`)
+                        setDraft(form);
+                        setSelectedFormId(form.id);
+                        setMessage(`Loaded form “${form.title}”.`);
                       }}
                       className={`w-full rounded-xl border px-4 py-3 text-left transition ${selectedFormId === form.id ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-emerald-300'}`}
                     >
@@ -300,7 +300,7 @@ function FormManagementPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FormManagementPage
+export default FormManagementPage;

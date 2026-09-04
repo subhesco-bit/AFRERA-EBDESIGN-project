@@ -1,0 +1,297 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #faf8f3; }
+    a { color: #1a5f3a; } a:hover { color: #0f3a23; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="padding: 40px; max-width: 1200px; margin: 0 auto;">
+  <h1 style="margin: 0 0 32px 0; color: #1f2937; font-size: 28px; font-weight: 700;">Seller-Identity Panel</h1>
+  <p style="margin: 0 0 32px 0; color: #6b7280; font-size: 14px;">Display seller reputation, certifications, and farm-to-origin traceability</p>
+
+  <!-- Two-column layout: Expandable Panel vs Detailed Profile -->
+  <div style="display: grid; grid-template-columns: 360px 1fr; gap: 48px;">
+
+    <!-- COMPACT SELLER PANEL (Expandable) -->
+    <div>
+      <h2 style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Compact Panel (Product Card)</h2>
+
+      <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <!-- Header with Seller Avatar -->
+        <div style="background: linear-gradient(135deg, #1a5f3a 0%, #0f3a23 100%); padding: 16px; color: white;">
+          <div style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: #d4a942; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 20px;">A</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 700; font-size: 16px;">Assam Tea Cooperative</div>
+              <div style="font-size: 13px; opacity: 0.9;">Assam, India</div>
+              <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">Est. 2018 • 8 years as seller</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 16px;">
+          <!-- Rating Section -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; margin-bottom: 12px;">
+            <div>
+              <div style="color: #6b7280; font-size: 11px; font-weight: 500; text-transform: uppercase; margin-bottom: 4px;">Seller Rating</div>
+              <div style="display: flex; align-items: baseline; gap: 4px;">
+                <span style="color: #d4a942; font-size: 16px;">★★★★★</span>
+                <span style="color: #1f2937; font-weight: 700; font-size: 16px;">4.8</span>
+                <span style="color: #6b7280; font-size: 12px;">(512 reviews)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust Badges -->
+          <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6;">
+            <div style="color: #6b7280; font-size: 11px; font-weight: 500; text-transform: uppercase; margin-bottom: 8px;">Certifications</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <div style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px;">
+                <span style="font-size: 12px;">🏆</span>
+                <span style="font-size: 12px; color: #92400e; font-weight: 600;">GI Certified</span>
+              </div>
+              <div style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; background: #ecfdf5; border: 1px solid #d1fae5; border-radius: 4px;">
+                <span style="font-size: 12px;">🌿</span>
+                <span style="font-size: 12px; color: #059669; font-weight: 600;">Organic</span>
+              </div>
+              <div style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px;">
+                <span style="font-size: 12px;">✓</span>
+                <span style="font-size: 12px; color: #92400e; font-weight: 600;">Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6;">
+            <div style="text-align: center;">
+              <div style="color: #6b7280; font-size: 11px; font-weight: 500;">Total Sales</div>
+              <div style="color: #1a5f3a; font-weight: 700; font-size: 16px;">12.8K</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: #6b7280; font-size: 11px; font-weight: 500;">Response Time</div>
+              <div style="color: #1a5f3a; font-weight: 700; font-size: 16px;">2 hrs</div>
+            </div>
+          </div>
+
+          <!-- FOLU Badge -->
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px; background: #f0fdf4; border-radius: 6px; border-left: 3px solid #1a5f3a; margin-bottom: 12px;">
+            <span style="font-size: 16px;">📍</span>
+            <div style="flex: 1;">
+              <div style="color: #1a5f3a; font-size: 12px; font-weight: 600;">Farm-to-Origin Verified</div>
+              <div style="color: #6b7280; font-size: 11px;">Traceable supply chain</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 8px;">
+            <button style="flex: 1; padding: 10px; background: #1a5f3a; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">💬 Message Seller</button>
+            <button style="flex: 1; padding: 10px; background: white; color: #1a5f3a; border: 2px solid #1a5f3a; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer;">View Profile →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAILED SELLER PROFILE -->
+    <div>
+      <h2 style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Detailed Profile (Expanded View)</h2>
+
+      <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <!-- Hero Section with Background -->
+        <div style="background: linear-gradient(135deg, #d4a942 0%, #b8941a 100%); height: 120px; position: relative;">
+          <div style="position: absolute; top: 12px; right: 12px; background: white; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 12px; color: #92400e;">
+            🏆 GI Certified Producer
+          </div>
+        </div>
+
+        <!-- Profile Header -->
+        <div style="padding: 20px; position: relative; margin-top: -36px;">
+          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: #d4a942; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 32px; border: 4px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">A</div>
+            <div style="flex: 1; padding-top: 8px;">
+              <h3 style="margin: 0 0 4px 0; color: #1f2937; font-size: 22px; font-weight: 700;">Assam Tea Cooperative</h3>
+              <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 14px;">📍 Assam Valley, India</p>
+              <div style="display: flex; gap: 16px; font-size: 13px; color: #6b7280;">
+                <span><span style="color: #1f2937; font-weight: 600;">8 yrs</span> as seller</span>
+                <span>Since <span style="color: #1f2937; font-weight: 600;">2018</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rating Overview -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px; background: #faf8f3; border-radius: 8px; margin-bottom: 20px;">
+            <div style="text-align: center;">
+              <div style="color: #6b7280; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; font-weight: 500;">Overall Rating</div>
+              <div style="color: #1a5f3a; font-size: 18px; font-weight: 700;">4.8★</div>
+              <div style="color: #6b7280; font-size: 11px; margin-top: 2px;">512 reviews</div>
+            </div>
+            <div style="text-align: center; border-left: 1px solid #e5e7eb;">
+              <div style="color: #6b7280; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; font-weight: 500;">Product Quality</div>
+              <div style="color: #d4a942; font-size: 18px; font-weight: 700;">4.9★</div>
+              <div style="color: #6b7280; font-size: 11px; margin-top: 2px;">Excellent</div>
+            </div>
+            <div style="text-align: center; border-left: 1px solid #e5e7eb;">
+              <div style="color: #6b7280; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; font-weight: 500;">Shipping Speed</div>
+              <div style="color: #059669; font-size: 18px; font-weight: 700;">4.7★</div>
+              <div style="color: #6b7280; font-size: 11px; margin-top: 2px;">1-2 days</div>
+            </div>
+            <div style="text-align: center; border-left: 1px solid #e5e7eb;">
+              <div style="color: #6b7280; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; font-weight: 500;">Communication</div>
+              <div style="color: #1a5f3a; font-size: 18px; font-weight: 700;">4.8★</div>
+              <div style="color: #6b7280; font-size: 11px; margin-top: 2px;">2 hrs avg</div>
+            </div>
+          </div>
+
+          <!-- Certifications & Trust Section -->
+          <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb;">
+            <div style="color: #1f2937; font-weight: 600; font-size: 14px; margin-bottom: 12px;">🎖️ Certifications & Trust Indicators</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #fef3c7; border-radius: 6px;">
+                <span style="font-size: 20px;">🏆</span>
+                <div>
+                  <div style="color: #92400e; font-weight: 600; font-size: 13px;">GI Certified</div>
+                  <div style="color: #6b7280; font-size: 11px;">Geographical Indication</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #ecfdf5; border-radius: 6px;">
+                <span style="font-size: 20px;">🌿</span>
+                <div>
+                  <div style="color: #059669; font-weight: 600; font-size: 13px;">Organic Certified</div>
+                  <div style="color: #6b7280; font-size: 11px;">Certified by ECOCERT</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #fef3c7; border-radius: 6px;">
+                <span style="font-size: 20px;">🤝</span>
+                <div>
+                  <div style="color: #92400e; font-weight: 600; font-size: 13px;">Fair-Trade Certified</div>
+                  <div style="color: #6b7280; font-size: 11px;">Fair Wages Guaranteed</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f0fdf4; border-radius: 6px;">
+                <span style="font-size: 20px;">✓</span>
+                <div>
+                  <div style="color: #1a5f3a; font-weight: 600; font-size: 13px;">Verified Seller</div>
+                  <div style="color: #6b7280; font-size: 11px;">Identity & Business Verified</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FOLU & Traceability Section -->
+          <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb;">
+            <div style="color: #1f2937; font-weight: 600; font-size: 14px; margin-bottom: 12px;">📍 Farm-to-Origin & Traceability</div>
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 2px solid #1a5f3a; border-radius: 8px; padding: 16px;">
+              <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                <div style="flex: 1;">
+                  <div style="color: #1a5f3a; font-weight: 600; font-size: 14px; margin-bottom: 8px;">✓ Origin Verified</div>
+                  <div style="color: #6b7280; font-size: 13px; line-height: 1.5; margin-bottom: 12px;">
+                    All products traceable to specific farms in Assam Valley with GPS coordinates, farming documentation, and sustainability certifications.
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+                    <div>
+                      <span style="color: #6b7280;">Farm Region:</span>
+                      <div style="color: #1f2937; font-weight: 600;">Assam Valley, Kamrup</div>
+                    </div>
+                    <div>
+                      <span style="color: #6b7280;">GPS Coordinates:</span>
+                      <div style="color: #1f2937; font-weight: 600; font-family: monospace;">26.14°N, 91.73°E</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #1a5f3a 0%, #10b981 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; text-align: center;">
+                  Farm Map Embed
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button style="flex: 1; padding: 8px; background: white; color: #1a5f3a; border: 1px solid #1a5f3a; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">View Farm Details →</button>
+                <button style="flex: 1; padding: 8px; background: white; color: #1a5f3a; border: 1px solid #1a5f3a; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">Traceability Certificate →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Stats -->
+          <div>
+            <div style="color: #1f2937; font-weight: 600; font-size: 14px; margin-bottom: 12px;">📊 Business Performance</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+              <div style="text-align: center; padding: 16px; background: #faf8f3; border-radius: 6px;">
+                <div style="color: #6b7280; font-size: 11px; margin-bottom: 8px; text-transform: uppercase;">Total Sales</div>
+                <div style="color: #1a5f3a; font-size: 20px; font-weight: 700;">12.8K</div>
+                <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">products sold</div>
+              </div>
+              <div style="text-align: center; padding: 16px; background: #faf8f3; border-radius: 6px;">
+                <div style="color: #6b7280; font-size: 11px; margin-bottom: 8px; text-transform: uppercase;">Active Products</div>
+                <div style="color: #1a5f3a; font-size: 20px; font-weight: 700;">247</div>
+                <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">in catalog</div>
+              </div>
+              <div style="text-align: center; padding: 16px; background: #faf8f3; border-radius: 6px;">
+                <div style="color: #6b7280; font-size: 11px; margin-bottom: 8px; text-transform: uppercase;">Repeat Buyers</div>
+                <div style="color: #1a5f3a; font-size: 20px; font-weight: 700;">68%</div>
+                <div style="color: #6b7280; font-size: 11px; margin-top: 4px;">loyalty rate</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Explanation -->
+  <div style="margin-top: 48px; padding: 24px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+    <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 14px; font-weight: 600;">Key Components Explained</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ Trust Indicators</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>Seller rating with review count</li>
+          <li>Years active in business</li>
+          <li>Response time metrics</li>
+          <li>Repeat buyer percentage</li>
+          <li>Verified seller badge</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ Certifications</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>GI (Geographical Indication)</li>
+          <li>Organic certification badge</li>
+          <li>Fair-trade certification</li>
+          <li>Issuing authority shown</li>
+          <li>Visual color-coded badges</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ FOLU Transparency</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>Farm location & region</li>
+          <li>GPS coordinates</li>
+          <li>Embeddable farm map</li>
+          <li>Traceability certificate link</li>
+          <li>Farm-to-origin documentation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { logisticsAPI } from '../services/api'
-import { Truck, PackageCheck, AlertCircle, MapPinned, RefreshCw, ArrowUpRight, Thermometer, Clock3 } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { logisticsAPI } from '../services/api';
+import { Truck, PackageCheck, AlertCircle, MapPinned, RefreshCw, ArrowUpRight, Thermometer, Clock3 } from 'lucide-react';
 
 export default function SupplyChainAnalyticsPage() {
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all');
   const shipmentsQuery = useQuery({
     queryKey: ['supply-chain-shipments', statusFilter],
     queryFn: () => logisticsAPI.getShipments(statusFilter === 'all' ? {} : { status: statusFilter }, { page: 1, limit: 50 }).then((response) => response.data),
     refetchInterval: 120000,
-  })
+  });
 
-  const shipments = shipmentsQuery.data?.shipments || shipmentsQuery.data?.items || []
-  const activeShipments = shipments.filter((shipment) => !['delivered', 'cancelled'].includes(shipment.status))
-  const delayedShipments = shipments.filter((shipment) => ['delayed', 'at_risk', 'exception'].includes(shipment.status))
-  const deliveredShipments = shipments.filter((shipment) => shipment.status === 'delivered')
-  const onTimeRate = shipments.length ? Math.round((deliveredShipments.length / shipments.length) * 100) : 0
-  const statusOptions = ['all', 'pending', 'in_transit', 'delayed', 'delivered']
+  const shipments = shipmentsQuery.data?.shipments || shipmentsQuery.data?.items || [];
+  const activeShipments = shipments.filter((shipment) => !['delivered', 'cancelled'].includes(shipment.status));
+  const delayedShipments = shipments.filter((shipment) => ['delayed', 'at_risk', 'exception'].includes(shipment.status));
+  const deliveredShipments = shipments.filter((shipment) => shipment.status === 'delivered');
+  const onTimeRate = shipments.length ? Math.round((deliveredShipments.length / shipments.length) * 100) : 0;
+  const statusOptions = ['all', 'pending', 'in_transit', 'delayed', 'delivered'];
 
   return (
     <div className="min-h-screen bg-v42-paddy2 px-4 py-8 sm:px-6 lg:px-8">
@@ -62,5 +62,5 @@ export default function SupplyChainAnalyticsPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

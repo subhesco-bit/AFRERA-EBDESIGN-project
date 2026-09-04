@@ -34,7 +34,7 @@ priority: BLOCKING - Required to proceed
 ---
 
 ### Phase 3: sve Repository
-**URL:** github.com/svesco2024-lgtm/sve
+**URL:** github.com/Subhesco2024-lgtm/sve
 
 **Critical Questions:**
 1. What does sve stand for and do?
@@ -228,4 +228,5 @@ Once data arrives, I will produce:
 **Awaiting data for DEEP repository to activate Phase 2.**
 
 **Which format can you provide: Descriptions / File Listings / Key Files / Full Repos?**
+
 

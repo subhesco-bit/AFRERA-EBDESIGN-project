@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import api from '../../services/api';
+import api from '../../services/componentApi';
 
 /**
  * AI Chat Component
@@ -25,7 +25,7 @@ export default function AIChat() {
     { id: 'farmer-advisor', name: 'Farmer Advisor', icon: '🌾', specialty: 'Crop planning, weather, farming best practices' },
     { id: 'business-analyst', name: 'Business Analyst', icon: '📊', specialty: 'Market trends, pricing, financial analysis' },
     { id: 'operations-manager', name: 'Operations Manager', icon: '⚙️', specialty: 'Logistics, inventory, supply chain' },
-    { id: 'governance-agent', name: 'Governance Agent', icon: '🛡️', specialty: 'Compliance, risk management, policy' }
+    { id: 'governance-agent', name: 'Governance Agent', icon: '🛡️', specialty: 'Compliance, risk management, policy' },
   ];
 
   const QUICK_SUGGESTIONS = [
@@ -33,7 +33,7 @@ export default function AIChat() {
     'Analyze current market prices',
     'Optimize my inventory levels',
     'Check compliance status',
-    'Forecast demand for next month'
+    'Forecast demand for next month',
   ];
 
   useEffect(() => {
@@ -52,11 +52,11 @@ export default function AIChat() {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { 
-      role: 'user', 
+    const userMessage = {
+      role: 'user',
       content: input,
       attachments,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -68,27 +68,27 @@ export default function AIChat() {
         requestType: 'conversational',
         query: userMessage.content,
         agentPreference: selectedAgent,
-        context: context,
-        attachments: attachments
+        context,
+        attachments,
       });
 
-      const aiMessage = { 
-        role: 'assistant', 
+      const aiMessage = {
+        role: 'assistant',
         content: response.data.data.response,
         agent: response.data.data.agent,
         metadata: response.data.data.metadata,
         decision: response.data.data.decision,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
       setMessages(prev => [...prev, aiMessage]);
       setContext(response.data.data.context);
       setDecision(response.data.data.decision);
     } catch (err) {
       console.error('AI chat error:', err);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }]);
     } finally {
       setLoading(false);
@@ -118,7 +118,7 @@ export default function AIChat() {
     try {
       await api.post('/ai/decision/execute', {
         decision_id: decision.id,
-        action: action
+        action,
       });
       alert(`Action "${action}" executed successfully`);
     } catch (err) {
@@ -220,9 +220,9 @@ export default function AIChat() {
                   >
                     <div
                       className={`max-w-[75%] p-3 rounded-lg ${
-                        message.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white border border-gray-200'
+                        message.role === 'user' ?
+                          'bg-blue-600 text-white' :
+                          'bg-white border border-gray-200'
                       }`}
                     >
                       {message.agent && (

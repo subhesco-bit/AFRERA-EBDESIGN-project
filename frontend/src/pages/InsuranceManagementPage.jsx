@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
+import { NativeSelect as Select } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
 import { LoadingSkeleton } from '../components/ui/enhancedComponents';
 
@@ -27,7 +27,7 @@ const InsuranceManagementPage = () => {
     queryKey: ['userPolicies'],
     queryFn: () => insuranceAPI.getPolicies({ scope: 'mine' }, { page: 1, limit: 50 })
       .then(res => res.data),
-    refetchInterval: 180000 // 3 minutes
+    refetchInterval: 180000, // 3 minutes
   });
 
   const { data: insuranceProducts } = useQuery({
@@ -111,12 +111,12 @@ const InsuranceManagementPage = () => {
               <label className="block text-sm font-medium mb-2">Duration (years)</label>
               <Input type="number" min="1" required value={policyForm.duration_years} onChange={(event) => setPolicyForm({ ...policyForm, duration_years: event.target.value })} placeholder="Enter duration" />
             </div>
-          <div className="mt-4 flex gap-2 md:col-span-2">
-            <Button type="submit" disabled={createPolicyMutation.isPending}>{createPolicyMutation.isPending ? 'Submitting...' : 'Submit policy application'}</Button>
-            <Button type="button" variant="outline" onClick={() => setShowPurchaseForm(false)}>
+            <div className="mt-4 flex gap-2 md:col-span-2">
+              <Button type="submit" disabled={createPolicyMutation.isPending}>{createPolicyMutation.isPending ? 'Submitting...' : 'Submit policy application'}</Button>
+              <Button type="button" variant="outline" onClick={() => setShowPurchaseForm(false)}>
               Cancel
-            </Button>
-          </div>
+              </Button>
+            </div>
           </form>
         </Card>
       )}
@@ -193,7 +193,7 @@ const InsuranceManagementPage = () => {
                     <p className="text-sm text-gray-600 mb-2">{product.description || 'Coverage details are provided in the policy terms.'}</p>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">{product.premium ? `From ₹${Number(product.premium).toLocaleString('en-IN')}` : 'Quote required'}</span>
-                      <Button size="sm" onClick={() => { setPolicyForm({ ...policyForm, insurance_type: product.type || product.product_type || 'crop' }); setShowPurchaseForm(true) }}>Request quote</Button>
+                      <Button size="sm" onClick={() => { setPolicyForm({ ...policyForm, insurance_type: product.type || product.product_type || 'crop' }); setShowPurchaseForm(true); }}>Request quote</Button>
                     </div>
                   </div>
                 ))}
@@ -224,7 +224,7 @@ const InsuranceManagementPage = () => {
                       <p className="font-medium">{claim.claim_type || claim.type || 'Insurance claim'}</p>
                       <p className="text-sm text-gray-600">Claim ID: {claim.claim_number || claim.claimId || claim.id}</p>
                     </div>
-                    <Badge variant="outline">In Review</Badge>
+                    <Badge variant="outline">{claim.status || 'Under review'}</Badge>
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
@@ -249,23 +249,25 @@ const InsuranceManagementPage = () => {
           {activeTab === 'documents' && (
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Policy Documents</h2>
-              <div className="space-y-3">
-                <div className="p-3 border rounded flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Crop Insurance Policy</p>
-                    <p className="text-sm text-gray-600">Policy ID: POL-2024-001</p>
-                  </div>
-                  <Button variant="outline" size="sm">Download</Button>
+              {policies.length === 0 ? (
+                <p className="text-sm text-gray-500">No active policies to attach documents to yet.</p>
+              ) : (
+                <div className="space-y-3 mb-4">
+                  {policies.map((policy) => (
+                    <div key={policy.id} className="p-3 border rounded flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">{policy.insuranceType || 'Insurance policy'}</p>
+                        <p className="text-sm text-gray-600">Policy ID: {policy.policyId || policy.id}</p>
+                      </div>
+                      <span className="text-xs text-gray-500">No document on file</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="p-3 border rounded flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Equipment Insurance Policy</p>
-                    <p className="text-sm text-gray-600">Policy ID: POL-2024-002</p>
-                  </div>
-                  <Button variant="outline" size="sm">Download</Button>
-                </div>
-                <Button className="w-full">Upload New Document</Button>
-              </div>
+              )}
+              <p className="text-sm text-gray-500">
+                Document upload and download is not available yet — this account has no policy document
+                storage wired up on the backend. Contact support for a copy of your policy documents.
+              </p>
             </Card>
           )}
         </>

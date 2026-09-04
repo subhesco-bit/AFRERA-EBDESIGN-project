@@ -54,6 +54,7 @@ const escrowService = require('./services/legacy/escrowService');
 const custodyEventRoutes = require('./services/legacy/custodyEventRoutes');
 // Health check routes for monitoring
 const healthRoutes = require('./routes/healthRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const offlinePaymentService = require('./services/legacy/offlinePaymentService');
 const advancedAIService = require('./services/legacy/advancedAIService');
 const offlineSyncService = require('./services/legacy/offlineSyncService');
@@ -669,6 +670,7 @@ const mountRoute = (pathPrefix, serviceModule) => {
 };
 
 app.use('/api/v1/auth', criticalRouteMonitoring, authService.router);
+app.use('/api/v1/dashboard', dashboardRoutes);
 mountRoute('/api/v1/products', productService);
 app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 // NOTE: farmerService and gstService export plain functions, not a .router,
@@ -847,6 +849,7 @@ const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes');
 const blockchainVerificationRoutes = require('./routes/blockchainVerificationRoutes');
 const digitalTwinRoutes = require('./routes/digitalTwinRoutes');
 const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoutes');
+const apiCompatibilityRoutes = require('./routes/apiCompatibilityRoutes');
 
 // CORRECTION: Standardized Tier 1 routes to /api/v1/ prefix for consistency
 app.use('/api/v1/analytics', advancedAnalyticsRoutes);
@@ -855,6 +858,7 @@ app.use('/api/v1/iot', iotIntegrationRoutes);
 app.use('/api/v1/blockchain', blockchainVerificationRoutes);
 app.use('/api/v1/digital-twin', digitalTwinRoutes);
 app.use('/api/v1/enterprise', enterpriseIntegrationRoutes);
+app.use('/api/v1', apiCompatibilityRoutes);
 
 // Routes that existed but were never mounted anywhere
 app.use('/api/v1/gst', gstRoutes);

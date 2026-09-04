@@ -1,52 +1,52 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
-import { authAPI } from '../services/api'
-import { useAuthStore, demoAccounts } from '../store/authStore'
-import toast from 'react-hot-toast'
-import { LogIn, Eye, EyeOff, ShieldCheck, Store, UserRound, Landmark } from 'lucide-react'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { authAPI } from '../services/api';
+import { useAuthStore, demoAccounts } from '../store/authStore';
+import toast from 'react-hot-toast';
+import { LogIn, Eye, EyeOff, ShieldCheck, Store, UserRound, Landmark } from 'lucide-react';
 
 function LoginPage() {
-  const navigate = useNavigate()
-  const { setAuth, loginDemo } = useAuthStore()
-  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate();
+  const { setAuth, loginDemo } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-  })
+  });
 
   const loginMutation = useMutation({
     mutationFn: authAPI.login,
     onSuccess: (response) => {
-      const { user, accessToken, refreshToken } = response.data
-      setAuth(user, accessToken, refreshToken)
-      toast.success('Login successful')
-      navigate(user?.role === 'admin' ? '/admin/settings' : '/dashboard')
+      const { user, accessToken, refreshToken } = response.data;
+      setAuth(user, accessToken, refreshToken);
+      toast.success('Login successful');
+      navigate(user?.role === 'admin' ? '/admin/settings' : '/dashboard');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Login failed')
+      toast.error(error.response?.data?.error || 'Login failed');
     },
-  })
+  });
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    loginMutation.mutate(formData)
-  }
+    e.preventDefault();
+    loginMutation.mutate(formData);
+  };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleDemoLogin = (role) => {
-    const ok = loginDemo(role)
+    const ok = loginDemo(role);
     if (!ok) {
-      toast.error('Demo account not available')
-      return
+      toast.error('Demo account not available');
+      return;
     }
 
-    toast.success('Demo account connected successfully')
-    navigate(role === 'admin' ? '/admin/settings' : role === 'banker' ? '/banker-dashboard' : role === 'farmer' ? '/farmer-portal' : '/dashboard')
-  }
+    toast.success('Demo account connected successfully');
+    navigate(role === 'admin' ? '/admin/settings' : role === 'banker' ? '/banker-dashboard' : role === 'farmer' ? '/farmer-portal' : '/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-v42-paddy2 py-12 px-4">
@@ -151,7 +151,7 @@ function LoginPage() {
 
           <div className="space-y-3">
             {demoAccounts.map((account) => {
-              const Icon = account.role === 'admin' ? ShieldCheck : account.role === 'banker' ? Landmark : account.role === 'farmer' ? UserRound : Store
+              const Icon = account.role === 'admin' ? ShieldCheck : account.role === 'banker' ? Landmark : account.role === 'farmer' ? UserRound : Store;
 
               return (
                 <button
@@ -171,13 +171,13 @@ function LoginPage() {
                     </div>
                   </div>
                 </button>
-              )
+              );
             })}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;

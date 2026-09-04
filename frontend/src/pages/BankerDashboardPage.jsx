@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { TrendingUp, Shield, FileText, Users, DollarSign, AlertTriangle, BarChart3, PieChart, Activity, Download } from 'lucide-react'
-import { bankerAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { TrendingUp, Shield, FileText, Users, DollarSign, AlertTriangle, BarChart3, PieChart, Activity, Download } from 'lucide-react';
+import { bankerAPI } from '../services/api';
 
 function BankerDashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: portfolioStats } = useQuery({
     queryKey: ['banker-portfolio'],
     queryFn: () => bankerAPI.getPortfolio().then(r => r.data),
-  })
+  });
 
   const { data: riskDashboard } = useQuery({
     queryKey: ['banker-risk'],
     queryFn: () => bankerAPI.getRiskDashboard().then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -32,15 +32,15 @@ function BankerDashboardPage() {
           { id: 'loan-applications', label: 'Loan Applications', icon: FileText },
           { id: 'portfolio', label: 'Portfolio', icon: PieChart },
           { id: 'risk', label: 'Risk Assessment', icon: AlertTriangle },
-          { id: 'reports', label: 'Reports', icon: Download }
+          { id: 'reports', label: 'Reports', icon: Download },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-blue-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -146,7 +146,7 @@ function BankerDashboardPage() {
               {[
                 { id: 'APP-001', farmer: 'Bornali Gogoi', amount: 500000, score: 780, status: 'approved' },
                 { id: 'APP-002', farmer: 'Rimon Lyngdoh', amount: 750000, score: 720, status: 'pending' },
-                { id: 'APP-003', farmer: 'Ramcharan Naga', amount: 300000, score: 680, status: 'review' }
+                { id: 'APP-003', farmer: 'Ramcharan Naga', amount: 300000, score: 680, status: 'review' },
               ].map((app) => (
                 <div key={app.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
@@ -160,8 +160,8 @@ function BankerDashboardPage() {
                     </div>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                       app.status === 'approved' ? 'bg-green-100 text-green-800' :
-                      app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-blue-100 text-blue-800'
+                        app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-blue-100 text-blue-800'
                     }`}>
                       {app.status}
                     </span>
@@ -270,7 +270,7 @@ function BankerDashboardPage() {
               { id: 'APP-001', farmer: 'Bornali Gogoi', type: 'Crop Loan', amount: 500000, purpose: 'Kharif sowing', score: 780, status: 'approved', date: '2026-08-01' },
               { id: 'APP-002', farmer: 'Rimon Lyngdoh', type: 'Equipment Loan', amount: 750000, purpose: 'Tractor purchase', score: 720, status: 'pending', date: '2026-08-02' },
               { id: 'APP-003', farmer: 'Ramcharan Naga', type: 'Working Capital', amount: 300000, purpose: 'Harvest expenses', score: 680, status: 'review', date: '2026-08-03' },
-              { id: 'APP-004', farmer: 'Priya Sharma', type: 'Land Development', amount: 1200000, purpose: 'Irrigation system', score: 810, status: 'approved', date: '2026-08-04' }
+              { id: 'APP-004', farmer: 'Priya Sharma', type: 'Land Development', amount: 1200000, purpose: 'Irrigation system', score: 810, status: 'approved', date: '2026-08-04' },
             ].map((app) => (
               <div key={app.id} className="border rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
@@ -280,8 +280,8 @@ function BankerDashboardPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     app.status === 'approved' ? 'bg-green-100 text-green-800' :
-                    app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-blue-100 text-blue-800'
+                      app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-blue-100 text-blue-800'
                   }`}>
                     {app.status}
                   </span>
@@ -303,9 +303,9 @@ function BankerDashboardPage() {
                     <div className="text-gray-600">Risk Level</div>
                     <div className={`font-medium ${
                       app.score >= 750 ? 'text-green-600' :
-                      app.score >= 650 ? 'text-blue-600' :
-                      app.score >= 550 ? 'text-yellow-600' :
-                      'text-red-600'
+                        app.score >= 650 ? 'text-blue-600' :
+                          app.score >= 550 ? 'text-yellow-600' :
+                            'text-red-600'
                     }`}>
                       {app.score >= 750 ? 'Low' : app.score >= 650 ? 'Medium' : app.score >= 550 ? 'High' : 'Very High'}
                     </div>
@@ -342,7 +342,7 @@ function BankerDashboardPage() {
                   { type: 'Crop Loans', amount: 25000000, percentage: 45, color: 'bg-green-500' },
                   { type: 'Equipment Loans', amount: 15000000, percentage: 27, color: 'bg-blue-500' },
                   { type: 'Working Capital', amount: 10000000, percentage: 18, color: 'bg-purple-500' },
-                  { type: 'Land Development', amount: 5000000, percentage: 10, color: 'bg-orange-500' }
+                  { type: 'Land Development', amount: 5000000, percentage: 10, color: 'bg-orange-500' },
                 ].map((item) => (
                   <div key={item.type} className="flex items-center">
                     <div className="w-32 text-sm text-gray-600">{item.type}</div>
@@ -361,7 +361,7 @@ function BankerDashboardPage() {
                   { region: 'Assam', amount: 20000000, percentage: 36 },
                   { region: 'Meghalaya', amount: 15000000, percentage: 27 },
                   { region: 'Nagaland', amount: 12000000, percentage: 22 },
-                  { region: 'Manipur', amount: 8000000, percentage: 15 }
+                  { region: 'Manipur', amount: 8000000, percentage: 15 },
                 ].map((item) => (
                   <div key={item.region} className="flex items-center">
                     <div className="w-32 text-sm text-gray-600">{item.region}</div>
@@ -431,7 +431,7 @@ function BankerDashboardPage() {
               { name: 'RBI Monthly Returns', frequency: 'Monthly', status: 'on_track', due: '2026-08-15' },
               { name: 'NABARD Portfolio Report', frequency: 'Quarterly', status: 'pending', due: '2026-09-30' },
               { name: 'Priority Sector Lending', frequency: 'Quarterly', status: 'on_track', due: '2026-09-30' },
-              { name: 'NPA Classification Report', frequency: 'Monthly', status: 'on_track', due: '2026-08-15' }
+              { name: 'NPA Classification Report', frequency: 'Monthly', status: 'on_track', due: '2026-08-15' },
             ].map((report) => (
               <div key={report.name} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
@@ -441,7 +441,7 @@ function BankerDashboardPage() {
                 <div className="flex items-center space-x-3">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     report.status === 'on_track' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {report.status === 'on_track' ? 'On Track' : 'Pending'}
                   </span>
@@ -455,7 +455,7 @@ function BankerDashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default BankerDashboardPage
+export default BankerDashboardPage;

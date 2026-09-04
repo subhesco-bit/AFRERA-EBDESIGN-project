@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #ffffff; }
+    a { color: #1a5f3a; } a:hover { color: #0f3a23; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #ffffff;">
+
+  <!-- Header -->
+  <div style="background: linear-gradient(135deg, #1a5f3a 0%, #0f3a23 100%); color: white; padding: 16px 24px; border-bottom: 1px solid #0a2417;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto;">
+      <h1 style="margin: 0; font-size: 20px; font-weight: 700;">🌾 AFRERA Marketplace</h1>
+      <div style="display: flex; gap: 16px; align-items: center;">
+        <div style="display: flex; gap: 8px; flex: 1; max-width: 400px;">
+          <input type="text" placeholder="Search products, sellers, orders..." style="flex: 1; padding: 8px 12px; border: none; border-radius: 6px; font-size: 13px; background: rgba(255,255,255,0.95);">
+          <button style="padding: 8px 12px; background: #d4a942; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer;">🔍</button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button style="padding: 8px 12px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 13px; cursor: pointer;">🛒 Cart</button>
+          <button style="padding: 8px 12px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; font-size: 13px; cursor: pointer;">👤 Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role-Based Tab Navigation (NEW) -->
+  <div style="background: white; border-bottom: 2px solid #f3f4f6; padding: 0 24px;">
+    <div style="display: flex; gap: 0; max-width: 1400px; margin: 0 auto;">
+      <button style="padding: 12px 24px; border: none; background: transparent; color: #1a5f3a; font-weight: 600; cursor: pointer; border-bottom: 3px solid #1a5f3a; font-size: 14px;">
+        🛍️ Browse Products
+      </button>
+      <button style="padding: 12px 24px; border: none; background: transparent; color: #6b7280; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; font-size: 14px;">
+        📦 My Listings (Seller)
+      </button>
+      <button style="padding: 12px 24px; border: none; background: transparent; color: #6b7280; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; font-size: 14px;">
+        💼 Bulk Orders (B2B)
+      </button>
+      <button style="padding: 12px 24px; border: none; background: transparent; color: #6b7280; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; font-size: 14px;">
+        🏆 GI Products
+      </button>
+      <button style="padding: 12px 24px; border: none; background: transparent; color: #6b7280; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; font-size: 14px;">
+        📊 Analytics
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div style="display: flex; flex: 1; overflow: hidden; background: #faf8f3;">
+
+    <!-- Left Sidebar Filters -->
+    <div style="width: 240px; border-right: 1px solid #e5e7eb; background: white; overflow-y: auto; padding: 20px;">
+      <div style="color: #1f2937; font-weight: 600; font-size: 14px; margin-bottom: 16px;">Filters</div>
+
+      <!-- Category Filter -->
+      <div style="margin-bottom: 24px;">
+        <div style="color: #1f2937; font-weight: 600; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Category</div>
+        <div style="space-y: 8px;">
+          <div style="padding: 6px 0; cursor: pointer;"><span style="color: #1a5f3a; font-weight: 500;">Rice</span> (245)</div>
+          <div style="padding: 6px 0; cursor: pointer;"><span style="color: #6b7280;">Tea</span> (89)</div>
+          <div style="padding: 6px 0; cursor: pointer;"><span style="color: #6b7280;">Spices</span> (156)</div>
+          <div style="padding: 6px 0; cursor: pointer;"><span style="color: #6b7280;">Coffee</span> (42)</div>
+        </div>
+      </div>
+
+      <!-- Certification Filter -->
+      <div style="margin-bottom: 24px;">
+        <div style="color: #1f2937; font-weight: 600; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Certification</div>
+        <div style="space-y: 8px;">
+          <div style="padding: 6px 0; display: flex; gap: 8px; cursor: pointer;"><input type="checkbox" checked style="cursor: pointer;"/><span style="color: #1a5f3a; font-weight: 500;">Organic</span></div>
+          <div style="padding: 6px 0; display: flex; gap: 8px; cursor: pointer;"><input type="checkbox" checked style="cursor: pointer;"/><span style="color: #1a5f3a; font-weight: 500;">Fair-Trade</span></div>
+          <div style="padding: 6px 0; display: flex; gap: 8px; cursor: pointer;"><input type="checkbox" style="cursor: pointer;"/><span style="color: #6b7280;">GI Protected</span></div>
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div style="margin-bottom: 24px;">
+        <div style="color: #1f2937; font-weight: 600; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Price Range</div>
+        <input type="range" min="0" max="1000" value="500" style="width: 100%;"/>
+        <div style="color: #6b7280; font-size: 12px; margin-top: 8px;">₹0 - ₹1000</div>
+      </div>
+
+      <!-- Seller Rating -->
+      <div>
+        <div style="color: #1f2937; font-weight: 600; font-size: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Seller Rating</div>
+        <div style="space-y: 6px;">
+          <div style="padding: 4px 0; cursor: pointer;"><span style="color: #d4a942;">★★★★★</span> <span style="color: #6b7280; font-size: 12px;">(4.5+)</span></div>
+          <div style="padding: 4px 0; cursor: pointer;"><span style="color: #d4a942;">★★★★</span> <span style="color: #6b7280; font-size: 12px;">(4.0+)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Product Grid -->
+    <div style="flex: 1; padding: 24px; overflow-y: auto;">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+        <!-- Product Card 1 -->
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+          <div style="height: 140px; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">Image</div>
+          <div style="padding: 12px;">
+            <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: #d4a942; font-size: 11px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">F</div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 12px; color: #1f2937;">Farmer</div>
+                <div style="font-size: 11px; color: #6b7280;">4.8★ (156)</div>
+              </div>
+            </div>
+            <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 4px;">Organic Rice</div>
+            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+              <span style="font-size: 9px; background: #ecfdf5; color: #059669; padding: 2px 4px; border-radius: 2px; font-weight: 500;">🌿 Organic</span>
+              <span style="font-size: 9px; background: #fef3c7; color: #92400e; padding: 2px 4px; border-radius: 2px; font-weight: 500;">✓ Verified</span>
+            </div>
+            <div style="font-weight: 700; font-size: 14px; color: #1a5f3a; margin-bottom: 8px;">₹450</div>
+            <button style="width: 100%; padding: 6px; background: #1a5f3a; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer;">Add to Cart</button>
+          </div>
+        </div>
+
+        <!-- Product Card 2 - GI Product -->
+        <div style="background: white; border: 2px solid #d4a942; border-radius: 8px; overflow: hidden;">
+          <div style="height: 140px; background: #d4a942; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; position: relative;">
+            <span style="position: absolute; top: 6px; right: 6px; background: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; color: #92400e; font-weight: 600;">🏆 GI</span>
+            Image
+          </div>
+          <div style="padding: 12px;">
+            <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: #d4a942; font-size: 11px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">T</div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 12px; color: #1f2937;">Tea Coop</div>
+                <div style="font-size: 11px; color: #6b7280;">★★★★★ (512)</div>
+              </div>
+            </div>
+            <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 4px;">Darjeeling Tea</div>
+            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+              <span style="font-size: 9px; background: #fef3c7; color: #92400e; padding: 2px 4px; border-radius: 2px; font-weight: 500;">🏆 GI</span>
+              <span style="font-size: 9px; background: #ecfdf5; color: #059669; padding: 2px 4px; border-radius: 2px; font-weight: 500;">Top Seller</span>
+            </div>
+            <div style="font-weight: 700; font-size: 14px; color: #d4a942; margin-bottom: 4px;">₹850</div>
+            <div style="font-size: 11px; color: #059669; font-weight: 500; margin-bottom: 8px;">+15% GI Premium</div>
+            <button style="width: 100%; padding: 6px; background: #d4a942; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer;">Add to Cart</button>
+          </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+          <div style="height: 140px; background: #059669; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">Image</div>
+          <div style="padding: 12px;">
+            <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
+              <div style="width: 24px; height: 24px; border-radius: 50%; background: #d4a942; font-size: 11px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">S</div>
+              <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 12px; color: #1f2937;">Spice Seller</div>
+                <div style="font-size: 11px; color: #6b7280;">4.6★ (203)</div>
+              </div>
+            </div>
+            <div style="font-weight: 600; font-size: 13px; color: #1f2937; margin-bottom: 4px;">Turmeric Powder</div>
+            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+              <span style="font-size: 9px; background: #ecfdf5; color: #059669; padding: 2px 4px; border-radius: 2px; font-weight: 500;">🌿 Organic</span>
+              <span style="font-size: 9px; background: #fef3c7; color: #92400e; padding: 2px 4px; border-radius: 2px; font-weight: 500;">🤝 Fair-Trade</span>
+            </div>
+            <div style="font-weight: 700; font-size: 14px; color: #1a5f3a; margin-bottom: 8px;">₹280</div>
+            <button style="width: 100%; padding: 6px; background: #1a5f3a; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer;">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Info -->
+  <div style="background: #f3f4f6; border-top: 1px solid #e5e7eb; padding: 12px 24px; font-size: 12px; color: #6b7280;">
+    <div style="max-width: 1400px; margin: 0 auto;">
+      Showing 3 of 892 products • <span style="color: #1a5f3a; font-weight: 500;">Unified marketplace combining Consumer, Seller, B2B, and GI experiences</span>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

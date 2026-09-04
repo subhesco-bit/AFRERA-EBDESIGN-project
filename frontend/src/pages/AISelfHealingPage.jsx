@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { HeartPulse, Zap, AlertTriangle, CheckCircle } from 'lucide-react'
-import { aiSelfHealingAPI } from '../services/api'
-import { aiDecisionService } from '../services/aiDecisionService'
-import ActionCard from '../components/common/ActionCard'
+import { useState, useEffect } from 'react';
+import { HeartPulse, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { aiSelfHealingAPI } from '../services/api';
+import { aiDecisionService } from '../services/aiDecisionService';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/aiSelfHealingRoutes.js +
@@ -19,55 +19,55 @@ import ActionCard from '../components/common/ActionCard'
 const TABS = [
   ['heal', 'Detect & Heal'],
   ['config', 'Patterns, Strategies & Monitoring'],
-]
+];
 
 function AISelfHealingPage() {
-  const [tab, setTab] = useState('heal')
-  const [autoHeal, setAutoHeal] = useState(false)
+  const [tab, setTab] = useState('heal');
+  const [autoHeal, setAutoHeal] = useState(false);
   const [healingDecisions, setHealingDecisions] = useState(() => aiDecisionService.getFallbackDecisions('healing', {
     count: 3,
     baseTitle: 'Healing recommendation',
-    icon: '🩺'
-  }))
-  const [healthMetrics, setHealthMetrics] = useState(null)
+    icon: '🩺',
+  }));
+  const [healthMetrics, setHealthMetrics] = useState(null);
 
   useEffect(() => {
-    loadHealthMetrics()
-    const interval = setInterval(loadHealthMetrics, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    loadHealthMetrics();
+    const interval = setInterval(loadHealthMetrics, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loadHealthMetrics = async () => {
     try {
-      const response = await aiSelfHealingAPI.getHealthMetrics()
-      setHealthMetrics(response.data.data)
+      const response = await aiSelfHealingAPI.getHealthMetrics();
+      setHealthMetrics(response.data.data);
     } catch (err) {
-      console.error('Failed to load health metrics:', err)
+      console.error('Failed to load health metrics:', err);
     }
-  }
+  };
 
   const executeHealingDecision = async (decisionId, action) => {
     try {
-      const decision = healingDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Healing decision' }
+      const decision = healingDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Healing decision' };
       const result = await aiDecisionService.executeDecisionAction({
         decision,
         action,
         callback: async (id, nextAction) => {
           if (typeof aiSelfHealingAPI.executeHealingDecision === 'function') {
-            return aiSelfHealingAPI.executeHealingDecision(id, nextAction)
+            return aiSelfHealingAPI.executeHealingDecision(id, nextAction);
           }
-          return { ok: true, action: nextAction, decisionId: id }
-        }
-      })
+          return { ok: true, action: nextAction, decisionId: id };
+        },
+      });
 
-      alert(`Healing decision ${action} executed successfully`)
-      console.info('Healing decision result:', result)
-      loadHealthMetrics()
+      alert(`Healing decision ${action} executed successfully`);
+      console.info('Healing decision result:', result);
+      loadHealthMetrics();
     } catch (err) {
-      console.error('Failed to execute healing decision:', err)
-      alert('Failed to execute decision')
+      console.error('Failed to execute healing decision:', err);
+      alert('Failed to execute decision');
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -112,8 +112,8 @@ function AISelfHealingPage() {
                         <h3 className="font-semibold text-gray-900">{decision.title}</h3>
                         <span className={`text-xs px-2 py-1 rounded ${
                           decision.severity === 'critical' ? 'bg-red-100 text-red-800' :
-                          decision.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
+                            decision.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-green-100 text-green-800'
                         }`}>
                           {decision.severity}
                         </span>
@@ -257,7 +257,7 @@ function AISelfHealingPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default AISelfHealingPage
+export default AISelfHealingPage;

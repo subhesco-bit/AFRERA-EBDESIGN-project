@@ -1,64 +1,64 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { labourAPI } from '../services/api'
-import { Users, Plus, X, CheckCircle2, IndianRupee } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { labourAPI } from '../services/api';
+import { Users, Plus, X, CheckCircle2, IndianRupee } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const SKILLS = ['General', 'Machine Operator', 'Sprayer', 'Harvester', 'Irrigation', 'Supervisor']
-const WAGE_TYPES = ['Daily', 'Piece Rate', 'Monthly']
+const SKILLS = ['General', 'Machine Operator', 'Sprayer', 'Harvester', 'Irrigation', 'Supervisor'];
+const WAGE_TYPES = ['Daily', 'Piece Rate', 'Monthly'];
 
-const emptyWorker = { name: '', phone: '', skill: 'General', wage_type: 'Daily', wage_rate: '' }
+const emptyWorker = { name: '', phone: '', skill: 'General', wage_type: 'Daily', wage_rate: '' };
 
 function LabourManagementPage() {
-  const queryClient = useQueryClient()
-  const [tab, setTab] = useState('workers')
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyWorker)
-  const [attendanceForm, setAttendanceForm] = useState({ worker_id: '', date: '', status: 'present', hours: '' })
+  const queryClient = useQueryClient();
+  const [tab, setTab] = useState('workers');
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyWorker);
+  const [attendanceForm, setAttendanceForm] = useState({ worker_id: '', date: '', status: 'present', hours: '' });
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: workersData, isLoading: workersLoading, error: workersError } = useQuery({
     queryKey: ['labour-workers'],
     queryFn: async () => (await labourAPI.getWorkers()).data?.data ?? [],
-  })
+  });
 
   const { data: attendanceData, isLoading: attendanceLoading, error: attendanceError } = useQuery({
     queryKey: ['labour-attendance'],
     queryFn: async () => (await labourAPI.getAttendance()).data?.data ?? [],
-  })
+  });
 
   const { data: paymentsData } = useQuery({
     queryKey: ['labour-payments'],
     queryFn: async () => (await labourAPI.getPayments()).data?.data ?? [],
-  })
+  });
 
   const createWorkerMutation = useMutation({
     mutationFn: (payload) => labourAPI.createWorker(payload),
     onSuccess: () => {
-      toast.success('Worker added')
-      queryClient.invalidateQueries({ queryKey: ['labour-workers'] })
-      setShowForm(false)
-      setForm(emptyWorker)
+      toast.success('Worker added');
+      queryClient.invalidateQueries({ queryKey: ['labour-workers'] });
+      setShowForm(false);
+      setForm(emptyWorker);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to add worker'),
-  })
+  });
 
   const recordAttendanceMutation = useMutation({
     mutationFn: (payload) => labourAPI.recordAttendance(payload),
     onSuccess: () => {
-      toast.success('Attendance recorded')
-      queryClient.invalidateQueries({ queryKey: ['labour-attendance'] })
-      setAttendanceForm({ worker_id: '', date: '', status: 'present', hours: '' })
+      toast.success('Attendance recorded');
+      queryClient.invalidateQueries({ queryKey: ['labour-attendance'] });
+      setAttendanceForm({ worker_id: '', date: '', status: 'present', hours: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record attendance'),
-  })
+  });
 
-  const workers = workersData || []
-  const attendance = attendanceData || []
-  const payments = paymentsData || []
-  const totalWageBill = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
-  const presentToday = attendance.filter((a) => a.status === 'present').length
+  const workers = workersData || [];
+  const attendance = attendanceData || [];
+  const payments = paymentsData || [];
+  const totalWageBill = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  const presentToday = attendance.filter((a) => a.status === 'present').length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -143,9 +143,9 @@ function LabourManagementPage() {
             <h2 className="font-semibold text-gray-800 mb-4">Record Attendance</h2>
             <form
               onSubmit={(e) => {
-                e.preventDefault()
-                if (!attendanceForm.worker_id || !attendanceForm.date) { toast.error('Worker and date are required'); return }
-                recordAttendanceMutation.mutate(attendanceForm)
+                e.preventDefault();
+                if (!attendanceForm.worker_id || !attendanceForm.date) { toast.error('Worker and date are required'); return; }
+                recordAttendanceMutation.mutate(attendanceForm);
               }}
               className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end"
             >
@@ -222,9 +222,9 @@ function LabourManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.name) { toast.error('Name is required'); return }
-                  createWorkerMutation.mutate({ ...form, wage_rate: form.wage_rate === '' ? null : Number(form.wage_rate) })
+                  e.preventDefault();
+                  if (!form.name) { toast.error('Name is required'); return; }
+                  createWorkerMutation.mutate({ ...form, wage_rate: form.wage_rate === '' ? null : Number(form.wage_rate) });
                 }}
                 className="space-y-4"
               >
@@ -271,7 +271,7 @@ function LabourManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default LabourManagementPage
+export default LabourManagementPage;

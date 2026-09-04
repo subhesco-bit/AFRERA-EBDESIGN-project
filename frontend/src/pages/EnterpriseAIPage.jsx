@@ -1,6 +1,6 @@
-import { Brain } from 'lucide-react'
-import { enterpriseAIAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Brain } from 'lucide-react';
+import { enterpriseAIAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/enterpriseAIRoutes.js. Per that file's own
@@ -67,7 +67,7 @@ function EnterpriseAIPage() {
         onRun={(v, p) => enterpriseAIAPI.query({ query: v.query, context: p })}
       />
     </div>
-  )
+  );
 }
 
-export default EnterpriseAIPage
+export default EnterpriseAIPage;

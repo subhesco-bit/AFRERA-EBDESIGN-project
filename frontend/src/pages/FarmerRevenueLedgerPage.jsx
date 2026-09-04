@@ -43,9 +43,9 @@ export default function FarmerRevenueLedgerPage() {
   const loadLedger = async () => {
     setLoading(true);
     try {
-      const response = await farmerValueAPI.getSeasonLedger({ 
-        season: season || undefined, 
-        year: year ? parseInt(year) : undefined 
+      const response = await farmerValueAPI.getSeasonLedger({
+        season: season || undefined,
+        year: year ? parseInt(year) : undefined,
       });
       setLedger(response.data.data);
     } catch (error) {

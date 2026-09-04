@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Gauge, Zap, TrendingUp, Activity } from 'lucide-react'
-import { aiOperationIntelligenceAPI } from '../services/api'
-import { aiDecisionService } from '../services/aiDecisionService'
-import ActionCard from '../components/common/ActionCard'
+import { useState, useEffect } from 'react';
+import { Gauge, Zap, TrendingUp, Activity } from 'lucide-react';
+import { aiOperationIntelligenceAPI } from '../services/api';
+import { aiDecisionService } from '../services/aiDecisionService';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/aiOperationIntelligenceRoutes.js +
@@ -22,54 +22,54 @@ import ActionCard from '../components/common/ActionCard'
 const TABS = [
   ['optimize', 'Monitor & Optimize'],
   ['manage', 'Strategies, Resources & History'],
-]
+];
 
 function AIOperationIntelligencePage() {
-  const [tab, setTab] = useState('optimize')
-  const [autoOptimize, setAutoOptimize] = useState(false)
+  const [tab, setTab] = useState('optimize');
+  const [autoOptimize, setAutoOptimize] = useState(false);
   const [optimizationDecisions, setOptimizationDecisions] = useState(() => aiDecisionService.getFallbackDecisions('operations', {
     count: 3,
-    baseTitle: 'Optimization recommendation'
-  }))
-  const [performanceMetrics, setPerformanceMetrics] = useState(null)
+    baseTitle: 'Optimization recommendation',
+  }));
+  const [performanceMetrics, setPerformanceMetrics] = useState(null);
 
   useEffect(() => {
-    loadPerformanceMetrics()
-    const interval = setInterval(loadPerformanceMetrics, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    loadPerformanceMetrics();
+    const interval = setInterval(loadPerformanceMetrics, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loadPerformanceMetrics = async () => {
     try {
-      const response = await aiOperationIntelligenceAPI.getMetrics()
-      setPerformanceMetrics(response.data.data)
+      const response = await aiOperationIntelligenceAPI.getMetrics();
+      setPerformanceMetrics(response.data.data);
     } catch (err) {
-      console.error('Failed to load performance metrics:', err)
+      console.error('Failed to load performance metrics:', err);
     }
-  }
+  };
 
   const executeOptimizationDecision = async (decisionId, action) => {
     try {
-      const decision = optimizationDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Optimization decision' }
+      const decision = optimizationDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Optimization decision' };
       const result = await aiDecisionService.executeDecisionAction({
         decision,
         action,
         callback: async (id, nextAction) => {
           if (typeof aiOperationIntelligenceAPI.executeOptimizationDecision === 'function') {
-            return aiOperationIntelligenceAPI.executeOptimizationDecision(id, nextAction)
+            return aiOperationIntelligenceAPI.executeOptimizationDecision(id, nextAction);
           }
-          return { ok: true, action: nextAction, decisionId: id }
-        }
-      })
+          return { ok: true, action: nextAction, decisionId: id };
+        },
+      });
 
-      alert(`Optimization decision ${action} executed successfully`)
-      console.info('Optimization decision result:', result)
-      loadPerformanceMetrics()
+      alert(`Optimization decision ${action} executed successfully`);
+      console.info('Optimization decision result:', result);
+      loadPerformanceMetrics();
     } catch (err) {
-      console.error('Failed to execute optimization decision:', err)
-      alert('Failed to execute decision')
+      console.error('Failed to execute optimization decision:', err);
+      alert('Failed to execute decision');
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -114,8 +114,8 @@ function AIOperationIntelligencePage() {
                         <h3 className="font-semibold text-gray-900">{decision.title}</h3>
                         <span className={`text-xs px-2 py-1 rounded ${
                           decision.impact === 'high' ? 'bg-green-100 text-green-800' :
-                          decision.impact === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
+                            decision.impact === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'
                         }`}>
                           {decision.impact} impact
                         </span>
@@ -264,7 +264,7 @@ function AIOperationIntelligencePage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default AIOperationIntelligencePage
+export default AIOperationIntelligencePage;

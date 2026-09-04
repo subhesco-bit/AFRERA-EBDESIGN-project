@@ -18,25 +18,25 @@ const IoTMonitoringDashboard = () => {
   const [timeRange, setTimeRange] = useState('24h');
 
   // Get farmer's devices
-  const { data: devicesData, isLoading: devicesLoading } = useQuery({
+  const { data: devicesData, isLoading: devicesLoading, error: devicesError } = useQuery({
     queryKey: ['farmerDevices', user?.id],
     queryFn: () => api.get(`/iot/farmers/${user.id}/devices`).then(res => res.data.data),
-    enabled: !!user?.id,
-    refetchInterval: 60000 // 1 minute
+    enabled: Boolean(user?.id),
+    refetchInterval: 60000, // 1 minute
   });
 
   // Get system status
   const { data: systemStatus } = useQuery({
     queryKey: ['iotSystemStatus'],
     queryFn: () => api.get('/iot/system/status').then(res => res.data.data),
-    refetchInterval: 300000 // 5 minutes
+    refetchInterval: 300000, // 5 minutes
   });
 
   // Get device details when selected
   const { data: deviceDetails } = useQuery({
     queryKey: ['deviceDetails', selectedDevice],
     queryFn: () => api.get(`/iot/devices/${selectedDevice}/status`).then(res => res.data.data),
-    enabled: !!selectedDevice
+    enabled: Boolean(selectedDevice),
   });
 
   if (devicesLoading) {
@@ -44,6 +44,17 @@ const IoTMonitoringDashboard = () => {
       <div className="p-6 space-y-6">
         <h1 className="text-3xl font-bold">IoT Monitoring Dashboard</h1>
         <LoadingSkeleton variant="rectangular" lines={4} />
+      </div>
+    );
+  }
+
+  if (devicesError) {
+    return (
+      <div className="p-6 space-y-6">
+        <h1 className="text-3xl font-bold">IoT Monitoring Dashboard</h1>
+        <p className="rounded border border-red-200 bg-red-50 p-4 text-red-700">
+          Unable to load IoT devices: {devicesError.message}
+        </p>
       </div>
     );
   }
@@ -152,8 +163,8 @@ const IoTMonitoringDashboard = () => {
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${
                         deviceDetails.healthStatus === 'healthy' ? 'bg-green-500' :
-                        deviceDetails.healthStatus === 'degraded' ? 'bg-yellow-500' :
-                        'bg-red-500'
+                          deviceDetails.healthStatus === 'degraded' ? 'bg-yellow-500' :
+                            'bg-red-500'
                       }`} />
                       <span className="font-medium">{deviceDetails.healthStatus}</span>
                     </div>
@@ -195,7 +206,7 @@ const IoTMonitoringDashboard = () => {
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Time Range</label>
-            <select 
+            <select
               className="w-full p-2 border rounded"
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}

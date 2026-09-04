@@ -1,6 +1,6 @@
 # CURRENT SYSTEM BASELINE
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Audit Date:** 1 September 2026  
 **Purpose:** Factual baseline of actual constructed system
 
@@ -170,3 +170,4 @@ The legacy directory contains the bulk of historical services including:
 ---
 
 *This baseline is the factual starting point for the comprehensive audit.*
+

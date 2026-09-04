@@ -1,6 +1,6 @@
-import { Brain } from 'lucide-react'
-import { completeAIIntegrationAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Brain } from 'lucide-react';
+import { completeAIIntegrationAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/completeAIIntegrationRoutes.js +
@@ -110,7 +110,7 @@ function CompleteAIIntegrationPage() {
         onRun={() => completeAIIntegrationAPI.getAIModelInfo()}
       />
     </div>
-  )
+  );
 }
 
-export default CompleteAIIntegrationPage
+export default CompleteAIIntegrationPage;

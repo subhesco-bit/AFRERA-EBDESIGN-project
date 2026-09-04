@@ -1,31 +1,31 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Scale, Plus, X, CheckCircle, Star } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Scale, Plus, X, CheckCircle, Star } from 'lucide-react';
 
 function ComparePage() {
-  const [selectedProducts, setSelectedProducts] = useState([])
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: availableProducts } = useQuery({
     queryKey: ['products-for-compare'],
     queryFn: () => farmersAPI.getProductsForCompare().then(r => r.data),
-  })
+  });
 
   const { data: marketData } = useQuery({
     queryKey: ['market-data'],
     queryFn: () => farmersAPI.getMarketComparisonData().then(r => r.data),
-  })
+  });
 
   const addToCompare = (product) => {
     if (selectedProducts.length < 4 && !selectedProducts.find(p => p.id === product.id)) {
-      setSelectedProducts([...selectedProducts, product])
+      setSelectedProducts([...selectedProducts, product]);
     }
-  }
+  };
 
   const removeFromCompare = (productId) => {
-    setSelectedProducts(selectedProducts.filter(p => p.id !== productId))
-  }
+    setSelectedProducts(selectedProducts.filter(p => p.id !== productId));
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -88,9 +88,9 @@ function ComparePage() {
           {selectedProducts.length >= 2 && (
             <div className="mt-6 overflow-x-auto">
               <table className="w-full">
-        {/* A caption is the first thing a screen-reader user hears. Without
+                {/* A caption is the first thing a screen-reader user hears. Without
             it the table is announced only as "table with N columns". */}
-        <caption className="sr-only">Product comparison across selected items</caption>
+                <caption className="sr-only">Product comparison across selected items</caption>
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Parameter</th>
@@ -179,9 +179,9 @@ function ComparePage() {
                   onClick={() => addToCompare(product)}
                   disabled={selectedProducts.length >= 4 || selectedProducts.find(p => p.id === product.id)}
                   className={`p-2 rounded-lg transition ${
-                    selectedProducts.find(p => p.id === product.id)
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50'
+                    selectedProducts.find(p => p.id === product.id) ?
+                      'bg-green-600 text-white' :
+                      'bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-50'
                   }`}
                 >
                   {selectedProducts.find(p => p.id === product.id) ? (
@@ -218,7 +218,7 @@ function ComparePage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default ComparePage
+export default ComparePage;

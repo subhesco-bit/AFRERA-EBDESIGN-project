@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Skeleton Loading Components
- * 
+ *
  * Production-ready skeleton screens with:
  * - Multiple skeleton variants (text, image, card, list, table)
  * - Animated shimmer effect
@@ -11,8 +11,7 @@
  * - Dark mode support
  */
 
-import { cn } from '../../lib/utils'
-
+import { cn } from '../../lib/utils';
 
 /**
  * Base Skeleton component
@@ -23,7 +22,7 @@ function Skeleton({ className, ...props }) {
       className={cn('animate-pulse rounded-md bg-gray-200 dark:bg-gray-700', className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -37,21 +36,21 @@ function TextSkeleton({ lines = 3, className, ...props }) {
           key={i}
           className={cn(
             'h-4',
-            i === lines - 1 ? 'w-3/4' : 'w-full'
+            i === lines - 1 ? 'w-3/4' : 'w-full',
           )}
         />
       ))}
     </div>
-  )
+  );
 }
 
 /**
  * Image Skeleton - simulates image loading
  */
 function ImageSkeleton({ className, aspectRatio = '16/9', ...props }) {
-  const [width, height] = aspectRatio.split('/').map(Number)
-  const paddingBottom = `${(height / width) * 100}%`
-  
+  const [width, height] = aspectRatio.split('/').map(Number);
+  const paddingBottom = `${(height / width) * 100}%`;
+
   return (
     <div
       className={cn('relative overflow-hidden rounded-md', className)}
@@ -60,7 +59,7 @@ function ImageSkeleton({ className, aspectRatio = '16/9', ...props }) {
     >
       <Skeleton className="absolute inset-0 h-full w-full" />
     </div>
-  )
+  );
 }
 
 /**
@@ -79,7 +78,7 @@ function CardSkeleton({ className, ...props }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -98,7 +97,7 @@ function ListSkeleton({ count = 5, className, ...props }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 /**
@@ -124,7 +123,7 @@ function TableSkeleton({ rows = 5, columns = 4, className, ...props }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -135,15 +134,15 @@ function AvatarSkeleton({ className, size = 'md', ...props }) {
     sm: 'h-8 w-8',
     md: 'h-12 w-12',
     lg: 'h-16 w-16',
-    xl: 'h-24 w-24'
-  }
-  
+    xl: 'h-24 w-24',
+  };
+
   return (
     <Skeleton
       className={cn('rounded-full', sizeClasses[size], className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -152,7 +151,7 @@ function AvatarSkeleton({ className, size = 'md', ...props }) {
 function ButtonSkeleton({ className, ...props }) {
   return (
     <Skeleton className={cn('h-10 w-24 rounded-md', className)} {...props} />
-  )
+  );
 }
 
 /**
@@ -161,7 +160,7 @@ function ButtonSkeleton({ className, ...props }) {
 function InputSkeleton({ className, ...props }) {
   return (
     <Skeleton className={cn('h-10 w-full rounded-md', className)} {...props} />
-  )
+  );
 }
 
 /**
@@ -175,7 +174,7 @@ function PageSkeleton({ className, ...props }) {
         <Skeleton className="h-8 w-1/3" />
         <Skeleton className="h-4 w-1/2" />
       </div>
-      
+
       {/* Content */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
@@ -183,7 +182,7 @@ function PageSkeleton({ className, ...props }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -194,9 +193,9 @@ function LoadingSpinner({ className, size = 'md', ...props }) {
     sm: 'h-4 w-4',
     md: 'h-6 w-6',
     lg: 'h-8 w-8',
-    xl: 'h-12 w-12'
-  }
-  
+    xl: 'h-12 w-12',
+  };
+
   return (
     <div
       className={cn('inline-block animate-spin rounded-full border-2 border-solid border-current border-r-transparent', sizeClasses[size], className)}
@@ -206,7 +205,7 @@ function LoadingSpinner({ className, size = 'md', ...props }) {
     >
       <span className="sr-only">Loading...</span>
     </div>
-  )
+  );
 }
 
 /**
@@ -227,7 +226,7 @@ function LoadingBar({ className, progress = 0, ...props }) {
         style={{ width: `${progress}%` }}
       />
     </div>
-  )
+  );
 }
 
 /**
@@ -242,12 +241,12 @@ function LoadingDots({ className, ...props }) {
           className="h-2 w-2 animate-bounce rounded-full bg-blue-600"
           style={{
             animationDelay: `${i * 0.2}s`,
-            animationDuration: '1s'
+            animationDuration: '1s',
           }}
         />
       ))}
     </div>
-  )
+  );
 }
 
 /**
@@ -258,7 +257,7 @@ function LoadingOverlay({ message = 'Loading...', className, ...props }) {
     <div
       className={cn(
         'fixed inset-0 z-modal flex items-center justify-center bg-white/80 backdrop-blur-sm dark:bg-gray-900/80',
-        className
+        className,
       )}
       role="dialog"
       aria-modal="true"
@@ -272,7 +271,7 @@ function LoadingOverlay({ message = 'Loading...', className, ...props }) {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 export {
@@ -289,5 +288,5 @@ export {
   LoadingSpinner,
   LoadingBar,
   LoadingDots,
-  LoadingOverlay
-}
+  LoadingOverlay,
+};

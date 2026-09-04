@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { AlertTriangle, Award, ShieldAlert } from 'lucide-react'
-import ActionCard from '../components/common/ActionCard'
-import { glutWarningAPI, sellerRankingAPI, civilDisruptionAPI } from '../services/api'
+import { useState } from 'react';
+import { AlertTriangle, Award, ShieldAlert } from 'lucide-react';
+import ActionCard from '../components/common/ActionCard';
+import { glutWarningAPI, sellerRankingAPI, civilDisruptionAPI } from '../services/api';
 
 /**
  * Market signals hub: three real, mounted backend route files that had zero
@@ -17,10 +17,10 @@ const TABS = [
   { id: 'glut', label: 'Glut Warning', icon: AlertTriangle },
   { id: 'sellers', label: 'Seller Ranking', icon: Award },
   { id: 'disruptions', label: 'Civil Disruptions', icon: ShieldAlert },
-]
+];
 
 function MarketSignalsPage() {
-  const [tab, setTab] = useState('glut')
+  const [tab, setTab] = useState('glut');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -119,7 +119,7 @@ function MarketSignalsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default MarketSignalsPage
+export default MarketSignalsPage;

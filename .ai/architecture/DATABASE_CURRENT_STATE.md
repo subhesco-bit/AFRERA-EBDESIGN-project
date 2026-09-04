@@ -1,6 +1,6 @@
 # DATABASE CURRENT STATE
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Date:** 24 August 2026  
 **Status:** MIGRATIONS CREATED, NOT EXECUTED
 
@@ -378,3 +378,4 @@ DATABASE_POOL_IDLE_TIMEOUT=30000
 ---
 
 *This document provides a factual assessment of the current database state without making assumptions about local infrastructure availability.*
+

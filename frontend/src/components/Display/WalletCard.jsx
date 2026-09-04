@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { walletAPI } from '../../services/api';
 
 /**
  * WalletCard Component
@@ -15,15 +16,8 @@ export default function WalletCard({ onAddFunds, onTransfer }) {
 
   const loadWallet = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/v1/dashboard/balance', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to load balance');
-
-      const data = await response.json();
-      setBalance(data.data.balance);
+      const response = await walletAPI.getBalance();
+      setBalance(response.data.data.balance);
     } catch (err) {
       setError(err.message);
     } finally {

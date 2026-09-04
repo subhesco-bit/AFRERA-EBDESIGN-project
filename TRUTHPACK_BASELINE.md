@@ -1,7 +1,7 @@
 # TRUTHPACK BASELINE — EBDESIGN Agricultural Digital Operating System
 
 **Generated:** 2026-09-01  
-**Repository:** SVESCO/EBDESIGN  
+**Repository:** Subhesco/EBDESIGN  
 **Scope:** Complete repository audit and verified implementation status  
 **Purpose:** Single source of truth for actual system state
 

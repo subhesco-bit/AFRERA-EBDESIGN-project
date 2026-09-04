@@ -18,22 +18,22 @@ BEGIN
     SET search_vector = to_tsvector('english', 
       COALESCE(name, '') || ' ' || 
       COALESCE(description, '') || ' ' || 
-      COALESCE(category, '') || ' ' || 
-      COALESCE(location, '')
+      COALESCE(usp, '') || ' ' ||
+      COALESCE(tags::text, '')
     );
     
     -- Create trigger to auto-update search vector
-    CREATE OR REPLACE FUNCTION products_search_vector_update() RETURNS trigger AS $$
+    CREATE OR REPLACE FUNCTION products_search_vector_update() RETURNS trigger AS $search_update$
     BEGIN
       NEW.search_vector := to_tsvector('english', 
         COALESCE(NEW.name, '') || ' ' || 
         COALESCE(NEW.description, '') || ' ' || 
-        COALESCE(NEW.category, '') || ' ' || 
-        COALESCE(NEW.location, '')
+        COALESCE(NEW.usp, '') || ' ' ||
+        COALESCE(NEW.tags::text, '')
       );
       RETURN NEW;
     END;
-    $$ LANGUAGE plpgsql;
+    $search_update$ LANGUAGE plpgsql;
     
     CREATE TRIGGER products_search_vector_trigger
       BEFORE INSERT OR UPDATE ON products

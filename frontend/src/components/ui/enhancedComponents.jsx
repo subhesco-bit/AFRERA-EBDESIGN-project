@@ -1,7 +1,7 @@
 /**
  * Enhanced UI Components - Production Level Polish
  * Advanced components with loading states, transitions, micro-interactions
- * 
+ *
  * Features:
  * - Smooth animations and transitions
  * - Loading states and skeletons
@@ -14,12 +14,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Enhanced Card with hover effects and transitions
-export const EnhancedCard = ({ 
-  children, 
-  className = '', 
+export const EnhancedCard = ({
+  children,
+  className = '',
   hover = true,
   onClick,
-  ...props 
+  ...props
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -39,19 +39,19 @@ export const EnhancedCard = ({
 };
 
 // Enhanced Button with loading states and animations
-export const EnhancedButton = ({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
+export const EnhancedButton = ({
+  children,
+  variant = 'primary',
+  size = 'md',
   loading = false,
   disabled = false,
   className = '',
   onClick,
   icon: Icon,
-  ...props 
+  ...props
 }) => {
   const baseClasses = 'font-medium rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-2 relative overflow-hidden';
-  
+
   const variantClasses = {
     primary: 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500 shadow-lg shadow-blue-500/30',
     secondary: 'bg-gradient-to-r from-gray-600 to-gray-700 text-white hover:from-gray-700 hover:to-gray-800 focus:ring-gray-500 shadow-lg shadow-gray-500/30',
@@ -59,14 +59,14 @@ export const EnhancedButton = ({
     danger: 'bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-500 shadow-lg shadow-red-500/30',
     warning: 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white hover:from-yellow-600 hover:to-yellow-700 focus:ring-yellow-500 shadow-lg shadow-yellow-500/30',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500'
+    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
   };
-  
+
   const sizeClasses = {
     sm: 'px-4 py-2 text-sm',
     md: 'px-6 py-3 text-base',
     lg: 'px-8 py-4 text-lg',
-    xl: 'px-10 py-5 text-xl'
+    xl: 'px-10 py-5 text-xl',
   };
 
   return (
@@ -108,12 +108,12 @@ export const EnhancedButton = ({
 };
 
 // Enhanced Badge with animations
-export const EnhancedBadge = ({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
+export const EnhancedBadge = ({
+  children,
+  variant = 'primary',
+  size = 'md',
   pulse = false,
-  className = '' 
+  className = '',
 }) => {
   const variantClasses = {
     primary: 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300',
@@ -121,13 +121,13 @@ export const EnhancedBadge = ({
     success: 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300',
     danger: 'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-300',
     warning: 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300',
-    info: 'bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-800 border border-cyan-300'
+    info: 'bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-800 border border-cyan-300',
   };
-  
+
   const sizeClasses = {
     sm: 'px-3 py-1 text-xs',
     md: 'px-4 py-1.5 text-sm',
-    lg: 'px-5 py-2 text-base'
+    lg: 'px-5 py-2 text-base',
   };
 
   return (
@@ -136,7 +136,7 @@ export const EnhancedBadge = ({
       initial={{ scale: 0.8, opacity: 0 }}
       animate={pulse ? {
         scale: [1, 1.05, 1],
-        transition: { duration: 2, repeat: Infinity }
+        transition: { duration: 2, repeat: Infinity },
       } : { scale: 1, opacity: 1 }}
     >
       {children}
@@ -145,13 +145,13 @@ export const EnhancedBadge = ({
 };
 
 // Enhanced Alert with animations and dismiss
-export const EnhancedAlert = ({ 
-  children, 
-  variant = 'info', 
+export const EnhancedAlert = ({
+  children,
+  variant = 'info',
   dismissible = false,
   className = '',
   onDismiss,
-  ...props 
+  ...props
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -166,7 +166,7 @@ export const EnhancedAlert = ({
     success: 'bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 text-green-800',
     danger: 'bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 text-red-800',
     warning: 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-l-4 border-yellow-500 text-yellow-800',
-    info: 'bg-gradient-to-r from-cyan-50 to-cyan-100 border-l-4 border-cyan-500 text-cyan-800'
+    info: 'bg-gradient-to-r from-cyan-50 to-cyan-100 border-l-4 border-cyan-500 text-cyan-800',
   };
 
   const icons = {
@@ -175,7 +175,7 @@ export const EnhancedAlert = ({
     success: '✅',
     danger: '⚠️',
     warning: '⚡',
-    info: 'ℹ️'
+    info: 'ℹ️',
   };
 
   return (
@@ -229,32 +229,32 @@ export const EnhancedInput = ({
       {label && (
         <motion.label
           initial={{ y: 0 }}
-          animate={{ 
+          animate={{
             y: isFocused || hasValue ? -24 : 0,
-            scale: isFocused || hasValue ? 0.85 : 1
+            scale: isFocused || hasValue ? 0.85 : 1,
           }}
           className={`absolute left-3 transition-all duration-200 pointer-events-none ${
-            isFocused || hasValue 
-              ? 'text-blue-600 text-xs bg-white px-1' 
-              : 'text-gray-500 text-base'
+            isFocused || hasValue ?
+              'text-blue-600 text-xs bg-white px-1' :
+              'text-gray-500 text-base'
           }`}
         >
           {label}
         </motion.label>
       )}
-      
+
       <div className="relative">
         {Icon && (
           <Icon className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors ${isFocused ? 'text-blue-600' : ''}`} />
         )}
-        
+
         <input
           className={`w-full px-4 py-3 border-2 rounded-xl transition-all duration-300 focus:outline-none ${
             Icon ? 'pl-10' : ''
           } ${
-            error 
-              ? 'border-red-500 focus:border-red-600 focus:ring-4 focus:ring-red-100' 
-              : 'border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
+            error ?
+              'border-red-500 focus:border-red-600 focus:ring-4 focus:ring-red-100' :
+              'border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100'
           } ${isFocused ? 'shadow-lg' : ''}`}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -262,7 +262,7 @@ export const EnhancedInput = ({
           {...props}
         />
       </div>
-      
+
       <AnimatePresence>
         {error && (
           <motion.p
@@ -289,16 +289,16 @@ export const EnhancedInput = ({
 };
 
 // Enhanced Loading Skeleton
-export const LoadingSkeleton = ({ 
-  variant = 'text', 
-  lines = 3, 
-  className = '' 
+export const LoadingSkeleton = ({
+  variant = 'text',
+  lines = 3,
+  className = '',
 }) => {
   const variants = {
     text: 'h-4',
     circular: 'w-12 h-12 rounded-full',
     rectangular: 'h-32',
-    avatar: 'w-10 h-10 rounded-full'
+    avatar: 'w-10 h-10 rounded-full',
   };
 
   const getWidth = (index) => {
@@ -308,7 +308,7 @@ export const LoadingSkeleton = ({
   };
 
   const skeletonStyle = (index) => ({
-    width: getWidth(index)
+    width: getWidth(index),
   });
 
   return (
@@ -322,7 +322,7 @@ export const LoadingSkeleton = ({
           transition={{
             duration: 1.5,
             repeat: Infinity,
-            repeatType: 'reverse'
+            repeatType: 'reverse',
           }}
           style={skeletonStyle(i)}
         />
@@ -338,13 +338,13 @@ export const EnhancedModal = ({
   title,
   children,
   size = 'md',
-  className = ''
+  className = '',
 }) => {
   const sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
-    xl: 'max-w-4xl'
+    xl: 'max-w-4xl',
   };
 
   useEffect(() => {
@@ -403,7 +403,7 @@ export const EnhancedTooltip = ({
   children,
   content,
   position = 'top',
-  className = ''
+  className = '',
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
@@ -412,7 +412,7 @@ export const EnhancedTooltip = ({
     const rect = e.currentTarget.getBoundingClientRect();
     setCoords({
       x: rect.left + rect.width / 2,
-      y: rect.top
+      y: rect.top,
     });
     setIsVisible(true);
   };
@@ -421,11 +421,11 @@ export const EnhancedTooltip = ({
     top: 'bottom-full mb-2',
     bottom: 'top-full mt-2',
     left: 'right-full mr-2',
-    right: 'left-full ml-2'
+    right: 'left-full ml-2',
   };
 
   return (
-    <div 
+    <div
       className="relative inline-block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsVisible(false)}
@@ -454,16 +454,16 @@ export const EnhancedProgressBar = ({
   color = 'blue',
   animated = true,
   showLabel = true,
-  className = ''
+  className = '',
 }) => {
   const percentage = Math.min(100, Math.max(0, (value / max) * 100));
-  
+
   const colorClasses = {
     blue: 'bg-gradient-to-r from-blue-500 to-blue-600',
     green: 'bg-gradient-to-r from-green-500 to-green-600',
     red: 'bg-gradient-to-r from-red-500 to-red-600',
     yellow: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
-    purple: 'bg-gradient-to-r from-purple-500 to-purple-600'
+    purple: 'bg-gradient-to-r from-purple-500 to-purple-600',
   };
 
   return (
@@ -492,7 +492,7 @@ export const EnhancedToast = ({
   type = 'info',
   duration = 3000,
   onClose,
-  className = ''
+  className = '',
 }) => {
   useEffect(() => {
     const timer = setTimeout(onClose, duration);
@@ -503,14 +503,14 @@ export const EnhancedToast = ({
     info: 'bg-blue-500',
     success: 'bg-green-500',
     error: 'bg-red-500',
-    warning: 'bg-yellow-500'
+    warning: 'bg-yellow-500',
   };
 
   const icons = {
     info: 'ℹ️',
     success: '✅',
     error: '❌',
-    warning: '⚠️'
+    warning: '⚠️',
   };
 
   return (
@@ -536,5 +536,5 @@ export default {
   EnhancedModal,
   EnhancedTooltip,
   EnhancedProgressBar,
-  EnhancedToast
+  EnhancedToast,
 };

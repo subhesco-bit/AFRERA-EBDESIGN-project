@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react'
-import { X, Menu, ChevronRight, Home, User, ShoppingBag, MessageSquare, Settings } from 'lucide-react'
+import React, { useState, useEffect } from 'react';
+import { X, Menu, ChevronRight, Home, User, ShoppingBag, MessageSquare, Settings } from 'lucide-react';
 
 const MobileOptimization = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const mobileNavItems = [
     { icon: Home, label: 'Home', path: '/' },
     { icon: ShoppingBag, label: 'Marketplace', path: '/marketplace' },
     { icon: MessageSquare, label: 'AI Chat', path: '/ai/chat' },
     { icon: User, label: 'Profile', path: '/dashboard' },
-    { icon: Settings, label: 'Settings', path: '/settings' }
-  ]
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ];
 
   if (!isMobile) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
   return (
@@ -45,11 +45,11 @@ const MobileOptimization = ({ children }) => {
 
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/50"
           onClick={() => setIsMenuOpen(false)}
         >
-          <div 
+          <div
             className="fixed left-0 top-0 bottom-0 w-64 bg-background"
             onClick={(e) => e.stopPropagation()}
           >
@@ -101,7 +101,7 @@ const MobileOptimization = ({ children }) => {
         </div>
       </nav>
     </div>
-  )
-}
+  );
+};
 
-export default MobileOptimization
+export default MobileOptimization;

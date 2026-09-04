@@ -1,7 +1,7 @@
 # EBDESIGN PRODUCTION READINESS CERTIFICATION
 
 **Date:** September 1, 2026  
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Status:** ✅ **PRODUCTION-READY (PENDING FINAL EXECUTION)**  
 **Classification:** Audit-Ready, Compliance-Verified, Enterprise-Grade  
 **Governance:** Claude Design Authority
@@ -264,7 +264,7 @@ TOTAL: ~20 hours to production go-live (from now)
 EBDESIGN PRODUCTION CERTIFICATION AUTHORIZATION
 ═══════════════════════════════════════════════════════════════
 
-PROJECT: SVESCO/EBDESIGN Agricultural Digital Operating System
+PROJECT: Subhesco/EBDESIGN Agricultural Digital Operating System
 DATE: September 1, 2026
 AGENT: Claude (Orchestration Agent)
 GOVERNANCE: Claude Design Authority
@@ -373,3 +373,4 @@ All compliance requirements satisfied.
 
 *Claude Design Authority*  
 *September 1, 2026*
+

@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Caching and Offline Support
- * 
+ *
  * Production-ready caching with:
  * - LocalStorage and SessionStorage wrappers
  * - Cache invalidation strategies (TTL, version-based)
@@ -12,8 +12,7 @@
  * - IndexedDB integration for larger data
  */
 
-import config from '../config/env'
-
+import config from '../config/env';
 
 /**
  * Cache configuration
@@ -22,8 +21,8 @@ const CACHE_CONFIG = {
   ENABLED: config.CACHE_ENABLED,
   DEFAULT_TTL: config.CACHE_TTL_MS,
   PREFIX: 'ebdesign_cache_',
-  VERSION: 'v1'
-}
+  VERSION: 'v1',
+};
 
 /**
  * Storage types
@@ -31,26 +30,26 @@ const CACHE_CONFIG = {
 const StorageType = {
   LOCAL: 'localStorage',
   SESSION: 'sessionStorage',
-  MEMORY: 'memory'
-}
+  MEMORY: 'memory',
+};
 
 /**
  * In-memory cache for fast access
  */
-const memoryCache = new Map()
+const memoryCache = new Map();
 
 /**
  * Check if online
  */
 function isOnline() {
-  return navigator.onLine
+  return navigator.onLine;
 }
 
 /**
  * Get cache key with prefix and version
  */
 function getCacheKey(key) {
-  return `${CACHE_CONFIG.PREFIX}${CACHE_CONFIG.VERSION}_${key}`
+  return `${CACHE_CONFIG.PREFIX}${CACHE_CONFIG.VERSION}_${key}`;
 }
 
 /**
@@ -58,9 +57,9 @@ function getCacheKey(key) {
  */
 function parseCacheEntry(value) {
   try {
-    return JSON.parse(value)
+    return JSON.parse(value);
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -69,9 +68,9 @@ function parseCacheEntry(value) {
  */
 function stringifyCacheEntry(entry) {
   try {
-    return JSON.stringify(entry)
+    return JSON.stringify(entry);
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -79,9 +78,9 @@ function stringifyCacheEntry(entry) {
  * Check if cache entry is expired
  */
 function isExpired(entry) {
-  if (!entry || !entry.timestamp) return true
-  const ttl = entry.ttl || CACHE_CONFIG.DEFAULT_TTL
-  return Date.now() - entry.timestamp > ttl
+  if (!entry || !entry.timestamp) return true;
+  const ttl = entry.ttl || CACHE_CONFIG.DEFAULT_TTL;
+  return Date.now() - entry.timestamp > ttl;
 }
 
 /**
@@ -89,44 +88,44 @@ function isExpired(entry) {
  */
 function getStorage(type) {
   if (type === StorageType.MEMORY) {
-    return memoryCache
+    return memoryCache;
   }
-  return type === StorageType.SESSION ? sessionStorage : localStorage
+  return type === StorageType.SESSION ? sessionStorage : localStorage;
 }
 
 /**
  * Set item in cache
  */
 function setItem(key, value, options = {}) {
-  if (!CACHE_CONFIG.ENABLED) return false
+  if (!CACHE_CONFIG.ENABLED) return false;
 
   const {
     ttl = CACHE_CONFIG.DEFAULT_TTL,
     storage = StorageType.LOCAL,
-    tags = []
-  } = options
+    tags = [],
+  } = options;
 
-  const cacheKey = getCacheKey(key)
-  const storageObj = getStorage(storage)
+  const cacheKey = getCacheKey(key);
+  const storageObj = getStorage(storage);
 
   const entry = {
     value,
     timestamp: Date.now(),
     ttl,
     tags,
-    version: CACHE_CONFIG.VERSION
-  }
+    version: CACHE_CONFIG.VERSION,
+  };
 
   try {
     if (storage === StorageType.MEMORY) {
-      storageObj.set(cacheKey, entry)
+      storageObj.set(cacheKey, entry);
     } else {
-      storageObj.setItem(cacheKey, stringifyCacheEntry(entry))
+      storageObj.setItem(cacheKey, stringifyCacheEntry(entry));
     }
-    return true
+    return true;
   } catch (error) {
-    
-    return false
+
+    return false;
   }
 }
 
@@ -134,39 +133,39 @@ function setItem(key, value, options = {}) {
  * Get item from cache
  */
 function getItem(key, storage = StorageType.LOCAL) {
-  if (!CACHE_CONFIG.ENABLED) return null
+  if (!CACHE_CONFIG.ENABLED) return null;
 
-  const cacheKey = getCacheKey(key)
-  const storageObj = getStorage(storage)
+  const cacheKey = getCacheKey(key);
+  const storageObj = getStorage(storage);
 
   try {
-    let entry
+    let entry;
 
     if (storage === StorageType.MEMORY) {
-      entry = storageObj.get(cacheKey)
+      entry = storageObj.get(cacheKey);
     } else {
-      const value = storageObj.getItem(cacheKey)
-      entry = value ? parseCacheEntry(value) : null
+      const value = storageObj.getItem(cacheKey);
+      entry = value ? parseCacheEntry(value) : null;
     }
 
-    if (!entry) return null
+    if (!entry) return null;
 
     // Check version
     if (entry.version !== CACHE_CONFIG.VERSION) {
-      removeItem(key, storage)
-      return null
+      removeItem(key, storage);
+      return null;
     }
 
     // Check expiration
     if (isExpired(entry)) {
-      removeItem(key, storage)
-      return null
+      removeItem(key, storage);
+      return null;
     }
 
-    return entry.value
+    return entry.value;
   } catch (error) {
-    
-    return null
+
+    return null;
   }
 }
 
@@ -174,19 +173,19 @@ function getItem(key, storage = StorageType.LOCAL) {
  * Remove item from cache
  */
 function removeItem(key, storage = StorageType.LOCAL) {
-  const cacheKey = getCacheKey(key)
-  const storageObj = getStorage(storage)
+  const cacheKey = getCacheKey(key);
+  const storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
-      storageObj.delete(cacheKey)
+      storageObj.delete(cacheKey);
     } else {
-      storageObj.removeItem(cacheKey)
+      storageObj.removeItem(cacheKey);
     }
-    return true
+    return true;
   } catch (error) {
-    
-    return false
+
+    return false;
   }
 }
 
@@ -194,23 +193,23 @@ function removeItem(key, storage = StorageType.LOCAL) {
  * Clear all cache
  */
 function clearCache(storage = StorageType.LOCAL) {
-  const storageObj = getStorage(storage)
+  const storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
-      storageObj.clear()
+      storageObj.clear();
     } else {
-      const keys = Object.keys(storageObj)
+      const keys = Object.keys(storageObj);
       keys.forEach((key) => {
         if (key.startsWith(CACHE_CONFIG.PREFIX)) {
-          storageObj.removeItem(key)
+          storageObj.removeItem(key);
         }
-      })
+      });
     }
-    return true
+    return true;
   } catch (error) {
-    
-    return false
+
+    return false;
   }
 }
 
@@ -218,31 +217,31 @@ function clearCache(storage = StorageType.LOCAL) {
  * Clear cache by tag
  */
 function clearByTag(tag, storage = StorageType.LOCAL) {
-  const storageObj = getStorage(storage)
+  const storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
       for (const [key, entry] of storageObj.entries()) {
         if (entry.tags && entry.tags.includes(tag)) {
-          storageObj.delete(key)
+          storageObj.delete(key);
         }
       }
     } else {
-      const keys = Object.keys(storageObj)
+      const keys = Object.keys(storageObj);
       keys.forEach((key) => {
         if (key.startsWith(CACHE_CONFIG.PREFIX)) {
-          const value = storageObj.getItem(key)
-          const entry = parseCacheEntry(value)
+          const value = storageObj.getItem(key);
+          const entry = parseCacheEntry(value);
           if (entry && entry.tags && entry.tags.includes(tag)) {
-            storageObj.removeItem(key)
+            storageObj.removeItem(key);
           }
         }
-      })
+      });
     }
-    return true
+    return true;
   } catch (error) {
-    
-    return false
+
+    return false;
   }
 }
 
@@ -250,24 +249,24 @@ function clearByTag(tag, storage = StorageType.LOCAL) {
  * Get cache size
  */
 function getCacheSize(storage = StorageType.LOCAL) {
-  const storageObj = getStorage(storage)
+  const storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
-      return storageObj.size
+      return storageObj.size;
     }
 
-    let size = 0
-    const keys = Object.keys(storageObj)
+    let size = 0;
+    const keys = Object.keys(storageObj);
     keys.forEach((key) => {
       if (key.startsWith(CACHE_CONFIG.PREFIX)) {
-        size++
+        size++;
       }
-    })
-    return size
+    });
+    return size;
   } catch (error) {
-    
-    return 0
+
+    return 0;
   }
 }
 
@@ -279,36 +278,36 @@ async function staleWhileRevalidate(key, fetchFn, options = {}) {
     ttl = CACHE_CONFIG.DEFAULT_TTL,
     storage = StorageType.LOCAL,
     tags = [],
-    forceRefresh = false
-  } = options
+    forceRefresh = false,
+  } = options;
 
   // Return cached data immediately if available and not forcing refresh
   if (!forceRefresh) {
-    const cached = getItem(key, storage)
+    const cached = getItem(key, storage);
     if (cached !== null) {
       // Revalidate in background
       fetchFn().then((freshData) => {
-        setItem(key, freshData, { ttl, storage, tags })
+        setItem(key, freshData, { ttl, storage, tags });
       }).catch(() => {
         // Silently fail revalidation
-      })
-      return cached
+      });
+      return cached;
     }
   }
 
   // Fetch fresh data
   try {
-    const freshData = await fetchFn()
-    setItem(key, freshData, { ttl, storage, tags })
-    return freshData
+    const freshData = await fetchFn();
+    setItem(key, freshData, { ttl, storage, tags });
+    return freshData;
   } catch (error) {
     // If fetch fails, try to return stale data
-    const stale = getItem(key, storage)
+    const stale = getItem(key, storage);
     if (stale !== null) {
-      
-      return stale
+
+      return stale;
     }
-    throw error
+    throw error;
   }
 }
 
@@ -320,39 +319,39 @@ const apiCache = {
    * Cache GET request
    */
   async get(url, fetchFn, options = {}) {
-    const cacheKey = `api_${url}`
+    const cacheKey = `api_${url}`;
     return staleWhileRevalidate(cacheKey, fetchFn, {
       ttl: options.ttl || CACHE_CONFIG.DEFAULT_TTL,
       storage: options.storage || StorageType.LOCAL,
-      tags: ['api', ...(options.tags || [])]
-    })
+      tags: ['api', ...(options.tags || [])],
+    });
   },
 
   /**
    * Invalidate cache by URL pattern
    */
   invalidatePattern(pattern, storage = StorageType.LOCAL) {
-    const storageObj = getStorage(storage)
+    const storageObj = getStorage(storage);
 
     try {
       if (storage === StorageType.MEMORY) {
         for (const [key] of storageObj.entries()) {
           if (key.includes(pattern)) {
-            storageObj.delete(key)
+            storageObj.delete(key);
           }
         }
       } else {
-        const keys = Object.keys(storageObj)
+        const keys = Object.keys(storageObj);
         keys.forEach((key) => {
           if (key.startsWith(CACHE_CONFIG.PREFIX) && key.includes(pattern)) {
-            storageObj.removeItem(key)
+            storageObj.removeItem(key);
           }
-        })
+        });
       }
-      return true
+      return true;
     } catch (error) {
-      
-      return false
+
+      return false;
     }
   },
 
@@ -360,9 +359,9 @@ const apiCache = {
    * Clear all API cache
    */
   clear(storage = StorageType.LOCAL) {
-    return clearByTag('api', storage)
-  }
-}
+    return clearByTag('api', storage);
+  },
+};
 
 /**
  * Network status monitoring
@@ -374,14 +373,14 @@ const networkMonitor = {
    * Add listener for network status changes
    */
   addListener(callback) {
-    this.listeners.add(callback)
+    this.listeners.add(callback);
   },
 
   /**
    * Remove listener
    */
   removeListener(callback) {
-    this.listeners.delete(callback)
+    this.listeners.delete(callback);
   },
 
   /**
@@ -390,30 +389,30 @@ const networkMonitor = {
   notifyListeners(online) {
     this.listeners.forEach((callback) => {
       try {
-        callback(online)
+        callback(online);
       } catch (error) {
-        
+
       }
-    })
+    });
   },
 
   /**
    * Initialize network monitoring
    */
   init() {
-    const handleOnline = () => this.notifyListeners(true)
-    const handleOffline = () => this.notifyListeners(false)
+    const handleOnline = () => this.notifyListeners(true);
+    const handleOffline = () => this.notifyListeners(false);
 
-    window.addEventListener('online', handleOnline)
-    window.addEventListener('offline', handleOffline)
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     // Return cleanup function
     return () => {
-      window.removeEventListener('online', handleOnline)
-      window.removeEventListener('offline', handleOffline)
-    }
-  }
-}
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  },
+};
 
 /**
  * Offline queue for actions when offline
@@ -427,37 +426,37 @@ const offlineQueue = {
    */
   add(action) {
     if (this.queue.length >= this.maxQueueSize) {
-      this.queue.shift() // Remove oldest
+      this.queue.shift(); // Remove oldest
     }
     this.queue.push({
       ...action,
-      timestamp: Date.now()
-    })
-    this.saveQueue()
+      timestamp: Date.now(),
+    });
+    this.saveQueue();
   },
 
   /**
    * Process queue when back online
    */
   async process(processFn) {
-    if (!isOnline()) return 0
+    if (!isOnline()) return 0;
 
-    let processed = 0
-    const failed = []
+    let processed = 0;
+    const failed = [];
 
     for (const action of this.queue) {
       try {
-        await processFn(action)
-        processed++
+        await processFn(action);
+        processed++;
       } catch (error) {
-        failed.push(action)
+        failed.push(action);
       }
     }
 
-    this.queue = failed
-    this.saveQueue()
+    this.queue = failed;
+    this.saveQueue();
 
-    return processed
+    return processed;
   },
 
   /**
@@ -465,9 +464,9 @@ const offlineQueue = {
    */
   saveQueue() {
     try {
-      localStorage.setItem('offline_queue', JSON.stringify(this.queue))
+      localStorage.setItem('offline_queue', JSON.stringify(this.queue));
     } catch (error) {
-      
+
     }
   },
 
@@ -476,12 +475,12 @@ const offlineQueue = {
    */
   loadQueue() {
     try {
-      const saved = localStorage.getItem('offline_queue')
+      const saved = localStorage.getItem('offline_queue');
       if (saved) {
-        this.queue = JSON.parse(saved)
+        this.queue = JSON.parse(saved);
       }
     } catch (error) {
-      
+
     }
   },
 
@@ -489,20 +488,20 @@ const offlineQueue = {
    * Clear queue
    */
   clear() {
-    this.queue = []
-    this.saveQueue()
+    this.queue = [];
+    this.saveQueue();
   },
 
   /**
    * Get queue size
    */
   size() {
-    return this.queue.length
-  }
-}
+    return this.queue.length;
+  },
+};
 
 // Load offline queue on initialization
-offlineQueue.loadQueue()
+offlineQueue.loadQueue();
 
 /**
  * IndexedDB for larger data storage
@@ -517,110 +516,110 @@ const indexedDBCache = {
    */
   async init() {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.version)
+      const request = indexedDB.open(this.dbName, this.version);
 
-      request.onerror = () => reject(request.error)
+      request.onerror = () => reject(request.error);
       request.onsuccess = () => {
-        this.db = request.result
-        resolve(this.db)
-      }
+        this.db = request.result;
+        resolve(this.db);
+      };
 
       request.onupgradeneeded = (event) => {
-        const db = event.target.result
+        const db = event.target.result;
         if (!db.objectStoreNames.contains('cache')) {
-          db.createObjectStore('cache', { keyPath: 'key' })
+          db.createObjectStore('cache', { keyPath: 'key' });
         }
-      }
-    })
+      };
+    });
   },
 
   /**
    * Set item in IndexedDB
    */
   async setItem(key, value, options = {}) {
-    if (!this.db) await this.init()
+    if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readwrite')
-      const store = transaction.objectStore('cache')
+      const transaction = this.db.transaction('cache', 'readwrite');
+      const store = transaction.objectStore('cache');
 
       const entry = {
         key,
         value,
         timestamp: Date.now(),
         ttl: options.ttl || CACHE_CONFIG.DEFAULT_TTL,
-        tags: options.tags || []
-      }
+        tags: options.tags || [],
+      };
 
-      const request = store.put(entry)
-      request.onsuccess = () => resolve(true)
-      request.onerror = () => reject(request.error)
-    })
+      const request = store.put(entry);
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => reject(request.error);
+    });
   },
 
   /**
    * Get item from IndexedDB
    */
   async getItem(key) {
-    if (!this.db) await this.init()
+    if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readonly')
-      const store = transaction.objectStore('cache')
-      const request = store.get(key)
+      const transaction = this.db.transaction('cache', 'readonly');
+      const store = transaction.objectStore('cache');
+      const request = store.get(key);
 
       request.onsuccess = () => {
-        const entry = request.result
+        const entry = request.result;
         if (!entry) {
-          resolve(null)
-          return
+          resolve(null);
+          return;
         }
 
         // Check expiration
         if (isExpired(entry)) {
-          this.removeItem(key)
-          resolve(null)
-          return
+          this.removeItem(key);
+          resolve(null);
+          return;
         }
 
-        resolve(entry.value)
-      }
-      request.onerror = () => reject(request.error)
-    })
+        resolve(entry.value);
+      };
+      request.onerror = () => reject(request.error);
+    });
   },
 
   /**
    * Remove item from IndexedDB
    */
   async removeItem(key) {
-    if (!this.db) await this.init()
+    if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readwrite')
-      const store = transaction.objectStore('cache')
-      const request = store.delete(key)
+      const transaction = this.db.transaction('cache', 'readwrite');
+      const store = transaction.objectStore('cache');
+      const request = store.delete(key);
 
-      request.onsuccess = () => resolve(true)
-      request.onerror = () => reject(request.error)
-    })
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => reject(request.error);
+    });
   },
 
   /**
    * Clear IndexedDB
    */
   async clear() {
-    if (!this.db) await this.init()
+    if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readwrite')
-      const store = transaction.objectStore('cache')
-      const request = store.clear()
+      const transaction = this.db.transaction('cache', 'readwrite');
+      const store = transaction.objectStore('cache');
+      const request = store.clear();
 
-      request.onsuccess = () => resolve(true)
-      request.onerror = () => reject(request.error)
-    })
-  }
-}
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => reject(request.error);
+    });
+  },
+};
 
 /**
  * Cache utilities API
@@ -638,7 +637,7 @@ const cache = {
   apiCache,
   networkMonitor,
   offlineQueue,
-  indexedDBCache
-}
+  indexedDBCache,
+};
 
-export default cache
+export default cache;

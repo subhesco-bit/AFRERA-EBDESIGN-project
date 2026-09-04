@@ -1,4 +1,4 @@
-const authService = require('../authService');
+const authService = require('../dual-use/authService');
 
 describe('AuthService', () => {
   describe('validateCredentials', () => {

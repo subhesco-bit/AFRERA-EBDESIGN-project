@@ -12,53 +12,53 @@
  *   thousands of departures; three lots is not a model, and a UI that renders
  *   both as the same chart invites the same confidence in both.
  */
-import React, { useState, useEffect, useCallback } from 'react'
-import { yieldAPI } from '../services/api'
+import React, { useState, useEffect, useCallback } from 'react';
+import { yieldAPI } from '../services/api';
 import {
   ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable,
-} from '../components/common/DataPrimitives'
+} from '../components/common/DataPrimitives';
 
 export default function YieldManagementPage() {
-  const [attention, setAttention] = useState(null)
-  const [lotCode, setLotCode] = useState('')
-  const [price, setPrice] = useState(null)
-  const [curve, setCurve] = useState(null)
-  const [cropKey, setCropKey] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [msg, setMsg] = useState(null)
+  const [attention, setAttention] = useState(null);
+  const [lotCode, setLotCode] = useState('');
+  const [price, setPrice] = useState(null);
+  const [curve, setCurve] = useState(null);
+  const [cropKey, setCropKey] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [msg, setMsg] = useState(null);
 
   const loadAttention = useCallback(async () => {
     try {
-      const r = await yieldAPI.lotsNeedingAttention({ withinDays: 7 })
-      setAttention(r.data?.data)
-    } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-  }, [])
-  useEffect(() => { loadAttention() }, [loadAttention])
+      const r = await yieldAPI.lotsNeedingAttention({ withinDays: 7 });
+      setAttention(r.data?.data);
+    } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+  }, []);
+  useEffect(() => { loadAttention(); }, [loadAttention]);
 
   const checkPrice = async (e) => {
-    e.preventDefault()
-    if (!lotCode) return
-    setMsg(null)
-    try { const r = await yieldAPI.lotPrice(lotCode); setPrice(r.data?.data) }
-    catch (err) { setPrice(null); setMsg(err.response?.data?.error || err.message) }
-  }
+    e.preventDefault();
+    if (!lotCode) return;
+    setMsg(null);
+    try { const r = await yieldAPI.lotPrice(lotCode); setPrice(r.data?.data); }
+    catch (err) { setPrice(null); setMsg(err.response?.data?.error || err.message); }
+  };
 
   const openBucket = async () => {
-    if (!lotCode) return
+    if (!lotCode) return;
     try {
-      const r = await yieldAPI.openNextBucket(lotCode)
-      setMsg(r.data?.data?.note)
-      checkPrice({ preventDefault() {} })
-    } catch (err) { setMsg(err.response?.data?.error || err.message) }
-  }
+      const r = await yieldAPI.openNextBucket(lotCode);
+      setMsg(r.data?.data?.note);
+      checkPrice({ preventDefault() {} });
+    } catch (err) { setMsg(err.response?.data?.error || err.message); }
+  };
 
   const loadCurve = async (e) => {
-    e.preventDefault()
-    if (!cropKey) return
-    try { const r = await yieldAPI.bookingCurve(cropKey); setCurve(r.data?.data) }
-    catch (err) { setCurve(null); setMsg(err.response?.data?.error || err.message) }
-  }
+    e.preventDefault();
+    if (!cropKey) return;
+    try { const r = await yieldAPI.bookingCurve(cropKey); setCurve(r.data?.data); }
+    catch (err) { setCurve(null); setMsg(err.response?.data?.error || err.message); }
+  };
 
   return (
     <ModulePage
@@ -131,8 +131,8 @@ export default function YieldManagementPage() {
                 </div>
 
                 {price.floorApplied && (
-                  <div role="note" style={{ marginTop: 14, border: '1px solid #1a7f37',
-                    borderLeft: '4px solid #1a7f37', background: '#e6f4ea', borderRadius: 6,
+                  <div role="note" style={{ marginTop: 14, border: '1px solid hsl(var(--data-real))',
+                    borderLeft: '4px solid hsl(var(--data-real))', background: 'color-mix(in srgb, hsl(var(--data-real)) 12%, transparent)', borderRadius: 6,
                     padding: '10px 12px' }}>
                     <strong>Markdown stopped at the farmer floor.</strong>
                     <p style={{ margin: '4px 0 0', fontSize: 14 }}>{price.floorNote}</p>
@@ -140,7 +140,7 @@ export default function YieldManagementPage() {
                 )}
 
                 {price.unallocatedKg > 0 && (
-                  <p role="alert" style={{ marginTop: 12, color: '#bc4c00', fontSize: 14 }}>
+                  <p role="alert" style={{ marginTop: 12, color: 'hsl(var(--sev-critical))', fontSize: 14 }}>
                     <strong><Value value={price.unallocatedKg} unit="kg" decimals={0} /> is unallocated</strong>
                     {' '}— no bucket covers it, so nobody can buy it.
                   </p>
@@ -172,8 +172,8 @@ export default function YieldManagementPage() {
               <button type="submit">Load curve</button>
             </form>
             {curve?.note && (
-              <p role="note" style={{ marginTop: 12, background: '#fff8c5',
-                border: '1px solid #d4a72c66', borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>
+              <p role="note" style={{ marginTop: 12, background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)',
+                border: '1px solid hsl(var(--sev-warning))', borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>
                 {curve.note}
               </p>
             )}
@@ -199,5 +199,5 @@ export default function YieldManagementPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

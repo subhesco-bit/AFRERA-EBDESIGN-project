@@ -1,45 +1,45 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { ShoppingCart, Package, Check, Clock } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { ShoppingCart, Package, Check, Clock } from 'lucide-react';
 
 const BulkPurchasePage = () => {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
   const [orderData, setOrderData] = useState({
     products: [],
     quantity: 0,
     deliveryDate: '',
-    specialInstructions: ''
-  })
+    specialInstructions: '',
+  });
 
   const sampleProducts = [
     { id: 1, name: 'Organic Rice', price: 45, unit: 'kg', minOrder: 100 },
     { id: 2, name: 'Fresh Tomatoes', price: 30, unit: 'kg', minOrder: 50 },
-    { id: 3, name: 'Organic Wheat', price: 40, unit: 'kg', minOrder: 100 }
-  ]
+    { id: 3, name: 'Organic Wheat', price: 40, unit: 'kg', minOrder: 100 },
+  ];
 
   const handleAddProduct = (product) => {
     setOrderData(prev => ({
       ...prev,
-      products: [...prev.products, { ...product, quantity: product.minOrder }]
-    }))
-  }
+      products: [...prev.products, { ...product, quantity: product.minOrder }],
+    }));
+  };
 
   const handleQuantityChange = (productId, quantity) => {
     setOrderData(prev => ({
       ...prev,
-      products: prev.products.map(p => 
-        p.id === productId ? { ...p, quantity } : p
-      )
-    }))
-  }
+      products: prev.products.map(p =>
+        p.id === productId ? { ...p, quantity } : p,
+      ),
+    }));
+  };
 
   const calculateTotal = () => {
     return orderData.products.reduce((total, product) => {
-      return total + (product.price * product.quantity)
-    }, 0)
-  }
+      return total + (product.price * product.quantity);
+    }, 0);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -140,7 +140,7 @@ const BulkPurchasePage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BulkPurchasePage
+export default BulkPurchasePage;

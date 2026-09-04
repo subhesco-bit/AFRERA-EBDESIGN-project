@@ -1,6 +1,6 @@
 # GAP RESOLUTION MATRIX
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Based On:** MASTER_MISSING_CONCEPT_INDEX.md (77 gaps identified)  
 **Resolution Date:** 1 September 2026  
 **Focus:** Actionable fixes, prioritization, and compliance alignment
@@ -169,3 +169,4 @@
 ---
 
 *This Gap Resolution Matrix provides actionable steps for resolving all 77 identified gaps with clear ownership, timelines, and compliance considerations.*
+

@@ -1,49 +1,49 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingCart, User, Menu, Search, LogOut, ChevronDown, Sprout, DollarSign, Package, Building2, Shield, Landmark, Brain, Megaphone, Leaf } from 'lucide-react'
-import { useAuthStore } from '../store/authStore'
-import { useState, useRef, useEffect } from 'react'
-import LanguageSelector from './Multilingual/LanguageSelector'
-import NotificationBell from './NotificationBell'
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart, User, Menu, Search, LogOut, ChevronDown, Sprout, DollarSign, Package, Building2, Shield, Landmark, Brain, Megaphone, Leaf, Users as UsersIcon } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+import { useState, useRef, useEffect } from 'react';
+import LanguageSelector from './Multilingual/LanguageSelector';
+import NotificationBell from './NotificationBell';
 
 function Header() {
-  const { user, isAuthenticated, logout } = useAuthStore()
-  const navigate = useNavigate()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [openDropdown, setOpenDropdown] = useState(null)
-  const dropdownRefs = useRef({})
+  const { user, isAuthenticated, logout } = useAuthStore();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const dropdownRefs = useRef({});
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
+    logout();
+    navigate('/');
+  };
 
   const toggleDropdown = (dropdownName) => {
-    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName)
-  }
+    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
+  };
 
   const closeDropdown = () => {
-    setOpenDropdown(null)
-  }
+    setOpenDropdown(null);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (openDropdown && !dropdownRefs.current[openDropdown]?.contains(event.target)) {
-        closeDropdown()
+        closeDropdown();
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [openDropdown])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openDropdown]);
 
   const handleKeyDown = (event, dropdownName) => {
     if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      toggleDropdown(dropdownName)
+      event.preventDefault();
+      toggleDropdown(dropdownName);
     } else if (event.key === 'Escape') {
-      closeDropdown()
+      closeDropdown();
     }
-  }
+  };
 
   return (
     <header className="bg-v42-forestd shadow-md sticky top-0 z-sticky font-body border-b-4 border-v42-turmeric">
@@ -60,11 +60,11 @@ function Header() {
           {/* Desktop Navigation */}
           <nav aria-label="Main" className="hidden md:flex items-center space-x-8">
             {/* Marketplace Dropdown */}
-            <div 
+            <div
               className="relative"
               ref={(el) => dropdownRefs.current.marketplace = el}
             >
-              <button 
+              <button
                 className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'marketplace'}
@@ -76,45 +76,45 @@ function Header() {
                 <ChevronDown className="w-4 h-4" />
               </button>
               {openDropdown === 'marketplace' && (
-                <div 
+                <div
                   className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                   role="menu"
                   aria-orientation="vertical"
                 >
-                  <Link 
-                    to="/marketplace" 
+                  <Link
+                    to="/marketplace"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Browse Products
                   </Link>
-                  <Link 
-                    to="/discover" 
+                  <Link
+                    to="/discover"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Discover
                   </Link>
-                  <Link 
-                    to="/price-check" 
+                  <Link
+                    to="/price-check"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Price Check
                   </Link>
-                  <Link 
-                    to="/compare" 
+                  <Link
+                    to="/compare"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Compare Products
                   </Link>
-                  <Link 
-                    to="/pre-order" 
+                  <Link
+                    to="/pre-order"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
@@ -126,11 +126,11 @@ function Header() {
             </div>
 
             {/* Farmer Portal Dropdown */}
-            <div 
+            <div
               className="relative"
               ref={(el) => dropdownRefs.current.farmer = el}
             >
-              <button 
+              <button
                 className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'farmer'}
@@ -142,77 +142,77 @@ function Header() {
                 <ChevronDown className="w-4 h-4" />
               </button>
               {openDropdown === 'farmer' && (
-                <div 
+                <div
                   className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                   role="menu"
                   aria-orientation="vertical"
                 >
-                  <Link 
-                    to="/farmer-entrance" 
+                  <Link
+                    to="/farmer-entrance"
                     className="block px-4 py-2 text-green-700 font-medium hover:bg-gray-100 border-b border-gray-100 mb-1 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Explore first — no sign-in
                   </Link>
-                  <Link 
-                    to="/farmerhome" 
+                  <Link
+                    to="/farmerhome"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Farmer Home
                   </Link>
-                  <Link 
-                    to="/farmer-sell" 
+                  <Link
+                    to="/farmer-sell"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Sell Produce
                   </Link>
-                  <Link 
-                    to="/farmer-field" 
+                  <Link
+                    to="/farmer-field"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     My Fields
                   </Link>
-                  <Link 
-                    to="/harvest-plan" 
+                  <Link
+                    to="/harvest-plan"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Harvest Plan
                   </Link>
-                  <Link 
-                    to="/harvest-score" 
+                  <Link
+                    to="/harvest-score"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Harvest Score
                   </Link>
-                  <Link 
-                    to="/what-grow" 
+                  <Link
+                    to="/what-grow"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     What to Grow
                   </Link>
-                  <Link 
-                    to="/seed-vault" 
+                  <Link
+                    to="/seed-vault"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Seed Vault
                   </Link>
-                  <Link 
-                    to="/farm-advisor" 
+                  <Link
+                    to="/farm-advisor"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
@@ -224,11 +224,11 @@ function Header() {
             </div>
 
             {/* Pricing Tools Dropdown */}
-            <div 
+            <div
               className="relative"
               ref={(el) => dropdownRefs.current.pricing = el}
             >
-              <button 
+              <button
                 className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'pricing'}
@@ -240,29 +240,29 @@ function Header() {
                 <ChevronDown className="w-4 h-4" />
               </button>
               {openDropdown === 'pricing' && (
-                <div 
+                <div
                   className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                   role="menu"
                   aria-orientation="vertical"
                 >
-                  <Link 
-                    to="/price-build" 
+                  <Link
+                    to="/price-build"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Price Builder
                   </Link>
-                  <Link 
-                    to="/dynamic-pricing" 
+                  <Link
+                    to="/dynamic-pricing"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Dynamic Pricing
                   </Link>
-                  <Link 
-                    to="/sell-timing" 
+                  <Link
+                    to="/sell-timing"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
@@ -278,11 +278,11 @@ function Header() {
                 pattern this session keeps finding); the three ERP domains below
                 (asset accounting, cost control, project systems) are added here
                 for the same reason, rather than repeating the gap. */}
-            <div 
+            <div
               className="relative"
               ref={(el) => dropdownRefs.current.finance = el}
             >
-              <button 
+              <button
                 className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                 aria-haspopup="true"
                 aria-expanded={openDropdown === 'finance'}
@@ -294,53 +294,53 @@ function Header() {
                 <ChevronDown className="w-4 h-4" />
               </button>
               {openDropdown === 'finance' && (
-                <div 
+                <div
                   className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                   role="menu"
                   aria-orientation="vertical"
                 >
-                  <Link 
-                    to="/ledger" 
+                  <Link
+                    to="/ledger"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     General Ledger
                   </Link>
-                  <Link 
-                    to="/compliance" 
+                  <Link
+                    to="/compliance"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Tax Compliance
                   </Link>
-                  <Link 
-                    to="/procurement" 
+                  <Link
+                    to="/procurement"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Procurement &amp; QC
                   </Link>
-                  <Link 
-                    to="/asset-accounting" 
+                  <Link
+                    to="/asset-accounting"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Asset Accounting
                   </Link>
-                  <Link 
-                    to="/cost-control" 
+                  <Link
+                    to="/cost-control"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
                   >
                     Cost Control
                   </Link>
-                  <Link 
-                    to="/project-systems" 
+                  <Link
+                    to="/project-systems"
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                     role="menuitem"
                     onClick={closeDropdown}
@@ -350,6 +350,17 @@ function Header() {
                 </div>
               )}
             </div>
+
+            {/* Stakeholders — persistent, unauthenticated path to the five
+                non-farmer/non-shopper dashboards (banker, government,
+                researcher, corporate, logistics). Previously these only
+                had a route and were reachable from the homepage doors;
+                a visitor navigating from any other page had no way back
+                to them without knowing the URL. */}
+            <Link to="/about" className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition">
+              <UsersIcon className="w-4 h-4" />
+              <span>Stakeholders</span>
+            </Link>
 
             <Link to="/logistics" className="text-v42-paddy/90 hover:text-v42-turmeric transition">
               Logistics
@@ -364,13 +375,19 @@ function Header() {
               Analytics
             </Link>
 
-            {/* Vendor Portal Dropdown */}
-            {isAuthenticated && (user?.role === 'corporate' || user?.role === 'logistics') && (
-              <div 
+            {/* Institutional Portal Dropdown — covers every non-farmer,
+                non-shopper stakeholder role (corporate, logistics, banker,
+                government, researcher). These dashboards already existed
+                and were routed, but only corporate/logistics ever got a
+                nav entry once signed in; banker/government/researcher
+                users had no persistent nav link to their own dashboard
+                anywhere outside the homepage doors or /about. */}
+            {isAuthenticated && ['corporate', 'logistics', 'banker', 'government', 'researcher'].includes(user?.role) && (
+              <div
                 className="relative"
                 ref={(el) => dropdownRefs.current.vendor = el}
               >
-                <button 
+                <button
                   className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'vendor'}
@@ -378,18 +395,18 @@ function Header() {
                   onKeyDown={(e) => handleKeyDown(e, 'vendor')}
                 >
                   <Building2 className="w-4 h-4" />
-                  <span>Vendor Portal</span>
+                  <span>Institutional Portal</span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {openDropdown === 'vendor' && (
-                  <div 
+                  <div
                     className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                     role="menu"
                     aria-orientation="vertical"
                   >
                     {user?.role === 'corporate' && (
-                      <Link 
-                        to="/corporate-buyer" 
+                      <Link
+                        to="/corporate-buyer"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                         role="menuitem"
                         onClick={closeDropdown}
@@ -398,13 +415,43 @@ function Header() {
                       </Link>
                     )}
                     {user?.role === 'logistics' && (
-                      <Link 
-                        to="/logistics-provider" 
+                      <Link
+                        to="/logistics-provider"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                         role="menuitem"
                         onClick={closeDropdown}
                       >
                         Logistics Provider
+                      </Link>
+                    )}
+                    {user?.role === 'banker' && (
+                      <Link
+                        to="/banker-dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        role="menuitem"
+                        onClick={closeDropdown}
+                      >
+                        Banker Dashboard
+                      </Link>
+                    )}
+                    {user?.role === 'government' && (
+                      <Link
+                        to="/government-dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        role="menuitem"
+                        onClick={closeDropdown}
+                      >
+                        Government Dashboard
+                      </Link>
+                    )}
+                    {user?.role === 'researcher' && (
+                      <Link
+                        to="/research-dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        role="menuitem"
+                        onClick={closeDropdown}
+                      >
+                        Research Dashboard
                       </Link>
                     )}
                   </div>
@@ -414,11 +461,11 @@ function Header() {
 
             {/* Admin Portal Dropdown */}
             {isAuthenticated && user?.role === 'admin' && (
-              <div 
+              <div
                 className="relative"
                 ref={(el) => dropdownRefs.current.admin = el}
               >
-                <button 
+                <button
                   className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'admin'}
@@ -430,37 +477,37 @@ function Header() {
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {openDropdown === 'admin' && (
-                  <div 
+                  <div
                     className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                     role="menu"
                     aria-orientation="vertical"
                   >
-                    <Link 
-                      to="/admin/settings" 
+                    <Link
+                      to="/admin/settings"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
                       onClick={closeDropdown}
                     >
                       Admin Dashboard
                     </Link>
-                    <Link 
-                      to="/ai-dashboard" 
+                    <Link
+                      to="/ai-dashboard"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
                       onClick={closeDropdown}
                     >
                       AI Dashboard
                     </Link>
-                    <Link 
-                      to="/erp-dashboard" 
+                    <Link
+                      to="/erp-dashboard"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
                       onClick={closeDropdown}
                     >
                       ERP Dashboard
                     </Link>
-                    <Link 
-                      to="/marketing-center" 
+                    <Link
+                      to="/marketing-center"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
                       onClick={closeDropdown}
@@ -474,11 +521,11 @@ function Header() {
 
             {/* Enterprise Portal Dropdown */}
             {isAuthenticated && (
-              <div 
+              <div
                 className="relative"
                 ref={(el) => dropdownRefs.current.enterprise = el}
               >
-                <button 
+                <button
                   className="flex items-center space-x-1 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'enterprise'}
@@ -490,21 +537,21 @@ function Header() {
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {openDropdown === 'enterprise' && (
-                  <div 
+                  <div
                     className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50"
                     role="menu"
                     aria-orientation="vertical"
                   >
-                    <Link 
-                      to="/b2b-marketplace" 
+                    <Link
+                      to="/b2b-marketplace"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
                       onClick={closeDropdown}
                     >
                       B2B Marketplace
                     </Link>
-                    <Link 
-                      to="/nutrient-marketplace" 
+                    <Link
+                      to="/nutrient-marketplace"
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
                       onClick={closeDropdown}
@@ -550,11 +597,11 @@ function Header() {
 
             {/* User Menu */}
             {isAuthenticated ? (
-              <div 
+              <div
                 className="relative"
                 ref={(el) => dropdownRefs.current.user = el}
               >
-                <button 
+                <button
                   className="flex items-center space-x-2 p-2 text-v42-paddy/90 hover:text-v42-turmeric transition focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
                   aria-haspopup="true"
                   aria-expanded={openDropdown === 'user'}
@@ -566,7 +613,7 @@ function Header() {
                   <span className="hidden md:inline">{user?.firstName || user?.email}</span>
                 </button>
                 {openDropdown === 'user' && (
-                  <div 
+                  <div
                     className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50"
                     role="menu"
                     aria-orientation="vertical"
@@ -597,8 +644,8 @@ function Header() {
                     </Link>
                     <button
                       onClick={() => {
-                        handleLogout()
-                        closeDropdown()
+                        handleLogout();
+                        closeDropdown();
                       }}
                       className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 flex items-center space-x-2 focus:bg-gray-100 focus:outline-none"
                       role="menuitem"
@@ -812,6 +859,15 @@ function Header() {
                 Project Systems
               </Link>
 
+              <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Stakeholders</div>
+              <Link
+                to="/about"
+                className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Who AFRERA is for
+              </Link>
+
               <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Other</div>
               <Link
                 to="/logistics"
@@ -842,10 +898,12 @@ function Header() {
                 Analytics
               </Link>
 
-              {/* Vendor Portal Mobile */}
-              {isAuthenticated && (user?.role === 'corporate' || user?.role === 'logistics') && (
+              {/* Institutional Portal Mobile — mirrors the desktop dropdown so
+                  banker/government/researcher roles have the same nav entry
+                  to their dashboard as corporate/logistics already had. */}
+              {isAuthenticated && ['corporate', 'logistics', 'banker', 'government', 'researcher'].includes(user?.role) && (
                 <>
-                  <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Vendor Portal</div>
+                  <div className="font-semibold text-v42-turmerictint px-4 py-2 mt-4">Institutional Portal</div>
                   {user?.role === 'corporate' && (
                     <Link
                       to="/corporate-buyer"
@@ -862,6 +920,33 @@ function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Logistics Provider
+                    </Link>
+                  )}
+                  {user?.role === 'banker' && (
+                    <Link
+                      to="/banker-dashboard"
+                      className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Banker Dashboard
+                    </Link>
+                  )}
+                  {user?.role === 'government' && (
+                    <Link
+                      to="/government-dashboard"
+                      className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Government Dashboard
+                    </Link>
+                  )}
+                  {user?.role === 'researcher' && (
+                    <Link
+                      to="/research-dashboard"
+                      className="text-v42-paddy/90 hover:text-v42-turmeric transition px-4 py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Research Dashboard
                     </Link>
                   )}
                 </>
@@ -891,7 +976,7 @@ function Header() {
         )}
       </div>
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;

@@ -1,62 +1,62 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { irrigationAPI } from '../services/api'
-import { Droplets, Plus, X, Waves, Trash2, Edit } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { irrigationAPI } from '../services/api';
+import { Droplets, Plus, X, Waves, Trash2, Edit } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const SOURCE_TYPES = ['Borewell', 'Canal', 'Tank/Pond', 'River Lift', 'Rainwater Harvesting']
-const METHODS = ['Drip', 'Sprinkler', 'Flood', 'Furrow']
+const SOURCE_TYPES = ['Borewell', 'Canal', 'Tank/Pond', 'River Lift', 'Rainwater Harvesting'];
+const METHODS = ['Drip', 'Sprinkler', 'Flood', 'Furrow'];
 
-const emptySchedule = { field_name: '', crop: '', method: 'Drip', frequency_days: '', duration_minutes: '', water_source: '' }
+const emptySchedule = { field_name: '', crop: '', method: 'Drip', frequency_days: '', duration_minutes: '', water_source: '' };
 
 function IrrigationManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptySchedule)
-  const [tab, setTab] = useState('schedules')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptySchedule);
+  const [tab, setTab] = useState('schedules');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: schedulesData, isLoading, error } = useQuery({
     queryKey: ['irrigation-schedules'],
     queryFn: async () => (await irrigationAPI.getSchedules()).data?.data ?? [],
-  })
+  });
 
   const { data: sourcesData, isLoading: sourcesLoading, error: sourcesError } = useQuery({
     queryKey: ['irrigation-water-sources'],
     queryFn: async () => (await irrigationAPI.getWaterSources()).data?.data ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? irrigationAPI.updateSchedule(editingId, payload) : irrigationAPI.createSchedule(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Schedule updated' : 'Schedule created')
-      queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] })
-      closeForm()
+      toast.success(editingId ? 'Schedule updated' : 'Schedule created');
+      queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save schedule'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => irrigationAPI.deleteSchedule(id),
-    onSuccess: () => { toast.success('Schedule removed'); queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] }) },
+    onSuccess: () => { toast.success('Schedule removed'); queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] }); },
     onError: () => toast.error('Failed to remove schedule'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptySchedule) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptySchedule); };
 
   const openEdit = (s) => {
     setForm({
       field_name: s.field_name || '', crop: s.crop || '', method: s.method || 'Drip',
       frequency_days: s.frequency_days ?? '', duration_minutes: s.duration_minutes ?? '', water_source: s.water_source || '',
-    })
-    setEditingId(s.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(s.id);
+    setShowForm(true);
+  };
 
-  const schedules = schedulesData || []
-  const sources = sourcesData || []
+  const schedules = schedulesData || [];
+  const sources = sourcesData || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -69,7 +69,7 @@ function IrrigationManagementPage() {
           <p className="text-gray-600">Schedule field irrigation and track water sources</p>
         </div>
         {tab === 'schedules' && (
-          <button onClick={() => { setForm(emptySchedule); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptySchedule); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center">
             <Plus className="w-5 h-5 mr-2" />New Schedule
           </button>
@@ -135,7 +135,7 @@ function IrrigationManagementPage() {
                       <td className="px-4 py-3 text-gray-700">{s.water_source || '—'}</td>
                       <td className="px-4 py-3 text-right space-x-2">
                         <button onClick={() => openEdit(s)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => { if (confirm('Delete this schedule?')) deleteMutation.mutate(s.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                        <button onClick={() => { if (confirm('Delete this schedule?')) deleteMutation.mutate(s.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                       </td>
                     </tr>
                   ))}
@@ -184,13 +184,13 @@ function IrrigationManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.field_name || !form.frequency_days) { toast.error('Field and frequency are required'); return }
+                  e.preventDefault();
+                  if (!form.field_name || !form.frequency_days) { toast.error('Field and frequency are required'); return; }
                   saveMutation.mutate({
                     ...form,
                     frequency_days: Number(form.frequency_days),
                     duration_minutes: form.duration_minutes === '' ? null : Number(form.duration_minutes),
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -245,7 +245,7 @@ function IrrigationManagementPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default IrrigationManagementPage
+export default IrrigationManagementPage;

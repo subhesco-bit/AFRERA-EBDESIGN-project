@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { landAPI } from '../services/api'
-import { MapPin, Plus, Trash2, Edit, X, FileCheck2 } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { landAPI } from '../services/api';
+import { MapPin, Plus, Trash2, Edit, X, FileCheck2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const OWNERSHIP_TYPES = ['Owned', 'Leased', 'Sharecropped', 'Government Allotted']
-const TITLE_STATUS = ['Verified', 'Pending Verification', 'Disputed', 'Not Submitted']
+const OWNERSHIP_TYPES = ['Owned', 'Leased', 'Sharecropped', 'Government Allotted'];
+const TITLE_STATUS = ['Verified', 'Pending Verification', 'Disputed', 'Not Submitted'];
 
 const emptyForm = {
   parcel_code: '',
@@ -19,41 +19,41 @@ const emptyForm = {
   survey_number: '',
   title_status: 'Pending Verification',
   notes: '',
-}
+};
 
 function LandRegistryPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyForm)
-  const [search, setSearch] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [search, setSearch] = useState('');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['land-parcels', search],
     queryFn: async () => {
-      const res = await landAPI.getParcels(search ? { search } : {})
-      return res.data?.data ?? []
+      const res = await landAPI.getParcels(search ? { search } : {});
+      return res.data?.data ?? [];
     },
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? landAPI.updateParcel(editingId, payload) : landAPI.createParcel(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Parcel updated' : 'Parcel registered')
-      queryClient.invalidateQueries({ queryKey: ['land-parcels'] })
-      closeForm()
+      toast.success(editingId ? 'Parcel updated' : 'Parcel registered');
+      queryClient.invalidateQueries({ queryKey: ['land-parcels'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save parcel'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => landAPI.deleteParcel(id),
-    onSuccess: () => { toast.success('Parcel removed'); queryClient.invalidateQueries({ queryKey: ['land-parcels'] }) },
+    onSuccess: () => { toast.success('Parcel removed'); queryClient.invalidateQueries({ queryKey: ['land-parcels'] }); },
     onError: () => toast.error('Failed to remove parcel'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm); };
 
   const openEdit = (p) => {
     setForm({
@@ -67,30 +67,30 @@ function LandRegistryPage() {
       survey_number: p.survey_number || '',
       title_status: p.title_status || 'Pending Verification',
       notes: p.notes || '',
-    })
-    setEditingId(p.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(p.id);
+    setShowForm(true);
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!form.owner_name || !form.village || !form.area_hectares) {
-      toast.error('Owner, village and area are required')
-      return
+      toast.error('Owner, village and area are required');
+      return;
     }
-    saveMutation.mutate({ ...form, area_hectares: Number(form.area_hectares) })
-  }
+    saveMutation.mutate({ ...form, area_hectares: Number(form.area_hectares) });
+  };
 
-  const parcels = data || []
-  const totalArea = parcels.reduce((s, p) => s + (Number(p.area_hectares) || 0), 0)
-  const verified = parcels.filter((p) => p.title_status === 'Verified').length
+  const parcels = data || [];
+  const totalArea = parcels.reduce((s, p) => s + (Number(p.area_hectares) || 0), 0);
+  const verified = parcels.filter((p) => p.title_status === 'Verified').length;
 
   const statusColor = (s) => ({
     Verified: 'bg-green-100 text-green-800',
     'Pending Verification': 'bg-yellow-100 text-yellow-800',
     Disputed: 'bg-red-100 text-red-800',
     'Not Submitted': 'bg-gray-100 text-gray-700',
-  }[s] || 'bg-gray-100 text-gray-700')
+  }[s] || 'bg-gray-100 text-gray-700');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -103,7 +103,7 @@ function LandRegistryPage() {
           <p className="text-gray-600">Register and track land parcels, ownership and title verification status</p>
         </div>
         <button
-          onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }}
+          onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }}
           className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center"
         >
           <Plus className="w-5 h-5 mr-2" />
@@ -183,7 +183,7 @@ function LandRegistryPage() {
                   </td>
                   <td className="px-4 py-3 text-right space-x-2">
                     <button onClick={() => openEdit(p)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => { if (confirm('Remove this parcel?')) deleteMutation.mutate(p.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => { if (confirm('Remove this parcel?')) deleteMutation.mutate(p.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -276,7 +276,7 @@ function LandRegistryPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default LandRegistryPage
+export default LandRegistryPage;

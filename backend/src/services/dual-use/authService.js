@@ -105,6 +105,12 @@ async function writeAuthStore(store) {
   }
 }
 
+function assertFallbackAuthStoreAllowed() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Authentication service unavailable');
+  }
+}
+
 async function getFallbackUserByEmail(email) {
   const store = await readAuthStore();
   return store.users.find((user) => user.email === email.toLowerCase());
@@ -290,10 +296,6 @@ async function registerUser(userData) {
   try {
     const pg = getPostgreSQL();
 
-    if (!pg && process.env.NODE_ENV === 'production') {
-      throw new Error('Authentication service unavailable');
-    }
-
     const registrationData = {
       ...userData,
       role: 'consumer',
@@ -301,31 +303,12 @@ async function registerUser(userData) {
     };
 
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const store = await readAuthStore();
       const normalizedEmail = (registrationData.email || '').toLowerCase();
       const existing = store.users.find((entry) => entry.email === normalizedEmail);
       if (existing) {
-        // Idempotent in test/fallback mode: return tokens for existing user
-        const accessToken = generateAccessToken(existing);
-        const refreshToken = generateRefreshToken(existing);
-        return {
-          user: {
-            id: existing.id,
-            email: existing.email,
-            phone: existing.phone,
-            role: existing.role,
-            status: existing.status,
-            profile: {
-              first_name: existing.first_name,
-              last_name: existing.last_name,
-              phone: existing.phone
-            }
-          },
-          token: accessToken,
-          accessToken,
-          refreshToken,
-          expiresIn: JWT_CONFIG.accessTokenExpiry
-        };
+        throw new Error('Email already registered');
       }
 
       const passwordHash = await hashPassword(registrationData.password);
@@ -459,6 +442,7 @@ async function loginUser(email, password, deviceInfo = {}) {
     const pg = getPostgreSQL();
 
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const user = await getFallbackUserByEmail(email);
       if (!user) {
         throw new Error('Invalid credentials');
@@ -598,6 +582,7 @@ async function refreshAccessToken(refreshToken) {
 
     const pg = getPostgreSQL();
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const user = await getFallbackUserByEmail(payload.email || '');
       if (!user) {
         throw new Error('User not found');
@@ -671,6 +656,7 @@ async function logoutUser(userId, refreshToken) {
   try {
     const pg = getPostgreSQL();
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       logger.info(`User logged out in fallback mode: ${userId}`);
       return { success: true, message: 'Logged out successfully' };
     }
@@ -1267,6 +1253,7 @@ router.get('/me', async (req, res) => {
     const pg = getPostgreSQL();
 
     if (!pg) {
+      assertFallbackAuthStoreAllowed();
       const user = await getFallbackUserByEmail(payload.email || '');
       if (!user) {
         return res.status(404).json({ error: 'User not found' });

@@ -1,6 +1,6 @@
 # MASTER MISSING CONCEPT INDEX
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Audit Date:** 1 September 2026  
 **Purpose:** Definitive index of missing, partial, and undocumented concepts
 
@@ -243,3 +243,4 @@
 ---
 
 *This index provides a comprehensive view of gaps between documented concepts and actual implementation. Priorities are based on business impact and dependencies.*
+

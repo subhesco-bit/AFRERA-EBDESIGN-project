@@ -61,14 +61,14 @@ ADD COLUMN IF NOT EXISTS rerouting_estimated_delay_hours INTEGER;
 CREATE INDEX IF NOT EXISTS idx_shipments_rerouting ON shipments(rerouting_required) WHERE rerouting_required = true;
 CREATE INDEX IF NOT EXISTS idx_shipments_rerouting_disruption ON shipments(rerouting_disruption_id);
 
--- Add expedited processing columns to insurance_claims table if they don't exist
-ALTER TABLE insurance_claims
+-- Add expedited processing columns to the canonical claims table.
+ALTER TABLE claims
 ADD COLUMN IF NOT EXISTS priority_level VARCHAR(20) DEFAULT 'normal', -- 'normal', 'expedited', 'urgent'
 ADD COLUMN IF NOT EXISTS expedited_reason VARCHAR(200),
 ADD COLUMN IF NOT EXISTS expedited_disruption_id UUID REFERENCES civil_disruption_events(id);
 
-CREATE INDEX IF NOT EXISTS idx_insurance_claims_priority ON insurance_claims(priority_level);
-CREATE INDEX IF NOT EXISTS idx_insurance_claims_expedited_disruption ON insurance_claims(expedited_disruption_id);
+CREATE INDEX IF NOT EXISTS idx_claims_priority ON claims(priority_level);
+CREATE INDEX IF NOT EXISTS idx_claims_expedited_disruption ON claims(expedited_disruption_id);
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_disruption_routing_updated_at()

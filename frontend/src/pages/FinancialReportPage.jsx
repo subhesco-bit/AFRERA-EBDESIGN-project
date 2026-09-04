@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
-import { Download, DollarSign, TrendingUp, TrendingDown, Wallet } from 'lucide-react'
-import AIInsightsPanel from '../components/ui/AIInsightsPanel'
-import { aiDecisionService } from '../services/aiDecisionService'
+import React, { useMemo, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Download, DollarSign, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 const FinancialReportPage = () => {
-  const [period, setPeriod] = useState('monthly')
+  const [period, setPeriod] = useState('monthly');
 
   const aiInsights = useMemo(
     () => [
@@ -23,7 +23,7 @@ const FinancialReportPage = () => {
         severity: 'warning',
         metadata: { source: 'fallback', module: 'finance' },
         context: { period, gap: 'cash flow' },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: 'finance-margin-upside',
@@ -37,15 +37,15 @@ const FinancialReportPage = () => {
         severity: 'info',
         metadata: { source: 'fallback', module: 'margin' },
         context: { margin: '35.4%' },
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     ],
-    [period]
-  )
+    [period],
+  );
 
   const handleApplyRecommendation = (insight) => {
-    alert(`Applied recommendation: ${insight.title}`)
-  }
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   const financialData = {
     totalRevenue: 3250000,
@@ -56,8 +56,8 @@ const FinancialReportPage = () => {
     expenseGrowth: 12.3,
     cashFlow: 890000,
     outstandingLoans: 1450000,
-    loanRepayments: 285000
-  }
+    loanRepayments: 285000,
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -192,7 +192,7 @@ const FinancialReportPage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FinancialReportPage
+export default FinancialReportPage;

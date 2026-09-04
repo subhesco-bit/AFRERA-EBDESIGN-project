@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { aiAPI } from '../../services/api'
+import React, { useState, useEffect, useRef } from 'react';
+import { aiAPI } from '../../services/componentApi';
 
 /**
  * Copilot Chat
@@ -7,15 +7,15 @@ import { aiAPI } from '../../services/api'
  * 2026-08-31: the "16gm AI Copilot Framework" (7 domain copilots - Finance,
  * Logistics, Warehouse, Insurance, Nutrition, Marketplace, Generic) has had
  * a real, complete backend (backend/src/services/legacy/aiCopilotService.js,
- * 674 lines) and a real, matching frontend API client (aiAPI.copilot.* in
- * services/api.js) for a while, but zero UI ever called it - the biggest
+ * 674 lines) and a real, matching frontend API client (aiAPI.copilot.*)
+ * for a while, but zero UI ever called it - the biggest
  * gap the project's own .ai/architecture/AI_BACKBONE_COMPONENT_MAPPING.md
  * flagged ("Only generic AI chat interface exists... need domain-specific
  * dashboards"). This is a real, working chat UI for any of the 6 domain
  * copilots, parameterized by copilotType - not a fabricated response, every
  * message here round-trips through the real backend and its real,
  * honestly-labelled (matched_on_real_data) responses.
- * 
+ *
  * Enhanced 2024-08-26: Added voice input, attachments, context panel, chat history,
  * and quick suggestions per PAGE-020 specification.
  */
@@ -27,7 +27,7 @@ const COPILOT_META = {
   insurance: { icon: '🛡️', label: 'Insurance', placeholder: 'Ask about policies, claims, risk…' },
   nutrition: { icon: '🥗', label: 'Nutrition', placeholder: 'Ask about diet, meals, nutrition…' },
   marketplace: { icon: '🛒', label: 'Marketplace', placeholder: 'Ask about pricing, products, trends…' },
-}
+};
 
 const QUICK_SUGGESTIONS = [
   'What are my recent transactions?',
@@ -35,64 +35,64 @@ const QUICK_SUGGESTIONS = [
   'What inventory is running low?',
   'Explain my policy coverage',
   'Nutrition recommendations for this week',
-  'Market trends for rice prices'
-]
+  'Market trends for rice prices',
+];
 
 export default function CopilotChat({ copilotType }) {
-  const [sessionId, setSessionId] = useState(null)
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [showHistory, setShowHistory] = useState(false)
-  const [showContext, setShowContext] = useState(false)
-  const [voiceActive, setVoiceActive] = useState(false)
-  const [attachments, setAttachments] = useState([])
-  const [context, setContext] = useState(null)
-  const [chatHistory, setChatHistory] = useState([])
-  const bottomRef = useRef(null)
-  const fileInputRef = useRef(null)
-  const meta = COPILOT_META[copilotType] || { icon: '🤖', label: copilotType, placeholder: 'Ask a question…' }
+  const [sessionId, setSessionId] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showContext, setShowContext] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false);
+  const [attachments, setAttachments] = useState([]);
+  const [context, setContext] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
+  const bottomRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const meta = COPILOT_META[copilotType] || { icon: '🤖', label: copilotType, placeholder: 'Ask a question…' };
 
   useEffect(() => {
-    setSessionId(null)
-    setMessages([])
-    setError(null)
-    loadChatHistory()
-  }, [copilotType])
+    setSessionId(null);
+    setMessages([]);
+    setError(null);
+    loadChatHistory();
+  }, [copilotType]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   async function loadChatHistory() {
     try {
-      const res = await aiAPI.copilot.getSessionHistory(copilotType)
-      setChatHistory(res.data?.sessions || [])
+      const res = await aiAPI.copilot.getSessionHistory(copilotType);
+      setChatHistory(res.data?.sessions || []);
     } catch (err) {
-      console.error('Failed to load chat history:', err)
+      console.error('Failed to load chat history:', err);
     }
   }
 
   async function ensureSession() {
-    if (sessionId) return sessionId
-    const res = await aiAPI.copilot.createSession(copilotType, {})
-    const id = res.data?.id
-    setSessionId(id)
-    return id
+    if (sessionId) return sessionId;
+    const res = await aiAPI.copilot.createSession(copilotType, {});
+    const id = res.data?.id;
+    setSessionId(id);
+    return id;
   }
 
   async function sendMessage() {
-    const text = input.trim()
-    if (!text || loading) return
-    setInput('')
-    setError(null)
-    setMessages((prev) => [...prev, { role: 'user', content: text, attachments, timestamp: new Date().toISOString() }])
-    setLoading(true)
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput('');
+    setError(null);
+    setMessages((prev) => [...prev, { role: 'user', content: text, attachments, timestamp: new Date().toISOString() }]);
+    setLoading(true);
     try {
-      const id = await ensureSession()
-      const res = await aiAPI.copilot.sendMessage(id, text, { context, attachments })
-      const response = res.data?.response
+      const id = await ensureSession();
+      const res = await aiAPI.copilot.sendMessage(id, text, { context, attachments });
+      const response = res.data?.response;
       setMessages((prev) => [
         ...prev,
         {
@@ -100,48 +100,48 @@ export default function CopilotChat({ copilotType }) {
           content: response?.content || 'No response received.',
           metadata: response?.metadata,
           structured_data: response?.structured_data,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
-      ])
-      setContext(response?.context)
+      ]);
+      setContext(response?.context);
     } catch (err) {
-      setError(err?.response?.data?.error || err.message || 'Failed to reach the copilot')
-      setMessages((prev) => prev.slice(0, -1))
+      setError(err?.response?.data?.error || err.message || 'Failed to reach the copilot');
+      setMessages((prev) => prev.slice(0, -1));
     } finally {
-      setLoading(false)
-      setAttachments([])
+      setLoading(false);
+      setAttachments([]);
     }
   }
 
   function handleKeyDown(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage()
+      e.preventDefault();
+      sendMessage();
     }
   }
 
   function handleVoiceInput() {
-    setVoiceActive(!voiceActive)
+    setVoiceActive(!voiceActive);
     // Voice input implementation would go here
   }
 
   function handleAttachmentClick() {
-    fileInputRef.current?.click()
+    fileInputRef.current?.click();
   }
 
   function handleFileSelect(e) {
-    const files = Array.from(e.target.files)
-    setAttachments(files)
+    const files = Array.from(e.target.files);
+    setAttachments(files);
   }
 
   function handleSuggestionClick(suggestion) {
-    setInput(suggestion)
-    sendMessage()
+    setInput(suggestion);
+    sendMessage();
   }
 
   function handleLoadSession(sessionId) {
     // Load specific chat session
-    setSessionId(sessionId)
+    setSessionId(sessionId);
     // Load messages for this session
   }
 
@@ -329,7 +329,7 @@ export default function CopilotChat({ copilotType }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export { COPILOT_META }
+export { COPILOT_META };

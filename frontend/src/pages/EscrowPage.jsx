@@ -48,7 +48,7 @@ export default function EscrowPage() {
   const handleRelease = async (e) => {
     e.preventDefault();
     if (!selectedEscrow) return;
-    
+
     setSubmitting(true);
     try {
       await escrowAPI.release(selectedEscrow.escrow_id, { notes: releaseNotes });
@@ -66,7 +66,7 @@ export default function EscrowPage() {
 
   const handleRefund = async (escrowId) => {
     if (!confirm('Are you sure you want to refund this escrow transaction?')) return;
-    
+
     try {
       await escrowAPI.refund(escrowId);
       toast.success('Escrow refunded successfully');
@@ -81,13 +81,13 @@ export default function EscrowPage() {
       pending: 'bg-yellow-100 text-yellow-800',
       released: 'bg-green-100 text-green-800',
       refunded: 'bg-red-100 text-red-800',
-      disputed: 'bg-orange-100 text-orange-800'
+      disputed: 'bg-orange-100 text-orange-800',
     };
     const icons = {
       pending: <Clock className="w-3 h-3" />,
       released: <CheckCircle className="w-3 h-3" />,
       refunded: <AlertCircle className="w-3 h-3" />,
-      disputed: <AlertCircle className="w-3 h-3" />
+      disputed: <AlertCircle className="w-3 h-3" />,
     };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
@@ -120,7 +120,7 @@ export default function EscrowPage() {
                 <div className="text-2xl font-bold text-gray-900">
                   {formatInr(escrowTransactions
                     .filter(e => e.status === 'pending')
-                    .reduce((sum, e) => sum + Number(e.amount), 0)
+                    .reduce((sum, e) => sum + Number(e.amount), 0),
                   )}
                 </div>
               </div>

@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
-import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query'
-import { productsAPI } from '../services/api'
-import { Filter, ShoppingCart, Star, Sparkles } from 'lucide-react'
-import { ordersAPI } from '../services/api'
-import toast from 'react-hot-toast'
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useQuery, useMutation, keepPreviousData } from '@tanstack/react-query';
+import { productsAPI } from '../services/api';
+import { Filter, ShoppingCart, Star, Sparkles } from 'lucide-react';
+import { ordersAPI } from '../services/api';
+import toast from 'react-hot-toast';
 
 /**
  * Requests an AI reference image for a product with no photo on file.
@@ -13,22 +14,22 @@ import toast from 'react-hot-toast'
  * VarietyDirectoryPage.jsx's GenerateImageButton.
  */
 function ProductImagePlaceholder({ product }) {
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState(null);
   const mutation = useMutation({
     mutationFn: () => productsAPI.requestImage(product.id, `Professional product photography of ${product.name}, natural lighting, clean background, realistic.`),
     onSuccess: (res) => setResult(res.data?.data),
     onError: (err) => setResult({ status: 'failed', error: err.response?.data?.error || err.message }),
-  })
+  });
 
   if (result?.status === 'completed' && result.imageUrl) {
-    return <img src={result.imageUrl} alt={product.name} className="w-full h-48 object-cover" />
+    return <img src={result.imageUrl} alt={product.name} className="w-full h-48 object-cover" />;
   }
 
   return (
     <div className="w-full h-48 bg-v42-paddy2 flex flex-col items-center justify-center gap-2 px-3 text-center">
       <span className="text-v42-mut text-sm">No image</span>
       <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); mutation.mutate() }}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); mutation.mutate(); }}
         disabled={mutation.isPending}
         className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-full bg-v42-forest/10 text-v42-forest hover:bg-v42-forest/20 transition disabled:opacity-60"
       >
@@ -44,56 +45,57 @@ function ProductImagePlaceholder({ product }) {
         <span className="text-[11px] text-v42-chilli px-2">{result.error || 'Image generation failed.'}</span>
       )}
     </div>
-  )
+  );
 }
 
 function MarketplacePage() {
+  const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState({
-    category_id: '',
+    category_id: searchParams.get('category') || '',
     state_id: '',
     gi_status: '',
     search: '',
     sort: '',
-  })
-  const [searchInput, setSearchInput] = useState('')
-  const searchDebounce = useRef(null)
-  const [addingMap, setAddingMap] = useState({})
+  });
+  const [searchInput, setSearchInput] = useState('');
+  const searchDebounce = useRef(null);
+  const [addingMap, setAddingMap] = useState({});
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 24,
-  })
+  });
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['products', filters, pagination],
     queryFn: async () => {
-      const res = await productsAPI.getProducts(filters, pagination)
-      return res.data || res
+      const res = await productsAPI.getProducts(filters, pagination);
+      return res.data || res;
     },
     placeholderData: keepPreviousData,
-  })
+  });
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-    setPagination((prev) => ({ ...prev, page: 1 }))
-  }
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
 
   // Debounced search: update local input immediately, propagate after delay
   const handleSearchInput = (e) => {
-    const v = e.target.value
-    setSearchInput(v)
-    if (searchDebounce.current) clearTimeout(searchDebounce.current)
+    const v = e.target.value;
+    setSearchInput(v);
+    if (searchDebounce.current) clearTimeout(searchDebounce.current);
     searchDebounce.current = setTimeout(() => {
-      setFilters((prev) => ({ ...prev, search: v }))
-      setPagination((prev) => ({ ...prev, page: 1 }))
-    }, 450)
-  }
+      setFilters((prev) => ({ ...prev, search: v }));
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }, 450);
+  };
 
   useEffect(() => {
     return () => {
-      if (searchDebounce.current) clearTimeout(searchDebounce.current)
-    }
-  }, [])
+      if (searchDebounce.current) clearTimeout(searchDebounce.current);
+    };
+  }, []);
 
   if (isLoading) {
     return (
@@ -107,7 +109,7 @@ function MarketplacePage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -115,7 +117,7 @@ function MarketplacePage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-red-600">Error loading products: {error.message}</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -134,13 +136,13 @@ function MarketplacePage() {
               <label className="block text-sm font-medium text-v42-ink2 mb-2">
                 Search
               </label>
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchInput}
-                    onChange={handleSearchInput}
-                    className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
-                  />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchInput}
+                onChange={handleSearchInput}
+                className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
+              />
             </div>
 
             {/* Category Filter */}
@@ -190,7 +192,7 @@ function MarketplacePage() {
               <label htmlFor="value" className="block text-sm font-medium text-v42-ink2 mb-2">Sort</label>
               <select id="value"
                 value={filters.sort}
-                onChange={(e) => { handleFilterChange('sort', e.target.value); setPagination((p) => ({ ...p, page: 1 })) }}
+                onChange={(e) => { handleFilterChange('sort', e.target.value); setPagination((p) => ({ ...p, page: 1 })); }}
                 className="w-full px-3 py-2 border border-v42-line rounded-lg focus:outline-none focus:ring-2 focus:ring-v42-turmeric"
               >
                 <option value="">Relevance</option>
@@ -283,20 +285,20 @@ function MarketplacePage() {
                     </div>
                     <button
                       onClick={async () => {
-                        if (addingMap[product.id]) return
-                        setAddingMap((m) => ({ ...m, [product.id]: true }))
+                        if (addingMap[product.id]) return;
+                        setAddingMap((m) => ({ ...m, [product.id]: true }));
                         // optimistic UX: mark as added
                         try {
-                          await ordersAPI.addToCart({ product_id: product.id, quantity: 1 })
-                          toast.success('Added to cart')
+                          await ordersAPI.addToCart({ product_id: product.id, quantity: 1 });
+                          toast.success('Added to cart');
                         } catch (err) {
-                          toast.error('Failed to add to cart')
+                          toast.error('Failed to add to cart');
                         } finally {
-                          setAddingMap((m) => ({ ...m, [product.id]: false }))
+                          setAddingMap((m) => ({ ...m, [product.id]: false }));
                         }
                       }}
                       className="flex items-center gap-2 px-3 py-2 bg-v42-forest text-v42-paddy rounded-lg hover:bg-v42-forestd transition disabled:opacity-60"
-                      disabled={!!addingMap[product.id]}
+                      disabled={Boolean(addingMap[product.id])}
                     >
                       {addingMap[product.id] ? 'Adding...' : <ShoppingCart className="w-5 h-5" />}
                     </button>
@@ -338,7 +340,7 @@ function MarketplacePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default MarketplacePage
+export default MarketplacePage;

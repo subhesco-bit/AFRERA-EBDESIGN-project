@@ -33,7 +33,7 @@ class AICollaborationService {
 
       // Initialize default context
       const defaultContext = {
-        project_name: 'SVESCO/EBDESIGN',
+        project_name: 'Subhesco/EBDESIGN',
         project_root: this.projectRoot,
         last_updated: new Date().toISOString(),
         active_ai: 'both',
@@ -386,3 +386,4 @@ class AICollaborationService {
 }
 
 module.exports = new AICollaborationService();
+

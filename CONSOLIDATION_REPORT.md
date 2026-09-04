@@ -235,5 +235,6 @@ Four decisions require product/architecture review before full deployment:
 ---
 
 *Integration Architect — Claude AI System*  
-*SVESCO/EBDESIGN Agricultural Operating System*  
+*Subhesco/EBDESIGN Agricultural Operating System*  
 *Unified Devin Implementation + Claude Coordination Architecture*
+

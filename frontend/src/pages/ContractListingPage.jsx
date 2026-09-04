@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { FileText, Calendar, DollarSign, User, CheckCircle } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { FileText, Calendar, DollarSign, User, CheckCircle } from 'lucide-react';
 
 const ContractListingPage = () => {
   const [contracts, setContracts] = useState([
     { id: 1, title: 'Organic Rice Cultivation', farmer: 'Green Valley Co-op', duration: '6 months', value: 250000, status: 'open' },
     { id: 2, title: 'Vegetable Supply Agreement', farmer: 'Sunrise Farms', duration: '12 months', value: 450000, status: 'open' },
-    { id: 3, title: 'Dairy Production Contract', farmer: 'Organic Dairy Ltd', duration: '8 months', value: 320000, status: 'pending' }
-  ])
+    { id: 3, title: 'Dairy Production Contract', farmer: 'Organic Dairy Ltd', duration: '8 months', value: 320000, status: 'pending' },
+  ]);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -57,7 +57,7 @@ const ContractListingPage = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ContractListingPage
+export default ContractListingPage;

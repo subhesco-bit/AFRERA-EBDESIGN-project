@@ -1,12 +1,12 @@
-import { useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ordersAPI } from '../services/api'
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ordersAPI } from '../services/api';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function CartPage() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // v5 react-query object syntax (see LoginPage.jsx) — was the tuple form,
   // which throws in the installed v5. .then(r => r.data) unwraps the axios
@@ -14,29 +14,29 @@ function CartPage() {
   const { data: cartData, isLoading, error } = useQuery({
     queryKey: ['cart'],
     queryFn: () => ordersAPI.getCart().then((r) => r.data),
-  })
+  });
 
   const updateQuantityMutation = useMutation({
     mutationFn: ({ id, quantity }) => ordersAPI.updateCartItem(id, { quantity }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cart'] })
-      toast.success('Cart updated')
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      toast.success('Cart updated');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to update cart')
+      toast.error(error.response?.data?.error || 'Failed to update cart');
     },
-  })
+  });
 
   const removeMutation = useMutation({
     mutationFn: (id) => ordersAPI.removeFromCart(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cart'] })
-      toast.success('Item removed from cart')
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      toast.success('Item removed from cart');
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to remove item')
+      toast.error(error.response?.data?.error || 'Failed to remove item');
     },
-  })
+  });
 
   if (isLoading) {
     return (
@@ -50,7 +50,7 @@ function CartPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -66,10 +66,10 @@ function CartPage() {
           Try again
         </button>
       </div>
-    )
+    );
   }
 
-  const { items = [], total_amount = 0 } = cartData || {}
+  const { items = [], total_amount = 0 } = cartData || {};
 
   if (items.length === 0) {
     return (
@@ -85,7 +85,7 @@ function CartPage() {
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -214,7 +214,7 @@ function CartPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default CartPage
+export default CartPage;

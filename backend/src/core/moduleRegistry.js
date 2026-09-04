@@ -5,11 +5,11 @@
 
 const path = require('path');
 const fs = require('fs');
-const EnhancedLibraryKnowledgeService = require('../services/claude/enhancedLibraryKnowledgeService');
+const { singleton: libraryKnowledgeService } = require('../../../modules/M645100_LIBRARYKNOWLEDGE/backend/service');
 
 class ModuleRegistry {
   constructor() {
-    this.libraryService = new EnhancedLibraryKnowledgeService();
+    this.libraryService = libraryKnowledgeService;
     this.loadedModules = new Map();
     this.moduleCache = new Map();
     this.executionQueue = new Map();

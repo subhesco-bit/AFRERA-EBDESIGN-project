@@ -1,6 +1,6 @@
-import { ArrowRight, BellRing, CheckCircle2, CircleDashed, Cpu, Gauge, ShieldCheck, Sparkles, TrendingUp, Zap } from 'lucide-react'
-import { Button } from './ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { ArrowRight, BellRing, CheckCircle2, CircleDashed, Cpu, Gauge, ShieldCheck, Sparkles, TrendingUp, Zap } from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 function StatCard({ label, value, trend, tone = 'emerald' }) {
   const tones = {
@@ -9,7 +9,7 @@ function StatCard({ label, value, trend, tone = 'emerald' }) {
     violet: 'border-violet-200 bg-violet-50 text-violet-800',
     amber: 'border-amber-200 bg-amber-50 text-amber-800',
     slate: 'border-slate-200 bg-slate-50 text-slate-800',
-  }
+  };
 
   return (
     <div className={`rounded-2xl border p-4 ${tones[tone] || tones.slate}`}>
@@ -19,7 +19,7 @@ function StatCard({ label, value, trend, tone = 'emerald' }) {
         <div className="rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-slate-600">{trend}</div>
       </div>
     </div>
-  )
+  );
 }
 
 function ProgressRow({ label, value, tone = 'bg-emerald-500' }) {
@@ -33,7 +33,7 @@ function ProgressRow({ label, value, tone = 'bg-emerald-500' }) {
         <div className={`h-full rounded-full ${tone}`} style={{ width: `${value}%` }} />
       </div>
     </div>
-  )
+  );
 }
 
 export default function AdvancedPageShell({
@@ -51,38 +51,38 @@ export default function AdvancedPageShell({
     { label: 'Growth signal', value: '₹18.6L', trend: '+12.8%', tone: 'blue' },
     { label: 'AI readiness', value: 'Online', trend: 'Live', tone: 'violet' },
     { label: 'Risk exposure', value: 'Low', trend: '-8.1%', tone: 'amber' },
-  ]
+  ];
 
   const defaultActions = [
     'Review module contract',
     'Connect backend endpoints',
     'Validate AI integration',
-  ]
+  ];
 
   const defaultInsights = [
     'Farm demand remains elevated across the Northeast corridor with strong pricing momentum.',
     'Inventory utilization is stable with a healthy margin buffer for the next cycle.',
     'Recommended actions are aligned with current operational constraints and compliance requirements.',
-  ]
+  ];
 
   const defaultPriorities = [
     { label: 'Field execution', value: 82, tone: 'bg-emerald-500' },
     { label: 'Market coverage', value: 74, tone: 'bg-sky-500' },
     { label: 'Compliance', value: 91, tone: 'bg-violet-500' },
     { label: 'Automation', value: 68, tone: 'bg-amber-500' },
-  ]
+  ];
 
   const defaultFeed = [
     { title: 'Logistics lane rebalanced', detail: '15-minute improvement in delivery window forecasting.', time: '2h ago' },
     { title: 'Soil advisory generated', detail: 'Crop health threshold recommendations issued for 12 plots.', time: '4h ago' },
     { title: 'Payment batch cleared', detail: 'New settlements reconciled against cooperative ledger.', time: 'Today' },
-  ]
+  ];
 
-  const safeStats = stats.length ? stats : defaultStats
-  const safeActions = actions.length ? actions : defaultActions
-  const safeInsights = insights.length ? insights : defaultInsights
-  const safePriorities = priorities.length ? priorities : defaultPriorities
-  const safeFeed = feed.length ? feed : defaultFeed
+  const safeStats = stats.length ? stats : defaultStats;
+  const safeActions = actions.length ? actions : defaultActions;
+  const safeInsights = insights.length ? insights : defaultInsights;
+  const safePriorities = priorities.length ? priorities : defaultPriorities;
+  const safeFeed = feed.length ? feed : defaultFeed;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
@@ -231,5 +231,5 @@ export default function AdvancedPageShell({
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Calculator, TrendingUp, Info, CheckCircle } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Calculator, TrendingUp, Info, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function PriceBuildPage() {
   const [costs, setCosts] = useState({
@@ -12,51 +12,51 @@ function PriceBuildPage() {
     irrigation: 0,
     equipment: 0,
     transport: 0,
-    other: 0
-  })
-  const [expectedYield, setExpectedYield] = useState('')
-  const [profitMargin, setProfitMargin] = useState(20)
-  const queryClient = useQueryClient()
+    other: 0,
+  });
+  const [expectedYield, setExpectedYield] = useState('');
+  const [profitMargin, setProfitMargin] = useState(20);
+  const queryClient = useQueryClient();
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: benchmarkPrices } = useQuery({
     queryKey: ['benchmark-prices'],
     queryFn: () => farmersAPI.getBenchmarkPrices().then(r => r.data),
-  })
+  });
 
   const { data: marketConditions } = useQuery({
     queryKey: ['market-conditions'],
     queryFn: () => farmersAPI.getMarketConditions().then(r => r.data),
-  })
+  });
 
   const savePricingMutation = useMutation({
     mutationFn: (data) => farmersAPI.savePricingModel(data),
     onSuccess: () => {
-      toast.success('Pricing model saved successfully')
-      queryClient.invalidateQueries({ queryKey: ['pricing-models'] })
+      toast.success('Pricing model saved successfully');
+      queryClient.invalidateQueries({ queryKey: ['pricing-models'] });
     },
     onError: () => {
-      toast.error('Failed to save pricing model')
+      toast.error('Failed to save pricing model');
     },
-  })
+  });
 
-  const totalCosts = Object.values(costs).reduce((sum, val) => sum + Number(val), 0)
-  const costPerUnit = expectedYield ? totalCosts / Number(expectedYield) : 0
-  const sellingPrice = costPerUnit * (1 + profitMargin / 100)
-  const profitAmount = sellingPrice - costPerUnit
+  const totalCosts = Object.values(costs).reduce((sum, val) => sum + Number(val), 0);
+  const costPerUnit = expectedYield ? totalCosts / Number(expectedYield) : 0;
+  const sellingPrice = costPerUnit * (1 + profitMargin / 100);
+  const profitAmount = sellingPrice - costPerUnit;
 
   const handleCostChange = (category, value) => {
-    setCosts(prev => ({ ...prev, [category]: Number(value) || 0 }))
-  }
+    setCosts(prev => ({ ...prev, [category]: Number(value) || 0 }));
+  };
 
   const handleSaveModel = () => {
     savePricingMutation.mutate({
       costs,
       expected_yield: expectedYield,
       profit_margin: profitMargin,
-      calculated_price: sellingPrice
-    })
-  }
+      calculated_price: sellingPrice,
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -73,7 +73,7 @@ function PriceBuildPage() {
           {/* Cost Input */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Production Costs</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -173,7 +173,7 @@ function PriceBuildPage() {
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Price Calculation</h2>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -231,7 +231,7 @@ function PriceBuildPage() {
                   <TrendingUp className="w-5 h-5 mr-2 text-blue-600" />
                   Market Comparison
                 </h2>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">Your Price</span>
@@ -275,7 +275,7 @@ function PriceBuildPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default PriceBuildPage
+export default PriceBuildPage;

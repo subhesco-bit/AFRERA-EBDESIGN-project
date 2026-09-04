@@ -1,41 +1,41 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { 
-  MapPin, 
-  Sprout, 
-  Calendar, 
-  Droplets, 
-  Sun, 
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import {
+  MapPin,
+  Sprout,
+  Calendar,
+  Droplets,
+  Sun,
   Thermometer,
   Plus,
   Edit,
-  Trash2
-} from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+  Trash2,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
 function FarmerFieldPage() {
-  const [selectedField, setSelectedField] = useState(null)
-  const [showAddModal, setShowAddModal] = useState(false)
-  const queryClient = useQueryClient()
+  const [selectedField, setSelectedField] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const queryClient = useQueryClient();
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: fields } = useQuery({
     queryKey: ['farmer-fields'],
     queryFn: () => farmersAPI.getFields('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const deleteFieldMutation = useMutation({
     mutationFn: (fieldId) => farmersAPI.deleteField(fieldId),
     onSuccess: () => {
-      toast.success('Field deleted successfully')
-      queryClient.invalidateQueries({ queryKey: ['farmer-fields'] })
+      toast.success('Field deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['farmer-fields'] });
     },
     onError: () => {
-      toast.error('Failed to delete field')
+      toast.error('Failed to delete field');
     },
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -58,13 +58,13 @@ function FarmerFieldPage() {
         {fields?.map((field) => (
           <div
             key={field.id}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                // Enter and Space are what a native <button> responds to.
-                // Without this the card is unreachable by keyboard entirely.
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click() }
-              }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              // Enter and Space are what a native <button> responds to.
+              // Without this the card is unreachable by keyboard entirely.
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); }
+            }}
             className="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer"
             onClick={() => setSelectedField(field)}
           >
@@ -97,8 +97,8 @@ function FarmerFieldPage() {
                     <span className="text-sm font-medium text-gray-700">Crop Status</span>
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       field.status === 'Healthy' ? 'bg-green-100 text-green-800' :
-                      field.status === 'Needs Attention' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                        field.status === 'Needs Attention' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
                     }`}>
                       {field.status}
                     </span>
@@ -124,7 +124,7 @@ function FarmerFieldPage() {
               <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
                 <button
                   onClick={(e) => {
-                    e.stopPropagation()
+                    e.stopPropagation();
                     // Edit logic
                   }}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded"
@@ -133,9 +133,9 @@ function FarmerFieldPage() {
                 </button>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation()
+                    e.stopPropagation();
                     if (confirm('Are you sure you want to delete this field?')) {
-                      deleteFieldMutation.mutate(field.id)
+                      deleteFieldMutation.mutate(field.id);
                     }
                   }}
                   className="p-2 text-red-600 hover:bg-red-50 rounded"
@@ -331,7 +331,7 @@ function FarmerFieldPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default FarmerFieldPage
+export default FarmerFieldPage;

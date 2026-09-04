@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
-import { useAuthStore } from '../store/authStore'
+import { Link, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 // Quick links — always visible, unchanged from before.
 const QUICK_LINKS = [
@@ -16,9 +16,9 @@ const QUICK_LINKS = [
   { to: '/diet-recipes', label: 'Diet & Recipes' },
   { to: '/wearables', label: 'Wearables' },
   { to: '/defense-fitness-prep', label: 'Defense Fitness Prep' },
-  { to: '/admin-dashboard', label: 'Admin' },
+  { to: '/admin/settings', label: 'Admin' },
   { to: '/admin/crop-value-review', label: 'Crop Value Review' },
-]
+];
 
 // Grouped sections covering the previously-unreachable routed pages (audit
 // UI Finding 7: 111/162 routed pages had no link anywhere in primary nav).
@@ -186,18 +186,18 @@ const NAV_GROUPS = [
       { to: '/experience', label: 'Experience Layer' },
     ],
   },
-]
+];
 
-const PUBLIC_PATHS = new Set(['/', '/marketplace', '/variety-directory'])
-const FARMER_PATHS = new Set(['/farmer-portal', '/farmer-profile', '/farmer-family', '/farmer-skills', '/farmer-verification', '/farmer-welfare', '/farmer-kyc', '/farmer-entrance/field', '/farmer-entrance/household', '/farmer-entrance/sell', '/farmer-entrance/shared'])
-const ADMIN_PATHS = new Set(['/users', '/system-administration', '/role-permissions', '/identity-management', '/platform-foundation', '/platform-management', '/shared-infra', '/sap-module-architecture', '/admin-dashboard', '/admin/crop-value-review'])
-const INSTITUTIONAL_PATHS = new Set(['/banker-dashboard', '/ca-dashboard', '/government-dashboard', '/research-dashboard', '/fpo-dashboard', '/fpo-registration', '/reos-dashboard'])
+const PUBLIC_PATHS = new Set(['/', '/marketplace', '/variety-directory']);
+const FARMER_PATHS = new Set(['/farmer-portal', '/farmer-profile', '/farmer-family', '/farmer-skills', '/farmer-verification', '/farmer-welfare', '/farmer-kyc', '/farmer-entrance/field', '/farmer-entrance/household', '/farmer-entrance/sell', '/farmer-entrance/shared']);
+const ADMIN_PATHS = new Set(['/users', '/system-administration', '/role-permissions', '/identity-management', '/platform-foundation', '/platform-management', '/shared-infra', '/sap-module-architecture', '/admin-dashboard', '/admin/crop-value-review']);
+const INSTITUTIONAL_PATHS = new Set(['/banker-dashboard', '/ca-dashboard', '/government-dashboard', '/research-dashboard', '/fpo-dashboard', '/fpo-registration', '/reos-dashboard']);
 
 function canAccess(item, user, isAuthenticated) {
-  if (PUBLIC_PATHS.has(item.to)) return true
-  if (!isAuthenticated) return false
-  if (ADMIN_PATHS.has(item.to)) return user?.role === 'admin'
-  if (FARMER_PATHS.has(item.to)) return ['farmer', 'admin'].includes(user?.role)
+  if (PUBLIC_PATHS.has(item.to)) return true;
+  if (!isAuthenticated) return false;
+  if (ADMIN_PATHS.has(item.to)) return user?.role === 'admin';
+  if (FARMER_PATHS.has(item.to)) return ['farmer', 'admin'].includes(user?.role);
   if (INSTITUTIONAL_PATHS.has(item.to)) {
     const roleByPath = {
       '/banker-dashboard': 'banker',
@@ -207,14 +207,14 @@ function canAccess(item, user, isAuthenticated) {
       '/fpo-dashboard': 'admin',
       '/fpo-registration': 'admin',
       '/reos-dashboard': 'admin',
-    }
-    return user?.role === 'admin' || user?.role === roleByPath[item.to]
+    };
+    return user?.role === 'admin' || user?.role === roleByPath[item.to];
   }
-  return true
+  return true;
 }
 
 function NavLink({ item, pathname }) {
-  const isActive = pathname === item.to
+  const isActive = pathname === item.to;
   return (
     <Link
       key={item.to}
@@ -224,17 +224,17 @@ function NavLink({ item, pathname }) {
     >
       {item.label}
     </Link>
-  )
+  );
 }
 
 export default function Sidebar() {
-  const { pathname } = useLocation()
-  const { user, isAuthenticated } = useAuthStore()
-  const visibleQuickLinks = QUICK_LINKS.filter((item) => canAccess(item, user, isAuthenticated))
+  const { pathname } = useLocation();
+  const { user, isAuthenticated } = useAuthStore();
+  const visibleQuickLinks = QUICK_LINKS.filter((item) => canAccess(item, user, isAuthenticated));
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter((item) => canAccess(item, user, isAuthenticated)),
-  })).filter((group) => group.items.length > 0)
+  })).filter((group) => group.items.length > 0);
 
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-gray-200 lg:bg-white lg:overflow-y-auto">
@@ -256,5 +256,5 @@ export default function Sidebar() {
         ))}
       </nav>
     </aside>
-  )
+  );
 }

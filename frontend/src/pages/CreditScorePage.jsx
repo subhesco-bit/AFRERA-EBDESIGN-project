@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { TrendingUp, Shield, AlertTriangle, CheckCircle } from 'lucide-react'
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { TrendingUp, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
 
 const CreditScorePage = () => {
   const [creditData, setCreditData] = useState({
@@ -11,21 +11,21 @@ const CreditScorePage = () => {
       { name: 'Payment History', impact: 'positive', score: 95 },
       { name: 'Credit Utilization', impact: 'positive', score: 88 },
       { name: 'Credit Age', impact: 'positive', score: 72 },
-      { name: 'Account Mix', impact: 'neutral', score: 65 }
+      { name: 'Account Mix', impact: 'neutral', score: 65 },
     ],
     recommendations: [
       'Maintain current payment pattern',
       'Keep credit utilization below 30%',
-      'Consider diversifying credit types'
-    ]
-  })
+      'Consider diversifying credit types',
+    ],
+  });
 
   const getScoreColor = (score) => {
-    if (score >= 750) return 'text-green-600'
-    if (score >= 700) return 'text-blue-600'
-    if (score >= 650) return 'text-yellow-600'
-    return 'text-red-600'
-  }
+    if (score >= 750) return 'text-green-600';
+    if (score >= 700) return 'text-blue-600';
+    if (score >= 650) return 'text-yellow-600';
+    return 'text-red-600';
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -65,7 +65,7 @@ const CreditScorePage = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-32 bg-muted rounded-full h-2">
-                        <div 
+                        <div
                           className="bg-primary h-2 rounded-full"
                           style={{ width: `${factor.score}%` }}
                         />
@@ -97,7 +97,7 @@ const CreditScorePage = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreditScorePage
+export default CreditScorePage;

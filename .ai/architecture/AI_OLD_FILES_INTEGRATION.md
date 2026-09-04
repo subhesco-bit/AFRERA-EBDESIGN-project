@@ -1,6 +1,6 @@
 # Old AI Files Integration Plan
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Date:** 31 August 2026  
 **Purpose:** Integrate existing AI files with reconstructed AI Backbone architecture
 

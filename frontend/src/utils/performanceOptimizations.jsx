@@ -1,7 +1,7 @@
 /**
  * Performance Optimization System
  * Production-level performance optimization utilities
- * 
+ *
  * Features:
  * - Code splitting and lazy loading
  * - Image optimization
@@ -38,7 +38,7 @@ const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen">
     <motion.div
       animate={{ rotate: 360 }}
-      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
       className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
     />
   </div>
@@ -48,7 +48,7 @@ const LoadingFallback = () => (
 export const createLazyRoute = (path, componentPath) => {
   return {
     path,
-    component: lazyLoad(() => import(`../pages/${componentPath}`))
+    component: lazyLoad(() => import(`../pages/${componentPath}`)),
   };
 };
 
@@ -75,14 +75,14 @@ export const ResponsiveImage = ({
     '(max-width: 768px)': '768w',
     '(max-width: 1024px)': '1024w',
     '(max-width: 1280px)': '1280w',
-    'default': '1536w'
+    default: '1536w',
   };
 
   const srcSet = Object.entries(imageSizes)
     .map(([media, width]) => {
-      const url = src.includes('?') 
-        ? `${src}&w=${width.replace('w', '')}` 
-        : `${src}?w=${width.replace('w', '')}`;
+      const url = src.includes('?') ?
+        `${src}&w=${width.replace('w', '')}` :
+        `${src}?w=${width.replace('w', '')}`;
       return media === 'default' ? url : `${url} ${media}`;
     })
     .join(', ');
@@ -151,7 +151,7 @@ class MemoryCache {
 
     this.cache.set(key, {
       value,
-      expiry: Date.now() + ttl
+      expiry: Date.now() + ttl,
     });
   }
 
@@ -208,7 +208,7 @@ export const localStorageCache = {
     try {
       const item = {
         value,
-        expiry: Date.now() + ttl
+        expiry: Date.now() + ttl,
       };
       localStorage.setItem(key, JSON.stringify(item));
     } catch (e) {
@@ -251,7 +251,7 @@ export const localStorageCache = {
     } catch (e) {
       console.warn('Failed to delete from localStorage:', e);
     }
-  }
+  },
 };
 
 // IndexedDB cache for larger data
@@ -289,7 +289,7 @@ export const indexedDBCache = {
       const item = {
         key,
         value,
-        expiry: Date.now() + ttl
+        expiry: Date.now() + ttl,
       };
 
       const request = store.put(item);
@@ -350,7 +350,7 @@ export const indexedDBCache = {
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
-  }
+  },
 };
 
 // ============================================
@@ -477,7 +477,7 @@ export const usePerformanceMonitor = (componentName) => {
       if (window.analytics) {
         window.analytics.track('component_render_time', {
           component: componentName,
-          duration
+          duration,
         });
       }
     };
@@ -565,7 +565,7 @@ export const useVirtualScroll = (items, itemHeight, containerHeight) => {
   const visibleStart = Math.floor(scrollTop / itemHeight);
   const visibleEnd = Math.min(
     visibleStart + Math.ceil(containerHeight / itemHeight) + 1,
-    items.length
+    items.length,
   );
 
   const visibleItems = items.slice(visibleStart, visibleEnd);
@@ -575,7 +575,7 @@ export const useVirtualScroll = (items, itemHeight, containerHeight) => {
     visibleItems,
     offsetY,
     onScroll: (e) => setScrollTop(e.target.scrollTop),
-    totalHeight: items.length * itemHeight
+    totalHeight: items.length * itemHeight,
   };
 };
 
@@ -610,7 +610,7 @@ export class RequestBatcher {
 
     try {
       const results = await Promise.all(
-        requests.map(([_, { requestFn }]) => requestFn())
+        requests.map(([_, { requestFn }]) => requestFn()),
       );
 
       requests.forEach(([key, { resolve }], index) => {
@@ -676,5 +676,5 @@ export default {
   preconnect,
   useVirtualScroll,
   requestBatcher,
-  requestDeduplicator
+  requestDeduplicator,
 };

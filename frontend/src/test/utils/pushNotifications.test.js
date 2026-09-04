@@ -1,80 +1,80 @@
-import { pushNotificationManager, initializePushNotifications, requestNotificationPermission, getSubscriptionStatus } from '../../utils/pushNotifications'
+import { pushNotificationManager, initializePushNotifications, requestNotificationPermission, getSubscriptionStatus } from '../../utils/pushNotifications';
 
 // Mock navigator and Notification
 const mockNavigator = {
   serviceWorker: {
-    register: jest.fn(() => Promise.resolve({}))
-  }
-}
+    register: jest.fn(() => Promise.resolve({})),
+  },
+};
 
 const mockNotification = {
   permission: 'default',
-  requestPermission: jest.fn(() => Promise.resolve('granted'))
-}
+  requestPermission: jest.fn(() => Promise.resolve('granted')),
+};
 
 Object.defineProperty(global, 'navigator', {
   value: mockNavigator,
-  writable: true
-})
+  writable: true,
+});
 
 Object.defineProperty(global, 'Notification', {
   value: mockNotification,
-  writable: true
-})
+  writable: true,
+});
 
 describe('Push Notifications', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
+    jest.clearAllMocks();
+  });
 
   describe('initializePushNotifications', () => {
     it('initializes push notification manager', async () => {
-      await initializePushNotifications()
+      await initializePushNotifications();
 
-      expect(mockNavigator.serviceWorker.register).toHaveBeenCalledWith('/sw.js')
-    })
+      expect(mockNavigator.serviceWorker.register).toHaveBeenCalledWith('/sw.js');
+    });
 
     it('handles unsupported browsers gracefully', async () => {
       // Mock unsupported browser
-      const originalServiceWorker = mockNavigator.serviceWorker
-      mockNavigator.serviceWorker = undefined
+      const originalServiceWorker = mockNavigator.serviceWorker;
+      mockNavigator.serviceWorker = undefined;
 
-      const result = await initializePushNotifications()
+      const result = await initializePushNotifications();
 
-      expect(result).toBe(false)
+      expect(result).toBe(false);
 
       // Restore
-      mockNavigator.serviceWorker = originalServiceWorker
-    })
-  })
+      mockNavigator.serviceWorker = originalServiceWorker;
+    });
+  });
 
   describe('requestNotificationPermission', () => {
     it('requests notification permission', async () => {
-      mockNotification.requestPermission.mockResolvedValueOnce('granted')
+      mockNotification.requestPermission.mockResolvedValueOnce('granted');
 
-      const result = await requestNotificationPermission()
+      const result = await requestNotificationPermission();
 
-      expect(mockNotification.requestPermission).toHaveBeenCalled()
-      expect(result).toBe(true)
-    })
+      expect(mockNotification.requestPermission).toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
 
     it('handles denied permission', async () => {
-      mockNotification.requestPermission.mockResolvedValueOnce('denied')
+      mockNotification.requestPermission.mockResolvedValueOnce('denied');
 
-      const result = await requestNotificationPermission()
+      const result = await requestNotificationPermission();
 
-      expect(result).toBe(false)
-    })
-  })
+      expect(result).toBe(false);
+    });
+  });
 
   describe('getSubscriptionStatus', () => {
     it('returns current subscription status', () => {
-      const status = getSubscriptionStatus()
+      const status = getSubscriptionStatus();
 
-      expect(status).toHaveProperty('isSupported')
-      expect(status).toHaveProperty('permission')
-      expect(status).toHaveProperty('isSubscribed')
-      expect(status).toHaveProperty('subscription')
-    })
-  })
-})
+      expect(status).toHaveProperty('isSupported');
+      expect(status).toHaveProperty('permission');
+      expect(status).toHaveProperty('isSubscribed');
+      expect(status).toHaveProperty('subscription');
+    });
+  });
+});

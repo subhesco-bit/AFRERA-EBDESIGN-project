@@ -8,23 +8,23 @@
  * someone with low vision can read it, and on a platform whose users skew
  * older and often work outdoors in glare, that is not a compliance checkbox.
  */
-import React, { useState, useEffect } from 'react'
-import { experienceAPI } from '../services/api'
+import React, { useState, useEffect } from 'react';
+import { experienceAPI } from '../services/api';
 import {
   ModulePage, Section, Field, Value, AsyncState, DataTable,
-} from '../components/common/DataPrimitives'
+} from '../components/common/DataPrimitives';
 
 export default function ExperienceLayerPage() {
-  const [themes, setThemes] = useState(null)
-  const [motion, setMotion] = useState(null)
-  const [components, setComponents] = useState(null)
-  const [a11y, setA11y] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [themes, setThemes] = useState(null);
+  const [motion, setMotion] = useState(null);
+  const [components, setComponents] = useState(null);
+  const [a11y, setA11y] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [pair, setPair] = useState({ fg: '#1f2328', bg: '#ffffff', large: false })
-  const [contrast, setContrast] = useState(null)
-  const [reduced, setReduced] = useState(false)
+  const [pair, setPair] = useState({ fg: 'hsl(var(--foreground))', bg: 'hsl(var(--background))', large: false });
+  const [contrast, setContrast] = useState(null);
+  const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -34,25 +34,25 @@ export default function ExperienceLayerPage() {
           experienceAPI.motion(false),
           experienceAPI.components({}),
           experienceAPI.accessibility().catch(() => ({ data: { data: null } })),
-        ])
-        setThemes(t.data?.data); setMotion(m.data?.data)
-        setComponents(c.data?.data); setA11y(a.data?.data)
-      } catch (e) { setError(e.response?.data?.error || e.message) } finally { setLoading(false) }
-    })()
-  }, [])
+        ]);
+        setThemes(t.data?.data); setMotion(m.data?.data);
+        setComponents(c.data?.data); setA11y(a.data?.data);
+      } catch (e) { setError(e.response?.data?.error || e.message); } finally { setLoading(false); }
+    })();
+  }, []);
 
   const check = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const r = await experienceAPI.contrast(pair.fg, pair.bg, pair.large)
-      setContrast(r.data?.data)
-    } catch (err) { setContrast({ error: err.message }) }
-  }
+      const r = await experienceAPI.contrast(pair.fg, pair.bg, pair.large);
+      setContrast(r.data?.data);
+    } catch (err) { setContrast({ error: err.message }); }
+  };
 
   const toggleMotion = async (next) => {
-    setReduced(next)
-    try { const m = await experienceAPI.motion(next); setMotion(m.data?.data) } catch { /* keep previous */ }
-  }
+    setReduced(next);
+    try { const m = await experienceAPI.motion(next); setMotion(m.data?.data); } catch { /* keep previous */ }
+  };
 
   return (
     <ModulePage
@@ -83,7 +83,7 @@ export default function ExperienceLayerPage() {
               <div style={{ marginTop: 16, display: 'flex', gap: 18, alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{
                   background: contrast.background, color: contrast.foreground,
-                  padding: '18px 22px', borderRadius: 8, border: '1px solid #d0d7de',
+                  padding: '18px 22px', borderRadius: 8, border: '1px solid hsl(var(--border))',
                   fontSize: contrast.largeText ? 22 : 15,
                 }}>
                   Sample text at this pairing
@@ -92,7 +92,7 @@ export default function ExperienceLayerPage() {
                   <div style={{ fontSize: 30, fontWeight: 600 }}>{contrast.ratio}:1</div>
                   <div style={{
                     fontSize: 14, fontWeight: 600,
-                    color: contrast.passesAA ? '#1a7f37' : '#cf222e',
+                    color: contrast.passesAA ? 'hsl(var(--data-real))' : 'hsl(var(--destructive))',
                   }}>
                     {contrast.verdict}
                   </div>
@@ -101,7 +101,7 @@ export default function ExperienceLayerPage() {
                   </div>
                 </div>
                 {contrast.note && (
-                  <p role="alert" style={{ flexBasis: '100%', margin: 0, color: '#cf222e', fontSize: 14 }}>
+                  <p role="alert" style={{ flexBasis: '100%', margin: 0, color: 'hsl(var(--destructive))', fontSize: 14 }}>
                     {contrast.note}
                   </p>
                 )}
@@ -111,7 +111,7 @@ export default function ExperienceLayerPage() {
 
           <Section title="Themes">
             {themes?.note && (
-              <p role="note" style={{ background: '#fff8c5', border: '1px solid #d4a72c66',
+              <p role="note" style={{ background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)', border: '1px solid hsl(var(--sev-warning))',
                 borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>{themes.note}</p>
             )}
             <DataTable
@@ -178,7 +178,7 @@ export default function ExperienceLayerPage() {
 
           <Section title="Accessibility conformance">
             {a11y?.note && (
-              <p role="note" style={{ background: '#fff8c5', border: '1px solid #d4a72c66',
+              <p role="note" style={{ background: 'color-mix(in srgb, hsl(var(--sev-warning)) 16%, transparent)', border: '1px solid hsl(var(--sev-warning))',
                 borderRadius: 6, padding: '10px 12px', fontSize: 14 }}>{a11y.note}</p>
             )}
             <DataTable
@@ -199,5 +199,5 @@ export default function ExperienceLayerPage() {
         </>
       </AsyncState>
     </ModulePage>
-  )
+  );
 }

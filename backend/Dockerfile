@@ -1,37 +1,19 @@
-# AFRERA Backend Dockerfile
-# Multi-stage build for production-ready image using a Debian-based Node image
-# to avoid Alpine-specific package manager and shell assumptions.
-
-# Stage 1: Build
-FROM node:20-slim AS builder
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files first so dependencies can be cached in Docker.
+# Copy package files
 COPY package*.json ./
 
-# Install dependencies using npm in a Debian-slim image.
-RUN npm ci --only=production
+# Install dependencies
+RUN npm ci
 
-# Copy source code
-COPY src ./src
+# Copy app code
+COPY . .
 
-# Stage 2: Production
-FROM node:20-slim AS production
+# Run migrations on startup
+RUN echo '#!/bin/sh\nnpm run migrate\nnpm start' > /entrypoint.sh && chmod +x /entrypoint.sh
 
-WORKDIR /app
+EXPOSE 3000
 
-# Copy dependencies from builder, preserving the standard production install layout.
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/src ./src
-
-# Expose port
-EXPOSE 3001
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
-
-# Start application
-CMD ["node", "src/index.js"]
+ENTRYPOINT ["/entrypoint.sh"]

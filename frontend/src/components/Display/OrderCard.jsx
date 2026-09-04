@@ -14,11 +14,11 @@ export default function OrderCard({
   onCancel,
 }) {
   const statusColors = {
-    pending: '#FFA500',
-    confirmed: '#4CAF50',
-    shipped: '#2196F3',
-    delivered: '#4CAF50',
-    cancelled: '#F44336',
+    pending: 'hsl(var(--sev-warning))',
+    confirmed: 'hsl(var(--data-real))',
+    shipped: 'hsl(var(--coldchain-ok))',
+    delivered: 'hsl(var(--data-real))',
+    cancelled: 'hsl(var(--destructive))',
   };
 
   return (

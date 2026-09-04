@@ -216,7 +216,7 @@ const NutrientValueMarketplace = () => {
       nutrientValueSalesAPI.submitNutrientContent(
         verifyForm.productId,
         { protein: Number(verifyForm.protein) || 0, iron: Number(verifyForm.iron) || 0, calcium: Number(verifyForm.calcium) || 0, fiber: Number(verifyForm.fiber) || 0 },
-        { lab: verifyForm.lab }
+        { lab: verifyForm.lab },
       ),
     onSuccess: () => {
       toast.success('Submitted for lab verification');

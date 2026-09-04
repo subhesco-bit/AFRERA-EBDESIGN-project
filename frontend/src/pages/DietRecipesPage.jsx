@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { ChefHat, Sparkles, AlertTriangle } from 'lucide-react'
-import { nutritionAPI } from '../services/api'
-import { AsyncState, Section } from '../components/common/DataPrimitives'
-import { Card, CardContent } from '../components/ui/card'
-import { Button } from '../components/ui/button'
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { ChefHat, Sparkles, AlertTriangle } from 'lucide-react';
+import { nutritionAPI } from '../services/api';
+import { AsyncState, Section } from '../components/common/DataPrimitives';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 
 /**
  * Diet & Recipes — real dietary profiles (nutritionIntelligenceService)
@@ -16,21 +16,21 @@ import { Button } from '../components/ui/button'
  * elsewhere in this codebase — this is education, not medical advice.
  */
 export default function DietRecipesPage() {
-  const [dietaryProfileId, setDietaryProfileId] = useState('')
-  const [targetCalories, setTargetCalories] = useState('')
-  const [result, setResult] = useState(null)
+  const [dietaryProfileId, setDietaryProfileId] = useState('');
+  const [targetCalories, setTargetCalories] = useState('');
+  const [result, setResult] = useState(null);
 
   const { data: profiles, isLoading: profilesLoading, error: profilesError } = useQuery({
     queryKey: ['dietary-profiles'],
     queryFn: () => nutritionAPI.getDietaryProfiles().then((r) => r.data || []),
-  })
+  });
 
   const recipeMutation = useMutation({
     mutationFn: () => nutritionAPI.generateRecipe(dietaryProfileId, targetCalories || undefined),
     onMutate: () => setResult(null),
     onSuccess: (res) => setResult(res.data),
     onError: (err) => setResult({ status: 'error', message: err.response?.data?.error || err.message }),
-  })
+  });
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
@@ -131,5 +131,5 @@ export default function DietRecipesPage() {
         </Section>
       )}
     </main>
-  )
+  );
 }

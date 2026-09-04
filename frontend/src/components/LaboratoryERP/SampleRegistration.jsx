@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { laboratoryERPAPI } from '../../services/api';
+import { laboratoryERPAPI } from '../../services/componentApi';
 
 /**
  * Sample Registration Component
@@ -28,7 +28,7 @@ const SampleRegistration = ({ onSuccess }) => {
     quantity_g: '',
     batch_number: '',
     priority: 'normal',
-    special_instructions: ''
+    special_instructions: '',
   });
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const SampleRegistration = ({ onSuccess }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -95,11 +95,11 @@ const SampleRegistration = ({ onSuccess }) => {
       const response = await laboratoryERPAPI.registerSample({
         ...formData,
         quantity_g: parseFloat(formData.quantity_g),
-        requested_tests: selectedTests
+        requested_tests: selectedTests,
       });
 
       onSuccess?.(response.data);
-      
+
       // Reset form
       setFormData({
         laboratory_id: '',
@@ -111,7 +111,7 @@ const SampleRegistration = ({ onSuccess }) => {
         quantity_g: '',
         batch_number: '',
         priority: 'normal',
-        special_instructions: ''
+        special_instructions: '',
       });
       setSelectedTests([]);
     } catch (err) {
@@ -124,7 +124,7 @@ const SampleRegistration = ({ onSuccess }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Register Sample for Testing</h2>
-      
+
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
           {error}
@@ -285,7 +285,7 @@ const SampleRegistration = ({ onSuccess }) => {
         {/* Test Selection */}
         <div className="border-t pt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Tests</h3>
-          
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Test Category

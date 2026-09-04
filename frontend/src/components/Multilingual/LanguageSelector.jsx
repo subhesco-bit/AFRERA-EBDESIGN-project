@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useMultilingual } from './MultilingualProvider';
-import { multilingualAPI } from '../../services/api';
 
 /**
  * Language Selector Component
@@ -16,43 +15,28 @@ import { multilingualAPI } from '../../services/api';
  *    rendering <LanguageSelector /> standalone (e.g. in the header) threw on
  *    selection. They now fall back to the MultilingualProvider context.
  *
- * FE-01/FE-02 fix (2026-08-07): this component fetched its own copy of the
- * language list with a raw fetch() (no auth header, and a duplicate of the
- * list MultilingualProvider already loads). It now reads `languages` from the
- * MultilingualProvider context first — the actual FE-02 fix, since the data
- * this component needs is already sitting one level up — and only falls back
- * to fetching for itself (via multilingualAPI, so auth is attached) when
- * rendered outside a MultilingualProvider.
+ * FE-01/FE-02 fix (2026-08-07): language data is owned by the
+ * MultilingualProvider and passed into this presentation component through
+ * context or props.
  */
-const LanguageSelector = ({ currentLanguage, onLanguageChange, showFlags = true }) => {
+const LanguageSelector = ({ currentLanguage, onLanguageChange, languages: providedLanguages, showFlags = true }) => {
   const ctx = useMultilingual();
   const activeLanguage = currentLanguage ?? ctx?.currentLanguage ?? 'en';
   const changeLanguage = onLanguageChange ?? ctx?.changeLanguage ?? (() => {});
-  const contextLanguages = ctx?.languages
+  const contextLanguages = providedLanguages ?? ctx?.languages;
 
   const [languages, setLanguages] = useState(contextLanguages || []);
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(!contextLanguages || contextLanguages.length === 0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (contextLanguages && contextLanguages.length > 0) {
       setLanguages(contextLanguages);
-      setLoading(false);
-      return;
+    } else {
+      setLanguages([]);
     }
-    fetchLanguages();
+    setLoading(false);
   }, [contextLanguages]);
-
-  const fetchLanguages = async () => {
-    try {
-      const response = await multilingualAPI.getLanguages();
-      setLanguages(response.data);
-    } catch (error) {
-      console.error('Failed to fetch languages:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLanguageSelect = (language) => {
     changeLanguage(language);
@@ -61,26 +45,26 @@ const LanguageSelector = ({ currentLanguage, onLanguageChange, showFlags = true 
 
   const getLanguageFlag = (isoCode) => {
     const flagMap = {
-      'en': '🇬🇧',
-      'hi': '🇮🇳',
-      'bn': '🇧🇩',
-      'as': '🇮🇳',
-      'mni': '🇮🇳',
-      'mte': '🇮🇳',
-      'kha': '🇮🇳',
-      'gar': '🇮🇳',
-      'nep': '🇳🇵',
-      'mizo': '🇮🇳',
-      'bho': '🇮🇳',
-      'ori': '🇮🇳',
-      'pun': '🇮🇳',
-      'guj': '🇮🇳',
-      'tam': '🇮🇳',
-      'tel': '🇮🇳',
-      'mal': '🇮🇳',
-      'kan': '🇮🇳',
-      'mar': '🇮🇳',
-      'urd': '🇵🇰'
+      en: '🇬🇧',
+      hi: '🇮🇳',
+      bn: '🇧🇩',
+      as: '🇮🇳',
+      mni: '🇮🇳',
+      mte: '🇮🇳',
+      kha: '🇮🇳',
+      gar: '🇮🇳',
+      nep: '🇳🇵',
+      mizo: '🇮🇳',
+      bho: '🇮🇳',
+      ori: '🇮🇳',
+      pun: '🇮🇳',
+      guj: '🇮🇳',
+      tam: '🇮🇳',
+      tel: '🇮🇳',
+      mal: '🇮🇳',
+      kan: '🇮🇳',
+      mar: '🇮🇳',
+      urd: '🇵🇰',
     };
     return flagMap[isoCode] || '🌐';
   };
@@ -112,9 +96,9 @@ const LanguageSelector = ({ currentLanguage, onLanguageChange, showFlags = true 
                 key={language.id}
                 onClick={() => handleLanguageSelect(language)}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                  language.iso_code === activeLanguage
-                    ? 'bg-blue-50 text-blue-700'
-                    : 'hover:bg-gray-100 text-gray-700'
+                  language.iso_code === activeLanguage ?
+                    'bg-blue-50 text-blue-700' :
+                    'hover:bg-gray-100 text-gray-700'
                 }`}
               >
                 {showFlags && <span className="text-xl">{getLanguageFlag(language.iso_code)}</span>}

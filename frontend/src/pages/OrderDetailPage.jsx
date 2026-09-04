@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, Package, MapPin } from 'lucide-react'
-import { ordersAPI } from '../services/api'
-import AIInsightsPanel from '../components/ui/AIInsightsPanel'
-import { aiDecisionService } from '../services/aiDecisionService'
+import { useMemo } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { CheckCircle2, Package, MapPin } from 'lucide-react';
+import { ordersAPI } from '../services/api';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 /**
  * Order confirmation / detail — real gap found while tracing the checkout
@@ -20,18 +20,18 @@ const STATUS_LABEL = {
   shipped: 'Shipped',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
-}
+};
 
 function OrderDetailPage() {
-  const { id } = useParams()
+  const { id } = useParams();
 
   const { data: order, isLoading, error } = useQuery({
     queryKey: ['order', id],
     queryFn: () => ordersAPI.getOrder(id).then((r) => r.data),
-  })
+  });
 
   const aiInsights = useMemo(() => {
-    if (!order) return []
+    if (!order) return [];
 
     return [
       aiDecisionService.buildDecision({
@@ -46,7 +46,7 @@ function OrderDetailPage() {
         severity: 'info',
         metadata: { source: 'fallback', module: 'orders' },
         context: { orderId: id, status: order.status },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: `order-${order.id || id}-inventory`,
@@ -60,17 +60,17 @@ function OrderDetailPage() {
         severity: 'warning',
         metadata: { source: 'fallback', module: 'fulfillment' },
         context: { items: order.items?.length || 0 },
-        timestamp: new Date().toISOString()
-      })
-    ]
-  }, [id, order])
+        timestamp: new Date().toISOString(),
+      }),
+    ];
+  }, [id, order]);
 
   const handleApplyRecommendation = (insight) => {
-    alert(`Applied recommendation: ${insight.title}`)
-  }
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   if (isLoading) {
-    return <div className="container mx-auto px-4 py-16 text-center text-gray-600">Loading order…</div>
+    return <div className="container mx-auto px-4 py-16 text-center text-gray-600">Loading order…</div>;
   }
 
   if (error || !order) {
@@ -80,7 +80,7 @@ function OrderDetailPage() {
         <p className="text-gray-600 mb-4">{error?.response?.data?.error || 'This order could not be loaded.'}</p>
         <Link to="/dashboard" className="text-green-700 underline">Back to dashboard</Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -139,7 +139,7 @@ function OrderDetailPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default OrderDetailPage
+export default OrderDetailPage;

@@ -14,6 +14,7 @@ import { Label } from '../components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { AlertTriangle, CheckCircle, XCircle, Search, MapPin } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { civilDisruptionAPI } from '../services/api';
 
 export default function DisruptionPage() {
   const [activeDisruptions, setActiveDisruptions] = useState([]);
@@ -26,7 +27,7 @@ export default function DisruptionPage() {
     affectedState: '',
     affectedDistrict: '',
     affectedRouteNames: '',
-    startDate: ''
+    startDate: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -37,11 +38,8 @@ export default function DisruptionPage() {
   const loadActiveDisruptions = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/v1/civil-disruption/active');
-      const data = await response.json();
-      if (data.success) {
-        setActiveDisruptions(data.data || []);
-      }
+      const response = await civilDisruptionAPI.listActive();
+      setActiveDisruptions(response.data?.data || []);
     } catch (error) {
       toast.error('Failed to load disruption data');
     } finally {
@@ -53,31 +51,19 @@ export default function DisruptionPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const response = await fetch('/api/v1/civil-disruption', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(formData)
+      await civilDisruptionAPI.report(formData);
+      toast.success('Disruption reported successfully');
+      setShowReportForm(false);
+      setFormData({
+        disruptionType: 'blockade',
+        title: '',
+        description: '',
+        affectedState: '',
+        affectedDistrict: '',
+        affectedRouteNames: '',
+        startDate: '',
       });
-      const data = await response.json();
-      if (data.success) {
-        toast.success('Disruption reported successfully');
-        setShowReportForm(false);
-        setFormData({
-          disruptionType: 'blockade',
-          title: '',
-          description: '',
-          affectedState: '',
-          affectedDistrict: '',
-          affectedRouteNames: '',
-          startDate: ''
-        });
-        loadActiveDisruptions();
-      } else {
-        toast.error(data.error || 'Failed to report disruption');
-      }
+      await loadActiveDisruptions();
     } catch (error) {
       toast.error('Failed to report disruption');
     } finally {
@@ -89,7 +75,7 @@ export default function DisruptionPage() {
     const styles = {
       unverified: 'bg-yellow-100 text-yellow-800',
       verified: 'bg-blue-100 text-blue-800',
-      resolved: 'bg-green-100 text-green-800'
+      resolved: 'bg-green-100 text-green-800',
     };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}>

@@ -1,6 +1,6 @@
 # IMPLEMENTATION ROADMAP
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Based On:** Gap Resolution Matrix (77 gaps)  
 **Roadmap Date:** 1 September 2026  
 **Focus:** Sequenced implementation with quick wins, mid-term, and long-term phases
@@ -403,3 +403,4 @@ Throughout all phases, the following Claude AI components must be preserved:
 ---
 
 *This Implementation Roadmap provides a sequenced approach to resolving all 77 gaps with clear phases, timelines, and compliance considerations while preserving Claude AI compatibility.*
+

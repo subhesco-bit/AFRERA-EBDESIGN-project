@@ -1,0 +1,98 @@
+{
+  "timestamp": "2026-09-04T15:31:16.895617",
+  "project": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+  "audit_results": {
+    "backend": {
+      "total_js_files": 1616,
+      "test_files": 785,
+      "services": 235,
+      "routes": 176,
+      "missing_dirs": []
+    },
+    "frontend": {
+      "total_jsx_files": 1152,
+      "components": 319,
+      "pages": 369,
+      "test_files": 10,
+      "missing_dirs": []
+    },
+    "database": {
+      "migrations": 352,
+      "migration_runner": true,
+      "schema_file": true
+    },
+    "infrastructure": {
+      "dockerfile": true,
+      "docker_compose": true,
+      "env_file": true,
+      "env_example": true
+    },
+    "documentation": {
+      "readme": true,
+      "docs_dir": true,
+      "ai_docs": 45
+    },
+    "ai_framework": {
+      "coordinator": true,
+      "library_service": true,
+      "ai_docs": 372
+    },
+    "tests": {
+      "backend_tests": 733,
+      "frontend_tests": 6,
+      "jest_configured": true
+    },
+    "deployments": {
+      "workflows": 1,
+      "kubernetes": false,
+      "deploy_config": false
+    }
+  },
+  "findings": {
+    "backend": [],
+    "frontend": [],
+    "database": [],
+    "infrastructure": [
+      {
+        "type": "INFO",
+        "issue": ".env.example found (good practice)",
+        "path": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\.env.example",
+        "fix": "Keep .env.example in git, .env in .gitignore"
+      }
+    ],
+    "documentation": [
+      {
+        "type": "INFO",
+        "issue": ".ai/ directory exists with 45 documentation files",
+        "path": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.ai",
+        "fix": "Continue expanding AI collaboration documentation"
+      }
+    ],
+    "ai_framework": [],
+    "tests": [],
+    "deployments": [
+      {
+        "type": "INFO",
+        "issue": "No Kubernetes or deployment configuration found",
+        "path": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+        "fix": "Create k8s/ or deploy/ directory for deployment specs"
+      }
+    ]
+  },
+  "metrics": {
+    "backend_js_files": 1616,
+    "backend_test_files": 785,
+    "backend_services": 235,
+    "backend_routes": 176,
+    "frontend_jsx_files": 1152,
+    "frontend_components": 319,
+    "frontend_pages": 369,
+    "frontend_test_files": 10,
+    "database_migrations": 352,
+    "ai_docs": 45,
+    "ai_framework_docs": 372,
+    "backend_tests": 733,
+    "frontend_tests": 6,
+    "github_workflows": 1
+  }
+}

@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import { Sprout, Search, BadgeCheck } from 'lucide-react'
-import { varietyDirectoryAPI } from '../services/api'
-import { AsyncState, Section } from '../components/common/DataPrimitives'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Sprout, Search, BadgeCheck } from 'lucide-react';
+import { varietyDirectoryAPI } from '../services/api';
+import { AsyncState, Section } from '../components/common/DataPrimitives';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 
 /**
  * Regional Variety Directory — real, citation-backed NE India crop/
@@ -23,12 +23,12 @@ import { Input } from '../components/ui/input'
  */
 function GiBadge({ status }) {
   if (status === 'registered') {
-    return <Badge className="gap-1 border-transparent bg-sev-info/15 text-sev-info hover:bg-sev-info/15"><BadgeCheck className="h-3 w-3" /> GI Registered</Badge>
+    return <Badge className="gap-1 border-transparent bg-sev-info/15 text-sev-info hover:bg-sev-info/15"><BadgeCheck className="h-3 w-3" /> GI Registered</Badge>;
   }
   if (status === 'pending') {
-    return <Badge variant="outline" className="text-data-estimated">GI Pending</Badge>
+    return <Badge variant="outline" className="text-data-estimated">GI Pending</Badge>;
   }
-  return null
+  return null;
 }
 
 /**
@@ -42,12 +42,12 @@ function GiBadge({ status }) {
  * code changes.
  */
 function GenerateImageButton({ variety }) {
-  const [result, setResult] = useState(null)
+  const [result, setResult] = useState(null);
   const mutation = useMutation({
     mutationFn: () => varietyDirectoryAPI.requestImage(variety.id),
     onSuccess: (res) => setResult(res.data?.data),
     onError: (err) => setResult({ status: 'failed', error: err.response?.data?.error || err.message }),
-  })
+  });
 
   return (
     <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -66,18 +66,18 @@ function GenerateImageButton({ variety }) {
         <span className="text-xs text-sev-critical">{result.error || 'Image generation failed.'}</span>
       )}
     </div>
-  )
+  );
 }
 
 function CreateListingForm({ variety, onCreated }) {
-  const [basePrice, setBasePrice] = useState('')
-  const [error, setError] = useState(null)
+  const [basePrice, setBasePrice] = useState('');
+  const [error, setError] = useState(null);
 
   const mutation = useMutation({
     mutationFn: () => varietyDirectoryAPI.createListing(variety.id, { basePrice: Number(basePrice) }),
     onSuccess: (res) => onCreated(res.data?.data),
     onError: (err) => setError(err.response?.data?.error || err.message),
-  })
+  });
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-2 border-t pt-3">
@@ -91,24 +91,24 @@ function CreateListingForm({ variety, onCreated }) {
       </Button>
       {error && <span className="text-xs text-sev-critical">{error}</span>}
     </div>
-  )
+  );
 }
 
 export default function VarietyDirectoryPage() {
-  const navigate = useNavigate()
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('')
-  const [expandedId, setExpandedId] = useState(null)
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
 
   const { data: categories } = useQuery({
     queryKey: ['variety-categories'],
     queryFn: () => varietyDirectoryAPI.getCategories().then((r) => r.data?.data || []),
-  })
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['variety-directory', search, category],
     queryFn: () => varietyDirectoryAPI.list({ search: search || undefined, category: category || undefined }).then((r) => r.data),
-  })
+  });
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
@@ -175,5 +175,5 @@ export default function VarietyDirectoryPage() {
         </AsyncState>
       </Section>
     </main>
-  )
+  );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SchemeUpdate Notifier = () => {
+const SchemeUpdateNotifier = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -20,4 +20,4 @@ const SchemeUpdate Notifier = () => {
   );
 };
 
-export default SchemeUpdate Notifier;
+export default SchemeUpdateNotifier;

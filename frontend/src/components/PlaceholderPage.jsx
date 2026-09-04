@@ -1,4 +1,4 @@
-import AdvancedPageShell from './AdvancedPageShell'
+import AdvancedPageShell from './AdvancedPageShell';
 
 export default function PlaceholderPage({ title, description, featureName }) {
   return (
@@ -7,5 +7,5 @@ export default function PlaceholderPage({ title, description, featureName }) {
       description={description}
       featureName={featureName}
     />
-  )
+  );
 }

@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { PackagePlus, Sparkles } from 'lucide-react'
-import { productsAPI } from '../services/api'
-import { buildProductImagePrompt } from '../utils/aiStudio'
-import { Section } from '../components/common/DataPrimitives'
-import { Card, CardContent } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
-import { Textarea } from '../components/ui/textarea'
-import offlineQueue from '../services/offlineQueue'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { PackagePlus, Sparkles } from 'lucide-react';
+import { productsAPI } from '../services/api';
+import { buildProductImagePrompt } from '../utils/aiStudio';
+import { Section } from '../components/common/DataPrimitives';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Textarea } from '../components/ui/textarea';
+import offlineQueue from '../services/offlineQueue';
 
 /**
  * Seller Product Creation — real gap confirmed this session: no page
@@ -40,23 +40,23 @@ const emptyForm = {
   imagePrompt: '',
   organic: false,
   gi_status: false,
-}
+};
 
 export default function SellerProductFormPage() {
-  const navigate = useNavigate()
-  const [form, setForm] = useState(emptyForm)
-  const [formError, setFormError] = useState(null)
+  const navigate = useNavigate();
+  const [form, setForm] = useState(emptyForm);
+  const [formError, setFormError] = useState(null);
 
   const { data: categories } = useQuery({
     queryKey: ['product-categories'],
     queryFn: () => productsAPI.getCategories().then((r) => r.data || []),
-  })
+  });
   const { data: states } = useQuery({
     queryKey: ['product-states'],
     queryFn: () => productsAPI.getStates().then((r) => r.data || []),
-  })
+  });
 
-  const [queuedOffline, setQueuedOffline] = useState(false)
+  const [queuedOffline, setQueuedOffline] = useState(false);
 
   // Rural connectivity is unreliable — a seller filling this form in a low-
   // signal area shouldn't lose their listing to a dropped connection. If
@@ -67,41 +67,41 @@ export default function SellerProductFormPage() {
   const createMutation = useMutation({
     mutationFn: (payload) => {
       if (!navigator.onLine) {
-        offlineQueue.add({ method: 'POST', url: '/products', data: payload })
-        return Promise.resolve({ queued: true })
+        offlineQueue.add({ method: 'POST', url: '/products', data: payload });
+        return Promise.resolve({ queued: true });
       }
-      return productsAPI.createProduct(payload)
+      return productsAPI.createProduct(payload);
     },
     onSuccess: (res) => {
       if (res?.queued) {
-        setQueuedOffline(true)
-        return
+        setQueuedOffline(true);
+        return;
       }
-      const prompt = form.imagePrompt?.trim() || buildProductImagePrompt(form.name, form.description, states?.find((s) => String(s.id) === String(form.state_id))?.name)
-      navigate(`/products/${res.data.id}?autoAI=1&prompt=${encodeURIComponent(prompt)}`)
+      const prompt = form.imagePrompt?.trim() || buildProductImagePrompt(form.name, form.description, states?.find((s) => String(s.id) === String(form.state_id))?.name);
+      navigate(`/products/${res.data.id}?autoAI=1&prompt=${encodeURIComponent(prompt)}`);
     },
     onError: (err, payload) => {
-      const isNetworkError = !err.response
+      const isNetworkError = !err.response;
       if (isNetworkError) {
-        offlineQueue.add({ method: 'POST', url: '/products', data: payload })
-        setQueuedOffline(true)
-        return
+        offlineQueue.add({ method: 'POST', url: '/products', data: payload });
+        setQueuedOffline(true);
+        return;
       }
-      setFormError(err.response?.data?.error || err.message)
+      setFormError(err.response?.data?.error || err.message);
     },
-  })
+  });
 
   const update = (field) => (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setForm((prev) => ({ ...prev, [field]: value }))
-  }
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    setFormError(null)
+    e.preventDefault();
+    setFormError(null);
     if (!form.name.trim() || !form.base_price) {
-      setFormError('Name and base price are required.')
-      return
+      setFormError('Name and base price are required.');
+      return;
     }
     createMutation.mutate({
       name: form.name.trim(),
@@ -116,8 +116,8 @@ export default function SellerProductFormPage() {
       tags: form.tags ? form.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
       organic: form.organic,
       gi_status: form.gi_status,
-    })
-  }
+    });
+  };
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6 lg:px-8">
@@ -251,5 +251,5 @@ export default function SellerProductFormPage() {
         </Card>
       </Section>
     </main>
-  )
+  );
 }

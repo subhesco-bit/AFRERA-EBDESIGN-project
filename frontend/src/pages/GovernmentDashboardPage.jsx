@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Shield, FileText, Users, DollarSign, AlertTriangle, CheckCircle, BarChart3, Activity, CloudRain, Megaphone, HeartHandshake, ListChecks } from 'lucide-react'
-import { governmentAPI, governmentSchemeAPI, schemeRegistryAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Shield, FileText, Users, DollarSign, AlertTriangle, CheckCircle, BarChart3, Activity, CloudRain, Megaphone, HeartHandshake, ListChecks } from 'lucide-react';
+import { governmentAPI, governmentSchemeAPI, schemeRegistryAPI } from '../services/api';
 
 function GovernmentDashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: schemeStats } = useQuery({
     queryKey: ['government-schemes'],
     queryFn: () => governmentAPI.getSchemeAnalytics().then(r => r.data),
-  })
+  });
 
   const { data: complianceData } = useQuery({
     queryKey: ['government-compliance'],
     queryFn: () => governmentAPI.getComplianceStatus().then(r => r.data),
-  })
+  });
 
   // Real governmentSchemeAPI / schemeRegistryAPI wiring — previously fully
   // built on the backend (governmentSchemeService.js, 15 endpoints) with
@@ -24,31 +24,31 @@ function GovernmentDashboardPage() {
     queryKey: ['scheme-registry'],
     queryFn: () => schemeRegistryAPI.list({}).then(r => r.data?.data),
     enabled: activeTab === 'schemes',
-  })
+  });
 
   const { data: expiryStatus } = useQuery({
     queryKey: ['scheme-registry-expiry'],
     queryFn: () => schemeRegistryAPI.getExpiring(90).then(r => r.data?.data),
     enabled: activeTab === 'schemes',
-  })
+  });
 
   const { data: weatherAlerts, isLoading: weatherLoading } = useQuery({
     queryKey: ['government-weather-alerts'],
     queryFn: () => governmentSchemeAPI.getWeatherAlerts({}).then(r => r.data?.data),
     enabled: activeTab === 'weather',
-  })
+  });
 
   const { data: announcements, isLoading: announcementsLoading } = useQuery({
     queryKey: ['government-announcements'],
     queryFn: () => governmentSchemeAPI.getAnnouncements({}).then(r => r.data?.data),
     enabled: activeTab === 'announcements',
-  })
+  });
 
   const { data: csrOpportunities, isLoading: csrLoading } = useQuery({
     queryKey: ['government-csr-opportunities'],
     queryFn: () => governmentSchemeAPI.getCsrOpportunities({}).then(r => r.data?.data),
     enabled: activeTab === 'csr',
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -74,9 +74,9 @@ function GovernmentDashboardPage() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-purple-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-purple-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -179,7 +179,7 @@ function GovernmentDashboardPage() {
                 { name: 'PMFBY', beneficiaries: 12500, disbursed: 45, utilization: 78, status: 'active' },
                 { name: 'MIDH', beneficiaries: 8200, disbursed: 32, utilization: 65, status: 'active' },
                 { name: 'AIF', beneficiaries: 3500, disbursed: 50, utilization: 85, status: 'active' },
-                { name: 'PM-FME', beneficiaries: 2100, disbursed: 15, utilization: 45, status: 'active' }
+                { name: 'PM-FME', beneficiaries: 2100, disbursed: 15, utilization: 45, status: 'active' },
               ].map((scheme) => (
                 <div key={scheme.name} className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
@@ -270,7 +270,7 @@ function GovernmentDashboardPage() {
               { id: 'PMFBY', name: 'Pradhan Mantri Fasal Bima Yojana', ministry: 'Agriculture', budget: 5000, utilized: 3900, status: 'active', expiry: '2027-03-31' },
               { id: 'MIDH', name: 'Mission for Integrated Development of Horticulture', ministry: 'Agri & Farmers Welfare', budget: 2500, utilized: 1625, status: 'active', expiry: '2028-03-31' },
               { id: 'AIF', name: 'Agriculture Infrastructure Fund', ministry: 'Animal Husbandry', budget: 8000, utilized: 6800, status: 'active', expiry: '2028-03-31' },
-              { id: 'OPGREENS', name: 'Operation Greens', ministry: 'Food Processing', budget: 3000, utilized: 2550, status: 'active', expiry: '2027-03-31' }
+              { id: 'OPGREENS', name: 'Operation Greens', ministry: 'Food Processing', budget: 3000, utilized: 2550, status: 'active', expiry: '2027-03-31' },
             ].map((scheme) => (
               <div key={scheme.id} className="border rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
@@ -280,8 +280,8 @@ function GovernmentDashboardPage() {
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     scheme.status === 'active' ? 'bg-green-100 text-green-800' :
-                    scheme.status === 'expiring' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
+                      scheme.status === 'expiring' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
                   }`}>
                     {scheme.status}
                   </span>
@@ -397,7 +397,7 @@ function GovernmentDashboardPage() {
               { type: 'Scheme Eligibility', status: 'compliant', lastCheck: '2026-08-04', issues: 0 },
               { type: 'Disbursement Compliance', status: 'compliant', lastCheck: '2026-08-04', issues: 0 },
               { type: 'Document Verification', status: 'review', lastCheck: '2026-08-03', issues: 3 },
-              { type: 'Audit Trail', status: 'compliant', lastCheck: '2026-08-04', issues: 0 }
+              { type: 'Audit Trail', status: 'compliant', lastCheck: '2026-08-04', issues: 0 },
             ].map((item) => (
               <div key={item.type} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
@@ -407,7 +407,7 @@ function GovernmentDashboardPage() {
                 <div className="flex items-center space-x-3">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     item.status === 'compliant' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {item.status}
                   </span>
@@ -430,7 +430,7 @@ function GovernmentDashboardPage() {
               { name: 'Scheme Performance Report', frequency: 'Monthly', status: 'ready' },
               { name: 'Beneficiary Impact Analysis', frequency: 'Quarterly', status: 'ready' },
               { name: 'Budget Utilization Report', frequency: 'Monthly', status: 'ready' },
-              { name: 'Compliance Audit Report', frequency: 'Quarterly', status: 'pending' }
+              { name: 'Compliance Audit Report', frequency: 'Quarterly', status: 'pending' },
             ].map((report) => (
               <div key={report.name} className="flex items-center justify-between p-4 border rounded-lg">
                 <div>
@@ -440,7 +440,7 @@ function GovernmentDashboardPage() {
                 <div className="flex items-center space-x-3">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     report.status === 'ready' ? 'bg-green-100 text-green-800' :
-                    'bg-yellow-100 text-yellow-800'
+                      'bg-yellow-100 text-yellow-800'
                   }`}>
                     {report.status === 'ready' ? 'Ready' : 'Pending'}
                   </span>
@@ -529,7 +529,7 @@ function GovernmentDashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default GovernmentDashboardPage
+export default GovernmentDashboardPage;

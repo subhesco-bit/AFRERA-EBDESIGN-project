@@ -16,148 +16,148 @@
  * ERP"), so the dropdown will usually list exactly one company, not because
  * the picker is fake but because the org itself is a single row.
  */
-import React, { useState, useEffect, useCallback } from 'react'
-import { assetAccountingAPI, companyAPI } from '../services/api'
-import { ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable } from '../components/common/DataPrimitives'
-import ResourceManager from '../components/common/ResourceManager'
+import React, { useState, useEffect, useCallback } from 'react';
+import { assetAccountingAPI, companyAPI } from '../services/api';
+import { ModulePage, Section, Field, Rupees, Value, AsyncState, DataTable } from '../components/common/DataPrimitives';
+import ResourceManager from '../components/common/ResourceManager';
 
-const DEPRECIATION_METHODS = ['straight_line', 'declining_balance', 'units_of_production', 'wdv']
+const DEPRECIATION_METHODS = ['straight_line', 'declining_balance', 'units_of_production', 'wdv'];
 
 export default function AssetAccountingPage() {
-  const [companyId, setCompanyId] = useState('')
-  const [companies, setCompanies] = useState([])
-  const [companiesError, setCompaniesError] = useState(null)
+  const [companyId, setCompanyId] = useState('');
+  const [companies, setCompanies] = useState([]);
+  const [companiesError, setCompaniesError] = useState(null);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
     companyAPI.listCompanies()
       .then((res) => {
-        if (cancelled) return
-        const list = res.data?.data || []
-        setCompanies(list)
+        if (cancelled) return;
+        const list = res.data?.data || [];
+        setCompanies(list);
         // A single-org platform should not force a redundant click through a
         // one-item dropdown — auto-select when there is exactly one company,
         // same as a human would.
-        if (list.length === 1) setCompanyId(String(list[0].id))
+        if (list.length === 1) setCompanyId(String(list[0].id));
       })
-      .catch((e) => { if (!cancelled) setCompaniesError(e.response?.data?.error || e.message) })
-    return () => { cancelled = true }
-  }, [])
+      .catch((e) => { if (!cancelled) setCompaniesError(e.response?.data?.error || e.message); });
+    return () => { cancelled = true; };
+  }, []);
 
   // Lightweight local roster of assets for the depreciation/disposal pickers
   // below — a second, independent read of the same real endpoint the
   // register table uses, not a mock.
-  const [assets, setAssets] = useState([])
-  const [assetsError, setAssetsError] = useState(null)
+  const [assets, setAssets] = useState([]);
+  const [assetsError, setAssetsError] = useState(null);
 
-  const [selectedAssetId, setSelectedAssetId] = useState('')
-  const [schedule, setSchedule] = useState(null)
-  const [scheduleMsg, setScheduleMsg] = useState(null)
-  const [postPeriod, setPostPeriod] = useState('')
+  const [selectedAssetId, setSelectedAssetId] = useState('');
+  const [schedule, setSchedule] = useState(null);
+  const [scheduleMsg, setScheduleMsg] = useState(null);
+  const [postPeriod, setPostPeriod] = useState('');
 
-  const [runAsOfDate, setRunAsOfDate] = useState('')
-  const [runResult, setRunResult] = useState(null)
+  const [runAsOfDate, setRunAsOfDate] = useState('');
+  const [runResult, setRunResult] = useState(null);
 
-  const [disposal, setDisposal] = useState({ disposalDate: '', disposalAmount: '' })
-  const [disposalResult, setDisposalResult] = useState(null)
+  const [disposal, setDisposal] = useState({ disposalDate: '', disposalAmount: '' });
+  const [disposalResult, setDisposalResult] = useState(null);
 
-  const [summary, setSummary] = useState(null)
-  const [summaryLoading, setSummaryLoading] = useState(false)
+  const [summary, setSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   const loadAssets = useCallback(async () => {
-    if (!companyId) { setAssets([]); return }
+    if (!companyId) { setAssets([]); return; }
     try {
-      const res = await assetAccountingAPI.getAssets(companyId)
-      setAssets(res.data?.data || [])
-      setAssetsError(null)
+      const res = await assetAccountingAPI.getAssets(companyId);
+      setAssets(res.data?.data || []);
+      setAssetsError(null);
     } catch (e) {
-      setAssetsError(e.response?.data?.error || e.message)
+      setAssetsError(e.response?.data?.error || e.message);
     }
-  }, [companyId])
+  }, [companyId]);
 
-  useEffect(() => { loadAssets() }, [loadAssets])
+  useEffect(() => { loadAssets(); }, [loadAssets]);
 
   const loadSchedule = async (assetId) => {
-    if (!assetId) { setSchedule(null); return }
+    if (!assetId) { setSchedule(null); return; }
     try {
-      const res = await assetAccountingAPI.getDepreciationSchedule(assetId)
-      setSchedule(res.data?.data || [])
+      const res = await assetAccountingAPI.getDepreciationSchedule(assetId);
+      setSchedule(res.data?.data || []);
     } catch (e) {
-      setSchedule({ error: e.response?.data?.error || e.message })
+      setSchedule({ error: e.response?.data?.error || e.message });
     }
-  }
+  };
 
-  useEffect(() => { loadSchedule(selectedAssetId) }, [selectedAssetId])
+  useEffect(() => { loadSchedule(selectedAssetId); }, [selectedAssetId]);
 
   const generateSchedule = async () => {
-    if (!selectedAssetId) return
-    setScheduleMsg(null)
+    if (!selectedAssetId) return;
+    setScheduleMsg(null);
     try {
-      const res = await assetAccountingAPI.generateDepreciationSchedule(selectedAssetId)
-      setScheduleMsg(`Generated ${res.data?.data?.periods ?? 0} period(s), monthly depreciation ${res.data?.data?.monthlyDepreciation ?? '—'}.`)
-      loadSchedule(selectedAssetId)
-      loadAssets()
+      const res = await assetAccountingAPI.generateDepreciationSchedule(selectedAssetId);
+      setScheduleMsg(`Generated ${res.data?.data?.periods ?? 0} period(s), monthly depreciation ${res.data?.data?.monthlyDepreciation ?? '—'}.`);
+      loadSchedule(selectedAssetId);
+      loadAssets();
     } catch (e) {
-      setScheduleMsg(e.response?.data?.error || e.message)
+      setScheduleMsg(e.response?.data?.error || e.message);
     }
-  }
+  };
 
   const postOnePeriod = async () => {
-    if (!selectedAssetId || !postPeriod) return
-    setScheduleMsg(null)
+    if (!selectedAssetId || !postPeriod) return;
+    setScheduleMsg(null);
     try {
-      await assetAccountingAPI.postDepreciationPeriod(selectedAssetId, postPeriod)
-      setScheduleMsg(`Posted period ${postPeriod}.`)
-      setPostPeriod('')
-      loadSchedule(selectedAssetId)
-      loadAssets()
+      await assetAccountingAPI.postDepreciationPeriod(selectedAssetId, postPeriod);
+      setScheduleMsg(`Posted period ${postPeriod}.`);
+      setPostPeriod('');
+      loadSchedule(selectedAssetId);
+      loadAssets();
     } catch (e) {
-      setScheduleMsg(e.response?.data?.error || e.message)
+      setScheduleMsg(e.response?.data?.error || e.message);
     }
-  }
+  };
 
   const runBatch = async (e) => {
-    e.preventDefault()
-    if (!companyId || !runAsOfDate) return
+    e.preventDefault();
+    if (!companyId || !runAsOfDate) return;
     try {
-      const res = await assetAccountingAPI.runDepreciationForPeriod(companyId, runAsOfDate)
-      setRunResult(res.data?.data)
-      loadAssets()
-      if (selectedAssetId) loadSchedule(selectedAssetId)
+      const res = await assetAccountingAPI.runDepreciationForPeriod(companyId, runAsOfDate);
+      setRunResult(res.data?.data);
+      loadAssets();
+      if (selectedAssetId) loadSchedule(selectedAssetId);
     } catch (e) {
-      setRunResult({ error: e.response?.data?.error || e.message })
+      setRunResult({ error: e.response?.data?.error || e.message });
     }
-  }
+  };
 
   const submitDisposal = async (e) => {
-    e.preventDefault()
-    if (!selectedAssetId || !disposal.disposalDate || disposal.disposalAmount === '') return
+    e.preventDefault();
+    if (!selectedAssetId || !disposal.disposalDate || disposal.disposalAmount === '') return;
     try {
       const res = await assetAccountingAPI.disposeAsset(selectedAssetId, {
         disposalDate: disposal.disposalDate,
         disposalAmount: Number(disposal.disposalAmount),
-      })
-      setDisposalResult(res.data?.data)
-      loadAssets()
+      });
+      setDisposalResult(res.data?.data);
+      loadAssets();
     } catch (e) {
-      setDisposalResult({ error: e.response?.data?.error || e.message })
+      setDisposalResult({ error: e.response?.data?.error || e.message });
     }
-  }
+  };
 
   const loadSummary = async () => {
-    if (!companyId) return
-    setSummaryLoading(true)
+    if (!companyId) return;
+    setSummaryLoading(true);
     try {
-      const res = await assetAccountingAPI.getAssetRegisterSummary(companyId)
-      setSummary(res.data?.data || [])
+      const res = await assetAccountingAPI.getAssetRegisterSummary(companyId);
+      setSummary(res.data?.data || []);
     } catch (e) {
-      setSummary({ error: e.response?.data?.error || e.message })
+      setSummary({ error: e.response?.data?.error || e.message });
     } finally {
-      setSummaryLoading(false)
+      setSummaryLoading(false);
     }
-  }
+  };
 
-  const unpostedPeriods = (schedule && !schedule.error ? schedule : []).filter((p) => !p.is_posted)
+  const unpostedPeriods = (schedule && !schedule.error ? schedule : []).filter((p) => !p.is_posted);
 
   return (
     <ModulePage
@@ -173,7 +173,7 @@ export default function AssetAccountingPage() {
           </select>
         </Field>
         {companiesError && (
-          <p role="alert" style={{ color: '#cf222e', fontSize: 13, marginTop: 8 }}>{companiesError}</p>
+          <p role="alert" style={{ color: 'hsl(var(--destructive))', fontSize: 13, marginTop: 8 }}>{companiesError}</p>
         )}
       </Section>
 
@@ -228,7 +228,7 @@ export default function AssetAccountingPage() {
               ]}
             />
             {assetsError && (
-              <p role="alert" style={{ color: '#cf222e', fontSize: 13, marginTop: 8 }}>{assetsError}</p>
+              <p role="alert" style={{ color: 'hsl(var(--destructive))', fontSize: 13, marginTop: 8 }}>{assetsError}</p>
             )}
           </Section>
 
@@ -260,7 +260,7 @@ export default function AssetAccountingPage() {
                 {scheduleMsg && <p role="status" style={{ fontSize: 13, marginTop: 8 }}>{scheduleMsg}</p>}
 
                 {schedule?.error ? (
-                  <p role="alert" style={{ color: '#cf222e', marginTop: 12 }}>{schedule.error}</p>
+                  <p role="alert" style={{ color: 'hsl(var(--destructive))', marginTop: 12 }}>{schedule.error}</p>
                 ) : (
                   <DataTable
                     caption="Depreciation schedule"
@@ -289,7 +289,7 @@ export default function AssetAccountingPage() {
             </form>
             {runResult && (
               runResult.error ? (
-                <p role="alert" style={{ color: '#cf222e', marginTop: 8 }}>{runResult.error}</p>
+                <p role="alert" style={{ color: 'hsl(var(--destructive))', marginTop: 8 }}>{runResult.error}</p>
               ) : (
                 <p role="status" style={{ marginTop: 8, fontSize: 14 }}>
                   Posted <Value value={runResult.postedCount} decimals={0} /> period(s), total depreciation{' '}
@@ -314,7 +314,7 @@ export default function AssetAccountingPage() {
             </form>
             {disposalResult && (
               disposalResult.error ? (
-                <p role="alert" style={{ color: '#cf222e', marginTop: 8 }}>{disposalResult.error}</p>
+                <p role="alert" style={{ color: 'hsl(var(--destructive))', marginTop: 8 }}>{disposalResult.error}</p>
               ) : (
                 <p role="status" style={{ marginTop: 8, fontSize: 14 }}>
                   Net book value at disposal <strong><Rupees value={disposalResult.netBookValueAtDisposal} /></strong>
@@ -348,5 +348,5 @@ export default function AssetAccountingPage() {
         </>
       )}
     </ModulePage>
-  )
+  );
 }

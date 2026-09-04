@@ -1,38 +1,38 @@
-import { useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { ImageIcon, Sparkles, Wand2, HeartPulse, Leaf, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { productMediaAIAPI, nutritionAPI } from '../services/api'
-import { buildCartoonPrompt, buildProductImagePrompt, getWellnessStatusTone } from '../utils/aiStudio'
+import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ImageIcon, Sparkles, Wand2, HeartPulse, Leaf, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { productMediaAIAPI, nutritionAPI } from '../services/api';
+import { buildCartoonPrompt, buildProductImagePrompt, getWellnessStatusTone } from '../utils/aiStudio';
 
 export default function AIProductStudioPage() {
-  const [productName, setProductName] = useState('Organic Assam Tea')
-  const [productDescription, setProductDescription] = useState('Premium tea with aroma and traceability from a certified farm')
-  const [stateName, setStateName] = useState('Assam')
-  const [moodTheme, setMoodTheme] = useState('farmer storytelling')
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const [productName, setProductName] = useState('Organic Assam Tea');
+  const [productDescription, setProductDescription] = useState('Premium tea with aroma and traceability from a certified farm');
+  const [stateName, setStateName] = useState('Assam');
+  const [moodTheme, setMoodTheme] = useState('farmer storytelling');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   const { data: wellnessData, isLoading: wellnessLoading, error: wellnessError } = useQuery({
     queryKey: ['wellness-practices'],
     queryFn: () => nutritionAPI.getWellnessPractices({ category: selectedCategory || undefined }).then((r) => r.data || { practices: [] }),
-  })
+  });
 
   const imagePrompt = useMemo(
     () => buildProductImagePrompt(productName, productDescription, stateName),
-    [productName, productDescription, stateName]
-  )
+    [productName, productDescription, stateName],
+  );
 
   const cartoonPrompt = useMemo(
     () => buildCartoonPrompt(productName, moodTheme),
-    [productName, moodTheme]
-  )
+    [productName, moodTheme],
+  );
 
   const providerStatus = useQuery({
     queryKey: ['product-media-status'],
     queryFn: () => productMediaAIAPI.getProviderStatus().then((r) => r.data?.data || r.data || {}),
-  })
+  });
 
-  const wellnessPractices = wellnessData?.practices || []
-  const statusTone = getWellnessStatusTone(providerStatus.data?.status || 'not_configured')
+  const wellnessPractices = wellnessData?.practices || [];
+  const statusTone = getWellnessStatusTone(providerStatus.data?.status || 'not_configured');
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
@@ -142,5 +142,5 @@ export default function AIProductStudioPage() {
         </div>
       </section>
     </main>
-  )
+  );
 }

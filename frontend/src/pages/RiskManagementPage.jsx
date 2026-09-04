@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
-import AIInsightsPanel from '../components/ui/AIInsightsPanel'
-import { aiDecisionService } from '../services/aiDecisionService'
+import { useMemo } from 'react';
+import AIInsightsPanel from '../components/ui/AIInsightsPanel';
+import { aiDecisionService } from '../services/aiDecisionService';
 
 export default function RiskManagementPage() {
   const aiInsights = useMemo(
@@ -17,7 +17,7 @@ export default function RiskManagementPage() {
         severity: 'critical',
         metadata: { source: 'fallback', module: 'risk' },
         context: { exposure: 'high', zones: 4 },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
       aiDecisionService.buildDecision({
         id: 'risk-market-volatility',
@@ -31,15 +31,15 @@ export default function RiskManagementPage() {
         severity: 'warning',
         metadata: { source: 'fallback', module: 'market' },
         context: { categories: 2, volatility: 'rising' },
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     ],
-    []
-  )
+    [],
+  );
 
   const handleApplyRecommendation = (insight) => {
-    alert(`Applied recommendation: ${insight.title}`)
-  }
+    alert(`Applied recommendation: ${insight.title}`);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -55,5 +55,5 @@ export default function RiskManagementPage() {
         onApplyRecommendation={handleApplyRecommendation}
       />
     </div>
-  )
+  );
 }

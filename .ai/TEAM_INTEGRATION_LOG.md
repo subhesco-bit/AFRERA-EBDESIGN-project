@@ -48,7 +48,7 @@ status: IN PROGRESS
 ## Phase 3: Integration (sve Repository)
 
 **Status:** ⏳ AWAITING PHASE 2 COMPLETION  
-**Target:** github.com/svesco2024-lgtm/sve
+**Target:** github.com/Subhesco2024-lgtm/sve
 
 **Planned Actions:**
 - [ ] Analyze sve repo
@@ -103,4 +103,5 @@ Option B: package.json + README + file structure
 Option C: Detailed description of DEEP's unique features and modules
 
 Awaiting data to continue integration sequence.
+
 

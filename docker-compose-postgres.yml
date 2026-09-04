@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ebdesign-postgres
+    environment:
+      POSTGRES_DB: ebdesign
+      POSTGRES_USER: ebdesign_user
+      POSTGRES_PASSWORD: ebdesign_dev_password_change_in_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ebdesign_user -d ebdesign"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ebdesign-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ebdesign-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ebdesign.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - ebdesign-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ebdesign-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ebdesign-network
+
+volumes:
+  postgres_data:
+
+networks:
+  ebdesign-network:
+    driver: bridge

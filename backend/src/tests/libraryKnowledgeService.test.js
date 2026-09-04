@@ -108,4 +108,18 @@ describe('LibraryKnowledgeService', () => {
       ])
     );
   });
+
+  it('indexes library files without a specialised catalogue adapter', () => {
+    const result = runServiceHarness(`
+      fs.mkdirSync(path.join(libraryRoot, '02_REFERENCE'), { recursive: true });
+      fs.writeFileSync(path.join(libraryRoot, '02_REFERENCE', 'workflow.md'), '# Runtime Test Workflow\\nConnect every module.');
+    `);
+
+    expect(result.init.indexedItems).toBe(7);
+    expect(result.init.contentHashes).toBe(6);
+    expect(result.statistics.byType['library-file']).toBe(1);
+    expect(result.searchResults).toEqual(
+      expect.arrayContaining([expect.objectContaining({ key: 'LIBRARY:02_REFERENCE/workflow.md' })])
+    );
+  });
 });

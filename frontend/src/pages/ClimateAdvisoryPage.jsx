@@ -1,24 +1,24 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { climateAdvisoryAPI, weatherAPI } from '../services/api'
-import { CloudSun, Plus, X, AlertTriangle, Bug } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { climateAdvisoryAPI, weatherAPI } from '../services/api';
+import { CloudSun, Plus, X, AlertTriangle, Bug } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const ADVISORY_TYPES = ['Sowing', 'Irrigation', 'Pest Management', 'Harvest Timing', 'General']
+const ADVISORY_TYPES = ['Sowing', 'Irrigation', 'Pest Management', 'Harvest Timing', 'General'];
 
-const emptyForm = { title: '', advisory: '', type: 'General', region: '', valid_until: '' }
+const emptyForm = { title: '', advisory: '', type: 'General', region: '', valid_until: '' };
 
 function ClimateAdvisoryPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState(emptyForm)
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState(emptyForm);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: advisoriesData, isLoading, error } = useQuery({
     queryKey: ['climate-advisories'],
     queryFn: async () => (await climateAdvisoryAPI.getAdvisories()).data?.data ?? [],
-  })
+  });
 
   // These already have real backend support (migration 057_climate_weather_d14.sql,
   // routes in weatherRoutes.js) — surfaced alongside advisories for context.
@@ -26,27 +26,27 @@ function ClimateAdvisoryPage() {
     queryKey: ['climate-active-alerts'],
     queryFn: async () => (await weatherAPI.activeAlerts()).data?.data ?? [],
     retry: false,
-  })
+  });
   const { data: pestData } = useQuery({
     queryKey: ['climate-pest-forecast'],
     queryFn: async () => (await weatherAPI.pestForecast({})).data?.data ?? [],
     retry: false,
-  })
+  });
 
   const createMutation = useMutation({
     mutationFn: (payload) => climateAdvisoryAPI.createAdvisory(payload),
     onSuccess: () => {
-      toast.success('Advisory published')
-      queryClient.invalidateQueries({ queryKey: ['climate-advisories'] })
-      setShowForm(false)
-      setForm(emptyForm)
+      toast.success('Advisory published');
+      queryClient.invalidateQueries({ queryKey: ['climate-advisories'] });
+      setShowForm(false);
+      setForm(emptyForm);
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to publish advisory'),
-  })
+  });
 
-  const advisories = advisoriesData || []
-  const alerts = Array.isArray(alertsData) ? alertsData : []
-  const pests = Array.isArray(pestData) ? pestData : []
+  const advisories = advisoriesData || [];
+  const alerts = Array.isArray(alertsData) ? alertsData : [];
+  const pests = Array.isArray(pestData) ? pestData : [];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -115,9 +115,9 @@ function ClimateAdvisoryPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.title || !form.advisory) { toast.error('Title and advisory text are required'); return }
-                  createMutation.mutate(form)
+                  e.preventDefault();
+                  if (!form.title || !form.advisory) { toast.error('Title and advisory text are required'); return; }
+                  createMutation.mutate(form);
                 }}
                 className="space-y-4"
               >
@@ -162,7 +162,7 @@ function ClimateAdvisoryPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default ClimateAdvisoryPage
+export default ClimateAdvisoryPage;

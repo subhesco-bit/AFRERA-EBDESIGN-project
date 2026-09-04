@@ -3,7 +3,7 @@ import React from 'react';
 export const LoadingModal = ({
   title = 'Loading',
   message = 'Please wait...',
-  progress
+  progress,
 }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

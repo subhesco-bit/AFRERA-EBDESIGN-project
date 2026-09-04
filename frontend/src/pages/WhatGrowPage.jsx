@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import Modal from '../components/common/Modal'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Sprout, Search, TrendingUp, Droplets, Sun, MapPin, DollarSign, Info } from 'lucide-react'
+import { useState } from 'react';
+import Modal from '../components/common/Modal';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Sprout, Search, TrendingUp, Droplets, Sun, MapPin, DollarSign, Info } from 'lucide-react';
 
 function WhatGrowPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedSeason, setSelectedSeason] = useState('kharif')
-  const [selectedSoil, setSelectedSoil] = useState('')
-  const [selectedCrop, setSelectedCrop] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState('kharif');
+  const [selectedSoil, setSelectedSoil] = useState('');
+  const [selectedCrop, setSelectedCrop] = useState(null);
 
   // v5 react-query object syntax (see LoginPage.jsx); .then(r => r.data)
   // unwraps the axios response so cropSuggestions is the real array
@@ -16,16 +16,16 @@ function WhatGrowPage() {
   const { data: cropSuggestions } = useQuery({
     queryKey: ['crop-suggestions', selectedSeason, selectedSoil],
     queryFn: () => farmersAPI.getCropSuggestions(selectedSeason, selectedSoil).then(r => r.data),
-  })
+  });
 
   const { data: marketPrices } = useQuery({
     queryKey: ['market-prices'],
     queryFn: () => farmersAPI.getMarketPrices().then(r => r.data),
-  })
+  });
 
   const filteredCrops = cropSuggestions?.filter(crop =>
-    crop.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    crop.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -92,13 +92,13 @@ function WhatGrowPage() {
         {filteredCrops?.map((crop) => (
           <div
             key={crop.id}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                // Enter and Space are what a native <button> responds to.
-                // Without this the card is unreachable by keyboard entirely.
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click() }
-              }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              // Enter and Space are what a native <button> responds to.
+              // Without this the card is unreachable by keyboard entirely.
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); }
+            }}
             className="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer"
             onClick={() => setSelectedCrop(crop)}
           >
@@ -141,8 +141,8 @@ function WhatGrowPage() {
                   <div
                     className={`h-2 rounded-full ${
                       crop.suitability_score >= 80 ? 'bg-green-600' :
-                      crop.suitability_score >= 60 ? 'bg-yellow-600' :
-                      'bg-red-600'
+                        crop.suitability_score >= 60 ? 'bg-yellow-600' :
+                          'bg-red-600'
                     }`}
                     style={{ width: `${crop.suitability_score}%` }}
                   />
@@ -251,8 +251,8 @@ function WhatGrowPage() {
                       <span className="text-gray-600">Current Demand</span>
                       <span className={`font-medium ${
                         selectedCrop.demand_level === 'High' ? 'text-green-600' :
-                        selectedCrop.demand_level === 'Medium' ? 'text-yellow-600' :
-                        'text-red-600'
+                          selectedCrop.demand_level === 'Medium' ? 'text-yellow-600' :
+                            'text-red-600'
                       }`}>
                         {selectedCrop.demand_level}
                       </span>
@@ -286,7 +286,7 @@ function WhatGrowPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default WhatGrowPage
+export default WhatGrowPage;

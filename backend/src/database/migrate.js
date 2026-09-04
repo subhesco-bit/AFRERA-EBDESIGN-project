@@ -8,6 +8,8 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const { logger } = require('../utils/logger');
+const { ensureSchemaMigrations } = require('./schema_migrations');
+const { isMechanicallyCertainTypeError, quarantineMigration } = require('./migration_quarantine');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL
@@ -59,19 +61,15 @@ async function runMigrations() {
       throw new Error('Database connection failed. Please check your DATABASE_URL configuration.');
     }
 
-    // Create migrations table if not exists
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS schema_migrations (
-        id SERIAL PRIMARY KEY,
-        filename VARCHAR(255) UNIQUE NOT NULL,
-        executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    // Use the shared definition and upgrade installations created by the old runner.
+    await ensureSchemaMigrations(pool);
 
     // Get all migration files
     const migrationFiles = fs.readdirSync(migrationsDir)
       .filter(file => file.endsWith('.sql'))
       .sort();
+
+    logPrefixCollisions(migrationFiles);
 
     logger.info(`Found ${migrationFiles.length} migration files`);
 
@@ -110,6 +108,11 @@ async function runMigrations() {
       }
 
       if (!migrationSuccess) {
+        if (isMechanicallyCertainTypeError(firstError)) {
+          const quarantinePath = quarantineMigration(migrationsDir, file, firstError);
+          logger.error(`Quarantined ${file} after confirmed type/FK incompatibility: ${quarantinePath}`);
+          throw new Error(`Migration ${file} is quarantined due to a confirmed type/FK incompatibility; see ${quarantinePath}`);
+        }
         // Try automated repair heuristics
         const repairedSQL = tryAutoRepair(migrationSQL);
         if (repairedSQL && repairedSQL !== migrationSQL) {
@@ -155,6 +158,20 @@ async function runMigrations() {
       await pool.end();
     } catch (poolError) {
       logger.error('Error closing database pool', { error: poolError.message });
+    }
+  }
+}
+
+function logPrefixCollisions(files) {
+  const prefixes = new Map();
+  for (const file of files) {
+    const prefix = file.match(/^([^_]+)_/)?.[1] || '[no-prefix]';
+    if (!prefixes.has(prefix)) prefixes.set(prefix, []);
+    prefixes.get(prefix).push(file);
+  }
+  for (const [prefix, names] of prefixes) {
+    if (names.length > 1) {
+      logger.warn(`Migration filename prefix collision ${prefix}; deterministic lexical order: ${names.join(', ')}`);
     }
   }
 }

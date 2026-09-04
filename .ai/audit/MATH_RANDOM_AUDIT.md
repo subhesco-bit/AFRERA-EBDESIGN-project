@@ -1,6 +1,6 @@
 # MATH.RANDOM() AUDIT REPORT
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Audit Date:** 1 September 2026  
 **Purpose:** Identify and classify Math.random() usage for fabricated AI outputs
 
@@ -187,3 +187,4 @@ The recommended approach is to:
 ---
 
 *This audit identifies both progress made and remaining work needed for production readiness.*
+

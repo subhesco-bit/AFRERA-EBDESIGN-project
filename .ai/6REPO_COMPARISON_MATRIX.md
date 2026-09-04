@@ -55,7 +55,7 @@ status: PHASE 1 COMPLETE - AWAITING PHASE 2-6 DATA
 
 ---
 
-## Phase 3: sve (github.com/svesco2024-lgtm/sve) ⏳
+## Phase 3: sve (github.com/Subhesco2024-lgtm/sve) ⏳
 
 | Dimension | Status | Data Needed |
 |-----------|--------|-------------|
@@ -217,4 +217,5 @@ REPO_NAME:
 **With Data:** Can proceed to complete all 6 phases within 4-6 hours
 
 **Next Action:** Provide DEEP repo data to activate Phase 2
+
 

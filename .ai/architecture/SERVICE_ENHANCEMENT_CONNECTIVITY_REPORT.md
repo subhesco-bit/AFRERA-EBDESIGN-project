@@ -1,6 +1,6 @@
 # COMPREHENSIVE SERVICE ENHANCEMENT AND CONNECTIVITY TESTING REPORT
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Mode:** Service Enhancement + Connectivity Testing  
 **Date:** 31 August 2026  
 **Classification:** Audit-Ready, Litigation-Ready  

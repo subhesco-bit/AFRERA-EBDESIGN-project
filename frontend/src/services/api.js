@@ -1,7 +1,7 @@
-import axios from 'axios'
-import config from '../config/env'
+import axios from 'axios';
+import config from '../config/env';
 
-const API_BASE_URL = config.API_URL
+const API_BASE_URL = config.API_URL;
 
 // Create axios instance
 const api = axios.create({
@@ -9,70 +9,70 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-})
+});
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    const token = localStorage.getItem('access_token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
     try {
-      const storedModes = JSON.parse(localStorage.getItem('afrera.a11y') || '{}')
+      const storedModes = JSON.parse(localStorage.getItem('afrera.a11y') || '{}');
       const modes = Object.entries({ ...storedModes, sms: storedModes.sms === undefined ? true : storedModes.sms })
         .filter(([, enabled]) => enabled)
-        .map(([mode]) => mode)
-      config.headers['X-A11y-Modes'] = modes.length ? modes.join(',') : 'none'
-      config.headers['X-Low-Bandwidth'] = storedModes.sms ? '1' : '0'
+        .map(([mode]) => mode);
+      config.headers['X-A11y-Modes'] = modes.length ? modes.join(',') : 'none';
+      config.headers['X-Low-Bandwidth'] = storedModes.sms ? '1' : '0';
     } catch {
-      config.headers['X-A11y-Modes'] = 'none'
-      config.headers['X-Low-Bandwidth'] = '0'
+      config.headers['X-A11y-Modes'] = 'none';
+      config.headers['X-Low-Bandwidth'] = '0';
     }
-    return config
+    return config;
   },
-  (error) => Promise.reject(error)
-)
+  (error) => Promise.reject(error),
+);
 
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config
+    const originalRequest = error.config;
 
     // Handle 401 Unauthorized - try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
+      originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token')
+        const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken) {
-          throw new Error('No refresh token available')
+          throw new Error('No refresh token available');
         }
         const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refresh_token: refreshToken,
-        })
+        });
 
-        const { access_token, refresh_token: newRefreshToken } = response.data
+        const { access_token, refresh_token: newRefreshToken } = response.data;
 
-        localStorage.setItem('access_token', access_token)
-        localStorage.setItem('refresh_token', newRefreshToken)
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('refresh_token', newRefreshToken);
 
-        originalRequest.headers.Authorization = `Bearer ${access_token}`
-        return api(originalRequest)
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, logout user
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('user')
-        window.location.href = '/login'
-        return Promise.reject(refreshError)
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
 // Auth API
 export const authAPI = {
@@ -81,10 +81,34 @@ export const authAPI = {
   logout: (data) => api.post('/auth/logout', data),
   refresh: (data) => api.post('/auth/refresh', data),
   getMe: () => api.get('/auth/me'),
-  setup2FA: (userId) => api.post(`/auth/2fa/setup`, { user_id: userId }),
-  verify2FA: (userId, code) => api.post(`/auth/2fa/verify`, { user_id: userId, code }),
-  disable2FA: (userId, password) => api.post(`/auth/2fa/disable`, { user_id: userId, password }),
-}
+  setup2FA: (userId) => api.post('/auth/2fa/setup', { user_id: userId }),
+  verify2FA: (userId, code) => api.post('/auth/2fa/verify', { user_id: userId, code }),
+  disable2FA: (userId, password) => api.post('/auth/2fa/disable', { user_id: userId, password }),
+};
+
+export const dashboardAPI = {
+  getStats: () => api.get('/dashboard/stats'),
+};
+
+export const userAPI = {
+  getProfile: () => api.get('/users/profile'),
+  updateProfile: (data) => api.put('/users/profile', data),
+  getAddresses: () => api.get('/users/addresses'),
+  addAddress: (data) => api.post('/users/addresses', data),
+};
+
+// MFA and privacy APIs use dedicated backend route groups.
+export const mfaAPI = {
+  setup: () => api.post('/mfa/setup'),
+  verify: (userId, token) => api.post('/mfa/verify', { userId, token }),
+  disable: () => api.post('/mfa/disable'),
+};
+
+export const privacyAPI = {
+  recordConsent: (consentType, consentGiven) => api.post('/privacy/consent', { consentType, consentGiven }),
+  getConsent: (userId) => api.get(`/privacy/consent/${userId}`),
+  requestDeletion: (reason) => api.post('/privacy/rtbf', { reason }),
+};
 
 // Library Knowledge API
 export const libraryAPI = {
@@ -95,7 +119,7 @@ export const libraryAPI = {
   getModules: (params = {}) => api.get('/library/modules', { params }),
   getModule: (moduleId) => api.get(`/library/modules/${encodeURIComponent(moduleId)}`),
   buildAIContext: (data) => api.post('/library/ai-context', data),
-}
+};
 
 // Products API
 export const productsAPI = {
@@ -111,7 +135,7 @@ export const productsAPI = {
   // at /api/v1/product-media-ai - honestly reports not_configured with no
   // image-gen API key present, rather than inventing an image.
   requestImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
-}
+};
 
 // Product Reviews API — real table-backed reviews (product_reviews, migration
 // 009_marketplace_enhancements.sql), mounted at /api/v1/product-reviews.
@@ -121,7 +145,7 @@ export const productReviewsAPI = {
   getReviews: (productId, params = {}) => api.get(`/product-reviews/products/${productId}`, { params }),
   getStats: (productId) => api.get(`/product-reviews/products/${productId}/stats`),
   createReview: (productId, data) => api.post(`/product-reviews/products/${productId}`, data),
-}
+};
 
 // Orders API
 export const ordersAPI = {
@@ -135,7 +159,19 @@ export const ordersAPI = {
   getOrders: (filters, pagination) => api.get('/orders', { params: { ...filters, ...pagination } }),
   updateOrderStatus: (id, data) => api.put(`/orders/${id}/status`, data),
   processPayment: (id, data) => api.post(`/orders/${id}/payment`, data),
-}
+  cancelOrder: (id) => api.delete(`/orders/${id}`),
+};
+
+export const blockchainVerificationAPI = {
+  getStats: () => api.get('/blockchain/stats'),
+  verifyProduct: (productId) => api.get(`/blockchain/products/${productId}/verify`),
+};
+
+export const enterpriseIntegrationAPI = {
+  getCurrentOrganizationIntegrations: () => api.get('/enterprise/organizations/current/integrations'),
+  getSystemStatus: () => api.get('/enterprise/system/status'),
+  getIntegrationHealth: (integrationId) => api.get(`/enterprise/integrations/${integrationId}/health`),
+};
 
 // Farmers API
 export const farmersAPI = {
@@ -145,7 +181,7 @@ export const farmersAPI = {
   addCertification: (id, data) => api.post(`/farmers/${id}/certifications`, data),
   getCertifications: (id) => api.get(`/farmers/${id}/certifications`),
   getFPOs: (filters) => api.get('/farmers/fpos/list', { params: filters }),
-}
+};
 
 /**
  * Seed Vault — real backend added 2026-08-15. SeedVaultPage.jsx previously
@@ -159,10 +195,12 @@ export const seedVaultAPI = {
   updateSeed: (id, data) => api.put(`/seed-vault/${id}`, data),
   recordUsage: (id, amountUsed) => api.post(`/seed-vault/${id}/record-usage`, { amountUsed }),
   deleteSeed: (id) => api.delete(`/seed-vault/${id}`),
-}
+};
 
 // Financial API
 export const financialAPI = {
+  getOverview: (timeRange) => api.get('/financial/overview', { params: { timeRange } }),
+  getLoans: (params) => api.get('/financial/loans', { params }),
   applyForLoan: (data) => api.post('/financial/loans', data),
   getFarmerLoans: (farmerId, filters) => api.get(`/financial/loans/farmer/${farmerId}`, { params: filters }),
   approveLoan: (id, data) => api.post(`/financial/loans/${id}/approve`, data),
@@ -171,7 +209,7 @@ export const financialAPI = {
   requestAdvance: (data) => api.post('/financial/advances', data),
   getFarmerAdvances: (farmerId) => api.get(`/financial/advances/farmer/${farmerId}`),
   getCreditScore: (farmerId) => api.get(`/financial/credit-score/${farmerId}`),
-}
+};
 
 // Logistics API
 export const logisticsAPI = {
@@ -189,7 +227,7 @@ export const logisticsAPI = {
   getLiveTracking: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/live-tracking`),
   getTemperatureData: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature`),
   getTemperatureAlerts: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature-alerts`),
-}
+};
 
 // Insurance API
 export const insuranceAPI = {
@@ -206,7 +244,7 @@ export const insuranceAPI = {
   calculatePremium: (data) => api.post('/insurance/calculate-premium', data),
   calculatePremiumByType: (type, data) => api.post(`/insurance/calculate/${type}`, data),
   generateQuote: (data) => api.post('/insurance/quotes', data),
-}
+};
 
 // AI API - Unified AI Gateway Integration
 export const aiAPI = {
@@ -216,21 +254,21 @@ export const aiAPI = {
   assessCreditRisk: (data) => api.post('/ai/assess/credit-risk', data),
   detectFraud: (data) => api.post('/ai/detect/fraud', data),
   generateRecommendations: (data) => api.post('/ai/recommend', data),
-  
+
   // NEW Unified AI Gateway endpoints
   // Smart routing - automatically routes to appropriate AI service
   route: (request) => api.post('/ai/route', request),
-  
+
   // Claude AI Coordinator
   coordinate: (request) => api.post('/ai/coordinate', request),
-  
+
   // AI Copilot Framework (16gm system)
   copilot: {
     createSession: (copilotType, context) => api.post('/ai/copilot/session', { copilot_type: copilotType, context }),
     sendMessage: (sessionId, message, context) => api.post(`/ai/copilot/session/${sessionId}/message`, { message, context }),
     getSessionHistory: (sessionId) => api.get(`/ai/copilot/session/${sessionId}/history`),
     closeSession: (sessionId) => api.put(`/ai/copilot/session/${sessionId}/close`),
-    
+
     // Domain-specific copilots
     finance: (message, context) => api.post('/ai/copilot/session/finance/message', { message, context }),
     logistics: (message, context) => api.post('/ai/copilot/session/logistics/message', { message, context }),
@@ -239,7 +277,7 @@ export const aiAPI = {
     nutrition: (message, context) => api.post('/ai/copilot/session/nutrition/message', { message, context }),
     marketplace: (message, context) => api.post('/ai/copilot/session/marketplace/message', { message, context }),
   },
-  
+
   // AI Backbone (multi-provider)
   backbone: {
     health: () => api.get('/ai/backbone/health'),
@@ -248,7 +286,7 @@ export const aiAPI = {
     predict: (context) => api.post('/ai/backbone/predict', { context }),
     intelligence: (query) => api.get('/ai/backbone/intelligence', { params: { query } }),
   },
-  
+
   // AI Collaboration (Devin-Claude tracking)
   collaboration: {
     getContext: () => api.get('/ai/collaboration/context'),
@@ -262,7 +300,7 @@ export const aiAPI = {
     getStats: () => api.get('/ai/collaboration/stats'),
     getReport: () => api.get('/ai/collaboration/report'),
   },
-  
+
   // AI Gateway (multi-provider routing)
   gateway: {
     chat: (request) => api.post('/ai/gateway/chat', request),
@@ -271,12 +309,12 @@ export const aiAPI = {
     getModels: (provider) => api.get(`/ai/gateway/models/${provider}`),
     setProviderEnabled: (provider, enabled) => api.put(`/ai/gateway/providers/${provider}/enable`, { enabled }),
   },
-  
+
   // System health and discovery
   health: () => api.get('/ai/health'),
   getServices: () => api.get('/ai/services'),
   getArchitecture: () => api.get('/ai/architecture'),
-}
+};
 
 // Product Media AI API — AI product-image generation, nutrient-comparison
 // video generation. See backend/src/services/productMediaAIService.js —
@@ -287,7 +325,7 @@ export const productMediaAIAPI = {
   generateImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
   buildVideoScript: (productId) => api.post(`/product-media-ai/products/${productId}/video-script`),
   generateVideo: (productId) => api.post(`/product-media-ai/products/${productId}/video`),
-}
+};
 
 // Wearable Integration API — Fitbit (real OAuth2), Apple Health / Samsung
 // Health (device-push only, see wearableIntegrationService.js header for why).
@@ -302,7 +340,7 @@ export const wearableAPI = {
     api.post('/wearable-integration/sync', { provider, activity_date: activityDate, activity }),
   getRecentActivity: (days) => api.get('/wearable-integration/activity/recent', { params: { days } }),
   disconnect: (provider) => api.delete(`/wearable-integration/${provider}`),
-}
+};
 
 // Defense/Police/BSF Fitness Prep API — self-prep comparison against real,
 // cited published physical standards. No connection to any actual
@@ -318,7 +356,7 @@ export const varietyDirectoryAPI = {
   getById: (id) => api.get(`/variety-directory/${id}`),
   requestImage: (id) => api.post(`/variety-directory/${id}/generate-image`),
   createListing: (id, data) => api.post(`/variety-directory/${id}/create-listing`, data),
-}
+};
 
 // Crop Value-Compound Research — AI-assisted, human-reviewed published
 // reference data. See backend/src/services/cropValueResearchService.js.
@@ -328,14 +366,14 @@ export const varietyDirectoryAPI = {
 export const platformTelemetryAPI = {
   getStatus: () => api.get('/platform-telemetry/status'),
   getAnalytics: () => api.get('/platform-telemetry/analytics'),
-}
+};
 
 export const cropValueResearchAPI = {
   getProviderStatus: () => api.get('/crop-value-research/status'),
   research: (varietyName, compoundKey) => api.post('/crop-value-research/research', { variety_name: varietyName, compound_key: compoundKey }),
   getPending: () => api.get('/crop-value-research/pending'),
   review: (id, approve) => api.post(`/crop-value-research/pending/${id}/review`, { approve }),
-}
+};
 
 export const defenseFitnessPrepAPI = {
   getCategories: () => api.get('/defense-fitness-prep/categories'),
@@ -343,7 +381,7 @@ export const defenseFitnessPrepAPI = {
   recordAttempt: (category, testComponent, recordedValue, source) =>
     api.post('/defense-fitness-prep/attempts', { category, test_component: testComponent, recorded_value: recordedValue, source }),
   getReadiness: (category, gender) => api.get(`/defense-fitness-prep/readiness/${category}`, { params: { gender } }),
-}
+};
 
 // Forms API
 export const formsAPI = {
@@ -355,14 +393,14 @@ export const formsAPI = {
   submitForm: (id, payload) => api.post(`/forms/${id}/submit`, payload),
   getSubmissions: (id) => api.get(`/forms/${id}/submissions`),
   getTemplates: () => api.get('/forms/templates'),
-}
+};
 
 // Analytics API
 export const analyticsAPI = {
   getOverview: () => api.get('/analytics/overview'),
   getInsights: () => api.get('/analytics/insights'),
   getPlatformStats: () => api.get('/analytics/platform-stats'),
-}
+};
 
 // ERP API
 export const erpAPI = {
@@ -373,7 +411,7 @@ export const erpAPI = {
   syncTransaction: (data) => api.post('/erp/sync/transaction', data),
   syncAsset: (data) => api.post('/erp/sync/asset', data),
   triggerBulkSync: (data) => api.post('/erp/sync/bulk', data),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Modules recovered 2026-08-05 (migrations 051-058).
@@ -392,7 +430,7 @@ export const pricingAPI = {
   advise: (body) => api.post('/pricing/advise', body),
   publish: (body) => api.post('/pricing/publish', body),
   recordBasis: (body) => api.post('/pricing/basis', body),
-}
+};
 
 /**
  * Hash-chained ledger (read-only), schemes, eNWR, freight, risk (053).
@@ -414,7 +452,7 @@ export const financeAPI = {
   recordRiskEvent: (body) => api.post('/finance/risk/event', body),
   partyRisk: (partyId) => api.get(`/finance/risk/${partyId}`),
   expiringCertificates: (params) => api.get('/finance/certificates/expiring', { params }),
-}
+};
 
 /**
  * Asset Accounting — AF-AA (996_enterprise_foundation). Fixed-asset register,
@@ -431,7 +469,7 @@ export const assetAccountingAPI = {
     api.post(`/erp/assets/assets/${assetId}/depreciation-schedule/${periodDate}/post`),
   runDepreciationForPeriod: (companyId, asOfDate) => api.post('/erp/assets/depreciation-run', { companyId, asOfDate }),
   disposeAsset: (assetId, data) => api.post(`/erp/assets/assets/${assetId}/dispose`, data),
-}
+};
 
 /**
  * Cost Control — AF-CO / "Controlling" (996_enterprise_foundation). Cost and
@@ -455,7 +493,7 @@ export const costControlAPI = {
   addBudgetLine: (budgetId, data) => api.post(`/erp/controlling/budgets/${budgetId}/lines`, data),
   getBudgetLines: (budgetId) => api.get(`/erp/controlling/budgets/${budgetId}/lines`),
   getBudgetVsActual: (budgetId) => api.get(`/erp/controlling/budgets/${budgetId}/vs-actual`),
-}
+};
 
 /**
  * Project Systems — AF-PS (9996_project_systems_schema). Projects, work
@@ -479,7 +517,7 @@ export const projectSystemsAPI = {
   completeMilestone: (milestoneId, actualCompletionDate) =>
     api.post(`/erp/projects/milestones/${milestoneId}/complete`, { actualCompletionDate }),
   getProjectBudgetVsActual: (projectId) => api.get(`/erp/projects/${projectId}/budget-vs-actual`),
-}
+};
 
 /**
  * Company lookup — resolves accounting UI gap for companyId/fiscalYear/chart-of-accounts.
@@ -491,7 +529,7 @@ export const companyAPI = {
   getCompany: (id) => api.get(`/companies/${id}`),
   getFiscalYears: (companyId) => api.get(`/companies/${companyId}/fiscal-years`),
   getChartOfAccounts: (companyId) => api.get(`/companies/${companyId}/chart-of-accounts`),
-}
+};
 
 /**
  * Platform Core API — AI-enhanced platform foundation (Platform Foundation D01).
@@ -509,7 +547,7 @@ export const platformCoreAPI = {
   applyConfiguration: (config) => api.post('/platform-core/configuration/apply', config),
   getMetrics: () => api.get('/platform-core/metrics'),
   getSystemState: () => api.get('/platform-core/state'),
-}
+};
 
 /**
  * Platform Configuration API — AI-enhanced configuration management.
@@ -526,7 +564,7 @@ export const platformConfigurationAPI = {
   getConfigurationHistory: (limit = 50) => api.get('/platform-configuration/configuration/history', { params: { limit } }),
   rollbackConfiguration: (targetConfigId) => api.post('/platform-configuration/configuration/rollback', { targetConfigId }),
   validateConfiguration: (config) => api.post('/platform-configuration/configuration/validate', config),
-}
+};
 
 /**
  * Tenant Management API — AI-enhanced tenant operations.
@@ -542,7 +580,7 @@ export const tenantManagementAPI = {
   predictUsage: (id, timeframe = '30d') => api.get(`/tenant-management/tenants/${id}/predict-usage`, { params: { timeframe } }),
   recommendTier: (id) => api.get(`/tenant-management/tenants/${id}/recommend-tier`),
   optimizeCost: (id) => api.post(`/tenant-management/tenants/${id}/optimize-cost`),
-}
+};
 
 /**
  * Organization Management API — AI-enhanced organization operations.
@@ -554,13 +592,13 @@ export const organizationManagementAPI = {
   updateOrganization: (id, updates) => api.put(`/organization-management/organizations/${id}`, updates),
   optimizeStructure: (id) => api.post(`/organization-management/organizations/${id}/optimize-structure`),
   recommendHierarchy: (id) => api.get(`/organization-management/organizations/${id}/recommend-hierarchy`),
-  predictUnitPerformance: (id, unitId, timeframe = '90d') => 
+  predictUnitPerformance: (id, unitId, timeframe = '90d') =>
     api.get(`/organization-management/organizations/${id}/units/${unitId}/predict-performance`, { params: { timeframe } }),
   optimizeResources: (id) => api.post(`/organization-management/organizations/${id}/optimize-resources`),
   analyzeChangeImpact: (id, proposedChange) => api.post(`/organization-management/organizations/${id}/analyze-change-impact`, proposedChange),
   getUnits: (id) => api.get(`/organization-management/organizations/${id}/units`),
   addUnit: (id, unitData) => api.post(`/organization-management/organizations/${id}/units`, unitData),
-}
+};
 
 /**
  * System Administration API — AI-enhanced system operations.
@@ -575,7 +613,7 @@ export const systemAdministrationAPI = {
   detectSecurityThreats: () => api.post('/system-administration/security/threats/detect'),
   getSystemHealthDashboard: () => api.get('/system-administration/dashboard/health'),
   performAutomatedMaintenance: () => api.post('/system-administration/maintenance/automated'),
-}
+};
 
 /** Domain D14 — Climate & Weather (057). */
 export const weatherAPI = {
@@ -595,7 +633,7 @@ export const weatherAPI = {
   // + trailing heat-stress days) computed from climate_indices and
   // weather_observations — see weatherService.getAdvisoryTriggers().
   advisoryTriggers: (params) => api.get('/weather/advisory-triggers', { params }),
-}
+};
 
 /** TDS, e-invoice IRN, GSTR, RCM (056). */
 export const complianceAPI = {
@@ -607,7 +645,7 @@ export const complianceAPI = {
   gstrDraft: (body) => api.post('/compliance/gstr/draft', body),
   recordRcm: (body) => api.post('/compliance/rcm', body),
   rcmOutstanding: (period) => api.get('/compliance/rcm/outstanding', { params: { period } }),
-}
+};
 
 /** M123 Poultry Management — Livestock domain. */
 /**
@@ -636,7 +674,7 @@ export const poultryAPI = {
   // Real backend route returns alerts across all active flocks, not per-flock
   // (no callers ever pass a real flockId - it was always undefined on the wire).
   getVaccinationAlerts: () => api.get('/poultry/vaccination-alerts'),
-}
+};
 
 /** M124 Goat Farming — Livestock domain. */
 export const goatAPI = {
@@ -657,7 +695,7 @@ export const goatAPI = {
   // Real backend routes return alerts across the whole herd, not per-animal.
   getBreedingAlerts: () => api.get('/goat/breeding-alerts'),
   getVaccinationAlerts: () => api.get('/goat/vaccination-alerts'),
-}
+};
 
 /** M125 Sheep Farming — Livestock domain. */
 export const sheepAPI = {
@@ -679,7 +717,7 @@ export const sheepAPI = {
   getBreedingAlerts: () => api.get('/sheep/breeding-alerts'),
   getVaccinationAlerts: () => api.get('/sheep/vaccination-alerts'),
   getShearingAlerts: () => api.get('/sheep/shearing-alerts'),
-}
+};
 
 /** M126 Pig Farming — Livestock domain. */
 export const pigAPI = {
@@ -701,7 +739,7 @@ export const pigAPI = {
   getBreedingAlerts: () => api.get('/pig/breeding-alerts'),
   getVaccinationAlerts: () => api.get('/pig/vaccination-alerts'),
   getFeedConversionRatio: (animalId) => api.get(`/pig/herd/${animalId}/fcr`),
-}
+};
 
 /** M127 Animal Health Management — Livestock domain (cross-cutting). */
 export const animalHealthAPI = {
@@ -724,16 +762,29 @@ export const animalHealthAPI = {
   getHealthOverview: (params) => api.get('/animal-health/overview', { params }),
   getActiveOutbreaks: () => api.get('/animal-health/active-outbreaks'),
   getActiveQuarantines: () => api.get('/animal-health/active-quarantines'),
-}
+};
 
 /** RFQ, quote outcomes, QC holds, FPO cost centres (056). */
+// Real backend: backend/src/routes/rfqRoutes.js, mounted at /api/v1/rfq
+// (backend/src/index.js). Fixed 2026-09-04 (institutional procurement audit):
+// this object previously called activeHolds/lossAnalysis/releaseQcHold,
+// none of which existed as keys on rfqAPI at all - RfqPage.jsx's calls threw
+// immediately on load, so the "Active QC holds", "Why quotes are lost" and
+// centre P&L sections of that page never showed real data. centrePnl also
+// pointed at a path (`/rfq/cost-centres/:id/pnl`) the backend never mounts;
+// the real route is GET /rfq/fpo/centre-pnl?fpoId=... (fpoId optional - all
+// centres when omitted, see rfqService.js centrePnl()).
 export const rfqAPI = {
   create: (body) => api.post('/rfq/rfq', body),
   bid: (rfqId, body) => api.post(`/rfq/rfq/${rfqId}/bid`, body),
   bids: (rfqId, asBuyer = false) => api.get(`/rfq/rfq/${rfqId}/bids`, { params: { asBuyer } }),
-  centrePnl: (centreId, period) => api.get(`/rfq/cost-centres/${centreId}/pnl`, { params: { period } }),
-  qcHolds: (rfqId) => api.get(`/rfq/rfq/${rfqId}/qc-holds`),
-}
+  recordQuoteOutcome: (body) => api.post('/rfq/quotes/outcome', body),
+  lossAnalysis: (params) => api.get('/rfq/quotes/loss-analysis', { params }),
+  raiseQcHold: (body) => api.post('/rfq/qc/hold', body),
+  releaseQcHold: (body) => api.post('/rfq/qc/release', body),
+  activeHolds: () => api.get('/rfq/qc/holds'),
+  centrePnl: (fpoId) => api.get('/rfq/fpo/centre-pnl', { params: { fpoId } }),
+};
 
 /** Regional demand, cost model, revenue (052). */
 export const economicAPI = {
@@ -744,7 +795,7 @@ export const economicAPI = {
   corridorModel: (corridor) => api.get('/cost/corridor-model', { params: { corridor } }),
   revenueOverview: (params) => api.get('/revenue/overview', { params }),
   allocateChannels: (body) => api.post('/revenue/allocate', body),
-}
+};
 
 /** Energy Management — power consumption, solar integration. */
 export const energyAPI = {
@@ -752,7 +803,7 @@ export const energyAPI = {
   recordConsumption: (body) => api.post('/energy/consumption', body),
   getSolarGeneration: (params) => api.get('/energy/solar', { params }),
   getEnergyOverview: () => api.get('/energy/overview'),
-}
+};
 
 /** Demand Management — demand forecasting, inventory planning.
  *  getDemandForecast fixed 2026-08-11: backend/src/routes/demandRoutes.js only
@@ -768,7 +819,7 @@ export const demandAPI = {
   getDemandForecast: (params) => api.get('/demand/forecast', { params }),
   getDemandHistory: (productId, params) => api.get(`/demand/history/${productId}`, { params }),
   updateDemandPlan: (productId, body) => api.put(`/demand/plan/${productId}`, body),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Previously-orphaned services wired 2026-08-11. These all call
@@ -793,7 +844,7 @@ export const dynamicPricingAPI = {
   getFloorBenchmark: (category) => api.get('/pricing/floor-benchmark', { params: { category } }),
   getLotAllocScore: (lotCode, dest) => api.get(`/pricing/lots/${lotCode}/alloc-score`, { params: { dest } }),
   getLotFestivalPrice: (lotCode, asOf) => api.get(`/pricing/lots/${lotCode}/festival-price`, { params: asOf ? { asOf } : {} }),
-}
+};
 
 /** Farmer Training Service — training programs, registration/progress, FOLU
  *  self-assessment, carbon footprint, NE-organic guidance, certificates,
@@ -809,7 +860,7 @@ export const farmerTrainingAPI = {
   issueCertificate: (registrationId, data) => api.post(`/training/certificates/${registrationId}`, data),
   getRecommendations: (farmerId) => api.get(`/training/recommendations/${farmerId}`),
   complianceReport: (data) => api.post('/training/compliance-report', data),
-}
+};
 
 /** Government Scheme Service action endpoints — scheme discovery, weather
  *  alerts, announcements, official login, CSR opportunities/proposals,
@@ -828,7 +879,7 @@ export const governmentSchemeAPI = {
   getLocalizedPage: (params) => api.get('/government/localized-page', { params }),
   trackScheme: (id) => api.get(`/government/schemes/track/${id}`),
   getExpiryStatus: () => api.get('/government/schemes/expiry-status'),
-}
+};
 
 /** Insurance Claims Service — the deeper claims pipeline (fraud detection,
  *  adjuster follow-ups, payout computation). Distinct from insuranceAPI's
@@ -846,7 +897,7 @@ export const insuranceClaimsAPI = {
   getStatus: (id) => api.get(`/insurance/claims/${id}/status`),
   detectFraud: (data) => api.post('/insurance/claims/fraud-detect', data),
   getPayout: (id) => api.get(`/insurance/claims/${id}/payout`),
-}
+};
 
 /** Pre-Season Order Service — advance/contract-farming order booking, sealed
  *  bidding, bid selection, milestone-based contracts, analytics, dashboard.
@@ -859,7 +910,7 @@ export const preSeasonAPI = {
   updateMilestones: (contractId, data) => api.put(`/pre-season/contracts/${contractId}/milestones`, data),
   getAnalytics: (params) => api.get('/pre-season/analytics', { params }),
   getDashboard: (params) => api.get('/pre-season/dashboard', { params }),
-}
+};
 
 /** AFRERA E-Commerce Service - International Launch Standard
  *  Comprehensive marketplace with AI-powered features:
@@ -876,19 +927,19 @@ export const ecommerceAPI = {
   getListing: (id) => api.get(`/ecommerce/listings/${id}`),
   updateListing: (id, data) => api.put(`/ecommerce/listings/${id}`, data),
   deleteListing: (id) => api.delete(`/ecommerce/listings/${id}`),
-  
+
   // Seller Analytics
   getSellerAnalytics: (period) => api.get('/ecommerce/seller/analytics', { params: { period } }),
   getSellerListings: () => api.get('/ecommerce/seller/listings'),
-  
+
   // GI Marketplace
   getGIListings: (filters) => api.get('/ecommerce/gi-listings', { params: filters }),
-  
+
   // Market Intelligence
   getPriceTrends: (categoryId, period) => api.get(`/ecommerce/market/price-trends/${categoryId}`, { params: { period } }),
   getDemandAnalysis: (categoryId) => api.get(`/ecommerce/market/demand/${categoryId}`),
   getPriceRecommendation: (data) => api.post('/ecommerce/price-recommendation', data),
-}
+};
 
 /** AFRERA E-Commerce Integration Service
  *  Deep integration between E-commerce and:
@@ -902,23 +953,23 @@ export const ecommerceIntegrationAPI = {
   // Nutrition Scoring
   calculateNutritionScore: (productId) => api.post(`/ecommerce-integration/nutrition-score/${productId}`),
   getNutritionPricePremium: (productId, basePrice) => api.get(`/ecommerce-integration/nutrition-price/${productId}`, { params: { basePrice } }),
-  
+
   // Recipe Integration
   getRecipeSuggestions: (productId, limit) => api.get(`/ecommerce-integration/recipes/${productId}`, { params: { limit } }),
   getRecipeProducts: (recipeId) => api.get(`/ecommerce-integration/recipe-products/${recipeId}`),
-  
+
   // Health-Based Recommendations
   getHealthRecommendations: (limit) => api.get('/ecommerce-integration/health-recommendations', { params: { limit } }),
   checkCompatibility: (productId) => api.get(`/ecommerce-integration/compatibility/${productId}`),
-  
+
   // Shopping Cart Nutrition
   calculateCartNutrition: (cartItems) => api.post('/ecommerce-integration/cart-nutrition', { cartItems }),
   calculateCartRDA: (cartNutrition) => api.post('/ecommerce-integration/cart-rda', { cartNutrition }),
-  
+
   // Dietitian Integration
   getDietitianCollections: (dietitianId) => api.get('/ecommerce-integration/dietitian-collections', { params: { dietitianId } }),
   getDietitianRecommendation: () => api.get('/ecommerce-integration/dietitian-recommendation'),
-}
+};
 
 /** AFRERA E-Commerce AI Service
  *  AI-powered marketplace capabilities:
@@ -934,25 +985,25 @@ export const ecommerceAIAPI = {
   // Customer Segmentation
   segmentCustomersRFM: () => api.post('/ecommerce-ai/segment-customers-rfm'),
   segmentCustomersBehavioral: () => api.post('/ecommerce-ai/segment-customers-behavioral'),
-  
+
   // Demand Forecasting
   forecastProductDemand: (productId, horizonDays) => api.post(`/ecommerce-ai/forecast-demand/${productId}`, { horizonDays }),
-  
+
   // Inventory Optimization
   optimizeInventory: (productId) => api.post(`/ecommerce-ai/optimize-inventory/${productId}`),
-  
+
   // Product Recommendations
   getPersonalizedRecommendations: (userId, limit) => api.get(`/ecommerce-ai/recommendations/${userId}`, { params: { limit } }),
-  
+
   // Sales Prediction
   predictSales: (categoryId, periodDays) => api.post('/ecommerce-ai/predict-sales', { categoryId, periodDays }),
-  
+
   // Customer Lifetime Value
   calculateCustomerLifetimeValue: (userId) => api.get(`/ecommerce-ai/clv/${userId}`),
-  
+
   // Market Basket Analysis
   analyzeMarketBasket: (categoryId) => api.get('/ecommerce-ai/market-basket', { params: { categoryId } }),
-}
+};
 
 /** AFRERA E-Commerce ERP Service
  *  ERP integration capabilities:
@@ -965,17 +1016,17 @@ export const ecommerceERPAPI = {
   // Financial ERP
   postToGeneralLedger: (transactionData) => api.post('/ecommerce-erp/post-gl', transactionData),
   generateGSTInvoice: (orderId) => api.post(`/ecommerce-erp/generate-gst-invoice/${orderId}`),
-  
+
   // Supply Chain ERP
   syncInventoryWithERP: (productId) => api.post(`/ecommerce-erp/sync-inventory/${productId}`),
   createPurchaseOrder: (listingId, quantity) => api.post('/ecommerce-erp/create-purchase-order', { listingId, quantity }),
-  
+
   // Customer ERP (CRM)
   syncCustomerWithCRM: (userId) => api.post(`/ecommerce-erp/sync-customer/${userId}`),
-  
+
   // Production ERP
   createProductionOrder: (productId, demandQuantity) => api.post('/ecommerce-erp/create-production-order', { productId, demandQuantity }),
-}
+};
 
 /** AFRERA E-Commerce Business Sales Service
  *  B2B and business sales capabilities:
@@ -990,18 +1041,18 @@ export const ecommerceBusinessSalesAPI = {
   createBulkOrder: (orderData) => api.post('/ecommerce-business/create-bulk-order', orderData),
   submitQuotation: (bulkOrderId, sellerId, quotationData) => api.post('/ecommerce-business/submit-quotation', { bulkOrderId, sellerId, quotationData }),
   acceptQuotation: (quotationId) => api.post(`/ecommerce-business/accept-quotation/${quotationId}`),
-  
+
   // Contract Farming
   createContractFarming: (contractData) => api.post('/ecommerce-business/create-contract-farming', contractData),
   recordContractMilestone: (contractId, milestoneData) => api.post('/ecommerce-business/record-milestone', { contractId, milestoneData }),
-  
+
   // Sales Analytics
   getSalesAnalytics: (filters) => api.get('/ecommerce-business/sales-analytics', { params: filters }),
   getB2BConversionMetrics: (periodDays) => api.get('/ecommerce-business/b2b-conversion-metrics', { params: { periodDays } }),
-  
+
   // Commission Management
   calculateCommission: (orderId) => api.post(`/ecommerce-business/calculate-commission/${orderId}`),
-}
+};
 
 /** AFRERA E-Commerce Marketing Service
  *  Marketing and advertising capabilities:
@@ -1016,22 +1067,22 @@ export const ecommerceMarketingAPI = {
   createCampaign: (campaignData) => api.post('/ecommerce-marketing/create-campaign', campaignData),
   launchCampaign: (campaignId) => api.post(`/ecommerce-marketing/launch-campaign/${campaignId}`),
   updateCampaignMetrics: (campaignId) => api.post(`/ecommerce-marketing/update-campaign-metrics/${campaignId}`),
-  
+
   // Sponsored Products
   createSponsoredProduct: (productData) => api.post('/ecommerce-marketing/create-sponsored-product', productData),
   getSponsoredProducts: (filters) => api.get('/ecommerce-marketing/sponsored-products', { params: filters }),
-  
+
   // Promotion Management
   createPromotion: (promotionData) => api.post('/ecommerce-marketing/create-promotion', promotionData),
   applyPromotion: (promoCode, orderId) => api.post(`/ecommerce-marketing/apply-promotion/${promoCode}`, { orderId }),
-  
+
   // Retargeting
   createCartRetargeting: (cartItems) => api.post('/ecommerce-marketing/retargeting-cart', { cartItems }),
   createProductViewRetargeting: (productId) => api.post('/ecommerce-marketing/retargeting-product-view', { productId }),
-  
+
   // Analytics
   getMarketingAnalytics: (filters) => api.get('/ecommerce-marketing/analytics', { params: filters }),
-}
+};
 
 /** AFRERA Nutrient Value Sales Service
  *  Nutrient-value-based sales capabilities:
@@ -1047,29 +1098,29 @@ export const ecommerceMarketingAPI = {
 export const nutrientValueSalesAPI = {
   // Nutrient-Value Pricing
   calculateNutrientValuePrice: (productId, nutrientContent) => api.post(`/nutrient-value/calculate-price/${productId}`, nutrientContent),
-  
+
   // Nutrient Content Verification
   submitNutrientContent: (productId, contentData, verificationData) => api.post('/nutrient-value/submit-verification', { productId, contentData, verificationData }),
   approveNutrientVerification: (verificationId, approvedBy, notes) => api.post(`/nutrient-value/approve-verification/${verificationId}`, { approvedBy, notes }),
-  
+
   // Nutrient-Value Listings
   createNutrientValueListing: (listingData) => api.post('/nutrient-value/create-listing', listingData),
-  
+
   // Nutrient Quality Tiers
   assignNutrientTier: (productId, manualOverride) => api.post(`/nutrient-value/assign-tier/${productId}`, { manualOverride }),
-  
+
   // Nutrient-Based Comparison
   compareProductsByNutrient: (productIds) => api.post('/nutrient-value/compare-products', { productIds }),
-  
+
   // Nutrient Certification
   issueNutrientCertificate: (productId, certificationData) => api.post('/nutrient-value/issue-certificate', { productId, certificationData }),
-  
+
   // Nutrient-Based Commission
   calculateNutrientBasedCommission: (orderId) => api.post(`/nutrient-value/calculate-commission/${orderId}`),
-  
+
   // Nutrient-Value Search
   searchByNutrientCriteria: (criteria) => api.get('/nutrient-value/search', { params: criteria }),
-}
+};
 
 /** Shared Infrastructure asset marketplace (register/search/book shared
  *  equipment, second-life equipment listings, community battery listings,
@@ -1087,7 +1138,7 @@ export const sharedInfraAPI = {
   listBatteries: (data) => api.post('/shared-infra/batteries/list', data),
   getRenewableSupport: (params) => api.get('/shared-infra/renewable/support', { params }),
   getAssetAnalytics: (id) => api.get(`/shared-infra/assets/${id}/analytics`),
-}
+};
 
 /** Soil Testing Service (M072 — individual lab sample results: submit sample,
  *  submit lab results, fertilizer recommendation, track a sample, health
@@ -1104,7 +1155,7 @@ export const soilTestingOpsAPI = {
   getHealthCard: (params) => api.get('/soil-testing/health-card', { params }),
   getInmPlan: (sampleId, params) => api.get(`/soil-testing/inm-plan/${sampleId}`, { params }),
   getOrganicInputPlan: (params) => api.get('/soil-testing/organic-input-plan', { params }),
-}
+};
 
 /** Subsidy Service action endpoints — project/equipment/logistics eligibility
  *  checks, applicable-scheme lookup, application submission, tracking, GST
@@ -1119,21 +1170,21 @@ export const subsidyOpsAPI = {
   apply: (data) => api.post('/subsidy/apply', data),
   track: (id) => api.get(`/subsidy/track/${id}`),
   calculateGst: (data) => api.post('/subsidy/gst/calculate', data),
-}
+};
 
 /** Cost Management — landed cost pricing, cost breakdowns. */
 export const costAPI = {
   getLandedCost: (productId) => api.get(`/costs/landed/${productId}`),
   calculateCost: (body) => api.post('/costs/calculate', body),
   getCostBreakdown: (productId) => api.get(`/costs/breakdown/${productId}`),
-}
+};
 
 /** Vision + OCR — image processing, document extraction. */
 export const visionAPI = {
   processImage: (body) => api.post('/vision/process', body),
   extractText: (body) => api.post('/vision/ocr', body),
   detectObjects: (body) => api.post('/vision/detect', body),
-}
+};
 
 // unifiedLedgerAPI ("One Ledger + 9 Economies") was removed 2026-08-17: the
 // backend it called was deleted as a rejected architecture (see
@@ -1147,7 +1198,7 @@ export const foluAPI = {
   recordChange: (body) => api.post('/folu/land-use/change', body),
   estimateCarbon: (body) => api.post('/folu/carbon/estimate', body),
   schemeStatus: (farmerId) => api.get(`/folu/schemes/${farmerId}`),
-}
+};
 
 /** Agmarknet / e-NAM prices and DBT reconciliation. */
 export const marketDataAPI = {
@@ -1155,14 +1206,14 @@ export const marketDataAPI = {
   ingestPrices: (records, source) => api.post('/market-data/prices/ingest', { records, source }),
   reconcileDbt: (body) => api.post('/market-data/dbt/reconcile', body),
   unclaimedEntitlements: (params) => api.get('/market-data/dbt/unclaimed', { params }),
-}
+};
 
 /** Driver tracking — served by the existing logistics routes, not a new module. */
 export const driverTrackingAPI = {
   recordLocation: (body) => api.post('/logistics-ops/drivers/location', body),
   activeDrivers: (params) => api.get('/logistics-ops/drivers/active', { params }),
   shipmentTrail: (id) => api.get(`/logistics-ops/shipments/${id}/trail`),
-}
+};
 
 /**
  * Geofencing — circular zone check-ins built on real mobile GPS
@@ -1176,7 +1227,7 @@ export const geofencingAPI = {
   checkIn: (body) => api.post('/geofencing/checkins', body),
   checkInHistory: (params) => api.get('/geofencing/checkins', { params }),
   driverZoneCheck: (body) => api.post('/geofencing/driver-zone-check', body),
-}
+};
 
 /** Village Profile Service (REOS Layer 5 - District/Village/Block Economic Database) */
 export const villageProfileAPI = {
@@ -1186,7 +1237,7 @@ export const villageProfileAPI = {
   getDistrictSummary: (district) => api.get(`/village-profiles/districts/${district}/economic-summary`),
   upsertVillage: (body) => api.post('/village-profiles/villages', body),
   searchVillages: (params) => api.get('/village-profiles/villages/search', { params }),
-}
+};
 
 /** Procurement Subscription Service (REOS Layer 1.9 - Subscription Commerce) */
 export const procurementSubscriptionAPI = {
@@ -1198,7 +1249,7 @@ export const procurementSubscriptionAPI = {
   cancelSubscription: (subscriptionId, body) => api.post(`/procurement-subscriptions/subscriptions/${subscriptionId}/cancel`, body),
   getSubscriptionsDue: (date) => api.get(`/procurement-subscriptions/subscriptions/due/${date}`),
   getStatistics: (params) => api.get('/procurement-subscriptions/subscriptions/statistics', { params }),
-}
+};
 
 /** Buying Club Service (REOS Layer 1.10-1.11 - Group Buying / Community Buying) */
 export const buyingClubAPI = {
@@ -1211,7 +1262,7 @@ export const buyingClubAPI = {
   createOrder: (body) => api.post('/buying-clubs/orders', body),
   getClubOrders: (clubId) => api.get(`/buying-clubs/orders/club/${clubId}`),
   getStatistics: (params) => api.get('/buying-clubs/clubs/statistics', { params }),
-}
+};
 
 /** Rural Enterprise Service (REOS Rural Life OS - rural_enterprises table) */
 export const ruralEnterpriseAPI = {
@@ -1222,7 +1273,7 @@ export const ruralEnterpriseAPI = {
   updateEnterprise: (enterpriseId, body) => api.put(`/rural-enterprises/enterprises/${enterpriseId}`, body),
   getStatistics: (params) => api.get('/rural-enterprises/enterprises/statistics', { params }),
   searchEnterprises: (params) => api.get('/rural-enterprises/enterprises/search', { params }),
-}
+};
 
 /** Renewable Energy Service (REOS Rural Life OS - renewable_energy_systems table) */
 export const renewableEnergyAPI = {
@@ -1232,7 +1283,7 @@ export const renewableEnergyAPI = {
   createSystem: (body) => api.post('/renewable-energy/systems', body),
   updateSystem: (systemId, body) => api.put(`/renewable-energy/systems/${systemId}`, body),
   getStatistics: (params) => api.get('/renewable-energy/systems/statistics', { params }),
-}
+};
 
 /** Household Economy Service (REOS Rural Life OS - household_economy table) */
 export const householdEconomyAPI = {
@@ -1240,7 +1291,7 @@ export const householdEconomyAPI = {
   getHouseholdsByVillage: (villageId) => api.get(`/household-economy/households/village/${villageId}`),
   getVillageSummary: (villageId) => api.get(`/household-economy/households/village/${villageId}/summary`),
   upsertHousehold: (body) => api.post('/household-economy/households', body),
-}
+};
 
 /** Shared Infrastructure Service (REOS Rural Life OS - shared_infrastructure_access table) */
 export const sharedInfrastructureAPI = {
@@ -1249,7 +1300,7 @@ export const sharedInfrastructureAPI = {
   getAccessByType: (infrastructureType) => api.get(`/shared-infrastructure/access/type/${infrastructureType}`),
   getVillageSummary: (villageId) => api.get(`/shared-infrastructure/access/village/${villageId}/summary`),
   upsertAccess: (body) => api.post('/shared-infrastructure/access', body),
-}
+};
 
 /** Machinery Access Service (REOS Rural Life OS - machinery_access table) */
 export const machineryAccessAPI = {
@@ -1258,7 +1309,7 @@ export const machineryAccessAPI = {
   getAccessByType: (machineryType) => api.get(`/machinery-access/access/type/${machineryType}`),
   getVillageSummary: (villageId) => api.get(`/machinery-access/access/village/${villageId}/summary`),
   upsertAccess: (body) => api.post('/machinery-access/access', body),
-}
+};
 
 /** Rural Finance Service (REOS Rural Life OS - rural_finance table) */
 export const ruralFinanceAPI = {
@@ -1267,7 +1318,7 @@ export const ruralFinanceAPI = {
   getFinanceByServiceType: (serviceType) => api.get(`/rural-finance/finance/service/${serviceType}`),
   getVillageSummary: (villageId) => api.get(`/rural-finance/finance/village/${villageId}/summary`),
   upsertFinance: (body) => api.post('/rural-finance/finance', body),
-}
+};
 
 /** AI Advisory Service (REOS Rural Life OS - ai_advisories table) */
 export const aiAdvisoryAPI = {
@@ -1278,7 +1329,7 @@ export const aiAdvisoryAPI = {
   createAdvisory: (body) => api.post('/ai-advisories/advisories', body),
   updateStatus: (advisoryId, body) => api.put(`/ai-advisories/advisories/${advisoryId}/status`, body),
   getStatistics: (params) => api.get('/ai-advisories/advisories/statistics', { params }),
-}
+};
 
 /** Market Access Service (REOS Rural Life OS - market_access table) */
 export const marketAccessAPI = {
@@ -1287,7 +1338,7 @@ export const marketAccessAPI = {
   getAccessByType: (marketType) => api.get(`/market-access/access/type/${marketType}`),
   getVillageSummary: (villageId) => api.get(`/market-access/access/village/${villageId}/summary`),
   upsertAccess: (body) => api.post('/market-access/access', body),
-}
+};
 
 /** Market Intelligence Service (REOS Rural Life OS - market_intelligence table) */
 export const marketIntelligenceAPI = {
@@ -1296,7 +1347,7 @@ export const marketIntelligenceAPI = {
   getIntelligenceByCrop: (cropId) => api.get(`/market-intelligence/intelligence/crop/${cropId}`),
   getLatestIntelligence: (villageId) => api.get(`/market-intelligence/intelligence/village/${villageId}/latest`),
   createIntelligence: (body) => api.post('/market-intelligence/intelligence', body),
-}
+};
 
 /** Mobility Rides Service (REOS Rural Life OS - mobility_rides table) */
 export const mobilityRidesAPI = {
@@ -1306,7 +1357,7 @@ export const mobilityRidesAPI = {
   createRide: (body) => api.post('/mobility-rides/rides', body),
   updateStatus: (rideId, body) => api.put(`/mobility-rides/rides/${rideId}/status`, body),
   getStatistics: (params) => api.get('/mobility-rides/rides/statistics', { params }),
-}
+};
 
 /** Yield management — lots, fare buckets, markdown, booking curve (059).
  *  Served by the existing /pricing routes; dynamicPricingService owns the logic. */
@@ -1316,13 +1367,13 @@ export const yieldAPI = {
   bookingCurve: (cropKey) => api.get(`/pricing/booking-curve/${cropKey}`),
   recordBookingPoint: (body) => api.post('/pricing/booking-curve', body),
   lotsNeedingAttention: (params) => api.get('/pricing/lots/attention', { params }),
-}
+};
 
 /** Competitor price intelligence — writes to price_intelligence (042 + 059). */
 export const competitorAPI = {
   observe: (body) => api.post('/market-data/competitor/observe', body),
   position: (params) => api.get('/market-data/competitor/position', { params }),
-}
+};
 
 /** Vendor / buyer orchestration API used by the logistics and corporate buyer pages. */
 export const vendorsAPI = {
@@ -1339,7 +1390,7 @@ export const vendorsAPI = {
   getColdChainNodes: () => api.get('/vendors/logistics/coldchain-nodes'),
   getReturnTruckOpportunities: () => api.get('/vendors/logistics/return-trucks'),
   createLogisticsBooking: (body) => api.post('/vendors/logistics/bookings', body),
-}
+};
 
 /** Experience Layer / DXP — the 15 engines (migration 060). */
 export const experienceAPI = {
@@ -1356,7 +1407,7 @@ export const experienceAPI = {
   recordConformance: (body) => api.post('/experience/accessibility', body),
   preferences: () => api.get('/experience/preferences'),
   savePreferences: (body) => api.put('/experience/preferences', body),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Dashboard/system callers recovered 2026-08-07 (FE-01 fix, docs/registry/20_FRONTEND_BOUNDARIES.md).
@@ -1373,56 +1424,56 @@ export const experienceAPI = {
 // ---------------------------------------------------------------------------
 
 /** Unversioned endpoints that live outside the /api/v1 prefix (e.g. health checks). */
-const SYSTEM_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
+const SYSTEM_BASE_URL = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 export const systemAPI = {
   getHealth: () => axios.get(`${SYSTEM_BASE_URL}/health`),
-}
+};
 
 /** Admin dashboard. */
 export const adminAPI = {
   getRecentAudit: () => api.get('/admin/audit/recent'),
   exportAuditCSV: () => api.get('/admin/audit/export', { responseType: 'blob' }),
-}
+};
 
 /** Banker dashboard. */
 export const bankerAPI = {
   getPortfolio: () => api.get('/banker/portfolio'),
   getRiskDashboard: () => api.get('/banker/risk-dashboard'),
-}
+};
 
 /** CA (chartered accountant) dashboard. */
 export const caAPI = {
   getAuditStats: () => api.get('/ca/audit-stats'),
-}
+};
 
 /** FPO dashboard summary stats — distinct from farmersAPI.getFPOs, which lists FPOs. */
 export const fpoAPI = {
   getStats: () => api.get('/fpo/stats'),
-}
+};
 
 /** Government dashboard. */
 export const governmentAPI = {
   getSchemeAnalytics: () => api.get('/government/scheme-analytics'),
   getComplianceStatus: () => api.get('/government/compliance-status'),
-}
+};
 
 /** Module hub catalogue and AI recommendation assistant. */
 export const modulesAPI = {
   getModules: () => api.get('/modules'),
   getOverview: () => api.get('/modules/overview'),
   askAssistant: (prompt) => api.post('/modules/assistant', { prompt }),
-}
+};
 
 /** Research dashboard. */
 export const researchAPI = {
   getStats: () => api.get('/research/stats'),
-}
+};
 
 /** Subsidy management dashboard — distinct from financeAPI.equipmentSubsidy. */
 export const subsidyAPI = {
   getStats: () => api.get('/subsidy/stats'),
   getPending: () => api.get('/subsidy/pending'),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Component callers recovered 2026-08-07 (FE-01 fix, docs/registry/20_FRONTEND_BOUNDARIES.md).
@@ -1436,7 +1487,7 @@ export const arVrAPI = {
   getExperiences: (targetEntityId, targetEntityType = 'product') =>
     api.get('/ar-vr/experiences', { params: { target_entity_id: targetEntityId, target_entity_type: targetEntityType } }),
   getInteractionPoints: (experienceId) => api.get(`/ar-vr/experiences/${experienceId}/interaction-points`),
-}
+};
 
 /** Blockchain traceability viewer (components/BlockchainTraceability/TraceabilityViewer.jsx). */
 export const blockchainTraceabilityAPI = {
@@ -1444,7 +1495,7 @@ export const blockchainTraceabilityAPI = {
     api.get(`/blockchain-traceability/traceability-events/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : {} }),
   verifyChainOfCustody: (productId, batchNumber) =>
     api.get(`/blockchain-traceability/chain-of-custody/verify/${productId}`, { params: batchNumber ? { batch_number: batchNumber } : {} }),
-}
+};
 
 /** Consumer health dashboard (components/ConsumerHealth/HealthDashboard.jsx). */
 export const consumerHealthAPI = {
@@ -1453,7 +1504,7 @@ export const consumerHealthAPI = {
   getHealthGoals: () => api.get('/consumer-health/health-goals'),
   getDietaryRecommendations: () => api.get('/consumer-health/dietary-recommendations'),
   getBMI: () => api.get('/consumer-health/bmi'),
-}
+};
 
 /** Conversational AI chat (components/ConversationalAI/ChatInterface.jsx). */
 export const conversationalAIAPI = {
@@ -1461,14 +1512,14 @@ export const conversationalAIAPI = {
   createSession: (body) => api.post('/conversational-ai/sessions', body),
   respond: (sessionId, message) => api.post(`/conversational-ai/sessions/${sessionId}/respond`, { message }),
   endSession: (sessionId, body) => api.post(`/conversational-ai/sessions/${sessionId}/end`, body),
-}
+};
 
 /** Farmer portal land records (components/FarmerPortal/LandRecords.jsx). */
 export const farmerPortalAPI = {
   getLandRecords: () => api.get('/farmer-portal/land-records'),
   addLandRecord: (data) => api.post('/farmer-portal/land-records', data),
   syncGovernmentLandRecords: () => api.post('/farmer-portal/land-records/sync-government'),
-}
+};
 
 /** Farmer Value Engine — revenue ledger and FVI calculations (services/legacy/farmerValueService.js). */
 export const farmerValueAPI = {
@@ -1476,7 +1527,7 @@ export const farmerValueAPI = {
   calculateFVI: (farmerId, params) => api.get(`/farmer-value/${farmerId}/fvi`, { params }),
   detectUnclaimedSubsidy: (farmerId) => api.get(`/farmer-value/${farmerId}/unclaimed-subsidy`),
   getFVIHistory: (farmerId) => api.get(`/farmer-value/${farmerId}/fvi-history`),
-}
+};
 
 /** Farmer wallet — real, DB-backed, transactional (see services/farmerService.js). */
 export const walletAPI = {
@@ -1487,7 +1538,7 @@ export const walletAPI = {
   withdraw: (data) => api.post('/farmer-portal/wallet/withdraw', data),
   transfer: (data) => api.post('/farmer-portal/wallet/transfer', data),
   linkBank: (data) => api.post('/farmer-portal/wallet/link-bank', data),
-}
+};
 
 /** Escrow management — real, DB-backed fund holding (see services/legacy/escrowService.js). */
 export const escrowAPI = {
@@ -1497,31 +1548,31 @@ export const escrowAPI = {
   release: (id, data) => api.post(`/escrow/${id}/release`, data),
   refund: (id) => api.post(`/escrow/${id}/refund`),
   getStatus: (id) => api.get(`/escrow/${id}/status`),
-}
+};
 
 /** Food intelligence recalls (components/FoodIntelligence/FoodSafetyDashboard.jsx). */
 export const foodIntelligenceAPI = {
   getActiveRecalls: () => api.get('/food-intelligence/food-recalls/active'),
-}
+};
 
 /** GI (Geographical Indication) product listing + authenticity verification (components/GIIntelligence/GIProductCard.jsx). */
 export const giIntelligenceAPI = {
   getGIProducts: (state) => api.get('/gi-intelligence/gi-products', { params: state ? { state } : {} }),
   verifyAuthentication: (authCode) => api.get(`/gi-intelligence/gi-authentication/verify/${authCode}`),
-}
+};
 
 /** IoT device monitoring (components/IoTIntegration/DeviceMonitor.jsx). */
 export const iotAPI = {
   getDevices: () => api.get('/iot-integration/iot-devices'),
   getUnacknowledgedAlerts: () => api.get('/iot-integration/device-alerts/unacknowledged'),
   getSensorData: (deviceId) => api.get(`/iot-integration/sensor-data/${deviceId}`),
-}
+};
 
 /** Knowledge graph explorer (components/KnowledgeGraph/KnowledgeExplorer.jsx). */
 export const knowledgeGraphAPI = {
   getRelatedNodes: (nodeId) => api.get(`/knowledge-graph/knowledge-nodes/${nodeId}/related`),
   searchNodes: (query) => api.get('/knowledge-graph/knowledge-nodes/search', { params: { q: query } }),
-}
+};
 
 /** Laboratory ERP sample intake (components/LaboratoryERP/SampleRegistration.jsx). */
 export const laboratoryERPAPI = {
@@ -1529,7 +1580,7 @@ export const laboratoryERPAPI = {
   getTestCategories: () => api.get('/laboratory-erp/test-categories'),
   getTestMethods: (categoryId) => api.get('/laboratory-erp/test-methods', { params: { category_id: categoryId } }),
   registerSample: (data) => api.post('/laboratory-erp/samples', data),
-}
+};
 
 /** GST + review sub-resources served under /marketplace (distinct from productsAPI/ordersAPI). */
 export const marketplaceAPI = {
@@ -1541,7 +1592,7 @@ export const marketplaceAPI = {
   getUserReviews: () => api.get('/marketplace/reviews/user'),
   submitReview: (data) => api.post('/marketplace/reviews', data),
   markReviewHelpful: (reviewId) => api.post(`/marketplace/reviews/${reviewId}/helpful`),
-}
+};
 
 /** Multilingual content, translation and language preferences. */
 export const multilingualAPI = {
@@ -1551,7 +1602,7 @@ export const multilingualAPI = {
   getContent: (language) => api.get('/multilingual/content', { params: { language } }),
   detect: (text) => api.post('/multilingual/detect', { text }),
   translate: (body) => api.post('/multilingual/translate', body),
-}
+};
 
 /** Nutrition intelligence (components/NutritionIntelligence/NutritionLabel.jsx). */
 export const nutritionAPI = {
@@ -1572,46 +1623,69 @@ export const nutritionAPI = {
   // ASTA color, etc.) actually differentiates this product. See
   // nutritionIntelligenceService.calculateValuePerNutrient.
   getValuePerNutrient: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
-}
+};
 
 export const dietTherapyAPI = {
   createPlan: (profile, options = {}) => api.post('/diet-therapy/plan', { profile, options }),
-  getRegionalFoodGroups: (region) => api.get('/diet-therapy/regional-food-groups', { params: { region } })
-}
+  getRegionalFoodGroups: (region) => api.get('/diet-therapy/regional-food-groups', { params: { region } }),
+};
 
 export const moduleAPI = {
   getContract: (moduleId) => api.get(`/backend-modules/${moduleId}/contract`),
   getOperations: (moduleId) => api.get(`/backend-modules/${moduleId}`),
   execute: (moduleId, operation, id, payload) => api.post(`/backend-modules/${moduleId}/${operation}${id ? `/${id}` : ''}`, payload),
-  askAI: (moduleId, question, context = {}) => api.post(`/backend-modules/${moduleId}/ai-advisory`, { question, context })
-}
+  askAI: (moduleId, question, context = {}) => api.post(`/backend-modules/${moduleId}/ai-advisory`, { question, context }),
+};
+
+export const moduleCrudAPI = {
+  list: (moduleId, params) => api.get(`/modules/${moduleId.toLowerCase()}`, { params }),
+  get: (moduleId, id) => api.get(`/modules/${moduleId.toLowerCase()}/${id}`),
+  create: (moduleId, data) => api.post(`/modules/${moduleId.toLowerCase()}`, data),
+  update: (moduleId, id, data) => api.put(`/modules/${moduleId.toLowerCase()}/${id}`, data),
+  remove: (moduleId, id) => api.delete(`/modules/${moduleId.toLowerCase()}/${id}`),
+};
 
 export const searchAPI = {
   search: (params = {}) => api.get('/search', { params }),
-  suggestions: (query, limit = 10) => api.get('/search/suggestions', { params: { query, limit } })
-}
+  suggestions: (query, limit = 10) => api.get('/search/suggestions', { params: { query, limit } }),
+};
 
 export const dprAPI = {
   preview: (data) => api.post('/dpr/preview', data),
   generate: (data) => api.post('/dpr', data),
   list: (params = {}) => api.get('/dpr', { params }),
   get: (id) => api.get(`/dpr/${id}`),
-  pdf: (id) => api.get(`/dpr/${id}/pdf`, { responseType: 'blob' })
-}
+  pdf: (id) => api.get(`/dpr/${id}/pdf`, { responseType: 'blob' }),
+};
 
 /** Organic traceability — farm registration, standards, consumer QR lookup. */
 export const organicTraceabilityAPI = {
   getStandards: () => api.get('/organic-traceability/standards'),
   registerFarm: (data) => api.post('/organic-traceability/farms', data),
   getConsumerTransparency: (qrCode) => api.get(`/organic-traceability/consumer-transparency/qr/${qrCode}`),
-}
+};
 
 /** Predictive analytics — demand forecasts and alerts. */
 export const predictiveAnalyticsAPI = {
+  getDemandForecast: (cropType, params) => api.get(`/predictive/demand/${cropType}`, { params }),
+  getPricingPrediction: (cropType, params) => api.get(`/predictive/pricing/${cropType}`, { params }),
   getForecasts: (params) => api.get('/predictive-analytics/forecasts', { params }),
   getPredictions: (entityId, entityType) => api.get(`/predictive-analytics/predictions/${entityId}/${entityType}`),
   getUnacknowledgedAlerts: () => api.get('/predictive-analytics/prediction-alerts/unacknowledged'),
-}
+};
+
+export const operationsAPI = {
+  getOverview: (params) => api.get('/operations/overview', { params }),
+};
+
+export const errorMonitoringAPI = {
+  log: (errorData) => api.post('/errors/log', errorData),
+};
+
+export const pushNotificationsAPI = {
+  subscribe: (subscription, userAgent) => api.post('/notifications/subscribe', { subscription, userAgent }),
+  unsubscribe: (subscription) => api.post('/notifications/unsubscribe', { subscription }),
+};
 
 /** Voice AI assistant sessions and commands. */
 export const voiceAIAPI = {
@@ -1619,7 +1693,7 @@ export const voiceAIAPI = {
   getPreferences: () => api.get('/voice-ai/voice-preferences'),
   sendCommand: (body) => api.post('/voice-ai/voice-commands', body),
   endSession: (sessionId) => api.post(`/voice-ai/voice-sessions/${sessionId}/end`),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Modules built 2026-08-07 for 15 confirmed STUB-ONLY frontends (M067, M031,
@@ -1641,7 +1715,7 @@ export const sowingAPI = {
   createRecord: (data) => api.post('/sowing/records', data),
   updateRecord: (id, data) => api.put(`/sowing/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/sowing/records/${id}`),
-}
+};
 
 /** M031 — Land Registry (Land domain). A `farm_plots` table exists (migration
  *  056_named_missing_modules.sql) but no route reads or writes it. */
@@ -1651,7 +1725,7 @@ export const landAPI = {
   createParcel: (data) => api.post('/land/parcels', data),
   updateParcel: (id, data) => api.put(`/land/parcels/${id}`, data),
   deleteParcel: (id) => api.delete(`/land/parcels/${id}`),
-}
+};
 
 /** M093 — Labour Management (Operations domain). No backend route found. */
 export const labourAPI = {
@@ -1662,7 +1736,7 @@ export const labourAPI = {
   recordAttendance: (data) => api.post('/labour/attendance', data),
   getPayments: (params) => api.get('/labour/payments', { params }),
   recordPayment: (data) => api.post('/labour/payments', data),
-}
+};
 
 /** M075 registry number — Irrigation Management (Water domain). Real backend
  *  as of 2026-08-28: backend/src/routes/irrigationManagementRoutes.js +
@@ -1677,7 +1751,7 @@ export const irrigationAPI = {
   createWaterSource: (data) => api.post('/irrigation/water-sources', data),
   getLogs: (params) => api.get('/irrigation/logs', { params }),
   recordLog: (data) => api.post('/irrigation/logs', data),
-}
+};
 
 /** M121 — Dairy Management (Livestock domain). Real backend as of 2026-08-10:
  *  backend/src/routes/dairyRoutes.js + dairyService.js, tables added in
@@ -1693,7 +1767,7 @@ export const dairyAPI = {
   getMilkYieldTrends: () => api.get('/dairy/milk-yield-trends'),
   // Vaccination-due + breeding/calving-due alerts (real dates, assumed intervals).
   getHealthAlerts: () => api.get('/dairy/health-alerts'),
-}
+};
 
 /** M112 — Fertilizer Inventory (Input Supply domain). Real backend as of
  *  2026-08-10: backend/src/routes/fertilizerRoutes.js +
@@ -1710,7 +1784,7 @@ export const fertilizerAPI = {
   issueStock: (id, data) => api.post(`/fertilizer/inventory/${id}/issue`, data),
   // Real stock + real consumption (agri_input_issues) -> computed reorder-point alerts.
   getReorderAlerts: () => api.get('/fertilizer/inventory/reorder-alerts'),
-}
+};
 
 /** M041 — Village Registry (Community domain). No backend route found. */
 /**
@@ -1721,7 +1795,7 @@ export const villageAPI = {
   createVillage: (data) => api.post('/backend-modules/M041/createVillage', data),
   addVillageResource: (villageId, resourceData) => api.post('/backend-modules/M041/addVillageResource', { villageId, ...resourceData }),
   getVillageAnalytics: (villageId) => api.get(`/backend-modules/M041/getVillageAnalytics/${villageId}`),
-}
+};
 
 /** M024 — Farmer KYC (Farmer domain). farmersAPI covers profile/FDI/certs but
  *  no route handles a KYC verification workflow. */
@@ -1731,7 +1805,7 @@ export const kycAPI = {
   submitApplication: (data) => api.post('/farmer-kyc/applications', data),
   verifyApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/verify`, data),
   rejectApplication: (id, data) => api.put(`/farmer-kyc/applications/${id}/reject`, data),
-}
+};
 
 /** M141 — Orchard Management (Horticulture domain). No backend route found. */
 /**
@@ -1746,7 +1820,7 @@ export const orchardAPI = {
   deleteOrchard: (id) => api.delete(`/backend-modules/M141/deleteOrchard/${id}`),
   getHarvestLog: (orchardId, year) => api.get(`/backend-modules/M141/getOrchardProduction/${orchardId}`, { params: { year } }),
   recordHarvest: (orchardId, data) => api.post('/backend-modules/M141/recordOrchardProduction', { orchardId, ...data }),
-}
+};
 
 /** M098 — Farm Costing (Operations domain). economicAPI.costBreakup covers
  *  corridor-level cost models; no route handles per-farm cost records. */
@@ -1756,7 +1830,7 @@ export const farmCostingAPI = {
   updateRecord: (id, data) => api.put(`/farm-costing/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/farm-costing/records/${id}`),
   getSummary: (params) => api.get('/farm-costing/summary', { params }),
-}
+};
 
 /** M132 — Pond Management (Fisheries domain). No backend route found. */
 /**
@@ -1773,7 +1847,7 @@ export const pondAPI = {
   createPond: (data) => api.post('/backend-modules/M132/createPond', data),
   updatePond: (id, data) => api.put(`/backend-modules/M132/updatePond/${id}`, data),
   deletePond: (id) => api.delete(`/backend-modules/M132/deletePond/${id}`),
-}
+};
 
 /** M101 — Tractor Management (Machinery domain). A `machinery_access` table
  *  exists (migration 041_rural_life_os_schema.sql) but no route reads or
@@ -1786,7 +1860,7 @@ export const machineryAPI = {
   getBookings: (params) => api.get('/machinery/bookings', { params }),
   createBooking: (data) => api.post('/machinery/bookings', data),
   updateBooking: (id, data) => api.put(`/machinery/bookings/${id}`, data),
-}
+};
 
 /** M013 — Authorization (Identity domain). authService.getUserPermissions()
  *  hardcodes a role→permission map server-side with no route to read, edit,
@@ -1798,7 +1872,7 @@ export const authorizationAPI = {
   getUsers: (params) => api.get('/authorization/users', { params }),
   updateUserRole: (userId, data) => api.put(`/authorization/users/${userId}/role`, data),
   getAuditLog: (params) => api.get('/authorization/audit-log', { params }),
-}
+};
 
 /** M083 — Climate Advisory (Climate domain). Real backend as of 2026-08-10:
  *  backend/src/routes/climateAdvisoryRoutes.js + weatherService.js, CRUD over
@@ -1809,7 +1883,7 @@ export const climateAdvisoryAPI = {
   getAdvisory: (id) => api.get(`/climate-advisory/advisories/${id}`),
   createAdvisory: (data) => api.post('/climate-advisory/advisories', data),
   updateAdvisory: (id, data) => api.put(`/climate-advisory/advisories/${id}`, data),
-}
+};
 
 /** M046 — SHG Management (Community domain, self-help groups). No backend
  *  route found. */
@@ -1822,7 +1896,7 @@ export const shgAPI = {
   addMember: (groupId, data) => api.post(`/shg/groups/${groupId}/members`, data),
   getSavings: (groupId, params) => api.get(`/shg/groups/${groupId}/savings`, { params }),
   recordSaving: (groupId, data) => api.post(`/shg/groups/${groupId}/savings`, data),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Modules built 2026-08-07, second batch, for 20 confirmed STUB-ONLY
@@ -1844,7 +1918,7 @@ export const farmerProfileAPI = {
   createProfile: (data) => api.post('/farmer-profiles', data),
   updateProfile: (id, data) => api.put(`/farmer-profiles/${id}`, data),
   deleteProfile: (id) => api.delete(`/farmer-profiles/${id}`),
-}
+};
 
 /** M023 — Farmer Family (Farmer domain). No backend route found for
  *  household/dependent records. */
@@ -1853,7 +1927,7 @@ export const farmerFamilyAPI = {
   createMember: (data) => api.post('/farmer-family/members', data),
   updateMember: (id, data) => api.put(`/farmer-family/members/${id}`, data),
   deleteMember: (id) => api.delete(`/farmer-family/members/${id}`),
-}
+};
 
 /** M025 — Farmer Verification (Farmer domain). Distinct from M024 Farmer KYC
  *  (kycAPI, document identity verification) — this tracks field/peer
@@ -1864,7 +1938,7 @@ export const farmerVerificationAPI = {
   submitRequest: (data) => api.post('/farmer-verification/requests', data),
   verifyRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/verify`, data),
   rejectRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/reject`, data),
-}
+};
 
 /** M026 — Farmer Skill Management (Farmer domain). farmerTrainingService.js
  *  exists server-side but has no mounted route; no CRUD for a farmer's
@@ -1874,7 +1948,7 @@ export const farmerSkillAPI = {
   addSkill: (data) => api.post('/farmer-skills', data),
   updateSkill: (id, data) => api.put(`/farmer-skills/${id}`, data),
   deleteSkill: (id) => api.delete(`/farmer-skills/${id}`),
-}
+};
 
 /** M029 — Farmer Health & Welfare (Farmer domain). No backend route found. */
 /**
@@ -1893,12 +1967,12 @@ export const farmerHealthRecordsAPI = {
   createRecord: (data) => api.post('/backend-modules/M029/createHealthRecord', data),
   updateRecord: (id, data) => api.put(`/backend-modules/M029/updateHealthRecord/${id}`, data),
   deleteRecord: (id) => api.delete(`/backend-modules/M029/deleteHealthRecord/${id}`),
-}
+};
 
 export const farmerWelfareAPI = {
   getPrograms: (params) => api.get('/backend-modules/M029/getWelfarePrograms', { params }),
   enroll: (farmerId, programId) => api.post('/backend-modules/M029/enrollWelfareProgram', { farmerId, programId }),
-}
+};
 
 /** M062 — Crop Calendar (Crop domain). cropPlanningService.js covers
  *  farmer-specific crop plans; no route handles a reusable sowing/harvest
@@ -1908,7 +1982,7 @@ export const cropCalendarAPI = {
   createEntry: (data) => api.post('/crop-calendar/entries', data),
   updateEntry: (id, data) => api.put(`/crop-calendar/entries/${id}`, data),
   deleteEntry: (id) => api.delete(`/crop-calendar/entries/${id}`),
-}
+};
 
 /** M069 — Harvest Planning (Crop domain). Backend module M069 auto-mounts
  *  at /api/v1/modules/m069 (backend/src/index.js generatedModuleNames
@@ -1921,7 +1995,7 @@ export const harvestPlanningAPI = {
   createPlan: (data) => api.post('/modules/m069', data),
   updatePlan: (id, data) => api.put(`/modules/m069/${id}`, data),
   deletePlan: (id) => api.delete(`/modules/m069/${id}`),
-}
+};
 
 /** M063 — Crop Registration (Crop domain). No backend route found for a
  *  crop master/reference registry. */
@@ -1931,7 +2005,7 @@ export const cropRegistrationAPI = {
   registerCrop: (data) => api.post('/crop-registration/crops', data),
   updateCrop: (id, data) => api.put(`/crop-registration/crops/${id}`, data),
   deleteCrop: (id) => api.delete(`/crop-registration/crops/${id}`),
-}
+};
 
 /** M064 — Crop Variety Management (Crop domain). No backend route found. */
 export const cropVarietyAPI = {
@@ -1939,7 +2013,7 @@ export const cropVarietyAPI = {
   createVariety: (data) => api.post('/crop-varieties', data),
   updateVariety: (id, data) => api.put(`/crop-varieties/${id}`, data),
   deleteVariety: (id) => api.delete(`/crop-varieties/${id}`),
-}
+};
 
 /** M065 — Seed Planning (Crop domain). No backend route found. */
 export const seedPlanningAPI = {
@@ -1947,7 +2021,7 @@ export const seedPlanningAPI = {
   createPlan: (data) => api.post('/seed-planning/plans', data),
   updatePlan: (id, data) => api.put(`/seed-planning/plans/${id}`, data),
   deletePlan: (id) => api.delete(`/seed-planning/plans/${id}`),
-}
+};
 
 /** M066 — Nursery Management (Crop domain). No backend route found. */
 export const nurseryAPI = {
@@ -1955,7 +2029,7 @@ export const nurseryAPI = {
   createNursery: (data) => api.post('/nurseries', data),
   updateNursery: (id, data) => api.put(`/nurseries/${id}`, data),
   deleteNursery: (id) => api.delete(`/nurseries/${id}`),
-}
+};
 
 /** M068 — Crop Monitoring (Crop domain). No backend route found for field
  *  observation/scouting records. */
@@ -1964,7 +2038,7 @@ export const cropMonitoringAPI = {
   createObservation: (data) => api.post('/crop-monitoring/observations', data),
   updateObservation: (id, data) => api.put(`/crop-monitoring/observations/${id}`, data),
   deleteObservation: (id) => api.delete(`/crop-monitoring/observations/${id}`),
-}
+};
 
 /** M033 — Land Lease Management (Land domain). landAPI/LandRegistryPage
  *  tracks ownership_type = "Leased" per parcel but no lease term, rent or
@@ -1974,7 +2048,7 @@ export const landLeaseAPI = {
   createLease: (data) => api.post('/land-leases', data),
   updateLease: (id, data) => api.put(`/land-leases/${id}`, data),
   deleteLease: (id) => api.delete(`/land-leases/${id}`),
-}
+};
 
 /** M035 — GIS Land Mapping (Land domain). No backend route found for parcel
  *  geo-coordinates/polygon boundaries. */
@@ -1983,7 +2057,7 @@ export const gisLandMappingAPI = {
   createMapping: (data) => api.post('/gis-land-mapping/parcels', data),
   updateMapping: (id, data) => api.put(`/gis-land-mapping/parcels/${id}`, data),
   deleteMapping: (id) => api.delete(`/gis-land-mapping/parcels/${id}`),
-}
+};
 
 /** M036 — Soil Mapping (Land domain). soilTestingService.js covers lab
  *  sample intake/results for an individual farmer; no route handles a
@@ -1993,7 +2067,7 @@ export const soilMappingAPI = {
   createZone: (data) => api.post('/soil-mapping/zones', data),
   updateZone: (id, data) => api.put(`/soil-mapping/zones/${id}`, data),
   deleteZone: (id) => api.delete(`/soil-mapping/zones/${id}`),
-}
+};
 
 /** M037 — Water Resource Mapping (Land domain). irrigationAPI (M075) tracks
  *  water sources used for scheduling; this is the registry/mapping view of
@@ -2004,7 +2078,7 @@ export const waterResourceMappingAPI = {
   createResource: (data) => api.post('/water-resource-mapping/resources', data),
   updateResource: (id, data) => api.put(`/water-resource-mapping/resources/${id}`, data),
   deleteResource: (id) => api.delete(`/water-resource-mapping/resources/${id}`),
-}
+};
 
 /** M038 — Geo Boundary Management (Land domain). No backend route found for
  *  administrative/village boundary records. */
@@ -2013,7 +2087,7 @@ export const geoBoundaryAPI = {
   createBoundary: (data) => api.post('/geo-boundaries', data),
   updateBoundary: (id, data) => api.put(`/geo-boundaries/${id}`, data),
   deleteBoundary: (id) => api.delete(`/geo-boundaries/${id}`),
-}
+};
 
 /** M039 — Survey Management (Land domain). LandRegistryPage stores a free-
  *  text survey_number per parcel; no route manages the survey workflow
@@ -2023,7 +2097,7 @@ export const surveyManagementAPI = {
   createSurvey: (data) => api.post('/land-surveys', data),
   updateSurvey: (id, data) => api.put(`/land-surveys/${id}`, data),
   deleteSurvey: (id) => api.delete(`/land-surveys/${id}`),
-}
+};
 
 /** M051 — FPO Registration (FPO domain). No backend route found for FPO
  *  legal-entity registration records (distinct from fpoAPI.getStats). */
@@ -2032,7 +2106,7 @@ export const fpoRegistrationAPI = {
   createRegistration: (data) => api.post('/fpo-registration/registrations', data),
   updateRegistration: (id, data) => api.put(`/fpo-registration/registrations/${id}`, data),
   deleteRegistration: (id) => api.delete(`/fpo-registration/registrations/${id}`),
-}
+};
 
 /** M052 — FPO Governance (FPO domain). No backend route found for board
  *  meetings/resolutions. */
@@ -2041,7 +2115,7 @@ export const fpoGovernanceAPI = {
   createMeeting: (data) => api.post('/fpo-governance/meetings', data),
   updateMeeting: (id, data) => api.put(`/fpo-governance/meetings/${id}`, data),
   deleteMeeting: (id) => api.delete(`/fpo-governance/meetings/${id}`),
-}
+};
 
 /** M055 — FPO Procurement (FPO domain). Distinct from
  *  FPODashboardPage's "Collective Orders" tab (member buy-side bulk
@@ -2055,7 +2129,7 @@ export const fpoProcurementAPI = {
   createOrder: (data) => api.post('/modules/m055', data),
   updateOrder: (id, data) => api.put(`/modules/m055/${id}`, data),
   deleteOrder: (id) => api.delete(`/modules/m055/${id}`),
-}
+};
 
 /** M056 — FPO Inventory (FPO domain). Collective inventory held by the
  *  FPO (produce/inputs in warehouses, cold storage, packhouses). Backed by
@@ -2068,7 +2142,7 @@ export const fpoInventoryAPI = {
   createItem: (data) => api.post('/modules/m056', data),
   updateItem: (id, data) => api.put(`/modules/m056/${id}`, data),
   deleteItem: (id) => api.delete(`/modules/m056/${id}`),
-}
+};
 
 /** M057 — FPO Marketing (FPO domain). No backend route found for
  *  campaign/market-linkage records. */
@@ -2077,7 +2151,7 @@ export const fpoMarketingAPI = {
   createCampaign: (data) => api.post('/fpo-marketing/campaigns', data),
   updateCampaign: (id, data) => api.put(`/fpo-marketing/campaigns/${id}`, data),
   deleteCampaign: (id) => api.delete(`/fpo-marketing/campaigns/${id}`),
-}
+};
 
 /** M059 — FPO Compliance (FPO domain). complianceAPI (M056) covers
  *  TDS/e-invoice/GSTR filings; no route handles FPO statutory filings
@@ -2087,7 +2161,7 @@ export const fpoComplianceAPI = {
   createFiling: (data) => api.post('/fpo-compliance/filings', data),
   updateFiling: (id, data) => api.put(`/fpo-compliance/filings/${id}`, data),
   deleteFiling: (id) => api.delete(`/fpo-compliance/filings/${id}`),
-}
+};
 
 // ---------------------------------------------------------------------------
 // V44 prototype reconciliation (2026-08-08, docs/V44_ADDITIONAL_FEATURES_
@@ -2105,7 +2179,7 @@ export const schemeRegistryAPI = {
   update: (code, data) => api.put(`/government/schemes/registry/${code}`, data),
   getExpiring: (days) => api.get('/government/schemes/registry/expiring', { params: { days } }),
   checkEligibility: (params) => api.get('/government/schemes/checker', { params }),
-}
+};
 
 /** MAP-protected contract offers (v44 feature 7). The farmer's floor price
  *  is never returned by any of these — see institutionalProcurementService.js. */
@@ -2113,7 +2187,7 @@ export const contractOfferAPI = {
   getOffers: (params) => api.get('/institutional-procurement/contract-offers', { params }),
   createOffer: (data) => api.post('/institutional-procurement/contract-offers', data),
   respondToOffer: (id, status) => api.put(`/institutional-procurement/contract-offers/${id}`, { status }),
-}
+};
 
 /** Mill Circuit booking (v44 feature 3). */
 export const millCircuitAPI = {
@@ -2121,13 +2195,13 @@ export const millCircuitAPI = {
   createSlot: (data) => api.post('/mill-fpo/mill-circuit/slots', data),
   getBookings: (params) => api.get('/mill-fpo/mill-circuit/bookings', { params }),
   createBooking: (data) => api.post('/mill-fpo/mill-circuit/bookings', data),
-}
+};
 
 /** FPO Ledger (v44 feature 3) — farmer-owned running ledger. */
 export const fpoLedgerAPI = {
   getEntries: (params) => api.get('/mill-fpo/fpo-ledger/entries', { params }),
   createEntry: (data) => api.post('/mill-fpo/fpo-ledger/entries', data),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Third batch (2026-08-08): Input Supply, Livestock, Community, Soil and
@@ -2144,7 +2218,7 @@ export const biofertilizerAPI = {
   createItem: (data) => api.post('/biofertilizers', data),
   updateItem: (id, data) => api.put(`/biofertilizers/${id}`, data),
   deleteItem: (id) => api.delete(`/biofertilizers/${id}`),
-}
+};
 
 /** M114 — Pesticide Inventory (Input Supply). No backend route found. */
 export const pesticideInventoryAPI = {
@@ -2152,7 +2226,7 @@ export const pesticideInventoryAPI = {
   createItem: (data) => api.post('/pesticide-inventory', data),
   updateItem: (id, data) => api.put(`/pesticide-inventory/${id}`, data),
   deleteItem: (id) => api.delete(`/pesticide-inventory/${id}`),
-}
+};
 
 /** M115 — Bio-Pesticide Management (Input Supply). No backend route found. */
 export const bioPesticideAPI = {
@@ -2160,7 +2234,7 @@ export const bioPesticideAPI = {
   createItem: (data) => api.post('/bio-pesticides', data),
   updateItem: (id, data) => api.put(`/bio-pesticides/${id}`, data),
   deleteItem: (id) => api.delete(`/bio-pesticides/${id}`),
-}
+};
 
 /** M116 — Micronutrient Management (Input Supply). No backend route found. */
 export const micronutrientAPI = {
@@ -2168,7 +2242,7 @@ export const micronutrientAPI = {
   createItem: (data) => api.post('/micronutrients', data),
   updateItem: (id, data) => api.put(`/micronutrients/${id}`, data),
   deleteItem: (id) => api.delete(`/micronutrients/${id}`),
-}
+};
 
 /** M117 — Organic Input Management (Input Supply). No backend route found. */
 export const organicInputAPI = {
@@ -2176,7 +2250,7 @@ export const organicInputAPI = {
   createItem: (data) => api.post('/organic-inputs', data),
   updateItem: (id, data) => api.put(`/organic-inputs/${id}`, data),
   deleteItem: (id) => api.delete(`/organic-inputs/${id}`),
-}
+};
 
 /** M118 — Input Procurement (Input Supply). vendorRoutes.js covers
  *  corporate/logistics/processor/retailer vendor profiles, not farm-input
@@ -2186,7 +2260,7 @@ export const inputProcurementAPI = {
   createOrder: (data) => api.post('/input-procurement/orders', data),
   updateOrder: (id, data) => api.put(`/input-procurement/orders/${id}`, data),
   deleteOrder: (id) => api.delete(`/input-procurement/orders/${id}`),
-}
+};
 
 /** M119 — Input Distribution (Input Supply). No backend route found for
  *  outbound distribution to farmers/dealers. */
@@ -2195,7 +2269,7 @@ export const inputDistributionAPI = {
   createRecord: (data) => api.post('/input-distribution/records', data),
   updateRecord: (id, data) => api.put(`/input-distribution/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/input-distribution/records/${id}`),
-}
+};
 
 /** M120 — Input Traceability (Input Supply). No backend route found. */
 export const inputTraceabilityAPI = {
@@ -2203,7 +2277,7 @@ export const inputTraceabilityAPI = {
   createRecord: (data) => api.post('/input-traceability/records', data),
   updateRecord: (id, data) => api.put(`/input-traceability/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/input-traceability/records/${id}`),
-}
+};
 
 /** M122 — Cattle Registry (Livestock). No backend route found. */
 export const cattleRegistryAPI = {
@@ -2211,7 +2285,7 @@ export const cattleRegistryAPI = {
   createAnimal: (data) => api.post('/cattle-registry/animals', data),
   updateAnimal: (id, data) => api.put(`/cattle-registry/animals/${id}`, data),
   deleteAnimal: (id) => api.delete(`/cattle-registry/animals/${id}`),
-}
+};
 
 /** M123 — Poultry Management (Livestock). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /poultry/batches. The real
@@ -2223,7 +2297,7 @@ export const poultryManagementAPI = {
   createBatch: (data) => api.post('/poultry/flocks', data),
   updateBatch: (id, data) => api.put(`/poultry/flocks/${id}`, data),
   deleteBatch: (id) => api.delete(`/poultry/flocks/${id}`),
-}
+};
 
 /** M124 — Goat Farming Management (Livestock). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /goat-farming/animals. The real
@@ -2235,7 +2309,7 @@ export const goatFarmingAPI = {
   createAnimal: (data) => api.post('/goat/herd', data),
   updateAnimal: (id, data) => api.put(`/goat/herd/${id}`, data),
   deleteAnimal: (id) => api.delete(`/goat/herd/${id}`),
-}
+};
 
 /** M125 — Sheep Farming Management (Livestock). ABSENT — no trace of this
  *  capability anywhere in the codebase. */
@@ -2249,7 +2323,7 @@ export const sheepFarmingAPI = {
   createAnimal: (data) => api.post('/sheep/flock', data),
   updateAnimal: (id, data) => api.put(`/sheep/flock/${id}`, data),
   deleteAnimal: (id) => api.delete(`/sheep/flock/${id}`),
-}
+};
 
 /** M126 — Pig Farming Management (Livestock). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /pig-farming/animals. The real
@@ -2261,7 +2335,7 @@ export const pigFarmingAPI = {
   createAnimal: (data) => api.post('/pig/herd', data),
   updateAnimal: (id, data) => api.put(`/pig/herd/${id}`, data),
   deleteAnimal: (id) => api.delete(`/pig/herd/${id}`),
-}
+};
 
 /** Livestock feed records — no backend route exists yet (LivestockManagementPage.jsx's
  *  "feed" tab notes this explicitly), but the frontend referenced this group without
@@ -2271,7 +2345,7 @@ export const feedManagementAPI = {
   createRecord: (data) => api.post('/livestock-feed/records', data),
   updateRecord: (id, data) => api.put(`/livestock-feed/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/livestock-feed/records/${id}`),
-}
+};
 
 /** Yield management — lots, fare buckets, markdown, booking curve (059).
  *  Served by the existing /pricing routes; dynamicPricingService owns the logic. */
@@ -2280,7 +2354,7 @@ export const yieldManagementAPI = {
   createRecord: (data) => api.post('/pricing/records', data),
   updateRecord: (id, data) => api.put(`/pricing/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/pricing/records/${id}`),
-}
+};
 
 /** M129 — Breeding Management (Livestock). No backend route found. */
 // breedingManagementAPI removed 2026-08-24: the generic cross-species
@@ -2296,7 +2370,7 @@ export const livestockAnalyticsAPI = {
   createRecord: (data) => api.post('/livestock-analytics/records', data),
   updateRecord: (id, data) => api.put(`/livestock-analytics/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/livestock-analytics/records/${id}`),
-}
+};
 
 /** M042 — Panchayat Management (Community). Real backend route:
  *  governanceModule.js POST/GET /governance/panchayats (create is
@@ -2305,7 +2379,7 @@ export const livestockAnalyticsAPI = {
 export const panchayatAPI = {
   getPanchayats: (params) => api.get('/governance/panchayats', { params }),
   createPanchayat: (data) => api.post('/governance/panchayats', data),
-}
+};
 
 /** M043 — Block Management (Community). No backend route found. */
 export const blockManagementAPI = {
@@ -2313,7 +2387,7 @@ export const blockManagementAPI = {
   createBlock: (data) => api.post('/blocks', data),
   updateBlock: (id, data) => api.put(`/blocks/${id}`, data),
   deleteBlock: (id) => api.delete(`/blocks/${id}`),
-}
+};
 
 /** M044 — District Management (Community). No backend route found. */
 export const districtManagementAPI = {
@@ -2321,7 +2395,7 @@ export const districtManagementAPI = {
   createDistrict: (data) => api.post('/districts', data),
   updateDistrict: (id, data) => api.put(`/districts/${id}`, data),
   deleteDistrict: (id) => api.delete(`/districts/${id}`),
-}
+};
 
 /** M045 — State Management (Community). No backend route found. */
 export const stateManagementAPI = {
@@ -2329,7 +2403,7 @@ export const stateManagementAPI = {
   createState: (data) => api.post('/states', data),
   updateState: (id, data) => api.put(`/states/${id}`, data),
   deleteState: (id) => api.delete(`/states/${id}`),
-}
+};
 
 /** M047 — Cooperative Management (Community). Real backend route:
  *  governanceModule.js POST/GET /governance/cooperatives (create is
@@ -2338,7 +2412,7 @@ export const stateManagementAPI = {
 export const cooperativeAPI = {
   getCooperatives: (params) => api.get('/governance/cooperatives', { params }),
   createCooperative: (data) => api.post('/governance/cooperatives', data),
-}
+};
 
 /** M048 — Producer Group Management (Community). No backend route found. */
 export const producerGroupAPI = {
@@ -2346,7 +2420,7 @@ export const producerGroupAPI = {
   createGroup: (data) => api.post('/producer-groups', data),
   updateGroup: (id, data) => api.put(`/producer-groups/${id}`, data),
   deleteGroup: (id) => api.delete(`/producer-groups/${id}`),
-}
+};
 
 /** M049 — Community Asset Management (Community). No backend route found. */
 export const communityAssetAPI = {
@@ -2354,7 +2428,7 @@ export const communityAssetAPI = {
   createAsset: (data) => api.post('/community-assets', data),
   updateAsset: (id, data) => api.put(`/community-assets/${id}`, data),
   deleteAsset: (id) => api.delete(`/community-assets/${id}`),
-}
+};
 
 /** M050 — Rural Development Management (Community). ABSENT — no trace of
  *  this capability anywhere in the codebase. */
@@ -2363,7 +2437,7 @@ export const ruralDevelopmentAPI = {
   createProject: (data) => api.post('/rural-development/projects', data),
   updateProject: (id, data) => api.put(`/rural-development/projects/${id}`, data),
   deleteProject: (id) => api.delete(`/rural-development/projects/${id}`),
-}
+};
 
 /** M071 — Soil Health Management (Soil). Distinct from soilTestingService.js
  *  (M072, individual lab test results) — this is a plot/zone-level health
@@ -2374,7 +2448,7 @@ export const soilHealthAPI = {
   createCard: (data) => api.post('/soil-health/cards', data),
   updateCard: (id, data) => api.put(`/soil-health/cards/${id}`, data),
   deleteCard: (id) => api.delete(`/soil-health/cards/${id}`),
-}
+};
 
 /** M073 — Nutrient Management (Soil). No backend route found. */
 export const nutrientManagementAPI = {
@@ -2382,7 +2456,7 @@ export const nutrientManagementAPI = {
   createPlan: (data) => api.post('/nutrient-management/plans', data),
   updatePlan: (id, data) => api.put(`/nutrient-management/plans/${id}`, data),
   deletePlan: (id) => api.delete(`/nutrient-management/plans/${id}`),
-}
+};
 
 /** M074 — Fertility Management (Soil). No backend route found. */
 export const fertilityManagementAPI = {
@@ -2390,7 +2464,7 @@ export const fertilityManagementAPI = {
   createRecord: (data) => api.post('/fertility-management/records', data),
   updateRecord: (id, data) => api.put(`/fertility-management/records/${id}`, data),
   deleteRecord: (id) => api.delete(`/fertility-management/records/${id}`),
-}
+};
 
 /**
  * M076-M080 — Water domain. Routed through the generic backend-module bridge
@@ -2405,35 +2479,35 @@ export const waterBudgetingAPI = {
   trackUsage: (budgetId, period) => api.post('/backend-modules/M076/trackWaterUsage', { budgetId, period }),
   optimizeAllocation: (budgetId, constraints) => api.post('/backend-modules/M076/optimizeWaterAllocation', { budgetId, constraints }),
   generateReport: (budgetId, reportType) => api.post('/backend-modules/M076/generateBudgetReport', { budgetId, reportType }),
-}
+};
 
 export const waterQualityAPI = {
   recordMeasurement: (measurementData) => api.post('/backend-modules/M077/recordWaterQualityMeasurement', measurementData),
   getComplianceReport: (locationId, period) => api.post('/backend-modules/M077/getComplianceReport', { locationId, period }),
   monitorQuality: (locationId) => api.post('/backend-modules/M077/monitorWaterQuality', { locationId }),
   getTreatmentRecommendations: (locationId, qualityIssues) => api.post('/backend-modules/M077/generateTreatmentRecommendations', { locationId, qualityIssues }),
-}
+};
 
 export const rainwaterHarvestingAPI = {
   designSystem: (designData) => api.post('/backend-modules/M078/designHarvestingSystem', designData),
   monitorCollection: (systemId, period) => api.post('/backend-modules/M078/monitorCollection', { systemId, period }),
   calculateBudget: (systemId, timeFrame) => api.post('/backend-modules/M078/calculateWaterBudget', { systemId, timeFrame }),
   manageStorage: (systemId, managementData) => api.post('/backend-modules/M078/manageStorageCapacity', { systemId, ...managementData }),
-}
+};
 
 export const watershedManagementAPI = {
   createPlan: (planData) => api.post('/backend-modules/M079/createWatershedPlan', planData),
   monitorHealth: (watershedId) => api.post('/backend-modules/M079/monitorWatershedHealth', { watershedId }),
   implementConservation: (watershedId, measuresData) => api.post('/backend-modules/M079/implementConservationMeasures', { watershedId, ...measuresData }),
   generateReport: (watershedId, reportType) => api.post('/backend-modules/M079/generateWatershedReport', { watershedId, reportType }),
-}
+};
 
 export const waterAnalyticsAPI = {
   generateUsageAnalytics: (params) => api.post('/backend-modules/M080/generateWaterUsageAnalytics', params),
   createDashboard: (dashboardConfig) => api.post('/backend-modules/M080/createWaterDashboard', dashboardConfig),
   generatePrediction: (predictionParams) => api.post('/backend-modules/M080/generatePredictiveAnalysis', predictionParams),
   comparePerformance: (comparisonParams) => api.post('/backend-modules/M080/compareWaterPerformance', comparisonParams),
-}
+};
 
 /** Water Records CRUD - backend/src/routes/waterManagementRoutes.js +
  *  services/legacy/waterManagementService.js. Distinct from waterBudgetingAPI
@@ -2447,31 +2521,31 @@ export const waterBudgetRecordsAPI = {
   create: (data) => api.post('/water-budgeting/budgets', data),
   update: (id, data) => api.put(`/water-budgeting/budgets/${id}`, data),
   remove: (id) => api.delete(`/water-budgeting/budgets/${id}`),
-}
+};
 export const waterQualityRecordsAPI = {
   list: (params) => api.get('/water-quality/readings', { params }),
   create: (data) => api.post('/water-quality/readings', data),
   update: (id, data) => api.put(`/water-quality/readings/${id}`, data),
   remove: (id) => api.delete(`/water-quality/readings/${id}`),
-}
+};
 export const rainwaterStructuresAPI = {
   list: (params) => api.get('/rainwater-harvesting/structures', { params }),
   create: (data) => api.post('/rainwater-harvesting/structures', data),
   update: (id, data) => api.put(`/rainwater-harvesting/structures/${id}`, data),
   remove: (id) => api.delete(`/rainwater-harvesting/structures/${id}`),
-}
+};
 export const watershedRecordsAPI = {
   list: (params) => api.get('/watersheds', { params }),
   create: (data) => api.post('/watersheds', data),
   update: (id, data) => api.put(`/watersheds/${id}`, data),
   remove: (id) => api.delete(`/watersheds/${id}`),
-}
+};
 export const waterAnalyticsRecordsAPI = {
   list: (params) => api.get('/water-analytics/records', { params }),
   create: (data) => api.post('/water-analytics/records', data),
   update: (id, data) => api.put(`/water-analytics/records/${id}`, data),
   remove: (id) => api.delete(`/water-analytics/records/${id}`),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Batch 4 (2026-08-08): Climate, Operations, Machinery, Horticulture,
@@ -2487,7 +2561,7 @@ export const droughtMonitoringAPI = {
   createRecord: (data) => api.post('/drought-monitoring', data),
   updateRecord: (id, data) => api.put(`/drought-monitoring/${id}`, data),
   deleteRecord: (id) => api.delete(`/drought-monitoring/${id}`),
-}
+};
 
 /** M086 — Flood Monitoring (Climate). */
 export const floodMonitoringAPI = {
@@ -2495,7 +2569,7 @@ export const floodMonitoringAPI = {
   createRecord: (data) => api.post('/flood-monitoring', data),
   updateRecord: (id, data) => api.put(`/flood-monitoring/${id}`, data),
   deleteRecord: (id) => api.delete(`/flood-monitoring/${id}`),
-}
+};
 
 /** M087 — Pest Forecasting (Climate). Real backend: GET /weather/pest-forecast
  *  (migration 057, same feed weatherAPI.pestForecast already reads). No
@@ -2503,7 +2577,7 @@ export const floodMonitoringAPI = {
 export const pestForecastingAPI = {
   getForecasts: (params) => api.get('/weather/pest-forecast', { params })
     .then((res) => ({ ...res, data: { ...res.data, data: res.data?.data?.forecasts ?? [] } })),
-}
+};
 
 /** M088 — Disease Forecasting (Climate). */
 export const diseaseForecastingAPI = {
@@ -2511,7 +2585,7 @@ export const diseaseForecastingAPI = {
   createForecast: (data) => api.post('/disease-forecasting', data),
   updateForecast: (id, data) => api.put(`/disease-forecasting/${id}`, data),
   deleteForecast: (id) => api.delete(`/disease-forecasting/${id}`),
-}
+};
 
 /** M089 — Climate Risk Assessment (Climate). */
 export const climateRiskAPI = {
@@ -2519,7 +2593,7 @@ export const climateRiskAPI = {
   createAssessment: (data) => api.post('/climate-risk', data),
   updateAssessment: (id, data) => api.put(`/climate-risk/${id}`, data),
   deleteAssessment: (id) => api.delete(`/climate-risk/${id}`),
-}
+};
 
 /** M090 — Agro-Meteorology (Climate). */
 export const agroMeteorologyAPI = {
@@ -2527,7 +2601,7 @@ export const agroMeteorologyAPI = {
   createRecord: (data) => api.post('/agro-meteorology', data),
   updateRecord: (id, data) => api.put(`/agro-meteorology/${id}`, data),
   deleteRecord: (id) => api.delete(`/agro-meteorology/${id}`),
-}
+};
 
 /** M091 — Farm Activity Management (Operations). No backend route found. */
 export const farmActivityAPI = {
@@ -2535,7 +2609,7 @@ export const farmActivityAPI = {
   createActivity: (data) => api.post('/farm-activities', data),
   updateActivity: (id, data) => api.put(`/farm-activities/${id}`, data),
   deleteActivity: (id) => api.delete(`/farm-activities/${id}`),
-}
+};
 
 /** M092 — Farm Task Scheduling (Operations). No backend route found. */
 export const farmTaskAPI = {
@@ -2543,7 +2617,7 @@ export const farmTaskAPI = {
   createTask: (data) => api.post('/farm-tasks', data),
   updateTask: (id, data) => api.put(`/farm-tasks/${id}`, data),
   deleteTask: (id) => api.delete(`/farm-tasks/${id}`),
-}
+};
 
 /** M094 — Contractor Management (Operations). No backend route found. */
 export const contractorManagementAPI = {
@@ -2551,7 +2625,7 @@ export const contractorManagementAPI = {
   createContractor: (data) => api.post('/contractors', data),
   updateContractor: (id, data) => api.put(`/contractors/${id}`, data),
   deleteContractor: (id) => api.delete(`/contractors/${id}`),
-}
+};
 
 /** M095 — Machinery Operations (Operations). No backend route found. */
 export const machineryOperationsAPI = {
@@ -2559,7 +2633,7 @@ export const machineryOperationsAPI = {
   createOperation: (data) => api.post('/machinery-operations', data),
   updateOperation: (id, data) => api.put(`/machinery-operations/${id}`, data),
   deleteOperation: (id) => api.delete(`/machinery-operations/${id}`),
-}
+};
 
 /** M096 — Equipment Scheduling (Operations). No backend route found. */
 export const equipmentSchedulingAPI = {
@@ -2567,7 +2641,7 @@ export const equipmentSchedulingAPI = {
   createSchedule: (data) => api.post('/equipment-scheduling', data),
   updateSchedule: (id, data) => api.put(`/equipment-scheduling/${id}`, data),
   deleteSchedule: (id) => api.delete(`/equipment-scheduling/${id}`),
-}
+};
 
 /** M097 — Input Consumption (Operations). No backend route found. */
 export const inputConsumptionAPI = {
@@ -2575,7 +2649,7 @@ export const inputConsumptionAPI = {
   createRecord: (data) => api.post('/input-consumption', data),
   updateRecord: (id, data) => api.put(`/input-consumption/${id}`, data),
   deleteRecord: (id) => api.delete(`/input-consumption/${id}`),
-}
+};
 
 /** M099 — Farm Productivity (Operations). No backend route found. */
 export const farmProductivityAPI = {
@@ -2583,7 +2657,7 @@ export const farmProductivityAPI = {
   createMetric: (data) => api.post('/farm-productivity', data),
   updateMetric: (id, data) => api.put(`/farm-productivity/${id}`, data),
   deleteMetric: (id) => api.delete(`/farm-productivity/${id}`),
-}
+};
 
 /** M100 — Farm Operations Dashboard (Operations). No backend route found. */
 export const farmOperationsDashboardAPI = {
@@ -2591,7 +2665,7 @@ export const farmOperationsDashboardAPI = {
   createKpi: (data) => api.post('/farm-operations-dashboard', data),
   updateKpi: (id, data) => api.put(`/farm-operations-dashboard/${id}`, data),
   deleteKpi: (id) => api.delete(`/farm-operations-dashboard/${id}`),
-}
+};
 
 /** M102 — Implement Management (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /machinery-implements. The real
@@ -2604,7 +2678,7 @@ export const farmOperationsDashboardAPI = {
 export const implementManagementAPI = {
   getImplements: (params) => api.get('/modules/m102', { params }),
   createImplement: (data) => api.post('/modules/m102/register', data),
-}
+};
 
 /** M103 — Equipment Inventory (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /equipment-inventory. Real
@@ -2612,7 +2686,7 @@ export const implementManagementAPI = {
 export const equipmentInventoryAPI = {
   getEquipment: (params) => api.get('/modules/m103', { params }),
   createEquipment: (data) => api.post('/modules/m103/register', data),
-}
+};
 
 /** M104 — Equipment Rental (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /equipment-rental. Real backend
@@ -2621,7 +2695,7 @@ export const equipmentInventoryAPI = {
 export const equipmentRentalAPI = {
   getRentals: (params) => api.get('/modules/m104', { params }),
   createRental: (data) => api.post('/modules/m104/list', data),
-}
+};
 
 /** M105 — Fleet Management (Machinery). Real backend at
  *  backend/src/routes/logisticsEnhancements.js, mounted at /api/v1/logistics
@@ -2638,7 +2712,7 @@ export const fleetManagementAPI = {
   // logisticsEnhancementService.getMaintenanceDueList — wave-1 machinery
   // business logic, 2026-08-10).
   getMaintenanceDue: (params) => api.get('/logistics/fleet/maintenance-due', { params }),
-}
+};
 
 /** M106 — Preventive Maintenance (Machinery). No backend route found. */
 export const preventiveMaintenanceAPI = {
@@ -2646,7 +2720,7 @@ export const preventiveMaintenanceAPI = {
   createRecord: (data) => api.post('/preventive-maintenance', data),
   updateRecord: (id, data) => api.put(`/preventive-maintenance/${id}`, data),
   deleteRecord: (id) => api.delete(`/preventive-maintenance/${id}`),
-}
+};
 
 /** M107 — Breakdown Maintenance (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /breakdown-maintenance. Real
@@ -2654,7 +2728,7 @@ export const preventiveMaintenanceAPI = {
 export const breakdownMaintenanceAPI = {
   getRecords: (params) => api.get('/modules/m107', { params }),
   createRecord: (data) => api.post('/modules/m107/report', data),
-}
+};
 
 /** M108 — Fuel Management (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /fuel-management. Real backend
@@ -2663,7 +2737,7 @@ export const breakdownMaintenanceAPI = {
 export const fuelManagementAPI = {
   getLogs: (params) => api.get('/modules/m108', { params }),
   createLog: (data) => api.post('/modules/m108/purchase', data),
-}
+};
 
 /** M109 — Spare Parts Management (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /spare-parts. Real backend at
@@ -2671,7 +2745,7 @@ export const fuelManagementAPI = {
 export const sparePartsAPI = {
   getParts: (params) => api.get('/modules/m109', { params }),
   createPart: (data) => api.post('/modules/m109/register', data),
-}
+};
 
 /** M110 — Asset Lifecycle Management (Machinery). No backend route found. */
 // Fixed 2026-08-24: was calling nonexistent /asset-lifecycle. Real backend
@@ -2679,7 +2753,7 @@ export const sparePartsAPI = {
 export const assetLifecycleAPI = {
   getAssets: (params) => api.get('/modules/m110', { params }),
   createAsset: (data) => api.post('/modules/m110/register', data),
-}
+};
 
 /** M142 — Vegetable Production (Horticulture). No backend route found. */
 export const vegetableProductionAPI = {
@@ -2687,7 +2761,7 @@ export const vegetableProductionAPI = {
   createRecord: (data) => api.post('/vegetable-production', data),
   updateRecord: (id, data) => api.put(`/vegetable-production/${id}`, data),
   deleteRecord: (id) => api.delete(`/vegetable-production/${id}`),
-}
+};
 
 /** M143 — Floriculture Management (Horticulture). Real backend:
  *  floricultureRoutes mounted at /api/v1/floriculture in index.js
@@ -2698,7 +2772,7 @@ export const floricultureAPI = {
   createRecord: (data) => api.post('/floriculture', data),
   updateRecord: (id, data) => api.put(`/floriculture/${id}`, data),
   deleteRecord: (id) => api.delete(`/floriculture/${id}`),
-}
+};
 
 /** M144 — Greenhouse Management (Horticulture). Real backend at
  *  backend/src/services/greenhouseService.js (mounted directly in index.js,
@@ -2721,7 +2795,7 @@ export const greenhouseAPI = {
   predictYield: (data) => api.post('/greenhouse/predict-yield', data),
   dpr: (data) => api.post('/greenhouse/dpr', data),
   costEstimate: (data) => api.post('/greenhouse/cost-estimate', data),
-}
+};
 
 /** M145 — Polyhouse Management (Horticulture). No backend route found. */
 export const polyhouseAPI = {
@@ -2729,7 +2803,7 @@ export const polyhouseAPI = {
   createRecord: (data) => api.post('/polyhouse-management', data),
   updateRecord: (id, data) => api.put(`/polyhouse-management/${id}`, data),
   deleteRecord: (id) => api.delete(`/polyhouse-management/${id}`),
-}
+};
 
 /** M146 — Hydroponics Management (Horticulture). No backend route found. */
 export const hydroponicsAPI = {
@@ -2737,7 +2811,7 @@ export const hydroponicsAPI = {
   createSystem: (data) => api.post('/hydroponics', data),
   updateSystem: (id, data) => api.put(`/hydroponics/${id}`, data),
   deleteSystem: (id) => api.delete(`/hydroponics/${id}`),
-}
+};
 
 /** M147 — Aeroponics Management (Horticulture). No backend route found. */
 export const aeroponicsAPI = {
@@ -2745,7 +2819,7 @@ export const aeroponicsAPI = {
   createSystem: (data) => api.post('/aeroponics', data),
   updateSystem: (id, data) => api.put(`/aeroponics/${id}`, data),
   deleteSystem: (id) => api.delete(`/aeroponics/${id}`),
-}
+};
 
 /** M148 — Precision Horticulture (Horticulture). Confirmed ABSENT (no trace
  *  anywhere in backend or frontend) — genuinely missing, safe to build. */
@@ -2758,7 +2832,7 @@ export const precisionHorticultureAPI = {
   createReading: (data) => api.post('/precision-horticulture', data),
   updateReading: (id, data) => api.put(`/precision-horticulture/${id}`, data),
   deleteReading: (id) => api.delete(`/precision-horticulture/${id}`),
-}
+};
 
 /**
  * User Management API (M006) — AI-enhanced user operations.
@@ -2772,7 +2846,20 @@ export const userManagementAPI = {
   getSystemAnalytics: () => api.get('/modules/m006/analytics'),
   detectAnomalies: () => api.get('/modules/m006/anomalies'),
   getPredictiveMaintenance: () => api.get('/modules/m006/predictive-maintenance'),
-}
+};
+
+/** M006 settings routes mounted under /api/v1/admin. */
+export const adminSettingsAPI = {
+  getSettings: () => api.get('/admin/settings'),
+  getSetting: (name) => api.get(`/admin/settings/${name}`),
+  upsertSetting: (name, value) => api.put(`/admin/settings/${name}`, { value }),
+};
+
+/** M011 user routes mounted under /api/v1/users. */
+export const userAdministrationAPI = {
+  listUsers: () => api.get('/users'),
+  createUser: (data) => api.post('/users', data),
+};
 
 /**
  * Role & Permission Management API (M007) — AI-enhanced RBAC.
@@ -2809,7 +2896,7 @@ export const rolePermissionAPI = {
   recommendRoleForUser: (userId) => executeM004('recommendRoleForUser', { userId }),
   getPermissionMatrix: () => executeM004('getPermissionMatrix', {}),
   getRoleHierarchy: () => executeM004('getRoleHierarchy', {}),
-}
+};
 
 /**
  * Audit & Compliance API (M008) — AI-enhanced compliance.
@@ -2825,7 +2912,7 @@ export const auditComplianceAPI = {
   evaluateComplianceRules: (userId) => api.get(`/modules/m008/users/${userId}/compliance`),
   generateComplianceReport: (params) => api.get('/modules/m008/reports/compliance', { params }),
   detectAuditAnomalies: (params) => api.get('/modules/m008/anomalies', { params }),
-}
+};
 
 /**
  * Security & Access Control API (M009) — AI-enhanced security.
@@ -2843,7 +2930,7 @@ export const securityAccessControlAPI = {
   calculateSecurityScore: (userId) => api.get(`/modules/m009/users/${userId}/security-score`),
   createAccessPolicy: (policyData) => api.post('/modules/m009/policies', policyData),
   evaluateAccessPolicy: (userId, resource, action) => api.post('/modules/m009/policies/evaluate', { userId, resource, action }),
-}
+};
 
 /**
  * Notification System API (M010) — AI-enhanced notifications.
@@ -2863,7 +2950,7 @@ export const notificationAPI = {
   renderTemplate: (templateId, variables) => api.post('/modules/m010/templates/render', { templateId, variables }),
   batchNotifications: (notificationIds) => api.post('/modules/m010/batch', { notificationIds }),
   getNotificationAnalytics: (params) => api.get('/modules/m010/analytics', { params }),
-}
+};
 
 /** M149 — Protected Cultivation (Horticulture). No backend route found. */
 export const protectedCultivationAPI = {
@@ -2871,7 +2958,7 @@ export const protectedCultivationAPI = {
   createStructure: (data) => api.post('/protected-cultivation', data),
   updateStructure: (id, data) => api.put(`/protected-cultivation/${id}`, data),
   deleteStructure: (id) => api.delete(`/protected-cultivation/${id}`),
-}
+};
 
 /** M150 — Horticulture Analytics (Horticulture). No backend route found. */
 export const horticultureAnalyticsAPI = {
@@ -2879,7 +2966,7 @@ export const horticultureAnalyticsAPI = {
   createMetric: (data) => api.post('/horticulture-analytics', data),
   updateMetric: (id, data) => api.put(`/horticulture-analytics/${id}`, data),
   deleteMetric: (id) => api.delete(`/horticulture-analytics/${id}`),
-}
+};
 
 /** M131 — Biofloc Farm Management (Fisheries). No backend route found. */
 export const biofloccFarmAPI = {
@@ -2887,7 +2974,7 @@ export const biofloccFarmAPI = {
   createTank: (data) => api.post('/biofloc-farms', data),
   updateTank: (id, data) => api.put(`/biofloc-farms/${id}`, data),
   deleteTank: (id) => api.delete(`/biofloc-farms/${id}`),
-}
+};
 
 /** M133 — Hatchery Management (Fisheries). No backend route found. */
 export const hatcheryManagementAPI = {
@@ -2895,7 +2982,7 @@ export const hatcheryManagementAPI = {
   createBatch: (data) => api.post('/hatchery-management', data),
   updateBatch: (id, data) => api.put(`/hatchery-management/${id}`, data),
   deleteBatch: (id) => api.delete(`/hatchery-management/${id}`),
-}
+};
 
 /** M134 — Fish Feed Management (Fisheries). No backend route found. */
 export const fishFeedAPI = {
@@ -2903,7 +2990,7 @@ export const fishFeedAPI = {
   createLog: (data) => api.post('/fish-feed', data),
   updateLog: (id, data) => api.put(`/fish-feed/${id}`, data),
   deleteLog: (id) => api.delete(`/fish-feed/${id}`),
-}
+};
 
 /** M135 — Water Quality Control, fisheries (Fisheries). No backend route found. */
 export const fisheriesWaterQualityAPI = {
@@ -2911,7 +2998,7 @@ export const fisheriesWaterQualityAPI = {
   createReading: (data) => api.post('/fisheries-water-quality', data),
   updateReading: (id, data) => api.put(`/fisheries-water-quality/${id}`, data),
   deleteReading: (id) => api.delete(`/fisheries-water-quality/${id}`),
-}
+};
 
 /** M136 — Fish Health Management (Fisheries). No backend route found. */
 export const fishHealthAPI = {
@@ -2919,7 +3006,7 @@ export const fishHealthAPI = {
   createRecord: (data) => api.post('/fish-health', data),
   updateRecord: (id, data) => api.put(`/fish-health/${id}`, data),
   deleteRecord: (id) => api.delete(`/fish-health/${id}`),
-}
+};
 
 /** M137 — Harvest Management, fisheries (Fisheries). No backend route found. */
 export const fisheriesHarvestAPI = {
@@ -2927,7 +3014,7 @@ export const fisheriesHarvestAPI = {
   createHarvest: (data) => api.post('/fisheries-harvest', data),
   updateHarvest: (id, data) => api.put(`/fisheries-harvest/${id}`, data),
   deleteHarvest: (id) => api.delete(`/fisheries-harvest/${id}`),
-}
+};
 
 /** M138 — Fish Processing Management (Fisheries). No backend route found. */
 export const fishProcessingAPI = {
@@ -2935,7 +3022,7 @@ export const fishProcessingAPI = {
   createBatch: (data) => api.post('/fish-processing', data),
   updateBatch: (id, data) => api.put(`/fish-processing/${id}`, data),
   deleteBatch: (id) => api.delete(`/fish-processing/${id}`),
-}
+};
 
 /** M139 — Cold Fish Chain (Fisheries). No backend route found. */
 export const coldFishChainAPI = {
@@ -2943,7 +3030,7 @@ export const coldFishChainAPI = {
   createShipment: (data) => api.post('/cold-fish-chain', data),
   updateShipment: (id, data) => api.put(`/cold-fish-chain/${id}`, data),
   deleteShipment: (id) => api.delete(`/cold-fish-chain/${id}`),
-}
+};
 
 /** M140 — Aquaculture Analytics (Fisheries). No backend route found. */
 export const aquacultureAnalyticsAPI = {
@@ -2951,7 +3038,7 @@ export const aquacultureAnalyticsAPI = {
   createMetric: (data) => api.post('/aquaculture-analytics', data),
   updateMetric: (id, data) => api.put(`/aquaculture-analytics/${id}`, data),
   deleteMetric: (id) => api.delete(`/aquaculture-analytics/${id}`),
-}
+};
 
 /** M014 — Role Management (Identity). No backend route found. */
 export const roleManagementAPI = {
@@ -2959,7 +3046,7 @@ export const roleManagementAPI = {
   createRole: (data) => api.post('/roles', data),
   updateRole: (id, data) => api.put(`/roles/${id}`, data),
   deleteRole: (id) => api.delete(`/roles/${id}`),
-}
+};
 
 /** M015 — Permission Management (Identity). No backend route found. */
 export const permissionManagementAPI = {
@@ -2967,7 +3054,7 @@ export const permissionManagementAPI = {
   createPermission: (data) => api.post('/permissions', data),
   updatePermission: (id, data) => api.put(`/permissions/${id}`, data),
   deletePermission: (id) => api.delete(`/permissions/${id}`),
-}
+};
 
 /** M016 — Single Sign-On (Identity). No backend route found. */
 export const ssoAPI = {
@@ -2975,7 +3062,7 @@ export const ssoAPI = {
   createProvider: (data) => api.post('/sso-providers', data),
   updateProvider: (id, data) => api.put(`/sso-providers/${id}`, data),
   deleteProvider: (id) => api.delete(`/sso-providers/${id}`),
-}
+};
 
 /** M017 — Multi-Factor Authentication (Identity). authService.js already has
  *  per-user 2FA setup/verify/disable (authAPI.setup2FA/verify2FA/disable2FA)
@@ -2985,7 +3072,7 @@ export const mfaManagementAPI = {
   createDevice: (data) => api.post('/mfa-devices', data),
   updateDevice: (id, data) => api.put(`/mfa-devices/${id}`, data),
   deleteDevice: (id) => api.delete(`/mfa-devices/${id}`),
-}
+};
 
 /** M018 — Digital Identity (Identity). No backend route found. */
 export const digitalIdentityAPI = {
@@ -2993,7 +3080,7 @@ export const digitalIdentityAPI = {
   createIdentity: (data) => api.post('/digital-identities', data),
   updateIdentity: (id, data) => api.put(`/digital-identities/${id}`, data),
   deleteIdentity: (id) => api.delete(`/digital-identities/${id}`),
-}
+};
 
 /** M019 — Consent Management (Identity). No backend route found. */
 export const consentManagementAPI = {
@@ -3001,7 +3088,7 @@ export const consentManagementAPI = {
   createRecord: (data) => api.post('/consent-records', data),
   updateRecord: (id, data) => api.put(`/consent-records/${id}`, data),
   deleteRecord: (id) => api.delete(`/consent-records/${id}`),
-}
+};
 
 /** M020 — Session Management (Identity). No backend route found. */
 export const sessionManagementAPI = {
@@ -3009,7 +3096,7 @@ export const sessionManagementAPI = {
   createSession: (data) => api.post('/sessions', data),
   updateSession: (id, data) => api.put(`/sessions/${id}`, data),
   deleteSession: (id) => api.delete(`/sessions/${id}`),
-}
+};
 
 /** M005 — Environment Management (Platform Foundation). No backend route found. */
 export const environmentManagementAPI = {
@@ -3017,7 +3104,7 @@ export const environmentManagementAPI = {
   createEnvironment: (data) => api.post('/environments', data),
   updateEnvironment: (id, data) => api.put(`/environments/${id}`, data),
   deleteEnvironment: (id) => api.delete(`/environments/${id}`),
-}
+};
 
 /** M007 — Feature Flag Management (Platform Foundation). No backend route found. */
 export const featureFlagAPI = {
@@ -3025,7 +3112,7 @@ export const featureFlagAPI = {
   createFlag: (data) => api.post('/feature-flags', data),
   updateFlag: (id, data) => api.put(`/feature-flags/${id}`, data),
   deleteFlag: (id) => api.delete(`/feature-flags/${id}`),
-}
+};
 
 /** M009 — Time Zone Management (Platform Foundation). No backend route found. */
 export const timeZoneManagementAPI = {
@@ -3033,7 +3120,7 @@ export const timeZoneManagementAPI = {
   createZone: (data) => api.post('/timezones', data),
   updateZone: (id, data) => api.put(`/timezones/${id}`, data),
   deleteZone: (id) => api.delete(`/timezones/${id}`),
-}
+};
 
 /** M010 — Master Configuration (Platform Foundation). No backend route found. */
 export const masterConfigAPI = {
@@ -3041,7 +3128,7 @@ export const masterConfigAPI = {
   createConfig: (data) => api.post('/master-config', data),
   updateConfig: (id, data) => api.put(`/master-config/${id}`, data),
   deleteConfig: (id) => api.delete(`/master-config/${id}`),
-}
+};
 
 // ---------------------------------------------------------------------------
 // Enterprise Control Layer (993) — backend/src/services/enterpriseControlService.js,
@@ -3085,7 +3172,7 @@ export const enterpriseControlAPI = {
   raiseIncident: (body) => api.post('/control/emergency/incidents', body),
   acknowledgeIncident: (incidentCode) => api.post(`/control/emergency/incidents/${incidentCode}/acknowledge`),
   activeIncidents: () => api.get('/control/emergency/active'),
-}
+};
 
 /** Complete ERP Integration - Comprehensive ERP integration with all modules.
  *  Integrates farmer, crop, livestock, and inbuilt modules with financial ERP,
@@ -3096,27 +3183,27 @@ export const completeERPIntegrationAPI = {
   syncFarmerCropPlanning: (farmerId, data) => api.post(`/complete-erp-integration/farmer/${farmerId}/crop-planning`, data),
   syncFarmerHarvest: (farmerId, data) => api.post(`/complete-erp-integration/farmer/${farmerId}/harvest`, data),
   syncFarmerField: (farmerId, data) => api.post(`/complete-erp-integration/farmer/${farmerId}/field`, data),
-  
+
   // Crop Module ERP Integration
   syncCropLifecycle: (cropId, data) => api.post(`/complete-erp-integration/crop/${cropId}/lifecycle`, data),
   syncCropYield: (cropId, data) => api.post(`/complete-erp-integration/crop/${cropId}/yield`, data),
-  
+
   // Livestock Module ERP Integration
   syncLivestock: (livestockId, data) => api.post(`/complete-erp-integration/livestock/${livestockId}`, data),
   syncLivestockProduction: (livestockId, data) => api.post(`/complete-erp-integration/livestock/${livestockId}/production`, data),
   syncLivestockHealth: (livestockId, data) => api.post(`/complete-erp-integration/livestock/${livestockId}/health`, data),
-  
+
   // Inbuilt Modules ERP Integration
   syncDairyProduction: (dairyId, data) => api.post(`/complete-erp-integration/dairy/${dairyId}/production`, data),
   syncPoultryProduction: (poultryId, data) => api.post(`/complete-erp-integration/poultry/${poultryId}/production`, data),
   syncGoatProduction: (goatId, data) => api.post(`/complete-erp-integration/goat/${goatId}/production`, data),
   syncSheepProduction: (sheepId, data) => api.post(`/complete-erp-integration/sheep/${sheepId}/production`, data),
   syncPigProduction: (pigId, data) => api.post(`/complete-erp-integration/pig/${pigId}/production`, data),
-  
+
   // Bulk ERP Integration
   getERPIntegrationStatus: (params) => api.get('/complete-erp-integration/status', { params }),
   forceSyncAllERPIntegrations: (data) => api.post('/complete-erp-integration/force-sync', data),
-}
+};
 
 /** Complete AI Integration - Comprehensive AI integration with all modules.
  *  Integrates farmer, crop, livestock, and inbuilt modules with predictive analytics,
@@ -3127,27 +3214,27 @@ export const completeAIIntegrationAPI = {
   recommendCropPlanning: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/crop-planning-recommendation`, data),
   predictHarvestTiming: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/harvest-timing-prediction`, data),
   optimizeFarmerResources: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/resource-optimization`, data),
-  
+
   // Crop Module AI Integration
   detectCropDisease: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/disease-detection`, data),
   predictCropYield: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/yield-prediction`, data),
-  
+
   // Livestock Module AI Integration
   monitorLivestockHealth: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/health-monitoring`, data),
   recommendLivestockBreeding: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/breeding-recommendation`, data),
-  
+
   // Inbuilt Modules AI Integration
   optimizeDairyProduction: (dairyId, data) => api.post(`/complete-ai-integration/dairy/${dairyId}/production-optimization`, data),
   monitorPoultryHealth: (poultryId, data) => api.post(`/complete-ai-integration/poultry/${poultryId}/health-monitoring`, data),
   optimizeGoatProduction: (goatId, data) => api.post(`/complete-ai-integration/goat/${goatId}/production-optimization`, data),
   optimizeSheepProduction: (sheepId, data) => api.post(`/complete-ai-integration/sheep/${sheepId}/production-optimization`, data),
   optimizePigProduction: (pigId, data) => api.post(`/complete-ai-integration/pig/${pigId}/production-optimization`, data),
-  
+
   // Bulk AI Integration
   getAIIntegrationStatus: (params) => api.get('/complete-ai-integration/status', { params }),
   forceSyncAllAIIntegrations: (data) => api.post('/complete-ai-integration/force-sync', data),
   getAIModelInfo: () => api.get('/complete-ai-integration/model-info'),
-}
+};
 
 /** Bulk Order API - Bulk/wholesale orders for marketplace.
  *  Real backend as of 2026-08-12: backend/src/routes/bulkOrderRoutes.js */
@@ -3161,7 +3248,7 @@ export const bulkOrderAPI = {
   acceptQuotation: (quotationId, data) => api.post(`/bulk-orders/quotations/${quotationId}/accept`, data),
   getBulkOrderAnalytics: (params) => api.get('/bulk-orders/analytics', { params }),
   cancelBulkOrder: (orderId, data) => api.post(`/bulk-orders/${orderId}/cancel`, data),
-}
+};
 
 /** Dairy AI API - AI-powered dairy management.
  *  Real backend as of 2026-08-12: backend/src/routes/dairyRoutes.js */
@@ -3170,7 +3257,7 @@ export const dairyAIAPI = {
   predictHealthRisks: (animalId) => api.post(`/dairy/ai/predict-health/${animalId}`),
   optimizeFeedComposition: (animalId, data) => api.post(`/dairy/ai/optimize-feed/${animalId}`, data),
   recommendBreeding: (animalId) => api.post(`/dairy/ai/recommend-breeding/${animalId}`),
-}
+};
 
 /** Poultry AI API - AI-powered poultry management.
  *  Real backend as of 2026-08-12: backend/src/routes/poultryRoutes.js */
@@ -3179,7 +3266,7 @@ export const poultryAIAPI = {
   monitorFlockHealth: (flockId) => api.post(`/poultry/ai/monitor-health/${flockId}`),
   optimizePoultryFeed: (flockId, data) => api.post(`/poultry/ai/optimize-feed/${flockId}`, data),
   predictMortalityRisk: (flockId) => api.post(`/poultry/ai/predict-mortality/${flockId}`),
-}
+};
 
 /** Goat AI API - AI-powered goat management.
  *  Real backend as of 2026-08-12: backend/src/routes/goatRoutes.js */
@@ -3188,7 +3275,7 @@ export const goatAIAPI = {
   monitorGoatHealth: (animalId) => api.post(`/goat/ai/monitor-health/${animalId}`),
   optimizeGoatFeed: (animalId, data) => api.post(`/goat/ai/optimize-feed/${animalId}`, data),
   recommendGoatBreeding: (animalId) => api.post(`/goat/ai/recommend-breeding/${animalId}`),
-}
+};
 
 /** Sheep AI API - AI-powered sheep management.
  *  Real backend as of 2026-08-12: backend/src/routes/sheepRoutes.js */
@@ -3197,7 +3284,7 @@ export const sheepAIAPI = {
   monitorSheepHealth: (animalId) => api.post(`/sheep/ai/monitor-health/${animalId}`),
   optimizeSheepFeed: (animalId, data) => api.post(`/sheep/ai/optimize-feed/${animalId}`, data),
   recommendSheepBreeding: (animalId) => api.post(`/sheep/ai/recommend-breeding/${animalId}`),
-}
+};
 
 /** Pig AI API - AI-powered pig management.
  *  Real backend as of 2026-08-12: backend/src/routes/pigRoutes.js */
@@ -3206,7 +3293,7 @@ export const pigAIAPI = {
   monitorPigHealth: (animalId) => api.post(`/pig/ai/monitor-health/${animalId}`),
   optimizePigFeed: (animalId, data) => api.post(`/pig/ai/optimize-feed/${animalId}`, data),
   recommendPigBreeding: (animalId) => api.post(`/pig/ai/recommend-breeding/${animalId}`),
-}
+};
 
 /** Comprehensive ERP API - Oracle/SAP standards complete ERP system.
  *  Real backend as of 2026-08-12: backend/src/routes/comprehensiveERPRoutes.js */
@@ -3226,7 +3313,7 @@ export const comprehensiveERPAPI = {
   postCostAllocation: (data) => api.post('/comprehensive-erp/co/cost-allocations', data),
   getCostCenterReport: (params) => api.get('/comprehensive-erp/co/cost-centers/report', { params }),
   getProfitCenterReport: (params) => api.get('/comprehensive-erp/co/profit-centers/report', { params }),
-  
+
   // Materials Management (MM)
   createMaterialMaster: (data) => api.post('/comprehensive-erp/mm/material-master', data),
   createPurchaseOrder: (data) => api.post('/comprehensive-erp/mm/purchase-orders', data),
@@ -3239,7 +3326,7 @@ export const comprehensiveERPAPI = {
   createSalesOrder: (data) => api.post('/comprehensive-erp/sd/sales-orders', data),
   createDelivery: (data) => api.post('/comprehensive-erp/sd/deliveries', data),
   createInvoice: (data) => api.post('/comprehensive-erp/sd/invoices', data),
-  
+
   // Production Planning (PP)
   createProductionOrder: (data) => api.post('/comprehensive-erp/pp/production-orders', data),
   releaseProductionOrder: (productionOrder) => api.post(`/comprehensive-erp/pp/production-orders/${productionOrder}/release`),
@@ -3250,12 +3337,12 @@ export const comprehensiveERPAPI = {
   createInspectionLot: (data) => api.post('/comprehensive-erp/qm/inspection-lots', data),
   recordInspectionResult: (data) => api.post('/comprehensive-erp/qm/inspection-results', data),
   makeUsageDecision: (inspectionLot, data) => api.post(`/comprehensive-erp/qm/inspection-lots/${inspectionLot}/usage-decision`, data),
-  
+
   // Plant Maintenance (PM)
   createEquipmentMaster: (data) => api.post('/comprehensive-erp/pm/equipment', data),
   createMaintenanceOrder: (data) => api.post('/comprehensive-erp/pm/maintenance-orders', data),
   confirmMaintenanceOrder: (maintenanceOrder, data) => api.post(`/comprehensive-erp/pm/maintenance-orders/${maintenanceOrder}/confirm`, data),
-  
+
   // Human Resources (HR)
   createEmployeeMaster: (data) => api.post('/comprehensive-erp/hr/employees', data),
   createOrganizationalUnit: (data) => api.post('/comprehensive-erp/hr/org-units', data),
@@ -3272,15 +3359,15 @@ export const comprehensiveERPAPI = {
   createBankAccount: (data) => api.post('/comprehensive-erp/tr/bank-accounts', data),
   recordCashFlow: (data) => api.post('/comprehensive-erp/tr/cash-flows', data),
   getCashPosition: (params) => api.get('/comprehensive-erp/tr/cash-position', { params }),
-  
+
   // Asset Management (AM)
   createFixedAsset: (data) => api.post('/comprehensive-erp/am/fixed-assets', data),
   calculateDepreciation: (assetCode, params) => api.post(`/comprehensive-erp/am/fixed-assets/${assetCode}/depreciation`, null, { params }),
-  
+
   // Business Intelligence (BI)
   getExecutiveDashboard: (params) => api.get('/comprehensive-erp/bi/executive-dashboard', { params }),
   getProfitabilityAnalysis: (params) => api.get('/comprehensive-erp/bi/profitability-analysis', { params }),
-}
+};
 
 /** Nervous System API - AFRERA enterprise route control with biological
  *  architecture (brain/heart/neural pathways/reflex/sensors/motor functions).
@@ -3324,7 +3411,7 @@ export const nervousSystemAPI = {
 
   // System Health
   getNervousSystemHealth: () => api.get('/nervous/health'),
-}
+};
 
 /** Logistics Enhancement API - fleet management, real-time shipment/driver
  *  tracking, temperature monitoring, warehouse integration.
@@ -3362,7 +3449,7 @@ export const logisticsEnhancementAPI = {
   recordDriverLocation: (data) => api.post('/logistics-enhancement/drivers/location', data),
   getActiveDrivers: (params) => api.get('/logistics-enhancement/drivers/active', { params }),
   getShipmentTrail: (id) => api.get(`/logistics-enhancement/shipments/${id}/trail`),
-}
+};
 
 /** Enterprise AI API - credit scoring, government scheme eligibility, model
  *  slot registry and the template-fallback conversational query endpoint.
@@ -3378,7 +3465,7 @@ export const enterpriseAIAPI = {
   getUnservedIntents: () => api.get('/enterprise-ai/unserved-intents'),
   upsertModelSlot: (data) => api.post('/enterprise-ai/model-slots', data),
   query: (data) => api.post('/enterprise-ai/query', data),
-}
+};
 
 /** AI Backbone API - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face).
  *  Real backend as of 2026-08-12: backend/src/routes/aiBackboneRoutes.js */
@@ -3388,7 +3475,7 @@ export const aiBackboneAPI = {
   getAIProviderStatus: () => api.get('/ai-backbone/status'),
   switchProvider: (data) => api.post('/ai-backbone/switch-provider', data),
   resetAIStatistics: () => api.post('/ai-backbone/reset-statistics'),
-  
+
   // Agricultural AI Operations
   supportAgriculturalDecision: (data) => api.post('/ai-backbone/agricultural-decision', data),
   optimizeLivestock: (data) => api.post('/ai-backbone/livestock-optimization', data),
@@ -3397,27 +3484,27 @@ export const aiBackboneAPI = {
   recommendCropPlanning: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/crop-planning-recommendation`, data),
   predictHarvestTiming: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/harvest-timing-prediction`, data),
   optimizeFarmerResources: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/resource-optimization`, data),
-  
+
   // Crop Module AI Integration
   detectCropDisease: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/disease-detection`, data),
   predictCropYield: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/yield-prediction`, data),
-  
+
   // Livestock Module AI Integration
   monitorLivestockHealth: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/health-monitoring`, data),
   recommendLivestockBreeding: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/breeding-recommendation`, data),
-  
+
   // Inbuilt Modules AI Integration
   optimizeDairyProduction: (dairyId, data) => api.post(`/complete-ai-integration/dairy/${dairyId}/production-optimization`, data),
   monitorPoultryHealth: (poultryId, data) => api.post(`/complete-ai-integration/poultry/${poultryId}/health-monitoring`, data),
   optimizeGoatProduction: (goatId, data) => api.post(`/complete-ai-integration/goat/${goatId}/production-optimization`, data),
   optimizeSheepProduction: (sheepId, data) => api.post(`/complete-ai-integration/sheep/${sheepId}/production-optimization`, data),
   optimizePigProduction: (pigId, data) => api.post(`/complete-ai-integration/pig/${pigId}/production-optimization`, data),
-  
+
   // Bulk AI Integration
   getAIIntegrationStatus: (params) => api.get('/complete-ai-integration/status', { params }),
   forceSyncAllAIIntegrations: (data) => api.post('/complete-ai-integration/force-sync', data),
   getAIModelInfo: () => api.get('/complete-ai-integration/model-info'),
-}
+};
 
 export const custodyAPI = {
   appendEvent: (data) => api.post('/custody/events', data),
@@ -3426,7 +3513,7 @@ export const custodyAPI = {
   confirmSettlementExecution: (instructionId) => api.post(`/custody/settlement/${instructionId}/confirm`),
   getSettlementInstruction: (instructionId) => api.get(`/custody/settlement/${instructionId}`),
   getStateMachine: () => api.get('/custody/state-machine'),
-}
+};
 
 /** Freight Pooling API - full-truck window pooling for shipments.
  *  Real backend as of 2026-08-29: backend/src/routes/freightPoolingRoutes.js */
@@ -3438,7 +3525,7 @@ export const freightPoolingAPI = {
   getPoolWindow: (windowId) => api.get(`/freight-pooling/windows/${windowId}`),
   joinPoolWindow: (windowId, shipmentId) => api.post(`/freight-pooling/windows/${windowId}/join`, { shipmentId }),
   closeAndDispatch: (windowId) => api.post(`/freight-pooling/windows/${windowId}/dispatch`),
-}
+};
 
 /** Return-Load Board API - post/search/book backhaul capacity.
  *  Real backend as of 2026-08-29: backend/src/routes/returnLoadBoardRoutes.js */
@@ -3447,7 +3534,7 @@ export const returnLoadBoardAPI = {
   searchAvailable: (params) => api.get('/return-load-board', { params }),
   bookPosting: (postingId, shipmentId) => api.post(`/return-load-board/${postingId}/book`, { shipmentId }),
   cancelPosting: (postingId) => api.delete(`/return-load-board/${postingId}`),
-}
+};
 
 /** Second-Use Equipment Exchange API.
  *  Real backend as of 2026-08-29: backend/src/routes/equipmentExchangeRoutes.js */
@@ -3458,21 +3545,21 @@ export const equipmentExchangeAPI = {
   reserveListing: (listingId) => api.post(`/equipment-exchange/${listingId}/reserve`),
   completeExchange: (listingId) => api.post(`/equipment-exchange/${listingId}/complete`),
   withdrawListing: (listingId) => api.delete(`/equipment-exchange/${listingId}`),
-}
+};
 
 /** Glut Early-Warning API - oversupply risk detection.
  *  Real backend as of 2026-08-29: backend/src/routes/glutWarningRoutes.js */
 export const glutWarningAPI = {
   checkGlutRisk: (categoryId, stateId) => api.get('/glut-warning/check', { params: { categoryId, stateId } }),
   scanAllCategories: (stateId) => api.get('/glut-warning/scan', { params: { stateId } }),
-}
+};
 
 /** Seller Ranking API - DB-backed seller trust ranking.
  *  Real backend as of 2026-08-29: backend/src/routes/sellerRankingRoutes.js */
 export const sellerRankingAPI = {
   getRankedSellers: (params) => api.get('/seller-ranking/sellers', { params }),
   getSellerTrustScore: (userId) => api.get(`/seller-ranking/sellers/${userId}/trust-score`),
-}
+};
 
 /** Civil Disruption / Blockade Response API.
  *  Real backend as of 2026-08-29: backend/src/routes/civilDisruptionRoutes.js */
@@ -3482,7 +3569,7 @@ export const civilDisruptionAPI = {
   verify: (id) => api.post(`/civil-disruptions/${id}/verify`),
   resolve: (id, endDate) => api.post(`/civil-disruptions/${id}/resolve`, { endDate }),
   checkShipmentRisk: (shipmentId) => api.get(`/civil-disruptions/shipments/${shipmentId}/risk`),
-}
+};
 
 /** Engineering Project API - Project/phase management + cost estimation.
  *  Real backend: backend/src/routes/engineeringProjectRoutes.js +
@@ -3494,7 +3581,7 @@ export const engineeringProjectAPI = {
   updateProjectPhase: (id, data) => api.put(`/engineering/projects/${id}/phase`, data),
   createCostEstimate: (id, data) => api.post(`/engineering/projects/${id}/cost-estimates`, data),
   getCostEstimates: (id) => api.get(`/engineering/projects/${id}/cost-estimates`),
-}
+};
 
 /** Realtime Monitoring API - In-memory resource monitoring/alerting engine.
  *  Real backend: backend/src/routes/realtimeMonitoringRoutes.js +
@@ -3505,7 +3592,7 @@ export const realtimeMonitoringAPI = {
   getMonitoringStatus: (id) => api.get(`/realtime-monitoring/monitors/${id}`),
   stopMonitoring: (id) => api.delete(`/realtime-monitoring/monitors/${id}`),
   healthCheck: () => api.get('/realtime-monitoring/health'),
-}
+};
 
 /** Cold Storage API - Facility/booking CRUD + capacity-checked booking rule.
  *  Real backend: backend/src/routes/coldStorageRoutes.js +
@@ -3519,7 +3606,7 @@ export const coldStorageAPI = {
   createBooking: (data) => api.post('/cold-storage/bookings', data),
   getBookings: (params) => api.get('/cold-storage/bookings', { params }),
   updateBookingStatus: (bookingId, status) => api.put(`/cold-storage/bookings/${bookingId}/status`, { status }),
-}
+};
 
 /** Cooperative Share API - FPO member share capital + patronage dividend.
  *  Real backend: backend/src/routes/cooperativeShareRoutes.js +
@@ -3532,7 +3619,7 @@ export const cooperativeShareAPI = {
   createDistribution: (data) => api.post('/cooperative-shares/distributions', data),
   listDistributions: (fpoId) => api.get('/cooperative-shares/distributions', { params: { fpoId } }),
   getDistribution: (id) => api.get(`/cooperative-shares/distributions/${id}`),
-}
+};
 
 /** Agricultural Intelligence API - Crop yield, soil, weather, pest, irrigation
  *  and fertilizer AI predictions. Real backend:
@@ -3548,7 +3635,7 @@ export const agriculturalIntelligenceAPI = {
   recommendFertilizer: (data) => api.post('/agri-intelligence/fertilizer/recommend', data),
   getAgriculturalAnalytics: (params) => api.get('/agri-intelligence/analytics', { params }),
   healthCheck: () => api.get('/agri-intelligence/health'),
-}
+};
 
 /** Wikipedia Knowledge Reference API - Wikimedia REST API integration.
  *  Real backend: backend/src/routes/wikipediaRoutes.js +
@@ -3556,7 +3643,7 @@ export const agriculturalIntelligenceAPI = {
 export const wikipediaAPI = {
   lookup: (q) => api.get('/wikipedia/lookup', { params: { q } }),
   getSummaryByTitle: (title) => api.get(`/wikipedia/summary/${encodeURIComponent(title)}`),
-}
+};
 
 /** FOLU Benchmark API - Food & Land Use transition benchmark indicators.
  *  Real backend: backend/src/routes/foluBenchmarkRoutes.js +
@@ -3564,7 +3651,7 @@ export const wikipediaAPI = {
 export const foluBenchmarkAPI = {
   listTransitions: () => api.get('/folu-benchmark/transitions'),
   getBenchmarkReport: () => api.get('/folu-benchmark/report'),
-}
+};
 
 /** Decision Support API - 8 core business logic functions for pricing,
  *  logistics, finance and governance. Real backend:
@@ -3579,7 +3666,7 @@ export const decisionSupportAPI = {
   compostPlan: (data) => api.post('/decision-support/compost-plan', data),
   schemeExpiryStatus: () => api.get('/decision-support/scheme-expiry-status'),
   complianceGaps: (data) => api.post('/decision-support/compliance-gaps', data),
-}
+};
 
 /** AI Agent API - agentic task execution, multi-agent coordination, agent
  *  and tool management. Real backend: backend/src/routes/aiAgentRoutes.js +
@@ -3598,7 +3685,7 @@ export const aiAgentAPI = {
   registerTool: (data) => api.post('/ai-agent/tool', data),
   getTools: () => api.get('/ai-agent/tools'),
   getHealth: () => api.get('/ai-agent/health'),
-}
+};
 
 /** AI Brain API - cognitive processing cycle (perception, attention,
  *  reasoning, learning, decision, planning), knowledge graph and working
@@ -3621,7 +3708,7 @@ export const aiBrainAPI = {
   updateContext: (data) => api.put('/ai-brain/context', data),
   clearWorkingMemory: () => api.delete('/ai-brain/working-memory'),
   getHealth: () => api.get('/ai-brain/health'),
-}
+};
 
 /** AI Self-Healing API - autonomous error detection, root cause analysis,
  *  recovery strategy execution and predictive failure prevention.
@@ -3641,7 +3728,7 @@ export const aiSelfHealingAPI = {
   addRecoveryStrategy: (data) => api.post('/ai-self-healing/strategy', data),
   getSystemState: () => api.get('/ai-self-healing/system-state'),
   getServiceHealth: () => api.get('/ai-self-healing/service-health'),
-}
+};
 
 /** AI Operation Intelligence API - real-time performance monitoring,
  *  optimization recommendations, predictive optimization, anomaly detection
@@ -3665,7 +3752,7 @@ export const aiOperationIntelligenceAPI = {
   getResourceAllocation: () => api.get('/ai-operation-intelligence/resources'),
   getOperationHistory: (limit) => api.get('/ai-operation-intelligence/history', { params: { limit } }),
   getServiceHealth: () => api.get('/ai-operation-intelligence/service-health'),
-}
+};
 
 /** SAP-Style Module Architecture API - module registration, dependency graph,
  *  lifecycle/version/config management, MTA descriptor generation.
@@ -3702,7 +3789,7 @@ export const sapModuleArchitectureAPI = {
   generateMTADescriptor: (id) => api.get(`/sap-module-architecture/modules/${id}/mta-descriptor`),
   getArchitectureOverview: () => api.get('/sap-module-architecture/overview'),
   getServiceHealth: () => api.get('/sap-module-architecture/service-health'),
-}
+};
 
 /** Research and Development (R&D) API - project management, collaborations,
  *  innovations, patents, funding, publications, knowledge base, AI assistance.
@@ -3751,7 +3838,7 @@ export const researchAndDevelopmentAPI = {
   // Analytics / health
   getRDAnalytics: () => api.get('/research-and-development/analytics'),
   getHealthStatus: () => api.get('/research-and-development/health'),
-}
+};
 
 /** Information Sharing API - document management, folders, permissions,
  *  sharing links, real-time collaboration sessions, AI recommendations.
@@ -3795,7 +3882,7 @@ export const informationSharingAPI = {
   getActivityLogs: (resourceId) => api.get(`/information-sharing/activity-logs/${resourceId}`),
   getAnalytics: () => api.get('/information-sharing/analytics'),
   getHealthStatus: () => api.get('/information-sharing/health'),
-}
+};
 
 /** Strategic Services API - Multi-Role Ecosystem Support
  * Pre-season purchase, contract farming, household procurement, government subsidy
@@ -3811,7 +3898,7 @@ export const strategicAPI = {
     getBuyerPortfolio: (params) => api.get('/strategic/pre-season/buyer-portfolio', { params }),
     getFarmerAgreements: (params) => api.get('/strategic/pre-season/farmer-agreements', { params }),
   },
-  
+
   // Contract Farming
   contractFarming: {
     createContract: (data) => api.post('/strategic/contract-farming/contracts', data),
@@ -3822,7 +3909,7 @@ export const strategicAPI = {
     getOpportunities: (params) => api.get('/strategic/contract-farming/opportunities', { params }),
     getFarmerContracts: (params) => api.get('/strategic/contract-farming/farmer-contracts', { params }),
   },
-  
+
   // Household Procurement
   household: {
     createProcurementPlan: (data) => api.post('/strategic/household/procurement-plans', data),
@@ -3835,7 +3922,7 @@ export const strategicAPI = {
     aggregateOrders: (data) => api.post('/strategic/household/aggregate-orders', data),
     getAggregationGroup: (id) => api.get(`/strategic/household/aggregation-groups/${id}`),
   },
-  
+
   // Government Subsidy
   government: {
     createSubsidyProgram: (data) => api.post('/strategic/government/subsidy-programs', data),
@@ -3849,6 +3936,6 @@ export const strategicAPI = {
     getFarmerDashboard: (params) => api.get('/strategic/government/farmer-dashboard', { params }),
     getDashboard: (params) => api.get('/strategic/government/dashboard', { params }),
   },
-}
+};
 
-export default api
+export default api;

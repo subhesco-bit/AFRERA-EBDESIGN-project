@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import { MessageCircle, Mic, X } from 'lucide-react'
-import Header from './Header'
-import Footer from './Footer'
-import Sidebar from './Sidebar'
-import BottomNav from './BottomNav'
-import { useAuthStore } from '../store/authStore'
-import ChatInterface from './ConversationalAI/ChatInterface'
-import VoiceAssistant from './VoiceAI/VoiceAssistant'
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { MessageCircle, Mic, X } from 'lucide-react';
+import Header from './Header';
+import Footer from './Footer';
+import Sidebar from './Sidebar';
+import BottomNav from './BottomNav';
+import { useAuthStore } from '../store/authStore';
+import ChatInterface from './ConversationalAI/ChatInterface';
+import VoiceAssistant from './VoiceAI/VoiceAssistant';
 
 // Global AI assistant widgets: both ChatInterface and VoiceAssistant were
 // fully built (real conversational-ai/voice-ai API calls) but had no parent
@@ -18,8 +18,8 @@ import VoiceAssistant from './VoiceAI/VoiceAssistant'
 // (authMiddleware on /conversational-ai/sessions and /voice-ai/voice-sessions),
 // so the widgets only render for logged-in users.
 function Layout({ children }) {
-  const { isAuthenticated } = useAuthStore()
-  const [openWidget, setOpenWidget] = useState(null) // null | 'chat' | 'voice'
+  const { isAuthenticated } = useAuthStore();
+  const [openWidget, setOpenWidget] = useState(null); // null | 'chat' | 'voice'
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
@@ -71,7 +71,7 @@ function Layout({ children }) {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default Layout
+export default Layout;

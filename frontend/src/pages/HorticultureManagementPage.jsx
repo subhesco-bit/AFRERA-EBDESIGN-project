@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Carrot, Flower2, Warehouse, Tent, Droplets, Wind, Radar, ShieldCheck, BarChart3 } from 'lucide-react'
+import { useState } from 'react';
+import { Carrot, Flower2, Warehouse, Tent, Droplets, Wind, Radar, ShieldCheck, BarChart3 } from 'lucide-react';
 import {
   vegetableProductionAPI,
   floricultureAPI,
@@ -10,8 +10,8 @@ import {
   precisionHorticultureAPI,
   protectedCultivationAPI,
   horticultureAnalyticsAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Horticulture domain sub-modules, batch 4: M142 (Vegetable
@@ -43,15 +43,15 @@ const TABS = [
   { id: 'precision', label: 'Precision Horticulture', icon: Radar },
   { id: 'protected', label: 'Protected Cultivation', icon: ShieldCheck },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-]
+];
 
-const BLOOM_STAGES = ['Bud', 'Bloom', 'Post-Bloom']
-const MEDIUMS = ['NFT', 'DWC', 'Aeroponic', 'Ebb-Flow', 'Drip']
-const STRUCTURE_TYPES = ['Shade Net', 'Poly Tunnel', 'Greenhouse', 'Mulching']
-const STRUCTURE_STATUS = ['Active', 'Under Maintenance', 'Idle']
+const BLOOM_STAGES = ['Bud', 'Bloom', 'Post-Bloom'];
+const MEDIUMS = ['NFT', 'DWC', 'Aeroponic', 'Ebb-Flow', 'Drip'];
+const STRUCTURE_TYPES = ['Shade Net', 'Poly Tunnel', 'Greenhouse', 'Mulching'];
+const STRUCTURE_STATUS = ['Active', 'Under Maintenance', 'Idle'];
 
 function HorticultureManagementPage() {
-  const [activeTab, setActiveTab] = useState('vegetable')
+  const [activeTab, setActiveTab] = useState('vegetable');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -413,7 +413,7 @@ function HorticultureManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default HorticultureManagementPage
+export default HorticultureManagementPage;
