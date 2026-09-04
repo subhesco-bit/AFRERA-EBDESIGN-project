@@ -678,9 +678,26 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-// P0 Phase 1: Marketplace Trust Services - Seller Verification
+// P0 Phase 1-2: Marketplace Trust Services
 const sellerVerificationsRouter = require('./routes/sellerVerifications');
 app.use('/api/v1', sellerVerificationsRouter);
+// P0 Phase 2: Buyer Trust + Product Certification
+const buyerTrustRouter = require('./routes/buyerTrust');
+const productCertificationsRouter = require('./routes/productCertifications');
+app.use('/api/v1', buyerTrustRouter);
+app.use('/api/v1', productCertificationsRouter);
+// P0 Phase 2: Loan Management + Subscription
+const loanManagementRouter = require('./routes/loanManagement');
+const subscriptionRouter = require('./routes/subscriptions');
+app.use('/api/v1', loanManagementRouter);
+app.use('/api/v1', subscriptionRouter);
+// P0 Phase 2: Price Forecasting + Weather Advisory + Crop Recommendation
+const priceForecastingRouter = require('./routes/priceForecasting');
+const weatherAdvisoryRouter = require('./routes/weatherAdvisory');
+const cropRecommendationsRouter = require('./routes/cropRecommendations');
+app.use('/api/v1', priceForecastingRouter);
+app.use('/api/v1', weatherAdvisoryRouter);
+app.use('/api/v1', cropRecommendationsRouter);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
