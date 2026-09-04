@@ -1,0 +1,12 @@
+const router = require('express').Router();
+const p8 = require('../services/phase8');
+const auth = require('../middleware/auth');
+router.post('/village/:id', auth, async (req, res) => { try { res.json(await p8.villageServices(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/rural-finance/:farmerId/:amount', auth, async (req, res) => { try { res.json(await p8.ruralFinance(req.params.farmerId, req.params.amount)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/extension/:id', auth, async (req, res) => { try { res.json(await p8.extension(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/community/:id', auth, async (req, res) => { try { res.json(await p8.community(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/infrastructure/:id', auth, async (req, res) => { try { res.json(await p8.infrastructure(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/supply-chain/:id', auth, async (req, res) => { try { res.json(await p8.supplyChain(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/energy/:id', auth, async (req, res) => { try { res.json(await p8.energy(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/health/:id', auth, async (req, res) => { try { res.json(await p8.health(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+module.exports = router;

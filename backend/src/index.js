@@ -746,6 +746,24 @@ app.use('/api/v1', complianceTrackingRouter);
 app.use('/api/v1', auditTrailRouter);
 app.use('/api/v1', certificationRouter);
 app.use('/api/v1', riskAssessmentRouter);
+// P3 Phase 7: Advanced (10 services)
+const blockchainRouter = require('./routes/blockchainTrace');
+const iotRouter = require('./routes/iotSensors');
+const automationRouter = require('./routes/automation');
+const biometricRouter = require('./routes/biometric');
+const videoRouter = require('./routes/videoAnalytics');
+const arRouter = require('./routes/ar');
+const vrRouter = require('./routes/vr');
+const mlRouter = require('./routes/mlOptimization');
+const nlpRouter = require('./routes/nlp');
+const vizRouter = require('./routes/dataVisualization');
+app.use('/api/v1', blockchainRouter, iotRouter, automationRouter, biometricRouter, videoRouter, arRouter, vrRouter, mlRouter, nlpRouter, vizRouter);
+// P3 Phase 8: Rural (8 services)
+const phase8Router = require('./routes/phase8');
+app.use('/api/v1', phase8Router);
+// P4 Phase 9: Optional (11 services)
+const phase9Router = require('./routes/phase9');
+app.use('/api/v1', phase9Router);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
