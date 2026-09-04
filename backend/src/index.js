@@ -698,6 +698,32 @@ const cropRecommendationsRouter = require('./routes/cropRecommendations');
 app.use('/api/v1', priceForecastingRouter);
 app.use('/api/v1', weatherAdvisoryRouter);
 app.use('/api/v1', cropRecommendationsRouter);
+// P1 Phase 3: Supply Chain & Logistics (5 services)
+const supplyChainTrackingRouter = require('./routes/supplyChainTracking');
+const warehouseManagementRouter = require('./routes/warehouseManagement');
+const coldChainMonitoringRouter = require('./routes/coldChainMonitoring');
+const bulkOrdersRouter = require('./routes/bulkOrders');
+const freightPoolingRouter = require('./routes/freightPooling');
+app.use('/api/v1', supplyChainTrackingRouter);
+app.use('/api/v1', warehouseManagementRouter);
+app.use('/api/v1', coldChainMonitoringRouter);
+app.use('/api/v1', bulkOrdersRouter);
+app.use('/api/v1', freightPoolingRouter);
+// P1 Phase 4: Agricultural Management (7 services)
+const farmCostingRouter = require('./routes/farmCosting');
+const yieldManagementRouter = require('./routes/yieldManagement');
+const soilHealthRouter = require('./routes/soilHealth');
+const climateAdvisoryRouterNew = require('./routes/climateAdvisory');
+const greenhouseRouterNew = require('./routes/greenhouse');
+const horticultureRouterNew = require('./routes/horticulture');
+const livestockRouterNew = require('./routes/livestock');
+app.use('/api/v1', farmCostingRouter);
+app.use('/api/v1', yieldManagementRouter);
+app.use('/api/v1', soilHealthRouter);
+app.use('/api/v1', climateAdvisoryRouterNew);
+app.use('/api/v1', greenhouseRouterNew);
+app.use('/api/v1', horticultureRouterNew);
+app.use('/api/v1', livestockRouterNew);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
