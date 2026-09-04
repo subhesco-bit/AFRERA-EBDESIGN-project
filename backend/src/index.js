@@ -764,6 +764,15 @@ app.use('/api/v1', phase8Router);
 // P4 Phase 9: Optional (11 services)
 const phase9Router = require('./routes/phase9');
 app.use('/api/v1', phase9Router);
+// Phase 10: Integration Services (10 services)
+const phase10Router = require('./routes/phase10');
+app.use('/api/v1', phase10Router);
+// Phase 11: Enterprise Services (10 services)
+const phase11Router = require('./routes/phase11');
+app.use('/api/v1', phase11Router);
+// Phase 12: Future-Ready Services (12 services)
+const phase12Router = require('./routes/phase12');
+app.use('/api/v1', phase12Router);
 // UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
 // Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
 app.use('/api/v1/ai', unifiedAIGateway);
