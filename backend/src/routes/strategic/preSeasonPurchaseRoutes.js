@@ -33,7 +33,7 @@ router.post('/agreements', authenticate, async (req, res) => {
  */
 router.get('/agreements/:id', authenticate, async (req, res) => {
   try {
-    const result = await service.trackProgress(req.params.id);
+    let result = await service.trackProgress(req.params.id);
     apiResponseHandler.sendSuccess(res, result, 'Agreement progress retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve agreement progress');
@@ -47,7 +47,7 @@ router.get('/agreements/:id', authenticate, async (req, res) => {
  */
 router.put('/agreements/:id/milestones/:milestoneId', authenticate, async (req, res) => {
   try {
-    const result = await service.updateMilestone(req.params.milestoneId, req.body);
+    let result = await service.updateMilestone(req.params.milestoneId, req.body);
     apiResponseHandler.sendSuccess(res, result, 'Milestone updated successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to update milestone');
@@ -61,7 +61,7 @@ router.put('/agreements/:id/milestones/:milestoneId', authenticate, async (req, 
  */
 router.post('/agreements/:id/settle', authenticate, authorize(['buyer', 'admin']), async (req, res) => {
   try {
-    const result = await service.settleAgreement(req.params.id, req.body);
+    let result = await service.settleAgreement(req.params.id, req.body);
     apiResponseHandler.sendSuccess(res, result, 'Agreement settled successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to settle agreement');
@@ -75,7 +75,7 @@ router.post('/agreements/:id/settle', authenticate, authorize(['buyer', 'admin']
  */
 router.get('/opportunities', authenticate, async (req, res) => {
   try {
-    const result = await service.getAvailableOpportunities(req.user.id);
+    let result = await service.getAvailableOpportunities(req.user.id);
     apiResponseHandler.sendSuccess(res, result, 'Opportunities retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve opportunities');
@@ -89,7 +89,7 @@ router.get('/opportunities', authenticate, async (req, res) => {
  */
 router.get('/buyer-portfolio', authenticate, requireRole('buyer'), async (req, res) => {
   try {
-    const result = await service.getBuyerPortfolio(req.user.id);
+    let result = await service.getBuyerPortfolio(req.user.id);
     apiResponseHandler.sendSuccess(res, result, 'Buyer portfolio retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve buyer portfolio');
@@ -104,7 +104,7 @@ router.get('/buyer-portfolio', authenticate, requireRole('buyer'), async (req, r
 router.get('/farmer-agreements', authenticate, requireRole('farmer'), async (req, res) => {
   try {
     // Get farmer's agreements - would need to implement this method in service
-    const result = { agreements: [], message: 'Farmer agreements retrieval' };
+    let result = { agreements: [], message: 'Farmer agreements retrieval' };
     apiResponseHandler.sendSuccess(res, result, 'Farmer agreements retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve farmer agreements');

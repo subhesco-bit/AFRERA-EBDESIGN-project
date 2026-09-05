@@ -84,7 +84,7 @@ async function createConfiguration(configData) {
  */
 async function getConfiguration(configKey, environment) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM platform_configurations WHERE config_key = $1 AND environment = $2 AND status = $3',
       [configKey, environment, 'active']
     );
@@ -93,7 +93,7 @@ async function getConfiguration(configKey, environment) {
       throw new Error('Configuration not found');
     }
 
-    const config = result.rows[0];
+    let config = result.rows[0];
     
     // Decrypt if encrypted
     if (config.encrypted) {
@@ -120,7 +120,7 @@ async function updateConfiguration(configId, updates) {
     } = updates;
 
     // AI-powered update validation
-    const aiRequest = {
+    let aiRequest = {
       task: 'configuration_update_validation',
       parameters: {
         config_id: configId,
@@ -130,9 +130,9 @@ async function updateConfiguration(configId, updates) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE platform_configurations 
        SET config_value = COALESCE($1, config_value),
            description = COALESCE($2, description),
@@ -167,7 +167,7 @@ async function bulkUpdateConfigurations(updates) {
     
     for (const update of updates) {
       try {
-        const result = await updateConfiguration(update.config_id, update);
+        let result = await updateConfiguration(update.config_id, update);
         results.push({ success: true, config_id: update.config_id, data: result });
       } catch (error) {
         results.push({ success: false, config_id: update.config_id, error: error.message });
@@ -252,7 +252,7 @@ async function decryptValue(encryptedValue) {
 
 async function getConfigurationById(configId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM platform_configurations WHERE config_id = $1',
       [configId]
     );

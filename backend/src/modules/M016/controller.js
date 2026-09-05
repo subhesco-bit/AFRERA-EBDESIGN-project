@@ -48,7 +48,7 @@ async function getFederatedIdentity(req, res) {
 
 async function updateFederatedIdentity(req, res) {
   try {
-    const identity = await service.updateFederatedIdentity(req.params.identityId, req.body);
+    let identity = await service.updateFederatedIdentity(req.params.identityId, req.body);
     if (!identity) return res.status(404).json({ success: false, error: 'Identity not found' });
     res.json({ success: true, data: identity });
   } catch (error) {
@@ -59,7 +59,7 @@ async function updateFederatedIdentity(req, res) {
 
 async function revokeFederatedIdentity(req, res) {
   try {
-    const identity = await service.revokeFederatedIdentity(req.params.identityId);
+    let identity = await service.revokeFederatedIdentity(req.params.identityId);
     if (!identity) return res.status(404).json({ success: false, error: 'Identity not found' });
     res.json({ success: true, data: identity });
   } catch (error) {
@@ -125,7 +125,7 @@ async function getTrustRelationships(req, res) {
 async function updateTrustScore(req, res) {
   try {
     const { provider, delta, reason } = req.body;
-    const trust = await service.updateTrustScore(provider, delta, reason);
+    let trust = await service.updateTrustScore(provider, delta, reason);
     if (!trust) return res.status(404).json({ success: false, error: 'Provider not found' });
     res.json({ success: true, data: trust });
   } catch (error) {
@@ -137,7 +137,7 @@ async function updateTrustScore(req, res) {
 // Centralized identity directory
 async function searchIdentities(req, res) {
   try {
-    const result = await service.searchIdentities(req.query);
+    let result = await service.searchIdentities(req.query);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('searchIdentities error', { error: error.message });

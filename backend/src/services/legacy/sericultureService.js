@@ -58,7 +58,7 @@ class SericultureService {
   async getSericultureById(sericultureId) {
     try {
       const query = 'SELECT * FROM sericulture WHERE id = $1';
-      const result = await this.pool.query(query, [sericultureId]);
+      let result = await this.pool.query(query, [sericultureId]);
       
       if (result.rows.length === 0) {
         throw new Error('Sericulture not found');
@@ -86,13 +86,13 @@ class SericultureService {
         current_rearing_count
       } = sericultureData;
 
-      const query = `
+      let query = `
         INSERT INTO sericulture (farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count
       ]);
 
@@ -108,13 +108,13 @@ class SericultureService {
    */
   async getSilkProduction(sericultureId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM silk_production
         WHERE sericulture_id = $1
         ORDER BY production_date DESC
       `;
 
-      const result = await this.pool.query(query, [sericultureId]);
+      let result = await this.pool.query(query, [sericultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting silk production:', error);
@@ -127,13 +127,13 @@ class SericultureService {
    */
   async getMulberryCultivation(sericultureId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM mulberry_cultivation
         WHERE sericulture_id = $1
         ORDER BY assessment_date DESC
       `;
 
-      const result = await this.pool.query(query, [sericultureId]);
+      let result = await this.pool.query(query, [sericultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting mulberry cultivation:', error);

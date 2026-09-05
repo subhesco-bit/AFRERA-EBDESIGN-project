@@ -14,7 +14,7 @@ async function registerSheepFlock(req, res) {
 
 async function getSheepFlock(req, res) {
   try {
-    const flock = await service.getSheepFlock(req.params.flockId);
+    let flock = await service.getSheepFlock(req.params.flockId);
     if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
     res.json({ success: true, data: flock });
   } catch (error) {
@@ -36,7 +36,7 @@ async function listSheepFlocks(req, res) {
 
 async function updateSheepFlock(req, res) {
   try {
-    const flock = await service.updateSheepFlock(req.params.flockId, req.body);
+    let flock = await service.updateSheepFlock(req.params.flockId, req.body);
     if (!flock) return res.status(404).json({ success: false, error: 'Flock not found' });
     res.json({ success: true, data: flock });
   } catch (error) {

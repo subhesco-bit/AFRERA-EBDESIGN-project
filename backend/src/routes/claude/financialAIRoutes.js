@@ -23,7 +23,7 @@ router.post('/ai-enhanced/process-loan', async (req, res) => {
 router.post('/ai-enhanced/assess-credit', async (req, res) => {
   try {
     const { farmerId, financialData, options } = req.body;
-    const result = await service.assessCreditRiskAI(farmerId, financialData, options);
+    let result = await service.assessCreditRiskAI(farmerId, financialData, options);
     res.json({ success: true, ai_enhanced: true, result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message, ai_enhanced: false });
@@ -37,7 +37,7 @@ router.get('/ai-capability', (req, res) => {
 
 router.post('/apply-loan', async (req, res) => {
   try {
-    const result = await originalService.applyForLoan(req.body);
+    let result = await originalService.applyForLoan(req.body);
     res.json({ success: true, ai_enhanced: false, result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message, ai_enhanced: false });

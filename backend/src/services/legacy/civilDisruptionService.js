@@ -54,7 +54,7 @@ class CivilDisruptionService {
   }
 
   async verify(disruptionId, verifiedBy) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE civil_disruption_events SET status = 'active', verified_by = $1, verified_at = NOW(), updated_at = NOW()
        WHERE id = $2 AND status = 'unverified' RETURNING *`,
       [verifiedBy, disruptionId]
@@ -64,13 +64,13 @@ class CivilDisruptionService {
   }
 
   async resolve(disruptionId, endDate) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE civil_disruption_events SET status = 'resolved', end_date = $1, updated_at = NOW()
        WHERE id = $2 RETURNING *`,
       [endDate || new Date().toISOString().slice(0, 10), disruptionId]
     );
     if (result.rows.length === 0) throw new Error('Disruption not found');
-    const event = result.rows[0];
+    let event = result.rows[0];
     signalBus.emitSignal(SIGNAL.CIVIL_DISRUPTION_RESOLVED, { disruptionId: event.id, affectedState: event.affected_state }, { source: 'civilDisruptionService' });
     return event;
   }
@@ -80,7 +80,7 @@ class CivilDisruptionService {
     const params = [];
     if (state) { params.push(state); conditions.push(`affected_state ILIKE $${params.length}`); }
     if (district) { params.push(district); conditions.push(`affected_district ILIKE $${params.length}`); }
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM civil_disruption_events WHERE ${conditions.join(' AND ')} ORDER BY start_date DESC`,
       params
     );
@@ -95,13 +95,13 @@ class CivilDisruptionService {
     const patterns = [event.affected_state, event.affected_district, ...(event.affected_route_names || [])].filter(Boolean);
     if (patterns.length === 0) return [];
 
-    const conditions = [];
-    const params = [];
+    let conditions = [];
+    let params = [];
     for (const p of patterns) {
       params.push(`%${p}%`);
       conditions.push(`(origin_address ILIKE $${params.length} OR destination_address ILIKE $${params.length})`);
     }
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT id, shipment_number, origin_address, destination_address, status
          FROM shipments
         WHERE status NOT IN ('delivered', 'cancelled')
@@ -120,7 +120,7 @@ class CivilDisruptionService {
     const activeDisruptions = await this.listActive();
     const matches = [];
     for (const event of activeDisruptions) {
-      const patterns = [event.affected_state, event.affected_district, ...(event.affected_route_names || [])].filter(Boolean);
+      let patterns = [event.affected_state, event.affected_district, ...(event.affected_route_names || [])].filter(Boolean);
       const text = `${shipment.origin_address} ${shipment.destination_address}`.toLowerCase();
       if (patterns.some((p) => text.includes(String(p).toLowerCase()))) {
         matches.push(event);

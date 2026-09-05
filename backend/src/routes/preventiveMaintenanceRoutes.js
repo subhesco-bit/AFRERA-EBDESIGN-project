@@ -43,7 +43,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/:id', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, validateBody(), bodyValidator((body) => validateOperationsBody(body, [], { dates: ['scheduled_date', 'completed_date'], numbers: { cost: { min: 0, max: 100000000 } } })), async (req, res) => {
   try {
-    const item = await preventiveMaintenance.update(req.params.id, req.body);
+    let item = await preventiveMaintenance.update(req.params.id, req.body);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
     emitMutation(req, 'update', item, SIGNAL.MAINTENANCE_RECORD_CHANGED, 'preventive_maintenance_routes'); res.json({ success: true, data: item });
   } catch (e) { return fail(req, res, e, 'maintenance.update', e.status || 500); }

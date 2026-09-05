@@ -118,7 +118,7 @@ class ProductionGates {
    * Check database health
    */
   async checkDatabaseHealth() {
-    const checks = {
+    let checks = {
       connectionEstablished: false,
       canRead: false,
       canWrite: false,
@@ -252,7 +252,7 @@ class ProductionGates {
    * Check E2E readiness
    */
   async checkE2EReadiness() {
-    const checks = {
+    let checks = {
       testFrameworkReady: true,
       testDataSeeded: false,
       testEnvironmentConfigured: false,
@@ -317,7 +317,7 @@ class ProductionGates {
    * Check security requirements
    */
   async checkSecurity() {
-    const checks = {
+    let checks = {
       httpsRedirect: false,
       corsConfigured: false,
       helmHeadersPresent: false,
@@ -327,7 +327,7 @@ class ProductionGates {
     };
 
     try {
-      const response = await this.makeRequest(`${this.backendUrl}/health`, 5000);
+      let response = await this.makeRequest(`${this.backendUrl}/health`, 5000);
 
       // Check for security headers
       const headers = response.headers || {};
@@ -360,7 +360,7 @@ class ProductionGates {
    * Check performance requirements
    */
   async checkPerformance() {
-    const checks = {
+    let checks = {
       avgResponseTime: 0,
       maxResponseTime: 0,
       responsesUnder500ms: 0,
@@ -378,7 +378,7 @@ class ProductionGates {
 
     for (const endpoint of sampleEndpoints) {
       try {
-        const startTime = Date.now();
+        let startTime = Date.now();
         await this.makeRequest(`${this.backendUrl}${endpoint}`, 5000);
         const duration = Date.now() - startTime;
 
@@ -405,7 +405,7 @@ class ProductionGates {
    * Check environment configuration
    */
   async checkEnvironment() {
-    const checks = {
+    let checks = {
       nodeVersionValid: true,
       envFilePresent: false,
       requiredEnvVars: {},
@@ -439,10 +439,10 @@ class ProductionGates {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    const startTime = Date.now();
+    let startTime = Date.now();
 
     try {
-      const response = await axios({
+      let response = await axios({
         method,
         url,
         signal: controller.signal,

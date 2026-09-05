@@ -66,7 +66,7 @@ function SlaBadge({ status }) {
     within_sla: { text: 'hsl(var(--data-real))', bg: 'color-mix(in srgb, hsl(var(--data-real)) 12%, transparent)', label: 'within SLA' },
     no_sla: { text: 'hsl(var(--data-assumed))', bg: 'hsl(var(--muted))', label: 'no SLA' },
   };
-  const s = map[status] || map.no_sla;
+  let s = map[status] || map.no_sla;
   return (
     <span style={{ color: s.text, background: s.bg, borderRadius: 4, padding: '1px 8px', fontSize: 11, fontWeight: 600 }}>
       {s.label}
@@ -297,7 +297,7 @@ function WorkflowTab() {
 /* ------------------------------------------------------------------ */
 
 function CrmClientsTab() {
-  const queryClient = useQueryClient();
+  let queryClient = useQueryClient();
   const [leadForm, setLeadForm] = useState({ source: '', organisationName: '', contactName: '', email: '', phone: '', segment: '', estimatedValue: '' });
   const [convertForm, setConvertForm] = useState({ leadCode: '', name: '', amount: '', probabilityPct: '', expectedCloseDate: '', createClient: false });
   const [clientIdInput, setClientIdInput] = useState('');
@@ -476,7 +476,7 @@ function LegalTab() {
     queryFn: () => enterpriseControlAPI.legalCalendar({ days: withinDays }).then((r) => r.data?.data ?? []),
   });
 
-  const rows = data || [];
+  let rows = data || [];
 
   return (
     <Section title="Legal calendar" description="Hearings and obligations due within the selected window (admin only). Read-only — no create route exists for legal matters or obligations on the backend.">
@@ -512,7 +512,7 @@ function LegalTab() {
 /* ------------------------------------------------------------------ */
 
 function RiskTab() {
-  const queryClient = useQueryClient();
+  let queryClient = useQueryClient();
   const [assessForm, setAssessForm] = useState({ riskCode: '', residualLikelihood: '', residualImpact: '' });
 
   const { data, isLoading, error } = useQuery({
@@ -530,7 +530,7 @@ function RiskTab() {
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record assessment'),
   });
 
-  const rows = data || [];
+  let rows = data || [];
 
   return (
     <div className="space-y-6">
@@ -598,7 +598,7 @@ function RiskTab() {
 const SEVERITY_OPTIONS = ['', 'low', 'medium', 'high', 'critical'];
 
 function EmergencyTab() {
-  const queryClient = useQueryClient();
+  let queryClient = useQueryClient();
   const [form, setForm] = useState({
     typeCode: '', severity: '', title: '', description: '',
     affectedEntityType: '', affectedEntityIds: '', peopleAtRisk: false,
@@ -632,7 +632,7 @@ function EmergencyTab() {
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to acknowledge'),
   });
 
-  const rows = data || [];
+  let rows = data || [];
 
   return (
     <div className="space-y-6">

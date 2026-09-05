@@ -106,7 +106,7 @@ router.post('/admin/sellers/:id/verify',
   }),
   async (req, res, next) => {
     try {
-      const result = await sellerVerificationService.verifySellerAccount(
+      let result = await sellerVerificationService.verifySellerAccount(
         req.params.id,
         req.body.admin_notes || ''
       );
@@ -137,7 +137,7 @@ router.post('/admin/sellers/:id/verify/reject',
   }),
   async (req, res, next) => {
     try {
-      const result = await sellerVerificationService.rejectVerification(
+      let result = await sellerVerificationService.rejectVerification(
         req.params.id,
         req.body.reason
       );

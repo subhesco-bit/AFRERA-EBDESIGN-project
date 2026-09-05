@@ -16,7 +16,7 @@ const createDashboard = async (req, res) => {
 
 const getDashboard = async (req, res) => {
   try {
-    const dashboard = await dashboardService.getDashboard(req.params.id);
+    let dashboard = await dashboardService.getDashboard(req.params.id);
     if (!dashboard) {
       return res.status(404).json({ success: false, error: 'Dashboard not found' });
     }
@@ -37,7 +37,7 @@ const listDashboards = async (req, res) => {
 
 const updateDashboard = async (req, res) => {
   try {
-    const dashboard = await dashboardService.updateDashboard(req.params.id, req.body);
+    let dashboard = await dashboardService.updateDashboard(req.params.id, req.body);
     if (!dashboard) {
       return res.status(404).json({ success: false, error: 'Dashboard not found' });
     }
@@ -49,7 +49,7 @@ const updateDashboard = async (req, res) => {
 
 const deleteDashboard = async (req, res) => {
   try {
-    const dashboard = await dashboardService.deleteDashboard(req.params.id);
+    let dashboard = await dashboardService.deleteDashboard(req.params.id);
     if (!dashboard) {
       return res.status(404).json({ success: false, error: 'Dashboard not found' });
     }
@@ -79,7 +79,7 @@ const getDashboardWidgets = async (req, res) => {
 
 const updateWidget = async (req, res) => {
   try {
-    const widget = await dashboardService.updateWidget(req.params.widgetId, req.body);
+    let widget = await dashboardService.updateWidget(req.params.widgetId, req.body);
     if (!widget) {
       return res.status(404).json({ success: false, error: 'Widget not found' });
     }
@@ -91,7 +91,7 @@ const updateWidget = async (req, res) => {
 
 const deleteWidget = async (req, res) => {
   try {
-    const widget = await dashboardService.deleteWidget(req.params.widgetId);
+    let widget = await dashboardService.deleteWidget(req.params.widgetId);
     if (!widget) {
       return res.status(404).json({ success: false, error: 'Widget not found' });
     }

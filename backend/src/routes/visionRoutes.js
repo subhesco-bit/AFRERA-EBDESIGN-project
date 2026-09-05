@@ -72,7 +72,7 @@ router.post
     logger.debug('router.post request');('/metadata', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
-    const result = await route(
+    let result = await route(
       'vision_engine',
       { buffer: req.file.buffer, operation: 'metadata' },
       { actorId: 'visionRoutes:metadata' }
@@ -90,7 +90,7 @@ router.post
   try {
     if (!requireFile(req, res)) return;
     const { width, height, fit, format } = req.body;
-    const result = await route(
+    let result = await route(
       'vision_engine',
       {
         buffer: req.file.buffer,
@@ -124,7 +124,7 @@ router.post
   try {
     if (!requireFile(req, res)) return;
     const { language, reportNumber } = req.body;
-    const result = await route(
+    let result = await route(
       'ocr_engine',
       { buffer: req.file.buffer, language, reportNumber },
       { actorId: 'visionRoutes:ocr' }

@@ -45,7 +45,7 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
   }
 
   async function get(id) {
-    const res = await pool.query(`SELECT * FROM ${tableName} WHERE ${idColumn} = $1`, [id]);
+    let res = await pool.query(`SELECT * FROM ${tableName} WHERE ${idColumn} = $1`, [id]);
     return res.rows[0] || null;
   }
 
@@ -60,7 +60,7 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
     if (!cols.length) throw new Error('No valid fields supplied');
     const values = cols.map((c) => payload[c]);
     const placeholders = cols.map((_, i) => `$${i + 1}`);
-    const res = await pool.query(
+    let res = await pool.query(
       `INSERT INTO ${tableName} (${cols.join(', ')}) VALUES (${placeholders.join(', ')}) RETURNING *`,
       values
     );
@@ -68,12 +68,12 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
   }
 
   async function update(id, payload = {}) {
-    const cols = fields.filter((f) => payload[f] !== undefined);
+    let cols = fields.filter((f) => payload[f] !== undefined);
     if (!cols.length) throw new Error('No valid fields supplied');
     const setClauses = cols.map((c, i) => `${c} = $${i + 1}`);
-    const values = cols.map((c) => payload[c]);
+    let values = cols.map((c) => payload[c]);
     values.push(id);
-    const res = await pool.query(
+    let res = await pool.query(
       `UPDATE ${tableName} SET ${setClauses.join(', ')}, updated_at = NOW() WHERE ${idColumn} = $${values.length} RETURNING *`,
       values
     );
@@ -81,7 +81,7 @@ function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at D
   }
 
   async function remove(id) {
-    const res = await pool.query(`DELETE FROM ${tableName} WHERE ${idColumn} = $1 RETURNING ${idColumn}`, [id]);
+    let res = await pool.query(`DELETE FROM ${tableName} WHERE ${idColumn} = $1 RETURNING ${idColumn}`, [id]);
     return !!res.rows[0];
   }
 

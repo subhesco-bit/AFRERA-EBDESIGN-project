@@ -57,7 +57,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY created_at DESC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting fleet', { error: error.message, stack: error.stack });
@@ -67,8 +67,8 @@ class LogisticsEnhancementService {
 
   async getVehicle(vehicleId) {
     try {
-      const query = 'SELECT * FROM fleet_vehicles WHERE id = $1';
-      const result = await this.pool.query(query, [vehicleId]);
+      let query = 'SELECT * FROM fleet_vehicles WHERE id = $1';
+      let result = await this.pool.query(query, [vehicleId]);
 
       if (result.rows.length === 0) {
         throw new Error('Vehicle not found');
@@ -83,7 +83,7 @@ class LogisticsEnhancementService {
 
   async updateVehicle(vehicleId, updateData) {
     try {
-      const query = `
+      let query = `
         UPDATE fleet_vehicles
         SET 
           status = COALESCE($1, status),
@@ -96,7 +96,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         updateData.status,
         updateData.driverId,
         updateData.currentLocation ? JSON.stringify(updateData.currentLocation) : null,
@@ -120,14 +120,14 @@ class LogisticsEnhancementService {
     try {
       const { type, scheduledDate, description, estimatedCost, priority } = maintenanceData;
 
-      const query = `
+      let query = `
         INSERT INTO vehicle_maintenance 
         (vehicle_id, type, scheduled_date, description, estimated_cost, priority, status)
         VALUES ($1, $2, $3, $4, $5, $6, 'scheduled')
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         vehicleId, type, scheduledDate, description, estimatedCost, priority
       ]);
 
@@ -253,14 +253,14 @@ class LogisticsEnhancementService {
     try {
       const { latitude, longitude, speed, heading, timestamp, status } = trackingData;
 
-      const query = `
+      let query = `
         INSERT INTO shipment_tracking 
         (shipment_id, latitude, longitude, speed, heading, timestamp, status)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         shipmentId, latitude, longitude, speed, heading, timestamp, status
       ]);
 
@@ -280,14 +280,14 @@ class LogisticsEnhancementService {
 
   async getTracking(shipmentId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM shipment_tracking 
         WHERE shipment_id = $1 
         ORDER BY timestamp DESC 
         LIMIT 100
       `;
 
-      const result = await this.pool.query(query, [shipmentId]);
+      let result = await this.pool.query(query, [shipmentId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting tracking', { error: error.message, stack: error.stack });
@@ -297,7 +297,7 @@ class LogisticsEnhancementService {
 
   async getLiveTracking(shipmentId) {
     try {
-      const query = `
+      let query = `
         SELECT 
           st.*,
           s.origin,
@@ -310,7 +310,7 @@ class LogisticsEnhancementService {
         LIMIT 1
       `;
 
-      const result = await this.pool.query(query, [shipmentId]);
+      let result = await this.pool.query(query, [shipmentId]);
 
       if (result.rows.length === 0) {
         throw new Error('No tracking data available');
@@ -327,7 +327,7 @@ class LogisticsEnhancementService {
     try {
       const { type, radius, coordinates, alertEnabled } = geofenceData;
 
-      const query = `
+      let query = `
         INSERT INTO shipment_geofences 
         (shipment_id, type, radius, coordinates, alert_enabled)
         VALUES ($1, $2, $3, $4, $5)
@@ -340,7 +340,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         shipmentId, type, radius, JSON.stringify(coordinates), alertEnabled
       ]);
 
@@ -357,14 +357,14 @@ class LogisticsEnhancementService {
     try {
       const { sensorId, temperature, humidity, timestamp, zone } = temperatureData;
 
-      const query = `
+      let query = `
         INSERT INTO temperature_readings 
         (shipment_id, sensor_id, temperature, humidity, timestamp, zone)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         shipmentId, sensorId, temperature, humidity, timestamp, zone
       ]);
 
@@ -386,7 +386,7 @@ class LogisticsEnhancementService {
         WHERE shipment_id = $1
       `;
 
-      const params = [shipmentId];
+      let params = [shipmentId];
       let paramCount = 1;
 
       if (filters.startDate) {
@@ -403,7 +403,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY timestamp DESC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting temperature data', { error: error.message, stack: error.stack });
@@ -415,7 +415,7 @@ class LogisticsEnhancementService {
     try {
       const { minTemp, maxTemp, minHumidity, maxHumidity, alertChannels } = alertData;
 
-      const query = `
+      let query = `
         INSERT INTO temperature_alerts 
         (shipment_id, min_temp, max_temp, min_humidity, max_humidity, alert_channels, enabled)
         VALUES ($1, $2, $3, $4, $5, $6, true)
@@ -430,7 +430,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         shipmentId, minTemp, maxTemp, minHumidity, maxHumidity,
         JSON.stringify(alertChannels)
       ]);
@@ -445,12 +445,12 @@ class LogisticsEnhancementService {
 
   async getTemperatureAlerts(shipmentId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM temperature_alerts 
         WHERE shipment_id = $1
       `;
 
-      const result = await this.pool.query(query, [shipmentId]);
+      let result = await this.pool.query(query, [shipmentId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting temperature alerts', { error: error.message, stack: error.stack });
@@ -477,14 +477,14 @@ class LogisticsEnhancementService {
 
   async triggerTemperatureAlert(shipmentId, alert, currentTemp) {
     try {
-      const query = `
+      let query = `
         INSERT INTO temperature_alert_log 
         (shipment_id, alert_id, temperature, triggered_at, resolved)
         VALUES ($1, $2, $3, NOW(), false)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [shipmentId, alert.id, currentTemp]);
+      let result = await this.pool.query(query, [shipmentId, alert.id, currentTemp]);
 
       logger.warn(`Temperature alert triggered for shipment ${shipmentId}: ${currentTemp}°C`);
       return result.rows[0];
@@ -499,14 +499,14 @@ class LogisticsEnhancementService {
     try {
       const { name, location, type, capacity, zones, features } = warehouseData;
 
-      const query = `
+      let query = `
         INSERT INTO warehouses 
         (name, location, type, capacity, zones, features, status)
         VALUES ($1, $2, $3, $4, $5, $6, 'active')
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         name, JSON.stringify(location), type, capacity,
         JSON.stringify(zones), JSON.stringify(features)
       ]);
@@ -522,7 +522,7 @@ class LogisticsEnhancementService {
   async getWarehouses(filters = {}) {
     try {
       let query = 'SELECT * FROM warehouses WHERE 1=1';
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (filters.type) {
@@ -539,7 +539,7 @@ class LogisticsEnhancementService {
 
       query += ' ORDER BY name ASC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting warehouses', { error: error.message, stack: error.stack });
@@ -549,8 +549,8 @@ class LogisticsEnhancementService {
 
   async getWarehouse(warehouseId) {
     try {
-      const query = 'SELECT * FROM warehouses WHERE id = $1';
-      const result = await this.pool.query(query, [warehouseId]);
+      let query = 'SELECT * FROM warehouses WHERE id = $1';
+      let result = await this.pool.query(query, [warehouseId]);
 
       if (result.rows.length === 0) {
         throw new Error('Warehouse not found');
@@ -567,7 +567,7 @@ class LogisticsEnhancementService {
     try {
       const { productId, quantity, zone, location, expiryDate } = inventoryData;
 
-      const query = `
+      let query = `
         INSERT INTO warehouse_inventory 
         (warehouse_id, product_id, quantity, zone, location, expiry_date)
         VALUES ($1, $2, $3, $4, $5, $6)
@@ -578,7 +578,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         warehouseId, productId, quantity, zone, location, expiryDate
       ]);
 
@@ -592,7 +592,7 @@ class LogisticsEnhancementService {
 
   async getWarehouseInventory(warehouseId) {
     try {
-      const query = `
+      let query = `
         SELECT 
           wi.*,
           p.name as product_name,
@@ -603,7 +603,7 @@ class LogisticsEnhancementService {
         ORDER BY wi.zone, wi.location
       `;
 
-      const result = await this.pool.query(query, [warehouseId]);
+      let result = await this.pool.query(query, [warehouseId]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting warehouse inventory', { error: error.message, stack: error.stack });
@@ -615,14 +615,14 @@ class LogisticsEnhancementService {
     try {
       const { type, items, referenceId } = shipmentData;
 
-      const query = `
+      let query = `
         INSERT INTO warehouse_shipments 
         (warehouse_id, type, items, reference_id, status)
         VALUES ($1, $2, $3, $4, 'processing')
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         warehouseId, type, JSON.stringify(items), referenceId
       ]);
 
@@ -651,7 +651,7 @@ class LogisticsEnhancementService {
 
   async removeInventory(warehouseId, productId, quantity) {
     try {
-      const query = `
+      let query = `
         UPDATE warehouse_inventory
         SET quantity = quantity - $1,
             updated_at = NOW()
@@ -659,7 +659,7 @@ class LogisticsEnhancementService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [quantity, warehouseId, productId]);
+      let result = await this.pool.query(query, [quantity, warehouseId, productId]);
 
       if (result.rows.length === 0) {
         throw new Error('Inventory not found');
@@ -674,7 +674,7 @@ class LogisticsEnhancementService {
 
   async getLogisticsStatistics(filters = {}) {
     try {
-      const query = `
+      let query = `
         SELECT 
           (SELECT COUNT(*) FROM fleet_vehicles WHERE status = 'active') as active_vehicles,
           (SELECT COUNT(*) FROM shipments WHERE status = 'in_transit') as active_shipments,
@@ -686,7 +686,7 @@ class LogisticsEnhancementService {
            WHERE tr.timestamp > NOW() - INTERVAL '24 hours') as temperature_violation_rate
       `;
 
-      const result = await this.pool.query(query);
+      let result = await this.pool.query(query);
       return result.rows[0];
     } catch (error) {
       logger.error('Error getting logistics statistics', { error: error.message, stack: error.stack });

@@ -35,7 +35,7 @@ router.get('/subsidy-programs', authenticate, async (req, res) => {
   try {
     const ministry = req.query.ministry;
     const fiscalYear = req.query.fiscal_year;
-    const result = await service.getGovernmentDashboard(ministry, fiscalYear);
+    let result = await service.getGovernmentDashboard(ministry, fiscalYear);
     apiResponseHandler.sendSuccess(res, result, 'Subsidy programs retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve subsidy programs');
@@ -50,7 +50,7 @@ router.get('/subsidy-programs', authenticate, async (req, res) => {
 router.get('/subsidy-programs/:id', authenticate, requireRole('admin'), async (req, res) => {
   try {
     // Get program details - would need to implement this method in service
-    const result = { program: null, message: 'Subsidy program details retrieval' };
+    let result = { program: null, message: 'Subsidy program details retrieval' };
     apiResponseHandler.sendSuccess(res, result, 'Subsidy program retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve subsidy program');
@@ -64,7 +64,7 @@ router.get('/subsidy-programs/:id', authenticate, requireRole('admin'), async (r
  */
 router.post('/eligibility', authenticate, async (req, res) => {
   try {
-    const result = await service.calculateEligibility(req.body.farmer_id, req.body.program_id);
+    let result = await service.calculateEligibility(req.body.farmer_id, req.body.program_id);
     apiResponseHandler.sendSuccess(res, result, 'Eligibility calculated successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to calculate eligibility');
@@ -78,7 +78,7 @@ router.post('/eligibility', authenticate, async (req, res) => {
  */
 router.post('/applications', authenticate, requireRole('farmer'), async (req, res) => {
   try {
-    const result = await service.submitSubsidyApplication(req.body);
+    let result = await service.submitSubsidyApplication(req.body);
     apiResponseHandler.sendSuccess(res, result, 'Subsidy application submitted successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to submit subsidy application');
@@ -93,7 +93,7 @@ router.post('/applications', authenticate, requireRole('farmer'), async (req, re
 router.get('/applications/:id', authenticate, async (req, res) => {
   try {
     // Get application details - would need to implement this method in service
-    const result = { application: null, message: 'Application details retrieval' };
+    let result = { application: null, message: 'Application details retrieval' };
     apiResponseHandler.sendSuccess(res, result, 'Application retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve application');
@@ -107,7 +107,7 @@ router.get('/applications/:id', authenticate, async (req, res) => {
  */
 router.post('/applications/:id/disburse', authenticate, requireRole('admin'), async (req, res) => {
   try {
-    const result = await service.disburseSubsidy(req.params.id, req.body);
+    let result = await service.disburseSubsidy(req.params.id, req.body);
     apiResponseHandler.sendSuccess(res, result, 'Subsidy disbursed successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to disburse subsidy');
@@ -121,7 +121,7 @@ router.post('/applications/:id/disburse', authenticate, requireRole('admin'), as
  */
 router.get('/programs/:id/impact', authenticate, requireRole('admin'), async (req, res) => {
   try {
-    const result = await service.trackSubsidyImpact(req.params.id);
+    let result = await service.trackSubsidyImpact(req.params.id);
     apiResponseHandler.sendSuccess(res, result, 'Subsidy impact tracked successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to track subsidy impact');
@@ -135,7 +135,7 @@ router.get('/programs/:id/impact', authenticate, requireRole('admin'), async (re
  */
 router.get('/farmer-dashboard', authenticate, requireRole('farmer'), async (req, res) => {
   try {
-    const result = await service.getFarmerSubsidyDashboard(req.user.id);
+    let result = await service.getFarmerSubsidyDashboard(req.user.id);
     apiResponseHandler.sendSuccess(res, result, 'Farmer subsidy dashboard retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve farmer subsidy dashboard');
@@ -149,9 +149,9 @@ router.get('/farmer-dashboard', authenticate, requireRole('farmer'), async (req,
  */
 router.get('/dashboard', authenticate, requireRole('admin'), async (req, res) => {
   try {
-    const ministry = req.query.ministry;
-    const fiscalYear = req.query.fiscal_year;
-    const result = await service.getGovernmentDashboard(ministry, fiscalYear);
+    let ministry = req.query.ministry;
+    let fiscalYear = req.query.fiscal_year;
+    let result = await service.getGovernmentDashboard(ministry, fiscalYear);
     apiResponseHandler.sendSuccess(res, result, 'Government dashboard retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve government dashboard');

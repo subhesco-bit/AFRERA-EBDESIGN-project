@@ -71,7 +71,7 @@ class TransactionService {
    */
   async getTransaction(transactionId) {
     try {
-      const query = `
+      let query = `
         SELECT 
           t.transaction_id,
           t.user_id,
@@ -91,7 +91,7 @@ class TransactionService {
         LEFT JOIN users u ON t.user_id = u.user_id
         WHERE t.transaction_id = $1
       `;
-      const result = await this.db.query(query, [transactionId]);
+      let result = await this.db.query(query, [transactionId]);
       
       if (result.rows.length === 0) {
         throw new Error('Transaction not found');
@@ -163,7 +163,7 @@ class TransactionService {
       query += ` ORDER BY t.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       
       // Get total count
       let countQuery = `SELECT COUNT(*) as total FROM transactions WHERE user_id = $1`;
@@ -209,7 +209,7 @@ class TransactionService {
     const { status, metadata, notes } = statusData;
 
     try {
-      const query = `
+      let query = `
         UPDATE transactions 
         SET status = $1,
             metadata = COALESCE($2, metadata),
@@ -218,7 +218,7 @@ class TransactionService {
         WHERE transaction_id = $4
         RETURNING *
       `;
-      const result = await this.db.query(query, [
+      let result = await this.db.query(query, [
         status,
         metadata ? JSON.stringify(metadata) : null,
         notes,
@@ -255,7 +255,7 @@ class TransactionService {
         FROM transactions
         WHERE user_id = $1
       `;
-      const params = [userId];
+      let params = [userId];
       let paramCount = 1;
 
       if (startDate) {
@@ -276,7 +276,7 @@ class TransactionService {
         params.push(category);
       }
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get user transaction statistics failed', error);
@@ -344,7 +344,7 @@ class TransactionService {
     const paymentGatewayService = require('./paymentGatewayService');
     
     try {
-      const result = await paymentGatewayService.processPayment({
+      let result = await paymentGatewayService.processPayment({
         userId: transaction.user_id,
         amount: transaction.amount,
         currency: transaction.currency,
@@ -367,10 +367,10 @@ class TransactionService {
    */
   async processRefundTransaction(transaction) {
     // Integrate with payment gateway service
-    const paymentGatewayService = require('./paymentGatewayService');
+    let paymentGatewayService = require('./paymentGatewayService');
     
     try {
-      const result = await paymentGatewayService.refundPayment(
+      let result = await paymentGatewayService.refundPayment(
         transaction.reference_id,
         { amount: transaction.amount, reason: transaction.description }
       );
@@ -394,7 +394,7 @@ class TransactionService {
     
     try {
       const metadata = transaction.metadata || {};
-      const result = await walletService.transferFunds(
+      let result = await walletService.transferFunds(
         metadata.fromWalletId,
         metadata.toWalletId,
         transaction.amount,
@@ -416,13 +416,13 @@ class TransactionService {
    */
   async cancelTransaction(transactionId, reason) {
     try {
-      const transaction = await this.getTransaction(transactionId);
+      let transaction = await this.getTransaction(transactionId);
       
       if (transaction.status !== 'pending' && transaction.status !== 'processing') {
         throw new Error('Cannot cancel transaction in current status');
       }
 
-      const result = await this.updateStatus(transactionId, {
+      let result = await this.updateStatus(transactionId, {
         status: 'cancelled',
         notes: reason
       });

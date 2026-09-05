@@ -31,7 +31,7 @@ async function getPond(req, res) {
 
 async function createPond(req, res) {
   try {
-    const pond = await service.createPond(req.body);
+    let pond = await service.createPond(req.body);
     res.status(201).json({ success: true, data: pond });
   } catch (error) {
     logger.error('createPond error', { error: error.message });
@@ -41,7 +41,7 @@ async function createPond(req, res) {
 
 async function updatePond(req, res) {
   try {
-    const pond = await service.updatePond(req.params.pondId, req.body);
+    let pond = await service.updatePond(req.params.pondId, req.body);
     if (!pond) return res.status(404).json({ success: false, error: 'Pond not found' });
     res.json({ success: true, data: pond });
   } catch (error) {
@@ -63,7 +63,7 @@ async function deletePond(req, res) {
 
 async function configurePondSensors(req, res) {
   try {
-    const result = await service.configurePondSensors(req.params.pondId, req.body.sensors || []);
+    let result = await service.configurePondSensors(req.params.pondId, req.body.sensors || []);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('configurePondSensors error', { error: error.message });

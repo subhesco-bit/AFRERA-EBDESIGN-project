@@ -75,7 +75,7 @@ function authMiddleware(req, res, next) {
       }
     }
 
-    const authHeader = req.headers.authorization;
+    let authHeader = req.headers.authorization;
     
     if (!authHeader) {
       return res.status(401).json({ 
@@ -84,7 +84,7 @@ function authMiddleware(req, res, next) {
       });
     }
     
-    const token = authHeader.replace('Bearer ', '');
+    let token = authHeader.replace('Bearer ', '');
     
     if (!token) {
       return res.status(401).json({ 
@@ -93,7 +93,7 @@ function authMiddleware(req, res, next) {
       });
     }
     
-    const payload = verifyToken(token);
+    let payload = verifyToken(token);
     
     // Attach user info to request
     req.user = {
@@ -176,13 +176,13 @@ function requirePermission(permission) {
  */
 function optionalAuth(req, res, next) {
   try {
-    const authHeader = req.headers.authorization;
+    let authHeader = req.headers.authorization;
     
     if (authHeader) {
-      const token = authHeader.replace('Bearer ', '');
+      let token = authHeader.replace('Bearer ', '');
       
       if (token) {
-        const payload = verifyToken(token);
+        let payload = verifyToken(token);
         req.user = {
           id: payload.userId,
           email: payload.email,

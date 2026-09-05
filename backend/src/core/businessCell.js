@@ -216,10 +216,10 @@ class BusinessCell {
 
   /** Concern: Automation. A cell-local action list, run with the same per-action isolation as core/effectors.js. */
   async automate(actions = []) {
-    const results = [];
+    let results = [];
     for (const action of actions) {
       try {
-        const outcome = await action.run();
+        let outcome = await action.run();
         results.push({ id: action.id, ok: true, outcome });
       } catch (err) {
         logger.error(`${this.id}:automation_failed`, { actionId: action.id, message: err.message });

@@ -69,8 +69,8 @@ async function getForecast({ productId, regionId, from, to, limit = 200 } = {}) 
  * claim from "we have not measured here".
  */
 async function getHeatmap({ date, productId } = {}) {
-  const params = [];
-  const where = ['region_id IS NOT NULL'];
+  let params = [];
+  let where = ['region_id IS NOT NULL'];
   if (date) { params.push(date); where.push(`forecast_date = $${params.length}`); }
   if (productId) { params.push(productId); where.push(`product_id::text = $${params.length}`); }
 

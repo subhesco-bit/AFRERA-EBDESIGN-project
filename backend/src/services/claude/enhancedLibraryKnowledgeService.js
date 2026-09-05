@@ -126,12 +126,12 @@ class EnhancedLibraryKnowledgeService {
       return;
     }
 
-    const moduleDirs = fs.readdirSync(this.backendModulesRoot, { withFileTypes: true })
+    let moduleDirs = fs.readdirSync(this.backendModulesRoot, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory() && /^M\d+$/.test(dirent.name))
       .map(dirent => dirent.name);
 
     for (const moduleDir of moduleDirs) {
-      const modulePath = path.join(this.backendModulesRoot, moduleDir);
+      let modulePath = path.join(this.backendModulesRoot, moduleDir);
       const servicePath = path.join(modulePath, 'service.js');
       if (!fs.existsSync(servicePath)) continue;
 
@@ -203,8 +203,8 @@ class EnhancedLibraryKnowledgeService {
       const componentFiles = fs.readdirSync(componentsDir).filter(f => f.endsWith('.md'));
       
       for (const file of componentFiles) {
-        const filePath = path.join(componentsDir, file);
-        const content = fs.readFileSync(filePath, 'utf8');
+        let filePath = path.join(componentsDir, file);
+        let content = fs.readFileSync(filePath, 'utf8');
         const componentData = this.parseComponentCard(content);
         
         this.index.set(file, {
@@ -225,7 +225,7 @@ class EnhancedLibraryKnowledgeService {
     
     for (const [key, item] of this.index) {
       if (item.type === 'plug-and-play-module') {
-        const moduleData = item.data;
+        let moduleData = item.data;
         
         this.moduleRegistry.set(moduleData.moduleId, {
           moduleId: moduleData.moduleId,
@@ -301,8 +301,8 @@ class EnhancedLibraryKnowledgeService {
     this.keywordIndex = new Map();
 
     for (const [moduleId, moduleInfo] of this.moduleRegistry) {
-      const moduleData = this.index.get(moduleId)?.data;
-      const keywords = moduleData?.discovery?.keywords
+      let moduleData = this.index.get(moduleId)?.data;
+      let keywords = moduleData?.discovery?.keywords
         || [moduleId, moduleInfo.name].join(' ').toLowerCase().split(/[\s_-]+/).filter(w => w.length >= 3);
       for (const keyword of keywords) {
         const k = String(keyword).toLowerCase();
@@ -332,7 +332,7 @@ class EnhancedLibraryKnowledgeService {
     // so nothing is presented as more finished than it is.
     for (const [moduleId, moduleInfo] of this.moduleRegistry) {
       let matchScore = 0;
-      const moduleData = this.index.get(moduleId)?.data;
+      let moduleData = this.index.get(moduleId)?.data;
 
       // Keywords: use declared discovery.keywords when present, otherwise fall back to
       // deriving from the module name/id so skeleton modules (no discovery block) are
@@ -342,10 +342,10 @@ class EnhancedLibraryKnowledgeService {
       // otherwise a query like "dairy" ranks a dozen unrelated ERP/analytics modules
       // above the actual dairy module because they all happen to share common words.
       const totalModules = this.moduleRegistry.size;
-      const keywords = moduleData?.discovery?.keywords
+      let keywords = moduleData?.discovery?.keywords
         || [moduleId, moduleInfo.name].join(' ').toLowerCase().split(/[\s_-]+/).filter(w => w.length >= 3);
       for (const keyword of keywords) {
-        const k = String(keyword).toLowerCase();
+        let k = String(keyword).toLowerCase();
         if (queryLower.includes(k)) {
           const docFreq = this.keywordIndex?.get(k)?.length || 1;
           const idf = Math.log((totalModules + 1) / docFreq);
@@ -414,7 +414,7 @@ class EnhancedLibraryKnowledgeService {
     }
 
     const moduleInfo = this.moduleRegistry.get(moduleId);
-    const moduleData = this.index.get(moduleId)?.data;
+    let moduleData = this.index.get(moduleId)?.data;
 
     return {
       success: true,
@@ -478,7 +478,7 @@ class EnhancedLibraryKnowledgeService {
       };
     }
 
-    const moduleInfo = this.moduleRegistry.get(moduleId);
+    let moduleInfo = this.moduleRegistry.get(moduleId);
     Object.assign(moduleInfo, status);
 
     // Update database
@@ -516,9 +516,9 @@ class EnhancedLibraryKnowledgeService {
     
     for (const [filename, item] of this.index) {
       if (item.type === 'plug-and-play-module') {
-        const moduleJsonPath = path.join(item.path, 'module.json');
+        let moduleJsonPath = path.join(item.path, 'module.json');
         if (fs.existsSync(moduleJsonPath)) {
-          const content = fs.readFileSync(moduleJsonPath, 'utf8');
+          let content = fs.readFileSync(moduleJsonPath, 'utf8');
           const hash = crypto.createHash('sha256').update(content).digest('hex');
           
           this.contentHashes.set(filename, {
@@ -529,8 +529,8 @@ class EnhancedLibraryKnowledgeService {
           });
         }
       } else {
-        const content = fs.readFileSync(item.path, 'utf8');
-        const hash = crypto.createHash('sha256').update(content).digest('hex');
+        let content = fs.readFileSync(item.path, 'utf8');
+        let hash = crypto.createHash('sha256').update(content).digest('hex');
         
         this.contentHashes.set(filename, {
           hash,
@@ -549,7 +549,7 @@ class EnhancedLibraryKnowledgeService {
    */
   async syncToDatabase() {
     try {
-      const pool = await getPostgreSQL();
+      let pool = await getPostgreSQL();
       
       // Create enhanced library_knowledge table
       await pool.query(`
@@ -633,7 +633,7 @@ class EnhancedLibraryKnowledgeService {
 
       // Insert/update module registry
       for (const [moduleId, moduleInfo] of this.moduleRegistry) {
-        const moduleData = this.index.get(moduleId)?.data;
+        let moduleData = this.index.get(moduleId)?.data;
         
         await pool.query(`
           INSERT INTO module_registry (module_id, version, name, category, status, capabilities, dependencies, discovery_metadata, execution_metadata, claude_integration, module_path, loaded, initialized, healthy)
@@ -701,7 +701,7 @@ class EnhancedLibraryKnowledgeService {
    * Parse module card from markdown
    */
   parseModuleCard(content) {
-    const moduleData = {
+    let moduleData = {
       id: '',
       name: '',
       domain: '',
@@ -732,7 +732,7 @@ class EnhancedLibraryKnowledgeService {
    * Parse component card from markdown
    */
   parseComponentCard(content) {
-    const componentData = {
+    let componentData = {
       id: '',
       name: '',
       type: '',
@@ -740,7 +740,7 @@ class EnhancedLibraryKnowledgeService {
       status: ''
     };
 
-    const lines = content.split('\n');
+    let lines = content.split('\n');
     for (const line of lines) {
       if (line.startsWith('# Component ID:')) {
         componentData.id = line.replace('# Component ID:', '').trim();

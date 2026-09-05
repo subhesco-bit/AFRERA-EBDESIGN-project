@@ -120,7 +120,7 @@ async function createProductListing(sellerId, listingData) {
  * Get marketplace listings with AI-powered ranking
  */
 async function getMarketplaceListings(filters = {}, pagination = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -243,7 +243,7 @@ async function getMarketplaceListings(filters = {}, pagination = {}) {
     query += ` LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     // Get total count
     const countQuery = query.replace(/SELECT.*FROM/, 'SELECT COUNT(DISTINCT pl.id) as total FROM')
@@ -277,7 +277,7 @@ async function getMarketplaceListings(filters = {}, pagination = {}) {
  * Get AI price recommendation based on market data
  */
 async function getAIPriceRecommendation(listingData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get historical prices for similar products
@@ -408,7 +408,7 @@ async function assessProductQuality(listingData) {
  * Predict market demand for product
  */
 async function predictMarketDemand(listingData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get seasonal demand patterns
@@ -478,7 +478,7 @@ function calculateVisibilityScore(qualityScore, demandPrediction) {
  * Get seller dashboard analytics
  */
 async function getSellerAnalytics(sellerId, period = '30d') {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const periodMap = {
@@ -558,7 +558,7 @@ async function getSellerAnalytics(sellerId, period = '30d') {
  * Get GI marketplace listings with premium pricing
  */
 async function getGIListings(filters = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const { state, gi_product_id } = filters;
@@ -579,7 +579,7 @@ async function getGIListings(filters = {}) {
       WHERE gml.listing_status = 'active'
     `;
     
-    const params = [];
+    let params = [];
     let paramCount = 0;
     
     if (gi_product_id) {
@@ -596,7 +596,7 @@ async function getGIListings(filters = {}) {
     
     query += ` ORDER BY gml.created_at DESC`;
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return {
       success: true,
@@ -616,18 +616,18 @@ async function getGIListings(filters = {}) {
  * Get market price trends for category
  */
 async function getMarketPriceTrends(categoryId, period = '30d') {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const periodMap = {
+    let periodMap = {
       '7d': '7 days',
       '30d': '30 days',
       '90d': '90 days'
     };
     
-    const periodFilter = periodMap[period] || '30 days';
+    let periodFilter = periodMap[period] || '30 days';
     
-    const result = await pg.query(`
+    let result = await pg.query(`
       SELECT 
         DATE(created_at) as date,
         AVG(base_price) as avg_price,
@@ -657,10 +657,10 @@ async function getMarketPriceTrends(categoryId, period = '30d') {
  * Get market demand analysis
  */
 async function getMarketDemandAnalysis(categoryId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const result = await pg.query(`
+    let result = await pg.query(`
       SELECT 
         c.name as category_name,
         COUNT(*) FILTER (WHERE listing_status = 'active') as active_listings,

@@ -98,7 +98,7 @@ function createQuery(table) {
     if (!pool) throw new Error("PostgreSQL is not connected");
 
     let text;
-    const values = [...state.values];
+    let values = [...state.values];
     if (state.operation === "insert") {
       const entries = Object.entries(state.data);
       text = `INSERT INTO ${tableName} (${entries.map(([key]) => identifier(key)).join(", ")}) VALUES (${entries
@@ -108,7 +108,7 @@ function createQuery(table) {
         })
         .join(", ")}) RETURNING *`;
     } else if (state.operation === "update") {
-      const entries = Object.entries(state.data);
+      let entries = Object.entries(state.data);
       text = `UPDATE ${tableName} SET ${entries
         .map(([key, value]) => {
           values.push(value);

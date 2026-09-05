@@ -50,13 +50,13 @@ async function listInventory({ page = 1, limit = 100 } = {}) {
 }
 
 async function createInventoryItem(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { name, category, unit, quantity, reorder_level, unit_price } = payload || {};
   if (!name || quantity === undefined || quantity === null) {
     throw new Error('name and quantity are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO fertilizer_inventory (name, category, unit, quantity, reorder_level, unit_price)
      VALUES ($1, COALESCE($2, 'Urea'), COALESCE($3, 'bag (50kg)'), $4, $5, $6)
      RETURNING *`,
@@ -66,10 +66,10 @@ async function createInventoryItem(payload) {
 }
 
 async function updateInventoryItem(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { name, category, unit, quantity, reorder_level, unit_price } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE fertilizer_inventory SET
        name = COALESCE($1, name),
        category = COALESCE($2, category),
@@ -86,9 +86,9 @@ async function updateInventoryItem(id, payload) {
 }
 
 async function deleteInventoryItem(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM fertilizer_inventory WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM fertilizer_inventory WHERE id = $1 RETURNING id', [id]);
   return !!res.rows[0];
 }
 
@@ -129,12 +129,12 @@ async function issueStock(id, payload) {
 }
 
 async function listIssues({ page = 1, limit = 100 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
-  const totalRes = await pg.query(`SELECT COUNT(*) FROM agri_input_issues WHERE input_type = 'fertilizer'`);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
-  const res = await pg.query(
+  let offset = (Number(page) - 1) * Number(limit);
+  let totalRes = await pg.query(`SELECT COUNT(*) FROM agri_input_issues WHERE input_type = 'fertilizer'`);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
+  let res = await pg.query(
     `SELECT * FROM agri_input_issues WHERE input_type = 'fertilizer'
      ORDER BY issued_on DESC, created_at DESC LIMIT $1 OFFSET $2`,
     [limit, offset]
@@ -148,7 +148,7 @@ async function listIssues({ page = 1, limit = 100 } = {}) {
 // ---------------------------------------------------------------------
 
 async function getReorderAlerts() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(

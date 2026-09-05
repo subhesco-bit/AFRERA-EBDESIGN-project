@@ -216,7 +216,7 @@ async function validateViewport(viewportKey, viewport) {
  * Check for overlapping elements
  */
 function checkElementOverlaps() {
-  const overlaps = [];
+  let overlaps = [];
   const elements = document.querySelectorAll('[data-test-layout]');
 
   for (let i = 0; i < elements.length; i++) {
@@ -277,7 +277,7 @@ function checkTextReadability() {
  * Check touch target sizes
  */
 function checkTouchTargets() {
-  const issues = [];
+  let issues = [];
   const touchTargets = document.querySelectorAll('button, a, input[type="checkbox"], input[type="radio"]');
 
   touchTargets.forEach(target => {
@@ -298,7 +298,7 @@ function checkTouchTargets() {
  * Check image loading and sizing
  */
 async function checkImageLoading() {
-  const issues = [];
+  let issues = [];
   const images = document.querySelectorAll('img');
 
   for (const img of images) {
@@ -313,7 +313,7 @@ async function checkImageLoading() {
     }
 
     // Check for proper sizing
-    const rect = img.getBoundingClientRect();
+    let rect = img.getBoundingClientRect();
     if (rect.width < 10 || rect.height < 10) {
       issues.push(`Tiny image detected: ${img.src || img.id}`);
     }
@@ -326,7 +326,7 @@ async function checkImageLoading() {
  * Calculate contrast ratio between text and background
  */
 function getContrastRatio(element) {
-  const style = window.getComputedStyle(element);
+  let style = window.getComputedStyle(element);
   const fgColor = style.color;
   const bgColor = style.backgroundColor;
 

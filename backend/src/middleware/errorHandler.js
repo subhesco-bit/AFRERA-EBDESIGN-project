@@ -40,35 +40,35 @@ const errorHandler = (err, req, res, next) => {
 
   // Mongoose duplicate key
   if (err.code === 11000) {
-    const message = 'Duplicate field value entered';
+    let message = 'Duplicate field value entered';
     error = new AppError(message, 400, 'DUPLICATE_FIELD');
   }
 
   // Mongoose validation error
   if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message).join(', ');
+    let message = Object.values(err.errors).map(val => val.message).join(', ');
     error = new AppError(message, 400, 'VALIDATION_ERROR');
   }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
-    const message = 'Invalid token. Please log in again.';
+    let message = 'Invalid token. Please log in again.';
     error = new AppError(message, 401, 'INVALID_TOKEN');
   }
 
   if (err.name === 'TokenExpiredError') {
-    const message = 'Your token has expired. Please log in again.';
+    let message = 'Your token has expired. Please log in again.';
     error = new AppError(message, 401, 'TOKEN_EXPIRED');
   }
 
   // PostgreSQL errors
   if (err.code === '23505') {
-    const message = 'Duplicate entry';
+    let message = 'Duplicate entry';
     error = new AppError(message, 409, 'DUPLICATE_ENTRY');
   }
 
   if (err.code === '23503') {
-    const message = 'Foreign key violation';
+    let message = 'Foreign key violation';
     error = new AppError(message, 400, 'FOREIGN_KEY_VIOLATION');
   }
 

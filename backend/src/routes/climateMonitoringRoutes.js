@@ -45,7 +45,7 @@ function crudRouter(service) {
   });
   router.put('/:id', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, bodyValidator((body) => { if (!Object.keys(body).length) throw new Error('At least one field is required'); }), async (req, res) => {
     try {
-      const item = await service.update(req.params.id, req.body);
+      let item = await service.update(req.params.id, req.body);
       if (!item) return res.status(404).json({ success: false, error: 'Not found' });
       res.json({ success: true, data: item });
     } catch (e) { return fail(req, res, e, 'update', e.status || 500); }

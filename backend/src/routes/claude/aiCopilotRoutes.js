@@ -68,7 +68,7 @@ router.get('/ai-capability', (req, res) => {
 router.post('/generate-copilot-response', async (req, res) => {
   try {
     const { copilotType, message, context, session } = req.body;
-    const result = await originalService.generateCopilotResponse(copilotType, message, context, session);
+    let result = await originalService.generateCopilotResponse(copilotType, message, context, session);
     
     res.json({
       success: true,

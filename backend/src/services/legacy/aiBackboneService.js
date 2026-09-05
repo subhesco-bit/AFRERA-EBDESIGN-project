@@ -155,7 +155,7 @@ async function callClaudeAI(prompt, options = {}) {
         throw error;
       }
       retryCount++;
-      const delay = Math.pow(2, retryCount) * 1000;
+      let delay = Math.pow(2, retryCount) * 1000;
       logger.warn(`Claude API error, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -174,12 +174,12 @@ async function callOpenAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.openai.total++;
 
-  const maxRetries = 3;
+  let maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {
     try {
-      const response = await fetch(`${AI_PROVIDERS.openai.baseUrl}/chat/completions`, {
+      let response = await fetch(`${AI_PROVIDERS.openai.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,10 +200,10 @@ async function callOpenAI(prompt, options = {}) {
       });
 
       if (!response.ok) {
-        const error = await response.text();
+        let error = await response.text();
         if (response.status === 429 && retryCount < maxRetries - 1) {
           retryCount++;
-          const delay = Math.pow(2, retryCount) * 1000;
+          let delay = Math.pow(2, retryCount) * 1000;
           logger.warn(`OpenAI API rate limited, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
@@ -211,7 +211,7 @@ async function callOpenAI(prompt, options = {}) {
         throw new Error(`OpenAI API error: ${response.status} - ${error}`);
       }
 
-      const data = await response.json();
+      let data = await response.json();
       
       aiRequestTracker.successfulRequests++;
       aiRequestTracker.providerStats.openai.success++;
@@ -236,7 +236,7 @@ async function callOpenAI(prompt, options = {}) {
       throw error;
     }
     retryCount++;
-    const delay = Math.pow(2, retryCount) * 1000;
+    let delay = Math.pow(2, retryCount) * 1000;
     logger.warn(`OpenAI API error, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
     await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -255,12 +255,12 @@ async function callGeminiAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.gemini.total++;
 
-  const maxRetries = 3;
+  let maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {
     try {
-      const response = await fetch(
+      let response = await fetch(
         `${AI_PROVIDERS.gemini.baseUrl}/${AI_PROVIDERS.gemini.model}:generateContent?key=${AI_PROVIDERS.gemini.apiKey}`,
         {
           method: 'POST',
@@ -286,10 +286,10 @@ async function callGeminiAI(prompt, options = {}) {
       );
 
       if (!response.ok) {
-        const error = await response.text();
+        let error = await response.text();
         if (response.status === 429 && retryCount < maxRetries - 1) {
           retryCount++;
-          const delay = Math.pow(2, retryCount) * 1000;
+          let delay = Math.pow(2, retryCount) * 1000;
           logger.warn(`Gemini API rate limited, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
@@ -297,7 +297,7 @@ async function callGeminiAI(prompt, options = {}) {
         throw new Error(`Gemini API error: ${response.status} - ${error}`);
       }
 
-      const data = await response.json();
+      let data = await response.json();
       
       aiRequestTracker.successfulRequests++;
     aiRequestTracker.providerStats.gemini.success++;
@@ -321,7 +321,7 @@ async function callGeminiAI(prompt, options = {}) {
       throw error;
     }
     retryCount++;
-    const delay = Math.pow(2, retryCount) * 1000;
+    let delay = Math.pow(2, retryCount) * 1000;
     logger.warn(`Gemini API error, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
     await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -341,7 +341,7 @@ async function callAzureOpenAI(prompt, options = {}) {
   aiRequestTracker.providerStats.azure.total++;
 
   try {
-    const response = await fetch(
+    let response = await fetch(
       `${AI_PROVIDERS.azure.endpoint}/openai/deployments/${AI_PROVIDERS.azure.deployment}/chat/completions?api-version=${AI_PROVIDERS.azure.apiVersion}`,
       {
         method: 'POST',
@@ -363,11 +363,11 @@ async function callAzureOpenAI(prompt, options = {}) {
     );
 
     if (!response.ok) {
-      const error = await response.text();
+      let error = await response.text();
       throw new Error(`Azure OpenAI API error: ${response.status} - ${error}`);
     }
 
-    const data = await response.json();
+    let data = await response.json();
     
     aiRequestTracker.successfulRequests++;
     aiRequestTracker.providerStats.azure.success++;
@@ -403,13 +403,13 @@ async function callHuggingFace(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.huggingface.total++;
 
-  const maxRetries = 3;
+  let maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {
     try {
       const model = options.model || AI_PROVIDERS.huggingface.defaultModel;
-      const response = await fetch(`${AI_PROVIDERS.huggingface.baseUrl}/models/${model}`, {
+      let response = await fetch(`${AI_PROVIDERS.huggingface.baseUrl}/models/${model}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${AI_PROVIDERS.huggingface.apiKey}`,
@@ -426,10 +426,10 @@ async function callHuggingFace(prompt, options = {}) {
       });
 
       if (!response.ok) {
-        const error = await response.text();
+        let error = await response.text();
         if (response.status === 429 && retryCount < maxRetries - 1) {
           retryCount++;
-          const delay = Math.pow(2, retryCount) * 1000;
+          let delay = Math.pow(2, retryCount) * 1000;
           logger.warn(`Hugging Face API rate limited, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
@@ -437,7 +437,7 @@ async function callHuggingFace(prompt, options = {}) {
         throw new Error(`Hugging Face API error: ${response.status} - ${error}`);
       }
 
-      const data = await response.json();
+      let data = await response.json();
       
       aiRequestTracker.successfulRequests++;
     aiRequestTracker.providerStats.huggingface.success++;
@@ -459,7 +459,7 @@ async function callHuggingFace(prompt, options = {}) {
       throw error;
     }
     retryCount++;
-    const delay = Math.pow(2, retryCount) * 1000;
+    let delay = Math.pow(2, retryCount) * 1000;
     logger.warn(`Hugging Face API error, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
     await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -478,12 +478,12 @@ async function callOllamaAI(prompt, options = {}) {
   aiRequestTracker.totalRequests++;
   aiRequestTracker.providerStats.ollama.total++;
 
-  const maxRetries = 3;
+  let maxRetries = 3;
   let retryCount = 0;
 
   while (retryCount < maxRetries) {
     try {
-      const response = await fetch(`${AI_PROVIDERS.ollama.baseUrl}/api/chat`, {
+      let response = await fetch(`${AI_PROVIDERS.ollama.baseUrl}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -506,10 +506,10 @@ async function callOllamaAI(prompt, options = {}) {
       });
 
       if (!response.ok) {
-        const error = await response.text();
+        let error = await response.text();
         if (response.status === 429 && retryCount < maxRetries - 1) {
           retryCount++;
-          const delay = Math.pow(2, retryCount) * 1000;
+          let delay = Math.pow(2, retryCount) * 1000;
           logger.warn(`Ollama server busy, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
@@ -517,7 +517,7 @@ async function callOllamaAI(prompt, options = {}) {
         throw new Error(`Ollama API error: ${response.status} - ${error}`);
       }
 
-      const data = await response.json();
+      let data = await response.json();
 
       aiRequestTracker.successfulRequests++;
       aiRequestTracker.providerStats.ollama.success++;
@@ -545,7 +545,7 @@ async function callOllamaAI(prompt, options = {}) {
         throw error;
       }
       retryCount++;
-      const delay = Math.pow(2, retryCount) * 1000;
+      let delay = Math.pow(2, retryCount) * 1000;
       logger.warn(`Ollama error, retrying in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
@@ -628,7 +628,7 @@ Please provide:
 4. Forward-looking insights
 5. Comparative analysis (if applicable)`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     analysis: response.content,
@@ -642,7 +642,7 @@ Please provide:
  * AI-powered supply chain optimization
  */
 async function optimizeSupplyChain(supplyChainData) {
-  const prompt = `As an expert supply chain analyst, analyze the following supply chain data and provide optimization recommendations:
+  let prompt = `As an expert supply chain analyst, analyze the following supply chain data and provide optimization recommendations:
 
 Inventory Levels: ${JSON.stringify(supplyChainData.inventory)}
 Lead Times: ${JSON.stringify(supplyChainData.leadTimes)}
@@ -656,7 +656,7 @@ Please provide:
 4. Risk mitigation strategies
 5. Cost optimization opportunities`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     optimization: response.content,
@@ -670,7 +670,7 @@ Please provide:
  * AI-powered production planning
  */
 async function optimizeProduction(productionData) {
-  const prompt = `As an expert production planner, analyze the following production data and provide optimization recommendations:
+  let prompt = `As an expert production planner, analyze the following production data and provide optimization recommendations:
 
 Production Orders: ${JSON.stringify(productionData.productionOrders)}
 Capacity Utilization: ${productionData.capacityUtilization}%
@@ -684,7 +684,7 @@ Please provide:
 4. Quality improvement strategies
 5. Efficiency improvement opportunities`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     optimization: response.content,
@@ -698,7 +698,7 @@ Please provide:
  * AI-powered HR analytics
  */
 async function analyzeHR(hrData) {
-  const prompt = `As an expert HR analyst, analyze the following HR data and provide insights:
+  let prompt = `As an expert HR analyst, analyze the following HR data and provide insights:
 
 Employee Count: ${hrData.employeeCount}
 Turnover Rate: ${hrData.turnoverRate}%
@@ -713,7 +713,7 @@ Please provide:
 4. Performance improvement insights
 5. Cost optimization opportunities`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     analysis: response.content,
@@ -727,7 +727,7 @@ Please provide:
  * AI-powered project management
  */
 async function analyzeProject(projectData) {
-  const prompt = `As an expert project manager, analyze the following project data and provide insights:
+  let prompt = `As an expert project manager, analyze the following project data and provide insights:
 
 Project Status: ${projectData.status}
 Completion: ${projectData.completion}%
@@ -742,7 +742,7 @@ Please provide:
 4. Resource optimization strategies
 5. Budget management insights`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     analysis: response.content,
@@ -756,7 +756,7 @@ Please provide:
  * AI-powered agricultural decision support
  */
 async function supportAgriculturalDecision(agriculturalData) {
-  const prompt = `As an expert agricultural consultant, analyze the following agricultural data and provide decision support:
+  let prompt = `As an expert agricultural consultant, analyze the following agricultural data and provide decision support:
 
 Crop Data: ${JSON.stringify(agriculturalData.crops)}
 Soil Data: ${JSON.stringify(agriculturalData.soil)}
@@ -770,7 +770,7 @@ Please provide:
 4. Risk mitigation strategies
 5. Market timing recommendations`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     recommendations: response.content,
@@ -784,7 +784,7 @@ Please provide:
  * AI-powered livestock management
  */
 async function optimizeLivestock(livestockData) {
-  const prompt = `As an expert livestock manager, analyze the following livestock data and provide optimization recommendations:
+  let prompt = `As an expert livestock manager, analyze the following livestock data and provide optimization recommendations:
 
 Animal Health: ${JSON.stringify(livestockData.health)}
 Production Data: ${JSON.stringify(livestockData.production)}
@@ -798,7 +798,7 @@ Please provide:
 4. Breeding program recommendations
 5. Disease prevention strategies`;
 
-  const response = await callAI(prompt, { maxTokens: 2048 });
+  let response = await callAI(prompt, { maxTokens: 2048 });
   
   return {
     optimization: response.content,

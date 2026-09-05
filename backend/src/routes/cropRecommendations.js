@@ -15,14 +15,14 @@ router.post('/recommendations/crops', authenticateToken, async (req, res, next) 
 router.get('/crops/:type/guidance', async (req, res, next) => {
   try {
     const { phase } = req.query;
-    const result = await cropRecommendationService.getCropGuidance(req.params.type, phase);
+    let result = await cropRecommendationService.getCropGuidance(req.params.type, phase);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });
 
 router.get('/crops/:type/market-outlook', async (req, res, next) => {
   try {
-    const result = await cropRecommendationService.getMarketOutlook(req.params.type);
+    let result = await cropRecommendationService.getMarketOutlook(req.params.type);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });

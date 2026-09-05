@@ -27,7 +27,7 @@ async function getRole(req, res) {
 
 async function createRole(req, res) {
   try {
-    const role = await service.createRole(req.body);
+    let role = await service.createRole(req.body);
     res.status(201).json({ success: true, data: role });
   } catch (error) {
     logger.error('createRole error', { error: error.message });
@@ -37,7 +37,7 @@ async function createRole(req, res) {
 
 async function updateRole(req, res) {
   try {
-    const role = await service.updateRole(req.params.id, req.body);
+    let role = await service.updateRole(req.params.id, req.body);
     if (!role) return res.status(404).json({ success: false, error: 'Role not found' });
     res.json({ success: true, data: role });
   } catch (error) {
@@ -113,7 +113,7 @@ async function getUserRoles(req, res) {
 
 async function getUserPermissions(req, res) {
   try {
-    const permissions = await service.getUserPermissions(req.params.userId);
+    let permissions = await service.getUserPermissions(req.params.userId);
     res.json({ success: true, data: permissions });
   } catch (error) {
     logger.error('getUserPermissions error', { error: error.message });

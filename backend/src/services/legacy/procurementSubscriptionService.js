@@ -312,7 +312,7 @@ function setupRoutes(app) {
 
   router.get('/subscriptions/product/:productId', async (req, res) => {
     try {
-      const subscriptions = await getSubscriptionsByProduct(req.params.productId);
+      let subscriptions = await getSubscriptionsByProduct(req.params.productId);
       res.json({ success: true, data: subscriptions });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -321,7 +321,7 @@ function setupRoutes(app) {
 
   router.post('/subscriptions', async (req, res) => {
     try {
-      const subscription = await createSubscription(req.body);
+      let subscription = await createSubscription(req.body);
       res.status(201).json({ success: true, data: subscription });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -330,7 +330,7 @@ function setupRoutes(app) {
 
   router.put('/subscriptions/:subscriptionId', async (req, res) => {
     try {
-      const subscription = await updateSubscription(req.params.subscriptionId, req.body);
+      let subscription = await updateSubscription(req.params.subscriptionId, req.body);
       res.json({ success: true, data: subscription });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -340,7 +340,7 @@ function setupRoutes(app) {
   router.post('/subscriptions/:subscriptionId/cancel', async (req, res) => {
     try {
       const { reason } = req.body;
-      const subscription = await cancelSubscription(req.params.subscriptionId, reason);
+      let subscription = await cancelSubscription(req.params.subscriptionId, reason);
       res.json({ success: true, data: subscription });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -349,7 +349,7 @@ function setupRoutes(app) {
 
   router.get('/subscriptions/due/:date', async (req, res) => {
     try {
-      const subscriptions = await getSubscriptionsDueForDelivery(req.params.date);
+      let subscriptions = await getSubscriptionsDueForDelivery(req.params.date);
       res.json({ success: true, data: subscriptions });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -358,7 +358,7 @@ function setupRoutes(app) {
 
   router.get('/subscriptions/statistics', async (req, res) => {
     try {
-      const stats = await getSubscriptionStatistics(req.query);
+      let stats = await getSubscriptionStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

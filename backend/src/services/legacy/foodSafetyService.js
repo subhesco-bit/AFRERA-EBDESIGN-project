@@ -97,7 +97,7 @@ router.get('/haccp', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get HACCP plans error', { error: error.message, stack: error.stack });
@@ -120,7 +120,7 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
       corrective_action_taken
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO haccp_monitoring_records 
        (haccp_plan_id, ccp_id, monitoring_value, critical_limit, within_limits, 
         monitoring_by, comments, corrective_action_taken, monitoring_time, created_at)
@@ -166,7 +166,7 @@ router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
       corrective_actions
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO fssai_compliance 
        (license_number, facility_id, license_type, license_category, valid_from, 
         valid_to, annual_turnover, manufacturing_activities, products_covered, 
@@ -199,7 +199,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
     const { facility_id, license_number, compliance_status } = req.query;
     
     let query = 'SELECT * FROM fssai_compliance WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -220,7 +220,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
       params.push(compliance_status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get FSSAI compliance records error', { error: error.message, stack: error.stack });
@@ -254,7 +254,7 @@ router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
       nonconformities
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO iso22000_compliance 
        (certificate_number, facility_id, scope, certification_body, issue_date, 
         expiry_date, surveillance_audits, management_review, internal_audits, 
@@ -288,7 +288,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
     const { facility_id, certificate_number, status } = req.query;
     
     let query = 'SELECT * FROM iso22000_compliance WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -309,7 +309,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get ISO 22000 compliance records error', { error: error.message, stack: error.stack });
@@ -342,7 +342,7 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
       communication_plan
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_safety_recalls 
        (product_id, batch_number, recall_type, recall_reason, risk_level, 
         affected_quantity, distribution_scope, notification_method, recall_initiator, 
@@ -394,7 +394,7 @@ router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...
   try {
     const { status, recovery_rate, closure_notes, closed_by } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE food_safety_recalls 
        SET status = $1,
            recovery_rate = COALESCE($2, recovery_rate),
@@ -427,7 +427,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
     const { product_id, status, risk_level, start_date, end_date } = req.query;
     
     let query = 'SELECT * FROM food_safety_recalls WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -460,7 +460,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
       params.push(end_date);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get recall records error', { error: error.message, stack: error.stack });
@@ -491,7 +491,7 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
       verification_method
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO capa_records 
        (source_type, source_id, issue_description, root_cause, impact_assessment, 
         preventive_action, corrective_action, responsibility, target_date, 
@@ -521,7 +521,7 @@ router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLA
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE capa_records 
        SET status = $1,
            completion_notes = $2,
@@ -554,7 +554,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
     const { source_type, source_id, status, responsibility } = req.query;
     
     let query = 'SELECT * FROM capa_records WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (source_type) {
@@ -581,7 +581,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
       params.push(responsibility);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get CAPA records error', { error: error.message, stack: error.stack });
@@ -616,7 +616,7 @@ router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
       next_audit_date
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_safety_audits 
        (audit_type, facility_id, audit_scope, audit_criteria, audit_team, 
         scheduled_date, actual_date, findings, nonconformities, observations, 
@@ -650,7 +650,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
     const { facility_id, audit_type, status, start_date, end_date } = req.query;
     
     let query = 'SELECT * FROM food_safety_audits WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -683,7 +683,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
       params.push(end_date);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get food safety audits error', { error: error.message, stack: error.stack });
@@ -717,7 +717,7 @@ router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) 
       review_date
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_safety_risk_assessments 
        (assessment_type, facility_id, product_id, hazard_identification, 
         risk_characterization, exposure_assessment, risk_level, likelihood, 
@@ -750,7 +750,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
     const { facility_id, product_id, assessment_type, risk_level } = req.query;
     
     let query = 'SELECT * FROM food_safety_risk_assessments WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -777,7 +777,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
       params.push(risk_level);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get risk assessments error', { error: error.message, stack: error.stack });
@@ -808,7 +808,7 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
       completed_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO corrective_actions 
        (source_type, source_id, issue_description, immediate_action, root_cause, 
         long_term_correction, responsibility, due_date, effectiveness_verification, 
@@ -837,7 +837,7 @@ router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requ
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE corrective_actions 
        SET status = $1,
            completion_notes = $2,
@@ -870,7 +870,7 @@ router.get('/corrective-actions', authMiddleware, async (req, res) => {
     const { source_type, source_id, status, responsibility } = req.query;
     
     let query = 'SELECT * FROM corrective_actions WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (source_type) {
@@ -897,7 +897,7 @@ router.get('/corrective-actions', authMiddleware, async (req, res) => {
       params.push(responsibility);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get corrective actions error', { error: error.message, stack: error.stack });

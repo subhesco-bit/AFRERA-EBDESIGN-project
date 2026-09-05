@@ -111,7 +111,7 @@ async function segmentCustomersRFM() {
  * Segment customers using behavioral clustering
  */
 async function segmentCustomersBehavioral() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Analyze customer behavior patterns
@@ -153,7 +153,7 @@ async function segmentCustomersBehavioral() {
       FROM customer_behavior
     `;
     
-    const result = await pg.query(behaviorQuery);
+    let result = await pg.query(behaviorQuery);
     
     // Update behavioral segments
     for (const customer of result.rows) {
@@ -186,7 +186,7 @@ async function segmentCustomersBehavioral() {
  * Forecast demand for products using time series analysis
  */
 async function forecastProductDemand(productId, horizonDays = 30) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get historical sales data
@@ -286,7 +286,7 @@ async function forecastProductDemand(productId, horizonDays = 30) {
  * Calculate moving average
  */
 function calculateMovingAverage(data, window) {
-  const result = [];
+  let result = [];
   for (let i = 0; i < data.length; i++) {
     const start = Math.max(0, i - window + 1);
     const subset = data.slice(start, i + 1);
@@ -313,7 +313,7 @@ function calculateTrend(data) {
   }
   
   const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const avg = data.reduce((sum, val) => sum + val, 0) / n;
+  let avg = data.reduce((sum, val) => sum + val, 0) / n;
   
   return slope / avg; // Return trend as percentage of average
 }
@@ -345,7 +345,7 @@ function detectSeasonality(data) {
  * Optimize inventory levels for products
  */
 async function optimizeInventory(productId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get current inventory and demand forecast
@@ -370,7 +370,7 @@ async function optimizeInventory(productId) {
     const currentStock = parseFloat(product.rows[0].current_stock);
     
     // Get demand forecast
-    const forecast = await forecastProductDemand(productId, 30);
+    let forecast = await forecastProductDemand(productId, 30);
     
     // Calculate optimal inventory levels
     const totalPredictedDemand = forecast.forecast.reduce((sum, f) => sum + f.predicted_quantity, 0);
@@ -440,7 +440,7 @@ async function optimizeInventory(productId) {
  * Get personalized product recommendations for user
  */
 async function getPersonalizedRecommendations(userId, limit = 10) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get user's purchase history
@@ -509,7 +509,7 @@ async function getPersonalizedRecommendations(userId, limit = 10) {
                LIMIT $${paramCount + 1}`;
     params.push(limit);
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     // Calculate recommendation scores
     const recommendations = result.rows.map(product => {
@@ -590,7 +590,7 @@ function getRecommendationReason(product, userSegment) {
  * Predict sales for time period
  */
 async function predictSales(categoryId = null, periodDays = 30) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get historical sales data
@@ -607,7 +607,7 @@ async function predictSales(categoryId = null, periodDays = 30) {
         AND o.created_at > NOW() - INTERVAL '90 days'
     `;
     
-    const params = [];
+    let params = [];
     let paramCount = 0;
     
     if (categoryId) {
@@ -619,7 +619,7 @@ async function predictSales(categoryId = null, periodDays = 30) {
     historicalQuery += ` GROUP BY DATE_TRUNC('day', o.created_at)
                      ORDER BY date ASC`;
     
-    const historical = await pg.query(historicalQuery, params);
+    let historical = await pg.query(historicalQuery, params);
     
     if (historical.rows.length < 7) {
       return {
@@ -631,14 +631,14 @@ async function predictSales(categoryId = null, periodDays = 30) {
     
     // Calculate predictions
     const revenues = historical.rows.map(r => parseFloat(r.daily_revenue));
-    const trend = calculateTrend(revenues);
+    let trend = calculateTrend(revenues);
     const avgRevenue = revenues.reduce((sum, r) => sum + r, 0) / revenues.length;
     
-    const forecast = [];
+    let forecast = [];
     for (let i = 0; i < periodDays; i++) {
-      const forecastDate = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
-      const dayOfWeek = forecastDate.getDay();
-      const seasonalFactor = detectSeasonality(revenues)[dayOfWeek] || 1.0;
+      let forecastDate = new Date(Date.now() + i * 24 * 60 * 60 * 1000);
+      let dayOfWeek = forecastDate.getDay();
+      let seasonalFactor = detectSeasonality(revenues)[dayOfWeek] || 1.0;
       
       const predictedRevenue = Math.max(0, Math.round(
         avgRevenue * (1 + trend * (i + 1) / 30) * seasonalFactor
@@ -682,7 +682,7 @@ async function predictSales(categoryId = null, periodDays = 30) {
  * Calculate customer lifetime value
  */
 async function calculateCustomerLifetimeValue(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get customer's purchase history
@@ -787,7 +787,7 @@ async function calculateCustomerLifetimeValue(userId) {
  * Analyze market basket for cross-sell opportunities
  */
 async function analyzeMarketBasket(categoryId = null) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Find products frequently purchased together
@@ -823,9 +823,9 @@ async function analyzeMarketBasket(categoryId = null) {
       LIMIT 20
     `;
     
-    const result = await pg.query(basketQuery);
+    let result = await pg.query(basketQuery);
     
-    const recommendations = result.rows.map(pair => ({
+    let recommendations = result.rows.map(pair => ({
       product_a: {
         id: pair.product_a,
         name: pair.product_a_name,

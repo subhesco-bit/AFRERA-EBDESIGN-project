@@ -80,7 +80,7 @@ router.get
     logger.debug('router.get request');('/modules/type/:type', (req, res) => {
   try {
     const { type } = req.params;
-    const modules = sapModuleArchitectureService.getModulesByType(type);
+    let modules = sapModuleArchitectureService.getModulesByType(type);
     
     res.json({
       success: true,
@@ -121,7 +121,7 @@ router.post
       capabilities: capabilities || []
     });
     
-    const module = sapModuleArchitectureService.getModule(id);
+    let module = sapModuleArchitectureService.getModule(id);
     
     res.json({
       success: true,
@@ -168,7 +168,7 @@ router.delete
     logger.debug('router.delete request');('/modules/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const result = sapModuleArchitectureService.deleteModule(id);
+    let result = sapModuleArchitectureService.deleteModule(id);
     
     res.json(result);
   } catch (error) {
@@ -286,7 +286,7 @@ router.put
     const { id } = req.params;
     const config = req.body;
     
-    const result = sapModuleArchitectureService.setModuleConfiguration(id, config);
+    let result = sapModuleArchitectureService.setModuleConfiguration(id, config);
     
     res.json(result);
   } catch (error) {
@@ -340,7 +340,7 @@ router.put
       });
     }
     
-    const result = sapModuleArchitectureService.updateModuleVersion(id, version);
+    let result = sapModuleArchitectureService.updateModuleVersion(id, version);
     
     res.json(result);
   } catch (error) {
@@ -370,7 +370,7 @@ router.post
       });
     }
     
-    const result = sapModuleArchitectureService.transitionModuleState(id, new_state);
+    let result = sapModuleArchitectureService.transitionModuleState(id, new_state);
     
     res.json(result);
   } catch (error) {

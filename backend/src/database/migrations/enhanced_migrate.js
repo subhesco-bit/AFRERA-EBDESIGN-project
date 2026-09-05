@@ -151,7 +151,7 @@ class EnhancedMigrationSystem {
       const filePath = path.join(this.migrationsDir, file);
       const content = fs.readFileSync(filePath, 'utf8');
       const checksum = this.calculateChecksum(content);
-      const metadata = this.extractMetadata(file, content);
+      let metadata = this.extractMetadata(file, content);
 
       return {
         filename: file,
@@ -321,7 +321,7 @@ class EnhancedMigrationSystem {
 
       logger.info('Starting enhanced migration process...');
 
-      const migrations = this.getMigrationFiles();
+      let migrations = this.getMigrationFiles();
       const executedMigrations = await this.getExecutedMigrations();
 
       logger.info(`Found ${migrations.length} migration files`);
@@ -426,7 +426,7 @@ class EnhancedMigrationSystem {
       }
 
       const rollbackContent = fs.readFileSync(rollbackPath, 'utf8');
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
 
       try {
         await client.query('BEGIN');
@@ -458,14 +458,14 @@ class EnhancedMigrationSystem {
     try {
       await this.initialize();
 
-      const migrations = this.getMigrationFiles();
-      const executedMigrations = await this.getExecutedMigrations();
+      let migrations = this.getMigrationFiles();
+      let executedMigrations = await this.getExecutedMigrations();
 
       const statusLines = ['\nMigration Status:', '=================='];
-      const checksumWarnings = await this.checkChecksumIntegrity(migrations, executedMigrations);
+      let checksumWarnings = await this.checkChecksumIntegrity(migrations, executedMigrations);
 
       for (const migration of migrations) {
-        const executed = executedMigrations.get(migration.filename);
+        let executed = executedMigrations.get(migration.filename);
         if (executed) {
           const checksumChanged = executed.checksum !== migration.checksum;
           const status = checksumChanged ? '⚠️  MODIFIED' : '✅';
@@ -505,7 +505,7 @@ class EnhancedMigrationSystem {
   createMigration(name, description = '') {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const filename = `${timestamp}_${name.replace(/\s+/g, '_').toLowerCase()}.sql`;
-    const filePath = path.join(this.migrationsDir, filename);
+    let filePath = path.join(this.migrationsDir, filename);
 
     const template = `-- Migration: ${name}
 -- Description: ${description}

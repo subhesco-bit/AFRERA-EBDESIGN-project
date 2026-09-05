@@ -91,7 +91,7 @@ async function createExperience(data) {
  */
 router.post('/experiences', authMiddleware, async (req, res) => {
   try {
-    const result = await createExperience({
+    let result = await createExperience({
       ...req.body,
       created_by: req.user.id
     });
@@ -127,7 +127,7 @@ async function getExperiences(filters = {}) {
 
     query += ' ORDER BY created_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get experiences error', { error: error.message, stack: error.stack });
@@ -141,7 +141,7 @@ async function getExperiences(filters = {}) {
 router.get('/experiences', async (req, res) => {
   try {
     const { experience_type, experience_category, target_entity_id, target_entity_type } = req.query;
-    const result = await getExperiences({ experience_type, experience_category, target_entity_id, target_entity_type });
+    let result = await getExperiences({ experience_type, experience_category, target_entity_id, target_entity_type });
     res.json(result);
   } catch (error) {
     logger.error('Get experiences API error', { error: error.message, stack: error.stack });
@@ -154,7 +154,7 @@ router.get('/experiences', async (req, res) => {
  */
 async function publishExperience(experienceId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'UPDATE ar_vr_experiences SET is_published = true, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
       [experienceId]
     );
@@ -164,7 +164,7 @@ async function publishExperience(experienceId) {
     }
 
     // Defensive fallback for test-mode: construct a minimal published experience
-    const fallback = { id: experienceId, is_published: true, updated_at: new Date().toISOString() };
+    let fallback = { id: experienceId, is_published: true, updated_at: new Date().toISOString() };
     persistTestFallback('arvr_experiences', fallback.id, fallback);
     return fallback;
   } catch (error) {
@@ -182,7 +182,7 @@ router.patch('/experiences/:experienceId/publish', authMiddleware,
   requireResourceOwner({ table: 'ar_vr_experiences', idParam: 'experienceId', ownerColumn: 'created_by' }),
   async (req, res) => {
   try {
-    const result = await publishExperience(req.params.experienceId);
+    let result = await publishExperience(req.params.experienceId);
     res.json(result);
   } catch (error) {
     logger.error('Publish experience API error', { error: error.message, stack: error.stack });
@@ -209,7 +209,7 @@ async function createAsset(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO ar_vr_assets 
        (asset_name, asset_type, asset_format, file_url, file_size_bytes, thumbnail_url, metadata, created_by)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -244,7 +244,7 @@ async function createAsset(data) {
  */
 router.post('/assets', authMiddleware, async (req, res) => {
   try {
-    const result = await createAsset({
+    let result = await createAsset({
       ...req.body,
       created_by: req.user.id
     });
@@ -261,7 +261,7 @@ router.post('/assets', authMiddleware, async (req, res) => {
 async function getAssets(assetType = null) {
   try {
     let query = 'SELECT * FROM ar_vr_assets WHERE 1=1';
-    const params = [];
+    let params = [];
 
     if (assetType) {
       query += ' AND asset_type = $1';
@@ -270,7 +270,7 @@ async function getAssets(assetType = null) {
 
     query += ' ORDER BY created_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get assets error', { error: error.message, stack: error.stack });
@@ -284,7 +284,7 @@ async function getAssets(assetType = null) {
 router.get('/assets', authMiddleware, async (req, res) => {
   try {
     const { asset_type } = req.query;
-    const result = await getAssets(asset_type);
+    let result = await getAssets(asset_type);
     res.json(result);
   } catch (error) {
     logger.error('Get assets API error', { error: error.message, stack: error.stack });
@@ -311,7 +311,7 @@ async function createInteractionPoint(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO interaction_points 
        (experience_id, point_name, point_type, position_x, position_y, position_z, interaction_data)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -330,7 +330,7 @@ async function createInteractionPoint(data) {
     console.log('TEST-ARVR: createInteractionPoint result=', JSON.stringify(result && result.rows ? result.rows[0] : result));
     if (result && result.rows && result.rows[0]) return result.rows[0];
 
-    const fallback = { id: `ip-${Date.now()}`, experience_id, point_name: point_name || 'Point', point_type: point_type || 'hotspot', position_x: position_x || 0, position_y: position_y || 0, position_z: position_z || 0, interaction_data: interaction_data || {} };
+    let fallback = { id: `ip-${Date.now()}`, experience_id, point_name: point_name || 'Point', point_type: point_type || 'hotspot', position_x: position_x || 0, position_y: position_y || 0, position_z: position_z || 0, interaction_data: interaction_data || {} };
     persistTestFallback('arvr_interaction_points', fallback.experience_id, fallback, true);
     return fallback;
   } catch (error) {
@@ -344,7 +344,7 @@ async function createInteractionPoint(data) {
  */
 router.post('/interaction-points', authMiddleware, async (req, res) => {
   try {
-    const result = await createInteractionPoint(req.body);
+    let result = await createInteractionPoint(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create interaction point API error', { error: error.message, stack: error.stack });
@@ -357,7 +357,7 @@ router.post('/interaction-points', authMiddleware, async (req, res) => {
  */
 async function getInteractionPoints(experienceId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM interaction_points WHERE experience_id = $1 AND is_active = true ORDER BY created_at ASC',
       [experienceId]
     );
@@ -374,7 +374,7 @@ async function getInteractionPoints(experienceId) {
  */
 router.get('/experiences/:experienceId/interaction-points', async (req, res) => {
   try {
-    const result = await getInteractionPoints(req.params.experienceId);
+    let result = await getInteractionPoints(req.params.experienceId);
     res.json(result);
   } catch (error) {
     logger.error('Get interaction points API error', { error: error.message, stack: error.stack });
@@ -399,7 +399,7 @@ async function createSession(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO ar_vr_sessions 
        (user_id, experience_id, session_type, device_type, session_data)
        VALUES ($1, $2, $3, $4, $5)
@@ -410,7 +410,7 @@ async function createSession(data) {
     console.log('TEST-ARVR: createSession result=', JSON.stringify(result && result.rows ? result.rows[0] : result));
     if (result && result.rows && result.rows[0]) return result.rows[0];
 
-    const fallback = { id: `sess-${Date.now()}`, session_id: `sess-${Date.now()}`, user_id: user_id || 'test-user', experience_id: experience_id || null, session_type: session_type || 'ar', device_type: device_type || 'mobile', session_data: session_data || {}, started_at: new Date().toISOString(), ended_at: null };
+    let fallback = { id: `sess-${Date.now()}`, session_id: `sess-${Date.now()}`, user_id: user_id || 'test-user', experience_id: experience_id || null, session_type: session_type || 'ar', device_type: device_type || 'mobile', session_data: session_data || {}, started_at: new Date().toISOString(), ended_at: null };
     persistTestFallback('arvr_sessions', fallback.id, fallback);
     return fallback;
   } catch (error) {
@@ -424,7 +424,7 @@ async function createSession(data) {
  */
 router.post('/sessions', authMiddleware, async (req, res) => {
   try {
-    const result = await createSession({
+    let result = await createSession({
       ...req.body,
       user_id: req.user.id
     });
@@ -440,7 +440,7 @@ router.post('/sessions', authMiddleware, async (req, res) => {
  */
 async function endSession(sessionId, interactionCount) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE ar_vr_sessions 
        SET ended_at = CURRENT_TIMESTAMP, 
            duration_seconds = calculate_session_duration(id),
@@ -455,7 +455,7 @@ async function endSession(sessionId, interactionCount) {
     }
 
     // Defensive fallback for test-mode: return a constructed ended session
-    const fallback = { id: sessionId, session_id: sessionId, ended_at: new Date().toISOString(), duration_seconds: 0, interaction_count: interactionCount };
+    let fallback = { id: sessionId, session_id: sessionId, ended_at: new Date().toISOString(), duration_seconds: 0, interaction_count: interactionCount };
     persistTestFallback('arvr_sessions', fallback.id, fallback);
     return fallback;
   } catch (error) {
@@ -474,7 +474,7 @@ router.patch('/sessions/:sessionId/end', authMiddleware,
   async (req, res) => {
   try {
     const { interaction_count } = req.body;
-    const result = await endSession(req.params.sessionId, interaction_count);
+    let result = await endSession(req.params.sessionId, interaction_count);
     res.json(result);
   } catch (error) {
     logger.error('End session API error', { error: error.message, stack: error.stack });
@@ -491,7 +491,7 @@ router.patch('/sessions/:sessionId/end', authMiddleware,
  */
 async function recordArVrAnalytics(metrics) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO ar_vr_analytics 
        (date, total_sessions, unique_users, average_session_duration, total_interactions, 
         most_viewed_experiences, device_distribution)
@@ -514,7 +514,7 @@ async function recordArVrAnalytics(metrics) {
     if (result && result.rows && result.rows[0]) return result.rows[0];
 
     // Defensive fallback: return the aggregated metrics shape expected by callers
-    const fallback = {
+    let fallback = {
       total_sessions: metrics && metrics.total_sessions ? Number(metrics.total_sessions) : 0,
       unique_users: metrics && metrics.unique_users ? Number(metrics.unique_users) : 0,
       avg_duration: metrics && metrics.avg_duration ? Number(metrics.avg_duration) : 0,
@@ -534,7 +534,7 @@ async function recordArVrAnalytics(metrics) {
 router.post('/ar-vr-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    const result = await recordArVrAnalytics(metrics);
+    let result = await recordArVrAnalytics(metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record AR/VR analytics API error', { error: error.message, stack: error.stack });

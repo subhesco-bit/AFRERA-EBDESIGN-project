@@ -47,7 +47,7 @@ const ProductReview = ({ productId, userId, initialReviews, initialStats }) => {
 
   const loadStats = async () => {
     try {
-      const response = await marketplaceAPI.getProductReviewStats(productId);
+      let response = await marketplaceAPI.getProductReviewStats(productId);
       setStats(response.data.data);
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -56,7 +56,7 @@ const ProductReview = ({ productId, userId, initialReviews, initialStats }) => {
 
   const checkUserReview = async () => {
     try {
-      const response = await marketplaceAPI.getUserReviews();
+      let response = await marketplaceAPI.getUserReviews();
       const userReviews = response.data.data.reviews.filter(r => r.product_id === productId);
       setHasReviewed(userReviews.length > 0);
     } catch (error) {
@@ -67,7 +67,7 @@ const ProductReview = ({ productId, userId, initialReviews, initialStats }) => {
   const submitReview = async () => {
     setLoading(true);
     try {
-      const response = await marketplaceAPI.submitReview({
+      let response = await marketplaceAPI.submitReview({
         productId,
         ...userReview,
       });

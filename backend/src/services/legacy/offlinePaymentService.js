@@ -196,12 +196,12 @@ async function processOfflinePayment(paymentCode, payerId, pin, biometricData = 
  */
 async function verifyUserPIN(userId, pin) {
   try {
-    const query = `
+    let query = `
       SELECT pin_hash FROM user_payment_settings
       WHERE user_id = $1
     `;
 
-    const result = await pool.query(query, [userId]);
+    let result = await pool.query(query, [userId]);
 
     if (result.rows.length === 0) {
       throw new Error('PIN not set for user');
@@ -220,7 +220,7 @@ async function verifyUserPIN(userId, pin) {
  */
 async function getDailyTransactionTotal(userId) {
   try {
-    const query = `
+    let query = `
       SELECT COALESCE(SUM(amount), 0) as total
       FROM offline_transactions
       WHERE payer_id = $1
@@ -228,7 +228,7 @@ async function getDailyTransactionTotal(userId) {
         AND status = 'completed'
     `;
 
-    const result = await pool.query(query, [userId]);
+    let result = await pool.query(query, [userId]);
     return parseFloat(result.rows[0].total);
   } catch (error) {
     logger.error('Failed to get daily transaction total', { error: error.message, stack: error.stack });
@@ -241,7 +241,7 @@ async function getDailyTransactionTotal(userId) {
  */
 async function addToSyncQueue(transactionId, transactionType) {
   try {
-    const query = `
+    let query = `
       INSERT INTO offline_sync_queue
       (transaction_id, transaction_type, sync_status, retry_count, created_at)
       VALUES ($1, $2, 'pending', 0, NOW())
@@ -260,7 +260,7 @@ async function addToSyncQueue(transactionId, transactionType) {
 async function syncOfflineTransactions() {
   try {
     // Get pending transactions
-    const query = `
+    let query = `
       SELECT * FROM offline_sync_queue
       WHERE sync_status = 'pending'
         OR (sync_status = 'failed' AND last_sync_attempt < NOW() - INTERVAL '5 minutes')
@@ -268,7 +268,7 @@ async function syncOfflineTransactions() {
       LIMIT 10
     `;
 
-    const result = await pool.query(query);
+    let result = await pool.query(query);
 
     for (const syncItem of result.rows) {
       try {
@@ -370,7 +370,7 @@ async function syncPaymentTransaction(transactionId) {
  */
 async function updateWalletBalance(userId, amount) {
   try {
-    const query = `
+    let query = `
       INSERT INTO user_wallets (user_id, balance)
       VALUES ($1, $2)
       ON CONFLICT (user_id) 
@@ -393,14 +393,14 @@ async function generateUSSDPaymentCode(userId, amount, merchantId) {
     const reference = `USSD-${Date.now()}`;
 
     // Store USSD request
-    const query = `
+    let query = `
       INSERT INTO ussd_payment_requests
       (user_id, merchant_id, amount, ussd_code, reference, status, created_at)
       VALUES ($1, $2, $3, $4, $5, 'pending', NOW())
       RETURNING *
     `;
 
-    const result = await pool.query(query, [userId, merchantId, amount, ussdCode, reference]);
+    let result = await pool.query(query, [userId, merchantId, amount, ussdCode, reference]);
 
     return {
       ussd_code: ussdCode,
@@ -426,13 +426,13 @@ async function processUSSDPayment(ussdCode, userId, pin) {
     const amount = parseFloat(parts[1]);
 
     // Get USSD request
-    const query = `
+    let query = `
       SELECT * FROM ussd_payment_requests
       WHERE ussd_code = $1 AND user_id = $2 AND status = 'pending'
         AND created_at > NOW() - INTERVAL '10 minutes'
     `;
 
-    const result = await pool.query(query, [ussdCode, userId]);
+    let result = await pool.query(query, [ussdCode, userId]);
 
     if (result.rows.length === 0) {
       throw new Error('Invalid or expired USSD code');
@@ -441,13 +441,13 @@ async function processUSSDPayment(ussdCode, userId, pin) {
     const ussdRequest = result.rows[0];
 
     // Verify PIN
-    const pinValid = await verifyUserPIN(userId, pin);
+    let pinValid = await verifyUserPIN(userId, pin);
     if (!pinValid) {
       throw new Error('Invalid PIN');
     }
 
     // Process payment
-    const transactionId = `USSD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    let transactionId = `USSD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     await pool.query(
       `INSERT INTO offline_transactions
@@ -482,14 +482,14 @@ async function processUSSDPayment(ussdCode, userId, pin) {
  */
 async function getOfflinePaymentStatus(transactionId) {
   try {
-    const query = `
+    let query = `
       SELECT ot.*, osq.sync_status, osq.synced_at
       FROM offline_transactions ot
       LEFT JOIN offline_sync_queue osq ON ot.transaction_id = osq.transaction_id
       WHERE ot.transaction_id = $1
     `;
 
-    const result = await pool.query(query, [transactionId]);
+    let result = await pool.query(query, [transactionId]);
 
     if (result.rows.length === 0) {
       throw new Error('Transaction not found');
@@ -524,7 +524,7 @@ router.post('/generate-qr', authMiddleware, async (req, res) => {
       });
     }
 
-    const result = await generateOfflinePaymentQR(
+    let result = await generateOfflinePaymentQR(
       merchant_id,
       amount,
       reference || `REF-${Date.now()}`,
@@ -550,7 +550,7 @@ router.post('/process', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Payment code and PIN are required' });
     }
 
-    const result = await processOfflinePayment(payment_code, req.user.id, pin, biometric_data);
+    let result = await processOfflinePayment(payment_code, req.user.id, pin, biometric_data);
     res.json(result);
   } catch (error) {
     logger.error('Process offline payment error', { error: error.message, stack: error.stack });
@@ -570,7 +570,7 @@ router.post('/ussd/generate', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Merchant ID and amount are required' });
     }
 
-    const result = await generateUSSDPaymentCode(req.user.id, amount, merchant_id);
+    let result = await generateUSSDPaymentCode(req.user.id, amount, merchant_id);
     res.json(result);
   } catch (error) {
     logger.error('Generate USSD code error', { error: error.message, stack: error.stack });
@@ -590,7 +590,7 @@ router.post('/ussd/process', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'USSD code and PIN are required' });
     }
 
-    const result = await processUSSDPayment(ussd_code, req.user.id, pin);
+    let result = await processUSSDPayment(ussd_code, req.user.id, pin);
     res.json(result);
   } catch (error) {
     logger.error('Process USSD payment error', { error: error.message, stack: error.stack });
@@ -604,7 +604,7 @@ router.post('/ussd/process', authMiddleware, async (req, res) => {
  */
 router.post('/sync', authMiddleware, async (req, res) => {
   try {
-    const result = await syncOfflineTransactions();
+    let result = await syncOfflineTransactions();
     res.json(result);
   } catch (error) {
     logger.error('Sync offline transactions error', { error: error.message, stack: error.stack });
@@ -618,7 +618,7 @@ router.post('/sync', authMiddleware, async (req, res) => {
  */
 router.get('/status/:transactionId', authMiddleware, async (req, res) => {
   try {
-    const result = await getOfflinePaymentStatus(req.params.transactionId);
+    let result = await getOfflinePaymentStatus(req.params.transactionId);
     res.json(result);
   } catch (error) {
     logger.error('Get payment status error', { error: error.message, stack: error.stack });
@@ -632,13 +632,13 @@ router.get('/status/:transactionId', authMiddleware, async (req, res) => {
  */
 router.get('/pending', authMiddleware, async (req, res) => {
   try {
-    const query = `
+    let query = `
       SELECT * FROM offline_transactions
       WHERE payer_id = $1 AND sync_status = 'pending'
       ORDER BY created_at DESC
     `;
 
-    const result = await pool.query(query, [req.user.id]);
+    let result = await pool.query(query, [req.user.id]);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get pending transactions error', { error: error.message, stack: error.stack });
@@ -658,9 +658,9 @@ router.post('/set-pin', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'PIN must be 4 digits' });
     }
 
-    const pinHash = crypto.createHash('sha256').update(pin).digest('hex');
+    let pinHash = crypto.createHash('sha256').update(pin).digest('hex');
 
-    const query = `
+    let query = `
       INSERT INTO user_payment_settings (user_id, pin_hash)
       VALUES ($1, $2)
       ON CONFLICT (user_id) 

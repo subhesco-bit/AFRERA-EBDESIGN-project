@@ -117,7 +117,7 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
     previousFocusRef.current = document.activeElement;
 
     // Focus first focusable element
-    const focusableElements = getFocusableElements();
+    let focusableElements = getFocusableElements();
     if (focusableElements.length > 0) {
       focusableElements[0].focus();
     }
@@ -164,7 +164,7 @@ export const ScreenReaderOnly = ({ children, as = 'span' }) => {
 
 // Visually hidden but accessible
 export const VisuallyHidden = ({ children, as = 'span' }) => {
-  const Tag = as;
+  let Tag = as;
   return (
     <Tag className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0">
       {children}
@@ -176,7 +176,7 @@ export const VisuallyHidden = ({ children, as = 'span' }) => {
 export const useKeyboardNavigation = (items, onSelect, onClose) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  const handleKeyDown = useCallback((e) => {
+  let handleKeyDown = useCallback((e) => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
@@ -274,10 +274,10 @@ export const useHighContrastMode = () => {
   const [prefersHighContrast, setPrefersHighContrast] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-contrast: high)');
+    let mediaQuery = window.matchMedia('(prefers-contrast: high)');
     setPrefersHighContrast(mediaQuery.matches);
 
-    const handler = (e) => setPrefersHighContrast(e.matches);
+    let handler = (e) => setPrefersHighContrast(e.matches);
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);
@@ -391,7 +391,7 @@ export const AccessibleModal = ({
     };
   }, [isOpen]);
 
-  const handleKeyDown = (e) => {
+  let handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       onClose();
     }
@@ -449,7 +449,7 @@ export const AccessibleModal = ({
 export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
   const tabsRef = useRef([]);
 
-  const handleKeyDown = (e, index) => {
+  let handleKeyDown = (e, index) => {
     let targetIndex;
 
     switch (e.key) {

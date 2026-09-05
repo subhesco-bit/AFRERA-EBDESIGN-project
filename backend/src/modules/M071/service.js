@@ -35,15 +35,15 @@ async function registerDairyHerd(herdData) {
 }
 
 async function getDairyHerd(herdId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM dairy_herds WHERE id = $1', [herdId]);
+  let res = await pg.query('SELECT * FROM dairy_herds WHERE id = $1', [herdId]);
   return res.rows[0] || null;
 }
 
 async function listDairyHerds({ page = 1, limit = 20, farmId, breed, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -67,7 +67,7 @@ async function listDairyHerds({ page = 1, limit = 20, farmId, breed, status } = 
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM dairy_herds`, 'SELECT COUNT(*) FROM dairy_herds').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -75,12 +75,12 @@ async function listDairyHerds({ page = 1, limit = 20, farmId, breed, status } = 
 }
 
 async function updateDairyHerd(herdId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { herdName, breed, cattleCount, location, averageMilkProduction, breedingStatus, status } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE dairy_herds 
      SET herd_name = COALESCE($1, herd_name),
          breed = COALESCE($2, breed),
@@ -111,7 +111,7 @@ async function updateDairyHerd(herdId, updates) {
 
 // AI-powered milk production analysis
 async function analyzeMilkProduction(herdId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const herd = await getDairyHerd(herdId);
@@ -193,7 +193,7 @@ function generateFeedOptimization(herd) {
 }
 
 function generateBreedingRecommendations(herd) {
-  const recommendations = [];
+  let recommendations = [];
   
   if (herd.breeding_status !== 'active') {
     recommendations.push({
@@ -230,12 +230,12 @@ function generateHealthAlerts(herd) {
 
 // Milk quality tracking
 async function recordMilkQuality(qualityData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { herdId, sampleDate, fatContent, proteinContent, snf, ph, bacterialCount, grade } = qualityData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO milk_quality (herd_id, sample_date, fat_content, protein_content, snf, ph, bacterial_count, grade, created_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
      RETURNING *`,
@@ -257,11 +257,11 @@ async function recordMilkQuality(qualityData) {
 }
 
 async function getMilkQualityHistory(herdId, { startDate, endDate, limit = 20 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM milk_quality WHERE herd_id = $1';
-  const params = [herdId];
+  let params = [herdId];
   let paramIndex = 2;
   
   if (startDate) {
@@ -276,13 +276,13 @@ async function getMilkQualityHistory(herdId, { startDate, endDate, limit = 20 } 
   query += ` ORDER BY sample_date DESC LIMIT $${paramIndex++}`;
   params.push(limit);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 // Dairy analytics
 async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -294,7 +294,7 @@ async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
     FROM dairy_herds
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -312,7 +312,7 @@ async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
   
   query += ` GROUP BY breed ORDER BY total_cattle DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     byBreed: res.rows,
@@ -323,7 +323,7 @@ async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
 }
 
 function generateDairyAnalyticsRecommendations(breedData) {
-  const recommendations = [];
+  let recommendations = [];
   
   const topBreed = breedData[0];
   if (topBreed) {

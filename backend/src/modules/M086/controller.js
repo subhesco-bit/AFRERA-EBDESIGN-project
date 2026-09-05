@@ -35,7 +35,7 @@ const ingestRealTimeData = async (req, res) => {
 
 const getRealTimeData = async (req, res) => {
   try {
-    const data = await monitoringService.getRealTimeData(req.params.id, req.query);
+    let data = await monitoringService.getRealTimeData(req.params.id, req.query);
     res.status(200).json({ success: true, data: data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

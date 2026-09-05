@@ -55,7 +55,7 @@ router.post('/credit-score', async (req, res, next) => {
       return res.json({ success: true, data: result });
     }
     if (buyerId) {
-      const result = await getBuyerCreditEligibility(buyerId);
+      let result = await getBuyerCreditEligibility(buyerId);
       return res.json({ success: true, data: result });
     }
     return res.status(400).json({
@@ -106,7 +106,7 @@ router.post('/scheme-eligibility', async (req, res, next) => {
     }
 
     if (category || state || farm_size) {
-      const result = await governmentSchemeService.checkSchemeEligibility({ category, state, farm_size });
+      let result = await governmentSchemeService.checkSchemeEligibility({ category, state, farm_size });
       return res.json({ success: true, data: result });
     }
 
@@ -239,7 +239,7 @@ router.post('/predict-price', notImplementedPrediction('ENTERPRISE_AI_PREDICT_PR
 // DB-backed (ai_model_registry, migration 058), unchanged by this audit.
 router.get('/model-slots', async (req, res, next) => {
   try {
-    const result = await aiOrchestrationService.listModelSlots();
+    let result = await aiOrchestrationService.listModelSlots();
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -248,7 +248,7 @@ router.get('/model-slots', async (req, res, next) => {
 
 router.get('/unserved-intents', async (req, res, next) => {
   try {
-    const result = await aiOrchestrationService.listUnservedIntents();
+    let result = await aiOrchestrationService.listUnservedIntents();
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -257,7 +257,7 @@ router.get('/unserved-intents', async (req, res, next) => {
 
 router.post('/model-slots', async (req, res, next) => {
   try {
-    const result = await aiOrchestrationService.upsertModelSlot(req.body || {});
+    let result = await aiOrchestrationService.upsertModelSlot(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -286,8 +286,8 @@ router.post('/query', async (req, res, next) => {
     if (!query) {
       return res.status(400).json({ success: false, error: 'query is required' });
     }
-    const actorId = req.user?.id ? `user:${req.user.id}` : 'enterpriseAIRoutes:/query';
-    const result = await aiOrchestrator.route(
+    let actorId = req.user?.id ? `user:${req.user.id}` : 'enterpriseAIRoutes:/query';
+    let result = await aiOrchestrator.route(
       'llm',
       { message: query, context: context || {}, allowTemplateFallback: true },
       { actorId }

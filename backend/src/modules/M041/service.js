@@ -126,7 +126,7 @@ async function addVillageResource(villageId, resourceData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO village_resources 
        (resource_id, village_id, resource_type, resource_name, capacity, current_utilization, 
         condition, last_maintenance_date, next_maintenance_date, responsible_person, created_at)
@@ -150,7 +150,7 @@ async function addVillageResource(villageId, resourceData) {
 
 async function getVillageAnalytics(villageId) {
   try {
-    const village = await pool.query('SELECT * FROM villages WHERE village_id = $1', [villageId]);
+    let village = await pool.query('SELECT * FROM villages WHERE village_id = $1', [villageId]);
     if (village.rows.length === 0) {
       throw new Error('Village not found');
     }
@@ -246,7 +246,7 @@ function getMaintenanceStatus(resources) {
 }
 
 async function generateVillageInsights(village, resources) {
-  const aiRequest = {
+  let aiRequest = {
     task: 'village_analytics_insights',
     parameters: {
       village_data: village,
@@ -255,7 +255,7 @@ async function generateVillageInsights(village, resources) {
     }
   };
 
-  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+  let aiResponse = await aiAPI.generateRecommendation(aiRequest);
   return aiResponse;
 }
 

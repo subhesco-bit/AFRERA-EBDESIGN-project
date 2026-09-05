@@ -22,7 +22,7 @@ const advisoryQuery = queryValidator((query) => {
     const error = new Error('limit must be an integer between 1 and 200'); error.status = 400; throw error;
   }
   if (query.region !== undefined && (typeof query.region !== 'string' || query.region.length > 80)) {
-    const error = new Error('region must be at most 80 characters'); error.status = 400; throw error;
+    let error = new Error('region must be at most 80 characters'); error.status = 400; throw error;
   }
 });
 const advisoryBody = bodyValidator((body) => {
@@ -58,7 +58,7 @@ router.get('/advisories/:id', rateLimiters.read, validateId, async (req, res) =>
 
 router.post('/advisories', rateLimiters.write, authMiddleware, advisoryBody, async (req, res) => {
   try {
-    const advisory = await weatherService.createAdvisory(req.body);
+    let advisory = await weatherService.createAdvisory(req.body);
     signalBus.emitSignal(SIGNAL.WEATHER_ALERT, { advisoryId: advisory.id, kind: 'advisory', source: advisory.source }, {
       severity: SEVERITY.NOTICE, source: 'climate_advisory_routes', entityId: String(advisory.id), correlationId: requestId(req, 'climate-advisory')
     });
@@ -68,7 +68,7 @@ router.post('/advisories', rateLimiters.write, authMiddleware, advisoryBody, asy
 
 router.put('/advisories/:id', rateLimiters.write, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), validateId, advisoryUpdateBody, async (req, res) => {
   try {
-    const advisory = await weatherService.updateAdvisory(req.params.id, req.body);
+    let advisory = await weatherService.updateAdvisory(req.params.id, req.body);
     if (!advisory) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: advisory });
   } catch (error) { return advisoryFail(req, res, error, 'updateAdvisory'); }

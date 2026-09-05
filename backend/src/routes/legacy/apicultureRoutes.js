@@ -30,7 +30,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/apiculture/:id - Get apiculture by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const apiculture = await apicultureService.getApicultureById(req.params.id);
+    let apiculture = await apicultureService.getApicultureById(req.params.id);
     res.json({ success: true, data: apiculture });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -40,7 +40,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/apiculture - Create apiculture
 router.post('/', authenticate, async (req, res) => {
   try {
-    const apiculture = await apicultureService.createApiculture(req.body);
+    let apiculture = await apicultureService.createApiculture(req.body);
     res.status(201).json({ success: true, data: apiculture });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

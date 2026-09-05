@@ -55,11 +55,11 @@ async function listAnimals({ page = 1, limit = 50 } = {}) {
 }
 
 async function createAnimal(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { tag_id, breed, dob, status, notes, last_vaccination_date, last_breeding_date } = payload || {};
   if (!tag_id) throw new Error('tag_id is required');
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO dairy_animals (tag_id, breed, dob, status, notes, last_vaccination_date, last_breeding_date)
      VALUES ($1, $2, $3, COALESCE($4, 'Lactating'), $5, $6, $7)
      RETURNING *`,
@@ -69,10 +69,10 @@ async function createAnimal(payload) {
 }
 
 async function updateAnimal(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { tag_id, breed, dob, status, notes, last_vaccination_date, last_breeding_date } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE dairy_animals SET
        tag_id = COALESCE($1, tag_id),
        breed = COALESCE($2, breed),
@@ -90,9 +90,9 @@ async function updateAnimal(id, payload) {
 }
 
 async function deleteAnimal(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM dairy_animals WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM dairy_animals WHERE id = $1 RETURNING id', [id]);
   return !!res.rows[0];
 }
 
@@ -101,12 +101,12 @@ async function deleteAnimal(id) {
 // ---------------------------------------------------------------------
 
 async function listMilkRecords({ page = 1, limit = 100 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
-  const totalRes = await pg.query('SELECT COUNT(*) FROM dairy_milk_records');
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
-  const res = await pg.query(
+  let offset = (Number(page) - 1) * Number(limit);
+  let totalRes = await pg.query('SELECT COUNT(*) FROM dairy_milk_records');
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
+  let res = await pg.query(
     `SELECT m.*, a.tag_id
        FROM dairy_milk_records m
        JOIN dairy_animals a ON a.id = m.animal_id
@@ -118,13 +118,13 @@ async function listMilkRecords({ page = 1, limit = 100 } = {}) {
 }
 
 async function recordMilk(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { animal_id, date, session, quantity_liters } = payload || {};
   if (!animal_id || !date || quantity_liters === undefined || quantity_liters === null) {
     throw new Error('animal_id, date and quantity_liters are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO dairy_milk_records (animal_id, date, session, quantity_liters)
      VALUES ($1, $2, COALESCE($3, 'morning'), $4)
      ON CONFLICT (animal_id, date, session)
@@ -140,7 +140,7 @@ async function recordMilk(payload) {
 // ---------------------------------------------------------------------
 
 async function getMilkYieldTrends() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(
@@ -201,7 +201,7 @@ async function getMilkYieldTrends() {
 // ---------------------------------------------------------------------
 
 async function getHealthAlerts() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(
@@ -249,7 +249,7 @@ async function getHealthAlerts() {
       if (a.status === 'Pregnant' && a.last_breeding_date) {
         const bredOn = new Date(a.last_breeding_date);
         const expectedCalving = new Date(bredOn.getTime() + ASSUMED_GESTATION_DAYS * msPerDay);
-        const daysUntilDue = daysBetween(today, expectedCalving);
+        let daysUntilDue = daysBetween(today, expectedCalving);
         if (daysUntilDue <= ASSUMED_DUE_SOON_WINDOW_DAYS) {
           alerts.push({
             animalId: a.id,
@@ -291,7 +291,7 @@ async function getHealthAlerts() {
  * Analyzes production data and provides optimization recommendations using real AI
  */
 async function optimizeMilkProduction(animalId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -395,7 +395,7 @@ async function optimizeMilkProduction(animalId) {
  * Predicts health risks based on production patterns and historical data using real AI
  */
 async function predictHealthRisks(animalId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -422,7 +422,7 @@ async function predictHealthRisks(animalId) {
     const productionRecords = rows.filter(r => r.quantity_liters !== null);
     
     // Prepare data for AI analysis
-    const livestockData = {
+    let livestockData = {
       health: {
         animalId,
         breed: animal.breed,
@@ -493,7 +493,7 @@ async function predictHealthRisks(animalId) {
  * Recommends optimal feed composition based on production goals using real AI
  */
 async function optimizeFeedComposition(animalId, productionGoal) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -511,10 +511,10 @@ async function optimizeFeedComposition(animalId, productionGoal) {
       };
     }
     
-    const animal = rows[0];
+    let animal = rows[0];
     
     // Prepare data for AI analysis
-    const livestockData = {
+    let livestockData = {
       health: {
         animalId,
         breed: animal.breed,
@@ -542,7 +542,7 @@ async function optimizeFeedComposition(animalId, productionGoal) {
     };
     
     // Call real AI for feed optimization
-    const aiOptimization = await aiBackbone.optimizeLivestock(livestockData);
+    let aiOptimization = await aiBackbone.optimizeLivestock(livestockData);
     
     const feedOptimization = {
       animalId,
@@ -583,7 +583,7 @@ async function optimizeFeedComposition(animalId, productionGoal) {
  * Recommends optimal breeding timing and partners using real AI
  */
 async function recommendBreeding(animalId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -601,10 +601,10 @@ async function recommendBreeding(animalId) {
       };
     }
     
-    const animal = rows[0];
+    let animal = rows[0];
 
     // Prepare data for AI analysis
-    const livestockData = {
+    let livestockData = {
       health: {
         animalId,
         breed: animal.breed,

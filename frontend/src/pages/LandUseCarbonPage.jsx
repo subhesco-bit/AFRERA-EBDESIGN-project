@@ -45,7 +45,7 @@ export default function LandUseCarbonPage() {
     setSchemeLoading(true);
     setSchemeError(null);
     try {
-      const r = await foluAPI.schemeStatus(farmerId);
+      let r = await foluAPI.schemeStatus(farmerId);
       setScheme(r.data?.data);
     } catch (e2) { setSchemeError(e2.response?.data?.error || e2.message); } finally { setSchemeLoading(false); }
   };

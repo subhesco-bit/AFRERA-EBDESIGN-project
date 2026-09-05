@@ -61,7 +61,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/profile', verifyToken, async (req, res) => {
   try {
-    const profile = getProfile(req.userId);
+    let profile = getProfile(req.userId);
     const { name, phone, profilePic, preferences } = req.body;
 
     if (name) profile.name = name;
@@ -86,7 +86,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/addresses', verifyToken, async (req, res) => {
   try {
-    const profile = getProfile(req.userId);
+    let profile = getProfile(req.userId);
 
     res.json({
       success: true,
@@ -114,7 +114,7 @@ router.post
       });
     }
 
-    const profile = getProfile(req.userId);
+    let profile = getProfile(req.userId);
 
     // If this is the default address, unset others
     if (isDefault) {

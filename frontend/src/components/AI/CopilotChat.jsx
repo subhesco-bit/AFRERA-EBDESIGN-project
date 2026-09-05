@@ -77,7 +77,7 @@ export default function CopilotChat({ copilotType }) {
 
   async function ensureSession() {
     if (sessionId) return sessionId;
-    const res = await aiAPI.copilot.createSession(copilotType, {});
+    let res = await aiAPI.copilot.createSession(copilotType, {});
     const id = res.data?.id;
     setSessionId(id);
     return id;
@@ -91,8 +91,8 @@ export default function CopilotChat({ copilotType }) {
     setMessages((prev) => [...prev, { role: 'user', content: text, attachments, timestamp: new Date().toISOString() }]);
     setLoading(true);
     try {
-      const id = await ensureSession();
-      const res = await aiAPI.copilot.sendMessage(id, text, { context, attachments });
+      let id = await ensureSession();
+      let res = await aiAPI.copilot.sendMessage(id, text, { context, attachments });
       const response = res.data?.response;
       setMessages((prev) => [
         ...prev,

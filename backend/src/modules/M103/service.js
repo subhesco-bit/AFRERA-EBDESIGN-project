@@ -122,7 +122,7 @@ async function updateEquipmentStatus(registryId, statusData) {
     };
 
     // AI-powered status analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'equipment_status_analysis',
       parameters: {
         registry_id: registryId,
@@ -133,10 +133,10 @@ async function updateEquipmentStatus(registryId, statusData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     update.ai_analysis = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE equipment_inventory 
        SET status = $1, condition = $2, location = $3, updated_at = CURRENT_TIMESTAMP
        WHERE equipment_registry_id = $4
@@ -260,7 +260,7 @@ async function assessUtilizationPotential(category, state) {
 
 async function getStatusHistory(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM equipment_status_history WHERE registry_id = $1 ORDER BY updated_at DESC LIMIT 10',
       [registryId]
     );
@@ -329,7 +329,7 @@ async function generateUtilizationRecommendations(registryId, period) {
 
 async function getEquipmentCount(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM equipment_inventory WHERE farmer_id = $1',
       [farmerId]
     );
@@ -341,7 +341,7 @@ async function getEquipmentCount(farmerId) {
 
 async function getCategoryBreakdown(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT equipment_category, COUNT(*) as count FROM equipment_inventory WHERE farmer_id = $1 GROUP BY equipment_category',
       [farmerId]
     );
@@ -408,7 +408,7 @@ async function listEquipment({ page = 1, limit = 20, farmer_id = null, status = 
 }
 
 async function getEquipment(id) {
-  const res = await pool.query('SELECT * FROM equipment_inventory WHERE equipment_registry_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM equipment_inventory WHERE equipment_registry_id = $1', [id]);
   return res.rows[0] || null;
 }
 

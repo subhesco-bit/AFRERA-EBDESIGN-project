@@ -251,7 +251,7 @@ class DeviceDetectionService {
    * Get viewport category
    */
   getViewportCategory() {
-    const width = this.deviceInfo?.viewport?.width || window.innerWidth;
+    let width = this.deviceInfo?.viewport?.width || window.innerWidth;
 
     if (width < 480) return 'xs';
     if (width < 768) return 'sm';
@@ -329,7 +329,7 @@ class DeviceDetectionService {
     const issues = [];
 
     // Check minimum viewport
-    const width = this.deviceInfo?.viewport?.width || window.innerWidth;
+    let width = this.deviceInfo?.viewport?.width || window.innerWidth;
     if (width < 320) {
       issues.push('Device width below minimum supported (320px)');
     }

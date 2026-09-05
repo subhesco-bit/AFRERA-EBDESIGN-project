@@ -98,7 +98,7 @@ async function createTenant(tenantData) {
  */
 async function getTenant(tenantId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM tenants WHERE tenant_id = $1',
       [tenantId]
     );
@@ -107,7 +107,7 @@ async function getTenant(tenantId) {
       throw new Error('Tenant not found');
     }
 
-    const tenant = result.rows[0];
+    let tenant = result.rows[0];
     tenant.usage_metrics = await getTenantUsageMetrics(tenantId);
     
     return tenant;
@@ -134,7 +134,7 @@ async function updateTenant(tenantId, updates) {
       status
     } = updates;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE tenants 
        SET tenant_name = COALESCE($1, tenant_name),
            plan_tier = COALESCE($2, plan_tier),
@@ -231,7 +231,7 @@ async function listTenants(filters) {
       params.push(offset);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
 
     return {
       total: result.rows.length,
@@ -276,7 +276,7 @@ async function optimizeTenantPerformance(planTier) {
 
 async function getStorageUsage(tenantId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT storage_used FROM tenants WHERE tenant_id = $1',
       [tenantId]
     );
@@ -288,7 +288,7 @@ async function getStorageUsage(tenantId) {
 
 async function getAPICalls(tenantId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT api_used FROM tenants WHERE tenant_id = $1',
       [tenantId]
     );
@@ -300,7 +300,7 @@ async function getAPICalls(tenantId) {
 
 async function getActiveUsers(tenantId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM users WHERE tenant_id = $1 AND status = $2',
       [tenantId, 'active']
     );

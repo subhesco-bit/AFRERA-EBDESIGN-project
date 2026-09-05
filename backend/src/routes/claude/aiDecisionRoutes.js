@@ -59,7 +59,7 @@ router.post('/ai-enhanced/predict-demand', async (req, res) => {
 router.post('/ai-enhanced/optimize-price', async (req, res) => {
   try {
     const { productId, marketConditions, options } = req.body;
-    const result = await service.optimizePriceAI(productId, marketConditions, options);
+    let result = await service.optimizePriceAI(productId, marketConditions, options);
     
     res.json({
       success: true,
@@ -81,7 +81,7 @@ router.post('/ai-enhanced/optimize-price', async (req, res) => {
 router.post('/ai-enhanced/assess-credit-risk', async (req, res) => {
   try {
     const { farmerId, loanApplication, options } = req.body;
-    const result = await service.assessCreditRiskAI(farmerId, loanApplication, options);
+    let result = await service.assessCreditRiskAI(farmerId, loanApplication, options);
     
     res.json({
       success: true,
@@ -103,7 +103,7 @@ router.post('/ai-enhanced/assess-credit-risk', async (req, res) => {
 router.post('/ai-enhanced/detect-fraud', async (req, res) => {
   try {
     const { transactionData, options } = req.body;
-    const result = await service.detectFraudAI(transactionData, options);
+    let result = await service.detectFraudAI(transactionData, options);
     
     res.json({
       success: true,
@@ -125,7 +125,7 @@ router.post('/ai-enhanced/detect-fraud', async (req, res) => {
 router.post('/ai-enhanced/generate-recommendations', async (req, res) => {
   try {
     const { userId, context, options } = req.body;
-    const result = await service.generateRecommendationsAI(userId, context, options);
+    let result = await service.generateRecommendationsAI(userId, context, options);
     
     res.json({
       success: true,
@@ -171,7 +171,7 @@ router.get('/ai-context/predict-demand', async (req, res) => {
 router.get('/ai-context/optimize-price', async (req, res) => {
   try {
     const { productId } = req.query;
-    const context = await service.getAIContext('optimizePrice', { productId });
+    let context = await service.getAIContext('optimizePrice', { productId });
     
     res.json({
       success: true,
@@ -191,7 +191,7 @@ router.get('/ai-context/optimize-price', async (req, res) => {
 router.get('/ai-context/assess-credit-risk', async (req, res) => {
   try {
     const { farmerId } = req.query;
-    const context = await service.getAIContext('assessCreditRisk', { farmerId });
+    let context = await service.getAIContext('assessCreditRisk', { farmerId });
     
     res.json({
       success: true,
@@ -211,7 +211,7 @@ router.get('/ai-context/assess-credit-risk', async (req, res) => {
 router.get('/ai-context/detect-fraud', async (req, res) => {
   try {
     const { transactionId } = req.query;
-    const context = await service.getAIContext('detectFraud', { transactionId });
+    let context = await service.getAIContext('detectFraud', { transactionId });
     
     res.json({
       success: true,
@@ -231,7 +231,7 @@ router.get('/ai-context/detect-fraud', async (req, res) => {
 router.get('/ai-context/generate-recommendations', async (req, res) => {
   try {
     const { userId } = req.query;
-    const context = await service.getAIContext('generateRecommendations', { userId });
+    let context = await service.getAIContext('generateRecommendations', { userId });
     
     res.json({
       success: true,
@@ -270,7 +270,7 @@ router.get('/ai-capability', (req, res) => {
 router.post('/predict/demand', async (req, res) => {
   try {
     const { productId, timeHorizon } = req.body;
-    const result = await originalService.predictDemand(productId, timeHorizon);
+    let result = await originalService.predictDemand(productId, timeHorizon);
     
     res.json({
       success: true,
@@ -292,7 +292,7 @@ router.post('/predict/demand', async (req, res) => {
 router.post('/optimize/price', async (req, res) => {
   try {
     const { productId, marketConditions, options } = req.body;
-    const result = await originalService.optimizePrice(productId, marketConditions, options);
+    let result = await originalService.optimizePrice(productId, marketConditions, options);
     
     res.json({
       success: true,
@@ -314,7 +314,7 @@ router.post('/optimize/price', async (req, res) => {
 router.post('/assess/credit-risk', async (req, res) => {
   try {
     const { farmerId, loanApplication } = req.body;
-    const result = await originalService.assessCreditRisk(farmerId, loanApplication);
+    let result = await originalService.assessCreditRisk(farmerId, loanApplication);
     
     res.json({
       success: true,
@@ -336,7 +336,7 @@ router.post('/assess/credit-risk', async (req, res) => {
 router.post('/detect/fraud', async (req, res) => {
   try {
     const { transactionData, options } = req.body;
-    const result = await originalService.detectFraud(transactionData, options);
+    let result = await originalService.detectFraud(transactionData, options);
     
     res.json({
       success: true,
@@ -358,7 +358,7 @@ router.post('/detect/fraud', async (req, res) => {
 router.post('/recommend', async (req, res) => {
   try {
     const { userId, context, options } = req.body;
-    const result = await originalService.generateRecommendations(userId, context, options);
+    let result = await originalService.generateRecommendations(userId, context, options);
     
     res.json({
       success: true,

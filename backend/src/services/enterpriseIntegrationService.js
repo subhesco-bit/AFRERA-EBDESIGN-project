@@ -152,7 +152,7 @@ class EnterpriseIntegrationService {
    */
   async processPayment(integrationId, paymentData) {
     try {
-      const integration = await this.getIntegration(integrationId);
+      let integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'payment_gateway') {
         return {
           success: false,
@@ -200,7 +200,7 @@ class EnterpriseIntegrationService {
    */
   async syncLogistics(integrationId, logisticsData) {
     try {
-      const integration = await this.getIntegration(integrationId);
+      let integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'logistics') {
         return {
           success: false,
@@ -246,7 +246,7 @@ class EnterpriseIntegrationService {
    */
   async sendAnalytics(integrationId, analyticsData) {
     try {
-      const integration = await this.getIntegration(integrationId);
+      let integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'analytics') {
         return {
           success: false,
@@ -258,7 +258,7 @@ class EnterpriseIntegrationService {
       const { eventType, eventData, userId, sessionId } = analyticsData;
 
       // Send analytics event
-      const result = await this.sendAnalyticsEvent(
+      let result = await this.sendAnalyticsEvent(
         integration,
         eventType,
         eventData,
@@ -289,7 +289,7 @@ class EnterpriseIntegrationService {
    */
   async sendCommunication(integrationId, messageData) {
     try {
-      const integration = await this.getIntegration(integrationId);
+      let integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'communication') {
         return {
           success: false,
@@ -300,7 +300,7 @@ class EnterpriseIntegrationService {
 
       const { channel, recipients, message, templateId } = messageData;
 
-      const result = await this.sendMessage(
+      let result = await this.sendMessage(
         integration,
         channel,
         recipients,
@@ -331,7 +331,7 @@ class EnterpriseIntegrationService {
    * Get integration by ID
    */
   async getIntegration(integrationId) {
-    const query = `
+    let query = `
       SELECT integration_id, integration_type, integration_name,
              endpoint_url, config, organization_id, status,
              created_at, last_tested
@@ -339,10 +339,10 @@ class EnterpriseIntegrationService {
       WHERE integration_id = $1 AND status = 'active'
     `;
 
-    const result = await db.query(query, [integrationId]);
+    let result = await db.query(query, [integrationId]);
     if (result.rows.length === 0) return null;
 
-    const integration = result.rows[0];
+    let integration = result.rows[0];
     integration.config = JSON.parse(integration.config);
     return integration;
   }
@@ -381,7 +381,7 @@ class EnterpriseIntegrationService {
    */
   async pushToERP(integration, dataType, records) {
     const endpoint = `${integration.endpoint_url}/api/${dataType}`;
-    const options = {
+    let options = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -390,7 +390,7 @@ class EnterpriseIntegrationService {
       body: JSON.stringify({ records })
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     return {
       status: response.statusCode === 200 ? 'success' : 'failed',
@@ -403,8 +403,8 @@ class EnterpriseIntegrationService {
    * Pull data from ERP
    */
   async pullFromERP(integration, dataType) {
-    const endpoint = `${integration.endpoint_url}/api/${dataType}`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/api/${dataType}`;
+    let options = {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -412,7 +412,7 @@ class EnterpriseIntegrationService {
       }
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     if (response.statusCode === 200) {
       const records = JSON.parse(response.body);
@@ -449,8 +449,8 @@ class EnterpriseIntegrationService {
    * Send payment request
    */
   async sendPaymentRequest(integration, paymentData) {
-    const endpoint = `${integration.endpoint_url}/payments`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/payments`;
+    let options = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -459,10 +459,10 @@ class EnterpriseIntegrationService {
       body: JSON.stringify(paymentData)
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     if (response.statusCode === 200) {
-      const result = JSON.parse(response.body);
+      let result = JSON.parse(response.body);
       return {
         success: true,
         data: {
@@ -484,8 +484,8 @@ class EnterpriseIntegrationService {
    * Create shipment
    */
   async createShipment(integration, shipmentData) {
-    const endpoint = `${integration.endpoint_url}/shipments`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/shipments`;
+    let options = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -494,10 +494,10 @@ class EnterpriseIntegrationService {
       body: JSON.stringify(shipmentData)
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     if (response.statusCode === 200) {
-      const result = JSON.parse(response.body);
+      let result = JSON.parse(response.body);
       return {
         success: true,
         data: {
@@ -519,8 +519,8 @@ class EnterpriseIntegrationService {
    * Track shipment
    */
   async trackShipment(integration, shipmentId) {
-    const endpoint = `${integration.endpoint_url}/shipments/${shipmentId}/track`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/shipments/${shipmentId}/track`;
+    let options = {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -528,10 +528,10 @@ class EnterpriseIntegrationService {
       }
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     if (response.statusCode === 200) {
-      const result = JSON.parse(response.body);
+      let result = JSON.parse(response.body);
       return {
         success: true,
         data: {
@@ -555,8 +555,8 @@ class EnterpriseIntegrationService {
    * Update shipment
    */
   async updateShipment(integration, shipmentData) {
-    const endpoint = `${integration.endpoint_url}/shipments/${shipmentData.shipmentId}`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/shipments/${shipmentData.shipmentId}`;
+    let options = {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -565,7 +565,7 @@ class EnterpriseIntegrationService {
       body: JSON.stringify(shipmentData)
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     if (response.statusCode === 200) {
       return {
@@ -588,8 +588,8 @@ class EnterpriseIntegrationService {
    * Send analytics event
    */
   async sendAnalyticsEvent(integration, eventType, eventData, userId, sessionId) {
-    const endpoint = `${integration.endpoint_url}/events`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/events`;
+    let options = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -604,7 +604,7 @@ class EnterpriseIntegrationService {
       })
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     return {
       eventId: `evt-${Date.now()}`,
@@ -616,8 +616,8 @@ class EnterpriseIntegrationService {
    * Send message
    */
   async sendMessage(integration, channel, recipients, message, templateId) {
-    const endpoint = `${integration.endpoint_url}/messages`;
-    const options = {
+    let endpoint = `${integration.endpoint_url}/messages`;
+    let options = {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
@@ -631,7 +631,7 @@ class EnterpriseIntegrationService {
       })
     };
 
-    const response = await this.makeHttpRequest(endpoint, options);
+    let response = await this.makeHttpRequest(endpoint, options);
     
     return {
       messageId: `msg-${Date.now()}`,
@@ -702,7 +702,7 @@ class EnterpriseIntegrationService {
    * Store payment record
    */
   async storePaymentRecord(paymentResult, integrationId) {
-    const query = `
+    let query = `
       INSERT INTO payment_records (
         payment_id, integration_id, order_id, amount,
         currency, status, transaction_id, created_at
@@ -724,7 +724,7 @@ class EnterpriseIntegrationService {
    * Log sync activity
    */
   async logSyncActivity(integrationId, syncConfig, syncResult) {
-    const query = `
+    let query = `
       INSERT INTO integration_sync_logs (
         integration_id, sync_type, data_type, sync_direction,
         records_processed, status, error_message, created_at
@@ -769,7 +769,7 @@ class EnterpriseIntegrationService {
    * Get organization integrations
    */
   async getOrganizationIntegrations(organizationId) {
-    const query = `
+    let query = `
       SELECT integration_id, integration_type, integration_name,
              status, created_at, last_tested
       FROM enterprise_integrations
@@ -777,7 +777,7 @@ class EnterpriseIntegrationService {
       ORDER BY created_at DESC
     `;
 
-    const result = await db.query(query, [organizationId]);
+    let result = await db.query(query, [organizationId]);
     
     return {
       success: true,
@@ -793,14 +793,14 @@ class EnterpriseIntegrationService {
    * Deactivate integration
    */
   async deactivateIntegration(integrationId) {
-    const query = `
+    let query = `
       UPDATE enterprise_integrations
       SET status = 'inactive', deactivated_at = NOW()
       WHERE integration_id = $1
       RETURNING integration_id, status
     `;
 
-    const result = await db.query(query, [integrationId]);
+    let result = await db.query(query, [integrationId]);
     
     // Remove from active integrations
     this.activeIntegrations.delete(integrationId);
@@ -819,7 +819,7 @@ class EnterpriseIntegrationService {
    * Get integration health status
    */
   async getIntegrationHealth(integrationId) {
-    const integration = await this.getIntegration(integrationId);
+    let integration = await this.getIntegration(integrationId);
     if (!integration) {
       return {
         success: false,
@@ -853,7 +853,7 @@ class EnterpriseIntegrationService {
    * Get recent sync activity
    */
   async getRecentSyncActivity(integrationId) {
-    const query = `
+    let query = `
       SELECT sync_type, data_type, sync_direction,
              records_processed, status, created_at
       FROM integration_sync_logs
@@ -862,7 +862,7 @@ class EnterpriseIntegrationService {
       LIMIT 10
     `;
 
-    const result = await db.query(query, [integrationId]);
+    let result = await db.query(query, [integrationId]);
     return result.rows;
   }
 

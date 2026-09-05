@@ -195,7 +195,7 @@ function setupRoutes(app) {
 
   router.get('/finance/service/:serviceType', async (req, res) => {
     try {
-      const financeRecords = await getRuralFinanceByServiceType(req.params.serviceType);
+      let financeRecords = await getRuralFinanceByServiceType(req.params.serviceType);
       res.json({ success: true, data: financeRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -213,7 +213,7 @@ function setupRoutes(app) {
 
   router.post('/finance', async (req, res) => {
     try {
-      const finance = await upsertRuralFinance(req.body);
+      let finance = await upsertRuralFinance(req.body);
       res.status(201).json({ success: true, data: finance });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });

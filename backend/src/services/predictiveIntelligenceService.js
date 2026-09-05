@@ -197,7 +197,7 @@ class PredictiveIntelligenceService {
    */
   async getHistoricalDemandData(cropType, region, days) {
     const safeDays = Math.max(1, Math.min(3650, parseInt(days, 10) || 90));
-    const query = `
+    let query = `
       SELECT
         DATE_TRUNC('day', o.created_at) as date,
         COUNT(oi.id) as demand_quantity,
@@ -212,7 +212,7 @@ class PredictiveIntelligenceService {
       ORDER BY date ASC
     `;
 
-    const result = await db.query(query, [cropType, region]);
+    let result = await db.query(query, [cropType, region]);
     return result.rows;
   }
 
@@ -220,8 +220,8 @@ class PredictiveIntelligenceService {
    * Get market pricing data
    */
   async getMarketPricingData(cropType, region, days) {
-    const safeDays = Math.max(1, Math.min(3650, parseInt(days, 10) || 60));
-    const query = `
+    let safeDays = Math.max(1, Math.min(3650, parseInt(days, 10) || 60));
+    let query = `
       SELECT
         DATE_TRUNC('day', o.created_at) as date,
         c.quality_grade,
@@ -237,7 +237,7 @@ class PredictiveIntelligenceService {
       ORDER BY date ASC
     `;
 
-    const result = await db.query(query, [cropType, region]);
+    let result = await db.query(query, [cropType, region]);
     return result.rows;
   }
 
@@ -245,7 +245,7 @@ class PredictiveIntelligenceService {
    * Get farmer yield history
    */
   async getFarmerYieldHistory(farmerId) {
-    const query = `
+    let query = `
       SELECT 
         h.crop_id,
         h.yield_kg,
@@ -259,7 +259,7 @@ class PredictiveIntelligenceService {
       ORDER BY h.harvest_date DESC
     `;
 
-    const result = await db.query(query, [farmerId]);
+    let result = await db.query(query, [farmerId]);
     return result.rows;
   }
 
@@ -267,7 +267,7 @@ class PredictiveIntelligenceService {
    * Get crop characteristics
    */
   async getCropCharacteristics(cropId) {
-    const query = `
+    let query = `
       SELECT 
         c.crop_type,
         c.variety,
@@ -278,7 +278,7 @@ class PredictiveIntelligenceService {
       WHERE c.id = $1
     `;
 
-    const result = await db.query(query, [cropId]);
+    let result = await db.query(query, [cropId]);
     return result.rows[0];
   }
 
@@ -320,7 +320,7 @@ class PredictiveIntelligenceService {
     const intercept = (sumY - slope * sumX) / n;
     
     // Generate forecast
-    const forecast = [];
+    let forecast = [];
     for (let i = 0; i < forecastDays; i++) {
       const predictedValue = slope * (n + i) + intercept;
       forecast.push({
@@ -474,7 +474,7 @@ class PredictiveIntelligenceService {
    * Generate yield recommendations
    */
   generateYieldRecommendations(environmentalData) {
-    const recommendations = [];
+    let recommendations = [];
     
     if (environmentalData.temperature < 20) {
       recommendations.push('Consider temperature control measures');

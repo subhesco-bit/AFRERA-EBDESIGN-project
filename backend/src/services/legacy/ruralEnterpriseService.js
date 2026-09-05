@@ -261,7 +261,7 @@ async function searchRuralEnterprises(filters) {
     } = filters;
 
     let query = `SELECT * FROM rural_enterprises WHERE 1=1`;
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -343,7 +343,7 @@ function setupRoutes(app) {
 
   router.get('/enterprises/type/:enterpriseType', async (req, res) => {
     try {
-      const enterprises = await getRuralEnterprisesByType(req.params.enterpriseType);
+      let enterprises = await getRuralEnterprisesByType(req.params.enterpriseType);
       res.json({ success: true, data: enterprises });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -352,7 +352,7 @@ function setupRoutes(app) {
 
   router.post('/enterprises', async (req, res) => {
     try {
-      const enterprise = await createRuralEnterprise(req.body);
+      let enterprise = await createRuralEnterprise(req.body);
       res.status(201).json({ success: true, data: enterprise });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -361,7 +361,7 @@ function setupRoutes(app) {
 
   router.put('/enterprises/:enterpriseId', async (req, res) => {
     try {
-      const enterprise = await updateRuralEnterprise(req.params.enterpriseId, req.body);
+      let enterprise = await updateRuralEnterprise(req.params.enterpriseId, req.body);
       res.json({ success: true, data: enterprise });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -370,7 +370,7 @@ function setupRoutes(app) {
 
   router.get('/enterprises/statistics', async (req, res) => {
     try {
-      const stats = await getRuralEnterpriseStatistics(req.query);
+      let stats = await getRuralEnterpriseStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -379,7 +379,7 @@ function setupRoutes(app) {
 
   router.get('/enterprises/search', async (req, res) => {
     try {
-      const enterprises = await searchRuralEnterprises(req.query);
+      let enterprises = await searchRuralEnterprises(req.query);
       res.json({ success: true, data: enterprises });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

@@ -43,7 +43,7 @@ async function launchCampaign(req, res) {
   try {
     const { campaignId } = req.params;
     
-    const result = await ecommerceMarketingService.launchCampaign(campaignId);
+    let result = await ecommerceMarketingService.launchCampaign(campaignId);
     
     res.json(result);
   } catch (error) {
@@ -63,7 +63,7 @@ async function updateCampaignMetrics(req, res) {
   try {
     const { campaignId } = req.params;
     
-    const result = await ecommerceMarketingService.updateCampaignMetrics(campaignId);
+    let result = await ecommerceMarketingService.updateCampaignMetrics(campaignId);
     
     res.json(result);
   } catch (error) {
@@ -86,7 +86,7 @@ async function updateCampaignMetrics(req, res) {
 async function createSponsoredProduct(req, res) {
   try {
     const sellerId = req.user.id;
-    const result = await ecommerceMarketingService.createSponsoredProduct(sellerId, req.body);
+    let result = await ecommerceMarketingService.createSponsoredProduct(sellerId, req.body);
     
     res.json(result);
   } catch (error) {
@@ -106,7 +106,7 @@ async function getSponsoredProducts(req, res) {
   try {
     const filters = req.query;
     
-    const result = await ecommerceMarketingService.getSponsoredProducts(filters);
+    let result = await ecommerceMarketingService.getSponsoredProducts(filters);
     
     res.json(result);
   } catch (error) {
@@ -129,7 +129,7 @@ async function getSponsoredProducts(req, res) {
 async function createPromotion(req, res) {
   try {
     const creatorId = req.user.id;
-    const result = await ecommerceMarketingService.createPromotion(creatorId, req.body);
+    let result = await ecommerceMarketingService.createPromotion(creatorId, req.body);
     
     res.json(result);
   } catch (error) {
@@ -149,9 +149,9 @@ async function applyPromotion(req, res) {
   try {
     const { promoCode } = req.params;
     const { orderId } = req.body;
-    const userId = req.user.id;
+    let userId = req.user.id;
     
-    const result = await ecommerceMarketingService.applyPromotion(promoCode, orderId, userId);
+    let result = await ecommerceMarketingService.applyPromotion(promoCode, orderId, userId);
     
     res.json(result);
   } catch (error) {
@@ -173,10 +173,10 @@ async function applyPromotion(req, res) {
  */
 async function createCartRetargeting(req, res) {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     const { cartItems } = req.body;
     
-    const result = await ecommerceMarketingService.createCartRetargeting(userId, cartItems);
+    let result = await ecommerceMarketingService.createCartRetargeting(userId, cartItems);
     
     res.json(result);
   } catch (error) {
@@ -194,10 +194,10 @@ async function createCartRetargeting(req, res) {
  */
 async function createProductViewRetargeting(req, res) {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     const { productId } = req.body;
     
-    const result = await ecommerceMarketingService.createProductViewRetargeting(userId, productId);
+    let result = await ecommerceMarketingService.createProductViewRetargeting(userId, productId);
     
     res.json(result);
   } catch (error) {
@@ -219,9 +219,9 @@ async function createProductViewRetargeting(req, res) {
  */
 async function getMarketingAnalytics(req, res) {
   try {
-    const filters = req.query;
+    let filters = req.query;
     
-    const result = await ecommerceMarketingService.getMarketingAnalytics(filters);
+    let result = await ecommerceMarketingService.getMarketingAnalytics(filters);
     
     res.json(result);
   } catch (error) {

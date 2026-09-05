@@ -301,7 +301,7 @@ async function bookSharedAsset(bookingData) {
     const grandTotal = amount + gst;
     const bookingNumber = generateConfirmationNumber();
 
-    const insertResult = await pool.query(
+    let insertResult = await pool.query(
       `INSERT INTO shared_infrastructure_access
          (reu_id, infrastructure_id, access_model, booking_number, start_date, end_date,
           capacity_required, unit_rate, total_cost, specifications, purpose, status)
@@ -322,7 +322,7 @@ async function bookSharedAsset(bookingData) {
       ]
     );
 
-    const row = insertResult.rows[0];
+    let row = insertResult.rows[0];
 
     const booking = {
       booking_id: row.id,
@@ -400,7 +400,7 @@ async function listSecondLifeEquipment(equipmentData) {
     };
 
     // AI-powered pricing recommendation
-    const aiRequest = {
+    let aiRequest = {
       task: 'second_life_equipment_pricing',
       parameters: {
         equipment_data: equipmentData,
@@ -410,7 +410,7 @@ async function listSecondLifeEquipment(equipmentData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     listing.ai_pricing_recommendation = aiResponse;
 
     // NOTE: no second-life equipment marketplace table exists in the schema
@@ -441,7 +441,7 @@ async function searchSecondLifeEquipment(searchParams) {
       max_age
     } = searchParams;
 
-    const results = {
+    let results = {
       search_id: generateId(),
       timestamp: new Date().toISOString(),
       search_params: searchParams,
@@ -502,7 +502,7 @@ async function listSecondLifeBattery(batteryData) {
     };
 
     // AI-powered agricultural applicability assessment
-    const aiRequest = {
+    let aiRequest = {
       task: 'battery_agricultural_applicability',
       parameters: {
         battery_data: batteryData,
@@ -512,7 +512,7 @@ async function listSecondLifeBattery(batteryData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     battery.ai_assessment = aiResponse;
 
     // NOTE: no second-life battery marketplace table exists in the schema
@@ -542,7 +542,7 @@ async function getRenewablePowerSupport(location, requirements) {
     } = requirements;
 
     // AI-powered renewable energy recommendation
-    const aiRequest = {
+    let aiRequest = {
       task: 'renewable_power_recommendation',
       parameters: {
         location,
@@ -559,7 +559,7 @@ async function getRenewablePowerSupport(location, requirements) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       recommendation_id: generateId(),
@@ -599,7 +599,7 @@ async function getEquipmentUtilizationAnalytics(assetId, period) {
       throw expectedError('assetId is required');
     }
 
-    const assetResult = await pool.query(
+    let assetResult = await pool.query(
       `SELECT id, utilization_rate, status FROM assets WHERE id = $1`,
       [assetId]
     );
@@ -788,7 +788,7 @@ function setupRoutes(app) {
       if (!asset_name || !asset_type) {
         return res.status(400).json({ success: false, error: 'asset_name and asset_type are required' });
       }
-      const asset = await registerSharedAsset(req.body);
+      let asset = await registerSharedAsset(req.body);
       res.json({ success: true, data: asset });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -797,7 +797,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/shared-infra/assets/search', async (req, res) => {
     try {
-      const results = await searchSharedInfrastructure(req.query);
+      let results = await searchSharedInfrastructure(req.query);
       res.json({ success: true, data: results });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -813,7 +813,7 @@ function setupRoutes(app) {
           error: 'asset_id, user_id, date_from, date_to, quantity and total_amount are required'
         });
       }
-      const booking = await bookSharedAsset(req.body);
+      let booking = await bookSharedAsset(req.body);
       res.json({ success: true, data: booking });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -822,7 +822,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/shared-infra/second-life/list', authMiddleware, async (req, res) => {
     try {
-      const listing = await listSecondLifeEquipment(req.body);
+      let listing = await listSecondLifeEquipment(req.body);
       res.json({ success: true, data: listing });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -831,7 +831,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/shared-infra/second-life/search', async (req, res) => {
     try {
-      const results = await searchSecondLifeEquipment(req.query);
+      let results = await searchSecondLifeEquipment(req.query);
       res.json({ success: true, data: results });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -840,7 +840,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/shared-infra/batteries/list', authMiddleware, async (req, res) => {
     try {
-      const battery = await listSecondLifeBattery(req.body);
+      let battery = await listSecondLifeBattery(req.body);
       res.json({ success: true, data: battery });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -849,7 +849,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/shared-infra/renewable/support', async (req, res) => {
     try {
-      const recommendations = await getRenewablePowerSupport(req.query.location, req.query);
+      let recommendations = await getRenewablePowerSupport(req.query.location, req.query);
       res.json({ success: true, data: recommendations });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -858,7 +858,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/shared-infra/assets/:id/analytics', async (req, res) => {
     try {
-      const analytics = await getEquipmentUtilizationAnalytics(req.params.id, req.query.period);
+      let analytics = await getEquipmentUtilizationAnalytics(req.params.id, req.query.period);
       res.json({ success: true, data: analytics });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

@@ -143,7 +143,7 @@ async function getProducts(filters = {}, pagination = {}) {
  */
 async function getProductById(productId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Validate database connection
     if (!pg) {
@@ -166,7 +166,7 @@ async function getProductById(productId) {
       WHERE p.id = $1
     `;
     
-    const result = await pg.query(query, [productId]);
+    let result = await pg.query(query, [productId]);
     
     if (result.rows.length === 0) {
       throw new Error('Product not found');
@@ -184,9 +184,9 @@ async function getProductById(productId) {
  */
 async function createProduct(productData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       INSERT INTO products (name, slug, sku, category_id, state_id, unit_id, description, usp,
                          gi_status, gi_certificate_number, gi_registry_date, organic,
                          organic_certificate_number, nutrition_data, images, base_price,
@@ -225,7 +225,7 @@ async function createProduct(productData) {
       productData.created_by || null
     ];
     
-    const result = await pg.query(query, values);
+    let result = await pg.query(query, values);
     const product = result.rows[0];
 
     logger.info(`Product created: ${product.name} (${product.id})`);
@@ -252,7 +252,7 @@ async function createProduct(productData) {
  */
 async function updateProduct(productId, productData, ownerUserId = null) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     if (ownerUserId) {
       const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
@@ -263,7 +263,7 @@ async function updateProduct(productId, productData, ownerUserId = null) {
       }
     }
 
-    const query = `
+    let query = `
       UPDATE products
       SET name = COALESCE($1, name),
           slug = COALESCE($2, slug),
@@ -295,7 +295,7 @@ async function updateProduct(productId, productData, ownerUserId = null) {
       RETURNING *
     `;
     
-    const values = [
+    let values = [
       productData.name,
       productData.slug,
       productData.sku,
@@ -324,7 +324,7 @@ async function updateProduct(productId, productData, ownerUserId = null) {
       productId
     ];
     
-    const result = await pg.query(query, values);
+    let result = await pg.query(query, values);
     
     if (result.rows.length === 0) {
       throw new Error('Product not found');
@@ -344,23 +344,23 @@ async function updateProduct(productId, productData, ownerUserId = null) {
  */
 async function deleteProduct(productId, ownerUserId = null) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     if (ownerUserId) {
-      const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
+      let owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
       if (owned.rows.length === 0) {
         throw new Error('Product not found');
       }
     }
 
-    const query = `
+    let query = `
       UPDATE products
       SET is_active = FALSE, updated_at = NOW()
       WHERE id = $1
       RETURNING *
     `;
 
-    const result = await pg.query(query, [productId]);
+    let result = await pg.query(query, [productId]);
     
     if (result.rows.length === 0) {
       throw new Error('Product not found');
@@ -380,9 +380,9 @@ async function deleteProduct(productId, ownerUserId = null) {
  */
 async function getCategories() {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT c.*, 
              (SELECT COUNT(*) FROM products WHERE category_id = c.id AND is_active = TRUE) as product_count
       FROM categories c
@@ -390,7 +390,7 @@ async function getCategories() {
       ORDER BY c.sort_order, c.name
     `;
     
-    const result = await pg.query(query);
+    let result = await pg.query(query);
     
     return result.rows;
   } catch (error) {
@@ -404,9 +404,9 @@ async function getCategories() {
  */
 async function getStates() {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT s.*,
              (SELECT COUNT(*) FROM products WHERE state_id = s.id AND is_active = TRUE) as product_count
       FROM states s
@@ -414,7 +414,7 @@ async function getStates() {
       ORDER BY s.name
     `;
     
-    const result = await pg.query(query);
+    let result = await pg.query(query);
     
     return result.rows;
   } catch (error) {
@@ -428,9 +428,9 @@ async function getStates() {
  */
 async function searchProducts(searchTerm, filters = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT p.*, c.name as category_name, s.name as state_name,
              ts_rank(to_tsvector('english', p.name || ' ' || COALESCE(p.description, '')), 
                     plainto_tsquery('english', $1)) as rank
@@ -443,7 +443,7 @@ async function searchProducts(searchTerm, filters = {}) {
       LIMIT 50
     `;
     
-    const result = await pg.query(query, [searchTerm]);
+    let result = await pg.query(query, [searchTerm]);
     
     return result.rows;
   } catch (error) {
@@ -489,7 +489,7 @@ router.get('/', async (req, res) => {
       sort_order: req.query.sort_order
     };
     
-    const result = await getProducts(filters, pagination);
+    let result = await getProducts(filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -499,7 +499,7 @@ router.get('/', async (req, res) => {
 // Get product by ID
 router.get('/:id', async (req, res) => {
   try {
-    const product = await getProductById(req.params.id);
+    let product = await getProductById(req.params.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -513,7 +513,7 @@ router.get('/:id', async (req, res) => {
 // Create product
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const product = await createProduct(req.body);
+    let product = await createProduct(req.body);
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -525,7 +525,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const isAdmin = req.user.role === 'admin';
-    const product = await updateProduct(req.params.id, req.body, isAdmin ? null : req.user.id);
+    let product = await updateProduct(req.params.id, req.body, isAdmin ? null : req.user.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -539,8 +539,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
 // Delete product — same ownership rule as update.
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const isAdmin = req.user.role === 'admin';
-    const product = await deleteProduct(req.params.id, isAdmin ? null : req.user.id);
+    let isAdmin = req.user.role === 'admin';
+    let product = await deleteProduct(req.params.id, isAdmin ? null : req.user.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -589,9 +589,9 @@ router.get('/search', async (req, res) => {
 // Trigger (or retry) AI image generation for a product
 router.post('/:id/generate-image', authMiddleware, async (req, res) => {
   try {
-    const product = await getProductById(req.params.id);
+    let product = await getProductById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    const result = await productMediaAIService.requestProductImageGeneration(
+    let result = await productMediaAIService.requestProductImageGeneration(
       req.params.id,
       `${product.name}${product.description ? ' — ' + product.description : ''}`
     );
@@ -614,7 +614,7 @@ router.get('/:id/video-script', async (req, res) => {
 // Trigger (or retry) AI video rendering from the real script above
 router.post('/:id/generate-video', authMiddleware, async (req, res) => {
   try {
-    const result = await productMediaAIService.requestProductVideoGeneration(req.params.id);
+    let result = await productMediaAIService.requestProductVideoGeneration(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

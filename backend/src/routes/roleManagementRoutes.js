@@ -42,7 +42,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/:id', authMiddleware, requirePermission('read_roles'), async (req, res) => {
   try {
-    const role = await roleManagementService.getRoleById(req.params.id);
+    let role = await roleManagementService.getRoleById(req.params.id);
     res.json(role);
   } catch (error) {
     if (error.message === 'Role not found') {
@@ -57,7 +57,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/:id', authMiddleware, requirePermission('update_roles'), async (req, res) => {
   try {
-    const role = await roleManagementService.updateRole(req.params.id, req.body);
+    let role = await roleManagementService.updateRole(req.params.id, req.body);
     res.json(role);
   } catch (error) {
     if (error.message === 'Role not found') {
@@ -72,7 +72,7 @@ router.delete
     // Log request
     logger.debug('router.delete request');('/:id', authMiddleware, requirePermission('delete_roles'), async (req, res) => {
   try {
-    const role = await roleManagementService.deleteRole(req.params.id);
+    let role = await roleManagementService.deleteRole(req.params.id);
     res.json(role);
   } catch (error) {
     if (error.message === 'Role not found' || error.message === 'Cannot delete system role') {
@@ -98,7 +98,7 @@ router.delete
     // Log request
     logger.debug('router.delete request');('/:id/permissions/:permissionId', authMiddleware, requirePermission('remove_permissions'), async (req, res) => {
   try {
-    const assignment = await roleManagementService.removePermission(req.params.id, req.params.permissionId);
+    let assignment = await roleManagementService.removePermission(req.params.id, req.params.permissionId);
     res.json(assignment);
   } catch (error) {
     res.status(500).json({ error: error.message });

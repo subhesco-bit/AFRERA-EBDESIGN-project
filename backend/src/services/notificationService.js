@@ -86,7 +86,7 @@ class NotificationService extends EventEmitter {
 
       for (const channel of channels) {
         try {
-          const result = await this.deliverToChannel(channel, {
+          let result = await this.deliverToChannel(channel, {
             userId: user_id,
             title,
             message,
@@ -213,7 +213,7 @@ class NotificationService extends EventEmitter {
       query += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Get user notifications failed', error);
@@ -226,13 +226,13 @@ class NotificationService extends EventEmitter {
    */
   async markAsRead(notificationId, userId) {
     try {
-      const query = `
+      let query = `
         UPDATE notifications 
         SET read = true, read_at = NOW()
         WHERE notification_id = $1 AND user_id = $2
         RETURNING *
       `;
-      const result = await this.db.query(query, [notificationId, userId]);
+      let result = await this.db.query(query, [notificationId, userId]);
       
       if (result.rows.length === 0) {
         throw new Error('Notification not found');
@@ -251,13 +251,13 @@ class NotificationService extends EventEmitter {
    */
   async markAllAsRead(userId) {
     try {
-      const query = `
+      let query = `
         UPDATE notifications 
         SET read = true, read_at = NOW()
         WHERE user_id = $1 AND read = false
         RETURNING *
       `;
-      const result = await this.db.query(query, [userId]);
+      let result = await this.db.query(query, [userId]);
       
       logger.info(`Marked ${result.rows.length} notifications as read for user ${userId}`);
       return result.rows;
@@ -272,12 +272,12 @@ class NotificationService extends EventEmitter {
    */
   async deleteNotification(notificationId, userId) {
     try {
-      const query = `
+      let query = `
         DELETE FROM notifications 
         WHERE notification_id = $1 AND user_id = $2
         RETURNING *
       `;
-      const result = await this.db.query(query, [notificationId, userId]);
+      let result = await this.db.query(query, [notificationId, userId]);
       
       if (result.rows.length === 0) {
         throw new Error('Notification not found');
@@ -296,7 +296,7 @@ class NotificationService extends EventEmitter {
    */
   async updateNotificationStatus(notificationId, status, metadata = {}) {
     try {
-      const query = `
+      let query = `
         UPDATE notifications 
         SET status = $1, 
             metadata = COALESCE($2, metadata),
@@ -318,11 +318,11 @@ class NotificationService extends EventEmitter {
    */
   async getUserPreferences(userId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM notification_preferences 
         WHERE user_id = $1
       `;
-      const result = await this.db.query(query, [userId]);
+      let result = await this.db.query(query, [userId]);
       
       if (result.rows.length === 0) {
         // Return default preferences
@@ -341,7 +341,7 @@ class NotificationService extends EventEmitter {
    */
   async updateUserPreferences(userId, preferences) {
     try {
-      const query = `
+      let query = `
         INSERT INTO notification_preferences (
           user_id, email_enabled, sms_enabled, push_enabled, 
           in_app_enabled, categories, updated_at
@@ -355,7 +355,7 @@ class NotificationService extends EventEmitter {
           updated_at = NOW()
         RETURNING *
       `;
-      const result = await this.db.query(query, [
+      let result = await this.db.query(query, [
         userId,
         preferences.email_enabled ?? true,
         preferences.sms_enabled ?? false,
@@ -398,7 +398,7 @@ class NotificationService extends EventEmitter {
 
     for (const userId of userIds) {
       try {
-        const result = await this.sendNotification({
+        let result = await this.sendNotification({
           ...notificationData,
           userId
         });
@@ -428,7 +428,7 @@ class NotificationService extends EventEmitter {
           SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed
         FROM notifications
       `;
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (userId) {
@@ -451,7 +451,7 @@ class NotificationService extends EventEmitter {
         params.push(endDate);
       }
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get notification statistics failed', error);

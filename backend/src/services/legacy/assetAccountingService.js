@@ -133,7 +133,7 @@ class AssetAccountingService {
 
       query += ' ORDER BY asset_code ASC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting fixed assets', { error: error.message, stack: error.stack });
@@ -143,7 +143,7 @@ class AssetAccountingService {
 
   async getAsset(assetId) {
     try {
-      const result = await this.pool.query('SELECT * FROM fixed_assets WHERE id = $1', [assetId]);
+      let result = await this.pool.query('SELECT * FROM fixed_assets WHERE id = $1', [assetId]);
       if (result.rows.length === 0) throw new Error('Fixed asset not found');
       return result.rows[0];
     } catch (error) {
@@ -223,7 +223,7 @@ class AssetAccountingService {
 
   async getDepreciationSchedule(assetId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         'SELECT * FROM depreciation_schedule WHERE fixed_asset_id = $1 ORDER BY period_date ASC',
         [assetId]
       );
@@ -242,7 +242,7 @@ class AssetAccountingService {
    */
   async postDepreciationPeriod(assetId, periodDate) {
     try {
-      const result = await withTransaction(async (client) => {
+      let result = await withTransaction(async (client) => {
         const { rows: due } = await client.query(
           `SELECT * FROM depreciation_schedule
            WHERE fixed_asset_id = $1 AND period_date = $2 AND is_posted = FALSE
@@ -329,7 +329,7 @@ class AssetAccountingService {
       if (!disposalDate) throw new Error('disposalDate is required');
       if (!(Number(disposalAmount) >= 0)) throw new Error('disposalAmount must be >= 0');
 
-      const asset = await this.getAsset(assetId);
+      let asset = await this.getAsset(assetId);
       if (asset.status === 'disposed') throw new Error('Asset is already disposed');
 
       // net_book_value is a GENERATED column (acquisition_cost -
@@ -341,7 +341,7 @@ class AssetAccountingService {
         : r4(Number(asset.acquisition_cost) - Number(asset.accumulated_depreciation || 0));
       const gainLoss = r4(Number(disposalAmount) - netBookValue);
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE fixed_assets
          SET status = 'disposed', disposal_date = $1, disposal_amount = $2
          WHERE id = $3
@@ -364,7 +364,7 @@ class AssetAccountingService {
   async getAssetRegisterSummary(companyId) {
     try {
       if (!companyId) throw new Error('companyId is required');
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT
            asset_class,
            status,

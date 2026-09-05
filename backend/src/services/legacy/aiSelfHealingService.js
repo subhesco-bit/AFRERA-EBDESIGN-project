@@ -265,7 +265,7 @@ class AISelfHealingService {
    */
   async performRootCauseAnalysis(error, context = {}) {
     try {
-      const prompt = `
+      let prompt = `
         Perform root cause analysis for the following error:
         
         Error: ${JSON.stringify(error)}
@@ -281,7 +281,7 @@ class AISelfHealingService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -627,7 +627,7 @@ class AISelfHealingService {
       const systemState = this.getSystemState();
       const healingHistory = this.healingHistory.slice(-100);
       
-      const prompt = `
+      let prompt = `
         Analyze the following system state and healing history to predict potential failures:
         
         System State: ${JSON.stringify(systemState)}
@@ -641,7 +641,7 @@ class AISelfHealingService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }

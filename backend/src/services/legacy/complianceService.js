@@ -236,7 +236,7 @@ async function recordRcm({ invoiceRef, supplierName, supplyDescription, taxableV
     [invoiceRef ?? null, supplierName, supplyDescription, taxableValueInr,
       gstRatePct, period, itcEligible]
   );
-  const row = rows[0];
+  let row = rows[0];
   return {
     ...row,
     rcm_liability_inr: Number(row.rcm_liability_inr),

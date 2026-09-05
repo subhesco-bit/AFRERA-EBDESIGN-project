@@ -105,7 +105,7 @@ async function createProfile(profileData) {
  */
 async function getProfile(profileId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM farmer_profiles WHERE profile_id = $1',
       [profileId]
     );
@@ -121,7 +121,7 @@ async function getProfile(profileId) {
  */
 async function getProfileByFarmerId(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM farmer_profiles WHERE farmer_id = $1',
       [farmerId]
     );
@@ -203,7 +203,7 @@ async function updateProfile(profileId, updates) {
       await logEnrichment(profileId, 'update', 'first_name', currentProfile.first_name, first_name, 'manual');
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE farmer_profiles 
        SET first_name = COALESCE($1, first_name),
            last_name = COALESCE($2, last_name),
@@ -274,7 +274,7 @@ async function addContactInfo(profileId, contactData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO farmer_contact_info 
        (contact_id, profile_id, phone, alternate_phone, email, address_line1, 
         address_line2, city, district, state, postal_code, country, is_primary, created_at)
@@ -326,7 +326,7 @@ async function addHouseholdMember(profileId, memberData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO farmer_household 
        (household_id, profile_id, member_name, relationship, age, gender, 
         education, occupation, income_contribution, is_working_on_farm, created_at)
@@ -373,7 +373,7 @@ async function addSkill(profileId, skillData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO farmer_skills 
        (skill_id, profile_id, skill_name, skill_category, proficiency_level, 
         years_experience, certification, certification_date, created_at)
@@ -399,12 +399,12 @@ async function addSkill(profileId, skillData) {
  */
 async function enrichProfile(profileId) {
   try {
-    const profile = await getProfile(profileId);
+    let profile = await getProfile(profileId);
     if (!profile) {
       throw new Error('Profile not found');
     }
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'profile_enrichment',
       parameters: {
         profile_data: profile,
@@ -415,7 +415,7 @@ async function enrichProfile(profileId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     // Apply AI recommendations
     const enrichmentResults = [];
@@ -456,7 +456,7 @@ async function enrichProfile(profileId) {
  */
 async function analyzeProfileCompleteness(profileId) {
   try {
-    const profile = await getProfile(profileId);
+    let profile = await getProfile(profileId);
     if (!profile) {
       throw new Error('Profile not found');
     }
@@ -483,7 +483,7 @@ async function analyzeProfileCompleteness(profileId) {
  */
 async function getFullProfile(profileId) {
   try {
-    const profile = await getProfile(profileId);
+    let profile = await getProfile(profileId);
     if (!profile) {
       return null;
     }
@@ -627,9 +627,9 @@ const REGIONAL_LANGUAGE_DEFAULTS = {
 // Any suggestion without a real per-farmer signal is labeled source: 'static'
 // instead of carrying a fabricated confidence score.
 async function generateEnrichmentSuggestions(profileData) {
-  const profile = profileData || {};
-  const missing = identifyMissingFields(profile);
-  const suggestions = [];
+  let profile = profileData || {};
+  let missing = identifyMissingFields(profile);
+  let suggestions = [];
 
   if (missing.includes('occupation')) {
     suggestions.push({
@@ -674,7 +674,7 @@ async function getRegionalPatterns(state) {
 
 async function getSimilarProfiles(profile) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM farmer_profiles 
        WHERE state = $1 AND education_level = $2 
        LIMIT 5`,

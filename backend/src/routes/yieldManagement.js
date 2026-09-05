@@ -11,7 +11,7 @@ router.post('/farms/:farmId/yield', auth, async (req, res) => {
 
 router.get('/farms/:farmId/yield-trends', async (req, res) => {
   try {
-    const result = await yieldService.getYieldTrends(req.params.farmId);
+    let result = await yieldService.getYieldTrends(req.params.farmId);
     res.json(result);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });

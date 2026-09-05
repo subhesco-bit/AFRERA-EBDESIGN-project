@@ -206,7 +206,7 @@ export const withCache = (fn, cacheKey, ttl = 60000) => {
 export const localStorageCache = {
   set(key, value, ttl = 60000) {
     try {
-      const item = {
+      let item = {
         value,
         expiry: Date.now() + ttl,
       };
@@ -218,7 +218,7 @@ export const localStorageCache = {
 
   get(key) {
     try {
-      const item = JSON.parse(localStorage.getItem(key));
+      let item = JSON.parse(localStorage.getItem(key));
       if (!item) return null;
 
       if (Date.now() > item.expiry) {
@@ -286,13 +286,13 @@ export const indexedDBCache = {
       const transaction = this.db.transaction([this.storeName], 'readwrite');
       const store = transaction.objectStore(this.storeName);
 
-      const item = {
+      let item = {
         key,
         value,
         expiry: Date.now() + ttl,
       };
 
-      const request = store.put(item);
+      let request = store.put(item);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -302,12 +302,12 @@ export const indexedDBCache = {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([this.storeName], 'readonly');
-      const store = transaction.objectStore(this.storeName);
-      const request = store.get(key);
+      let transaction = this.db.transaction([this.storeName], 'readonly');
+      let store = transaction.objectStore(this.storeName);
+      let request = store.get(key);
 
       request.onsuccess = () => {
-        const item = request.result;
+        let item = request.result;
         if (!item) {
           resolve(null);
           return;
@@ -330,9 +330,9 @@ export const indexedDBCache = {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([this.storeName], 'readwrite');
-      const store = transaction.objectStore(this.storeName);
-      const request = store.delete(key);
+      let transaction = this.db.transaction([this.storeName], 'readwrite');
+      let store = transaction.objectStore(this.storeName);
+      let request = store.delete(key);
 
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
@@ -343,9 +343,9 @@ export const indexedDBCache = {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction([this.storeName], 'readwrite');
-      const store = transaction.objectStore(this.storeName);
-      const request = store.clear();
+      let transaction = this.db.transaction([this.storeName], 'readwrite');
+      let store = transaction.objectStore(this.storeName);
+      let request = store.clear();
 
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
@@ -423,7 +423,7 @@ export const useThrottle = (value, limit = 300) => {
   const lastRan = useRef(Date.now());
 
   useEffect(() => {
-    const handler = setTimeout(() => {
+    let handler = setTimeout(() => {
       if (Date.now() - lastRan.current >= limit) {
         setThrottledValue(value);
         lastRan.current = Date.now();
@@ -443,7 +443,7 @@ export const useThrottle = (value, limit = 300) => {
 // Performance measurement utility
 export const measurePerformance = (name, fn) => {
   const start = performance.now();
-  const result = fn();
+  let result = fn();
   const end = performance.now();
 
   if (process.env.NODE_ENV === 'development') {
@@ -520,7 +520,7 @@ export const useFPSMonitor = () => {
 
 // Font loading optimization
 export const preloadFont = (fontUrl, fontFamily) => {
-  const link = document.createElement('link');
+  let link = document.createElement('link');
   link.rel = 'preload';
   link.as = 'font';
   link.type = 'font/woff2';
@@ -531,7 +531,7 @@ export const preloadFont = (fontUrl, fontFamily) => {
 
 // Script preloading
 export const preloadScript = (scriptUrl) => {
-  const link = document.createElement('link');
+  let link = document.createElement('link');
   link.rel = 'preload';
   link.as = 'script';
   link.href = scriptUrl;
@@ -540,7 +540,7 @@ export const preloadScript = (scriptUrl) => {
 
 // DNS prefetch
 export const prefetchDNS = (domain) => {
-  const link = document.createElement('link');
+  let link = document.createElement('link');
   link.rel = 'dns-prefetch';
   link.href = domain;
   document.head.appendChild(link);
@@ -548,7 +548,7 @@ export const prefetchDNS = (domain) => {
 
 // Preconnect to origin
 export const preconnect = (origin) => {
-  const link = document.createElement('link');
+  let link = document.createElement('link');
   link.rel = 'preconnect';
   link.href = origin;
   document.head.appendChild(link);

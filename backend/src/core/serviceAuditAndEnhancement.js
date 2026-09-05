@@ -112,7 +112,7 @@ class ServiceAuditEngine {
       for (const file of files) {
         if (file.endsWith('.js')) {
           const filePath = path.join(servicesDir, file);
-          const analysis = this.scanService(filePath);
+          let analysis = this.scanService(filePath);
           if (analysis) {
             services.push(analysis);
           }
@@ -179,7 +179,7 @@ class ${this.toPascalCase(serviceName)} extends EnhancedServiceFramework {
   async create(data) {
     return this.executeWithErrorHandling('create', async () => {
       const validated = this.validateInput(data);
-      const result = await this.db.query(
+      let result = await this.db.query(
         'INSERT INTO resources (name, description) VALUES ($1, $2) RETURNING *',
         [validated.name, validated.description]
       );
@@ -191,10 +191,10 @@ class ${this.toPascalCase(serviceName)} extends EnhancedServiceFramework {
 
   async update(id, data) {
     return this.executeWithErrorHandling('update', async () => {
-      const validatedId = Validator.uuid(id);
-      const validated = this.validateInput(data);
+      let validatedId = Validator.uuid(id);
+      let validated = this.validateInput(data);
 
-      const result = await this.db.query(
+      let result = await this.db.query(
         'UPDATE resources SET name = $1, description = $2, updated_at = NOW() WHERE id = $3 RETURNING *',
         [validated.name, validated.description, validatedId]
       );
@@ -209,9 +209,9 @@ class ${this.toPascalCase(serviceName)} extends EnhancedServiceFramework {
 
   async delete(id) {
     return this.executeWithErrorHandling('delete', async () => {
-      const validatedId = Validator.uuid(id);
+      let validatedId = Validator.uuid(id);
 
-      const result = await this.db.query(
+      let result = await this.db.query(
         'UPDATE resources SET deleted_at = NOW() WHERE id = $1 RETURNING *',
         [validatedId]
       );

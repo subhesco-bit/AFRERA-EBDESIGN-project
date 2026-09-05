@@ -96,13 +96,13 @@ const getAverageResponseTime = (endpoint = null) => {
 
   if (relevantTimes.length === 0) return 0;
 
-  const total = relevantTimes.reduce((sum, m) => sum + m.duration, 0);
+  let total = relevantTimes.reduce((sum, m) => sum + m.duration, 0);
   return total / relevantTimes.length;
 };
 
 // Get percentile response time
 const getPercentileResponseTime = (percentile = 95, endpoint = null) => {
-  const relevantTimes = endpoint
+  let relevantTimes = endpoint
     ? performanceMetrics.responseTimes.filter(m => m.endpoint === endpoint)
     : performanceMetrics.responseTimes;
 
@@ -192,7 +192,7 @@ const getErrorRate = () => {
     return 0;
   }
 
-  const recent = performanceMetrics.errorRates.slice(-10);
+  let recent = performanceMetrics.errorRates.slice(-10);
   return recent.reduce((sum, m) => sum + m.errorRate, 0) / recent.length;
 };
 
@@ -225,7 +225,7 @@ const getOptimizationRecommendations = () => {
   }
 
   // Check error rate
-  const errorRate = getErrorRate();
+  let errorRate = getErrorRate();
   if (errorRate > 1) {
     recommendations.push({
       type: 'error_rate',

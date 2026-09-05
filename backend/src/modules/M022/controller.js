@@ -16,7 +16,7 @@ const createProfile = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    const profile = await farmerProfileService.getProfile(req.params.id);
+    let profile = await farmerProfileService.getProfile(req.params.id);
     if (!profile) {
       return res.status(404).json({ success: false, error: 'Profile not found' });
     }
@@ -28,7 +28,7 @@ const getProfile = async (req, res) => {
 
 const getProfileByFarmerId = async (req, res) => {
   try {
-    const profile = await farmerProfileService.getProfileByFarmerId(req.params.farmerId);
+    let profile = await farmerProfileService.getProfileByFarmerId(req.params.farmerId);
     if (!profile) {
       return res.status(404).json({ success: false, error: 'Profile not found' });
     }
@@ -49,7 +49,7 @@ const listProfiles = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const profile = await farmerProfileService.updateProfile(req.params.id, req.body);
+    let profile = await farmerProfileService.updateProfile(req.params.id, req.body);
     if (!profile) {
       return res.status(404).json({ success: false, error: 'Profile not found' });
     }

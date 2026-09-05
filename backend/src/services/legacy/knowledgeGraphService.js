@@ -82,7 +82,7 @@ async function createKnowledgeNode(data) {
  */
 router.post('/knowledge-nodes', authMiddleware, async (req, res) => {
   try {
-    const result = await createKnowledgeNode(req.body);
+    let result = await createKnowledgeNode(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create knowledge node API error', { error: error.message, stack: error.stack });
@@ -108,7 +108,7 @@ async function searchKnowledgeNodes(query, nodeType = null) {
 
     queryText += ' ORDER BY confidence_score DESC LIMIT 50';
 
-    const result = await pool.query(queryText, params);
+    let result = await pool.query(queryText, params);
     return result.rows;
   } catch (error) {
     logger.error('Search knowledge nodes error', { error: error.message, stack: error.stack });
@@ -125,7 +125,7 @@ router.get('/knowledge-nodes/search', async (req, res) => {
     if (!q) {
       return res.status(400).json({ error: 'Query parameter q is required' });
     }
-    const result = await searchKnowledgeNodes(q, node_type);
+    let result = await searchKnowledgeNodes(q, node_type);
     res.json(result);
   } catch (error) {
     logger.error('Search knowledge nodes API error', { error: error.message, stack: error.stack });
@@ -151,7 +151,7 @@ async function createRelationship(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO knowledge_relationships 
        (source_node_id, target_node_id, relationship_type, relationship_properties, confidence_score, source)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -178,7 +178,7 @@ async function createRelationship(data) {
  */
 router.post('/relationships', authMiddleware, async (req, res) => {
   try {
-    const result = await createRelationship(req.body);
+    let result = await createRelationship(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create relationship API error', { error: error.message, stack: error.stack });
@@ -191,7 +191,7 @@ router.post('/relationships', authMiddleware, async (req, res) => {
  */
 async function findRelatedNodes(nodeId, relationshipType = null) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT find_related_nodes($1, $2, 2) as related_nodes',
       [nodeId, relationshipType]
     );
@@ -209,7 +209,7 @@ async function findRelatedNodes(nodeId, relationshipType = null) {
 router.get('/knowledge-nodes/:nodeId/related', async (req, res) => {
   try {
     const { relationship_type } = req.query;
-    const result = await findRelatedNodes(req.params.nodeId, relationship_type);
+    let result = await findRelatedNodes(req.params.nodeId, relationship_type);
     res.json(result);
   } catch (error) {
     logger.error('Find related nodes API error', { error: error.message, stack: error.stack });
@@ -234,7 +234,7 @@ async function createGraphQuery(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO graph_queries 
        (query_name, query_type, query_definition, parameters, description)
        VALUES ($1, $2, $3, $4, $5)
@@ -260,7 +260,7 @@ async function createGraphQuery(data) {
  */
 router.post('/graph-queries', authMiddleware, async (req, res) => {
   try {
-    const result = await createGraphQuery(req.body);
+    let result = await createGraphQuery(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create graph query API error', { error: error.message, stack: error.stack });
@@ -327,7 +327,7 @@ async function executeGraphQuery(queryId, parameters) {
  */
 router.post('/graph-queries/:queryId/execute', authMiddleware, async (req, res) => {
   try {
-    const result = await executeGraphQuery(req.params.queryId, {
+    let result = await executeGraphQuery(req.params.queryId, {
       ...req.body,
       executed_by: req.user.id
     });
@@ -347,7 +347,7 @@ router.post('/graph-queries/:queryId/execute', authMiddleware, async (req, res) 
  */
 async function recordKnowledgeAnalytics(metrics) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO knowledge_analytics 
        (date, total_nodes, total_relationships, total_queries_executed, 
         avg_query_time_ms, unique_users_querying, most_queried_node_types)
@@ -382,7 +382,7 @@ async function recordKnowledgeAnalytics(metrics) {
 router.post('/knowledge-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    const result = await recordKnowledgeAnalytics(metrics);
+    let result = await recordKnowledgeAnalytics(metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record knowledge analytics API error', { error: error.message, stack: error.stack });

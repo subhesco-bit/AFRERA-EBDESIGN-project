@@ -36,14 +36,14 @@ class GDPRService {
    */
   async getUserConsent(userId) {
     try {
-      const query = `
+      let query = `
         SELECT consent_type, consent_given, created_at, updated_at
         FROM user_consent
         WHERE user_id = $1
         ORDER BY updated_at DESC
       `;
       
-      const result = await this.pool.query(query, [userId]);
+      let result = await this.pool.query(query, [userId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting user consent:', error);
@@ -148,13 +148,13 @@ class GDPRService {
   async checkDataResidency(userId, dataRegion) {
     try {
       // Check if user data is stored in the correct region
-      const query = `
+      let query = `
         SELECT id, data_region, created_at
         FROM user_data_residency
         WHERE user_id = $1
       `;
       
-      const result = await this.pool.query(query, [userId]);
+      let result = await this.pool.query(query, [userId]);
       
       if (result.rows.length === 0) {
         // Create residency record

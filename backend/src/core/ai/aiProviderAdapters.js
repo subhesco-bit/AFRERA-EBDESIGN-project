@@ -64,7 +64,7 @@ function getProviderEnv(providerKey) {
  * Validate provider configuration
  */
 function validateProviderConfig(providerKey) {
-  const env = PROVIDER_ENV[providerKey];
+  let env = PROVIDER_ENV[providerKey];
   if (!env) {
     return { valid: false, reason: 'Unknown provider' };
   }

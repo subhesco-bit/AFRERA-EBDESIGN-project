@@ -37,13 +37,13 @@ const RolePermissionPage = () => {
         const res = await rolePermissionAPI.listRoles();
         setRoles(res.data.roles);
       } else if (activeTab === 'permissions') {
-        const res = await rolePermissionAPI.listPermissions();
+        let res = await rolePermissionAPI.listPermissions();
         setPermissions(res.data.data);
       } else if (activeTab === 'matrix') {
-        const res = await rolePermissionAPI.getPermissionMatrix();
+        let res = await rolePermissionAPI.getPermissionMatrix();
         setPermissionMatrix(res.data.data);
       } else if (activeTab === 'hierarchy') {
-        const res = await rolePermissionAPI.getRoleHierarchy();
+        let res = await rolePermissionAPI.getRoleHierarchy();
         setRoleHierarchy(res.data.data);
       }
     } catch (err) {

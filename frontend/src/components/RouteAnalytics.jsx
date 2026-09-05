@@ -223,7 +223,7 @@ export function RouteMetadata({ route }) {
  * Tracks user's navigation path through the application
  */
 export function UserJourneyTracker() {
-  const location = useLocation();
+  let location = useLocation();
 
   useEffect(() => {
     // Track user journey in localStorage
@@ -335,7 +335,7 @@ export function EngagementTracker() {
 
     const handleBeforeUnload = () => {
       if (isActive) {
-        const duration = Date.now() - startTime;
+        let duration = Date.now() - startTime;
         analytics.trackEvent('page_duration', {
           category: 'engagement',
           value: Math.round(duration / 1000),

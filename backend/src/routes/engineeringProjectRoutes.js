@@ -27,7 +27,7 @@ router.get('/projects', authMiddleware, async (req, res) => {
 
 router.get('/projects/:id', authMiddleware, async (req, res) => {
   try {
-    const project = await service.getProject(req.params.id, req.user.id, req.user.role === 'admin');
+    let project = await service.getProject(req.params.id, req.user.id, req.user.role === 'admin');
     res.json({ success: true, data: project });
   } catch (error) {
     res.status(error.message === 'Project not found' ? 404 : 500).json({ success: false, error: error.message });
@@ -36,7 +36,7 @@ router.get('/projects/:id', authMiddleware, async (req, res) => {
 
 router.put('/projects/:id/phase', authRateLimit, authMiddleware, async (req, res) => {
   try {
-    const project = await service.updateProjectPhase(
+    let project = await service.updateProjectPhase(
       req.params.id, req.user.id, req.user.role === 'admin', req.body
     );
     res.json({ success: true, data: project });

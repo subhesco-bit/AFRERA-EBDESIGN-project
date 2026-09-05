@@ -113,7 +113,7 @@ router.post
     if (b.participationShare < 0 || b.participationShare > 1) {
       throw new Error('participationShare must be between 0 and 1');
     }
-    const data = await risk.adviseCommitment({ ...b, farmerId: b.farmerId || req.user?.id });
+    let data = await risk.adviseCommitment({ ...b, farmerId: b.farmerId || req.user?.id });
     res.json({ success: true, data });
   } catch (error) { fail(res, error); }
 });
@@ -146,7 +146,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/basis', authMiddleware, async (req, res) => {
   try {
-    const b = req.body || {};
+    let b = req.body || {};
     for (const k of ['cropKey', 'farmgatePerKg', 'ncrDeliveredPerKg', 'freightPerKg', 'expectedLossPct']) {
       if (b[k] === undefined) throw new Error(`${k} is required`);
     }

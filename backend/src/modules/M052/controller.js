@@ -25,7 +25,7 @@ const listProducts = async (req, res) => {
 
 const getProduct = async (req, res) => {
   try {
-    const product = await productService.getProduct(req.params.id);
+    let product = await productService.getProduct(req.params.id);
     if (!product) {
       return res.status(404).json({ success: false, error: 'Product not found' });
     }
@@ -37,7 +37,7 @@ const getProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const product = await productService.updateProduct(req.params.id, req.body);
+    let product = await productService.updateProduct(req.params.id, req.body);
     if (!product) {
       return res.status(404).json({ success: false, error: 'Product not found' });
     }
@@ -61,7 +61,7 @@ const deleteProduct = async (req, res) => {
 
 const updateInventory = async (req, res) => {
   try {
-    const product = await productService.updateInventory(req.params.id, req.body.quantity, req.body.operation);
+    let product = await productService.updateInventory(req.params.id, req.body.quantity, req.body.operation);
     if (!product) {
       return res.status(404).json({ success: false, error: 'Product not found' });
     }

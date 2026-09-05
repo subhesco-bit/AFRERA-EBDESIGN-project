@@ -190,7 +190,7 @@ function setupRoutes(app) {
 
   router.get('/households/village/:villageId/summary', async (req, res) => {
     try {
-      const summary = await getVillageHouseholdEconomySummary(req.params.villageId);
+      let summary = await getVillageHouseholdEconomySummary(req.params.villageId);
       res.json({ success: true, data: summary });
     } catch (error) {
       res.status(404).json({ success: false, error: error.message });
@@ -199,7 +199,7 @@ function setupRoutes(app) {
 
   router.post('/households', async (req, res) => {
     try {
-      const economy = await upsertHouseholdEconomy(req.body);
+      let economy = await upsertHouseholdEconomy(req.body);
       res.status(201).json({ success: true, data: economy });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });

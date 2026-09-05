@@ -56,8 +56,8 @@ class PondManagementService {
   }
 
   async getPond(id) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-    const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
     
     if (res.rows.length === 0) return null;
     
@@ -67,10 +67,10 @@ class PondManagementService {
   }
 
   async createPond(payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { farmerId, name, location, area, pondType, depth, waterSource, capacity, sensorConfig, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `INSERT INTO ${tableName} (farmer_id, name, location, area, pond_type, depth, water_source, capacity, sensor_config, metadata, created_at) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW()) RETURNING *`,
       [farmerId, name, location, area, pondType, depth, waterSource, capacity, JSON.stringify(sensorConfig || {}), JSON.stringify(metadata || {})]
@@ -85,10 +85,10 @@ class PondManagementService {
   }
 
   async updatePond(id, payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { name, location, area, pondType, depth, waterSource, capacity, status, sensorConfig, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `UPDATE ${tableName} 
        SET name = $1, location = $2, area = $3, pond_type = $4, depth = $5, water_source = $6, capacity = $7, status = $8, sensor_config = $9, metadata = $10, updated_at = NOW() 
        WHERE id = $11 RETURNING *`,
@@ -104,8 +104,8 @@ class PondManagementService {
   }
 
   async deletePond(id) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-    const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
     return !!res.rows[0];
   }
 
@@ -132,7 +132,7 @@ class PondManagementService {
     const sensorId = `SENSOR-${pondId}-${sensorType}-${Date.now()}`;
     
     // Store sensor configuration
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     await pg.query(
       `INSERT INTO pond_sensors (pond_id, sensor_type, device_id, sensor_id, calibration, status, created_at) 
        VALUES ($1, $2, $3, $4, $5, 'ACTIVE', NOW())`,
@@ -148,7 +148,7 @@ class PondManagementService {
   }
 
   async getPondSensorData(pondId, { startTime, endTime, sensorTypes } = {}) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Get sensors for this pond
     const sensorsRes = await pg.query(
@@ -298,7 +298,7 @@ class PondManagementService {
   }
 
   async getPondHealthIndex(pondId) {
-    const sensorData = await this.getPondSensorData(pondId);
+    let sensorData = await this.getPondSensorData(pondId);
     const summary = sensorData.summary;
     
     // Calculate health index using AI
@@ -390,7 +390,7 @@ class PondManagementService {
   }
 
   async getPondAIInsights(pondId) {
-    const sensorData = await this.getPondSensorData(pondId);
+    let sensorData = await this.getPondSensorData(pondId);
     
     // AI-powered insights
     const insights = {
@@ -413,8 +413,8 @@ class PondManagementService {
   }
 
   async predictGrowthPotential(sensorData) {
-    const summary = sensorData.summary;
-    const healthIndex = this.calculateHealthIndex(summary);
+    let summary = sensorData.summary;
+    let healthIndex = this.calculateHealthIndex(summary);
 
     return {
       potential: healthIndex > 75 ? 'HIGH' : healthIndex > 50 ? 'MODERATE' : 'LOW',
@@ -424,7 +424,7 @@ class PondManagementService {
   }
 
   async optimizeFeeding(sensorData) {
-    const summary = sensorData.summary;
+    let summary = sensorData.summary;
     
     // AI-powered feeding optimization
     const feedRate = summary.averageTemperature > 28 ? 1.2 : 1.0;
@@ -445,8 +445,8 @@ class PondManagementService {
   }
 
   async assessDiseaseRisk(sensorData) {
-    const summary = sensorData.summary;
-    const healthIndex = this.calculateHealthIndex(summary);
+    let summary = sensorData.summary;
+    let healthIndex = this.calculateHealthIndex(summary);
     
     const riskFactors = [];
     
@@ -493,7 +493,7 @@ class PondManagementService {
 
   async predictHarvest(sensorData) {
     const growthPotential = await this.predictGrowthPotential(sensorData);
-    const healthIndex = this.calculateHealthIndex(sensorData.summary);
+    let healthIndex = this.calculateHealthIndex(sensorData.summary);
     
     const harvestDate = new Date();
     harvestDate.setDate(harvestDate.getDate() + 120); // ~4 months

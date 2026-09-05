@@ -51,7 +51,7 @@ const validateQuery = (schema) => {
     });
 
     if (error) {
-      const errors = error.details.map(detail => ({
+      let errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message,
         type: detail.type

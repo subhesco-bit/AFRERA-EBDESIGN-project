@@ -79,14 +79,14 @@ class ProductionExampleService extends ProductionService {
       const validatedLimit = Validator.number(limit, { min: 1, max: 100, integer: true });
 
       // Build cache key
-      const cacheKey = `resources:page:${validatedPage}:limit:${validatedLimit}:filters:${JSON.stringify(filters)}`;
+      let cacheKey = `resources:page:${validatedPage}:limit:${validatedLimit}:filters:${JSON.stringify(filters)}`;
 
       // Try cache
-      const cached = await this.cache.get(cacheKey);
+      let cached = await this.cache.get(cacheKey);
       if (cached) return cached;
 
       // Execute paginated query
-      const result = await this.paginate('resources', validatedPage, validatedLimit, {
+      let result = await this.paginate('resources', validatedPage, validatedLimit, {
         deleted_at: null,
         ...filters
       });
@@ -101,7 +101,7 @@ class ProductionExampleService extends ProductionService {
   // Update with optimistic locking
   async updateResource(resourceId, updates, version = null) {
     return this.executeWithErrorHandling('updateResource', async () => {
-      const validatedId = Validator.uuid(resourceId);
+      let validatedId = Validator.uuid(resourceId);
 
       // Fetch current resource
       const current = await this.getResourceById(validatedId);
@@ -111,7 +111,7 @@ class ProductionExampleService extends ProductionService {
       }
 
       // Execute update in transaction
-      const operations = [
+      let operations = [
         [
           `UPDATE resources
            SET ${Object.keys(updates).map((k, i) => `${k} = $${i + 1}`).join(', ')},
@@ -141,7 +141,7 @@ class ProductionExampleService extends ProductionService {
   // Soft delete with cascade
   async deleteResource(resourceId) {
     return this.executeWithErrorHandling('deleteResource', async () => {
-      const validatedId = Validator.uuid(resourceId);
+      let validatedId = Validator.uuid(resourceId);
 
       // Check for dependencies
       const dependencies = await this.db.query(
@@ -154,7 +154,7 @@ class ProductionExampleService extends ProductionService {
       }
 
       // Soft delete
-      const result = await this.db.query(
+      let result = await this.db.query(
         'UPDATE resources SET deleted_at = NOW(), deleted_by = $1 WHERE id = $2 RETURNING *',
         ['system', validatedId]
       );
@@ -176,13 +176,13 @@ class ProductionExampleService extends ProductionService {
     return this.executeWithErrorHandling('searchResources', async () => {
       const validatedQuery = Validator.string(query, { minLength: 1, maxLength: 255 });
 
-      const cacheKey = `search:${validatedQuery}:${page}:${limit}`;
-      const cached = await this.cache.get(cacheKey);
+      let cacheKey = `search:${validatedQuery}:${page}:${limit}`;
+      let cached = await this.cache.get(cacheKey);
       if (cached) return cached;
 
       const offset = (page - 1) * limit;
 
-      const result = await this.db.query(
+      let result = await this.db.query(
         `SELECT * FROM resources
          WHERE deleted_at IS NULL
          AND (name ILIKE $1 OR description ILIKE $1)

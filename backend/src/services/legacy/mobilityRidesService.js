@@ -237,7 +237,7 @@ function setupRoutes(app) {
 
   router.get('/rides/driver/:driverId', async (req, res) => {
     try {
-      const rides = await getMobilityRidesByDriver(req.params.driverId);
+      let rides = await getMobilityRidesByDriver(req.params.driverId);
       res.json({ success: true, data: rides });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -246,7 +246,7 @@ function setupRoutes(app) {
 
   router.post('/rides', async (req, res) => {
     try {
-      const ride = await createMobilityRide(req.body);
+      let ride = await createMobilityRide(req.body);
       res.status(201).json({ success: true, data: ride });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -256,7 +256,7 @@ function setupRoutes(app) {
   router.put('/rides/:rideId/status', async (req, res) => {
     try {
       const { status } = req.body;
-      const ride = await updateRideStatus(req.params.rideId, status);
+      let ride = await updateRideStatus(req.params.rideId, status);
       res.json({ success: true, data: ride });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -265,7 +265,7 @@ function setupRoutes(app) {
 
   router.get('/rides/statistics', async (req, res) => {
     try {
-      const stats = await getMobilityRideStatistics(req.query);
+      let stats = await getMobilityRideStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

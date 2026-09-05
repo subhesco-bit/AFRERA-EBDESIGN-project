@@ -341,7 +341,7 @@ router.get('/search', async (req, res) => {
   try {
     const { q, category, limit } = req.query;
     if (!q) return res.status(400).json({ error: 'Query parameter q is required' });
-    const result = await recallSimilar(q, {
+    let result = await recallSimilar(q, {
       category: category || null,
       limit: limit ? Number(limit) : undefined,
     });
@@ -355,7 +355,7 @@ router.get('/search', async (req, res) => {
 /** GET /entities/:entityType/:entityId */
 router.get('/entities/:entityType/:entityId', async (req, res) => {
   try {
-    const result = await recallByEntity(req.params.entityType, req.params.entityId);
+    let result = await recallByEntity(req.params.entityType, req.params.entityId);
     res.json(result);
   } catch (error) {
     logger.error('Recall memory by entity API error', { error: error.message });

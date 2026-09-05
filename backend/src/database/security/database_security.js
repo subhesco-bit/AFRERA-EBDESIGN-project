@@ -144,8 +144,8 @@ class DatabaseSecurity {
       const buffer = Buffer.from(ciphertext, 'base64');
       
       // Extract IV (12 bytes), auth tag (16 bytes), and encrypted data
-      const iv = buffer.slice(0, 12);
-      const authTag = buffer.slice(12, 28);
+      let iv = buffer.slice(0, 12);
+      let authTag = buffer.slice(12, 28);
       const encrypted = buffer.slice(28);
 
       const decipher = crypto.createDecipheriv(
@@ -318,7 +318,7 @@ class DatabaseSecurity {
    * Create security policies
    */
   async createSecurityPolicies() {
-    const policies = [
+    let policies = [
       // Prevent deletion of critical records
       `CREATE POLICY prevent_user_deletion ON users
        FOR DELETE USING (false)`,

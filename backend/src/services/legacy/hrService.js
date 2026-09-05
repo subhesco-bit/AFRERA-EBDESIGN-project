@@ -130,7 +130,7 @@ class HRService {
    * Predict employee attrition risk using ML
    */
   async predictEmployeeAttrition(employeeId) {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     try {
       // Get comprehensive employee data
@@ -222,7 +222,7 @@ class HRService {
    * Optimize shift schedule using reinforcement learning
    */
   async optimizeShiftSchedule(departmentId, startDate, endDate) {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     try {
       // Get department requirements
@@ -298,7 +298,7 @@ class HRService {
    * Analyze employee sentiment using NLP
    */
   async analyzeEmployeeSentiment(employeeId, timeframe = '30 days') {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     try {
       // Get employee feedback, reviews, and communications
@@ -395,11 +395,11 @@ class HRService {
    * Recommend personalized training for employees
    */
   async recommendTraining(employeeId) {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     try {
       // Get employee profile
-      const employeeQuery = `
+      let employeeQuery = `
         SELECT 
           e.*, e.skills as current_skills,
           d.skill_requirements as department_requirements,
@@ -411,7 +411,7 @@ class HRService {
         GROUP BY e.id, d.id
       `;
       
-      const employee = await pg.query(employeeQuery, [employeeId]);
+      let employee = await pg.query(employeeQuery, [employeeId]);
       
       if (employee.rows.length === 0) {
         throw new Error('Employee not found');
@@ -437,7 +437,7 @@ class HRService {
       const trainingPrograms = await pg.query(trainingQuery);
       
       // Use AI to recommend best training programs
-      const recommendations = trainingPrograms.rows
+      let recommendations = trainingPrograms.rows
         .map(program => {
           const skillsTaught = Array.isArray(program.skills_taught) ? program.skills_taught : [];
           const relevanceScore = this.calculateTrainingRelevance(skillGaps, skillsTaught, emp);
@@ -640,7 +640,7 @@ class HRService {
    * Generate retention recommendations
    */
   generateRetentionRecommendations(riskFactors, attritionRisk) {
-    const recommendations = [];
+    let recommendations = [];
     
     if (riskFactors.job_satisfaction < 0.5) {
       recommendations.push({
@@ -781,7 +781,7 @@ class HRService {
    * Extract feedback themes
    */
   extractFeedbackThemes(feedback) {
-    const themes = {};
+    let themes = {};
     
     feedback.forEach(f => {
       const category = f.category || 'general';
@@ -822,7 +822,7 @@ class HRService {
     if (!skillGaps.length || !skillsTaught.length) return 0;
     
     const matchingSkills = skillsTaught.filter(skill => skillGaps.includes(skill));
-    const relevanceScore = matchingSkills.length / skillGaps.length;
+    let relevanceScore = matchingSkills.length / skillGaps.length;
     
     // Boost score for high-performing employees
     const performanceBoost = (employee.avg_performance - 3) * 0.1;

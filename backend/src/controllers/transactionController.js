@@ -20,7 +20,7 @@ const transactionController = {
   async getTransaction(req, res) {
     try {
       const { transactionId } = req.params;
-      const transaction = await transactionService.getTransaction(transactionId);
+      let transaction = await transactionService.getTransaction(transactionId);
       res.json({ success: true, data: transaction });
     } catch (error) {
       logger.error('Get transaction failed', error);

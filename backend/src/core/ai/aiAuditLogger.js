@@ -168,7 +168,7 @@ async function getActorAuditLogs(actorId, options = {}) {
     query += ` ORDER BY timestamp DESC LIMIT $4 OFFSET $5`;
     params.push(limit, offset);
     
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     
     return {
       success: true,
@@ -191,7 +191,7 @@ async function getOperationAuditLogs(operation, options = {}) {
   
   try {
     let query = `SELECT * FROM ai_audit_logs WHERE operation = $1`;
-    const params = [operation];
+    let params = [operation];
     
     if (startDate) {
       query += ` AND timestamp >= $2`;
@@ -206,7 +206,7 @@ async function getOperationAuditLogs(operation, options = {}) {
     query += ` ORDER BY timestamp DESC LIMIT $4 OFFSET $5`;
     params.push(limit, offset);
     
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     
     return {
       success: true,
@@ -279,7 +279,7 @@ async function getAuditStatistics(options = {}) {
       AVG(latency_ms) as avg_latency
     FROM ai_audit_logs`;
     
-    const params = [];
+    let params = [];
     
     if (startDate) {
       query += ` WHERE timestamp >= $1`;
@@ -291,7 +291,7 @@ async function getAuditStatistics(options = {}) {
       params.push(endDate);
     }
     
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     
     return {
       success: true,

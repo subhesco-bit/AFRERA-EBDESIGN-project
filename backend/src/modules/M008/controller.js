@@ -34,7 +34,7 @@ async function getAuditLogs(req, res) {
 
 async function getAuditLog(req, res) {
   try {
-    const log = await service.getAuditLog(req.params.id);
+    let log = await service.getAuditLog(req.params.id);
     if (!log) return res.status(404).json({ success: false, error: 'Audit log not found' });
     res.json({ success: true, data: log });
   } catch (error) {

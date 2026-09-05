@@ -23,7 +23,7 @@ class SubscriptionService {
 
   async getActiveSubscription(userId) {
     try {
-      const sub = await db('subscriptions').where('user_id', userId).where('status', 'active').first();
+      let sub = await db('subscriptions').where('user_id', userId).where('status', 'active').first();
       if (!sub) return { active: false };
       return { active: true, plan_id: sub.plan_id, started: sub.start_date };
     } catch (error) {
@@ -60,7 +60,7 @@ class SubscriptionService {
 
   async processRecurringPayment(subscriptionId) {
     try {
-      const sub = await db('subscriptions').where('id', subscriptionId).first();
+      let sub = await db('subscriptions').where('id', subscriptionId).first();
       if (!sub) throw new NotFoundError('Subscription not found');
 
       const payment = await db('subscription_payments').insert({

@@ -54,9 +54,9 @@ async function createPolicy(policyData) {
  */
 async function getPolicyById(policyId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT p.*, ip.name as product_name, ip.type as product_type, ip.scheme,
              u.name as insured_name, u.email as insured_email,
              mp.policy_number as master_policy_number
@@ -67,7 +67,7 @@ async function getPolicyById(policyId) {
       WHERE p.id = $1
     `;
     
-    const result = await pg.query(query, [policyId]);
+    let result = await pg.query(query, [policyId]);
     
     if (result.rows.length === 0) {
       throw new Error('Policy not found');
@@ -85,7 +85,7 @@ async function getPolicyById(policyId) {
  */
 async function getPolicies(filters = {}, pagination = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { user_id, farmer_id, product_id, status } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
@@ -134,7 +134,7 @@ async function getPolicies(filters = {}, pagination = {}) {
     query += ` ORDER BY p.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return {
       policies: result.rows,
@@ -156,7 +156,7 @@ async function getPolicies(filters = {}, pagination = {}) {
  */
 async function submitClaim(claimData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Verify policy exists and is active
     const policyQuery = 'SELECT * FROM policies WHERE id = $1 AND status = $2';
@@ -168,14 +168,14 @@ async function submitClaim(claimData) {
     
     const claimNumber = generateClaimNumber();
     
-    const query = `
+    let query = `
       INSERT INTO claims (claim_number, policy_id, user_id, claim_amount, incident_date,
                          incident_description, incident_location, supporting_documents, status)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'submitted')
       RETURNING *
     `;
     
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       claimNumber,
       claimData.policy_id,
       claimData.user_id,
@@ -200,9 +200,9 @@ async function submitClaim(claimData) {
  */
 async function getClaimById(claimId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT c.*, p.policy_number, p.coverage_amount, p.insurer_name,
              u.name as claimant_name
       FROM claims c
@@ -211,7 +211,7 @@ async function getClaimById(claimId) {
       WHERE c.id = $1
     `;
     
-    const result = await pg.query(query, [claimId]);
+    let result = await pg.query(query, [claimId]);
     
     if (result.rows.length === 0) {
       throw new Error('Claim not found');
@@ -229,12 +229,12 @@ async function getClaimById(claimId) {
  */
 async function getClaims(filters = {}, pagination = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { user_id, policy_id, status } = filters;
     const { page = 1, limit = 20, sort_by = 'submitted_date', sort_order = 'DESC' } = pagination;
     
-    const offset = (page - 1) * limit;
+    let offset = (page - 1) * limit;
     
     let query = `
       SELECT c.*, p.policy_number, u.name as claimant_name
@@ -244,7 +244,7 @@ async function getClaims(filters = {}, pagination = {}) {
       WHERE 1=1
     `;
     
-    const params = [];
+    let params = [];
     let paramCount = 0;
     
     if (user_id) {
@@ -265,14 +265,14 @@ async function getClaims(filters = {}, pagination = {}) {
       params.push(status);
     }
     
-    const countQuery = query.replace(/SELECT c\.\*, p\.policy_number, u\.name as claimant_name/, 'SELECT COUNT(*)');
-    const countResult = await pg.query(countQuery, params);
-    const total = parseInt(countResult.rows[0].count);
+    let countQuery = query.replace(/SELECT c\.\*, p\.policy_number, u\.name as claimant_name/, 'SELECT COUNT(*)');
+    let countResult = await pg.query(countQuery, params);
+    let total = parseInt(countResult.rows[0].count);
     
     query += ` ORDER BY c.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return {
       claims: result.rows,
@@ -294,11 +294,11 @@ async function getClaims(filters = {}, pagination = {}) {
  */
 async function processClaim(claimId, decisionData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { status, approved_amount, rejection_reason, settlement_reference } = decisionData;
     
-    const query = `
+    let query = `
       UPDATE claims
       SET status = $1,
           reviewed_date = NOW(),
@@ -310,7 +310,7 @@ async function processClaim(claimId, decisionData) {
       RETURNING *
     `;
     
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       status,
       approved_amount || null,
       rejection_reason || null,
@@ -336,16 +336,16 @@ async function processClaim(claimId, decisionData) {
  */
 async function createMasterPolicy(policyData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       INSERT INTO master_policies (organization_type, organization_id, coverage_type, sum_insured,
                                   premium_amount, insurer_name, policy_number, start_date, end_date, terms)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `;
     
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       policyData.organization_type,
       policyData.organization_id || null,
       policyData.coverage_type,
@@ -372,13 +372,13 @@ async function createMasterPolicy(policyData) {
  */
 async function getMasterPolicies(filters = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { organization_type, organization_id, coverage_type, status } = filters;
     
     let query = 'SELECT * FROM master_policies WHERE 1=1';
     
-    const params = [];
+    let params = [];
     let paramCount = 0;
     
     if (organization_type) {
@@ -407,7 +407,7 @@ async function getMasterPolicies(filters = {}) {
     
     query += ' ORDER BY created_at DESC';
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return result.rows;
   } catch (error) {
@@ -421,13 +421,13 @@ async function getMasterPolicies(filters = {}) {
  */
 async function getInsuranceProducts(filters = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { type, status } = filters;
     
     let query = 'SELECT * FROM insurance_products WHERE 1=1';
     
-    const params = [];
+    let params = [];
     let paramCount = 0;
     
     if (type) {
@@ -444,7 +444,7 @@ async function getInsuranceProducts(filters = {}) {
     
     query += ' ORDER BY name';
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return result.rows;
   } catch (error) {
@@ -458,7 +458,7 @@ async function getInsuranceProducts(filters = {}) {
  */
 async function calculatePremium(product_id, coverage_amount, farmer_id = null) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get product details
     const productQuery = 'SELECT * FROM insurance_products WHERE id = $1';
@@ -508,8 +508,8 @@ function generatePolicyNumber() {
 }
 
 function generateClaimNumber() {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+  let timestamp = Date.now().toString(36).toUpperCase();
+  let random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `CLM-${timestamp}-${random}`;
 }
 
@@ -532,7 +532,7 @@ router.post('/policies', authMiddleware, async (req, res) => {
 // Get policy by ID
 router.get('/policies/:id', async (req, res) => {
   try {
-    const policy = await getPolicyById(req.params.id);
+    let policy = await getPolicyById(req.params.id);
     res.json(policy);
   } catch (error) {
     if (error.message === 'Policy not found') {
@@ -558,7 +558,7 @@ router.get('/policies', async (req, res) => {
       sort_by: req.query.sort_by,
       sort_order: req.query.sort_order
     };
-    const result = await getPolicies(filters, pagination);
+    let result = await getPolicies(filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -578,7 +578,7 @@ router.post('/claims', authMiddleware, async (req, res) => {
 // Get claim by ID
 router.get('/claims/:id', async (req, res) => {
   try {
-    const claim = await getClaimById(req.params.id);
+    let claim = await getClaimById(req.params.id);
     res.json(claim);
   } catch (error) {
     if (error.message === 'Claim not found') {
@@ -592,18 +592,18 @@ router.get('/claims/:id', async (req, res) => {
 // Get claims
 router.get('/claims', async (req, res) => {
   try {
-    const filters = {
+    let filters = {
       user_id: req.query.user_id,
       policy_id: req.query.policy_id,
       status: req.query.status
     };
-    const pagination = {
+    let pagination = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
       sort_by: req.query.sort_by,
       sort_order: req.query.sort_order
     };
-    const result = await getClaims(filters, pagination);
+    let result = await getClaims(filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -613,7 +613,7 @@ router.get('/claims', async (req, res) => {
 // Process claim
 router.put('/claims/:id/process', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    const claim = await processClaim(req.params.id, req.body);
+    let claim = await processClaim(req.params.id, req.body);
     res.json(claim);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -623,7 +623,7 @@ router.put('/claims/:id/process', authMiddleware, requireRole(...PLATFORM_STAFF_
 // Create master policy
 router.post('/master-policies', authMiddleware, async (req, res) => {
   try {
-    const policy = await createMasterPolicy(req.body);
+    let policy = await createMasterPolicy(req.body);
     res.status(201).json(policy);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -633,7 +633,7 @@ router.post('/master-policies', authMiddleware, async (req, res) => {
 // Get master policies
 router.get('/master-policies', async (req, res) => {
   try {
-    const filters = {
+    let filters = {
       organization_type: req.query.organization_type,
       organization_id: req.query.organization_id,
       coverage_type: req.query.coverage_type,
@@ -649,7 +649,7 @@ router.get('/master-policies', async (req, res) => {
 // Get insurance products
 router.get('/products', async (req, res) => {
   try {
-    const filters = {
+    let filters = {
       type: req.query.type,
       status: req.query.status
     };

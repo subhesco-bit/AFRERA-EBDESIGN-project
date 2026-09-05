@@ -135,7 +135,7 @@ async function createTrainingSession(sessionData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO training_sessions 
        (session_id, program_id, session_name, start_date, end_date, location, 
         location_type, district, state, instructor_id, schedule, max_participants, 
@@ -165,7 +165,7 @@ async function createTrainingSession(sessionData) {
 async function enrollFarmer(sessionId, farmerId) {
   try {
     // Check session availability
-    const session = await pool.query(
+    let session = await pool.query(
       'SELECT * FROM training_sessions WHERE session_id = $1',
       [sessionId]
     );
@@ -203,7 +203,7 @@ async function enrollFarmer(sessionId, farmerId) {
     };
 
     // AI-powered learning path
-    const aiRequest = {
+    let aiRequest = {
       task: 'learning_path_recommendation',
       parameters: {
         farmer_id: farmerId,
@@ -214,10 +214,10 @@ async function enrollFarmer(sessionId, farmerId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     enrollment.ai_learning_path = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO farmer_enrollments 
        (enrollment_id, session_id, farmer_id, enrollment_date, enrollment_status, 
         attendance_percentage, completion_percentage, assessment_score, certificate_issued, 
@@ -264,7 +264,7 @@ async function recordAttendance(sessionId, farmerId, attendanceData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO training_attendance 
        (attendance_id, session_id, enrollment_id, farmer_id, attendance_date, status, notes, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -302,14 +302,14 @@ async function submitAssessment(assessmentId, farmerId, answers) {
     }
 
     const assessmentData = assessment.rows[0];
-    const enrollment = await getEnrollmentByFarmerAndProgram(farmerId, assessmentData.program_id);
+    let enrollment = await getEnrollmentByFarmerAndProgram(farmerId, assessmentData.program_id);
 
     // Calculate score
     const score = calculateAssessmentScore(assessmentData.questions, answers);
     const percentage = (score / assessmentData.total_marks) * 100;
     const passed = percentage >= assessmentData.passing_score;
 
-    const result = {
+    let result = {
       result_id: generateId(),
       assessment_id: assessmentId,
       enrollment_id: enrollment.enrollment_id,
@@ -324,7 +324,7 @@ async function submitAssessment(assessmentId, farmerId, answers) {
     };
 
     // AI-powered performance analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'assessment_performance_analysis',
       parameters: {
         farmer_id: farmerId,
@@ -335,7 +335,7 @@ async function submitAssessment(assessmentId, farmerId, answers) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     result.ai_performance_analysis = aiResponse;
 
     const insertResult = await pool.query(
@@ -380,7 +380,7 @@ async function getRecommendedPrograms(farmerId) {
     const farmerSkills = await getFarmerSkills(farmerId);
     const completedPrograms = await getCompletedPrograms(farmerId);
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'training_program_recommendation',
       parameters: {
         farmer_profile: farmerProfile,
@@ -392,7 +392,7 @@ async function getRecommendedPrograms(farmerId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     return {
       farmer_id: farmerId,
@@ -463,7 +463,7 @@ async function predictLearningOutcomes(programData) {
 
 async function getFarmerProfile(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM farmer_profiles WHERE farmer_id = $1',
       [farmerId]
     );
@@ -475,7 +475,7 @@ async function getFarmerProfile(farmerId) {
 
 async function getProgramRequirements(programId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM training_programs WHERE program_id = $1',
       [programId]
     );
@@ -495,7 +495,7 @@ async function assessLearningStyle(farmerId) {
 
 async function getEnrollmentId(sessionId, farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT enrollment_id FROM farmer_enrollments WHERE session_id = $1 AND farmer_id = $2',
       [sessionId, farmerId]
     );
@@ -507,7 +507,7 @@ async function getEnrollmentId(sessionId, farmerId) {
 
 async function updateAttendancePercentage(enrollmentId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT 
         COUNT(*) FILTER (WHERE status = 'present') as present,
         COUNT(*) as total
@@ -516,8 +516,8 @@ async function updateAttendancePercentage(enrollmentId) {
       [enrollmentId]
     );
 
-    const attendance = result.rows[0];
-    const percentage = attendance.total > 0 ? (attendance.present / attendance.total) * 100 : 0;
+    let attendance = result.rows[0];
+    let percentage = attendance.total > 0 ? (attendance.present / attendance.total) * 100 : 0;
 
     await pool.query(
       'UPDATE farmer_enrollments SET attendance_percentage = $1 WHERE enrollment_id = $2',
@@ -530,7 +530,7 @@ async function updateAttendancePercentage(enrollmentId) {
 
 async function getEnrollmentByFarmerAndProgram(farmerId, programId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT fe.* FROM farmer_enrollments fe
        JOIN training_sessions ts ON fe.session_id = ts.session_id
        WHERE fe.farmer_id = $1 AND ts.program_id = $2
@@ -555,7 +555,7 @@ function calculateAssessmentScore(questions, answers) {
 
 async function getFarmerPerformanceHistory(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM assessment_results WHERE farmer_id = $1 ORDER BY attempted_at DESC LIMIT 10',
       [farmerId]
     );
@@ -589,7 +589,7 @@ async function issueCertificate(enrollmentId) {
 
 async function getFarmerSkills(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM farmer_skills WHERE profile_id IN (SELECT profile_id FROM farmer_profiles WHERE farmer_id = $1)',
       [farmerId]
     );
@@ -601,7 +601,7 @@ async function getFarmerSkills(farmerId) {
 
 async function getCompletedPrograms(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT tp.* FROM training_programs tp
        JOIN training_sessions ts ON tp.program_id = ts.program_id
        JOIN farmer_enrollments fe ON ts.session_id = fe.session_id
@@ -616,7 +616,7 @@ async function getCompletedPrograms(farmerId) {
 
 async function getAvailablePrograms() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM training_programs WHERE status = $1',
       ['active']
     );
@@ -648,7 +648,7 @@ async function getTotalPrograms(category) {
       query += ' AND category = $2';
       params.push(category);
     }
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.count || 0;
   } catch (error) {
     return 0;
@@ -658,7 +658,7 @@ async function getTotalPrograms(category) {
 async function getTotalSessions(district, startDate, endDate) {
   try {
     let query = 'SELECT COUNT(*) as count FROM training_sessions WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -674,7 +674,7 @@ async function getTotalSessions(district, startDate, endDate) {
       params.push(endDate);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.count || 0;
   } catch (error) {
     return 0;
@@ -684,7 +684,7 @@ async function getTotalSessions(district, startDate, endDate) {
 async function getTotalEnrollments(startDate, endDate) {
   try {
     let query = 'SELECT COUNT(*) as count FROM farmer_enrollments WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (startDate) {
@@ -696,7 +696,7 @@ async function getTotalEnrollments(startDate, endDate) {
       params.push(endDate);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.count || 0;
   } catch (error) {
     return 0;
@@ -709,7 +709,7 @@ async function getCompletionRate(startDate, endDate) {
       COUNT(*) FILTER (WHERE enrollment_status = 'completed') as completed,
       COUNT(*) as total
      FROM farmer_enrollments WHERE 1=1`;
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (startDate) {
@@ -721,7 +721,7 @@ async function getCompletionRate(startDate, endDate) {
       params.push(endDate);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     const data = result.rows[0];
     return data.total > 0 ? (data.completed / data.total) * 100 : 0;
   } catch (error) {
@@ -732,7 +732,7 @@ async function getCompletionRate(startDate, endDate) {
 async function getAverageAssessmentScore(startDate, endDate) {
   try {
     let query = 'SELECT AVG(percentage) as avg_score FROM assessment_results WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (startDate) {
@@ -744,7 +744,7 @@ async function getAverageAssessmentScore(startDate, endDate) {
       params.push(endDate);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.avg_score || 0;
   } catch (error) {
     return 0;
@@ -757,7 +757,7 @@ async function getCertificationRate(startDate, endDate) {
       COUNT(*) FILTER (WHERE certificate_issued = true) as certified,
       COUNT(*) as total
      FROM farmer_enrollments WHERE 1=1`;
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (startDate) {
@@ -769,8 +769,8 @@ async function getCertificationRate(startDate, endDate) {
       params.push(endDate);
     }
 
-    const result = await pool.query(query, params);
-    const data = result.rows[0];
+    let result = await pool.query(query, params);
+    let data = result.rows[0];
     return data.total > 0 ? (data.certified / data.total) * 100 : 0;
   } catch (error) {
     return 0;
@@ -783,7 +783,7 @@ async function getAttendanceRate(startDate, endDate) {
       COUNT(*) FILTER (WHERE status = 'present') as present,
       COUNT(*) as total
      FROM training_attendance WHERE 1=1`;
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (startDate) {
@@ -795,8 +795,8 @@ async function getAttendanceRate(startDate, endDate) {
       params.push(endDate);
     }
 
-    const result = await pool.query(query, params);
-    const data = result.rows[0];
+    let result = await pool.query(query, params);
+    let data = result.rows[0];
     return data.total > 0 ? (data.present / data.total) * 100 : 0;
   } catch (error) {
     return 0;
@@ -805,7 +805,7 @@ async function getAttendanceRate(startDate, endDate) {
 
 async function getTopPrograms(startDate, endDate) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT tp.program_name, COUNT(fe.enrollment_id) as enrollment_count
        FROM training_programs tp
        JOIN training_sessions ts ON tp.program_id = ts.program_id
@@ -824,7 +824,7 @@ async function getTopPrograms(startDate, endDate) {
 
 async function getDistrictPerformance(startDate, endDate) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT ts.district, COUNT(fe.enrollment_id) as enrollment_count,
         AVG(fe.assessment_score) as avg_score
        FROM training_sessions ts
@@ -841,7 +841,7 @@ async function getDistrictPerformance(startDate, endDate) {
 }
 
 async function generateTrainingInsights(startDate, endDate) {
-  const aiRequest = {
+  let aiRequest = {
     task: 'training_analytics_insights',
     parameters: {
       period: { startDate, endDate },
@@ -851,7 +851,7 @@ async function generateTrainingInsights(startDate, endDate) {
     }
   };
 
-  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+  let aiResponse = await aiAPI.generateRecommendation(aiRequest);
   return aiResponse;
 }
 

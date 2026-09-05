@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/vermicompost/:id - Get vermicompost by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const vermicompost = await vermicompostService.getVermicompostById(req.params.id);
+    let vermicompost = await vermicompostService.getVermicompostById(req.params.id);
     res.json({ success: true, data: vermicompost });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/vermicompost - Create vermicompost
 router.post('/', authenticate, async (req, res) => {
   try {
-    const vermicompost = await vermicompostService.createVermicompost(req.body);
+    let vermicompost = await vermicompostService.createVermicompost(req.body);
     res.status(201).json({ success: true, data: vermicompost });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

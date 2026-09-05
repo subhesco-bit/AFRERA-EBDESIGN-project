@@ -26,7 +26,7 @@ async function getOrchard(req, res) {
 
 async function createOrchard(req, res) {
   try {
-    const orchard = await service.createOrchard(req.body);
+    let orchard = await service.createOrchard(req.body);
     res.status(201).json({ success: true, data: orchard });
   } catch (error) {
     logger.error('createOrchard error', { error: error.message });
@@ -36,7 +36,7 @@ async function createOrchard(req, res) {
 
 async function updateOrchard(req, res) {
   try {
-    const orchard = await service.updateOrchard(req.params.orchardId, req.body);
+    let orchard = await service.updateOrchard(req.params.orchardId, req.body);
     if (!orchard) return res.status(404).json({ success: false, error: 'Orchard not found' });
     res.json({ success: true, data: orchard });
   } catch (error) {

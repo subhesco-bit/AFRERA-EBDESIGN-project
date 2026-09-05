@@ -88,7 +88,7 @@ router.get('/organizations/:id', rateLimiters.read, authMiddleware, validId, asy
 // Update organization
 router.put('/organizations/:id', ...writeAdmin, validId, validateBody(), body, updateBody, async (req, res) => {
   try {
-    const result = await organizationManagementService.updateOrganization(req.params.id, req.body);
+    let result = await organizationManagementService.updateOrganization(req.params.id, req.body);
     
     // Emit signal for organization update
     signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
@@ -149,7 +149,7 @@ router.get('/organizations/:id/units/:unitId/predict-performance', ...admin, val
 // Optimize resource allocation
 router.post('/organizations/:id/optimize-resources', ...writeAdmin, validId, async (req, res) => {
   try {
-    const optimization = await organizationManagementService.optimizeResourceAllocation(req.params.id);
+    let optimization = await organizationManagementService.optimizeResourceAllocation(req.params.id);
     res.json(optimization);
   } catch (error) {
     logger.error('organizationManagementRoutes:optimizeResources', { error: error.message });
@@ -187,7 +187,7 @@ router.post('/organizations/:id/units', ...writeAdmin, validId, validateBody(), 
   next();
 }, async (req, res) => {
   try {
-    const result = await organizationManagementService.addUnit(req.params.id, req.body);
+    let result = await organizationManagementService.addUnit(req.params.id, req.body);
     res.json(result);
   } catch (error) {
     logger.error('organizationManagementRoutes:addUnit', { error: error.message });

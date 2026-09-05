@@ -123,14 +123,14 @@ class ClaudeAIEnhancedRecoveryService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'analyzeRootCause',
         error: error.message,
         context: context
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'analysis',
         query: this.buildRootCauseQuery(error, context, options),
         context: { 
@@ -144,9 +144,9 @@ class ClaudeAIEnhancedRecoveryService {
         agentPreference: 'governance-agent'
       });
 
-      const originalResult = await this.originalService.analyzeRootCause(error, context);
+      let originalResult = await this.originalService.analyzeRootCause(error, context);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_root_cause: aiEnhancement.content || null,
@@ -227,8 +227,8 @@ class ClaudeAIEnhancedRecoveryService {
   extractPreventionRecommendations(aiContent) {
     if (!aiContent) return [];
     
-    const recommendations = [];
-    const lines = aiContent.split('\n');
+    let recommendations = [];
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('prevent') || line.includes('avoid') || line.includes('mitigate') || line.includes('reduce')) {

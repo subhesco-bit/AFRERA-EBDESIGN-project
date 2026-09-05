@@ -22,7 +22,7 @@ async function getAsset(req, res) {
 
 async function registerAsset(req, res) {
   try {
-    const asset = await service.registerAsset(req.body);
+    let asset = await service.registerAsset(req.body);
     res.status(201).json({ success: true, data: asset });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

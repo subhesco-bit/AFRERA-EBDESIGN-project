@@ -118,7 +118,7 @@ router.get('/recipes', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get recipes error', { error: error.message, stack: error.stack });
@@ -131,7 +131,7 @@ router.get('/recipes', authMiddleware, async (req, res) => {
  */
 router.get('/recipes/:id', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM recipe_database WHERE id = $1',
       [req.params.id]
     );
@@ -182,7 +182,7 @@ router.post('/generate-recipe', authRateLimit, authMiddleware, async (req, res) 
     });
 
     // Store generated recipe
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO recipe_database 
        (recipe_name, cuisine_type, meal_type, difficulty_level, preparation_time, 
         cooking_time, servings, ingredients, instructions, nutritional_info, 
@@ -490,7 +490,7 @@ async function calculateRecipeCost(ingredients, servings, location) {
 
     const category = ingredient.category || 'vegetables';
     const price = pricePerUnit[category] || 0.05;
-    const quantity = parseFloat(ingredient.quantity) || 1;
+    let quantity = parseFloat(ingredient.quantity) || 1;
     const ingredientCost = price * quantity;
 
     totalCost += ingredientCost;
@@ -550,7 +550,7 @@ router.get('/seasonal-recipes', authMiddleware, async (req, res) => {
     // Determine season if not provided
     const currentSeason = season || determineSeason(month);
 
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM recipe_database 
        WHERE is_verified = true 
          AND seasonal_availability @> $1::jsonb
@@ -590,7 +590,7 @@ router.get('/seasonal-ingredients', authMiddleware, async (req, res) => {
   try {
     const { season, region } = req.query;
 
-    const currentSeason = season || determineSeason();
+    let currentSeason = season || determineSeason();
 
     // Mock seasonal ingredients - in production, would query database
     const seasonalIngredients = {
@@ -623,7 +623,7 @@ router.get('/regional-recipes', authMiddleware, async (req, res) => {
     const { region, state, city, cuisine_type } = req.query;
 
     let query = 'SELECT * FROM recipe_database WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (region) {
@@ -652,7 +652,7 @@ router.get('/regional-recipes', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY popularity DESC LIMIT 20';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get regional recipes error', { error: error.message, stack: error.stack });
@@ -712,7 +712,7 @@ router.post('/institutional-recipes', authRateLimit, authMiddleware, async (req,
       status
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO institutional_recipes 
        (institution_id, recipe_name, meal_type, target_servings, dietary_requirements, 
         nutritional_targets, budget_constraints, equipment_available, staff_skill_level, 
@@ -746,7 +746,7 @@ router.get('/institutional-recipes', authMiddleware, async (req, res) => {
     const { institution_id, meal_type, status, dietary_requirements } = req.query;
     
     let query = 'SELECT * FROM institutional_recipes WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (institution_id) {
@@ -773,7 +773,7 @@ router.get('/institutional-recipes', authMiddleware, async (req, res) => {
       params.push(JSON.stringify([dietary_requirements]));
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get institutional recipes error', { error: error.message, stack: error.stack });

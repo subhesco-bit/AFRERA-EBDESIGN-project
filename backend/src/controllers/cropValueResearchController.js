@@ -35,7 +35,7 @@ const cropValueResearchController = {
     try {
       const { id } = req.params;
       const { approve } = req.body;
-      const result = await cropValueResearchService.reviewSuggestion(id, Boolean(approve), req.user.id);
+      let result = await cropValueResearchService.reviewSuggestion(id, Boolean(approve), req.user.id);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error reviewing crop value suggestion', { error: error.message });

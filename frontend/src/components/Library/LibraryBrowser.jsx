@@ -209,7 +209,7 @@ export default function LibraryBrowser() {
     setNotice('');
 
     try {
-      const response = await libraryAPI.initialize();
+      let response = await libraryAPI.initialize();
       const result = unwrap(response);
       await loadLibrary();
       setNotice(
@@ -228,7 +228,7 @@ export default function LibraryBrowser() {
     setNotice('');
 
     try {
-      const response = await libraryAPI.verifyCatalog();
+      let response = await libraryAPI.verifyCatalog();
       setVerification(unwrap(response));
     } catch (err) {
       setError(err.response?.data?.error?.message || err.message || 'Verification failed');
@@ -247,7 +247,7 @@ export default function LibraryBrowser() {
     }
 
     try {
-      const response = await libraryAPI.getModule(moduleId);
+      let response = await libraryAPI.getModule(moduleId);
       setSelectedItem(response.data?.module || item);
     } catch (_err) {
       setSelectedItem(item);
@@ -367,7 +367,7 @@ export default function LibraryBrowser() {
               <div className="divide-y divide-slate-100">
                 {items.map((item) => {
                   const type = getItemType(item);
-                  const moduleId = getModuleId(item);
+                  let moduleId = getModuleId(item);
 
                   return (
                     <article key={`${type}:${moduleId || item.path}`} className="p-4 hover:bg-slate-50">

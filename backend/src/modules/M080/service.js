@@ -139,7 +139,7 @@ async function createWaterDashboard(dashboardConfig) {
     };
 
     // AI-powered dashboard optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'water_dashboard_optimization',
       parameters: {
         dashboard_config: dashboardConfig,
@@ -150,11 +150,11 @@ async function createWaterDashboard(dashboardConfig) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     dashboard.ai_optimization = aiResponse;
 
     // Insert into database
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO water_dashboards 
        (dashboard_id, user_id, user_type, dashboard_name, location_scope, 
         widgets, refresh_interval, data_sources, status, ai_optimization, created_at)
@@ -212,7 +212,7 @@ async function generatePredictiveAnalysis(predictionParams) {
     };
 
     // AI-powered predictive modeling
-    const aiRequest = {
+    let aiRequest = {
       task: 'water_predictive_modeling',
       parameters: {
         location_id: location_id,
@@ -226,7 +226,7 @@ async function generatePredictiveAnalysis(predictionParams) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     prediction.ai_predictions = aiResponse;
 
     return prediction;
@@ -334,7 +334,7 @@ async function generateAnalyticsRecommendations(params) {
 
 async function getHistoricalUsageData(locationId, periodFrom, periodTo) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM water_usage_records 
        WHERE location_id = $1 AND usage_date BETWEEN $2 AND $3 
        ORDER BY usage_date`,
@@ -364,7 +364,7 @@ async function getEfficiencyMetrics(locationId) {
 
 async function getWaterSources(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM water_sources WHERE location_id = $1',
       [locationId]
     );

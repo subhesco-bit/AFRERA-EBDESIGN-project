@@ -86,7 +86,7 @@ export function ProtectedRoute({ children, requiredRole, requiredPermissions, re
  */
 export function PublicRoute({ children, redirectTo = '/dashboard' }) {
   const { isAuthenticated, loading } = useAuthStore();
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -115,7 +115,7 @@ export function PublicRoute({ children, redirectTo = '/dashboard' }) {
  */
 export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthorized' }) {
   const { user, isAuthenticated, initialized, initializeAuth } = useAuthStore();
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (!initialized) {
@@ -153,7 +153,7 @@ export function RoleRoute({ children, allowedRoles = [], redirectTo = '/unauthor
  */
 export function PermissionRoute({ children, requiredPermissions = [], redirectTo = '/unauthorized' }) {
   const { user, isAuthenticated, initialized, initializeAuth } = useAuthStore();
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (!initialized) {
@@ -166,7 +166,7 @@ export function PermissionRoute({ children, requiredPermissions = [], redirectTo
     }
 
     if (requiredPermissions.length > 0) {
-      const hasPermission = requiredPermissions.every(perm =>
+      let hasPermission = requiredPermissions.every(perm =>
         user?.permissions?.includes(perm),
       );
       if (!hasPermission) {
@@ -184,7 +184,7 @@ export function PermissionRoute({ children, requiredPermissions = [], redirectTo
   }
 
   if (requiredPermissions.length > 0) {
-    const hasPermission = requiredPermissions.every(perm =>
+    let hasPermission = requiredPermissions.every(perm =>
       user?.permissions?.includes(perm),
     );
     if (!hasPermission) {

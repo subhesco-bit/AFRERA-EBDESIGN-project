@@ -120,14 +120,14 @@ class ClaudeAIEnhancedFinancialService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'assessCreditRisk',
         farmerId: farmerId,
         financialData: financialData
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'assessment',
         query: this.buildCreditRiskQuery(farmerId, financialData, options),
         context: { 
@@ -140,9 +140,9 @@ class ClaudeAIEnhancedFinancialService {
         agentPreference: 'governance-agent'
       });
 
-      const originalResult = await this.originalService.assessCreditRisk(farmerId, financialData);
+      let originalResult = await this.originalService.assessCreditRisk(farmerId, financialData);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_credit_analysis: aiEnhancement.content || null,
@@ -234,7 +234,7 @@ class ClaudeAIEnhancedFinancialService {
     if (!aiContent) return [];
     
     const factors = [];
-    const lines = aiContent.split('\n');
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('risk') || line.includes('factor') || line.includes('concern')) {

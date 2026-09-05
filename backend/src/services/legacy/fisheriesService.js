@@ -58,7 +58,7 @@ class FisheriesService {
   async getFisheryById(fisheryId) {
     try {
       const query = 'SELECT * FROM fisheries WHERE id = $1';
-      const result = await this.pool.query(query, [fisheryId]);
+      let result = await this.pool.query(query, [fisheryId]);
       
       if (result.rows.length === 0) {
         throw new Error('Fishery not found');
@@ -87,13 +87,13 @@ class FisheriesService {
         average_weight_kg
       } = fisheryData;
 
-      const query = `
+      let query = `
         INSERT INTO fisheries (farmer_id, name, location, species, pond_size_sqft, water_source, stock_count, average_weight_kg)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         farmer_id, name, location, species, pond_size_sqft, water_source, stock_count, average_weight_kg
       ]);
 
@@ -109,13 +109,13 @@ class FisheriesService {
    */
   async getPondManagement(fisheryId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM pond_management
         WHERE fishery_id = $1
         ORDER BY inspection_date DESC
       `;
 
-      const result = await this.pool.query(query, [fisheryId]);
+      let result = await this.pool.query(query, [fisheryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting pond management:', error);
@@ -128,13 +128,13 @@ class FisheriesService {
    */
   async getFishFeed(fisheryId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM fish_feed
         WHERE fishery_id = $1
         ORDER BY feed_date DESC
       `;
 
-      const result = await this.pool.query(query, [fisheryId]);
+      let result = await this.pool.query(query, [fisheryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting fish feed:', error);
@@ -147,13 +147,13 @@ class FisheriesService {
    */
   async getFishHarvest(fisheryId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM fish_harvest
         WHERE fishery_id = $1
         ORDER BY harvest_date DESC
       `;
 
-      const result = await this.pool.query(query, [fisheryId]);
+      let result = await this.pool.query(query, [fisheryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting fish harvest:', error);

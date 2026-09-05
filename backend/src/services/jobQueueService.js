@@ -71,19 +71,19 @@ class JobQueueService extends EventEmitter {
     } = jobData;
 
     try {
-      const queue = this.queues.get(queueName);
+      let queue = this.queues.get(queueName);
       if (!queue) {
         throw new Error(`Queue ${queueName} not found`);
       }
 
-      const query = `
+      let query = `
         INSERT INTO jobs (
           queue_id, type, data, options, priority, 
           status, delay, created_at, scheduled_for
         ) VALUES ($1, $2, $3, $4, $5, 'pending', $6, NOW(), NOW() + $6 * INTERVAL '1 second')
         RETURNING *
       `;
-      const result = await this.db.query(query, [
+      let result = await this.db.query(query, [
         queue.queue_id,
         type,
         JSON.stringify(data),
@@ -108,13 +108,13 @@ class JobQueueService extends EventEmitter {
    */
   async getJob(jobId) {
     try {
-      const query = `
+      let query = `
         SELECT j.*, q.name as queue_name 
         FROM jobs j
         JOIN job_queues q ON j.queue_id = q.queue_id
         WHERE j.job_id = $1
       `;
-      const result = await this.db.query(query, [jobId]);
+      let result = await this.db.query(query, [jobId]);
       
       if (result.rows.length === 0) {
         throw new Error('Job not found');
@@ -151,7 +151,7 @@ class JobQueueService extends EventEmitter {
       query += ` ORDER BY j.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Get queue jobs failed', error);
@@ -164,13 +164,13 @@ class JobQueueService extends EventEmitter {
    */
   async removeJob(jobId) {
     try {
-      const job = await this.getJob(jobId);
+      let job = await this.getJob(jobId);
       
       if (job.status === 'processing') {
         throw new Error('Cannot remove job that is currently processing');
       }
 
-      const query = `
+      let query = `
         DELETE FROM jobs WHERE job_id = $1
       `;
       await this.db.query(query, [jobId]);
@@ -188,10 +188,10 @@ class JobQueueService extends EventEmitter {
    */
   async loadExistingQueues() {
     try {
-      const query = `
+      let query = `
         SELECT * FROM job_queues WHERE status = 'active'
       `;
-      const result = await this.db.query(query);
+      let result = await this.db.query(query);
       
       for (const queue of result.rows) {
         this.queues.set(queue.name, queue);
@@ -243,7 +243,7 @@ class JobQueueService extends EventEmitter {
       }
 
       // Get next pending job
-      const query = `
+      let query = `
         SELECT * FROM jobs
         WHERE queue_id = $1 
           AND status = 'pending'
@@ -252,13 +252,13 @@ class JobQueueService extends EventEmitter {
         LIMIT 1
         FOR UPDATE SKIP LOCKED
       `;
-      const result = await this.db.query(query, [queue.queue_id]);
+      let result = await this.db.query(query, [queue.queue_id]);
       
       if (result.rows.length === 0) {
         return;
       }
 
-      const job = result.rows[0];
+      let job = result.rows[0];
       
       // Mark as processing
       await this.updateJobStatus(job.job_id, 'processing');
@@ -344,7 +344,7 @@ class JobQueueService extends EventEmitter {
    */
   async updateJobStatus(jobId, status, metadata = {}) {
     try {
-      const query = `
+      let query = `
         UPDATE jobs 
         SET status = $1, 
             metadata = COALESCE($2, metadata),
@@ -366,7 +366,7 @@ class JobQueueService extends EventEmitter {
    */
   async getQueueStatistics(queueName) {
     try {
-      const query = `
+      let query = `
         SELECT 
           COUNT(*) as total_jobs,
           SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
@@ -377,7 +377,7 @@ class JobQueueService extends EventEmitter {
         JOIN job_queues q ON j.queue_id = q.queue_id
         WHERE q.name = $1
       `;
-      const result = await this.db.query(query, [queueName]);
+      let result = await this.db.query(query, [queueName]);
       return result.rows[0];
     } catch (error) {
       logger.error('Get queue statistics failed', error);
@@ -390,7 +390,7 @@ class JobQueueService extends EventEmitter {
    */
   async pauseQueue(queueName) {
     try {
-      const query = `
+      let query = `
         UPDATE job_queues 
         SET status = 'paused'
         WHERE name = $1
@@ -398,7 +398,7 @@ class JobQueueService extends EventEmitter {
       await this.db.query(query, [queueName]);
 
       // Stop worker
-      const worker = this.workers.get(queueName);
+      let worker = this.workers.get(queueName);
       if (worker) {
         clearInterval(worker);
         this.workers.delete(queueName);
@@ -417,7 +417,7 @@ class JobQueueService extends EventEmitter {
    */
   async resumeQueue(queueName) {
     try {
-      const query = `
+      let query = `
         UPDATE job_queues 
         SET status = 'active'
         WHERE name = $1
@@ -425,7 +425,7 @@ class JobQueueService extends EventEmitter {
       await this.db.query(query, [queueName]);
 
       // Restart worker
-      const queue = this.queues.get(queueName);
+      let queue = this.queues.get(queueName);
       if (queue) {
         this.startQueueWorker(queueName, queue);
       }

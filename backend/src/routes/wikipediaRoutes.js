@@ -31,7 +31,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/summary/:title', authMiddleware, async (req, res) => {
   try {
-    const result = await wikipediaService.getSummaryByTitle(req.params.title);
+    let result = await wikipediaService.getSummaryByTitle(req.params.title);
     if (!result) {
       return res.status(404).json({ success: false, error: `No Wikipedia page found for "${req.params.title}"` });
     }

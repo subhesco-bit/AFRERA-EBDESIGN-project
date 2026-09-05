@@ -25,7 +25,7 @@ const list = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const customer = await customerService.getCustomer(req.params.id);
+    let customer = await customerService.getCustomer(req.params.id);
     if (!customer) {
       return res.status(404).json({ success: false, error: 'Customer not found' });
     }
@@ -37,7 +37,7 @@ const get = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const customer = await customerService.updateCustomer(req.params.id, req.body);
+    let customer = await customerService.updateCustomer(req.params.id, req.body);
     if (!customer) {
       return res.status(404).json({ success: false, error: 'Customer not found' });
     }

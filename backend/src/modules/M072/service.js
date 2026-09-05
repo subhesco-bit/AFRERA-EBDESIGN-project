@@ -34,14 +34,14 @@ async function registerPoultryFlock(flockData) {
 }
 
 async function getPoultryFlock(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM poultry_flocks WHERE id = $1', [flockId]);
+  let res = await pg.query('SELECT * FROM poultry_flocks WHERE id = $1', [flockId]);
   return res.rows[0] || null;
 }
 
 async function listPoultryFlocks({ page = 1, limit = 20, farmId, birdType, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -65,7 +65,7 @@ async function listPoultryFlocks({ page = 1, limit = 20, farmId, birdType, statu
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM poultry_flocks`, 'SELECT COUNT(*) FROM poultry_flocks').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -73,12 +73,12 @@ async function listPoultryFlocks({ page = 1, limit = 20, farmId, birdType, statu
 }
 
 async function updatePoultryFlock(flockId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { flockName, birdType, birdCount, location, averageEggProduction, healthStatus, status } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE poultry_flocks 
      SET flock_name = COALESCE($1, flock_name),
          bird_type = COALESCE($2, bird_type),
@@ -108,7 +108,7 @@ async function updatePoultryFlock(flockId, updates) {
 
 // AI-powered egg production analysis
 async function analyzeEggProduction(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const flock = await getPoultryFlock(flockId);
@@ -168,7 +168,7 @@ function generateFeedOptimization(flock) {
 }
 
 function generateHealthRecommendations(flock) {
-  const recommendations = [];
+  let recommendations = [];
   if (flock.health_status !== 'healthy') {
     recommendations.push({
       type: 'health',
@@ -193,7 +193,7 @@ function generateEnvironmentalAlerts(flock) {
 
 // Poultry analytics
 async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -205,7 +205,7 @@ async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
     FROM poultry_flocks
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -223,7 +223,7 @@ async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
   
   query += ` GROUP BY bird_type ORDER BY total_birds DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     byBirdType: res.rows,
@@ -234,7 +234,7 @@ async function getPoultryAnalytics({ startDate, endDate, farmId } = {}) {
 }
 
 function generatePoultryAnalyticsRecommendations(birdData) {
-  const recommendations = [];
+  let recommendations = [];
   const topBirdType = birdData[0];
   if (topBirdType) {
     recommendations.push({

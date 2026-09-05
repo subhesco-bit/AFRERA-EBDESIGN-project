@@ -70,7 +70,7 @@ export default function CompetitivePositionPage() {
   const check = async (e) => {
     e.preventDefault(); setLoading(true);
     try {
-      const r = await competitorAPI.position({
+      let r = await competitorAPI.position({
         productName: query.productName,
         ourPricePerKg: query.ourPricePerKg,
       });

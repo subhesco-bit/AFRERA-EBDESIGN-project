@@ -51,7 +51,7 @@ router.post('/products/:id/certifications',
  */
 router.get('/products/:id/certifications', async (req, res, next) => {
   try {
-    const result = await productCertificationService.getProductCertifications(req.params.id);
+    let result = await productCertificationService.getProductCertifications(req.params.id);
 
     res.json({
       success: true,
@@ -77,7 +77,7 @@ router.post('/certifications/:id/verify',
   }),
   async (req, res, next) => {
     try {
-      const result = await productCertificationService.verifyCertification(
+      let result = await productCertificationService.verifyCertification(
         req.body.certificate_number
       );
 
@@ -106,7 +106,7 @@ router.delete('/certifications/:id',
   }),
   async (req, res, next) => {
     try {
-      const result = await productCertificationService.revokeCertification(
+      let result = await productCertificationService.revokeCertification(
         req.params.id,
         req.body.reason
       );

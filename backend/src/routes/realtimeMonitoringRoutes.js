@@ -56,7 +56,7 @@ router.delete
     // Log request
     logger.debug('router.delete request');('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    const monitor = await realtimeMonitoringService.stopMonitoring(req.params.id);
+    let monitor = await realtimeMonitoringService.stopMonitoring(req.params.id);
     res.json({ success: true, data: monitor });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });

@@ -52,7 +52,7 @@ class InMemoryRateLimitStore {
   }
 
   incr(key) {
-    const entry = this.store.get(key);
+    let entry = this.store.get(key);
     if (!entry) {
       this.store.set(key, { value: 1, expiresAt: Date.now() + 86400000 });
       return 1;
@@ -62,7 +62,7 @@ class InMemoryRateLimitStore {
   }
 
   incrby(key, amount) {
-    const entry = this.store.get(key);
+    let entry = this.store.get(key);
     if (!entry) {
       this.store.set(key, { value: amount, expiresAt: Date.now() + 86400000 });
       return amount;
@@ -72,7 +72,7 @@ class InMemoryRateLimitStore {
   }
 
   expire(key, ttl) {
-    const entry = this.store.get(key);
+    let entry = this.store.get(key);
     if (entry) {
       entry.expiresAt = Date.now() + ttl;
     }
@@ -119,7 +119,7 @@ class SlidingWindowRateLimiter {
   }
 
   async check(identifier) {
-    const now = Date.now();
+    let now = Date.now();
     const key = generateKey('sliding', identifier);
     const windowStart = now - this.windowMs;
 
@@ -170,8 +170,8 @@ class TokenBucketRateLimiter {
   }
 
   async check(identifier) {
-    const now = Date.now();
-    const key = generateKey('tokenbucket', identifier);
+    let now = Date.now();
+    let key = generateKey('tokenbucket', identifier);
     
     const state = this.store.get(key) || {
       tokens: this.capacity,
@@ -224,15 +224,15 @@ class FixedWindowRateLimiter {
   }
 
   async check(identifier) {
-    const now = Date.now();
-    const windowStart = Math.floor(now / this.windowMs) * this.windowMs;
-    const key = generateKey('fixed', `${identifier}:${windowStart}`);
+    let now = Date.now();
+    let windowStart = Math.floor(now / this.windowMs) * this.windowMs;
+    let key = generateKey('fixed', `${identifier}:${windowStart}`);
     
     const count = this.store.incr(key);
     this.store.expire(key, this.windowMs);
 
     if (count > this.max) {
-      const resetTime = windowStart + this.windowMs;
+      let resetTime = windowStart + this.windowMs;
       
       return {
         allowed: false,

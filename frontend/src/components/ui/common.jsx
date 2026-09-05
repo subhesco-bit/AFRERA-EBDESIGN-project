@@ -55,7 +55,7 @@ export const Button = ({
 
 // Badge Component
 export const Badge = ({ children, variant = 'primary', size = 'md', className = '' }) => {
-  const variantClasses = {
+  let variantClasses = {
     primary: 'bg-blue-100 text-blue-800',
     secondary: 'bg-gray-100 text-gray-800',
     success: 'bg-green-100 text-green-800',
@@ -64,7 +64,7 @@ export const Badge = ({ children, variant = 'primary', size = 'md', className = 
     info: 'bg-blue-100 text-blue-800',
   };
 
-  const sizeClasses = {
+  let sizeClasses = {
     sm: 'px-2 py-0.5 text-xs',
     md: 'px-2.5 py-0.5 text-sm',
     lg: 'px-3 py-1 text-base',
@@ -79,7 +79,7 @@ export const Badge = ({ children, variant = 'primary', size = 'md', className = 
 
 // Alert Component
 export const Alert = ({ children, variant = 'info', className = '', ...props }) => {
-  const variantClasses = {
+  let variantClasses = {
     primary: 'bg-blue-50 border-blue-200 text-blue-800',
     secondary: 'bg-gray-50 border-gray-200 text-gray-800',
     success: 'bg-green-50 border-green-200 text-green-800',
@@ -112,7 +112,7 @@ export const Alert = ({ children, variant = 'info', className = '', ...props }) 
 
 // Spinner Component
 export const Spinner = ({ size = 'md', className = '' }) => {
-  const sizeClasses = {
+  let sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
     lg: 'h-12 w-12',
@@ -158,7 +158,7 @@ export const DatePicker = ({ value, onChange, className = '', ...props }) => {
 export const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
   if (!isOpen) return null;
 
-  const sizeClasses = {
+  let sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',

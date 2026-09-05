@@ -217,7 +217,7 @@ router.get('/batch/:batch_id', async (req, res) => {
     const { batch_id } = req.params;
 
     // Placeholder for actual database lookup
-    const batch = {
+    let batch = {
       batch_id,
       product_name: 'Sample Product',
       quantity_kg: 1000,

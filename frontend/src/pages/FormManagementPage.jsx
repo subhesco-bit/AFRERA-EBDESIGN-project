@@ -147,7 +147,7 @@ function FormManagementPage() {
         workflow: draft.workflow || {},
       };
 
-      const response = draft.id ?
+      let response = draft.id ?
         await formsAPI.updateForm(draft.id, payload) :
         await formsAPI.createForm(payload);
 
@@ -174,7 +174,7 @@ function FormManagementPage() {
         ...accumulator,
         [field.label]: field.defaultValue || '',
       }), {});
-      const response = await formsAPI.submitForm(draft.id, { submittedBy: 'demo-user', values });
+      let response = await formsAPI.submitForm(draft.id, { submittedBy: 'demo-user', values });
       setMessage(`Submission recorded with id ${response.data.id}.`);
     } catch (error) {
       setMessage('Submission could not be recorded.');

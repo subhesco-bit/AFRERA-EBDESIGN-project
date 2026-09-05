@@ -185,7 +185,7 @@ async function getChain(shipmentId, verifyHash = true) {
       ORDER BY event_timestamp ASC
     `;
     
-    const result = await pool.query(query, [shipmentId]);
+    let result = await pool.query(query, [shipmentId]);
     const events = result.rows;
     
     if (events.length === 0) {
@@ -284,14 +284,14 @@ async function getChain(shipmentId, verifyHash = true) {
  * @returns {Promise<Object>} Created settlement instruction
  */
 async function issueSettlementInstruction(instructionData) {
-  const client = await pool.connect();
+  let client = await pool.connect();
   try {
     await client.query('BEGIN');
     
     // Generate reference number
     const referenceNumber = `SETTLE-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
     
-    const query = `
+    let query = `
       INSERT INTO settlement_instructions (
         shipment_id, custody_event_id, amount, currency,
         payer_account, payee_account, settlement_type,
@@ -300,7 +300,7 @@ async function issueSettlementInstruction(instructionData) {
       RETURNING *
     `;
     
-    const result = await client.query(query, [
+    let result = await client.query(query, [
       instructionData.shipment_id,
       instructionData.custody_event_id,
       instructionData.amount,
@@ -347,7 +347,7 @@ async function issueSettlementInstruction(instructionData) {
  */
 async function confirmSettlementExecution(instructionId, confirmedBy) {
   try {
-    const query = `
+    let query = `
       UPDATE settlement_instructions
       SET status = 'confirmed',
           confirmed_at = CURRENT_TIMESTAMP,
@@ -356,7 +356,7 @@ async function confirmSettlementExecution(instructionId, confirmedBy) {
       RETURNING *
     `;
     
-    const result = await pool.query(query, [confirmedBy, instructionId]);
+    let result = await pool.query(query, [confirmedBy, instructionId]);
     
     if (result.rows.length === 0) {
       throw new Error(`Settlement instruction not found: ${instructionId}`);
@@ -384,7 +384,7 @@ async function confirmSettlementExecution(instructionId, confirmedBy) {
  */
 async function getSettlementInstruction(instructionId) {
   try {
-    const query = `
+    let query = `
       SELECT si.*, 
              ce.event_type as trigger_event_type,
              ce.event_timestamp as trigger_event_timestamp
@@ -393,7 +393,7 @@ async function getSettlementInstruction(instructionId) {
       WHERE si.instruction_id = $1
     `;
     
-    const result = await pool.query(query, [instructionId]);
+    let result = await pool.query(query, [instructionId]);
     
     if (result.rows.length === 0) {
       throw new Error(`Settlement instruction not found: ${instructionId}`);

@@ -149,7 +149,7 @@ async function updateCattleHealth(registryId, healthData) {
     };
 
     // AI-powered health analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'cattle_health_analysis',
       parameters: {
         registry_id: registryId,
@@ -160,11 +160,11 @@ async function updateCattleHealth(registryId, healthData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     healthRecord.ai_analysis = aiResponse;
 
     // Update database
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE cattle_registry 
        SET health_status = $1, weight = $2, updated_at = CURRENT_TIMESTAMP
        WHERE registry_id = $3
@@ -258,9 +258,9 @@ async function generateRegistryReport(farmerId, reportType) {
  */
 async function getBreedingRecommendations(registryId) {
   try {
-    const cattle = await getCattleDetails(registryId);
+    let cattle = await getCattleDetails(registryId);
     
-    const aiRequest = {
+    let aiRequest = {
       task: 'cattle_breeding_recommendations',
       parameters: {
         cattle_details: cattle,
@@ -271,7 +271,7 @@ async function getBreedingRecommendations(registryId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       registry_id: registryId,
@@ -297,7 +297,7 @@ function generateId() {
 
 async function getBreedCharacteristics(breed) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM cattle_breed_characteristics WHERE breed_name = $1',
       [breed]
     );
@@ -309,7 +309,7 @@ async function getBreedCharacteristics(breed) {
 
 async function getRegionalHealthPatterns(state, district) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM regional_cattle_health_patterns WHERE state = $1 AND district = $2',
       [state, district]
     );
@@ -338,7 +338,7 @@ async function getNutritionalRequirements(breed, purpose) {
 
 async function getCattleHealthHistory(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM cattle_health_records WHERE registry_id = $1 ORDER BY recorded_at DESC LIMIT 10',
       [registryId]
     );
@@ -367,7 +367,7 @@ async function getEnvironmentalFactors(location) {
 
 async function getCattleBreed(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT breed FROM cattle_registry WHERE registry_id = $1',
       [registryId]
     );
@@ -379,7 +379,7 @@ async function getCattleBreed(registryId) {
 
 async function getCattleLocation(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT location, state, district FROM cattle_registry WHERE registry_id = $1',
       [registryId]
     );
@@ -443,7 +443,7 @@ async function generatePerformanceRecommendations(registryId, period) {
 
 async function getCattleCount(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM cattle_registry WHERE farmer_id = $1',
       [farmerId]
     );
@@ -455,7 +455,7 @@ async function getCattleCount(farmerId) {
 
 async function getBreedDistribution(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT breed, COUNT(*) as count FROM cattle_registry WHERE farmer_id = $1 GROUP BY breed',
       [farmerId]
     );
@@ -499,7 +499,7 @@ async function generateFarmerRecommendations(farmerId) {
 
 async function getCattleDetails(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM cattle_registry WHERE registry_id = $1',
       [registryId]
     );

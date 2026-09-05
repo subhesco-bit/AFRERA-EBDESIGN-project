@@ -99,7 +99,7 @@ async function startWorkflow({ workflowCode, entityType, entityId, amount, initi
  * rejection ends the instance and REQUIRES a reason (the DB enforces this too).
  */
 async function actOnWorkflow({ instanceCode, action, actorId, comment, delegatedFrom }) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows: found } = await db.query(
     `SELECT wi.*, ws.step_number, ws.workflow_id
        FROM workflow_instances wi
@@ -157,7 +157,7 @@ async function actOnWorkflow({ instanceCode, action, actorId, comment, delegated
 }
 
 async function listPendingApprovals({ role } = {}) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const params = [];
   let where = '';
   if (role) { params.push(role); where = 'WHERE required_role = $1'; }
@@ -172,7 +172,7 @@ async function listPendingApprovals({ role } = {}) {
 // ===========================================================================
 
 async function createLead(payload) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `INSERT INTO crm_leads
       (lead_code, source, organisation_name, contact_name, email, phone, segment, estimated_value, owner_id)
@@ -190,7 +190,7 @@ async function createLead(payload) {
  * for it is a data lie that quietly inflates conversion metrics.
  */
 async function convertLead({ leadCode, name, amount, probabilityPct, expectedCloseDate, createClient }) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -232,7 +232,7 @@ async function convertLead({ leadCode, name, amount, probabilityPct, expectedClo
 }
 
 async function getPipeline() {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query('SELECT * FROM v_sales_pipeline');
   const weighted = rows.reduce((s, r) => s + Number(r.weighted_value || 0), 0);
   const gross = rows.reduce((s, r) => s + Number(r.gross_value || 0), 0);
@@ -253,7 +253,7 @@ async function getPipeline() {
  * Returns the breakdown alongside the score so a low score can be argued with.
  */
 async function computeClientHealth(clientId) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query('SELECT * FROM clients WHERE id=$1', [clientId]);
   if (rows.length === 0) throw new Error(`Client ${clientId} not found`);
   const c = rows[0];
@@ -294,7 +294,7 @@ async function computeClientHealth(clientId) {
 // ===========================================================================
 
 async function listLegalCalendar({ withinDays = 60 } = {}) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `SELECT * FROM v_legal_calendar
       WHERE due_date <= CURRENT_DATE + ($1 || ' days')::interval
@@ -318,7 +318,7 @@ async function listLegalCalendar({ withinDays = 60 } = {}) {
  * register holding only residual scores cannot show whether controls work.
  */
 async function assessRisk({ riskCode, residualLikelihood, residualImpact, reviewedBy }) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `UPDATE risk_register
         SET residual_likelihood=$2, residual_impact=$3,
@@ -344,7 +344,7 @@ async function assessRisk({ riskCode, residualLikelihood, residualImpact, review
 }
 
 async function getRiskHeatmap() {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query('SELECT * FROM v_risk_heatmap ORDER BY critical DESC, total DESC');
   return rows;
 }
@@ -363,7 +363,7 @@ async function getRiskHeatmap() {
  */
 async function raiseIncident({ typeCode, severity, title, description, affectedEntityType,
   affectedEntityIds, peopleAtRisk, detectedBy }) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
 
   let type = null;
   if (typeCode) {
@@ -424,7 +424,7 @@ async function raiseIncident({ typeCode, severity, title, description, affectedE
 }
 
 async function acknowledgeIncident({ incidentCode, userId }) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `UPDATE emergency_incidents
         SET acknowledged_at=CURRENT_TIMESTAMP, acknowledged_by=$2,
@@ -438,7 +438,7 @@ async function acknowledgeIncident({ incidentCode, userId }) {
 }
 
 async function listActiveIncidents() {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query('SELECT * FROM v_active_incidents');
   // Triage order: life safety, then severity, then age.
   return rows.sort((a, b) =>
@@ -509,7 +509,7 @@ router.get('/legal/calendar', authMiddleware, adminMiddleware, async (req, res) 
 // --- Risk ---
 router.post('/risk/:riskCode/assess', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const data = await assessRisk({
+    let data = await assessRisk({
       riskCode: req.params.riskCode, ...req.body, reviewedBy: req.user?.id
     });
     res.json({ success: true, data });
@@ -527,14 +527,14 @@ router.get('/risk/heatmap', authMiddleware, async (req, res) => {
 // sees the problem first is rarely the person with the highest privilege.
 router.post('/emergency/incidents', authMiddleware, async (req, res) => {
   try {
-    const data = await raiseIncident({ ...req.body, detectedBy: req.user?.id ? 'human' : 'system' });
+    let data = await raiseIncident({ ...req.body, detectedBy: req.user?.id ? 'human' : 'system' });
     res.status(201).json({ success: true, data });
   } catch (e) { return fail(res, e, 'raiseIncident'); }
 });
 
 router.post('/emergency/incidents/:incidentCode/acknowledge', authMiddleware, async (req, res) => {
   try {
-    const data = await acknowledgeIncident({ incidentCode: req.params.incidentCode, userId: req.user?.id });
+    let data = await acknowledgeIncident({ incidentCode: req.params.incidentCode, userId: req.user?.id });
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'acknowledgeIncident'); }
 });

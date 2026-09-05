@@ -58,7 +58,7 @@ class ForestryService {
   async getForestryById(forestryId) {
     try {
       const query = 'SELECT * FROM forestry WHERE id = $1';
-      const result = await this.pool.query(query, [forestryId]);
+      let result = await this.pool.query(query, [forestryId]);
       
       if (result.rows.length === 0) {
         throw new Error('Forestry not found');
@@ -87,13 +87,13 @@ class ForestryService {
         expected_harvest_date
       } = forestryData;
 
-      const query = `
+      let query = `
         INSERT INTO forestry (farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date
       ]);
 
@@ -109,13 +109,13 @@ class ForestryService {
    */
   async getTimberInventory(forestryId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM timber_inventory
         WHERE forestry_id = $1
         ORDER BY inventory_date DESC
       `;
 
-      const result = await this.pool.query(query, [forestryId]);
+      let result = await this.pool.query(query, [forestryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting timber inventory:', error);
@@ -128,13 +128,13 @@ class ForestryService {
    */
   async getPlantationData(forestryId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM plantation_data
         WHERE forestry_id = $1
         ORDER BY assessment_date DESC
       `;
 
-      const result = await this.pool.query(query, [forestryId]);
+      let result = await this.pool.query(query, [forestryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting plantation data:', error);

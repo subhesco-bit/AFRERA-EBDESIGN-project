@@ -73,7 +73,7 @@ function CreateListingForm({ variety, onCreated }) {
   const [basePrice, setBasePrice] = useState('');
   const [error, setError] = useState(null);
 
-  const mutation = useMutation({
+  let mutation = useMutation({
     mutationFn: () => varietyDirectoryAPI.createListing(variety.id, { basePrice: Number(basePrice) }),
     onSuccess: (res) => onCreated(res.data?.data),
     onError: (err) => setError(err.response?.data?.error || err.message),

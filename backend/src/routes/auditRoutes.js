@@ -34,7 +34,7 @@ router.get('/entities/:entityType/:entityId', authMiddleware, adminMiddleware, a
 // Logs for a specific user
 router.get('/users/:userId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const logs = await auditService.getUserLogs(req.params.userId, req.query);
+    let logs = await auditService.getUserLogs(req.params.userId, req.query);
     res.json({ success: true, data: logs });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -55,7 +55,7 @@ router.get('/report', authMiddleware, adminMiddleware, async (req, res) => {
 router.get('/compliance/:complianceType', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { period } = req.query;
-    const report = await auditService.getComplianceAudit(req.params.complianceType, period);
+    let report = await auditService.getComplianceAudit(req.params.complianceType, period);
     res.json({ success: true, data: report });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -65,7 +65,7 @@ router.get('/compliance/:complianceType', authMiddleware, adminMiddleware, async
 // Security audit trail (logins, failed logins, permission denials, etc.)
 router.get('/security', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const report = await auditService.getSecurityAudit(req.query);
+    let report = await auditService.getSecurityAudit(req.query);
     res.json({ success: true, data: report });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

@@ -47,7 +47,7 @@ const DeviceMonitor = ({ devices: devicesProp, alerts: alertsProp }) => {
 
   const fetchAlerts = async () => {
     try {
-      const response = await iotAPI.getUnacknowledgedAlerts();
+      let response = await iotAPI.getUnacknowledgedAlerts();
       setAlerts(response.data);
     } catch (err) {
       console.error('Failed to fetch alerts:', err);
@@ -56,7 +56,7 @@ const DeviceMonitor = ({ devices: devicesProp, alerts: alertsProp }) => {
 
   const fetchSensorData = async (deviceId) => {
     try {
-      const response = await iotAPI.getSensorData(deviceId);
+      let response = await iotAPI.getSensorData(deviceId);
       setSensorData(response.data);
     } catch (err) {
       console.error('Failed to fetch sensor data:', err);

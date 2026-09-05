@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/mushroom/:id - Get mushroom cultivation by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const mushroom = await mushroomService.getMushroomById(req.params.id);
+    let mushroom = await mushroomService.getMushroomById(req.params.id);
     res.json({ success: true, data: mushroom });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/mushroom - Create mushroom cultivation
 router.post('/', authenticate, async (req, res) => {
   try {
-    const mushroom = await mushroomService.createMushroom(req.body);
+    let mushroom = await mushroomService.createMushroom(req.body);
     res.status(201).json({ success: true, data: mushroom });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

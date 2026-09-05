@@ -97,7 +97,7 @@ async function addNotification(notificationData) {
       retry_policy
     } = notificationData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO alert_notifications 
        (notification_id, rule_id, notification_type, notification_config, 
         recipients, priority, retry_policy, is_active, created_at)
@@ -153,7 +153,7 @@ async function createIncident(incidentData) {
     };
 
     // AI-powered incident classification
-    const aiRequest = {
+    let aiRequest = {
       task: 'incident_classification',
       parameters: {
         incident_type: incident_type,
@@ -163,10 +163,10 @@ async function createIncident(incidentData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     incident.ai_classification = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO alert_incidents 
        (incident_id, rule_id, incident_type, severity, status, triggered_value, 
         threshold_value, context_data, description, detected_at)
@@ -202,7 +202,7 @@ async function createIncident(incidentData) {
  */
 async function acknowledgeIncident(incidentId, acknowledgedBy) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE alert_incidents 
        SET status = $1, acknowledged_by = $2, acknowledged_at = $3 
        WHERE incident_id = $4 
@@ -230,7 +230,7 @@ async function acknowledgeIncident(incidentId, acknowledgedBy) {
 async function resolveIncident(incidentId, resolvedBy, resolutionDetails) {
   try {
     const wasFalsePositive = Boolean(resolutionDetails && resolutionDetails.wasFalsePositive);
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE alert_incidents
        SET status = $1, resolved_by = $2, resolved_at = $3, is_false_positive = $4
        WHERE incident_id = $5
@@ -285,7 +285,7 @@ async function getIncidents(filters = {}) {
 
     query += ' ORDER BY detected_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting incidents', { error: error.message });
@@ -306,7 +306,7 @@ async function addEscalation(escalationData) {
       auto_escalate
     } = escalationData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO alert_escalations 
        (escalation_id, rule_id, escalation_level, escalation_config, 
         wait_time_minutes, auto_escalate, is_active, created_at)
@@ -347,7 +347,7 @@ async function createSuppression(suppressionData) {
       created_by
     } = suppressionData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO alert_suppressions 
        (suppression_id, rule_id, suppression_type, suppression_config, 
         start_time, end_time, reason, created_by, status, created_at)
@@ -390,7 +390,7 @@ async function createMaintenanceWindow(windowData) {
       created_by
     } = windowData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO alert_maintenance_windows 
        (window_id, window_name, window_type, start_time, end_time, 
         affected_rules, description, created_by, status, created_at)
@@ -437,7 +437,7 @@ async function calculateAlertStatistics(ruleId, periodType, periodStart, periodE
     const mtr = calculateMeanTimeToResolve(incidents);
     const fpr = calculateFalsePositiveRate(incidents);
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO alert_statistics 
        (stat_id, rule_id, period_type, period_start, period_end, 
         total_incidents, acknowledged_incidents, resolved_incidents, 
@@ -483,7 +483,7 @@ async function getAlertBestPractices(ruleType) {
 
 async function getSimilarRules(ruleType) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM alert_rules WHERE rule_type = $1 LIMIT 5',
       [ruleType]
     );
@@ -495,7 +495,7 @@ async function getSimilarRules(ruleType) {
 
 async function getHistoricalIncidents(ruleId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM alert_incidents WHERE rule_id = $1 ORDER BY detected_at DESC LIMIT 50',
       [ruleId]
     );
@@ -555,7 +555,7 @@ function calculateMeanTimeToAcknowledge(incidents) {
 
   const times = acknowledged.map(i => {
     const detected = new Date(i.detected_at).getTime();
-    const acknowledged = new Date(i.acknowledged_at).getTime();
+    let acknowledged = new Date(i.acknowledged_at).getTime();
     return (acknowledged - detected) / 1000 / 60; // minutes
   });
 
@@ -566,9 +566,9 @@ function calculateMeanTimeToResolve(incidents) {
   const resolved = incidents.filter(i => i.resolved_at && i.detected_at);
   if (resolved.length === 0) return 0;
 
-  const times = resolved.map(i => {
-    const detected = new Date(i.detected_at).getTime();
-    const resolved = new Date(i.resolved_at).getTime();
+  let times = resolved.map(i => {
+    let detected = new Date(i.detected_at).getTime();
+    let resolved = new Date(i.resolved_at).getTime();
     return (resolved - detected) / 1000 / 60; // minutes
   });
 
@@ -581,7 +581,7 @@ function calculateMeanTimeToResolve(incidents) {
  * is no honest rate to report from zero resolutions.
  */
 function calculateFalsePositiveRate(incidents) {
-  const resolved = incidents.filter((i) => i.status === 'resolved');
+  let resolved = incidents.filter((i) => i.status === 'resolved');
   if (resolved.length === 0) return null;
   const falsePositives = resolved.filter((i) => i.is_false_positive === true).length;
   return falsePositives / resolved.length;

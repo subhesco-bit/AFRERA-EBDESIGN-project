@@ -85,7 +85,7 @@ function validateInput(input, context = {}) {
  * Validate AI output
  */
 function validateOutput(output, context = {}) {
-  const violations = [];
+  let violations = [];
   
   // Check text length
   if (typeof output === 'string' && output.length > OUTPUT_RULES.MAX_TEXT_LENGTH) {
@@ -205,7 +205,7 @@ function checkRateLimit(userId, operation) {
  * Apply content policy filters
  */
 function applyContentPolicy(content, policy) {
-  const violations = [];
+  let violations = [];
   
   if (policy.blockProfanity) {
     const profanityPattern = /\b(damn|hell|shit)\b/gi;

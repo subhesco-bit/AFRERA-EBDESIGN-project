@@ -43,13 +43,13 @@ const SystemAdministrationPage = () => {
         const data = await userManagementAPI.getSettings();
         setSettings(data.data);
       } else if (activeTab === 'analytics') {
-        const data = await userManagementAPI.getSystemAnalytics();
+        let data = await userManagementAPI.getSystemAnalytics();
         setAnalytics(data.data);
       } else if (activeTab === 'anomalies') {
-        const data = await userManagementAPI.detectAnomalies();
+        let data = await userManagementAPI.detectAnomalies();
         setAnomalies(data.data);
       } else if (activeTab === 'maintenance') {
-        const data = await userManagementAPI.getPredictiveMaintenance();
+        let data = await userManagementAPI.getPredictiveMaintenance();
         setMaintenance(data.data);
       } else if (activeTab === 'audit') {
         const [logsRes, anomaliesRes] = await Promise.all([

@@ -112,7 +112,7 @@ router.get('/tenants', ...admin, (req, res, next) => {
 // Update tenant
 router.put('/tenants/:id', ...writeAdmin, validId, validateBody(), body, updateBody, async (req, res) => {
   try {
-    const result = await tenantManagementService.updateTenant(req.params.id, req.body);
+    let result = await tenantManagementService.updateTenant(req.params.id, req.body);
     
     // Emit signal for tenant update
     signalBus.emitSignal(SIGNAL.TENANT_UPDATED, {
@@ -135,7 +135,7 @@ router.put('/tenants/:id', ...writeAdmin, validId, validateBody(), body, updateB
 // Delete tenant
 router.delete('/tenants/:id', ...writeAdmin, validId, async (req, res) => {
   try {
-    const result = await tenantManagementService.deleteTenant(req.params.id);
+    let result = await tenantManagementService.deleteTenant(req.params.id);
     
     // Emit signal for tenant deletion
     signalBus.emitSignal(SIGNAL.TENANT_DELETED, {
@@ -194,7 +194,7 @@ router.get('/tenants/:id/recommend-tier', ...admin, validId, async (req, res) =>
 // Optimize tenant cost
 router.post('/tenants/:id/optimize-cost', ...writeAdmin, validId, async (req, res) => {
   try {
-    const optimization = await tenantManagementService.optimizeTenantCost(req.params.id);
+    let optimization = await tenantManagementService.optimizeTenantCost(req.params.id);
     res.json(optimization);
   } catch (error) {
     logger.error('tenantManagementRoutes:optimizeCost', { error: error.message });

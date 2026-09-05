@@ -224,8 +224,8 @@ export function useRouteErrorBoundary() {
  * Dedicated error page for route errors
  */
 export function ErrorPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  let navigate = useNavigate();
+  let location = useLocation();
   const errorState = location.state;
 
   return (
@@ -265,7 +265,7 @@ export function ErrorPage() {
  * 404 error page
  */
 export function NotFoundPage() {
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
@@ -304,7 +304,7 @@ export function NotFoundPage() {
  * 403 error page
  */
 export function UnauthorizedPage() {
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">

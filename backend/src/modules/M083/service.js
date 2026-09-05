@@ -130,7 +130,7 @@ async function getPerformanceMetrics(entityId, entityType, filters = {}) {
 
     query += ' ORDER BY period_start DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting performance metrics', { error: error.message });
@@ -156,7 +156,7 @@ async function generatePerformanceReport(entityId, entityType, reportType, perio
     const overallScore = calculateOverallScore(categoryScores);
 
     // AI-powered insights generation
-    const aiRequest = {
+    let aiRequest = {
       task: 'performance_report_insights',
       parameters: {
         metrics: metrics,
@@ -167,7 +167,7 @@ async function generatePerformanceReport(entityId, entityType, reportType, perio
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const report = {
       report_id: generateId(),
@@ -186,7 +186,7 @@ async function generatePerformanceReport(entityId, entityType, reportType, perio
       generated_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO performance_reports 
        (report_id, entity_id, entity_type, report_type, period_type, period_start, period_end, 
         overall_score, category_scores, metric_details, trend_analysis, insights, recommendations, generated_at)
@@ -223,7 +223,7 @@ async function generatePerformanceReport(entityId, entityType, reportType, perio
  */
 async function analyzePerformanceTrends(entityId, entityType, metricName, periodStart, periodEnd) {
   try {
-    const metrics = await getPerformanceMetrics(entityId, entityType, {
+    let metrics = await getPerformanceMetrics(entityId, entityType, {
       period_start: periodStart,
       period_end: periodEnd
     });
@@ -235,7 +235,7 @@ async function analyzePerformanceTrends(entityId, entityType, metricName, period
     }
 
     // AI-powered trend analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'performance_trend_analysis',
       parameters: {
         metric_name: metricName,
@@ -245,7 +245,7 @@ async function analyzePerformanceTrends(entityId, entityType, metricName, period
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const trend = {
       trend_id: generateId(),
@@ -263,7 +263,7 @@ async function analyzePerformanceTrends(entityId, entityType, metricName, period
       calculated_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO performance_trends 
        (trend_id, entity_id, entity_type, metric_name, trend_type, trend_direction, 
         trend_strength, forecast_value, confidence_level, time_series_data, 
@@ -315,7 +315,7 @@ async function comparePerformance(comparisonData) {
     for (const metric of metrics_to_compare) {
       const metricResults = [];
       for (const entity of comparison_entities) {
-        const metrics = await getPerformanceMetrics(entity.id, entity.type, {
+        let metrics = await getPerformanceMetrics(entity.id, entity.type, {
           metric_category: metric.category
         });
         const latestMetric = metrics[0];
@@ -342,7 +342,7 @@ async function comparePerformance(comparisonData) {
     const opportunities = identifyOpportunities(results, ranking);
 
     // AI-powered comparison insights
-    const aiRequest = {
+    let aiRequest = {
       task: 'performance_comparison_insights',
       parameters: {
         comparison_type: comparison_type,
@@ -352,7 +352,7 @@ async function comparePerformance(comparisonData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const comparison = {
       comparison_id: generateId(),
@@ -370,7 +370,7 @@ async function comparePerformance(comparisonData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO performance_comparisons 
        (comparison_id, entity_id, entity_type, comparison_type, comparison_entities, 
         metrics_compared, results, ranking, gaps, opportunities, comparison_date, created_at)
@@ -419,7 +419,7 @@ async function setPerformanceTarget(targetData) {
       weight
     } = targetData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO performance_targets 
        (target_id, entity_id, entity_type, metric_name, target_value, target_type, 
         stretch_target, baseline_value, period_type, period_start, period_end, weight, status, created_at)
@@ -456,7 +456,7 @@ async function setPerformanceTarget(targetData) {
  */
 async function getPerformanceTargets(entityId, entityType) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM performance_targets WHERE entity_id = $1 AND entity_type = $2 AND status = $3',
       [entityId, entityType, 'active']
     );
@@ -473,7 +473,7 @@ async function getPerformanceTargets(entityId, entityType) {
 async function identifyPerformanceDrivers(entityId, entityType, metrics) {
   try {
     // AI-powered driver identification
-    const aiRequest = {
+    let aiRequest = {
       task: 'performance_driver_identification',
       parameters: {
         metrics: metrics,
@@ -482,11 +482,11 @@ async function identifyPerformanceDrivers(entityId, entityType, metrics) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    const drivers = [];
+    let drivers = [];
     for (const driver of aiResponse.drivers) {
-      const result = await pool.query(
+      let result = await pool.query(
         `INSERT INTO performance_drivers 
          (driver_id, entity_id, entity_type, driver_name, driver_category, 
           impact_score, correlation_coefficient, influence_weight, driver_data, 
@@ -535,7 +535,7 @@ async function createPerformanceAlert(alertData) {
       recommended_actions
     } = alertData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO performance_alerts 
        (alert_id, entity_id, entity_type, metric_name, alert_type, severity, 
         current_value, threshold_value, message, recommended_actions, triggered_at)
@@ -571,7 +571,7 @@ async function getPerformanceAlerts(entityId, entityType, filters = {}) {
   try {
     const { is_resolved } = filters;
     let query = 'SELECT * FROM performance_alerts WHERE entity_id = $1 AND entity_type = $2';
-    const params = [entityId, entityType];
+    let params = [entityId, entityType];
     let paramCount = 2;
 
     if (is_resolved !== undefined) {
@@ -582,7 +582,7 @@ async function getPerformanceAlerts(entityId, entityType, filters = {}) {
 
     query += ' ORDER BY triggered_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting performance alerts', { error: error.message });
@@ -597,7 +597,7 @@ function generateId() {
 
 async function getHistoricalPerformance(entityId, metricName) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT metric_value, period_start FROM performance_metrics WHERE entity_id = $1 AND metric_name = $2 ORDER BY period_start DESC LIMIT 12',
       [entityId, metricName]
     );
@@ -609,7 +609,7 @@ async function getHistoricalPerformance(entityId, metricName) {
 
 async function getIndustryBenchmarks(metricName) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM performance_benchmarks WHERE metric_name = $1 AND status = $2',
       [metricName, 'active']
     );
@@ -629,7 +629,7 @@ async function getPerformanceContext(entityId, entityType) {
 }
 
 async function getRelevantBenchmarks(metrics) {
-  const benchmarks = {};
+  let benchmarks = {};
   for (const metric of metrics) {
     benchmarks[metric.metric_name] = await getIndustryBenchmarks(metric.metric_name);
   }
@@ -637,7 +637,7 @@ async function getRelevantBenchmarks(metrics) {
 }
 
 async function analyzeTrends(entityId, entityType, metrics) {
-  const trends = {};
+  let trends = {};
   for (const metric of metrics) {
     trends[metric.metric_name] = {
       direction: 'increasing',
@@ -667,7 +667,7 @@ function calculateCategoryScores(metrics) {
 }
 
 function calculateOverallScore(categoryScores) {
-  const scores = Object.values(categoryScores);
+  let scores = Object.values(categoryScores);
   if (scores.length === 0) return 0;
   return scores.reduce((a, b) => a + b, 0) / scores.length;
 }
@@ -688,9 +688,9 @@ async function getExternalFactors(entityId, entityType) {
 }
 
 function calculatePerformanceGaps(results) {
-  const gaps = {};
+  let gaps = {};
   Object.keys(results).forEach(metricName => {
-    const values = results[metricName];
+    let values = results[metricName];
     const max = Math.max(...values.map(v => v.value));
     const min = Math.min(...values.map(v => v.value));
     gaps[metricName] = {

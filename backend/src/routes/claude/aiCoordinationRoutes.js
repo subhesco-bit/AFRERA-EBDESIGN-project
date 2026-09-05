@@ -27,7 +27,7 @@ router.get('/ai-capability', (req, res) => {
 
 router.post('/coordinate-ai', async (req, res) => {
   try {
-    const result = await originalService.coordinateAIRequest(req.body.requestType, req.body.query, req.body.context);
+    let result = await originalService.coordinateAIRequest(req.body.requestType, req.body.query, req.body.context);
     res.json({ success: true, ai_enhanced: false, result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message, ai_enhanced: false });

@@ -70,13 +70,13 @@ async function listExaminations({ page = 1, limit = 50, animal_type = null, heal
 }
 
 async function createExamination(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { animal_type, animal_id, examination_date, examination_type, health_status, body_temperature_c, heart_rate_bpm, respiratory_rate_bpm, findings, examiner_name, notes } = payload || {};
   if (!animal_type || !animal_id || !examination_date || !examination_type || !health_status) {
     throw new Error('animal_type, animal_id, examination_date, examination_type and health_status are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO animal_health_examinations (animal_type, animal_id, examination_date, examination_type, health_status, body_temperature_c, heart_rate_bpm, respiratory_rate_bpm, findings, examiner_name, notes)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      RETURNING *`,
@@ -86,10 +86,10 @@ async function createExamination(payload) {
 }
 
 async function updateExamination(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { health_status, body_temperature_c, heart_rate_bpm, respiratory_rate_bpm, findings, examiner_name, notes } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE animal_health_examinations SET
        health_status = COALESCE($1, health_status),
        body_temperature_c = COALESCE($2, body_temperature_c),
@@ -106,9 +106,9 @@ async function updateExamination(id, payload) {
 }
 
 async function deleteExamination(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM animal_health_examinations WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM animal_health_examinations WHERE id = $1 RETURNING id', [id]);
   return res.rows[0] || null;
 }
 
@@ -117,9 +117,9 @@ async function deleteExamination(id) {
 // ---------------------------------------------------------------------
 
 async function listTreatments({ page = 1, limit = 50, animal_type = null } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
+  let offset = (Number(page) - 1) * Number(limit);
   
   let query = 'SELECT COUNT(*) FROM animal_treatments';
   let countParams = [];
@@ -134,11 +134,11 @@ async function listTreatments({ page = 1, limit = 50, animal_type = null } = {})
     query += ' WHERE ' + conditions.join(' AND ');
   }
   
-  const totalRes = await pg.query(query, countParams);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
+  let totalRes = await pg.query(query, countParams);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
   
   query = 'SELECT * FROM animal_treatments';
-  const params = [limit, offset];
+  let params = [limit, offset];
   
   if (conditions.length > 0) {
     query += ' WHERE animal_type = $3';
@@ -146,18 +146,18 @@ async function listTreatments({ page = 1, limit = 50, animal_type = null } = {})
   }
   query += ' ORDER BY treatment_date DESC LIMIT $1 OFFSET $2';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
 
 async function createTreatment(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { animal_type, animal_id, treatment_date, medication_name, dosage, administration_route, prescribing_vet, diagnosis, notes } = payload || {};
   if (!animal_type || !animal_id || !treatment_date || !medication_name) {
     throw new Error('animal_type, animal_id, treatment_date and medication_name are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO animal_treatments (animal_type, animal_id, treatment_date, medication_name, dosage, administration_route, prescribing_vet, diagnosis, notes)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
      RETURNING *`,
@@ -167,10 +167,10 @@ async function createTreatment(payload) {
 }
 
 async function updateTreatment(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { medication_name, dosage, administration_route, prescribing_vet, diagnosis, notes } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE animal_treatments SET
        medication_name = COALESCE($1, medication_name),
        dosage = COALESCE($2, dosage),
@@ -186,9 +186,9 @@ async function updateTreatment(id, payload) {
 }
 
 async function deleteTreatment(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM animal_treatments WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM animal_treatments WHERE id = $1 RETURNING id', [id]);
   return res.rows[0] || null;
 }
 
@@ -197,9 +197,9 @@ async function deleteTreatment(id) {
 // ---------------------------------------------------------------------
 
 async function listOutbreaks({ page = 1, limit = 50, status = null, affected_animal_type = null } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
+  let offset = (Number(page) - 1) * Number(limit);
   
   let query = 'SELECT COUNT(*) FROM disease_outbreaks';
   let countParams = [];
@@ -218,11 +218,11 @@ async function listOutbreaks({ page = 1, limit = 50, status = null, affected_ani
     query += ' WHERE ' + conditions.join(' AND ');
   }
   
-  const totalRes = await pg.query(query, countParams);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
+  let totalRes = await pg.query(query, countParams);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
   
   query = 'SELECT * FROM disease_outbreaks';
-  const params = [limit, offset];
+  let params = [limit, offset];
   
   if (conditions.length > 0) {
     query += ' WHERE ' + conditions.map((c, i) => c.replace(/\$\d+/, '$' + (i + 3))).join(' AND ');
@@ -231,18 +231,18 @@ async function listOutbreaks({ page = 1, limit = 50, status = null, affected_ani
   }
   query += ' ORDER BY start_date DESC LIMIT $1 OFFSET $2';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
 
 async function createOutbreak(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { outbreak_name, disease_name, start_date, affected_animal_type, severity, affected_count, deaths_count, containment_measures, reported_by, notes } = payload || {};
   if (!outbreak_name || !disease_name || !start_date || !affected_animal_type || !severity) {
     throw new Error('outbreak_name, disease_name, start_date, affected_animal_type and severity are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO disease_outbreaks (outbreak_name, disease_name, start_date, affected_animal_type, severity, affected_count, deaths_count, containment_measures, reported_by, notes)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING *`,
@@ -252,10 +252,10 @@ async function createOutbreak(payload) {
 }
 
 async function updateOutbreak(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { end_date, affected_count, deaths_count, containment_measures, status, notes } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE disease_outbreaks SET
        end_date = COALESCE($1, end_date),
        affected_count = COALESCE($2, affected_count),
@@ -272,9 +272,9 @@ async function updateOutbreak(id, payload) {
 }
 
 async function deleteOutbreak(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM disease_outbreaks WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM disease_outbreaks WHERE id = $1 RETURNING id', [id]);
   return res.rows[0] || null;
 }
 
@@ -283,9 +283,9 @@ async function deleteOutbreak(id) {
 // ---------------------------------------------------------------------
 
 async function listQuarantines({ page = 1, limit = 50, status = null, animal_type = null } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
+  let offset = (Number(page) - 1) * Number(limit);
   
   let query = 'SELECT COUNT(*) FROM quarantine_records';
   let countParams = [];
@@ -304,11 +304,11 @@ async function listQuarantines({ page = 1, limit = 50, status = null, animal_typ
     query += ' WHERE ' + conditions.join(' AND ');
   }
   
-  const totalRes = await pg.query(query, countParams);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
+  let totalRes = await pg.query(query, countParams);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
   
   query = 'SELECT * FROM quarantine_records';
-  const params = [limit, offset];
+  let params = [limit, offset];
   
   if (conditions.length > 0) {
     query += ' WHERE ' + conditions.map((c, i) => c.replace(/\$\d+/, '$' + (i + 3))).join(' AND ');
@@ -317,18 +317,18 @@ async function listQuarantines({ page = 1, limit = 50, status = null, animal_typ
   }
   query += ' ORDER BY quarantine_start_date DESC LIMIT $1 OFFSET $2';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
 
 async function createQuarantine(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { animal_type, animal_id, quarantine_start_date, reason, quarantine_type, location, notes } = payload || {};
   if (!animal_type || !animal_id || !quarantine_start_date || !reason || !quarantine_type) {
     throw new Error('animal_type, animal_id, quarantine_start_date, reason and quarantine_type are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO quarantine_records (animal_type, animal_id, quarantine_start_date, reason, quarantine_type, location, notes)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
@@ -338,10 +338,10 @@ async function createQuarantine(payload) {
 }
 
 async function updateQuarantine(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { quarantine_end_date, status, notes } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE quarantine_records SET
        quarantine_end_date = COALESCE($1, quarantine_end_date),
        status = COALESCE($2, status),
@@ -355,9 +355,9 @@ async function updateQuarantine(id, payload) {
 }
 
 async function deleteQuarantine(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM quarantine_records WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM quarantine_records WHERE id = $1 RETURNING id', [id]);
   return res.rows[0] || null;
 }
 
@@ -366,7 +366,7 @@ async function deleteQuarantine(id) {
 // ---------------------------------------------------------------------
 
 async function getHealthOverview() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const examRes = await pg.query(
@@ -438,7 +438,7 @@ async function getHealthOverview() {
 // ---------------------------------------------------------------------
 
 async function getActiveOutbreaks() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(
@@ -477,19 +477,19 @@ async function getActiveOutbreaks() {
 // ---------------------------------------------------------------------
 
 async function getActiveQuarantines() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(
       `SELECT * FROM quarantine_records WHERE status = 'active' ORDER BY quarantine_start_date DESC`
     );
 
-    const today = new Date();
-    const msPerDay = 24 * 60 * 60 * 1000;
-    const daysBetween = (from, to) => Math.round((to.getTime() - from.getTime()) / msPerDay);
+    let today = new Date();
+    let msPerDay = 24 * 60 * 60 * 1000;
+    let daysBetween = (from, to) => Math.round((to.getTime() - from.getTime()) / msPerDay);
 
-    const enriched = rows.map((quarantine) => {
-      const startDate = new Date(quarantine.quarantine_start_date);
+    let enriched = rows.map((quarantine) => {
+      let startDate = new Date(quarantine.quarantine_start_date);
       const daysInQuarantine = daysBetween(startDate, today);
       const isOverdue = quarantine.quarantine_end_date && daysBetween(new Date(quarantine.quarantine_end_date), today) < 0;
 

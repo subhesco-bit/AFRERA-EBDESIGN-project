@@ -155,8 +155,8 @@ class InsurancePolicyIssuanceService {
    * Calculate seasonal payment schedule
    */
   calculateSeasonalSchedule(premiumAmount, startDate) {
-    const installmentAmount = premiumAmount / 2;
-    const schedule = [];
+    let installmentAmount = premiumAmount / 2;
+    let schedule = [];
 
     // First installment
     schedule.push({
@@ -184,14 +184,14 @@ class InsurancePolicyIssuanceService {
    */
   async updateQuoteStatus(quoteId, status) {
     try {
-      const query = `
+      let query = `
         UPDATE insurance_quotes
         SET status = $1, updated_at = NOW()
         WHERE id = $2
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [status, quoteId]);
+      let result = await this.pool.query(query, [status, quoteId]);
       return result.rows[0];
     } catch (error) {
       logger.error('Error updating quote status', { error: error.message, stack: error.stack });
@@ -222,7 +222,7 @@ class InsurancePolicyIssuanceService {
         params.push(userId);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       if (result.rows.length === 0) {
         throw new Error('Policy not found');
@@ -240,7 +240,7 @@ class InsurancePolicyIssuanceService {
    */
   async getPolicyByNumber(policyNumber) {
     try {
-      const query = `
+      let query = `
         SELECT 
           ip.*,
           u.name as policyholder_name,
@@ -250,7 +250,7 @@ class InsurancePolicyIssuanceService {
         WHERE ip.policy_number = $1
       `;
 
-      const result = await this.pool.query(query, [policyNumber]);
+      let result = await this.pool.query(query, [policyNumber]);
 
       if (result.rows.length === 0) {
         throw new Error('Policy not found');
@@ -276,7 +276,7 @@ class InsurancePolicyIssuanceService {
         WHERE ip.policyholder_id = $1
       `;
 
-      const params = [userId];
+      let params = [userId];
       let paramCount = 1;
 
       if (insuranceType) {
@@ -302,7 +302,7 @@ class InsurancePolicyIssuanceService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return {
         policies: result.rows,
@@ -331,7 +331,7 @@ class InsurancePolicyIssuanceService {
         throw new Error('Only active policies can be renewed');
       }
 
-      const query = `
+      let query = `
         UPDATE insurance_policies
         SET 
           end_date = $1,
@@ -343,7 +343,7 @@ class InsurancePolicyIssuanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         endDate,
         premiumAmount,
         paymentReference,
@@ -363,7 +363,7 @@ class InsurancePolicyIssuanceService {
    */
   async cancelPolicy(policyId, userId, reason) {
     try {
-      const policy = await this.getPolicy(policyId, userId);
+      let policy = await this.getPolicy(policyId, userId);
 
       if (policy.status !== 'active') {
         throw new Error('Only active policies can be cancelled');
@@ -372,7 +372,7 @@ class InsurancePolicyIssuanceService {
       // Calculate refund
       const refundAmount = this.calculateRefund(policy);
 
-      const query = `
+      let query = `
         UPDATE insurance_policies
         SET 
           status = 'cancelled',
@@ -383,7 +383,7 @@ class InsurancePolicyIssuanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [reason, refundAmount, policyId]);
+      let result = await this.pool.query(query, [reason, refundAmount, policyId]);
 
       logger.info(`Policy ${policy.policy_number} cancelled`);
       return {
@@ -409,7 +409,7 @@ class InsurancePolicyIssuanceService {
 
     // Pro-rata refund based on remaining days
     const refundRatio = daysRemaining / totalDays;
-    const refundAmount = policy.premium_amount * refundRatio * 0.8; // 80% of pro-rata
+    let refundAmount = policy.premium_amount * refundRatio * 0.8; // 80% of pro-rata
 
     return refundAmount.toFixed(2);
   }
@@ -421,7 +421,7 @@ class InsurancePolicyIssuanceService {
     const { amount, paymentMethod, reference, transactionId } = paymentData;
 
     try {
-      const policy = await this.getPolicy(policyId, null, true);
+      let policy = await this.getPolicy(policyId, null, true);
       let paymentSchedule;
       try {
         paymentSchedule = JSON.parse(policy.payment_schedule);
@@ -447,7 +447,7 @@ class InsurancePolicyIssuanceService {
       // Check if all installments are paid
       const allPaid = paymentSchedule.every(i => i.status === 'paid');
 
-      const query = `
+      let query = `
         UPDATE insurance_policies
         SET 
           payment_schedule = $1,
@@ -457,7 +457,7 @@ class InsurancePolicyIssuanceService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         JSON.stringify(paymentSchedule),
         amount,
         allPaid,
@@ -477,13 +477,13 @@ class InsurancePolicyIssuanceService {
    */
   async getPolicyDocuments(policyId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM policy_documents
         WHERE policy_id = $1
         ORDER BY created_at DESC
       `;
 
-      const result = await this.pool.query(query, [policyId]);
+      let result = await this.pool.query(query, [policyId]);
 
       return result.rows;
     } catch (error) {
@@ -499,14 +499,14 @@ class InsurancePolicyIssuanceService {
     const { documentType, fileName, fileUrl, fileSize } = documentData;
 
     try {
-      const query = `
+      let query = `
         INSERT INTO policy_documents 
         (policy_id, document_type, file_name, file_url, file_size)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         policyId,
         documentType,
         fileName,

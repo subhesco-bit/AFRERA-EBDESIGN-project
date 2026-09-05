@@ -27,7 +27,7 @@ router.get('/ai-capability', (req, res) => {
 
 router.post('/assess-risk', async (req, res) => {
   try {
-    const result = await originalService.assessRisk(req.body);
+    let result = await originalService.assessRisk(req.body);
     res.json({ success: true, ai_enhanced: false, result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message, ai_enhanced: false });

@@ -71,7 +71,7 @@ class PaymentService {
       const cached = await cacheService.get(`wallet:${userId}:balance`);
       if (cached) return cached;
 
-      const result = await database().query(
+      let result = await database().query(
         'SELECT balance FROM wallets WHERE user_id = $1',
         [userId]
       );
@@ -134,7 +134,7 @@ class PaymentService {
   // Record transaction
   async recordTransaction(userId, amount, gateway, transactionId) {
     try {
-      const result = await database().query(
+      let result = await database().query(
         `INSERT INTO transactions
          (user_id, amount, gateway, transaction_id, status, created_at)
          VALUES ($1, $2, $3, $4, $5, NOW())
@@ -153,7 +153,7 @@ class PaymentService {
   // Update wallet balance
   async updateBalance(userId, amount) {
     try {
-      const result = await database().query(
+      let result = await database().query(
         'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2 RETURNING *',
         [amount, userId]
       );
@@ -201,10 +201,10 @@ class PaymentService {
   // Get transaction history
   async getTransactionHistory(userId, limit = 50) {
     try {
-      const cached = await cacheService.get(`transactions:${userId}:history`);
+      let cached = await cacheService.get(`transactions:${userId}:history`);
       if (cached) return cached;
 
-      const result = await database().query(
+      let result = await database().query(
         `SELECT * FROM transactions WHERE user_id = $1
          ORDER BY created_at DESC LIMIT $2`,
         [userId, limit]

@@ -20,7 +20,7 @@ class SupplyChainTrackingService {
 
   async trackShipment(shipmentId) {
     try {
-      const shipment = await db('shipments').where('id', shipmentId).first();
+      let shipment = await db('shipments').where('id', shipmentId).first();
       if (!shipment) throw new NotFoundError('Shipment not found');
 
       const events = await db('tracking_events').where('shipment_id', shipmentId).orderBy('created_at');

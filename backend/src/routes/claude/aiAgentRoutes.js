@@ -27,7 +27,7 @@ router.get('/ai-capability', (req, res) => {
 
 router.post('/process-task', async (req, res) => {
   try {
-    const result = await originalService.processAgentTask(req.body.agentType, req.body.task, req.body.context);
+    let result = await originalService.processAgentTask(req.body.agentType, req.body.task, req.body.context);
     res.json({ success: true, ai_enhanced: false, result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message, ai_enhanced: false });

@@ -49,10 +49,10 @@ router.post('/unified', authMiddleware, async (req, res) => {
 router.post('/conversational', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    const userId = req.user.id;
-    const sessionId = req.sessionID || req.headers['x-session-id'];
+    let userId = req.user.id;
+    let sessionId = req.sessionID || req.headers['x-session-id'];
 
-    const aiRequest = {
+    let aiRequest = {
       requestType: 'conversational',
       query,
       context: context || {},
@@ -61,7 +61,7 @@ router.post('/conversational', authMiddleware, async (req, res) => {
       agentPreference: 'farmer-advisor'
     };
 
-    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
@@ -83,10 +83,10 @@ router.post('/conversational', authMiddleware, async (req, res) => {
 router.post('/analytical', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    const userId = req.user.id;
-    const sessionId = req.sessionID || req.headers['x-session-id'];
+    let userId = req.user.id;
+    let sessionId = req.sessionID || req.headers['x-session-id'];
 
-    const aiRequest = {
+    let aiRequest = {
       requestType: 'analytical',
       query,
       context: context || {},
@@ -95,7 +95,7 @@ router.post('/analytical', authMiddleware, async (req, res) => {
       agentPreference: 'business-analyst'
     };
 
-    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
@@ -117,10 +117,10 @@ router.post('/analytical', authMiddleware, async (req, res) => {
 router.post('/automation', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    const userId = req.user.id;
-    const sessionId = req.sessionID || req.headers['x-session-id'];
+    let userId = req.user.id;
+    let sessionId = req.sessionID || req.headers['x-session-id'];
 
-    const aiRequest = {
+    let aiRequest = {
       requestType: 'automation',
       query,
       context: context || {},
@@ -129,7 +129,7 @@ router.post('/automation', authMiddleware, async (req, res) => {
       agentPreference: 'operations-manager'
     };
 
-    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
@@ -151,10 +151,10 @@ router.post('/automation', authMiddleware, async (req, res) => {
 router.post('/governance', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    const userId = req.user.id;
-    const sessionId = req.sessionID || req.headers['x-session-id'];
+    let userId = req.user.id;
+    let sessionId = req.sessionID || req.headers['x-session-id'];
 
-    const aiRequest = {
+    let aiRequest = {
       requestType: 'monitoring',
       query,
       context: context || {},
@@ -163,7 +163,7 @@ router.post('/governance', authMiddleware, async (req, res) => {
       agentPreference: 'governance-agent'
     };
 
-    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
@@ -282,7 +282,7 @@ router.get('/agents', authMiddleware, async (req, res) => {
  */
 router.get('/usage', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     const { startDate, endDate } = req.query;
 
     // This would query the ai_usage_tracking table

@@ -115,7 +115,7 @@ export const EnhancedBadge = ({
   pulse = false,
   className = '',
 }) => {
-  const variantClasses = {
+  let variantClasses = {
     primary: 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300',
     secondary: 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 border border-gray-300',
     success: 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300',
@@ -124,7 +124,7 @@ export const EnhancedBadge = ({
     info: 'bg-gradient-to-r from-cyan-100 to-cyan-200 text-cyan-800 border border-cyan-300',
   };
 
-  const sizeClasses = {
+  let sizeClasses = {
     sm: 'px-3 py-1 text-xs',
     md: 'px-4 py-1.5 text-sm',
     lg: 'px-5 py-2 text-base',
@@ -160,7 +160,7 @@ export const EnhancedAlert = ({
     if (onDismiss) onDismiss();
   };
 
-  const variantClasses = {
+  let variantClasses = {
     primary: 'bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 text-blue-800',
     secondary: 'bg-gradient-to-r from-gray-50 to-gray-100 border-l-4 border-gray-500 text-gray-800',
     success: 'bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 text-green-800',
@@ -340,7 +340,7 @@ export const EnhancedModal = ({
   size = 'md',
   className = '',
 }) => {
-  const sizeClasses = {
+  let sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
@@ -506,7 +506,7 @@ export const EnhancedToast = ({
     warning: 'bg-yellow-500',
   };
 
-  const icons = {
+  let icons = {
     info: 'ℹ️',
     success: '✅',
     error: '❌',

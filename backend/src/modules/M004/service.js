@@ -86,7 +86,7 @@ async function createOrganization(orgData) {
  */
 async function getOrganization(orgId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM organizations WHERE org_id = $1',
       [orgId]
     );
@@ -107,7 +107,7 @@ async function getOrganization(orgId) {
  */
 async function updateOrganization(orgId, updates) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE organizations 
        SET org_name = COALESCE($1, org_name),
            org_type = COALESCE($2, org_type),
@@ -169,7 +169,7 @@ async function listOrganizations(filters) {
       params.push(offset);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
 
     return {
       total: result.rows.length,

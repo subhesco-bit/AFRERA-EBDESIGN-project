@@ -83,7 +83,7 @@ async function getFarmerAlerts(req, res) {
 
 async function markAlertAsRead(req, res) {
   try {
-    const result = await service.markAlertAsRead(req.params.alertId);
+    let result = await service.markAlertAsRead(req.params.alertId);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('markAlertAsRead error', { error: error.message });

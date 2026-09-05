@@ -28,7 +28,7 @@ router.get('/ai-capability', (req, res) => {
 router.get('/products', async (req, res) => {
   try {
     const { filters, pagination } = req.query;
-    const result = await originalService.getProducts(filters, pagination);
+    let result = await originalService.getProducts(filters, pagination);
     res.json({ success: true, ai_enhanced: false, result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message, ai_enhanced: false });

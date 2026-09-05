@@ -123,7 +123,7 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
     };
 
     // AI-powered repair optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'repair_optimization',
       parameters: {
         repair_data: repairData,
@@ -134,7 +134,7 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     repair.ai_optimization = aiResponse;
 
     await pool.query(
@@ -144,7 +144,7 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
       [breakdownId]
     );
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO emergency_repairs 
        (repair_id, breakdown_id, technician_id, estimated_arrival, priority, 
         required_parts, estimated_cost, repair_notes, status, ai_optimization, created_at)
@@ -228,7 +228,7 @@ function generateId() {
 
 async function getEquipmentHistory(equipmentId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM equipment_breakdowns WHERE equipment_id = $1 ORDER BY breakdown_date DESC LIMIT 5',
       [equipmentId]
     );
@@ -305,7 +305,7 @@ async function getRepairEstimates(equipmentType, severity) {
 
 async function getBreakdownDetails(breakdownId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1',
       [breakdownId]
     );
@@ -394,7 +394,7 @@ async function generateDowntimeRecommendations(equipmentId, period) {
 
 async function getTotalBreakdowns(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM equipment_breakdowns WHERE farmer_id = $1',
       [farmerId]
     );
@@ -406,7 +406,7 @@ async function getTotalBreakdowns(farmerId) {
 
 async function getBreakdownByType(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT equipment_type, COUNT(*) as count FROM equipment_breakdowns WHERE farmer_id = $1 GROUP BY equipment_type',
       [farmerId]
     );
@@ -472,7 +472,7 @@ async function listBreakdowns({ page = 1, limit = 20, farmer_id = null, status =
 }
 
 async function getBreakdown(id) {
-  const res = await pool.query('SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1', [id]);
   return res.rows[0] || null;
 }
 

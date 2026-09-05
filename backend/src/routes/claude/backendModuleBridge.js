@@ -82,13 +82,13 @@ async function handle(req, res) {
 }
 
 router.get('/:moduleId/contract', rateLimiters.api, authMiddleware, (req, res) => {
-  const mod = loadModule(req.params.moduleId);
+  let mod = loadModule(req.params.moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${req.params.moduleId}` });
   res.json({ success: true, data: buildModuleContract(req.params.moduleId, mod) });
 });
 
 router.post('/:moduleId/ai-advisory', rateLimiters.api, authMiddleware, async (req, res) => {
-  const mod = loadModule(req.params.moduleId);
+  let mod = loadModule(req.params.moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${req.params.moduleId}` });
   const contract = buildModuleContract(req.params.moduleId, mod);
   if (!req.body?.question || typeof req.body.question !== 'string' || req.body.question.length > 4000) {
@@ -110,11 +110,11 @@ router.post('/:moduleId/ai-advisory', rateLimiters.api, authMiddleware, async (r
 
 router.post('/:moduleId/ai-decision', rateLimiters.api, authMiddleware, async (req, res) => {
   const { moduleId } = req.params;
-  const mod = loadModule(moduleId);
+  let mod = loadModule(moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${moduleId}` });
 
   const { question, operation, context } = req.body || {};
-  const contract = buildModuleContract(moduleId, mod);
+  let contract = buildModuleContract(moduleId, mod);
   const operationExists = operation === undefined || (
     typeof operation === 'string' && typeof mod[operation] === 'function'
   );
@@ -168,7 +168,7 @@ router.delete('/:moduleId/:operation', rateLimiters.api, authMiddleware, handle)
 // Lists which operations actually exist on a module - lets a frontend page
 // discover real function names instead of guessing.
 router.get('/:moduleId', rateLimiters.api, authMiddleware, (req, res) => {
-  const mod = loadModule(req.params.moduleId);
+  let mod = loadModule(req.params.moduleId);
   if (!mod) return res.status(404).json({ success: false, error: `No backend module found for ${req.params.moduleId}` });
   res.json({ success: true, operations: Object.keys(mod).filter(k => typeof mod[k] === 'function') });
 });

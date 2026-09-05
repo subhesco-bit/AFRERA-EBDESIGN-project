@@ -134,7 +134,7 @@ function getCreditAccount(transactionType) {
  * Generate GST invoice for marketplace order
  */
 async function generateGSTInvoice(orderId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get order details
@@ -292,7 +292,7 @@ function getGSTRate(hsnCode) {
  * Sync marketplace inventory with ERP warehouse
  */
 async function syncInventoryWithERP(productId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get marketplace inventory
@@ -378,7 +378,7 @@ async function syncInventoryWithERP(productId) {
  * Create purchase order for marketplace listing
  */
 async function createPurchaseOrder(listingId, quantity) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get listing details
@@ -396,7 +396,7 @@ async function createPurchaseOrder(listingId, quantity) {
       throw new Error('Listing not found');
     }
     
-    const product = listing.rows[0];
+    let product = listing.rows[0];
     
     // Generate PO number
     const poNumber = `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}`;
@@ -454,7 +454,7 @@ async function createPurchaseOrder(listingId, quantity) {
  * Sync marketplace customer with CRM
  */
 async function syncCustomerWithCRM(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get user details
@@ -551,11 +551,11 @@ function calculateCustomerTier(activity) {
  * Create production order based on marketplace demand
  */
 async function createProductionOrder(productId, demandQuantity) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get product details
-    const product = await pg.query(`
+    let product = await pg.query(`
       SELECT id, product_name, category_id, seller_id
       FROM product_listings
       WHERE id = $1
@@ -566,7 +566,7 @@ async function createProductionOrder(productId, demandQuantity) {
     }
     
     // Generate production order number
-    const poNumber = `PRD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}`;
+    let poNumber = `PRD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000000)).padStart(6, '0')}`;
     
     // Calculate production requirements
     const productionOrder = {

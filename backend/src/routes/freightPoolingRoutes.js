@@ -40,7 +40,7 @@ router.get('/windows', authMiddleware, async (req, res) => {
 
 router.get('/windows/:windowId', authMiddleware, async (req, res) => {
   try {
-    const window = await freightPoolingService.getPoolWindow(req.params.windowId);
+    let window = await freightPoolingService.getPoolWindow(req.params.windowId);
     res.json({ success: true, data: window });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -58,7 +58,7 @@ router.post('/windows/:windowId/join', authMiddleware, async (req, res) => {
 
 router.post('/windows/:windowId/dispatch', authMiddleware, async (req, res) => {
   try {
-    const window = await freightPoolingService.closeAndDispatch(req.params.windowId);
+    let window = await freightPoolingService.closeAndDispatch(req.params.windowId);
     res.json({ success: true, data: window });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

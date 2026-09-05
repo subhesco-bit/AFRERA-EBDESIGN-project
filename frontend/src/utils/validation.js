@@ -287,14 +287,14 @@ const validators = {
    * Postal code validator
    */
   postalCode: (countryCode = 'US') => {
-    const patterns = {
+    let patterns = {
       US: /^\d{5}(-\d{4})?$/,
       UK: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/,
       IN: /^\d{6}$/,
     };
 
     return (value) => {
-      const pattern = patterns[countryCode] || patterns.US;
+      let pattern = patterns[countryCode] || patterns.US;
       if (!pattern.test(value)) {
         return 'Please enter a valid postal code';
       }

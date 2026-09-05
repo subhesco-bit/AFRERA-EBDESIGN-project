@@ -119,7 +119,7 @@ export default function ProjectSystemsPage() {
   const loadBudgetVsActual = useCallback(async (projectId) => {
     if (!projectId) { setBudgetVsActual(null); return; }
     try {
-      const res = await projectSystemsAPI.getProjectBudgetVsActual(projectId);
+      let res = await projectSystemsAPI.getProjectBudgetVsActual(projectId);
       setBudgetVsActual(res.data?.data || null);
     } catch (err) {
       setBudgetVsActual({ error: err.response?.data?.error || err.message });

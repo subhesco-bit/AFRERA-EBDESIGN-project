@@ -77,7 +77,7 @@ function sanitizeBody(body) {
     'private_key',
     'auth_code'
   ];
-  const sanitized = { ...body };
+  let sanitized = { ...body };
   
   for (const field of sensitiveFields) {
     if (sanitized[field]) {
@@ -95,7 +95,7 @@ function sanitizeQuery(query) {
   if (!query) return null;
   
   const sensitiveParams = ['token', 'key', 'secret', 'password', 'auth'];
-  const sanitized = { ...query };
+  let sanitized = { ...query };
   
   for (const param of sensitiveParams) {
     if (sanitized[param]) {
@@ -279,8 +279,8 @@ function requestLogger(req, res, next) {
  * Detailed error logging middleware (use after error handler)
  */
 function errorLogger(error, req, res, next) {
-  const requestId = req.id || 'unknown';
-  const duration = Date.now() - (req.startTime || Date.now());
+  let requestId = req.id || 'unknown';
+  let duration = Date.now() - (req.startTime || Date.now());
   
   logger.error('Request error', {
     requestId,

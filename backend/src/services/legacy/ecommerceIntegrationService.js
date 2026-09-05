@@ -142,10 +142,10 @@ function estimateCalories(categoryId) {
  * Higher nutrition scores get price premiums
  */
 async function calculateNutritionPricePremium(productListingId, basePrice) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const listing = await pg.query(
+    let listing = await pg.query(
       'SELECT nutrition_score, nutrition_grade FROM product_listings WHERE id = $1',
       [productListingId]
     );
@@ -193,11 +193,11 @@ async function calculateNutritionPricePremium(productListingId, basePrice) {
  * Finds recipes that use this product as an ingredient
  */
 async function getRecipeSuggestionsForProduct(productListingId, limit = 5) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get product details
-    const listing = await pg.query(
+    let listing = await pg.query(
       'SELECT product_name, category_id FROM product_listings WHERE id = $1',
       [productListingId]
     );
@@ -206,7 +206,7 @@ async function getRecipeSuggestionsForProduct(productListingId, limit = 5) {
       return { recipes: [] };
     }
     
-    const product = listing.rows[0];
+    let product = listing.rows[0];
     
     // Search for recipes that might use this product
     // This would ideally use the recipe intelligence service
@@ -260,7 +260,7 @@ async function getRecipeSuggestionsForProduct(productListingId, limit = 5) {
  * Integrates with nutrient calculator
  */
 async function calculateRecipeNutrition(recipeId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const recipe = await pg.query(
@@ -308,10 +308,10 @@ async function calculateRecipeNutrition(recipeId) {
  * Reverse lookup: recipe -> marketplace products
  */
 async function getProductsForRecipe(recipeId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const recipe = await pg.query(
+    let recipe = await pg.query(
       'SELECT ingredients FROM recipe_database WHERE id = $1',
       [recipeId]
     );
@@ -320,7 +320,7 @@ async function getProductsForRecipe(recipeId) {
       return { products: [] };
     }
     
-    const ingredients = recipe.rows[0].ingredients;
+    let ingredients = recipe.rows[0].ingredients;
     const productIds = [];
     
     // Find matching products in marketplace
@@ -360,7 +360,7 @@ async function getProductsForRecipe(recipeId) {
  * Integrates with Consumer Health Service
  */
 async function getHealthBasedRecommendations(userId, limit = 10) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get user's health profile
@@ -444,10 +444,10 @@ async function getHealthBasedRecommendations(userId, limit = 10) {
  * Get general recommendations (fallback)
  */
 async function getGeneralRecommendations(limit = 10) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const result = await pg.query(`
+    let result = await pg.query(`
       SELECT 
         pl.*,
         pl.nutrition_score,
@@ -474,11 +474,11 @@ async function getGeneralRecommendations(limit = 10) {
  * Check product compatibility with user's health profile
  */
 async function checkProductCompatibility(productId, userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get product allergens and dietary info
-    const product = await pg.query(
+    let product = await pg.query(
       'SELECT allergens, dietary_compatibility FROM product_listings WHERE id = $1',
       [productId]
     );
@@ -490,7 +490,7 @@ async function checkProductCompatibility(productId, userId) {
     const { allergens, dietary_compatibility } = product.rows[0];
     
     // Get user health profile
-    const healthProfile = await consumerHealthService.getHealthProfile(userId);
+    let healthProfile = await consumerHealthService.getHealthProfile(userId);
     
     if (!healthProfile) {
       return { compatible: true, warnings: [] };
@@ -545,14 +545,14 @@ async function checkProductCompatibility(productId, userId) {
  * Integrates with nutrient calculator
  */
 async function calculateCartNutrition(cartItems) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     let totalNutrition = { PRO: 0, CARB: 0, FAT: 0, FIB: 0, CAL: 0 };
     const itemNutrition = [];
     
     for (const item of cartItems) {
-      const product = await pg.query(
+      let product = await pg.query(
         'SELECT nutrition_data, quantity, unit FROM product_listings WHERE id = $1',
         [item.product_id]
       );
@@ -560,7 +560,7 @@ async function calculateCartNutrition(cartItems) {
       if (product.rows.length > 0) {
         const nutritionData = product.rows[0].nutrition_data || estimateBasicNutrition(1);
         const quantity = item.quantity || 1;
-        const weight = product.rows[0].quantity || 100;
+        let weight = product.rows[0].quantity || 100;
         
         const itemTotal = {};
         for (const nutrient in nutritionData) {
@@ -600,7 +600,7 @@ async function calculateCartNutrition(cartItems) {
 async function calculateCartRDAPercentage(cartNutrition, userId) {
   try {
     // Get user demographics from health profile
-    const healthProfile = await consumerHealthService.getHealthProfile(userId);
+    let healthProfile = await consumerHealthService.getHealthProfile(userId);
     
     if (!healthProfile) {
       return { rda_percentages: [], user_profile: null };
@@ -655,7 +655,7 @@ function getRDAStatus(percentage) {
  * Get dietitian-curated product collections
  */
 async function getDietitianCollections(dietitianId = null) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     let query = `
@@ -674,7 +674,7 @@ async function getDietitianCollections(dietitianId = null) {
       WHERE dc.is_active = true
     `;
     
-    const params = [];
+    let params = [];
     
     if (dietitianId) {
       query += ' AND dc.dietitian_id = $1';
@@ -683,7 +683,7 @@ async function getDietitianCollections(dietitianId = null) {
     
     query += ' ORDER BY dc.created_at DESC';
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     // Get products for each collection
     const collections = await Promise.all(result.rows.map(async (collection) => {
@@ -716,18 +716,18 @@ async function getDietitianCollections(dietitianId = null) {
  * Get dietitian recommendation for user
  */
 async function getDietitianRecommendation(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get user's health profile
-    const healthProfile = await consumerHealthService.getHealthProfile(userId);
+    let healthProfile = await consumerHealthService.getHealthProfile(userId);
     
     if (!healthProfile) {
       return { recommendation: null, reason: 'No health profile found' };
     }
     
     // Find dietitian collections matching user's needs
-    const collections = await pg.query(`
+    let collections = await pg.query(`
       SELECT dc.*, u.full_name as dietitian_name
       FROM dietitian_collections dc
       LEFT JOIN users u ON dc.dietitian_id = u.id
@@ -746,7 +746,7 @@ async function getDietitianRecommendation(userId) {
     
     // Get products for top collection
     const topCollection = collections.rows[0];
-    const products = await pg.query(`
+    let products = await pg.query(`
       SELECT pl.*
       FROM dietitian_collection_products dcp
       JOIN product_listings pl ON dcp.product_id = pl.id

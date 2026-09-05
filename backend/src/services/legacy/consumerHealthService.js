@@ -75,7 +75,7 @@ async function createHealthProfile(userId, data) {
  */
 router.post('/health-profiles', authMiddleware, async (req, res) => {
   try {
-    const result = await createHealthProfile(req.user.id, req.body);
+    let result = await createHealthProfile(req.user.id, req.body);
     // Defensive fallback: if DB/mock returned empty/blank, echo created resource
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
       const fallback = Object.assign({}, req.body, { id: `hp-fallback-${Date.now()}`, user_id: req.user.id });
@@ -94,7 +94,7 @@ router.post('/health-profiles', authMiddleware, async (req, res) => {
  */
 async function getHealthProfile(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM health_profiles WHERE user_id = $1',
       [userId]
     );
@@ -104,7 +104,7 @@ async function getHealthProfile(userId) {
       if (process.env.NODE_ENV === 'test') {
         try {
           if (typeof pool.getTestData === 'function') {
-            const fallback = pool.getTestData('health_profiles', userId);
+            let fallback = pool.getTestData('health_profiles', userId);
             if (fallback) return fallback;
           }
 
@@ -132,13 +132,13 @@ async function getHealthProfile(userId) {
  */
 router.get('/health-profiles', authMiddleware, async (req, res) => {
   try {
-    const result = await getHealthProfile(req.user.id);
+    let result = await getHealthProfile(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get health profile API error', { error: error.message, stack: error.stack });
     // In test mode return a sensible fallback so tests can proceed
     if (process.env.NODE_ENV === 'test') {
-      const fallback = {
+      let fallback = {
         id: `hp-fallback-${Date.now()}`,
         user_id: req.user.id,
         profile_name: 'Test Profile',
@@ -180,7 +180,7 @@ async function createDietaryProfile(userId, data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dietary_profiles 
        (user_id, profile_type, daily_calorie_target, macronutrient_targets, micronutrient_targets, 
         meal_frequency, meal_timing, hydration_target_ml, is_active)
@@ -210,9 +210,9 @@ async function createDietaryProfile(userId, data) {
  */
 router.post('/dietary-profiles', authMiddleware, async (req, res) => {
   try {
-    const result = await createDietaryProfile(req.user.id, req.body);
+    let result = await createDietaryProfile(req.user.id, req.body);
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
-      const fallback = Object.assign({}, req.body, { id: `dp-fallback-${Date.now()}`, user_id: req.user.id });
+      let fallback = Object.assign({}, req.body, { id: `dp-fallback-${Date.now()}`, user_id: req.user.id });
       persistTestFallback('dietary_profiles', req.user.id, fallback, false);
       return res.status(201).json(fallback);
     }
@@ -240,7 +240,7 @@ async function logHealthMetric(userId, data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO health_metrics 
        (user_id, metric_type, metric_value, unit, notes, source)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -260,9 +260,9 @@ async function logHealthMetric(userId, data) {
  */
 router.post('/health-metrics', authMiddleware, async (req, res) => {
   try {
-    const result = await logHealthMetric(req.user.id, req.body);
+    let result = await logHealthMetric(req.user.id, req.body);
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
-      const fallback = Object.assign({}, req.body, { id: `hm-fallback-${Date.now()}`, user_id: req.user.id });
+      let fallback = Object.assign({}, req.body, { id: `hm-fallback-${Date.now()}`, user_id: req.user.id });
       persistTestFallback('health_metrics', req.user.id, fallback, true);
       return res.status(201).json(fallback);
     }
@@ -289,7 +289,7 @@ async function getHealthMetrics(userId, metricType = null, limit = 50) {
     query += ' ORDER BY recorded_at DESC LIMIT $' + (params.length + 1);
     params.push(limit);
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get health metrics error', { error: error.message, stack: error.stack });
@@ -303,7 +303,7 @@ async function getHealthMetrics(userId, metricType = null, limit = 50) {
 router.get('/health-metrics', authMiddleware, async (req, res) => {
   try {
     const { metric_type, limit } = req.query;
-    const result = await getHealthMetrics(req.user.id, metric_type, parseInt(limit) || 50);
+    let result = await getHealthMetrics(req.user.id, metric_type, parseInt(limit) || 50);
     res.json(result);
   } catch (error) {
     logger.error('Get health metrics API error', { error: error.message, stack: error.stack });
@@ -329,7 +329,7 @@ async function createHealthGoal(userId, data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO health_goals 
        (user_id, goal_type, target_value, current_value, unit, start_date, target_date, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
@@ -349,9 +349,9 @@ async function createHealthGoal(userId, data) {
  */
 router.post('/health-goals', authMiddleware, async (req, res) => {
   try {
-    const result = await createHealthGoal(req.user.id, req.body);
+    let result = await createHealthGoal(req.user.id, req.body);
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
-      const fallback = Object.assign({}, req.body, { id: `hg-fallback-${Date.now()}`, user_id: req.user.id, status: 'active' });
+      let fallback = Object.assign({}, req.body, { id: `hg-fallback-${Date.now()}`, user_id: req.user.id, status: 'active' });
       persistTestFallback('health_goals', req.user.id, fallback, true);
       return res.status(201).json(fallback);
     }
@@ -367,7 +367,7 @@ router.post('/health-goals', authMiddleware, async (req, res) => {
  */
 async function getHealthGoals(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM health_goals WHERE user_id = $1 AND status = $2 ORDER BY created_at DESC',
       [userId, 'active']
     );
@@ -384,7 +384,7 @@ async function getHealthGoals(userId) {
  */
 router.get('/health-goals', authMiddleware, async (req, res) => {
   try {
-    const result = await getHealthGoals(req.user.id);
+    let result = await getHealthGoals(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get health goals API error', { error: error.message, stack: error.stack });
@@ -409,7 +409,7 @@ async function generateDietaryRecommendation(userId, data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dietary_recommendations 
        (user_id, recommendation_type, recommendation_text, priority, category, reasoning, is_personalized)
        VALUES ($1, $2, $3, $4, $5, $6, true)
@@ -429,9 +429,9 @@ async function generateDietaryRecommendation(userId, data) {
  */
 router.post('/dietary-recommendations', authMiddleware, async (req, res) => {
   try {
-    const result = await generateDietaryRecommendation(req.user.id, req.body);
+    let result = await generateDietaryRecommendation(req.user.id, req.body);
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
-      const fallback = Object.assign({}, req.body, { id: `dr-fallback-${Date.now()}`, user_id: req.user.id });
+      let fallback = Object.assign({}, req.body, { id: `dr-fallback-${Date.now()}`, user_id: req.user.id });
       persistTestFallback('dietary_recommendations', req.user.id, fallback, true);
       return res.status(201).json(fallback);
     }
@@ -447,7 +447,7 @@ router.post('/dietary-recommendations', authMiddleware, async (req, res) => {
  */
 async function getDietaryRecommendations(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM dietary_recommendations 
        WHERE user_id = $1 AND is_dismissed = false 
        AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
@@ -467,7 +467,7 @@ async function getDietaryRecommendations(userId) {
  */
 router.get('/dietary-recommendations', authMiddleware, async (req, res) => {
   try {
-    const result = await getDietaryRecommendations(req.user.id);
+    let result = await getDietaryRecommendations(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get dietary recommendations API error', { error: error.message, stack: error.stack });
@@ -491,7 +491,7 @@ async function createHealthAlert(userId, data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO health_alerts 
        (user_id, alert_type, severity, alert_message, trigger_data)
        VALUES ($1, $2, $3, $4, $5)
@@ -511,9 +511,9 @@ async function createHealthAlert(userId, data) {
  */
 router.post('/health-alerts', authMiddleware, async (req, res) => {
   try {
-    const result = await createHealthAlert(req.user.id, req.body);
+    let result = await createHealthAlert(req.user.id, req.body);
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
-      const fallback = Object.assign({}, req.body, { id: `ha-fallback-${Date.now()}`, user_id: req.user.id });
+      let fallback = Object.assign({}, req.body, { id: `ha-fallback-${Date.now()}`, user_id: req.user.id });
       persistTestFallback('health_alerts', req.user.id, fallback, true);
       return res.status(201).json(fallback);
     }
@@ -529,7 +529,7 @@ router.post('/health-alerts', authMiddleware, async (req, res) => {
  */
 async function getHealthAlerts(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM health_alerts WHERE user_id = $1 ORDER BY created_at DESC',
       [userId]
     );
@@ -546,7 +546,7 @@ async function getHealthAlerts(userId) {
  */
 router.get('/health-alerts', authMiddleware, async (req, res) => {
   try {
-    const result = await getHealthAlerts(req.user.id);
+    let result = await getHealthAlerts(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get health alerts API error', { error: error.message, stack: error.stack });
@@ -573,7 +573,7 @@ async function logFoodConsumption(userId, data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_consumption_logs 
        (user_id, food_item_id, product_id, meal_type, quantity_g, calories_consumed, nutritional_intake, notes)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -602,9 +602,9 @@ async function logFoodConsumption(userId, data) {
  */
 router.post('/food-consumption', authMiddleware, async (req, res) => {
   try {
-    const result = await logFoodConsumption(req.user.id, req.body);
+    let result = await logFoodConsumption(req.user.id, req.body);
     if (!result || (typeof result === 'string') || (Object.keys(result).length === 0)) {
-      const fallback = Object.assign({}, req.body, { id: `fc-fallback-${Date.now()}`, user_id: req.user.id });
+      let fallback = Object.assign({}, req.body, { id: `fc-fallback-${Date.now()}`, user_id: req.user.id });
       persistTestFallback('food_consumption_logs', req.user.id, fallback, true);
       return res.status(201).json(fallback);
     }
@@ -625,7 +625,7 @@ router.post('/food-consumption', authMiddleware, async (req, res) => {
 async function getHealthAnalytics(userId, startDate = null, endDate = null) {
   try {
     let query = 'SELECT * FROM health_analytics WHERE user_id = $1';
-    const params = [userId];
+    let params = [userId];
 
     if (startDate) {
       query += ' AND date >= $2';
@@ -639,7 +639,7 @@ async function getHealthAnalytics(userId, startDate = null, endDate = null) {
 
     query += ' ORDER BY date DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get health analytics error', { error: error.message, stack: error.stack });
@@ -653,7 +653,7 @@ async function getHealthAnalytics(userId, startDate = null, endDate = null) {
 router.get('/health-analytics', authMiddleware, async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    const result = await getHealthAnalytics(req.user.id, start_date, end_date);
+    let result = await getHealthAnalytics(req.user.id, start_date, end_date);
     res.json(result);
   } catch (error) {
     logger.error('Get health analytics API error', { error: error.message, stack: error.stack });
@@ -684,7 +684,7 @@ async function calculateBMI(userId) {
       }
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT calculate_bmi($1, $2) as bmi',
       [profile.weight_kg, profile.height_cm]
     );
@@ -715,7 +715,7 @@ async function calculateBMI(userId) {
  */
 router.get('/bmi', authMiddleware, async (req, res) => {
   try {
-    const result = await calculateBMI(req.user.id);
+    let result = await calculateBMI(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Calculate BMI API error', { error: error.message, stack: error.stack });
@@ -771,8 +771,8 @@ function calculateAgeYears(dateOfBirth) {
  */
 function calculateMifflinStJeorBMRTDEE({ ageYears, sex, weightKg, heightCm, activityLevel }) {
   const age = Number(ageYears);
-  const weight = Number(weightKg);
-  const height = Number(heightCm);
+  let weight = Number(weightKg);
+  let height = Number(heightCm);
 
   if (!age || age <= 0 || !weight || weight <= 0 || !height || height <= 0) {
     throw new Error('age, weight_kg, and height_cm are required and must be positive numbers to estimate BMR/TDEE');
@@ -856,7 +856,7 @@ async function calculateBMRTDEE(userId, overrides = {}) {
  */
 router.post('/bmr-tdee', authMiddleware, async (req, res) => {
   try {
-    const result = await calculateBMRTDEE(req.user.id, req.body || {});
+    let result = await calculateBMRTDEE(req.user.id, req.body || {});
     res.json(result);
   } catch (error) {
     logger.error('Calculate BMR/TDEE API error', { error: error.message, stack: error.stack });

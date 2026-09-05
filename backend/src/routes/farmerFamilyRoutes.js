@@ -30,7 +30,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 router.put('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
-    const item = await farmerFamily.update(req.params.id, req.body);
+    let item = await farmerFamily.update(req.params.id, req.body);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: item });
   } catch (e) { res.status(400).json({ success: false, error: e.message }); }

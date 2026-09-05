@@ -20,7 +20,7 @@ class SeedVaultService {
 
   /** Real categories are simply the distinct set the farmer has actually recorded — no invented master list. */
   async listCategories(farmerId) {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT DISTINCT category AS id, category AS name FROM seed_vault_items WHERE farmer_id = $1 ORDER BY category ASC',
       [farmerId]
     );
@@ -33,7 +33,7 @@ class SeedVaultService {
     if (!category) throw new Error('category is required');
     if (!(Number(quantity) >= 0)) throw new Error('quantity must be >= 0');
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO seed_vault_items
          (farmer_id, name, variety, category, quantity, unit, purchase_date, min_stock, supplier, storage_conditions)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -49,7 +49,7 @@ class SeedVaultService {
     if (existing.rows.length === 0) throw new Error('Seed not found');
 
     const { name, variety, category, quantity, unit, purchaseDate, minStock, supplier, storageConditions } = data || {};
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE seed_vault_items SET
          name = COALESCE($1, name),
          variety = COALESCE($2, variety),
@@ -70,7 +70,7 @@ class SeedVaultService {
   }
 
   async deleteSeed(seedId, farmerId) {
-    const result = await pool.query(
+    let result = await pool.query(
       'DELETE FROM seed_vault_items WHERE id = $1 AND farmer_id = $2 RETURNING id',
       [seedId, farmerId]
     );
@@ -81,11 +81,11 @@ class SeedVaultService {
   /** Real usage recording: decrements quantity, never below zero. */
   async recordUsage(seedId, farmerId, amountUsed) {
     if (!(Number(amountUsed) > 0)) throw new Error('amountUsed must be > 0');
-    const existing = await pool.query('SELECT quantity FROM seed_vault_items WHERE id = $1 AND farmer_id = $2', [seedId, farmerId]);
+    let existing = await pool.query('SELECT quantity FROM seed_vault_items WHERE id = $1 AND farmer_id = $2', [seedId, farmerId]);
     if (existing.rows.length === 0) throw new Error('Seed not found');
 
     const newQuantity = Math.max(0, Number(existing.rows[0].quantity) - Number(amountUsed));
-    const result = await pool.query(
+    let result = await pool.query(
       'UPDATE seed_vault_items SET quantity = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
       [newQuantity, seedId]
     );

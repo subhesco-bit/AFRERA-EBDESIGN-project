@@ -75,21 +75,21 @@ async function getProject(projectId, userId, isAdmin = false) {
     where += ' AND user_id = $2';
     params.push(userId);
   }
-  const result = await pool.query(`SELECT * FROM engineering_projects WHERE ${where}`, params);
+  let result = await pool.query(`SELECT * FROM engineering_projects WHERE ${where}`, params);
   if (result.rows.length === 0) throw new Error('Project not found');
   return result.rows[0];
 }
 
 async function listProjects(userId, { status, projectType, page = 1, limit = 20 } = {}) {
   const conditions = ['user_id = $1', 'deleted_at IS NULL'];
-  const params = [userId];
+  let params = [userId];
   if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
   if (projectType) { params.push(projectType); conditions.push(`project_type = $${params.length}`); }
 
   const offset = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
   params.push(Math.max(1, Number(limit)), offset);
 
-  const result = await pool.query(
+  let result = await pool.query(
     `SELECT * FROM engineering_projects
      WHERE ${conditions.join(' AND ')}
      ORDER BY created_at DESC
@@ -103,7 +103,7 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
   await getProject(projectId, userId, isAdmin); // ownership check, 404s if not found/owned
 
   const sets = [];
-  const params = [];
+  let params = [];
   if (phase !== undefined) { params.push(phase); sets.push(`phase = $${params.length}`); }
   if (phaseProgress !== undefined) {
     if (phaseProgress < 0 || phaseProgress > 100) throw new Error('phaseProgress must be 0-100');
@@ -114,7 +114,7 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
 
   sets.push('updated_at = CURRENT_TIMESTAMP');
   params.push(projectId);
-  const result = await pool.query(
+  let result = await pool.query(
     `UPDATE engineering_projects SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING *`,
     params
   );
@@ -143,14 +143,14 @@ async function lookupReferenceRate(client, { rateSource, code, region }) {
     return regional !== undefined ? Number(regional) : Number(row.base_price);
   }
   if (table === 'labor_rates') {
-    const r = await client.query(
+    let r = await client.query(
       `SELECT daily_rate FROM labor_rates WHERE skill_category = $1 AND ($2::text IS NULL OR region = $2)
        ORDER BY (region = $2) DESC LIMIT 1`,
       [code, region || null]
     );
     return r.rows.length ? Number(r.rows[0].daily_rate) : null;
   }
-  const r = await client.query(`SELECT daily_rate FROM equipment_rates WHERE equipment_code = $1`, [code]);
+  let r = await client.query(`SELECT daily_rate FROM equipment_rates WHERE equipment_code = $1`, [code]);
   return r.rows.length ? Number(r.rows[0].daily_rate) : null;
 }
 
@@ -240,7 +240,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
 
 async function getCostEstimates(projectId, userId, isAdmin = false) {
   await getProject(projectId, userId, isAdmin);
-  const result = await pool.query(
+  let result = await pool.query(
     `SELECT * FROM cost_estimates WHERE project_id = $1 ORDER BY created_at DESC`,
     [projectId]
   );

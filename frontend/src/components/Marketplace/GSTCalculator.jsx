@@ -58,7 +58,7 @@ const GSTCalculator = ({ orderId, productId }) => {
   const calculateOrderGST = async () => {
     setLoading(true);
     try {
-      const response = await marketplaceAPI.calculateOrderGST(orderId);
+      let response = await marketplaceAPI.calculateOrderGST(orderId);
       setGstData(response.data.data);
     } catch (error) {
       console.error('Error calculating order GST:', error);
@@ -70,7 +70,7 @@ const GSTCalculator = ({ orderId, productId }) => {
   const generateInvoice = async () => {
     setLoading(true);
     try {
-      const response = await marketplaceAPI.generateGstInvoice(orderId);
+      let response = await marketplaceAPI.generateGstInvoice(orderId);
       alert(`Invoice Generated: ${response.data.data.invoiceNumber}`);
     } catch (error) {
       console.error('Error generating invoice:', error);

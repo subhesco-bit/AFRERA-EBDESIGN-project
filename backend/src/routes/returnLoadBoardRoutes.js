@@ -36,7 +36,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/:postingId/book', authMiddleware, async (req, res) => {
   try {
-    const posting = await returnLoadBoardService.bookPosting(req.params.postingId, req.body.shipmentId);
+    let posting = await returnLoadBoardService.bookPosting(req.params.postingId, req.body.shipmentId);
     res.json({ success: true, data: posting });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -47,7 +47,7 @@ router.delete
     // Log request
     logger.debug('router.delete request');('/:postingId', authMiddleware, async (req, res) => {
   try {
-    const posting = await returnLoadBoardService.cancelPosting(req.params.postingId, req.user.id);
+    let posting = await returnLoadBoardService.cancelPosting(req.params.postingId, req.user.id);
     res.json({ success: true, data: posting });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

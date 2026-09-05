@@ -78,7 +78,7 @@ function getFitbitAuthUrl(state) {
 /** Step 2 — real token exchange with Fitbit, then persists the connection. */
 async function handleFitbitCallback(userId, code) {
   if (!fitbitConfigured()) {
-    const err = new Error('Fitbit is not configured');
+    let err = new Error('Fitbit is not configured');
     err.code = 'not_configured';
     throw err;
   }
@@ -103,7 +103,7 @@ async function handleFitbitCallback(userId, code) {
   }
 
   const tokenData = await response.json();
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const expiresAt = new Date(Date.now() + (tokenData.expires_in || 28800) * 1000);
 
   await pg.query(
@@ -121,24 +121,24 @@ async function handleFitbitCallback(userId, code) {
 
 /** Real pull from Fitbit's activity summary API for today, using the stored token. */
 async function syncFitbitActivity(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const { rows } = await pg.query(
     `SELECT access_token FROM wearable_connections WHERE user_id = $1 AND provider = 'fitbit' AND status = 'active'`,
     [userId]
   );
   if (rows.length === 0) {
-    const err = new Error('No active Fitbit connection for this user');
+    let err = new Error('No active Fitbit connection for this user');
     err.code = 'not_connected';
     throw err;
   }
 
   const today = new Date().toISOString().split('T')[0];
-  const response = await fetch(`${FITBIT_API_BASE}/user/-/activities/date/${today}.json`, {
+  let response = await fetch(`${FITBIT_API_BASE}/user/-/activities/date/${today}.json`, {
     headers: { Authorization: `Bearer ${rows[0].access_token}` },
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
+    let errorText = await response.text();
     throw new Error(`Fitbit activity fetch failed: ${response.status} - ${errorText}`);
   }
 
@@ -173,7 +173,7 @@ async function ingestDeviceActivity(userId, provider, activityDate, activity = {
   if (!['apple_health', 'samsung_health'].includes(provider)) {
     throw new Error(`ingestDeviceActivity only accepts apple_health or samsung_health, got: ${provider}`);
   }
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
 
   await pg.query(
     `INSERT INTO wearable_connections (user_id, provider, sync_method, status, connected_at, last_synced_at)
@@ -207,7 +207,7 @@ async function ingestDeviceActivity(userId, provider, activityDate, activity = {
  * has been synced.
  */
 async function getRecentActivitySummary(userId, days = 7) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const { rows } = await pg.query(
     `SELECT AVG(steps)::int AS avg_steps, AVG(calories_burned)::numeric(8,2) AS avg_calories_burned,
             AVG(active_minutes)::int AS avg_active_minutes, COUNT(*) AS days_with_data
@@ -227,7 +227,7 @@ async function getRecentActivitySummary(userId, days = 7) {
 }
 
 async function disconnectProvider(userId, provider) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   await pg.query(
     `UPDATE wearable_connections SET status = 'revoked' WHERE user_id = $1 AND provider = $2`,
     [userId, provider]

@@ -23,7 +23,7 @@ router.post('/crop-yield/predict', authMiddleware, async (req, res) => {
 
 router.post('/soil/analyze', authMiddleware, async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.analyzeSoil(req.body || {});
+    let result = await agriculturalIntelligenceService.analyzeSoil(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -34,7 +34,7 @@ router.get('/weather-intelligence', authMiddleware, async (req, res) => {
   try {
     const { location, timeframe } = req.query;
     if (!location) return res.status(400).json({ success: false, error: 'location is required' });
-    const result = await agriculturalIntelligenceService.getWeatherIntelligence(location, timeframe || '7d');
+    let result = await agriculturalIntelligenceService.getWeatherIntelligence(location, timeframe || '7d');
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -43,7 +43,7 @@ router.get('/weather-intelligence', authMiddleware, async (req, res) => {
 
 router.post('/pest-outbreak/predict', authMiddleware, async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.predictPestOutbreak(req.body || {});
+    let result = await agriculturalIntelligenceService.predictPestOutbreak(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -52,7 +52,7 @@ router.post('/pest-outbreak/predict', authMiddleware, async (req, res) => {
 
 router.post('/crops/recommend', authMiddleware, async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.recommendCrops(req.body || {});
+    let result = await agriculturalIntelligenceService.recommendCrops(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -61,7 +61,7 @@ router.post('/crops/recommend', authMiddleware, async (req, res) => {
 
 router.post('/irrigation/optimize', authMiddleware, async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.optimizeIrrigation(req.body || {});
+    let result = await agriculturalIntelligenceService.optimizeIrrigation(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -70,7 +70,7 @@ router.post('/irrigation/optimize', authMiddleware, async (req, res) => {
 
 router.post('/fertilizer/recommend', authMiddleware, async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.recommendFertilizer(req.body || {});
+    let result = await agriculturalIntelligenceService.recommendFertilizer(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -79,7 +79,7 @@ router.post('/fertilizer/recommend', authMiddleware, async (req, res) => {
 
 router.get('/analytics', authMiddleware, async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.getAgriculturalAnalytics(req.query || {});
+    let result = await agriculturalIntelligenceService.getAgriculturalAnalytics(req.query || {});
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -88,7 +88,7 @@ router.get('/analytics', authMiddleware, async (req, res) => {
 
 router.get('/health', async (req, res) => {
   try {
-    const result = await agriculturalIntelligenceService.healthCheck();
+    let result = await agriculturalIntelligenceService.healthCheck();
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

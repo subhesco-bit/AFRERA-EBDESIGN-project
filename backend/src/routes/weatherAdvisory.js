@@ -13,7 +13,7 @@ router.get('/weather/:lat/:lng/advisory', async (req, res, next) => {
 router.get('/weather/:lat/:lng/crop-advisory', async (req, res, next) => {
   try {
     const { crop } = req.query;
-    const result = await weatherAdvisoryService.generateCropAdvisory({}, crop);
+    let result = await weatherAdvisoryService.generateCropAdvisory({}, crop);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });
@@ -21,7 +21,7 @@ router.get('/weather/:lat/:lng/crop-advisory', async (req, res, next) => {
 router.get('/weather/:lat/:lng/alerts', async (req, res, next) => {
   try {
     const forecast = { rainfall: Math.random() * 50, temperature: 25 + Math.random() * 15 };
-    const result = await weatherAdvisoryService.checkAlerts(forecast);
+    let result = await weatherAdvisoryService.checkAlerts(forecast);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });

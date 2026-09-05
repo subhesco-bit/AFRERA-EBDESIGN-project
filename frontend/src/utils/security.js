@@ -109,10 +109,10 @@ const secureStorage = {
    */
   getItem(key) {
     try {
-      const data = localStorage.getItem(key);
+      let data = localStorage.getItem(key);
       if (!data) return null;
 
-      const parsed = JSON.parse(data);
+      let parsed = JSON.parse(data);
 
       // Check if data is expired (24 hours)
       if (parsed.timestamp && Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
@@ -217,7 +217,7 @@ const tokenManager = {
     if (!token) return null;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      let payload = JSON.parse(atob(token.split('.')[1]));
       return payload.exp ? new Date(payload.exp * 1000) : null;
     } catch {
       return null;
@@ -334,7 +334,7 @@ const rateLimiter = {
    */
   isRateLimited(actionKey, maxRequests = 10, windowMs = 60000) {
     const key = `rate_limit_${actionKey}`;
-    const data = secureStorage.getItem(key);
+    let data = secureStorage.getItem(key);
 
     if (!data) {
       secureStorage.setItem(key, {
@@ -344,7 +344,7 @@ const rateLimiter = {
       return false;
     }
 
-    const parsed = JSON.parse(data);
+    let parsed = JSON.parse(data);
 
     // Reset if window expired
     if (Date.now() > parsed.resetTime) {
@@ -370,12 +370,12 @@ const rateLimiter = {
    * Get remaining requests
    */
   getRemainingRequests(actionKey, maxRequests = 10) {
-    const key = `rate_limit_${actionKey}`;
-    const data = secureStorage.getItem(key);
+    let key = `rate_limit_${actionKey}`;
+    let data = secureStorage.getItem(key);
 
     if (!data) return maxRequests;
 
-    const parsed = JSON.parse(data);
+    let parsed = JSON.parse(data);
 
     if (Date.now() > parsed.resetTime) {
       return maxRequests;

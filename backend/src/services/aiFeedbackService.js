@@ -76,10 +76,10 @@ class AIFeedbackService {
    */
   async updateLearningMetrics(feedbackType, rating) {
     try {
-      const pool = await this.getPool();
+      let pool = await this.getPool();
       const metricId = `metric_${feedbackType}_${Date.now()}`;
 
-      const query = `
+      let query = `
         INSERT INTO ai_learning_metrics (id, metric_type, metric_value, metric_count, metadata)
         VALUES ($1, $2, $3, 1, $4)
         ON CONFLICT (metric_type) DO UPDATE SET
@@ -104,8 +104,8 @@ class AIFeedbackService {
    */
   async getSessionFeedbackStats(sessionId) {
     try {
-      const pool = await this.getPool();
-      const query = `
+      let pool = await this.getPool();
+      let query = `
         SELECT 
           feedback_type,
           COUNT(*) as count,
@@ -128,8 +128,8 @@ class AIFeedbackService {
    */
   async getOverallMetrics() {
     try {
-      const pool = await this.getPool();
-      const query = `
+      let pool = await this.getPool();
+      let query = `
         SELECT 
           metric_type,
           metric_value,
@@ -140,7 +140,7 @@ class AIFeedbackService {
         LIMIT 20
       `;
 
-      const result = await pool.query(query);
+      let result = await pool.query(query);
       return result.rows;
     } catch (error) {
       console.error('Error getting overall metrics:', error);
@@ -153,8 +153,8 @@ class AIFeedbackService {
    */
   async analyzeNegativeFeedback() {
     try {
-      const pool = await this.getPool();
-      const query = `
+      let pool = await this.getPool();
+      let query = `
         SELECT 
           feedback_type,
           COUNT(*) as count,
@@ -166,7 +166,7 @@ class AIFeedbackService {
         ORDER BY count DESC
       `;
 
-      const result = await pool.query(query);
+      let result = await pool.query(query);
       return result.rows;
     } catch (error) {
       console.error('Error analyzing negative feedback:', error);

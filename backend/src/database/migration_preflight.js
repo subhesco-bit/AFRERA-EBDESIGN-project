@@ -107,7 +107,7 @@ function findDuplicateOwnership(tables) {
 }
 
 function findForeignKeyMismatches(tables) {
-  const definitions = new Map();
+  let definitions = new Map();
   for (const table of tables) {
     if (!definitions.has(table.tableName)) definitions.set(table.tableName, new Map());
     for (const [column, type] of table.columns) {
@@ -140,7 +140,7 @@ function findForeignKeyMismatches(tables) {
 }
 
 function findAmbiguousForeignKeyTypes(tables) {
-  const definitions = new Map();
+  let definitions = new Map();
   for (const table of tables) {
     if (!definitions.has(table.tableName)) definitions.set(table.tableName, new Map());
     for (const [column, type] of table.columns) {
@@ -151,8 +151,8 @@ function findAmbiguousForeignKeyTypes(tables) {
   const ambiguous = [];
   for (const table of tables) {
     for (const foreignKey of table.foreignKeys) {
-      const localType = table.columns.get(foreignKey.column);
-      const targetTypes = [...(definitions.get(foreignKey.targetTable)?.get(foreignKey.targetColumn) || [])];
+      let localType = table.columns.get(foreignKey.column);
+      let targetTypes = [...(definitions.get(foreignKey.targetTable)?.get(foreignKey.targetColumn) || [])];
       if (targetTypes.length > 1 && targetTypes.includes(localType)) {
         ambiguous.push({
           filename: table.filename,
@@ -170,7 +170,7 @@ function findAmbiguousForeignKeyTypes(tables) {
 
 function inspectSchemaMigrationDefinitions() {
   const files = ['migrate.js', path.join('migrations', 'enhanced_migrate.js')];
-  const definitions = files.map(relativePath => {
+  let definitions = files.map(relativePath => {
     const filename = path.join(databaseDir, relativePath);
     const content = fs.readFileSync(filename, 'utf8');
     const start = content.search(/CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+schema_migrations\s*\(/i);
@@ -196,8 +196,8 @@ function inspectSchemaMigrationDefinitions() {
 }
 
 function run() {
-  const files = fs.readdirSync(migrationsDir).filter(file => file.endsWith('.sql')).sort();
-  const tables = files.flatMap(file => parseTables(file, fs.readFileSync(path.join(migrationsDir, file), 'utf8')));
+  let files = fs.readdirSync(migrationsDir).filter(file => file.endsWith('.sql')).sort();
+  let tables = files.flatMap(file => parseTables(file, fs.readFileSync(path.join(migrationsDir, file), 'utf8')));
   const report = {
     migrationCount: files.length,
     tableDefinitions: tables.length,

@@ -161,7 +161,7 @@ const verifyConnection = async (client) => {
 // Check table existence
 const verifyTables = async (client) => {
   try {
-    const result = await client.query(`
+    let result = await client.query(`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'
     `);

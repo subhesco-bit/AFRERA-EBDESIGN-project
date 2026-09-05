@@ -129,7 +129,7 @@ class AuditService {
       query += ` ORDER BY al.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Get audit logs failed', error);
@@ -142,7 +142,7 @@ class AuditService {
    */
   async getAuditLog(auditLogId) {
     try {
-      const query = `
+      let query = `
         SELECT 
           al.*,
           u.username,
@@ -151,7 +151,7 @@ class AuditService {
         LEFT JOIN users u ON al.user_id = u.user_id
         WHERE al.audit_log_id = $1
       `;
-      const result = await this.db.query(query, [auditLogId]);
+      let result = await this.db.query(query, [auditLogId]);
       
       if (result.rows.length === 0) {
         throw new Error('Audit log not found');
@@ -169,7 +169,7 @@ class AuditService {
    */
   async getUserActivityHistory(userId, limit = 50) {
     try {
-      const query = `
+      let query = `
         SELECT 
           action,
           entity_type,
@@ -180,7 +180,7 @@ class AuditService {
         ORDER BY created_at DESC
         LIMIT $2
       `;
-      const result = await this.db.query(query, [userId, limit]);
+      let result = await this.db.query(query, [userId, limit]);
       return result.rows;
     } catch (error) {
       logger.error('Get user activity history failed', error);
@@ -193,7 +193,7 @@ class AuditService {
    */
   async getEntityChangeHistory(entityType, entityId, limit = 50) {
     try {
-      const query = `
+      let query = `
         SELECT 
           al.*,
           u.username
@@ -203,7 +203,7 @@ class AuditService {
         ORDER BY al.created_at DESC
         LIMIT $3
       `;
-      const result = await this.db.query(query, [entityType, entityId, limit]);
+      let result = await this.db.query(query, [entityType, entityId, limit]);
       return result.rows;
     } catch (error) {
       logger.error('Get entity change history failed', error);
@@ -229,7 +229,7 @@ class AuditService {
           SUM(CASE WHEN action = 'read' THEN 1 ELSE 0 END) as reads
         FROM audit_logs
       `;
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (userId) {
@@ -252,7 +252,7 @@ class AuditService {
         params.push(endDate);
       }
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get audit statistics failed', error);
@@ -284,7 +284,7 @@ class AuditService {
         LEFT JOIN users u ON al.user_id = u.user_id
         WHERE al.created_at >= $1 AND al.created_at <= $2
       `;
-      const params = [defaultStartDate, defaultEndDate];
+      let params = [defaultStartDate, defaultEndDate];
       let paramCount = 2;
 
       if (entityType) {
@@ -295,7 +295,7 @@ class AuditService {
 
       query += ` GROUP BY user_id, u.username, u.email ORDER BY total_actions DESC`;
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return {
         period: { start: defaultStartDate, end: defaultEndDate },
         entityType: entityType || 'all',
@@ -312,12 +312,12 @@ class AuditService {
    */
   async cleanOldLogs(daysToKeep = 90) {
     try {
-      const query = `
+      let query = `
         DELETE FROM audit_logs
         WHERE created_at < NOW() - INTERVAL '${daysToKeep} days'
         RETURNING *
       `;
-      const result = await this.db.query(query);
+      let result = await this.db.query(query);
       
       logger.info(`Cleaned ${result.rows.length} old audit logs`);
       return result.rows.length;
@@ -361,12 +361,12 @@ class AuditService {
    */
   async createAuditSnapshot(description) {
     try {
-      const query = `
+      let query = `
         INSERT INTO audit_snapshots (description, created_at)
         VALUES ($1, NOW())
         RETURNING *
       `;
-      const result = await this.db.query(query, [description]);
+      let result = await this.db.query(query, [description]);
       
       const snapshotId = result.rows[0].snapshot_id;
 
@@ -426,7 +426,7 @@ class AuditService {
    */
   async getAuditSnapshots(limit = 20) {
     try {
-      const query = `
+      let query = `
         SELECT 
           s.*,
           COUNT(als.snapshot_id) as log_count
@@ -436,7 +436,7 @@ class AuditService {
         ORDER BY s.created_at DESC
         LIMIT $1
       `;
-      const result = await this.db.query(query, [limit]);
+      let result = await this.db.query(query, [limit]);
       return result.rows;
     } catch (error) {
       logger.error('Get audit snapshots failed', error);

@@ -141,7 +141,7 @@ async function updateTractorMaintenance(registryId, maintenanceData) {
     };
 
     // AI-powered maintenance analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'tractor_maintenance_analysis',
       parameters: {
         registry_id: registryId,
@@ -152,7 +152,7 @@ async function updateTractorMaintenance(registryId, maintenanceData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     maintenanceRecord.ai_analysis = aiResponse;
 
     await pool.query(
@@ -278,7 +278,7 @@ async function getOptimalUsagePatterns(hp, fuelType) {
 
 async function getMaintenanceHistory(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM tractor_maintenance_records WHERE registry_id = $1 ORDER BY service_date DESC LIMIT 10',
       [registryId]
     );
@@ -306,7 +306,7 @@ async function getUsagePatterns(registryId) {
 
 async function getTractorMakeModel(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT make, model FROM tractor_registry WHERE tractor_registry_id = $1',
       [registryId]
     );
@@ -371,7 +371,7 @@ async function generatePerformanceRecommendations(registryId, period) {
 
 async function getTractorCount(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM tractor_registry WHERE farmer_id = $1',
       [farmerId]
     );
@@ -383,7 +383,7 @@ async function getTractorCount(farmerId) {
 
 async function getMakeDistribution(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT make, COUNT(*) as count FROM tractor_registry WHERE farmer_id = $1 GROUP BY make',
       [farmerId]
     );

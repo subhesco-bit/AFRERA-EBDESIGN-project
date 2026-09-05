@@ -441,7 +441,7 @@ class HouseholdProcurementService {
     const today = new Date();
     const deliveryDate = new Date(today);
     
-    const dayOfWeek = today.getDay();
+    let dayOfWeek = today.getDay();
     const daysUntilPreferred = (preferredDay - dayOfWeek + 7) % 7;
     deliveryDate.setDate(today.getDate() + daysUntilPreferred);
     
@@ -456,7 +456,7 @@ class HouseholdProcurementService {
    */
   async aggregateHouseholdOrders(region, deliveryDate) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get all households in aggregation group
@@ -538,7 +538,7 @@ class HouseholdProcurementService {
     let totalCost = 0;
     
     households.forEach(household => {
-      const familySize = household.family_size;
+      let familySize = household.family_size;
       // Assuming average prices
       totalCost += (familySize * 15 * 35) + // Rice
                   (familySize * 10 * 30) + // Wheat
@@ -586,7 +586,7 @@ class HouseholdProcurementService {
    * @returns {number} Base price
    */
   getBasePrice(commodity) {
-    const prices = {
+    let prices = {
       rice: 35,
       wheat: 30,
       pulses: 80,
@@ -603,7 +603,7 @@ class HouseholdProcurementService {
    */
   async createSubscription(subscriptionData) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO household_subscriptions 
          (household_id, product_id, variety_id, quantity, frequency, 
           start_date, end_date, auto_renew)
@@ -638,7 +638,7 @@ class HouseholdProcurementService {
    */
   async manageSubscription(subscriptionId, managementData) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE household_subscriptions 
          SET status = $1, end_date = $2, auto_renew = $3
          WHERE id = $4
@@ -667,7 +667,7 @@ class HouseholdProcurementService {
    */
   async getHouseholdDashboard(householdId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get active plans

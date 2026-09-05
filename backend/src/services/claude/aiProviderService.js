@@ -180,14 +180,14 @@ class ClaudeAIEnhancedProviderService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'callProvider',
         provider: provider,
         promptContext: this.extractPromptContext(prompt)
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: this.buildProviderCallQuery(provider, prompt, options),
         context: { 
@@ -199,9 +199,9 @@ class ClaudeAIEnhancedProviderService {
         agentPreference: 'operations-manager'
       });
 
-      const originalResult = await this.originalService.callProvider(provider, prompt, options);
+      let originalResult = await this.originalService.callProvider(provider, prompt, options);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_optimization_insights: aiEnhancement.content || null,
@@ -320,7 +320,7 @@ class ClaudeAIEnhancedProviderService {
     if (!aiContent) return null;
     
     const efficiencyMetrics = {};
-    const lines = aiContent.split('\n');
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('token') || line.includes('latency') || line.includes('cost')) {

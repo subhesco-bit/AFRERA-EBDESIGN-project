@@ -149,7 +149,7 @@ class AdvancedSearchService {
    */
   async getSearchSuggestions(query, limit = 10) {
     try {
-      const pool = await this.getPool();
+      let pool = await this.getPool();
       
       const searchQuery = `
         SELECT DISTINCT name, category
@@ -167,7 +167,7 @@ class AdvancedSearchService {
         LIMIT $4
       `;
 
-      const result = await pool.query(searchQuery, [
+      let result = await pool.query(searchQuery, [
         `%${query}%`,
         `${query}%`,
         `%${query}%`,
@@ -192,7 +192,7 @@ class AdvancedSearchService {
    */
   async getPopularSearchTerms(limit = 10) {
     try {
-      const pool = await this.getPool();
+      let pool = await this.getPool();
       
       const query = `
         SELECT 
@@ -205,7 +205,7 @@ class AdvancedSearchService {
         LIMIT $1
       `;
 
-      const result = await pool.query(query, [limit]);
+      let result = await pool.query(query, [limit]);
 
       return {
         success: true,
@@ -225,7 +225,7 @@ class AdvancedSearchService {
    */
   async logSearch(searchData) {
     try {
-      const pool = await this.getPool();
+      let pool = await this.getPool();
       const { userId, query, resultsCount, filters } = searchData;
 
       const logQuery = `
@@ -249,7 +249,7 @@ class AdvancedSearchService {
    */
   async getAvailableFilters() {
     try {
-      const pool = await this.getPool();
+      let pool = await this.getPool();
 
       // Get categories
       const categoriesQuery = `

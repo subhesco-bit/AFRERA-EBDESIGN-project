@@ -48,7 +48,7 @@ const PlatformManagementPage = () => {
     // no `confidence` field unless it is one this session actually computed.
     try {
       const res = await aiBackboneAPI.getAIProviderStatus();
-      const status = res.data?.data;
+      let status = res.data?.data;
       const insights = [];
       const now = new Date().toISOString();
 
@@ -107,12 +107,12 @@ const PlatformManagementPage = () => {
   // anywhere in this codebase, so total_requests/error_rate/growth trends and
   // per-service latency are honestly absent below rather than invented.
   const fetchPlatformStatus = async () => {
-    const res = await platformTelemetryAPI.getStatus();
+    let res = await platformTelemetryAPI.getStatus();
     return res.data?.data;
   };
 
   const fetchPlatformAnalytics = async () => {
-    const res = await platformTelemetryAPI.getAnalytics();
+    let res = await platformTelemetryAPI.getAnalytics();
     return res.data?.data;
   };
 

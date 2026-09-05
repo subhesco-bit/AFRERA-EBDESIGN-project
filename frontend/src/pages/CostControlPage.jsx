@@ -80,7 +80,7 @@ export default function CostControlPage() {
   const loadBudgets = useCallback(async () => {
     if (!companyId) { setBudgets([]); return; }
     try {
-      const res = await costControlAPI.getBudgets(companyId);
+      let res = await costControlAPI.getBudgets(companyId);
       setBudgets(res.data?.data || []);
     } catch { setBudgets([]); }
   }, [companyId]);
@@ -91,7 +91,7 @@ export default function CostControlPage() {
     e.preventDefault();
     if (!selectedCostCenterId) return;
     try {
-      const res = await costControlAPI.getCostCenterActuals(selectedCostCenterId, fiscalPeriodId ? { fiscalPeriodId } : {});
+      let res = await costControlAPI.getCostCenterActuals(selectedCostCenterId, fiscalPeriodId ? { fiscalPeriodId } : {});
       setActuals(res.data?.data || []);
     } catch (err) {
       setActuals({ error: err.response?.data?.error || err.message });

@@ -102,7 +102,7 @@ class SellerRankingService {
       if (stateId) { params.push(stateId); conditions.push(`p.state_id = $${params.length}`); }
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT DISTINCT f.id, f.user_id, u.name, f.fdi_score, f.fulfilled_orders, f.disputes,
               f.years_active, f.certification_count, f.training_completed
          FROM farmers f

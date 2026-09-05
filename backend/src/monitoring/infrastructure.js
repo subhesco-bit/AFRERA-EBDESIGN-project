@@ -263,7 +263,7 @@ class MonitoringInfrastructure {
    * Complete trace span
    */
   completeTraceSpan(spanId, metadata = {}) {
-    const span = this.activeTraces.get(spanId);
+    let span = this.activeTraces.get(spanId);
     if (!span) {
       throw new Error(`Span ${spanId} not found`);
     }

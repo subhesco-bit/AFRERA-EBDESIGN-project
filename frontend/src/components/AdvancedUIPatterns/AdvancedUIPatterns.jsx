@@ -309,7 +309,7 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     setItems(newItems);
 
     try {
-      const result = await addItemFn(item);
+      let result = await addItemFn(item);
       setItems(prev => prev.map(i => i.id === tempId ? result : i));
       setOptimisticItems(null);
       return result;
@@ -327,8 +327,8 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     setIsUpdating(true);
     setError(null);
 
-    const previousItems = items;
-    const newItems = items.filter(item => item.id !== itemId);
+    let previousItems = items;
+    let newItems = items.filter(item => item.id !== itemId);
 
     setOptimisticItems(newItems);
     setItems(newItems);
@@ -346,12 +346,12 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     }
   }, [items, removeItemFn]);
 
-  const update = useCallback(async (itemId, updates) => {
+  let update = useCallback(async (itemId, updates) => {
     setIsUpdating(true);
     setError(null);
 
-    const previousItems = items;
-    const newItems = items.map(item =>
+    let previousItems = items;
+    let newItems = items.map(item =>
       item.id === itemId ? { ...item, ...updates, isOptimistic: true } : item,
     );
 
@@ -359,7 +359,7 @@ export const useOptimisticList = (initialItems, addItemFn, removeItemFn, updateI
     setItems(newItems);
 
     try {
-      const result = await updateItemFn(itemId, updates);
+      let result = await updateItemFn(itemId, updates);
       setItems(prev => prev.map(i => i.id === itemId ? result : i));
       setOptimisticItems(null);
       return result;
@@ -718,7 +718,7 @@ export const ProgressiveSkeleton = ({
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), delay);
+    let timer = setTimeout(() => setShowContent(true), delay);
     return () => clearTimeout(timer);
   }, [delay]);
 

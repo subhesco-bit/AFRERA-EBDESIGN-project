@@ -66,12 +66,12 @@ class FoluBenchmarkService {
 
   /** Transition 6: Reducing food loss and waste (proxy: real cold-storage booking volume). */
   async foodLossReductionIndicator() {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT COUNT(*) AS booking_count, COALESCE(SUM(quantity_units), 0) AS total_quantity_units,
               COUNT(DISTINCT farmer_id) AS farmers_using_cold_storage
          FROM cold_storage_bookings WHERE status IN ('checked_in', 'checked_out')`
     );
-    const row = result.rows[0];
+    let row = result.rows[0];
     return {
       transition: 6,
       available: Number(row.booking_count) > 0,
@@ -85,11 +85,11 @@ class FoluBenchmarkService {
 
   /** Transition 7: Local loops and linkages (proxy: real marketplace order volume). */
   async localLoopsIndicator() {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT COUNT(*) AS order_count, COALESCE(SUM(total_amount), 0) AS total_gmv_inr
          FROM orders WHERE status NOT IN ('cancelled', 'refunded')`
     );
-    const row = result.rows[0];
+    let row = result.rows[0];
     return {
       transition: 7,
       available: Number(row.order_count) > 0,
@@ -101,12 +101,12 @@ class FoluBenchmarkService {
 
   /** Transition 8: Harnessing the digital revolution (proxy: real platform-training adoption). */
   async digitalAdoptionIndicator() {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT COUNT(*) AS total_farmers, COUNT(*) FILTER (WHERE training_completed = TRUE) AS trained_count
          FROM farmers WHERE status = 'active'`
     );
-    const row = result.rows[0];
-    const total = Number(row.total_farmers);
+    let row = result.rows[0];
+    let total = Number(row.total_farmers);
     return {
       transition: 8,
       available: total > 0,

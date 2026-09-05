@@ -80,7 +80,7 @@ export default function AssetAccountingPage() {
   const loadSchedule = async (assetId) => {
     if (!assetId) { setSchedule(null); return; }
     try {
-      const res = await assetAccountingAPI.getDepreciationSchedule(assetId);
+      let res = await assetAccountingAPI.getDepreciationSchedule(assetId);
       setSchedule(res.data?.data || []);
     } catch (e) {
       setSchedule({ error: e.response?.data?.error || e.message });
@@ -93,7 +93,7 @@ export default function AssetAccountingPage() {
     if (!selectedAssetId) return;
     setScheduleMsg(null);
     try {
-      const res = await assetAccountingAPI.generateDepreciationSchedule(selectedAssetId);
+      let res = await assetAccountingAPI.generateDepreciationSchedule(selectedAssetId);
       setScheduleMsg(`Generated ${res.data?.data?.periods ?? 0} period(s), monthly depreciation ${res.data?.data?.monthlyDepreciation ?? '—'}.`);
       loadSchedule(selectedAssetId);
       loadAssets();
@@ -120,7 +120,7 @@ export default function AssetAccountingPage() {
     e.preventDefault();
     if (!companyId || !runAsOfDate) return;
     try {
-      const res = await assetAccountingAPI.runDepreciationForPeriod(companyId, runAsOfDate);
+      let res = await assetAccountingAPI.runDepreciationForPeriod(companyId, runAsOfDate);
       setRunResult(res.data?.data);
       loadAssets();
       if (selectedAssetId) loadSchedule(selectedAssetId);
@@ -133,7 +133,7 @@ export default function AssetAccountingPage() {
     e.preventDefault();
     if (!selectedAssetId || !disposal.disposalDate || disposal.disposalAmount === '') return;
     try {
-      const res = await assetAccountingAPI.disposeAsset(selectedAssetId, {
+      let res = await assetAccountingAPI.disposeAsset(selectedAssetId, {
         disposalDate: disposal.disposalDate,
         disposalAmount: Number(disposal.disposalAmount),
       });
@@ -148,7 +148,7 @@ export default function AssetAccountingPage() {
     if (!companyId) return;
     setSummaryLoading(true);
     try {
-      const res = await assetAccountingAPI.getAssetRegisterSummary(companyId);
+      let res = await assetAccountingAPI.getAssetRegisterSummary(companyId);
       setSummary(res.data?.data || []);
     } catch (e) {
       setSummary({ error: e.response?.data?.error || e.message });

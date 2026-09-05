@@ -47,7 +47,7 @@ const SampleRegistration = ({ onSuccess }) => {
 
   const fetchTestCategories = async () => {
     try {
-      const response = await laboratoryERPAPI.getTestCategories();
+      let response = await laboratoryERPAPI.getTestCategories();
       setTestCategories(response.data);
     } catch (err) {
       console.error('Failed to fetch test categories:', err);
@@ -56,7 +56,7 @@ const SampleRegistration = ({ onSuccess }) => {
 
   const fetchTestMethods = async (categoryId) => {
     try {
-      const response = await laboratoryERPAPI.getTestMethods(categoryId);
+      let response = await laboratoryERPAPI.getTestMethods(categoryId);
       setTestMethods(response.data);
     } catch (err) {
       console.error('Failed to fetch test methods:', err);
@@ -92,7 +92,7 @@ const SampleRegistration = ({ onSuccess }) => {
     setError(null);
 
     try {
-      const response = await laboratoryERPAPI.registerSample({
+      let response = await laboratoryERPAPI.registerSample({
         ...formData,
         quantity_g: parseFloat(formData.quantity_g),
         requested_tests: selectedTests,

@@ -71,7 +71,7 @@ class GlutWarningService {
 
   /** Scans all categories with recent activity for glut risk — real aggregate query, not per-category looping guesswork. */
   async scanAllCategories(stateId) {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT category_id, COUNT(DISTINCT created_by) AS seller_count
          FROM products
         WHERE is_active = TRUE

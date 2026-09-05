@@ -57,7 +57,7 @@ class FreightPoolingService {
     if (!originAddress || !destinationAddress) throw new Error('originAddress and destinationAddress are required');
     if (!(Number(vehicleCapacityKg) > 0)) throw new Error('vehicleCapacityKg must be > 0');
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO freight_pool_windows (origin_address, destination_address, vehicle_capacity_kg, closes_at)
        VALUES ($1, $2, $3, $4) RETURNING *`,
       [originAddress, destinationAddress, vehicleCapacityKg, closesAt || null]
@@ -103,12 +103,12 @@ class FreightPoolingService {
     // lock stops the same shipment joining two windows concurrently. Same
     // shape as coldStorageService.createBooking.
     return withTransaction(async (client) => {
-      const windowResult = await client.query(
+      let windowResult = await client.query(
         'SELECT * FROM freight_pool_windows WHERE id = $1 FOR UPDATE',
         [windowId]
       );
       if (windowResult.rows.length === 0) throw new Error('Freight pool window not found');
-      const window = windowResult.rows[0];
+      let window = windowResult.rows[0];
       if (window.status !== 'open') throw new Error(`Cannot join a ${window.status} window`);
 
       const shipmentResult = await client.query(
@@ -137,7 +137,7 @@ class FreightPoolingService {
       const fillPctAfterJoin = (newTotal / Number(window.vehicle_capacity_kg)) * 100;
       const ratePerKg = rateForFillPct(fillPctAfterJoin);
 
-      const result = await client.query(
+      let result = await client.query(
         `INSERT INTO freight_pool_shipments (window_id, shipment_id, weight_kg, rate_per_kg_inr)
          VALUES ($1, $2, $3, $4) RETURNING *`,
         [windowId, shipmentId, shipment.weight_kg, ratePerKg]
@@ -149,12 +149,12 @@ class FreightPoolingService {
   }
 
   async listOpenWindows() {
-    const result = await pool.query(`SELECT * FROM freight_pool_windows WHERE status = 'open' ORDER BY created_at DESC`);
+    let result = await pool.query(`SELECT * FROM freight_pool_windows WHERE status = 'open' ORDER BY created_at DESC`);
     return result.rows;
   }
 
   async closeAndDispatch(windowId) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE freight_pool_windows SET status = 'dispatched', dispatched_at = NOW(), updated_at = NOW()
        WHERE id = $1 AND status = 'open' RETURNING *`,
       [windowId]

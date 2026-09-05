@@ -47,7 +47,7 @@ export default function YieldManagementPage() {
   const openBucket = async () => {
     if (!lotCode) return;
     try {
-      const r = await yieldAPI.openNextBucket(lotCode);
+      let r = await yieldAPI.openNextBucket(lotCode);
       setMsg(r.data?.data?.note);
       checkPrice({ preventDefault() {} });
     } catch (err) { setMsg(err.response?.data?.error || err.message); }

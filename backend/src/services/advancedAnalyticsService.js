@@ -104,13 +104,13 @@ class AdvancedAnalyticsService {
    */
   async getMarketTrendAnalytics(cropType, region, timeRange = '90d') {
     try {
-      const cacheKey = `market:${cropType}:${region}:trends:${timeRange}`;
+      let cacheKey = `market:${cropType}:${region}:trends:${timeRange}`;
       
       if (this.cache.has(cacheKey)) {
         return this.cache.get(cacheKey);
       }
 
-      const query = `
+      let query = `
         SELECT 
           DATE_TRUNC('day', o.created_at) as date,
           COUNT(o.id) as daily_orders,
@@ -126,9 +126,9 @@ class AdvancedAnalyticsService {
         ORDER BY date ASC
       `;
 
-      const result = await db.query(query, [cropType, region]);
+      let result = await db.query(query, [cropType, region]);
       
-      const analytics = {
+      let analytics = {
         cropType,
         region,
         timeRange,
@@ -161,7 +161,7 @@ class AdvancedAnalyticsService {
    */
   async getPlatformAnalytics(timeRange = '30d') {
     try {
-      const cacheKey = `platform:analytics:${timeRange}`;
+      let cacheKey = `platform:analytics:${timeRange}`;
       
       if (this.cache.has(cacheKey)) {
         return this.cache.get(cacheKey);
@@ -170,7 +170,7 @@ class AdvancedAnalyticsService {
       // Independent scalar subqueries, not a join — farmers/buyers/orders/crops have no
       // natural join key for a platform-wide summary, and joining them directly produces a
       // Cartesian product (every farmer x every buyer x every order x every crop).
-      const query = `
+      let query = `
         SELECT
           (SELECT COUNT(DISTINCT id) FROM farmers) as active_farmers,
           (SELECT COUNT(DISTINCT id) FROM buyers) as active_buyers,
@@ -180,9 +180,9 @@ class AdvancedAnalyticsService {
           (SELECT COALESCE(AVG(total_amount), 0) FROM orders WHERE created_at >= NOW() - INTERVAL '${toSafeInterval(timeRange)}') as avg_order_value
       `;
 
-      const result = await db.query(query);
+      let result = await db.query(query);
       
-      const analytics = {
+      let analytics = {
         timeRange,
         activeFarmers: result.rows[0].active_farmers,
         activeBuyers: result.rows[0].active_buyers,
@@ -238,8 +238,8 @@ class AdvancedAnalyticsService {
       const { metrics, filters, groupBy, timeRange } = config;
       
       // Build dynamic query based on configuration
-      const query = this.buildCustomQuery(metrics, filters, groupBy, timeRange);
-      const result = await db.query(query.text, query.values);
+      let query = this.buildCustomQuery(metrics, filters, groupBy, timeRange);
+      let result = await db.query(query.text, query.values);
       
       return { 
         success: true, 
@@ -291,7 +291,7 @@ class AdvancedAnalyticsService {
    */
   buildWhereClause(filters, timeRange) {
     const conditions = [];
-    const values = [];
+    let values = [];
 
     if (timeRange) {
       conditions.push(`created_at >= NOW() - INTERVAL '${toSafeInterval(timeRange)}'`);
