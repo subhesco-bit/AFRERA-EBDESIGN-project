@@ -3,7 +3,7 @@
  * RESTful API endpoints for forestry management (M026)
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const forestryService = require('../../services/legacy/forestryService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which

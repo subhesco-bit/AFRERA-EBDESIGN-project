@@ -3,7 +3,7 @@
  * API endpoints for government subsidy management
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const governmentSubsidyService = require('../../services/strategic/governmentSubsidyService.js');
 const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');

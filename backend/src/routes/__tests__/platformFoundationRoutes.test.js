@@ -33,7 +33,7 @@ jest.mock('../../services/legacy/organizationManagementService', () => mockServi
 jest.mock('../../services/legacy/systemAdministrationService', () => mockServices.system);
 
 const app = express();
-app.use(express.json());
+app.use(expresson());
 app.use('/platform', require('../platformConfigurationRoutes'));
 app.use('/tenant', require('../tenantManagementRoutes'));
 app.use('/organization', require('../organizationManagementRoutes'));

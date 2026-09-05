@@ -9,7 +9,7 @@
  * - Original copilot endpoints
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const service = require('../../services/claude/aiCopilotService.js');
 const originalService = require('../../services/legacy/aiCopilotService.js');

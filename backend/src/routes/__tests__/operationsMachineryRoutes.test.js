@@ -18,7 +18,7 @@ const { farmActivityRoutes } = require('../operationsManagementRoutes');
 const maintenanceRoutes = require('../preventiveMaintenanceRoutes');
 const exchangeRoutes = require('../equipmentExchangeRoutes');
 const app = express();
-app.use(express.json());
+app.use(expresson());
 app.use('/activities', farmActivityRoutes);
 app.use('/maintenance', maintenanceRoutes);
 app.use('/exchange', exchangeRoutes);

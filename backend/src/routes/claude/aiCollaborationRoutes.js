@@ -3,7 +3,7 @@
  * API endpoints for Devin-Claude AI collaboration
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const aiCollaborationService = require('../../services/claude/aiCollaborationService.js');
 

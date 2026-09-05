@@ -3,7 +3,7 @@
  * RESTful API endpoints for apiculture management (M028)
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const apicultureService = require('../../services/legacy/apicultureService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which

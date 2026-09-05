@@ -2,7 +2,7 @@
  * Logistics AI Routes - Claude AI Integration
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const service = require('../../services/claude/logisticsAIService.js');
 const originalService = require('../../services/legacy/logisticsService.js');

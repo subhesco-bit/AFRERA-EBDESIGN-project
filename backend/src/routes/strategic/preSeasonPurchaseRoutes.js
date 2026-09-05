@@ -3,7 +3,7 @@
  * API endpoints for pre-season purchase agreements
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const preSeasonPurchaseService = require('../../services/strategic/preSeasonPurchaseService.js');
 const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');

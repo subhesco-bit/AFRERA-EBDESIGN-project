@@ -2,7 +2,7 @@
  * MFA Routes - Multi-Factor Authentication API Endpoints
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const mfaService = require('../../services/dual-use/mfaService.js');
 const { authMiddleware } = require('../../middleware/auth.js');
