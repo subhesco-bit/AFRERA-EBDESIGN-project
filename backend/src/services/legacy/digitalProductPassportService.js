@@ -10,7 +10,7 @@ const crypto = require('crypto');
 const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 // Loaded on first QR generation, not at import — see authService for why.
 const QRCode = { toDataURL: (...args) => require('qrcode').toDataURL(...args) };
 
@@ -27,7 +27,7 @@ const pool = require('../../database/pool');
 /**
  * Generate unique product ID
  */
-router.post('/product-id', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/product-id', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_type,
@@ -110,7 +110,7 @@ router.get('/product-id/:id', authMiddleware, async (req, res) => {
 /**
  * Create lot/batch record
  */
-router.post('/batches', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/batches', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       batch_number,
@@ -191,7 +191,7 @@ router.get('/batches', authMiddleware, async (req, res) => {
 /**
  * Create farm information record
  */
-router.post('/farm-info', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/farm-info', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -280,7 +280,7 @@ router.get('/farm-info', authMiddleware, async (req, res) => {
 /**
  * Create farmer information record
  */
-router.post('/farmer-info', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/farmer-info', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -364,7 +364,7 @@ router.get('/farmer-info', authMiddleware, async (req, res) => {
 /**
  * Create certification information record
  */
-router.post('/certification-info', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/certification-info', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -448,7 +448,7 @@ router.get('/certification-info', authMiddleware, async (req, res) => {
 /**
  * Create processing history record
  */
-router.post('/processing-history', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/processing-history', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -532,7 +532,7 @@ router.get('/processing-history', authMiddleware, async (req, res) => {
 /**
  * Create logistics history record
  */
-router.post('/logistics-history', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/logistics-history', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -617,7 +617,7 @@ router.get('/logistics-history', authMiddleware, async (req, res) => {
 /**
  * Create sustainability data record
  */
-router.post('/sustainability-data', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/sustainability-data', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -696,7 +696,7 @@ router.get('/sustainability-data', authMiddleware, async (req, res) => {
 /**
  * Create carbon data record
  */
-router.post('/carbon-data', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/carbon-data', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -771,7 +771,7 @@ router.get('/carbon-data', authMiddleware, async (req, res) => {
 /**
  * Create quality report
  */
-router.post('/quality-reports', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/quality-reports', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -853,7 +853,7 @@ router.get('/quality-reports', authMiddleware, async (req, res) => {
 /**
  * Create recall status record
  */
-router.post('/recall-status', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/recall-status', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -1057,3 +1057,4 @@ module.exports = {
   router,
   isHealthy
 };
+

@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
 const { PROCUREMENT_ROLES } = require('../../middleware/roleGroups');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -24,7 +24,7 @@ const pool = require('../../database/pool');
 /**
  * Create tender
  */
-router.post('/tenders', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/tenders', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       tender_number,
@@ -126,7 +126,7 @@ router.get('/tenders', authMiddleware, async (req, res) => {
 /**
  * Submit bid for tender
  */
-router.post('/tenders/:id/bids', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/tenders/:id/bids', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       supplier_id,
@@ -169,7 +169,7 @@ router.post('/tenders/:id/bids', authRateLimit, authMiddleware, async (req, res)
 /**
  * Create demand forecast
  */
-router.post('/demand-forecast', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/demand-forecast', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -256,7 +256,7 @@ router.get('/demand-forecast', authMiddleware, async (req, res) => {
 /**
  * Create menu plan
  */
-router.post('/menu-plans', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/menu-plans', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -365,7 +365,7 @@ router.get('/menu-plans', authMiddleware, async (req, res) => {
 /**
  * Create nutrition compliance record
  */
-router.post('/nutrition-compliance', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/nutrition-compliance', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -448,7 +448,7 @@ router.get('/nutrition-compliance', authMiddleware, async (req, res) => {
 /**
  * Create supply contract
  */
-router.post('/contracts', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/contracts', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       contract_number,
@@ -549,7 +549,7 @@ router.get('/contracts', authMiddleware, async (req, res) => {
 /**
  * Create quality inspection
  */
-router.post('/quality-inspections', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/quality-inspections', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       inspection_number,
@@ -646,7 +646,7 @@ router.get('/quality-inspections', authMiddleware, async (req, res) => {
 /**
  * Create settlement record
  */
-router.post('/settlements', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/settlements', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       settlement_number,
@@ -798,7 +798,7 @@ function generateOfferNumber() {
  * Submit a contract offer. Institution-side: authenticated, but the caller
  * never learns the farmer's floor — only whether the offer cleared it.
  */
-router.post('/contract-offers', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/contract-offers', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       farmer_id, crop, institution_id, offered_price_inr_per_kg, quantity_kg,
@@ -918,3 +918,4 @@ module.exports = {
   router,
   isHealthy
 };
+

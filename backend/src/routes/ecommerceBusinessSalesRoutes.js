@@ -13,7 +13,7 @@ const express = require('express');
 const router = express.Router();
 const ecommerceBusinessSalesController = require('../controllers/ecommerceBusinessSalesController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // ============================================================================
 // B2B BULK ORDER ROUTES
@@ -24,21 +24,21 @@ const { authRateLimit } = require('../middleware/rateLimiter');
  * @desc    Create B2B bulk order request
  * @access  Private (Buyer)
  */
-router.post('/create-bulk-order', authRateLimit, authMiddleware, ecommerceBusinessSalesController.createBulkOrder);
+router.post('/create-bulk-order', authLimiter, authMiddleware, ecommerceBusinessSalesController.createBulkOrder);
 
 /**
  * @route   POST /api/ecommerce-business/submit-quotation
  * @desc    Submit quotation for bulk order
  * @access  Private (Seller)
  */
-router.post('/submit-quotation', authRateLimit, authMiddleware, ecommerceBusinessSalesController.submitQuotation);
+router.post('/submit-quotation', authLimiter, authMiddleware, ecommerceBusinessSalesController.submitQuotation);
 
 /**
  * @route   POST /api/ecommerce-business/accept-quotation/:quotationId
  * @desc    Accept quotation and create order
  * @access  Private (Buyer)
  */
-router.post('/accept-quotation/:quotationId', authRateLimit, authMiddleware, ecommerceBusinessSalesController.acceptQuotation);
+router.post('/accept-quotation/:quotationId', authLimiter, authMiddleware, ecommerceBusinessSalesController.acceptQuotation);
 
 // ============================================================================
 // CONTRACT FARMING ROUTES
@@ -49,14 +49,14 @@ router.post('/accept-quotation/:quotationId', authRateLimit, authMiddleware, eco
  * @desc    Create contract farming agreement
  * @access  Private (Buyer)
  */
-router.post('/create-contract-farming', authRateLimit, authMiddleware, ecommerceBusinessSalesController.createContractFarming);
+router.post('/create-contract-farming', authLimiter, authMiddleware, ecommerceBusinessSalesController.createContractFarming);
 
 /**
  * @route   POST /api/ecommerce-business/record-milestone
  * @desc    Record contract farming milestone
  * @access  Private (Admin/Buyer/Farmer)
  */
-router.post('/record-milestone', authRateLimit, authMiddleware, ecommerceBusinessSalesController.recordContractMilestone);
+router.post('/record-milestone', authLimiter, authMiddleware, ecommerceBusinessSalesController.recordContractMilestone);
 
 // ============================================================================
 // SALES ANALYTICS ROUTES
@@ -85,10 +85,11 @@ router.get('/b2b-conversion-metrics', authMiddleware, ecommerceBusinessSalesCont
  * @desc    Calculate platform commission for order
  * @access  Private (Admin)
  */
-router.post('/calculate-commission/:orderId', authRateLimit, authMiddleware, ecommerceBusinessSalesController.calculateCommission);
+router.post('/calculate-commission/:orderId', authLimiter, authMiddleware, ecommerceBusinessSalesController.calculateCommission);
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
 module.exports = router;
+

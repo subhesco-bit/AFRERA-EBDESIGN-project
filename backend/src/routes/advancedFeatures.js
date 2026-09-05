@@ -8,7 +8,7 @@ const router = express.Router();
 const advancedFeaturesService = require('../services/legacy/advancedFeaturesService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // AI Recommendations Routes
 router.post('/ai/recommendations', authMiddleware, async (req, res) => {

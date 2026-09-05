@@ -9,7 +9,7 @@ const router = express.Router();
 const assetAccountingService = require('../services/legacy/assetAccountingService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // Fixed Asset Register
 router.post('/assets', authMiddleware, adminMiddleware, async (req, res) => {
@@ -77,7 +77,7 @@ router.post('/assets/:assetId/depreciation-schedule/:periodDate/post', authMiddl
   }
 });
 
-router.post('/depreciation-run', authRateLimit, authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/depreciation-run', authLimiter, authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { companyId, asOfDate } = req.body;
     let result = await assetAccountingService.runDepreciationForPeriod(companyId, asOfDate);
@@ -98,3 +98,4 @@ router.post('/assets/:assetId/dispose', authMiddleware, adminMiddleware, async (
 });
 
 module.exports = router;
+

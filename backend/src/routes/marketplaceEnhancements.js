@@ -11,7 +11,7 @@ const productReviewService = require('../services/legacy/productReviewService');
 const bulkOrderService = require('../services/legacy/bulkOrderService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // GST Routes
 router.post('/gst/calculate/order/:orderId', authMiddleware, async (req, res) => {
@@ -64,7 +64,7 @@ router.post('/gst/validate', async (req, res) => {
 });
 
 // Product Review Routes
-router.post('/reviews', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/reviews', authLimiter, authMiddleware, async (req, res) => {
   try {
     const review = await productReviewService.createReview(req.user.id, req.body.productId, req.body);
     res.json({ success: true, data: review });
@@ -93,7 +93,7 @@ router.get('/reviews/product/:productId/stats', async (req, res) => {
   }
 });
 
-router.post('/reviews/:reviewId/helpful', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/reviews/:reviewId/helpful', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
     const result = await productReviewService.markReviewHelpful(reviewId, req.user.id);
@@ -103,7 +103,7 @@ router.post('/reviews/:reviewId/helpful', authRateLimit, authMiddleware, async (
   }
 });
 
-router.put('/reviews/:reviewId', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/reviews/:reviewId', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
     let review = await productReviewService.updateReview(reviewId, req.user.id, req.body);
@@ -113,7 +113,7 @@ router.put('/reviews/:reviewId', authRateLimit, authMiddleware, async (req, res)
   }
 });
 
-router.delete('/reviews/:reviewId', authRateLimit, authMiddleware, async (req, res) => {
+router.delete('/reviews/:reviewId', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
     let result = await productReviewService.deleteReview(reviewId, req.user.id);
@@ -143,7 +143,7 @@ router.get('/reviews/user', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/reviews/:reviewId/report', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/reviews/:reviewId/report', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
     const { reason } = req.body;
@@ -155,7 +155,7 @@ router.post('/reviews/:reviewId/report', authRateLimit, authMiddleware, async (r
 });
 
 // Bulk Order Routes
-router.post('/bulk-orders', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/bulk-orders', authLimiter, authMiddleware, async (req, res) => {
   try {
     const bulkOrder = await bulkOrderService.createBulkOrderRequest(req.user.id, req.body);
     res.json({ success: true, data: bulkOrder });
@@ -250,3 +250,4 @@ router.delete('/bulk-orders/:orderId', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+
