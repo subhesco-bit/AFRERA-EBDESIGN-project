@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const subscriptionService = require('../services/subscriptionService');
-const { authenticateToken } = require('../middleware/auth');
+const { authMiddleware: authenticateToken } = require('../middleware/auth');
 const { validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
@@ -34,3 +34,4 @@ router.delete('/subscriptions/:id', authenticateToken, async (req, res, next) =>
 });
 
 module.exports = router;
+

@@ -5,7 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const loanManagementService = require('../services/loanManagementService');
-const { authenticateToken, authorize } = require('../middleware/auth');
+const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
 const { validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
@@ -76,3 +76,4 @@ router.get('/loans/:id/payments', authenticateToken, async (req, res, next) => {
 });
 
 module.exports = router;
+
