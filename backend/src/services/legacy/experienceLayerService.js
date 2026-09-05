@@ -24,8 +24,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../../database/pool');
+const { logger } = require('../../../utils/logger');
 
 // ---------------------------------------------------------------------------
 // Design tokens
@@ -439,3 +439,4 @@ module.exports = {
   resolveExperience,
   feedbackFor,
 };
+

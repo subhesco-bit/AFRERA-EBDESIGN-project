@@ -3,10 +3,10 @@
  * Manages insurance policies, claims, and master policies
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { authMiddleware, requireRole } = require('../../../middleware/auth');
+const { PLATFORM_STAFF_ROLES } = require('../../../middleware/roleGroups');
 
 /**
  * Create insurance policy
@@ -685,3 +685,4 @@ module.exports = {
   getInsuranceProducts,
   calculatePremium
 };
+

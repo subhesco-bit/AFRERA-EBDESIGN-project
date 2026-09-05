@@ -30,11 +30,11 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../../utils/logger');
 
 class CostControlService {
   constructor() {
-    this.pool = require('../../database/pool');
+    this.pool = require('../../../database/pool');
   }
 
   // -------------------------------------------------------------------
@@ -434,3 +434,4 @@ class CostControlService {
 }
 
 module.exports = new CostControlService();
+

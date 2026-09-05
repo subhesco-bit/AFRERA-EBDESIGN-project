@@ -832,3 +832,4 @@ class KnowledgeService {
 const knowledgeService = new KnowledgeService();
 
 module.exports = knowledgeService;
+

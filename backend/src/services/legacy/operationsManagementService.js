@@ -59,3 +59,4 @@ module.exports = {
   farmActivities, farmTasks, contractors, machineryOperations,
   equipmentScheduling, inputConsumption, farmProductivity, farmOperationsDashboard,
 };
+

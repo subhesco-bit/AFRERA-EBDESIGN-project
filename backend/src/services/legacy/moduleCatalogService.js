@@ -1,10 +1,10 @@
 const express = require('express');
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../../utils/logger');
 // SECURITY 2026-08-04: /assistant is a POST because it carries a prompt body,
 // but it only READS the module catalog — it changes nothing. Requiring auth
 // would break discovery for anonymous visitors, which is the point of the
 // catalog. Throttling is the appropriate control for an unauthenticated POST.
-const { rateLimiter } = require('../../middleware/rateLimiter');
+const { rateLimiter } = require('../../../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -234,3 +234,4 @@ module.exports = {
   buildPlatformOverview,
   buildAssistantResponse
 };
+

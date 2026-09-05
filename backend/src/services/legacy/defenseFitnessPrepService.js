@@ -13,8 +13,8 @@
  * eat toward a published, cited physical standard," not a vague fitness app.
  */
 
-const { getPostgreSQL } = require('../../database/connection');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('../../../utils/logger');
 
 async function getStandardCategories() {
   const pg = getPostgreSQL();
@@ -90,3 +90,4 @@ module.exports = {
   recordAttempt,
   getReadinessComparison,
 };
+

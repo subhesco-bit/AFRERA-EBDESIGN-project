@@ -6,9 +6,9 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { authMiddleware, requireRole } = require('../../../middleware/auth');
 
 const router = express.Router();
 const STORE_PATH = path.join(__dirname, '..', '..', 'database', 'form_store.json');
@@ -441,3 +441,4 @@ module.exports = {
   listSubmissions,
   buildAiInsights
 };
+

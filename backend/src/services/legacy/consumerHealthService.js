@@ -5,16 +5,16 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
-const { NUTRITION_WELLNESS_DISCLAIMER } = require('../../utils/disclaimers');
+const { logger } = require('../../../utils/logger');
+const { authMiddleware } = require('../../../middleware/auth');
+const { NUTRITION_WELLNESS_DISCLAIMER } = require('../../../utils/disclaimers');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
-const { persistTestFallback } = require('../../utils/testFallbackStore');
+const pool = require('../../../database/pool');
+const { persistTestFallback } = require('../../../utils/testFallbackStore');
 
 // ============================================================================
 // HEALTH PROFILES
@@ -896,3 +896,4 @@ module.exports = {
   calculateBMRTDEE,
   isHealthy
 };
+

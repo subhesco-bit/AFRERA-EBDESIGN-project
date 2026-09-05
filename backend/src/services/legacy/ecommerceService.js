@@ -12,9 +12,9 @@
  * - Multi-language and multi-currency support
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { signalBus } = require('../../../core/signalBus');
 
 // ============================================================================
 // PRODUCT LISTING MANAGEMENT
@@ -712,3 +712,4 @@ module.exports = {
   getMarketPriceTrends,
   getMarketDemandAnalysis
 };
+

@@ -4,10 +4,10 @@
  * Handles data synchronization, business process automation, and financial Reconciliation
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
-const { AppError } = require('../../middleware/errorHandler');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { authMiddleware } = require('../../../middleware/auth');
+const { AppError } = require('../../../middleware/errorHandler');
 
 // ERP configuration
 const ERP_CONFIG = {
@@ -941,3 +941,4 @@ module.exports = {
   getSyncStatus,
   triggerBulkSync
 };
+

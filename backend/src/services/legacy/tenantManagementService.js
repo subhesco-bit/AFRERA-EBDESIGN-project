@@ -9,10 +9,10 @@
  * - Tenant health scoring
  */
 
-const DatabaseService = require('../../database/connection');
+const DatabaseService = require('../../../database/connection');
 const aiGatewayService = require('./aiGatewayService');
 const analyticsService = require('./analyticsService');
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../../utils/logger');
 
 class TenantManagementService {
   constructor() {

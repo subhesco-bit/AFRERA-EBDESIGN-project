@@ -4,8 +4,8 @@
  * Provides standardized AI capabilities: prediction, optimization, analysis, recommendations
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class AiGatewayService {
   constructor() {

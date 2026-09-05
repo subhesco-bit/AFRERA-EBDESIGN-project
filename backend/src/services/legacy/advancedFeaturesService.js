@@ -3,13 +3,13 @@
  * Future-ready capabilities including AI recommendations, blockchain integration, and IoT automation
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../../utils/logger');
 
 class AdvancedFeaturesService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../../database/pool');
   }
 
   /**
@@ -525,3 +525,4 @@ class AdvancedFeaturesService {
 }
 
 module.exports = new AdvancedFeaturesService();
+

@@ -18,9 +18,9 @@
  * - Dietary restriction compatibility
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { signalBus } = require('../../../core/signalBus');
 
 // Import integrated services
 const nutritionIntelligenceService = require('./nutritionIntelligenceService');
@@ -847,3 +847,4 @@ module.exports = {
   // Signal Bus Events
   emitIntegrationEvent
 };
+

@@ -20,8 +20,8 @@
  *    own even before any video-rendering provider is ever configured.
  */
 
-const { getPostgreSQL } = require('../../database/connection');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('../../../utils/logger');
 const nutritionIntelligenceService = require('./nutritionIntelligenceService');
 
 // ============================================================================
@@ -192,3 +192,4 @@ module.exports = {
   buildNutrientComparisonScript,
   requestProductVideoGeneration,
 };
+

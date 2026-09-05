@@ -17,9 +17,9 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
-const { withTransaction } = require('../../core/withTransaction');
+const { logger } = require('../../../utils/logger');
+const pool = require('../../../database/pool');
+const { withTransaction } = require('../../../core/withTransaction');
 
 class CooperativeShareService {
   constructor() {
@@ -198,3 +198,4 @@ class CooperativeShareService {
 }
 
 module.exports = new CooperativeShareService();
+

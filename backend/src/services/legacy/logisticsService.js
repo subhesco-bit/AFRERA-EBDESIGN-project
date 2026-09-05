@@ -3,10 +3,10 @@
  * Manages shipments, vehicles, drivers, and tracking
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { LOGISTICS_ROLES } = require('../../middleware/roleGroups');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { authMiddleware, requireRole } = require('../../../middleware/auth');
+const { LOGISTICS_ROLES } = require('../../../middleware/roleGroups');
 const decisionSupportService = require('./decisionSupportService');
 
 /**
@@ -170,7 +170,7 @@ async function updateShipmentStatus(shipmentId, status, notes = null) {
     const shipment = result.rows[0];
     
     // Emit WebSocket event
-    const io = require('../../index').app.get('io');
+    const io = require('../../../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('shipment_status_updated', {
         shipment_id: shipmentId,
@@ -211,7 +211,7 @@ async function addTrackingUpdate(shipmentId, trackingData) {
     ]);
     
     // Emit WebSocket event
-    let io = require('../../index').app.get('io');
+    let io = require('../../../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('tracking_update', {
         shipment_id: shipmentId,
@@ -697,3 +697,4 @@ module.exports = {
   getShipmentModes,
   getEcoLogisticsScore
 };
+

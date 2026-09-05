@@ -13,11 +13,11 @@
  * - Explainable AI (XAI)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL, getMongoDatabase } = require('../../database/connection');
-const stats = require('../../utils/statistics');
-const { authMiddleware } = require('../../middleware/auth');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL, getMongoDatabase } = require('../../../database/connection');
+const stats = require('../../../utils/statistics');
+const { authMiddleware } = require('../../../middleware/auth');
+const { signalBus, SIGNAL, SEVERITY } = require('../../../core/signalBus');
 
 // NOTE (2026-08-03): @tensorflow/tfjs-node used to be imported here and was
 // never actually called anywhere in this file - the "models" below returned

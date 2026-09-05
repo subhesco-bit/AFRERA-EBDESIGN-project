@@ -28,8 +28,8 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
+const { logger } = require('../../../utils/logger');
+const pool = require('../../../database/pool');
 const PDFDocument = require('pdfkit');
 
 class DprGenerationService {
@@ -456,3 +456,4 @@ class DprGenerationService {
 }
 
 module.exports = new DprGenerationService();
+

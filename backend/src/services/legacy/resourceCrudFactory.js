@@ -11,7 +11,7 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
+const pool = require('../../../database/pool');
 
 function createCrudService(tableName, { idColumn = 'id', orderBy = 'created_at DESC', fields, requiredFields = [] } = {}) {
   if (!Array.isArray(fields) || !fields.length) {
@@ -103,3 +103,4 @@ module.exports = { createCrudService };
   const { ...rest } = m105;
   Object.assign(module.exports, rest);
 }
+
