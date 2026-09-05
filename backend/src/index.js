@@ -489,10 +489,9 @@ async function startup() {
 
     // Step 14: Mount orphaned services with setupRoutes()
     logger.info('🔌 Mounting previously-orphaned services with setupRoutes()...');
-    const serviceLoader = app.locals.serviceLoader;
-    if (serviceLoader) {
+    if (app.locals.serviceLoader) {
       try {
-        const orphanedMountStats = await serviceLoader.mountServiceRoutes(app);
+        const orphanedMountStats = await app.locals.serviceLoader.mountServiceRoutes(app);
         logger.info(`✅ Orphaned services mount completed`, orphanedMountStats);
       } catch (error) {
         logger.warn('⚠️  Orphaned services mount encountered issues', { error: error.message });
