@@ -1134,10 +1134,10 @@ const router = express.Router();
 // The dedicated 5-req/60s brute-force limiter existed but was never
 // attached here — these routes fell back to the generic 100 req/min
 // limiter, far too permissive for login/register/2FA.
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 
 // Register
-router.post('/register', authRateLimit, async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const result = await registerUser(req.body);
     res.status(201).json(result);
@@ -1147,7 +1147,7 @@ router.post('/register', authRateLimit, async (req, res) => {
 });
 
 // Login
-router.post('/login', authRateLimit, async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password, device_info } = req.body;
     let result = await loginUser(email, password, device_info);
@@ -1158,7 +1158,7 @@ router.post('/login', authRateLimit, async (req, res) => {
 });
 
 // Refresh token
-router.post('/refresh', authRateLimit, async (req, res) => {
+router.post('/refresh', authLimiter, async (req, res) => {
   try {
     const { refresh_token } = req.body;
     let result = await refreshAccessToken(refresh_token);
@@ -1193,7 +1193,7 @@ router.post('/2fa/setup', lazyAuth, async (req, res) => {
 // Verify 2FA — a raw 6-digit code with no auth gate (the user isn't fully
 // logged in yet at this step of the flow), so the rate limiter is this
 // route's only real defense against brute-forcing the ~1,000,000 codes.
-router.post('/2fa/verify', authRateLimit, async (req, res) => {
+router.post('/2fa/verify', authLimiter, async (req, res) => {
   try {
     const { user_id, code } = req.body;
     let result = await verifyTwoFactor(user_id, code);
