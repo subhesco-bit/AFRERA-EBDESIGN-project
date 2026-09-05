@@ -205,7 +205,7 @@ class KnowledgeService {
    * Get a specific article
    */
   getArticle(articleId) {
-    const article = this.articles.get(articleId);
+    let article = this.articles.get(articleId);
     if (article) {
       article.viewCount = (article.viewCount || 0) + 1;
       this.articles.set(articleId, article);
@@ -217,7 +217,7 @@ class KnowledgeService {
    * Update article
    */
   updateArticle(articleId, updates) {
-    const article = this.articles.get(articleId);
+    let article = this.articles.get(articleId);
     if (!article) {
       throw new Error(`Article ${articleId} not found`);
     }
@@ -254,7 +254,7 @@ class KnowledgeService {
    * Delete article
    */
   deleteArticle(articleId) {
-    const article = this.articles.get(articleId);
+    let article = this.articles.get(articleId);
     if (!article) {
       throw new Error(`Article ${articleId} not found`);
     }
@@ -264,7 +264,7 @@ class KnowledgeService {
     
     // Update taxonomy count
     if (article.taxonomyId) {
-      const taxonomy = this.taxonomies.get(article.taxonomyId);
+      let taxonomy = this.taxonomies.get(article.taxonomyId);
       if (taxonomy) {
         taxonomy.articleCount = Math.max(0, (taxonomy.articleCount || 0) - 1);
         this.taxonomies.set(article.taxonomyId, taxonomy);
@@ -369,7 +369,7 @@ class KnowledgeService {
   createTaxonomy(taxonomyData) {
     const taxonomyId = taxonomyData.id || `tax-${Date.now()}`;
     
-    const taxonomy = {
+    let taxonomy = {
       id: taxonomyId,
       name: taxonomyData.name,
       description: taxonomyData.description,
@@ -471,7 +471,7 @@ class KnowledgeService {
    * Calculate relevance score
    */
   calculateRelevance(query, item) {
-    const queryLower = query.toLowerCase();
+    let queryLower = query.toLowerCase();
     let score = 0;
 
     if (item.title.toLowerCase().includes(queryLower)) score += 10;
@@ -511,7 +511,7 @@ class KnowledgeService {
    */
   calculateReadTime(content) {
     if (!content) return 0;
-    const words = content.split(' ').length;
+    let words = content.split(' ').length;
     return Math.ceil(words / 200); // Average reading speed: 200 words per minute
   }
 
@@ -564,7 +564,7 @@ class KnowledgeService {
       throw new Error(`No version history found for ${itemId}`);
     }
 
-    const version = history.find(v => v.version === versionNumber);
+    let version = history.find(v => v.version === versionNumber);
     if (!version) {
       throw new Error(`Version ${versionNumber} not found`);
     }
@@ -650,7 +650,7 @@ class KnowledgeService {
     
     // Update item stats
     if (feedbackData.resourceType === 'article') {
-      const article = this.articles.get(feedbackData.resourceId);
+      let article = this.articles.get(feedbackData.resourceId);
       if (article) {
         if (feedbackData.helpful) {
           article.helpfulCount = (article.helpfulCount || 0) + 1;
@@ -696,7 +696,7 @@ class KnowledgeService {
         reason: 'Based on your reading history and interests'
       }));
     } else if (context.type === 'trending_topics') {
-      const articles = this.getArticles({ status: 'published' });
+      let articles = this.getArticles({ status: 'published' });
       const trending = articles
         .sort((a, b) => b.viewCount - a.viewCount)
         .slice(0, 5);
@@ -730,10 +730,10 @@ class KnowledgeService {
    * Get knowledge analytics
    */
   getAnalytics() {
-    const articles = Array.from(this.articles.values());
+    let articles = Array.from(this.articles.values());
     const wikiPages = Array.from(this.wikiPages.values());
     const taxonomies = Array.from(this.taxonomies.values());
-    const feedback = Array.from(this.feedback.values());
+    let feedback = Array.from(this.feedback.values());
 
     return {
       content: {
@@ -776,7 +776,7 @@ class KnowledgeService {
     const grouped = {};
     articles.forEach(article => {
       const taxId = article.taxonomyId || 'uncategorized';
-      const taxonomy = this.taxonomies.get(taxId);
+      let taxonomy = this.taxonomies.get(taxId);
       const name = taxonomy ? taxonomy.name : 'Uncategorized';
       grouped[name] = (grouped[name] || 0) + 1;
     });
@@ -787,7 +787,7 @@ class KnowledgeService {
    * Group articles by language
    */
   groupByLanguage(articles) {
-    const grouped = {};
+    let grouped = {};
     articles.forEach(article => {
       const lang = article.language || 'unknown';
       grouped[lang] = (grouped[lang] || 0) + 1;
@@ -799,7 +799,7 @@ class KnowledgeService {
    * Group articles by status
    */
   groupByStatus(articles) {
-    const grouped = {};
+    let grouped = {};
     articles.forEach(article => {
       const status = article.status || 'unknown';
       grouped[status] = (grouped[status] || 0) + 1;
@@ -832,3 +832,6 @@ class KnowledgeService {
 const knowledgeService = new KnowledgeService();
 
 module.exports = knowledgeService;
+
+
+

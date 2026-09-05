@@ -13,7 +13,7 @@ const express = require('express');
 const router = express.Router();
 const ecommerceMarketingController = require('../controllers/ecommerceMarketingController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // ============================================================================
 // CAMPAIGN MANAGEMENT ROUTES
@@ -24,21 +24,21 @@ const { authRateLimit } = require('../middleware/rateLimiter');
  * @desc    Create marketing campaign
  * @access  Private (Admin/Marketing)
  */
-router.post('/create-campaign', authRateLimit, authMiddleware, ecommerceMarketingController.createCampaign);
+router.post('/create-campaign', authLimiter, authMiddleware, ecommerceMarketingController.createCampaign);
 
 /**
  * @route   POST /api/ecommerce-marketing/launch-campaign/:campaignId
  * @desc    Launch marketing campaign
  * @access  Private (Admin/Marketing)
  */
-router.post('/launch-campaign/:campaignId', authRateLimit, authMiddleware, ecommerceMarketingController.launchCampaign);
+router.post('/launch-campaign/:campaignId', authLimiter, authMiddleware, ecommerceMarketingController.launchCampaign);
 
 /**
  * @route   POST /api/ecommerce-marketing/update-campaign-metrics/:campaignId
  * @desc    Update campaign performance metrics
  * @access  Private (Admin/Marketing)
  */
-router.post('/update-campaign-metrics/:campaignId', authRateLimit, authMiddleware, ecommerceMarketingController.updateCampaignMetrics);
+router.post('/update-campaign-metrics/:campaignId', authLimiter, authMiddleware, ecommerceMarketingController.updateCampaignMetrics);
 
 // ============================================================================
 // SPONSORED PRODUCTS ROUTES
@@ -49,7 +49,7 @@ router.post('/update-campaign-metrics/:campaignId', authRateLimit, authMiddlewar
  * @desc    Create sponsored product listing
  * @access  Private (Seller)
  */
-router.post('/create-sponsored-product', authRateLimit, authMiddleware, ecommerceMarketingController.createSponsoredProduct);
+router.post('/create-sponsored-product', authLimiter, authMiddleware, ecommerceMarketingController.createSponsoredProduct);
 
 /**
  * @route   GET /api/ecommerce-marketing/sponsored-products
@@ -67,7 +67,7 @@ router.get('/sponsored-products', ecommerceMarketingController.getSponsoredProdu
  * @desc    Create promotion/discount offer
  * @access  Private (Admin/Marketing)
  */
-router.post('/create-promotion', authRateLimit, authMiddleware, ecommerceMarketingController.createPromotion);
+router.post('/create-promotion', authLimiter, authMiddleware, ecommerceMarketingController.createPromotion);
 
 /**
  * @route   POST /api/ecommerce-marketing/apply-promotion/:promoCode
@@ -85,14 +85,14 @@ router.post('/apply-promotion/:promoCode', authMiddleware, ecommerceMarketingCon
  * @desc    Create cart abandonment retargeting campaign
  * @access  Private (System)
  */
-router.post('/retargeting-cart', authRateLimit, ecommerceMarketingController.createCartRetargeting);
+router.post('/retargeting-cart', authLimiter, ecommerceMarketingController.createCartRetargeting);
 
 /**
  * @route   POST /api/ecommerce-marketing/retargeting-product-view
  * @desc    Create product view retargeting
  * @access  Private (System)
  */
-router.post('/retargeting-product-view', authRateLimit, ecommerceMarketingController.createProductViewRetargeting);
+router.post('/retargeting-product-view', authLimiter, ecommerceMarketingController.createProductViewRetargeting);
 
 // ============================================================================
 // PERFORMANCE ANALYTICS ROUTES
@@ -110,3 +110,4 @@ router.get('/analytics', authMiddleware, ecommerceMarketingController.getMarketi
 // ============================================================================
 
 module.exports = router;
+

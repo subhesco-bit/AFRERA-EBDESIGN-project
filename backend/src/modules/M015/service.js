@@ -49,7 +49,7 @@ async function setupTOTP(userId) {
 }
 
 async function verifyTOTP(userId, token) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get user's TOTP secret
@@ -62,7 +62,7 @@ async function verifyTOTP(userId, token) {
     return { success: false, error: 'TOTP not setup for user' };
   }
   
-  const secret = secretRes.rows[0].secret;
+  let secret = secretRes.rows[0].secret;
   
   // Verify token
   const verified = speakeasy.totp.verify({
@@ -83,7 +83,7 @@ async function verifyTOTP(userId, token) {
 
 // SMS OTP
 async function sendSMSOTP(userId, phoneNumber) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Generate OTP
@@ -110,10 +110,10 @@ async function sendSMSOTP(userId, phoneNumber) {
 }
 
 async function verifySMSOTP(userId, otp) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
+  let hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
   
   const res = await pg.query(
     `SELECT * FROM mfa_otp 
@@ -135,14 +135,14 @@ async function verifySMSOTP(userId, otp) {
 
 // Email OTP
 async function sendEmailOTP(userId, email) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Generate OTP
-  const otp = crypto.randomInt(100000, 999999).toString();
+  let otp = crypto.randomInt(100000, 999999).toString();
   
   // Store OTP (hashed)
-  const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
+  let hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
   
   await pg.query(
     `INSERT INTO mfa_otp (user_id, method, email, otp_hash, expires_at, created_at)
@@ -162,12 +162,12 @@ async function sendEmailOTP(userId, email) {
 }
 
 async function verifyEmailOTP(userId, otp) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
+  let hashedOTP = crypto.createHash('sha256').update(otp).digest('hex');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM mfa_otp 
      WHERE user_id = $1 AND method = 'email' AND otp_hash = $2 AND expires_at > NOW()
      ORDER BY created_at DESC LIMIT 1`,
@@ -187,7 +187,7 @@ async function verifyEmailOTP(userId, otp) {
 
 // Biometric authentication
 async function registerBiometric(userId, biometricData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // In production, biometric data should be properly encrypted and stored securely
@@ -210,12 +210,12 @@ async function registerBiometric(userId, biometricData) {
 }
 
 async function verifyBiometric(userId, biometricData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const biometricHash = crypto.createHash('sha256').update(JSON.stringify(biometricData)).digest('hex');
+  let biometricHash = crypto.createHash('sha256').update(JSON.stringify(biometricData)).digest('hex');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM mfa_biometrics WHERE user_id = $1 AND biometric_type = $2 AND is_active = true',
     [userId, biometricData.type]
   );
@@ -231,7 +231,7 @@ async function verifyBiometric(userId, biometricData) {
 
 // Device trust management
 async function setDeviceTrust(userId, deviceFingerprint, trustLevel = 'trusted') {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -248,10 +248,10 @@ async function setDeviceTrust(userId, deviceFingerprint, trustLevel = 'trusted')
 }
 
 async function checkDeviceTrust(userId, deviceFingerprint) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM trusted_devices 
      WHERE user_id = $1 AND device_fingerprint = $2 AND expires_at > NOW()`,
     [userId, deviceFingerprint]
@@ -266,7 +266,7 @@ async function checkDeviceTrust(userId, deviceFingerprint) {
 
 // Recovery codes
 async function generateRecoveryCodes(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const codes = [];
@@ -294,12 +294,12 @@ async function generateRecoveryCodes(userId) {
 }
 
 async function verifyRecoveryCode(userId, code) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT codes_hash FROM mfa_recovery_codes WHERE user_id = $1 AND is_active = true',
     [userId]
   );
@@ -328,7 +328,7 @@ async function verifyRecoveryCode(userId, code) {
 
 // AI-powered fraud detection
 async function detectMFAFraud(userId, method, context) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Check for suspicious patterns
@@ -373,7 +373,7 @@ async function detectMFAFraud(userId, method, context) {
 
 // Get user's MFA status
 async function getMFAStatus(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const totpEnabled = await pg.query(
@@ -414,7 +414,7 @@ async function getMFAStatus(userId) {
 
 // Disable MFA for user
 async function disableMFA(userId, method) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   if (method === 'totp' || method === 'sms' || method === 'email') {
@@ -441,7 +441,7 @@ async function disableMFA(userId, method) {
 
 // Helper function
 async function logMFAEvent(userId, method, eventType) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(

@@ -11,11 +11,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * POST /api/blockchain/transactions/product
@@ -56,7 +56,7 @@ router.post('/transactions/custody',
     try {
       const transferData = req.body;
 
-      const result = await blockchainService.addCustodyTransfer(transferData);
+      let result = await blockchainService.addCustodyTransfer(transferData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Custody transfer recorded on blockchain');
@@ -79,7 +79,7 @@ router.get('/products/:productId/verify',
     try {
       const { productId } = req.params;
 
-      const result = await blockchainService.verifyProductAuthenticity(productId);
+      let result = await blockchainService.verifyProductAuthenticity(productId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Product authenticity verified');
@@ -102,7 +102,7 @@ router.get('/products/:productId/traceability',
     try {
       const { productId } = req.params;
 
-      const result = await blockchainService.getProductTraceabilityReport(productId);
+      let result = await blockchainService.getProductTraceabilityReport(productId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Product traceability report generated');
@@ -146,7 +146,7 @@ router.get('/stats',
   authorize(['admin', 'analyst']),
   async (req, res) => {
     try {
-      const result = await blockchainService.getBlockchainStats();
+      let result = await blockchainService.getBlockchainStats();
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Blockchain statistics retrieved');
@@ -167,7 +167,7 @@ router.post('/transactions/process',
   authorize(['admin', 'system']),
   async (req, res) => {
     try {
-      const result = await blockchainService.processPendingTransactions();
+      let result = await blockchainService.processPendingTransactions();
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, result.message);

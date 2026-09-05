@@ -14,7 +14,7 @@ const express = require('express');
 const router = express.Router();
 const nervousSystemController = require('../controllers/nervousSystemController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // ============================================================================
 // BRAIN CONTROL ROUTES
@@ -25,7 +25,7 @@ const { authRateLimit } = require('../middleware/rateLimiter');
  * @desc    Process event through central brain
  * @access  Private (Admin/System)
  */
-router.post('/brain/process-event', authRateLimit, authMiddleware, nervousSystemController.processEventThroughBrain);
+router.post('/brain/process-event', authLimiter, authMiddleware, nervousSystemController.processEventThroughBrain);
 
 /**
  * @route   GET /api/nervous/brain/decision-history
@@ -50,14 +50,14 @@ router.get('/brain/focus', authMiddleware, nervousSystemController.getBrainFocus
  * @desc    Start heart beat
  * @access  Private (Admin)
  */
-router.post('/heart/start', authRateLimit, authMiddleware, nervousSystemController.startHeartBeat);
+router.post('/heart/start', authLimiter, authMiddleware, nervousSystemController.startHeartBeat);
 
 /**
  * @route   POST /api/nervous/heart/stop
  * @desc    Stop heart beat
  * @access  Private (Admin)
  */
-router.post('/heart/stop', authRateLimit, authMiddleware, nervousSystemController.stopHeartBeat);
+router.post('/heart/stop', authLimiter, authMiddleware, nervousSystemController.stopHeartBeat);
 
 /**
  * @route   GET /api/nervous/heart/status
@@ -75,7 +75,7 @@ router.get('/heart/status', authMiddleware, nervousSystemController.getHeartBeat
  * @desc    Create neural pathway between modules
  * @access  Private (Admin)
  */
-router.post('/neural/create-pathway', authRateLimit, authMiddleware, nervousSystemController.createNeuralPathway);
+router.post('/neural/create-pathway', authLimiter, authMiddleware, nervousSystemController.createNeuralPathway);
 
 /**
  * @route   GET /api/nervous/neural/pathways
@@ -89,7 +89,7 @@ router.get('/neural/pathways', authMiddleware, nervousSystemController.getNeural
  * @desc    Strengthen neural pathway
  * @access  Private (Admin)
  */
-router.post('/neural/strengthen/:pathwayId', authRateLimit, authMiddleware, nervousSystemController.strengthenNeuralPathway);
+router.post('/neural/strengthen/:pathwayId', authLimiter, authMiddleware, nervousSystemController.strengthenNeuralPathway);
 
 // ============================================================================
 // REFLEX ARC ROUTES
@@ -100,7 +100,7 @@ router.post('/neural/strengthen/:pathwayId', authRateLimit, authMiddleware, nerv
  * @desc    Create reflex arc
  * @access  Private (Admin)
  */
-router.post('/reflex/create-arc', authRateLimit, authMiddleware, nervousSystemController.createReflexArc);
+router.post('/reflex/create-arc', authLimiter, authMiddleware, nervousSystemController.createReflexArc);
 
 /**
  * @route   GET /api/nervous/reflex/arcs
@@ -114,7 +114,7 @@ router.get('/reflex/arcs', authMiddleware, nervousSystemController.getReflexArcs
  * @desc    Trigger reflex response
  * @access  Private (Admin/System)
  */
-router.post('/reflex/trigger', authRateLimit, authMiddleware, nervousSystemController.triggerReflex);
+router.post('/reflex/trigger', authLimiter, authMiddleware, nervousSystemController.triggerReflex);
 
 // ============================================================================
 // SENSOR ROUTES
@@ -125,7 +125,7 @@ router.post('/reflex/trigger', authRateLimit, authMiddleware, nervousSystemContr
  * @desc    Register sensor
  * @access  Private (Admin)
  */
-router.post('/sensor/register', authRateLimit, authMiddleware, nervousSystemController.registerSensor);
+router.post('/sensor/register', authLimiter, authMiddleware, nervousSystemController.registerSensor);
 
 /**
  * @route   GET /api/nervous/sensor/data/:sensorId
@@ -150,7 +150,7 @@ router.get('/sensor/status', authMiddleware, nervousSystemController.getSensorsS
  * @desc    Execute motor function
  * @access  Private (Admin/System)
  */
-router.post('/motor/execute', authRateLimit, authMiddleware, nervousSystemController.executeMotorFunction);
+router.post('/motor/execute', authLimiter, authMiddleware, nervousSystemController.executeMotorFunction);
 
 /**
  * @route   GET /api/nervous/motor/active
@@ -168,14 +168,14 @@ router.get('/motor/active', authMiddleware, nervousSystemController.getActiveMot
  * @desc    Register enterprise route
  * @access  Private (Admin)
  */
-router.post('/route/register', authRateLimit, authMiddleware, nervousSystemController.registerEnterpriseRoute);
+router.post('/route/register', authLimiter, authMiddleware, nervousSystemController.registerEnterpriseRoute);
 
 /**
  * @route   POST /api/nervous/route/request
  * @desc    Route request through enterprise control
  * @access  Private (System)
  */
-router.post('/route/request', authRateLimit, nervousSystemController.routeRequest);
+router.post('/route/request', authLimiter, nervousSystemController.routeRequest);
 
 /**
  * @route   GET /api/nervous/route/optimal
@@ -189,7 +189,7 @@ router.get('/route/optimal', nervousSystemController.getOptimalRoute);
  * @desc    Deactivate enterprise route
  * @access  Private (Admin)
  */
-router.post('/route/deactivate/:routeId', authRateLimit, authMiddleware, nervousSystemController.deactivateEnterpriseRoute);
+router.post('/route/deactivate/:routeId', authLimiter, authMiddleware, nervousSystemController.deactivateEnterpriseRoute);
 
 // ============================================================================
 // SYSTEM HEALTH ROUTES
@@ -207,3 +207,4 @@ router.get('/health', authMiddleware, nervousSystemController.getNervousSystemHe
 // ============================================================================
 
 module.exports = router;
+

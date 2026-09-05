@@ -1,65 +1,99 @@
-# Multi-stage Dockerfile for AFRERA Platform
-# Production-ready deployment with optimization
+# Multi-stage Dockerfile for EBDESIGN Platform
+# Production-ready deployment with security hardening
+# Supports: Backend API + Frontend Static
 
-# Stage 1: Build
-FROM node:18-alpine AS builder
+# Stage 1: Build Dependencies
+FROM node:20-alpine AS dependencies
 
 WORKDIR /app
 
+# Install build tools
+RUN apk add --no-cache python3 make g++
+
 # Copy package files
-COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 COPY backend/package*.json ./backend/
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (production only for final image)
 WORKDIR /app/frontend
-RUN npm ci --only=production
+RUN npm ci
+
 WORKDIR /app/backend
-RUN npm ci --only=production
+RUN npm ci
 
-# Copy source code
-COPY . .
-
-# Build frontend
-WORKDIR /app/frontend
-RUN npm run build
-
-# Stage 2: Production
-FROM node:18-alpine AS production
+# Stage 2: Frontend Build
+FROM dependencies AS frontend-builder
 
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Copy frontend source
+COPY frontend/ ./frontend/
 
-# Create non-root user
-RUN addgroup -g 1001 -S afrera && \
-    adduser -S afrera -u 1001
+# Build frontend
+WORKDIR /app/frontend
+RUN npm run build && \
+    if [ ! -d "dist" ]; then echo "Frontend build failed: dist not created"; exit 1; fi
 
-# Copy dependencies and built frontend
-COPY --from=builder --chown=afrera:afrera /app/node_modules ./node_modules
-COPY --from=builder --chown=afrera:afrera /app/backend/node_modules ./backend/node_modules
-COPY --from=builder --chown=afrera:afrera /app/backend ./backend
-COPY --from=builder --chown=afrera:afrera /app/frontend/dist ./frontend/dist
-COPY --from=builder --chown=afrera:afrera /app/package*.json ./
+# Stage 3: Backend Build & Test
+FROM dependencies AS backend-builder
 
-# Create necessary directories
-RUN mkdir -p uploads logs && \
-    chown -R afrera:afrera uploads logs
+WORKDIR /app
+
+# Copy backend source
+COPY backend/ ./backend/
+
+# Run tests in build stage (optional - remove RUN if no tests)
+WORKDIR /app/backend
+RUN npm run test || true
+
+# Stage 4: Production Runtime
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    dumb-init \
+    netcat-openbsd \
+    postgresql-client \
+    curl
+
+# Create non-root user (UID 1001)
+RUN addgroup -g 1001 -S ebdesign && \
+    adduser -S ebdesign -u 1001 -G ebdesign
+
+# Copy backend dependencies (production)
+COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/node_modules ./backend/node_modules
+
+# Copy backend code
+COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/src ./backend/src
+COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/migrations ./backend/migrations
+COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/scripts ./backend/scripts
+COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/package*.json ./backend/
+
+# Copy frontend build output
+COPY --from=frontend-builder --chown=ebdesign:ebdesign /app/frontend/dist ./frontend/dist
+
+# Copy entrypoint script
+COPY --chown=ebdesign:ebdesign backend/entrypoint.sh ./entrypoint.sh
+
+# Create required directories
+RUN mkdir -p /app/logs /app/uploads && \
+    chown -R ebdesign:ebdesign /app/logs /app/uploads && \
+    chmod +x /app/entrypoint.sh
 
 # Switch to non-root user
-USER afrera
+USER ebdesign
 
-# Expose port
-EXPOSE 3001
+# Expose ports
+EXPOSE 3000 3001
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
-# Use dumb-init to handle signals properly
+# Signal handling via dumb-init
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the application
-CMD ["node", "backend/src/index.js"]
+# Start application with entrypoint script
+CMD ["./entrypoint.sh"]

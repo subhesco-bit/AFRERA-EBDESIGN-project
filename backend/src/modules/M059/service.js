@@ -57,7 +57,7 @@ async function getDiscount(discountId) {
 async function updateDiscount(discountId, updates) {
   try {
     const { name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products, status } = updates;
-    const res = await pool.query(
+    let res = await pool.query(
       `UPDATE discounts SET name = COALESCE($1, name), discount_type = COALESCE($2, discount_type), value = COALESCE($3, value), min_purchase = COALESCE($4, min_purchase), max_discount = COALESCE($5, max_discount), start_date = COALESCE($6, start_date), end_date = COALESCE($7, end_date), applicable_products = COALESCE($8, applicable_products::jsonb), status = COALESCE($9, status), updated_at = NOW() WHERE discount_id = $10 RETURNING *`,
       [name, discount_type, value, min_purchase, max_discount, start_date, end_date, applicable_products ? JSON.stringify(applicable_products) : null, status, discountId]
     );
@@ -70,7 +70,7 @@ async function updateDiscount(discountId, updates) {
 
 async function deleteDiscount(discountId) {
   try {
-    const res = await pool.query('DELETE FROM discounts WHERE discount_id = $1 RETURNING discount_id', [discountId]);
+    let res = await pool.query('DELETE FROM discounts WHERE discount_id = $1 RETURNING discount_id', [discountId]);
     return !!res.rows[0];
   } catch (error) {
     logger.error('Error deleting discount', { error: error.message });

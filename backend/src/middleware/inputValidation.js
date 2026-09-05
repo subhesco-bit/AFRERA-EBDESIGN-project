@@ -68,7 +68,7 @@ function sanitizeObject(obj) {
   if (typeof obj !== 'object' || obj === null) return obj;
   
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeObject(item));
+    return obj.map(item => typeof item === 'string' ? sanitizeInput(item) : sanitizeObject(item));
   }
   
   const sanitized = {};

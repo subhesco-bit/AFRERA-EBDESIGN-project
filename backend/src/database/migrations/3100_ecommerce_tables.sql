@@ -59,7 +59,7 @@ CREATE INDEX IF NOT EXISTS idx_product_listings_search ON product_listings USING
 -- GI Marketplace Listings Table (enhanced version)
 CREATE TABLE IF NOT EXISTS gi_marketplace_listings (
     id VARCHAR(50) PRIMARY KEY,
-    gi_product_id INTEGER REFERENCES gi_products(id),
+    gi_product_id UUID REFERENCES gi_products(id),
     product_id VARCHAR(50) REFERENCES product_listings(id),
     seller_id VARCHAR(50) NOT NULL REFERENCES users(id),
     listing_title VARCHAR(255) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS gi_marketplace_listings (
     premium_percentage DECIMAL(5, 2) DEFAULT 0,
     quality_tier VARCHAR(20),
     harvest_date DATE,
-    location_id INTEGER REFERENCES addresses(id),
+    location_id UUID REFERENCES addresses(id),
     listing_status VARCHAR(20) DEFAULT 'active',
     authenticity_verified BOOLEAN DEFAULT FALSE,
     authenticity_score DECIMAL(3, 2),

@@ -28,10 +28,10 @@ async function createSession(userId, deviceInfo) {
 }
 
 async function validateSession(sessionToken) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM sessions 
      WHERE session_token = $1 
      AND expires_at > NOW()
@@ -43,7 +43,7 @@ async function validateSession(sessionToken) {
 }
 
 async function invalidateSession(sessionToken) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -55,7 +55,7 @@ async function invalidateSession(sessionToken) {
 }
 
 async function invalidateAllUserSessions(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database non initialized');
   
   await pg.query(
@@ -68,10 +68,10 @@ async function invalidateAllUserSessions(userId) {
 
 // Device fingerprinting
 async function recordDeviceFingerprint(userId, fingerprint) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO device_fingerprints (user_id, fingerprint, user_agent, ip_address, first_seen, last_seen, created_at)
      VALUES ($1, $2, $3, $4, NOW(), NOW(), NOW())
      ON CONFLICT (user_id, fingerprint) DO UPDATE SET
@@ -84,10 +84,10 @@ async function recordDeviceFingerprint(userId, fingerprint) {
 }
 
 async function getUserDevices(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM device_fingerprints WHERE user_id = $1 ORDER BY last_seen DESC`,
     [userId]
   );
@@ -97,7 +97,7 @@ async function getUserDevices(userId) {
 
 // Security event logging
 async function logSecurityEvent(userId, ipAddress, eventType, reason) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -109,10 +109,10 @@ async function logSecurityEvent(userId, ipAddress, eventType, reason) {
 
 // Get user's recent security events
 async function getUserSecurityEvents(userId, { limit = 20 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM security_events 
      WHERE user_id = $1 
      ORDER BY created_at DESC 
@@ -125,7 +125,7 @@ async function getUserSecurityEvents(userId, { limit = 20 } = {}) {
 
 // Change password
 async function changePassword(userId, currentPassword, newPassword) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Verify current password

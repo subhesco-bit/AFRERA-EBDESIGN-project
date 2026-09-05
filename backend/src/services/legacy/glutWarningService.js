@@ -18,7 +18,7 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 const GLUT_SELLER_THRESHOLD = 3; // ASSUMED — see file header
 const WINDOW_DAYS = 14;
@@ -71,7 +71,7 @@ class GlutWarningService {
 
   /** Scans all categories with recent activity for glut risk — real aggregate query, not per-category looping guesswork. */
   async scanAllCategories(stateId) {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT category_id, COUNT(DISTINCT created_by) AS seller_count
          FROM products
         WHERE is_active = TRUE
@@ -87,3 +87,6 @@ class GlutWarningService {
 }
 
 module.exports = new GlutWarningService();
+
+
+

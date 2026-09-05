@@ -7,8 +7,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -241,7 +241,7 @@ async function getAIAdvisoryStatistics(filters = {}) {
 function setupRoutes(app) {
   const express = require('express');
   const router = express.Router();
-  const authMiddleware = require('../../middleware/auth');
+  const authMiddleware = require('../../middleware\/auth');
 
   router.use(authMiddleware);
 
@@ -265,7 +265,7 @@ function setupRoutes(app) {
 
   router.get('/advisories/farmer/:farmerId', async (req, res) => {
     try {
-      const advisories = await getAIAdvisoriesByFarmer(req.params.farmerId);
+      let advisories = await getAIAdvisoriesByFarmer(req.params.farmerId);
       res.json({ success: true, data: advisories });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -274,7 +274,7 @@ function setupRoutes(app) {
 
   router.get('/advisories/type/:advisoryType', async (req, res) => {
     try {
-      const advisories = await getAIAdvisoriesByType(req.params.advisoryType);
+      let advisories = await getAIAdvisoriesByType(req.params.advisoryType);
       res.json({ success: true, data: advisories });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -283,7 +283,7 @@ function setupRoutes(app) {
 
   router.post('/advisories', async (req, res) => {
     try {
-      const advisory = await createAIAdvisory(req.body);
+      let advisory = await createAIAdvisory(req.body);
       res.status(201).json({ success: true, data: advisory });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -293,7 +293,7 @@ function setupRoutes(app) {
   router.put('/advisories/:advisoryId/status', async (req, res) => {
     try {
       const { status, feedback } = req.body;
-      const advisory = await updateAdvisoryStatus(req.params.advisoryId, status, feedback);
+      let advisory = await updateAdvisoryStatus(req.params.advisoryId, status, feedback);
       res.json({ success: true, data: advisory });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -302,7 +302,7 @@ function setupRoutes(app) {
 
   router.get('/advisories/statistics', async (req, res) => {
     try {
-      const stats = await getAIAdvisoryStatistics(req.query);
+      let stats = await getAIAdvisoryStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -323,3 +323,6 @@ module.exports = {
   getAIAdvisoryStatistics,
   setupRoutes
 };
+
+
+

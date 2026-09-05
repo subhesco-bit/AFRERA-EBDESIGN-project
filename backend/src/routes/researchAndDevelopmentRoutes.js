@@ -7,6 +7,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const researchAndDevelopmentService = require('../services/legacy/researchAndDevelopmentService');
 
@@ -15,7 +17,9 @@ const researchAndDevelopmentService = require('../services/legacy/researchAndDev
  */
 
 // Get all R&D projects
-router.get('/projects', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/projects', (req, res) => {
   try {
     const filters = {
       status: req.query.status,
@@ -39,7 +43,9 @@ router.get('/projects', (req, res) => {
 });
 
 // Get a specific R&D project
-router.get('/projects/:projectId', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/projects/:projectId', (req, res) => {
   try {
     const project = researchAndDevelopmentService.getRDProject(req.params.projectId);
     if (!project) {
@@ -61,9 +67,11 @@ router.get('/projects/:projectId', (req, res) => {
 });
 
 // Create a new R&D project
-router.post('/projects', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/projects', (req, res) => {
   try {
-    const project = researchAndDevelopmentService.createRDProject(req.body);
+    let project = researchAndDevelopmentService.createRDProject(req.body);
     res.status(201).json({
       success: true,
       message: 'R&D project created successfully',
@@ -78,9 +86,11 @@ router.post('/projects', (req, res) => {
 });
 
 // Update an R&D project
-router.put('/projects/:projectId', (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/projects/:projectId', (req, res) => {
   try {
-    const project = researchAndDevelopmentService.updateRDProject(req.params.projectId, req.body);
+    let project = researchAndDevelopmentService.updateRDProject(req.params.projectId, req.body);
     res.json({
       success: true,
       message: 'R&D project updated successfully',
@@ -95,7 +105,9 @@ router.put('/projects/:projectId', (req, res) => {
 });
 
 // Delete an R&D project
-router.delete('/projects/:projectId', (req, res) => {
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/projects/:projectId', (req, res) => {
   try {
     const result = researchAndDevelopmentService.deleteRDProject(req.params.projectId);
     res.json({
@@ -115,7 +127,9 @@ router.delete('/projects/:projectId', (req, res) => {
  */
 
 // Add milestone to project
-router.post('/projects/:projectId/milestones', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/projects/:projectId/milestones', (req, res) => {
   try {
     const milestone = researchAndDevelopmentService.addMilestone(req.params.projectId, req.body);
     res.status(201).json({
@@ -132,9 +146,11 @@ router.post('/projects/:projectId/milestones', (req, res) => {
 });
 
 // Update milestone status
-router.put('/projects/:projectId/milestones/:milestoneId', (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/projects/:projectId/milestones/:milestoneId', (req, res) => {
   try {
-    const milestone = researchAndDevelopmentService.updateMilestone(req.params.projectId, req.params.milestoneId, req.body);
+    let milestone = researchAndDevelopmentService.updateMilestone(req.params.projectId, req.params.milestoneId, req.body);
     res.json({
       success: true,
       message: 'Milestone updated successfully',
@@ -153,9 +169,11 @@ router.put('/projects/:projectId/milestones/:milestoneId', (req, res) => {
  */
 
 // Get all collaborations
-router.get('/collaborations', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/collaborations', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       type: req.query.type,
       projectId: req.query.projectId
@@ -176,7 +194,9 @@ router.get('/collaborations', (req, res) => {
 });
 
 // Create a new collaboration
-router.post('/collaborations', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/collaborations', (req, res) => {
   try {
     const collaboration = researchAndDevelopmentService.createCollaboration(req.body);
     res.status(201).json({
@@ -197,9 +217,11 @@ router.post('/collaborations', (req, res) => {
  */
 
 // Get all innovations
-router.get('/innovations', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/innovations', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       category: req.query.category,
       projectId: req.query.projectId,
@@ -221,7 +243,9 @@ router.get('/innovations', (req, res) => {
 });
 
 // Create a new innovation
-router.post('/innovations', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/innovations', (req, res) => {
   try {
     const innovation = researchAndDevelopmentService.createInnovation(req.body);
     res.status(201).json({
@@ -242,9 +266,11 @@ router.post('/innovations', (req, res) => {
  */
 
 // Get all patents
-router.get('/patents', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/patents', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       jurisdiction: req.query.jurisdiction,
       innovationId: req.query.innovationId
@@ -265,7 +291,9 @@ router.get('/patents', (req, res) => {
 });
 
 // Create a new patent
-router.post('/patents', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/patents', (req, res) => {
   try {
     const patent = researchAndDevelopmentService.createPatent(req.body);
     res.status(201).json({
@@ -286,9 +314,11 @@ router.post('/patents', (req, res) => {
  */
 
 // Get all funding opportunities
-router.get('/funding', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/funding', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       category: req.query.category,
       provider: req.query.provider
@@ -309,7 +339,9 @@ router.get('/funding', (req, res) => {
 });
 
 // Create a new funding opportunity
-router.post('/funding', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/funding', (req, res) => {
   try {
     const funding = researchAndDevelopmentService.createFundingOpportunity(req.body);
     res.status(201).json({
@@ -326,7 +358,9 @@ router.post('/funding', (req, res) => {
 });
 
 // Apply for funding
-router.post('/funding/:fundingId/apply', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/funding/:fundingId/apply', (req, res) => {
   try {
     const application = researchAndDevelopmentService.applyForFunding(req.params.fundingId, req.body);
     res.status(201).json({
@@ -347,9 +381,11 @@ router.post('/funding/:fundingId/apply', (req, res) => {
  */
 
 // Get all publications
-router.get('/publications', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/publications', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       type: req.query.type,
       projectId: req.query.projectId
@@ -370,7 +406,9 @@ router.get('/publications', (req, res) => {
 });
 
 // Create a new publication
-router.post('/publications', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/publications', (req, res) => {
   try {
     const publication = researchAndDevelopmentService.createPublication(req.body);
     res.status(201).json({
@@ -391,7 +429,9 @@ router.post('/publications', (req, res) => {
  */
 
 // Get AI research assistance
-router.post('/ai-assistance', async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/ai-assistance', async (req, res) => {
   try {
     const { query, context } = req.body;
     if (!query) {
@@ -419,10 +459,12 @@ router.post('/ai-assistance', async (req, res) => {
  */
 
 // Search knowledge base
-router.get('/knowledge', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/knowledge', (req, res) => {
   try {
     const query = req.query.q;
-    const filters = {
+    let filters = {
       category: req.query.category,
       verified: req.query.verified
     };
@@ -442,9 +484,11 @@ router.get('/knowledge', (req, res) => {
 });
 
 // Add knowledge to knowledge base
-router.post('/knowledge', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/knowledge', (req, res) => {
   try {
-    const knowledge = researchAndDevelopmentService.addKnowledge(req.body);
+    let knowledge = researchAndDevelopmentService.addKnowledge(req.body);
     res.status(201).json({
       success: true,
       message: 'Knowledge added successfully',
@@ -463,7 +507,9 @@ router.post('/knowledge', (req, res) => {
  */
 
 // Get R&D analytics
-router.get('/analytics', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/analytics', (req, res) => {
   try {
     const analytics = researchAndDevelopmentService.getRDAnalytics();
     res.json({
@@ -483,7 +529,9 @@ router.get('/analytics', (req, res) => {
  */
 
 // Get service health status
-router.get('/health', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/health', (req, res) => {
   try {
     const health = researchAndDevelopmentService.getHealthStatus();
     res.json({

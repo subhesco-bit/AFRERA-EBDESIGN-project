@@ -3,13 +3,13 @@
  * Future-ready capabilities including AI recommendations, blockchain integration, and IoT automation
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class AdvancedFeaturesService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -52,7 +52,7 @@ class AdvancedFeaturesService {
   }
 
   generateAIRecommendations(module, userData, preferences, behavior) {
-    const recommendations = [];
+    let recommendations = [];
 
     switch (module) {
       case 'marketplace':
@@ -154,7 +154,7 @@ class AdvancedFeaturesService {
     try {
       const { action, parameters, executorId } = executionData;
 
-      const query = `
+      let query = `
         UPDATE smart_contracts
         SET 
           status = $1,
@@ -165,7 +165,7 @@ class AdvancedFeaturesService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         action === 'fulfill' ? 'fulfilled' : 'rejected',
         JSON.stringify({ action, parameters }),
         executorId,
@@ -194,14 +194,14 @@ class AdvancedFeaturesService {
     } = deviceData;
 
     try {
-      const query = `
+      let query = `
         INSERT INTO iot_devices 
         (device_id, device_type, location, capabilities, owner, metadata, status)
         VALUES ($1, $2, $3, $4, $5, $6, 'active')
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         deviceId,
         deviceType,
         JSON.stringify(location),
@@ -222,14 +222,14 @@ class AdvancedFeaturesService {
     try {
       const { readings, timestamp, deviceStatus } = sensorData;
 
-      const query = `
+      let query = `
         INSERT INTO iot_readings 
         (device_id, readings, timestamp, device_status)
         VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         deviceId,
         JSON.stringify(readings),
         timestamp,
@@ -250,12 +250,12 @@ class AdvancedFeaturesService {
   async triggerIoTAutomation(deviceId, readings) {
     try {
       // Get device automation rules
-      const query = `
+      let query = `
         SELECT * FROM iot_automation_rules
         WHERE device_id = $1 AND enabled = true
       `;
 
-      const result = await this.pool.query(query, [deviceId]);
+      let result = await this.pool.query(query, [deviceId]);
       const rules = result.rows;
 
       for (const rule of rules) {
@@ -313,14 +313,14 @@ class AdvancedFeaturesService {
       // Simple demand forecasting algorithm
       const forecast = this.calculateDemandForecast(productId, region, timeframe, historicalData);
 
-      const query = `
+      let query = `
         INSERT INTO demand_forecasts 
         (product_id, region, timeframe, forecast_data, accuracy, created_at)
         VALUES ($1, $2, $3, $4, $5, NOW())
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         productId,
         region,
         timeframe,
@@ -342,7 +342,7 @@ class AdvancedFeaturesService {
     const average = values.reduce((a, b) => a + b, 0) / values.length;
     const trend = (values[values.length - 1] - values[0]) / values.length;
 
-    const forecast = {
+    let forecast = {
       productId,
       region,
       timeframe,
@@ -375,7 +375,7 @@ class AdvancedFeaturesService {
       const intent = this.parseVoiceIntent(command);
 
       // Execute the command
-      const result = await this.executeVoiceIntent(intent, userId);
+      let result = await this.executeVoiceIntent(intent, userId);
 
       return {
         command,
@@ -444,14 +444,14 @@ class AdvancedFeaturesService {
     } = experienceData;
 
     try {
-      const query = `
+      let query = `
         INSERT INTO ar_vr_experiences 
         (experience_type, product_id, content, interactivity, requirements, status)
         VALUES ($1, $2, $3, $4, $5, 'active')
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         experienceType,
         productId,
         JSON.stringify(content),
@@ -488,7 +488,7 @@ class AdvancedFeaturesService {
 
   async buildKnowledgeGraphQuery(queryType, params) {
     // Simulated knowledge graph data
-    const graphData = {
+    let graphData = {
       nodes: [],
       edges: [],
       relationships: []
@@ -525,3 +525,6 @@ class AdvancedFeaturesService {
 }
 
 module.exports = new AdvancedFeaturesService();
+
+
+

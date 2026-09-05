@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { authorizationAPI } from '../services/api'
-import { KeyRound, ShieldAlert, Users, ScrollText } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { authorizationAPI } from '../services/api';
+import { KeyRound, ShieldAlert, Users, ScrollText } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // Mirrors backend/src/services/authService.js:getUserPermissions() — the
 // hardcoded role→permission map this page is meant to expose and manage.
@@ -15,48 +15,48 @@ const FALLBACK_ROLES = [
   { role: 'consumer', permissions: ['marketplace:read', 'marketplace:buy', 'orders:read', 'orders:create'] },
   { role: 'logistics', permissions: ['logistics:read', 'logistics:update', 'shipments:read', 'shipments:update', 'vehicles:read', 'drivers:read'] },
   { role: 'horeca', permissions: ['marketplace:read', 'marketplace:buy', 'orders:read', 'orders:create', 'procurement:read'] },
-]
+];
 
 function AuthorizationPage() {
-  const queryClient = useQueryClient()
-  const [tab, setTab] = useState('roles')
-  const [selectedRole, setSelectedRole] = useState(null)
+  const queryClient = useQueryClient();
+  const [tab, setTab] = useState('roles');
+  const [selectedRole, setSelectedRole] = useState(null);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: rolesData, isLoading: rolesLoading, error: rolesError } = useQuery({
     queryKey: ['authorization-roles'],
     queryFn: async () => {
-      const res = await authorizationAPI.getRoles()
-      return res.data?.data ?? []
+      const res = await authorizationAPI.getRoles();
+      return res.data?.data ?? [];
     },
     retry: false,
-  })
+  });
 
   const { data: usersData, isLoading: usersLoading, error: usersError } = useQuery({
     queryKey: ['authorization-users'],
     queryFn: async () => (await authorizationAPI.getUsers()).data?.data ?? [],
-  })
+  });
 
   const { data: auditData, isLoading: auditLoading, error: auditError } = useQuery({
     queryKey: ['authorization-audit-log'],
     queryFn: async () => (await authorizationAPI.getAuditLog()).data?.data ?? [],
-  })
+  });
 
   const updateRoleMutation = useMutation({
     mutationFn: ({ userId, role }) => authorizationAPI.updateUserRole(userId, { role }),
     onSuccess: () => {
-      toast.success('Role updated')
-      queryClient.invalidateQueries({ queryKey: ['authorization-users'] })
+      toast.success('Role updated');
+      queryClient.invalidateQueries({ queryKey: ['authorization-users'] });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to update role'),
-  })
+  });
 
   // If the backend has no /authorization/roles route yet, fall back to the
   // role catalogue mirrored from authService.js so the permission matrix is
   // still real and useful rather than empty.
-  const roles = (rolesData && rolesData.length > 0) ? rolesData : (rolesError ? FALLBACK_ROLES : (rolesData || []))
-  const users = usersData || []
-  const auditLog = auditData || []
+  const roles = (rolesData && rolesData.length > 0) ? rolesData : (rolesError ? FALLBACK_ROLES : (rolesData || []));
+  const users = usersData || [];
+  const auditLog = auditData || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -192,7 +192,7 @@ function AuthorizationPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default AuthorizationPage
+export default AuthorizationPage;

@@ -16,9 +16,9 @@ async function setupTOTP(req, res) {
 
 async function verifyTOTP(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { token } = req.body;
-    const result = await service.verifyTOTP(userId, token);
+    let result = await service.verifyTOTP(userId, token);
     
     if (result.success) {
       res.json({ success: true, data: result });
@@ -34,9 +34,9 @@ async function verifyTOTP(req, res) {
 // SMS OTP endpoints
 async function sendSMSOTP(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { phoneNumber } = req.body;
-    const result = await service.sendSMSOTP(userId, phoneNumber);
+    let result = await service.sendSMSOTP(userId, phoneNumber);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('sendSMSOTP error', { error: error.message });
@@ -46,9 +46,9 @@ async function sendSMSOTP(req, res) {
 
 async function verifySMSOTP(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { otp } = req.body;
-    const result = await service.verifySMSOTP(userId, otp);
+    let result = await service.verifySMSOTP(userId, otp);
     
     if (result.success) {
       res.json({ success: true, data: result });
@@ -64,9 +64,9 @@ async function verifySMSOTP(req, res) {
 // Email OTP endpoints
 async function sendEmailOTP(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { email } = req.body;
-    const result = await service.sendEmailOTP(userId, email);
+    let result = await service.sendEmailOTP(userId, email);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('sendEmailOTP error', { error: error.message });
@@ -76,9 +76,9 @@ async function sendEmailOTP(req, res) {
 
 async function verifyEmailOTP(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { otp } = req.body;
-    const result = await service.verifyEmailOTP(userId, otp);
+    let result = await service.verifyEmailOTP(userId, otp);
     
     if (result.success) {
       res.json({ success: true, data: result });
@@ -94,8 +94,8 @@ async function verifyEmailOTP(req, res) {
 // Biometric endpoints
 async function registerBiometric(req, res) {
   try {
-    const userId = req.user?.id;
-    const result = await service.registerBiometric(userId, req.body);
+    let userId = req.user?.id;
+    let result = await service.registerBiometric(userId, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('registerBiometric error', { error: error.message });
@@ -105,8 +105,8 @@ async function registerBiometric(req, res) {
 
 async function verifyBiometric(req, res) {
   try {
-    const userId = req.user?.id;
-    const result = await service.verifyBiometric(userId, req.body);
+    let userId = req.user?.id;
+    let result = await service.verifyBiometric(userId, req.body);
     
     if (result.success) {
       res.json({ success: true, data: result });
@@ -122,9 +122,9 @@ async function verifyBiometric(req, res) {
 // Device trust endpoints
 async function setDeviceTrust(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { deviceFingerprint, trustLevel } = req.body;
-    const result = await service.setDeviceTrust(userId, deviceFingerprint, trustLevel);
+    let result = await service.setDeviceTrust(userId, deviceFingerprint, trustLevel);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('setDeviceTrust error', { error: error.message });
@@ -134,9 +134,9 @@ async function setDeviceTrust(req, res) {
 
 async function checkDeviceTrust(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { deviceFingerprint } = req.body;
-    const result = await service.checkDeviceTrust(userId, deviceFingerprint);
+    let result = await service.checkDeviceTrust(userId, deviceFingerprint);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('checkDeviceTrust error', { error: error.message });
@@ -147,8 +147,8 @@ async function checkDeviceTrust(req, res) {
 // Recovery codes endpoints
 async function generateRecoveryCodes(req, res) {
   try {
-    const userId = req.user?.id;
-    const result = await service.generateRecoveryCodes(userId);
+    let userId = req.user?.id;
+    let result = await service.generateRecoveryCodes(userId);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('generateRecoveryCodes error', { error: error.message });
@@ -158,9 +158,9 @@ async function generateRecoveryCodes(req, res) {
 
 async function verifyRecoveryCode(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { code } = req.body;
-    const result = await service.verifyRecoveryCode(userId, code);
+    let result = await service.verifyRecoveryCode(userId, code);
     
     if (result.success) {
       res.json({ success: true, data: result });
@@ -176,7 +176,7 @@ async function verifyRecoveryCode(req, res) {
 // Status and management
 async function getMFAStatus(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const status = await service.getMFAStatus(userId);
     res.json({ success: true, data: status });
   } catch (error) {
@@ -187,9 +187,9 @@ async function getMFAStatus(req, res) {
 
 async function disableMFA(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { method } = req.body;
-    const result = await service.disableMFA(userId, method);
+    let result = await service.disableMFA(userId, method);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('disableMFA error', { error: error.message });
@@ -200,9 +200,9 @@ async function disableMFA(req, res) {
 // AI-powered fraud detection
 async function detectMFAFraud(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { method, context } = req.body;
-    const result = await service.detectMFAFraud(userId, method, context);
+    let result = await service.detectMFAFraud(userId, method, context);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('detectMFAFraud error', { error: error.message });

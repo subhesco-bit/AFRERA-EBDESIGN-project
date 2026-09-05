@@ -7,8 +7,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -321,7 +321,7 @@ async function getBuyingClubStatistics(filters = {}) {
 function setupRoutes(app) {
   const express = require('express');
   const router = express.Router();
-  const authMiddleware = require('../../middleware/auth');
+  const authMiddleware = require('../../middleware\/auth');
 
   router.use(authMiddleware);
 
@@ -345,7 +345,7 @@ function setupRoutes(app) {
 
   router.get('/clubs/district/:district', async (req, res) => {
     try {
-      const clubs = await getBuyingClubsByDistrict(req.params.district);
+      let clubs = await getBuyingClubsByDistrict(req.params.district);
       res.json({ success: true, data: clubs });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -354,7 +354,7 @@ function setupRoutes(app) {
 
   router.post('/clubs', async (req, res) => {
     try {
-      const club = await createBuyingClub(req.body);
+      let club = await createBuyingClub(req.body);
       res.status(201).json({ success: true, data: club });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -363,7 +363,7 @@ function setupRoutes(app) {
 
   router.put('/clubs/:clubId', async (req, res) => {
     try {
-      const club = await updateBuyingClub(req.params.clubId, req.body);
+      let club = await updateBuyingClub(req.params.clubId, req.body);
       res.json({ success: true, data: club });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -373,7 +373,7 @@ function setupRoutes(app) {
   router.post('/clubs/:clubId/members', async (req, res) => {
     try {
       const { memberId, role } = req.body;
-      const club = await addMemberToClub(req.params.clubId, memberId, role);
+      let club = await addMemberToClub(req.params.clubId, memberId, role);
       res.json({ success: true, data: club });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -400,7 +400,7 @@ function setupRoutes(app) {
 
   router.get('/clubs/statistics', async (req, res) => {
     try {
-      const stats = await getBuyingClubStatistics(req.query);
+      let stats = await getBuyingClubStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -423,3 +423,6 @@ module.exports = {
   getBuyingClubStatistics,
   setupRoutes
 };
+
+
+

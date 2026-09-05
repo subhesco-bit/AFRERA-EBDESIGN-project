@@ -17,9 +17,9 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
-const { withTransaction } = require('../../core/withTransaction');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
+const { withTransaction } = require('../../core\/withTransaction');
 
 class CooperativeShareService {
   constructor() {
@@ -56,7 +56,7 @@ class CooperativeShareService {
 
   async listMembers(fpoId) {
     if (!fpoId) throw new Error('fpoId is required');
-    const result = await this.pool.query(
+    let result = await this.pool.query(
       `SELECT fms.*, u.name AS farmer_name
          FROM fpo_member_shares fms
          LEFT JOIN farmers f ON f.id = fms.farmer_id
@@ -70,7 +70,7 @@ class CooperativeShareService {
 
   async getPaidUpCapital(fpoId) {
     if (!fpoId) throw new Error('fpoId is required');
-    const result = await this.pool.query(
+    let result = await this.pool.query(
       `SELECT COALESCE(SUM(shares_held * share_value_inr), 0) AS total_paid_up_capital_inr,
               COUNT(*) FILTER (WHERE status = 'active') AS active_member_count
          FROM fpo_member_shares WHERE fpo_id = $1`,
@@ -168,7 +168,7 @@ class CooperativeShareService {
   }
 
   async getDistribution(distributionId) {
-    const distResult = await this.pool.query(
+    let distResult = await this.pool.query(
       `SELECT * FROM fpo_profit_distributions WHERE id = $1`,
       [distributionId]
     );
@@ -189,7 +189,7 @@ class CooperativeShareService {
 
   async listDistributions(fpoId) {
     if (!fpoId) throw new Error('fpoId is required');
-    const result = await this.pool.query(
+    let result = await this.pool.query(
       `SELECT * FROM fpo_profit_distributions WHERE fpo_id = $1 ORDER BY period_end DESC`,
       [fpoId]
     );
@@ -198,3 +198,6 @@ class CooperativeShareService {
 }
 
 module.exports = new CooperativeShareService();
+
+
+

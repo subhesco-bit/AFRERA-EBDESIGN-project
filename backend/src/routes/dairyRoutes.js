@@ -12,6 +12,10 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
+
+protectLivestockRouter(router);
+router.use(authMiddleware);
 
 router.get('/animals', async (req, res) => {
   try {
@@ -33,7 +37,7 @@ router.post('/animals', authMiddleware, async (req, res) => {
 
 router.put('/animals/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
-    const animal = await dairyService.updateAnimal(req.params.id, req.body);
+    let animal = await dairyService.updateAnimal(req.params.id, req.body);
     if (!animal) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: animal });
   } catch (error) {
@@ -53,7 +57,7 @@ router.delete('/animals/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROL
 
 router.get('/milk-records', async (req, res) => {
   try {
-    const result = await dairyService.listMilkRecords({ page: req.query.page, limit: req.query.limit });
+    let result = await dairyService.listMilkRecords({ page: req.query.page, limit: req.query.limit });
     res.json({ success: true, data: result.items, pagination: result.pagination });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -111,7 +115,7 @@ router.get('/health-alerts', async (req, res) => {
 // AI-powered milk production optimization
 router.post('/ai/optimize-production/:animalId', async (req, res) => {
   try {
-    const result = await dairyService.optimizeMilkProduction(req.params.animalId);
+    let result = await dairyService.optimizeMilkProduction(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -121,7 +125,7 @@ router.post('/ai/optimize-production/:animalId', async (req, res) => {
 // AI-powered health prediction
 router.post('/ai/predict-health/:animalId', async (req, res) => {
   try {
-    const result = await dairyService.predictHealthRisks(req.params.animalId);
+    let result = await dairyService.predictHealthRisks(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -132,7 +136,7 @@ router.post('/ai/predict-health/:animalId', async (req, res) => {
 router.post('/ai/optimize-feed/:animalId', async (req, res) => {
   try {
     const { productionGoal } = req.body;
-    const result = await dairyService.optimizeFeedComposition(req.params.animalId, productionGoal);
+    let result = await dairyService.optimizeFeedComposition(req.params.animalId, productionGoal);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -142,7 +146,7 @@ router.post('/ai/optimize-feed/:animalId', async (req, res) => {
 // AI-powered breeding recommendations
 router.post('/ai/recommend-breeding/:animalId', async (req, res) => {
   try {
-    const result = await dairyService.recommendBreeding(req.params.animalId);
+    let result = await dairyService.recommendBreeding(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

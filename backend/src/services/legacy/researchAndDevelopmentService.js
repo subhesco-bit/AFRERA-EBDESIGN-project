@@ -175,7 +175,7 @@ class ResearchAndDevelopmentService {
    * Update R&D project
    */
   updateRDProject(projectId, updates) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -194,7 +194,7 @@ class ResearchAndDevelopmentService {
    * Delete R&D project
    */
   deleteRDProject(projectId) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -207,7 +207,7 @@ class ResearchAndDevelopmentService {
    * Add milestone to project
    */
   addMilestone(projectId, milestoneData) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -232,12 +232,12 @@ class ResearchAndDevelopmentService {
    * Update milestone status
    */
   updateMilestone(projectId, milestoneId, updates) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
 
-    const milestone = project.milestones.find(m => m.id === milestoneId);
+    let milestone = project.milestones.find(m => m.id === milestoneId);
     if (!milestone) {
       throw new Error(`Milestone ${milestoneId} not found`);
     }
@@ -454,7 +454,7 @@ class ResearchAndDevelopmentService {
    * Apply for funding
    */
   applyForFunding(fundingId, applicationData) {
-    const funding = this.fundingOpportunities.get(fundingId);
+    let funding = this.fundingOpportunities.get(fundingId);
     if (!funding) {
       throw new Error(`Funding opportunity ${fundingId} not found`);
     }
@@ -554,14 +554,18 @@ class ResearchAndDevelopmentService {
    * Generate AI response for research query
    */
   generateAIResponse(query, context) {
-    const responses = [
-      `Based on current research trends in ${context.category || 'agriculture'}, I recommend exploring machine learning approaches for ${query}.`,
-      `Recent studies suggest that integrating IoT sensors with AI models can significantly improve ${query} outcomes.`,
-      `For optimal results in ${query}, consider implementing a hybrid approach combining traditional methods with deep learning.`,
-      `The latest research indicates that ${query} can be enhanced through data-driven decision making and predictive analytics.`
-    ];
-
-    return responses[Math.floor(Math.random() * responses.length)];
+    // FIXED 2026-09-01: Previously selected random response with Math.random
+    // No real research AI is connected in this environment; honestly report
+    // unavailable state instead of fabricating plausible-looking research responses.
+    return {
+      status: 'unavailable',
+      reason: 'Research AI service not configured. Implement Claude AI integration or provide ANTHROPIC_API_KEY.',
+      query: query,
+      context: context,
+      available_features: ['AI research assistant', 'literature review', 'experimental design'],
+      configuration_required: 'ANTHROPIC_API_KEY',
+      suggested_approach: 'Claude AI coordinator can provide research assistance when configured'
+    };
   }
 
   /**
@@ -702,3 +706,6 @@ class ResearchAndDevelopmentService {
 const researchAndDevelopmentService = new ResearchAndDevelopmentService();
 
 module.exports = researchAndDevelopmentService;
+
+
+

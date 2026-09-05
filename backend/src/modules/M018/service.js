@@ -35,7 +35,7 @@ async function createDataAccessPolicy(policyData) {
 }
 
 async function getDataAccessPolicies({ resourceName, accessLevel } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM data_access_policies WHERE is_active = true';
@@ -53,12 +53,12 @@ async function getDataAccessPolicies({ resourceName, accessLevel } = {}) {
   
   query += ' ORDER BY resource_name';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 async function checkDataAccess(userId, resourceName, accessLevel) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get user's roles
@@ -146,12 +146,12 @@ async function applyDataMasking(data, maskingRules) {
 }
 
 async function createMaskingRule(ruleData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { field, maskType, maskChar, visibleChars, appliesToResources } = ruleData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO masking_rules (field, mask_type, mask_char, visible_chars, applies_to_resources, is_active, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
      RETURNING *`,
@@ -162,11 +162,11 @@ async function createMaskingRule(ruleData) {
 }
 
 async function getMaskingRules({ resource } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM masking_rules WHERE is_active = true';
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (resource) {
@@ -176,18 +176,18 @@ async function getMaskingRules({ resource } = {}) {
   
   query += ' ORDER BY field';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 // Privacy policy management
 async function createPrivacyPolicy(policyData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, description, policyText, effectiveDate, categories } = policyData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO privacy_policies (name, description, policy_text, effective_date, categories, is_active, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())
      RETURNING *`,
@@ -209,7 +209,7 @@ async function createPrivacyPolicy(policyData) {
 }
 
 async function getPrivacyPolicies({ activeOnly = true } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM privacy_policies';
@@ -218,15 +218,15 @@ async function getPrivacyPolicies({ activeOnly = true } = {}) {
   }
   query += ' ORDER BY effective_date DESC';
   
-  const res = await pg.query(query);
+  let res = await pg.query(query);
   return res.rows;
 }
 
 async function acceptPrivacyPolicy(userId, policyId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO privacy_policy_acceptances (user_id, policy_id, accepted_at, created_at)
      VALUES ($1, $2, NOW(), NOW())
      ON CONFLICT (user_id, policy_id) DO UPDATE SET
@@ -252,7 +252,7 @@ async function acceptPrivacyPolicy(userId, policyId) {
 
 // AI-powered privacy risk assessment
 async function assessPrivacyRisk(userId, dataOperation) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { operationType, dataCategories, dataVolume, destination } = dataOperation;
@@ -352,7 +352,7 @@ function generatePrivacyRecommendations(riskLevel, riskFactors) {
 
 // Privacy impact analysis
 async function performPrivacyImpactAnalysis(userId, proposedChange) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { changeType, affectedResources, dataCategories, affectedUsers } = proposedChange;
@@ -402,7 +402,7 @@ async function performPrivacyImpactAnalysis(userId, proposedChange) {
 }
 
 function generateImpactRecommendations(impactLevel, impacts) {
-  const recommendations = [];
+  let recommendations = [];
   
   if (impactLevel === 'high') {
     recommendations.push({
@@ -431,7 +431,7 @@ function generateImpactRecommendations(impactLevel, impacts) {
 
 // Privacy compliance monitoring
 async function getPrivacyComplianceStatus() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get policy compliance
@@ -479,7 +479,7 @@ async function getPrivacyComplianceStatus() {
 
 // Data retention management
 async function enforceDataRetention() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const policies = await getDataAccessPolicies();

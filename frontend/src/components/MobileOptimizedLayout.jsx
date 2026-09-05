@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Menu, X, Home, User, ShoppingCart, Bell } from 'lucide-react'
+import { useState } from 'react';
+import { Menu, X, Home, User, ShoppingCart, Bell } from 'lucide-react';
 
 function MobileOptimizedLayout({ children, title, showBackButton = false, onBack }) {
-  const [bottomNavOpen, setBottomNavOpen] = useState(true)
+  const [bottomNavOpen, setBottomNavOpen] = useState(true);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
@@ -21,12 +21,12 @@ function MobileOptimizedLayout({ children, title, showBackButton = false, onBack
               <span className="font-bold text-gray-800">AFRERA</span>
             </div>
           )}
-          
+
           <h1 className="font-semibold text-gray-800 truncate flex-1 text-center pr-8">
             {title}
           </h1>
-          
-          <button className="p-2">
+
+          <button type="button" className="p-2" aria-label="View notifications">
             <Bell className="w-6 h-6 text-gray-600" />
           </button>
         </div>
@@ -59,7 +59,7 @@ function MobileOptimizedLayout({ children, title, showBackButton = false, onBack
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default MobileOptimizedLayout
+export default MobileOptimizedLayout;

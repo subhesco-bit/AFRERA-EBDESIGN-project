@@ -33,7 +33,7 @@ async function create(req, res) {
     if (!payload.email || !payload.password) return res.status(400).json({ success: false, error: 'email and password required' });
     const existing = await service.getUserByEmail(payload.email);
     if (existing) return res.status(409).json({ success: false, error: 'User already exists' });
-    const user = await service.createUser(payload);
+    let user = await service.createUser(payload);
     res.status(201).json({ success: true, data: user });
   } catch (error) {
     logger.error('create user error', { error: error.message });
@@ -43,9 +43,9 @@ async function create(req, res) {
 
 async function update(req, res) {
   try {
-    const id = req.params.id;
-    const payload = req.body || {};
-    const user = await service.updateUser(id, payload);
+    let id = req.params.id;
+    let payload = req.body || {};
+    let user = await service.updateUser(id, payload);
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     res.json({ success: true, data: user });
   } catch (error) {
@@ -56,7 +56,7 @@ async function update(req, res) {
 
 async function remove(req, res) {
   try {
-    const id = req.params.id;
+    let id = req.params.id;
     const ok = await service.deleteUser(id);
     if (!ok) return res.status(404).json({ success: false, error: 'User not found' });
     res.json({ success: true });
@@ -111,7 +111,7 @@ async function getUserBehaviorProfile(req, res) {
 async function bulkCreateUsers(req, res) {
   try {
     const { users } = req.body;
-    const result = await service.bulkCreateUsers(users);
+    let result = await service.bulkCreateUsers(users);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('bulkCreateUsers error', { error: error.message });

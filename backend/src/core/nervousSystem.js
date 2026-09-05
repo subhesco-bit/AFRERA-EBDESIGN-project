@@ -72,7 +72,7 @@ class CentralBrain {
    * Make intelligent decision based on event
    */
   async makeDecision(eventType, context) {
-    const decision = {
+    let decision = {
       event_type: eventType,
       action: null,
       modules_to_inform: [],
@@ -613,7 +613,7 @@ class SensorNetwork {
   }
 
   async readDatabaseSensor(sensor) {
-    const pool = require('../database/pool');
+    let pool = require('../database/pool');
     const result = await pool.query(sensor.query);
     return { type: 'database', data: result.rows };
   }

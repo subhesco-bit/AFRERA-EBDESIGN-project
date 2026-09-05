@@ -103,7 +103,7 @@ async function applyForSubsidy(schemeId, farmerId, applicationData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO subsidy_applications 
        (application_id, scheme_id, farmer_id, application_date, application_status, 
         land_area, crops_grown, estimated_subsidy, documents_submitted, verification_status, 
@@ -132,7 +132,7 @@ async function getRecommendedSubsidies(farmerId) {
     const farmerProfile = await getFarmerProfile(farmerId);
     const farmerLand = await getFarmerLand(farmerId);
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'subsidy_recommendation',
       parameters: {
         farmer_profile: farmerProfile,
@@ -142,7 +142,7 @@ async function getRecommendedSubsidies(farmerId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     return {
       farmer_id: farmerId,
@@ -162,7 +162,7 @@ function generateId() {
 
 async function getFarmerProfile(farmerId) {
   try {
-    const result = await pool.query('SELECT * FROM farmer_profiles WHERE farmer_id = $1', [farmerId]);
+    let result = await pool.query('SELECT * FROM farmer_profiles WHERE farmer_id = $1', [farmerId]);
     return result.rows[0] || {};
   } catch (error) {
     return {};
@@ -171,7 +171,7 @@ async function getFarmerProfile(farmerId) {
 
 async function getSchemeCriteria(schemeId) {
   try {
-    const result = await pool.query('SELECT * FROM subsidy_schemes WHERE scheme_id = $1', [schemeId]);
+    let result = await pool.query('SELECT * FROM subsidy_schemes WHERE scheme_id = $1', [schemeId]);
     return result.rows[0] || {};
   } catch (error) {
     return {};
@@ -180,7 +180,7 @@ async function getSchemeCriteria(schemeId) {
 
 async function getHistoricalApprovals(schemeId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM subsidy_applications WHERE scheme_id = $1 AND application_status = $2',
       [schemeId, 'approved']
     );
@@ -192,7 +192,7 @@ async function getHistoricalApprovals(schemeId) {
 
 async function calculateEstimatedSubsidy(schemeId, landArea) {
   try {
-    const scheme = await getSchemeCriteria(schemeId);
+    let scheme = await getSchemeCriteria(schemeId);
     if (!scheme.max_amount || !scheme.subsidy_percentage) return 0;
     
     const baseAmount = landArea * 10000; // Assumed base rate per hectare
@@ -205,7 +205,7 @@ async function calculateEstimatedSubsidy(schemeId, landArea) {
 
 async function getFarmerLand(farmerId) {
   try {
-    const result = await pool.query('SELECT * FROM land_parcels WHERE farmer_id = $1', [farmerId]);
+    let result = await pool.query('SELECT * FROM land_parcels WHERE farmer_id = $1', [farmerId]);
     return result.rows;
   } catch (error) {
     return [];
@@ -214,7 +214,7 @@ async function getFarmerLand(farmerId) {
 
 async function getActiveSchemes() {
   try {
-    const result = await pool.query('SELECT * FROM subsidy_schemes WHERE status = $1', ['active']);
+    let result = await pool.query('SELECT * FROM subsidy_schemes WHERE status = $1', ['active']);
     return result.rows;
   } catch (error) {
     return [];

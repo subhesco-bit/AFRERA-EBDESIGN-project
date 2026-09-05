@@ -1,15 +1,15 @@
 /**
  * REOS Dashboard Page
- * 
+ *
  * Comprehensive dashboard for all REOS (Rural Economic Operating System) services
  * Covers: Village Profiles, Procurement Subscriptions, Buying Clubs, Rural Enterprises,
  * Renewable Energy, Household Economy, Shared Infrastructure, Machinery Access,
  * Rural Finance, AI Advisories, Market Access, Market Intelligence, Mobility Rides
  */
 
-import React, { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
 import {
   villageProfileAPI,
   procurementSubscriptionAPI,
@@ -23,8 +23,8 @@ import {
   aiAdvisoryAPI,
   marketAccessAPI,
   marketIntelligenceAPI,
-  mobilityRidesAPI
-} from '../services/api'
+  mobilityRidesAPI,
+} from '../services/api';
 import {
   Building2,
   ShoppingCart,
@@ -43,14 +43,14 @@ import {
   Plus,
   Search,
   Filter,
-  Download
-} from 'lucide-react'
+  Download,
+} from 'lucide-react';
 
 function REOSDashboardPage() {
-  const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState('village-profiles')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [showForm, setShowForm] = useState(false)
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('village-profiles');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   const tabs = [
     { id: 'village-profiles', label: 'Village Profiles', icon: Building2 },
@@ -65,44 +65,44 @@ function REOSDashboardPage() {
     { id: 'ai-advisories', label: 'AI Advisories', icon: Brain },
     { id: 'market-access', label: 'Market Access', icon: Store },
     { id: 'market-intelligence', label: 'Market Intelligence', icon: TrendingUp },
-    { id: 'mobility-rides', label: 'Mobility Rides', icon: Car }
-  ]
+    { id: 'mobility-rides', label: 'Mobility Rides', icon: Car },
+  ];
 
   // Village Profiles
   const { data: villageProfiles, isLoading: villagesLoading } = useQuery({
     queryKey: ['village-profiles'],
-    queryFn: async () => (await villageProfileAPI.searchVillages({})).data?.data ?? []
-  })
+    queryFn: async () => (await villageProfileAPI.searchVillages({})).data?.data ?? [],
+  });
 
   // Procurement Subscriptions
   const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
     queryKey: ['procurement-subscriptions'],
-    queryFn: async () => (await procurementSubscriptionAPI.getStatistics({})).data?.data ?? {}
-  })
+    queryFn: async () => (await procurementSubscriptionAPI.getStatistics({})).data?.data ?? {},
+  });
 
   // Buying Clubs
   const { data: buyingClubs, isLoading: clubsLoading } = useQuery({
     queryKey: ['buying-clubs'],
-    queryFn: async () => (await buyingClubAPI.getStatistics({})).data?.data ?? {}
-  })
+    queryFn: async () => (await buyingClubAPI.getStatistics({})).data?.data ?? {},
+  });
 
   // Rural Enterprises
   const { data: enterprises, isLoading: enterprisesLoading } = useQuery({
     queryKey: ['rural-enterprises'],
-    queryFn: async () => (await ruralEnterpriseAPI.getStatistics({})).data?.data ?? {}
-  })
+    queryFn: async () => (await ruralEnterpriseAPI.getStatistics({})).data?.data ?? {},
+  });
 
   // Renewable Energy
   const { data: energySystems, isLoading: energyLoading } = useQuery({
     queryKey: ['renewable-energy'],
-    queryFn: async () => (await renewableEnergyAPI.getStatistics({})).data?.data ?? {}
-  })
+    queryFn: async () => (await renewableEnergyAPI.getStatistics({})).data?.data ?? {},
+  });
 
   // AI Advisories
   const { data: advisories, isLoading: advisoriesLoading } = useQuery({
     queryKey: ['ai-advisories'],
-    queryFn: async () => (await aiAdvisoryAPI.getStatistics({})).data?.data ?? {}
-  })
+    queryFn: async () => (await aiAdvisoryAPI.getStatistics({})).data?.data ?? {},
+  });
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -159,7 +159,7 @@ function REOSDashboardPage() {
               </div>
             </div>
           </div>
-        )
+        );
 
       case 'procurement-subscriptions':
         return (
@@ -183,7 +183,7 @@ function REOSDashboardPage() {
               </div>
             </div>
           </div>
-        )
+        );
 
       case 'buying-clubs':
         return (
@@ -207,7 +207,7 @@ function REOSDashboardPage() {
               </div>
             </div>
           </div>
-        )
+        );
 
       case 'rural-enterprises':
         return (
@@ -231,7 +231,7 @@ function REOSDashboardPage() {
               </div>
             </div>
           </div>
-        )
+        );
 
       case 'renewable-energy':
         return (
@@ -255,7 +255,7 @@ function REOSDashboardPage() {
               </div>
             </div>
           </div>
-        )
+        );
 
       case 'ai-advisories':
         return (
@@ -279,7 +279,7 @@ function REOSDashboardPage() {
               </div>
             </div>
           </div>
-        )
+        );
 
       default:
         return (
@@ -288,9 +288,9 @@ function REOSDashboardPage() {
             <h3 className="text-lg font-medium text-gray-900 mb-2">Service Overview</h3>
             <p className="text-gray-500">Select a tab to view detailed information for this service.</p>
           </div>
-        )
+        );
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -306,9 +306,9 @@ function REOSDashboardPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600 font-medium'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                activeTab === tab.id ?
+                  'border-blue-600 text-blue-600 font-medium' :
+                  'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -344,7 +344,7 @@ function REOSDashboardPage() {
         {renderTabContent()}
       </div>
     </div>
-  )
+  );
 }
 
-export default REOSDashboardPage
+export default REOSDashboardPage;

@@ -5,14 +5,14 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // CONVERSATION SESSIONS
@@ -49,7 +49,7 @@ async function createConversationSession(userId, domainId, language = 'en') {
 router.post('/sessions', authMiddleware, async (req, res) => {
   try {
     const { domain_id, language } = req.body;
-    const result = await createConversationSession(req.user.id, domain_id, language);
+    let result = await createConversationSession(req.user.id, domain_id, language);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create session API error', { error: error.message, stack: error.stack });
@@ -62,7 +62,7 @@ router.post('/sessions', authMiddleware, async (req, res) => {
  */
 async function getConversationSession(sessionId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT cs.*, cd.name as domain_name 
        FROM conversation_sessions cs
        LEFT JOIN conversation_domains cd ON cs.domain_id = cd.id
@@ -86,7 +86,7 @@ async function getConversationSession(sessionId) {
  */
 router.get('/sessions/:sessionId', authMiddleware, async (req, res) => {
   try {
-    const result = await getConversationSession(req.params.sessionId);
+    let result = await getConversationSession(req.params.sessionId);
     res.json(result);
   } catch (error) {
     logger.error('Get session API error', { error: error.message, stack: error.stack });
@@ -117,7 +117,7 @@ async function addMessage(sessionId, role, content, contentType = 'text', metada
 
     const processingTime = Date.now() - startTime;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO conversation_messages 
        (session_id, role, content, content_type, metadata, intent_detected, confidence_score, processing_time_ms)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -150,7 +150,7 @@ async function addMessage(sessionId, role, content, contentType = 'text', metada
 router.post('/sessions/:sessionId/messages', authMiddleware, async (req, res) => {
   try {
     const { role, content, content_type, metadata } = req.body;
-    const result = await addMessage(req.params.sessionId, role, content, content_type, metadata);
+    let result = await addMessage(req.params.sessionId, role, content, content_type, metadata);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add message API error', { error: error.message, stack: error.stack });
@@ -163,7 +163,7 @@ router.post('/sessions/:sessionId/messages', authMiddleware, async (req, res) =>
  */
 async function getConversationMessages(sessionId, limit = 50) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM conversation_messages 
        WHERE session_id = $1 
        ORDER BY timestamp ASC 
@@ -184,7 +184,7 @@ async function getConversationMessages(sessionId, limit = 50) {
 router.get('/sessions/:sessionId/messages', authMiddleware, async (req, res) => {
   try {
     const { limit } = req.query;
-    const result = await getConversationMessages(req.params.sessionId, parseInt(limit) || 50);
+    let result = await getConversationMessages(req.params.sessionId, parseInt(limit) || 50);
     res.json(result);
   } catch (error) {
     logger.error('Get messages API error', { error: error.message, stack: error.stack });
@@ -244,7 +244,7 @@ async function detectIntent(message) {
 router.post('/detect-intent', authMiddleware, async (req, res) => {
   try {
     const { message } = req.body;
-    const result = await detectIntent(message);
+    let result = await detectIntent(message);
     res.json(result);
   } catch (error) {
     logger.error('Detect intent API error', { error: error.message, stack: error.stack });
@@ -265,7 +265,7 @@ async function generateResponse(sessionId, userMessage, context = {}) {
     const session = await getConversationSession(sessionId);
     
     // Detect intent
-    const intentResult = await detectIntent(userMessage);
+    let intentResult = await detectIntent(userMessage);
     
     // Get response template based on intent
     const response = await getResponseForIntent(intentResult.intent, session.domain_id, context);
@@ -330,7 +330,7 @@ router.post('/sessions/:sessionId/respond', authMiddleware, async (req, res) => 
     await addMessage(req.params.sessionId, 'user', message);
     
     // Generate response
-    const response = await generateResponse(req.params.sessionId, message, context);
+    let response = await generateResponse(req.params.sessionId, message, context);
     
     // Add assistant message
     await addMessage(req.params.sessionId, 'assistant', response.content);
@@ -351,7 +351,7 @@ router.post('/sessions/:sessionId/respond', authMiddleware, async (req, res) => 
  */
 async function getConversationDomains() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM conversation_domains WHERE is_active = true ORDER BY priority DESC, name'
     );
     return result.rows;
@@ -366,7 +366,7 @@ async function getConversationDomains() {
  */
 router.get('/domains', async (req, res) => {
   try {
-    const result = await getConversationDomains();
+    let result = await getConversationDomains();
     res.json(result);
   } catch (error) {
     logger.error('Get domains API error', { error: error.message, stack: error.stack });
@@ -383,7 +383,7 @@ router.get('/domains', async (req, res) => {
  */
 async function setContext(sessionId, contextKey, contextValue, expiresAt = null) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO conversation_context (session_id, context_key, context_value, expires_at)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (session_id, context_key)
@@ -417,7 +417,7 @@ async function getContext(sessionId, contextKey = null) {
     // Filter expired contexts
     query += ' AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
 
     if (contextKey) {
       return result.rows.length > 0 ? result.rows[0] : null;
@@ -442,7 +442,7 @@ async function getContext(sessionId, contextKey = null) {
 router.post('/sessions/:sessionId/context', authMiddleware, async (req, res) => {
   try {
     const { context_key, context_value, expires_at } = req.body;
-    const result = await setContext(req.params.sessionId, context_key, context_value, expires_at);
+    let result = await setContext(req.params.sessionId, context_key, context_value, expires_at);
     res.json(result);
   } catch (error) {
     logger.error('Set context API error', { error: error.message, stack: error.stack });
@@ -456,7 +456,7 @@ router.post('/sessions/:sessionId/context', authMiddleware, async (req, res) => 
 router.get('/sessions/:sessionId/context', authMiddleware, async (req, res) => {
   try {
     const { context_key } = req.query;
-    const result = await getContext(req.params.sessionId, context_key);
+    let result = await getContext(req.params.sessionId, context_key);
     res.json(result);
   } catch (error) {
     logger.error('Get context API error', { error: error.message, stack: error.stack });
@@ -483,7 +483,7 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
       .reduce((sum, m) => sum + m.processing_time_ms, 0) / assistantMessages || 0;
 
     // Get session info
-    const session = await getConversationSession(sessionId);
+    let session = await getConversationSession(sessionId);
 
     // Record analytics
     await pool.query(
@@ -524,7 +524,7 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
 router.post('/sessions/:sessionId/end', authMiddleware, async (req, res) => {
   try {
     const { resolution_status, user_satisfaction, feedback } = req.body;
-    const result = await endConversation(req.params.sessionId, resolution_status, user_satisfaction, feedback);
+    let result = await endConversation(req.params.sessionId, resolution_status, user_satisfaction, feedback);
     res.json(result);
   } catch (error) {
     logger.error('End conversation API error', { error: error.message, stack: error.stack });
@@ -554,3 +554,6 @@ module.exports = {
   endConversation,
   isHealthy
 };
+
+
+

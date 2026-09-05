@@ -12,11 +12,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * POST /api/digital-twin/farm
@@ -63,7 +63,7 @@ router.post('/crop',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      const result = await digitalTwinService.createCropDigitalTwin(cropData);
+      let result = await digitalTwinService.createCropDigitalTwin(cropData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Crop digital twin created successfully');
@@ -86,7 +86,7 @@ router.post('/:twinId/sync',
     try {
       const { twinId } = req.params;
 
-      const result = await digitalTwinService.syncDigitalTwin(twinId);
+      let result = await digitalTwinService.syncDigitalTwin(twinId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Digital twin synced successfully');
@@ -114,7 +114,7 @@ router.post('/:twinId/simulate',
         return apiResponseHandler.sendError(res, 'Simulation configuration is required', 400, 'MISSING_PARAMETER');
       }
 
-      const result = await digitalTwinService.runSimulation(twinId, simulationConfig);
+      let result = await digitalTwinService.runSimulation(twinId, simulationConfig);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Simulation completed successfully');
@@ -180,7 +180,7 @@ router.get('/farmers/:farmerId',
         ORDER BY created_at DESC
       `;
 
-      const result = await db.query(query, [farmerId]);
+      let result = await db.query(query, [farmerId]);
       
       const twins = await Promise.all(
         result.rows.map(async (twin) => ({

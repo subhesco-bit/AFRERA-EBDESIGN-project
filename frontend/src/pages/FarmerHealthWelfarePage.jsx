@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { HeartPulse, Gift } from 'lucide-react'
-import { farmerHealthRecordsAPI, farmerWelfareAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { useState } from 'react';
+import { HeartPulse, Gift } from 'lucide-react';
+import { farmerHealthRecordsAPI, farmerWelfareAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * M029 (backend/src/modules/M029). The real backend has two genuinely
@@ -17,42 +17,42 @@ import ResourceManager from '../components/common/ResourceManager'
  * Rebuilt (2026-08-28) as two real sections instead of one fabricated form.
  */
 
-const HEALTH_TYPES = ['Injury', 'Illness', 'Chronic Condition', 'Maternity', 'Mental Health', 'Checkup']
-const SEVERITY = ['Low', 'Medium', 'High', 'Critical']
+const HEALTH_TYPES = ['Injury', 'Illness', 'Chronic Condition', 'Maternity', 'Mental Health', 'Checkup'];
+const SEVERITY = ['Low', 'Medium', 'High', 'Critical'];
 
 function WelfareProgramsSection() {
-  const [programs, setPrograms] = useState(null)
-  const [loadError, setLoadError] = useState('')
-  const [farmerId, setFarmerId] = useState('')
-  const [programId, setProgramId] = useState('')
-  const [enrollResult, setEnrollResult] = useState(null)
-  const [enrollError, setEnrollError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [programs, setPrograms] = useState(null);
+  const [loadError, setLoadError] = useState('');
+  const [farmerId, setFarmerId] = useState('');
+  const [programId, setProgramId] = useState('');
+  const [enrollResult, setEnrollResult] = useState(null);
+  const [enrollError, setEnrollError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const loadPrograms = async () => {
-    setLoadError('')
+    setLoadError('');
     try {
-      const res = await farmerWelfareAPI.getPrograms()
-      setPrograms(res.data?.data?.items ?? [])
+      const res = await farmerWelfareAPI.getPrograms();
+      setPrograms(res.data?.data?.items ?? []);
     } catch (e) {
-      setLoadError(e?.response?.data?.error || e.message || 'Failed to load programs')
+      setLoadError(e?.response?.data?.error || e.message || 'Failed to load programs');
     }
-  }
+  };
 
   const enroll = async () => {
-    setEnrollError('')
-    setEnrollResult(null)
-    if (!farmerId || !programId) { setEnrollError('Farmer ID and Program ID are both required'); return }
-    setLoading(true)
+    setEnrollError('');
+    setEnrollResult(null);
+    if (!farmerId || !programId) { setEnrollError('Farmer ID and Program ID are both required'); return; }
+    setLoading(true);
     try {
-      const res = await farmerWelfareAPI.enroll(farmerId, programId)
-      setEnrollResult(res.data?.data)
+      let res = await farmerWelfareAPI.enroll(farmerId, programId);
+      setEnrollResult(res.data?.data);
     } catch (e) {
-      setEnrollError(e?.response?.data?.error || e.message || 'Enrollment failed')
+      setEnrollError(e?.response?.data?.error || e.message || 'Enrollment failed');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5">
@@ -100,7 +100,7 @@ function WelfareProgramsSection() {
       {enrollError && <div className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-2">{enrollError}</div>}
       {enrollResult && <pre className="mt-3 text-xs bg-gray-50 border border-gray-200 rounded p-2 overflow-x-auto">{JSON.stringify(enrollResult, null, 2)}</pre>}
     </div>
-  )
+  );
 }
 
 function FarmerHealthWelfarePage() {
@@ -151,7 +151,7 @@ function FarmerHealthWelfarePage() {
 
       <WelfareProgramsSection />
     </div>
-  )
+  );
 }
 
-export default FarmerHealthWelfarePage
+export default FarmerHealthWelfarePage;

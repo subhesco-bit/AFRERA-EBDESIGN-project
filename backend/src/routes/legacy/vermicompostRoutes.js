@@ -3,12 +3,12 @@
  * RESTful API endpoints for vermicompost management (M030)
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const vermicompostService = require('../../services/legacy/vermicompostService');
+const vermicompostService = require('../../services/legacy/vermicompostService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/vermicompost - Get all vermicompost
 router.get('/', authenticate, async (req, res) => {
@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/vermicompost/:id - Get vermicompost by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const vermicompost = await vermicompostService.getVermicompostById(req.params.id);
+    let vermicompost = await vermicompostService.getVermicompostById(req.params.id);
     res.json({ success: true, data: vermicompost });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/vermicompost - Create vermicompost
 router.post('/', authenticate, async (req, res) => {
   try {
-    const vermicompost = await vermicompostService.createVermicompost(req.body);
+    let vermicompost = await vermicompostService.createVermicompost(req.body);
     res.status(201).json({ success: true, data: vermicompost });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

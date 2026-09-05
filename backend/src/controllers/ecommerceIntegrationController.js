@@ -45,7 +45,7 @@ async function getNutritionPricePremium(req, res) {
     const { productId } = req.params;
     const { basePrice } = req.query;
     
-    const result = await ecommerceIntegrationService.calculateNutritionPricePremium(
+    let result = await ecommerceIntegrationService.calculateNutritionPricePremium(
       productId, 
       parseFloat(basePrice)
     );
@@ -76,7 +76,7 @@ async function getRecipeSuggestions(req, res) {
     const { productId } = req.params;
     const { limit } = req.query;
     
-    const result = await ecommerceIntegrationService.getRecipeSuggestionsForProduct(
+    let result = await ecommerceIntegrationService.getRecipeSuggestionsForProduct(
       productId, 
       parseInt(limit) || 5
     );
@@ -99,7 +99,7 @@ async function getRecipeProducts(req, res) {
   try {
     const { recipeId } = req.params;
     
-    const result = await ecommerceIntegrationService.getProductsForRecipe(recipeId);
+    let result = await ecommerceIntegrationService.getProductsForRecipe(recipeId);
     
     res.json(result);
   } catch (error) {
@@ -124,7 +124,7 @@ async function getHealthRecommendations(req, res) {
     const userId = req.user.id;
     const { limit } = req.query;
     
-    const result = await ecommerceIntegrationService.getHealthBasedRecommendations(
+    let result = await ecommerceIntegrationService.getHealthBasedRecommendations(
       userId, 
       parseInt(limit) || 10
     );
@@ -146,9 +146,9 @@ async function getHealthRecommendations(req, res) {
 async function checkCompatibility(req, res) {
   try {
     const { productId } = req.params;
-    const userId = req.user.id;
+    let userId = req.user.id;
     
-    const result = await ecommerceIntegrationService.checkProductCompatibility(productId, userId);
+    let result = await ecommerceIntegrationService.checkProductCompatibility(productId, userId);
     
     res.json({
       success: true,
@@ -175,7 +175,7 @@ async function calculateCartNutrition(req, res) {
   try {
     const { cartItems } = req.body;
     
-    const result = await ecommerceIntegrationService.calculateCartNutrition(cartItems);
+    let result = await ecommerceIntegrationService.calculateCartNutrition(cartItems);
     
     res.json(result);
   } catch (error) {
@@ -194,9 +194,9 @@ async function calculateCartNutrition(req, res) {
 async function calculateCartRDA(req, res) {
   try {
     const { cartNutrition } = req.body;
-    const userId = req.user.id;
+    let userId = req.user.id;
     
-    const result = await ecommerceIntegrationService.calculateCartRDAPercentage(cartNutrition, userId);
+    let result = await ecommerceIntegrationService.calculateCartRDAPercentage(cartNutrition, userId);
     
     res.json(result);
   } catch (error) {
@@ -220,7 +220,7 @@ async function getDietitianCollections(req, res) {
   try {
     const { dietitianId } = req.query;
     
-    const result = await ecommerceIntegrationService.getDietitianCollections(dietitianId);
+    let result = await ecommerceIntegrationService.getDietitianCollections(dietitianId);
     
     res.json(result);
   } catch (error) {
@@ -238,9 +238,9 @@ async function getDietitianCollections(req, res) {
  */
 async function getDietitianRecommendation(req, res) {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     
-    const result = await ecommerceIntegrationService.getDietitianRecommendation(userId);
+    let result = await ecommerceIntegrationService.getDietitianRecommendation(userId);
     
     res.json(result);
   } catch (error) {

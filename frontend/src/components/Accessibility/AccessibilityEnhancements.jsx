@@ -1,7 +1,7 @@
 /**
  * Accessibility Enhancements System
  * Production-level accessibility features for WCAG 2.1 AA compliance
- * 
+ *
  * Features:
  * - ARIA labels and descriptions
  * - Keyboard navigation support
@@ -35,7 +35,7 @@ export const aria = {
   busy: (isBusy) => ({ 'aria-busy': isBusy.toString() }),
   controls: (id) => ({ 'aria-controls': id }),
   owns: (id) => ({ 'aria-owns': id }),
-  hidden: (isHidden) => ({ 'aria-hidden': isHidden.toString() })
+  hidden: (isHidden) => ({ 'aria-hidden': isHidden.toString() }),
 };
 
 // Skip links component
@@ -43,7 +43,7 @@ export const SkipLinks = () => {
   const links = [
     { id: 'main-content', label: 'Skip to main content' },
     { id: 'navigation', label: 'Skip to navigation' },
-    { id: 'search', label: 'Skip to search' }
+    { id: 'search', label: 'Skip to search' },
   ];
 
   return (
@@ -68,16 +68,16 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
 
   const getFocusableElements = useCallback(() => {
     if (!trapRef.current) return [];
-    
+
     const focusableSelectors = [
       'a[href]',
       'button:not([disabled])',
       'textarea:not([disabled])',
       'input:not([disabled])',
       'select:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])'
+      '[tabindex]:not([tabindex="-1"])',
     ];
-    
+
     return trapRef.current.querySelectorAll(focusableSelectors.join(','));
   }, []);
 
@@ -117,7 +117,7 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
     previousFocusRef.current = document.activeElement;
 
     // Focus first focusable element
-    const focusableElements = getFocusableElements();
+    let focusableElements = getFocusableElements();
     if (focusableElements.length > 0) {
       focusableElements[0].focus();
     }
@@ -127,7 +127,7 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      
+
       // Restore focus
       if (previousFocusRef.current) {
         previousFocusRef.current.focus();
@@ -164,7 +164,7 @@ export const ScreenReaderOnly = ({ children, as = 'span' }) => {
 
 // Visually hidden but accessible
 export const VisuallyHidden = ({ children, as = 'span' }) => {
-  const Tag = as;
+  let Tag = as;
   return (
     <Tag className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0">
       {children}
@@ -176,7 +176,7 @@ export const VisuallyHidden = ({ children, as = 'span' }) => {
 export const useKeyboardNavigation = (items, onSelect, onClose) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  const handleKeyDown = useCallback((e) => {
+  let handleKeyDown = useCallback((e) => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
@@ -247,8 +247,8 @@ export const useFocusManagement = (initialFocus = null) => {
     focusProps: {
       ref: elementRef,
       onFocus: handleFocus,
-      onBlur: handleBlur
-    }
+      onBlur: handleBlur,
+    },
   };
 };
 
@@ -274,10 +274,10 @@ export const useHighContrastMode = () => {
   const [prefersHighContrast, setPrefersHighContrast] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-contrast: high)');
+    let mediaQuery = window.matchMedia('(prefers-contrast: high)');
     setPrefersHighContrast(mediaQuery.matches);
 
-    const handler = (e) => setPrefersHighContrast(e.matches);
+    let handler = (e) => setPrefersHighContrast(e.matches);
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);
@@ -328,7 +328,7 @@ export const AccessibleField = ({
   helper,
   required = false,
   children,
-  id
+  id,
 }) => {
   const errorId = `${id}-error`;
   const helperId = `${id}-helper`;
@@ -344,21 +344,21 @@ export const AccessibleField = ({
         {label}
         {required && <span className="text-red-500 ml-1" aria-label="required">*</span>}
       </label>
-      
+
       {React.cloneElement(children, {
         id,
         'aria-labelledby': labelId,
         'aria-describedby': error ? errorId : helperId,
         'aria-invalid': error ? 'true' : 'false',
-        'aria-required': required ? 'true' : 'false'
+        'aria-required': required ? 'true' : 'false',
       })}
-      
+
       {helper && !error && (
         <p id={helperId} className="text-sm text-gray-500">
           {helper}
         </p>
       )}
-      
+
       {error && (
         <p id={errorId} className="text-sm text-red-600" role="alert">
           {error}
@@ -374,7 +374,7 @@ export const AccessibleModal = ({
   onClose,
   title,
   children,
-  size = 'md'
+  size = 'md',
 }) => {
   const modalRef = useRef(null);
   const titleId = useRef(`modal-title-${Math.random().toString(36).substr(2, 9)}`);
@@ -391,7 +391,7 @@ export const AccessibleModal = ({
     };
   }, [isOpen]);
 
-  const handleKeyDown = (e) => {
+  let handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       onClose();
     }
@@ -412,14 +412,14 @@ export const AccessibleModal = ({
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       <FocusTrap isActive={isOpen} onEscape={onClose}>
         <div
           ref={modalRef}
           className={`relative bg-white rounded-lg shadow-xl w-full ${
             size === 'sm' ? 'max-w-md' :
-            size === 'md' ? 'max-w-lg' :
-            size === 'lg' ? 'max-w-2xl' : 'max-w-4xl'
+              size === 'md' ? 'max-w-lg' :
+                size === 'lg' ? 'max-w-2xl' : 'max-w-4xl'
           }`}
           tabIndex={-1}
         >
@@ -435,7 +435,7 @@ export const AccessibleModal = ({
               <span aria-hidden="true">×</span>
             </button>
           </div>
-          
+
           <div className="p-6">
             {children}
           </div>
@@ -449,9 +449,9 @@ export const AccessibleModal = ({
 export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
   const tabsRef = useRef([]);
 
-  const handleKeyDown = (e, index) => {
+  let handleKeyDown = (e, index) => {
     let targetIndex;
-    
+
     switch (e.key) {
       case 'ArrowLeft':
         e.preventDefault();
@@ -494,10 +494,10 @@ export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
             onKeyDown={(e) => handleKeyDown(e, index)}
             className={`
               px-4 py-2 text-sm font-medium border-b-2 -mb-px focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${activeTab === tab.id
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-              }
+              ${activeTab === tab.id ?
+            'border-blue-500 text-blue-600' :
+            'border-transparent text-gray-500 hover:text-gray-700'
+          }
             `}
           >
             {tab.icon && <span className="mr-2" aria-hidden="true">{tab.icon}</span>}
@@ -505,7 +505,7 @@ export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
           </button>
         ))}
       </div>
-      
+
       {tabs.map(tab => (
         <div
           key={tab.id}
@@ -556,5 +556,5 @@ export default {
   AccessibleField,
   AccessibleModal,
   AccessibleTabs,
-  useAnnouncement
+  useAnnouncement,
 };

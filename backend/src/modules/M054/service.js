@@ -127,7 +127,7 @@ async function listCustomers({ page = 1, limit = 20, status = null, customerType
  */
 async function getCustomer(customerId) {
   try {
-    const res = await pool.query('SELECT * FROM customers WHERE customer_id = $1', [customerId]);
+    let res = await pool.query('SELECT * FROM customers WHERE customer_id = $1', [customerId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error getting customer', { error: error.message });
@@ -142,7 +142,7 @@ async function updateCustomer(customerId, updates) {
   try {
     const { name, email, phone, address, customer_type, business_type, status, metadata } = updates;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE customers 
        SET name = COALESCE($1, name),
            email = COALESCE($2, email),
@@ -175,7 +175,7 @@ async function updateCustomer(customerId, updates) {
  */
 async function deleteCustomer(customerId) {
   try {
-    const res = await pool.query('DELETE FROM customers WHERE customer_id = $1 RETURNING customer_id', [customerId]);
+    let res = await pool.query('DELETE FROM customers WHERE customer_id = $1 RETURNING customer_id', [customerId]);
     return !!res.rows[0];
   } catch (error) {
     logger.error('Error deleting customer', { error: error.message });
@@ -188,11 +188,11 @@ async function deleteCustomer(customerId) {
  */
 async function getCustomerInsights(customerId) {
   try {
-    const customer = await getCustomer(customerId);
+    let customer = await getCustomer(customerId);
     const purchaseHistory = await getCustomerPurchaseHistory(customerId);
     const preferences = await getCustomerPreferences(customerId);
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'customer_insights',
       parameters: {
         customer_data: customer,
@@ -203,7 +203,7 @@ async function getCustomerInsights(customerId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     return {
       customer_id: customerId,
@@ -252,7 +252,7 @@ async function getPersonalizationOpportunities(customerData) {
 }
 
 async function getCustomerPurchaseHistory(customerId) {
-  const res = await pool.query(
+  let res = await pool.query(
     `SELECT * FROM orders WHERE customer_id = $1 ORDER BY created_at DESC LIMIT 50`,
     [customerId]
   );
@@ -260,7 +260,7 @@ async function getCustomerPurchaseHistory(customerId) {
 }
 
 async function getCustomerPreferences(customerId) {
-  const res = await pool.query(
+  let res = await pool.query(
     'SELECT * FROM customer_preferences WHERE customer_id = $1',
     [customerId]
   );

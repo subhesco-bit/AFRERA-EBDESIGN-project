@@ -7,8 +7,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -245,7 +245,7 @@ async function getRenewableEnergyStatistics(filters = {}) {
 function setupRoutes(app) {
   const express = require('express');
   const router = express.Router();
-  const authMiddleware = require('../../middleware/auth');
+  const authMiddleware = require('../../middleware\/auth');
 
   router.use(authMiddleware);
 
@@ -269,7 +269,7 @@ function setupRoutes(app) {
 
   router.get('/systems/type/:energyType', async (req, res) => {
     try {
-      const systems = await getRenewableEnergySystemsByType(req.params.energyType);
+      let systems = await getRenewableEnergySystemsByType(req.params.energyType);
       res.json({ success: true, data: systems });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -278,7 +278,7 @@ function setupRoutes(app) {
 
   router.post('/systems', async (req, res) => {
     try {
-      const system = await createRenewableEnergySystem(req.body);
+      let system = await createRenewableEnergySystem(req.body);
       res.status(201).json({ success: true, data: system });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -287,7 +287,7 @@ function setupRoutes(app) {
 
   router.put('/systems/:systemId', async (req, res) => {
     try {
-      const system = await updateRenewableEnergySystem(req.params.systemId, req.body);
+      let system = await updateRenewableEnergySystem(req.params.systemId, req.body);
       res.json({ success: true, data: system });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -296,7 +296,7 @@ function setupRoutes(app) {
 
   router.get('/systems/statistics', async (req, res) => {
     try {
-      const stats = await getRenewableEnergyStatistics(req.query);
+      let stats = await getRenewableEnergyStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -316,3 +316,6 @@ module.exports = {
   getRenewableEnergyStatistics,
   setupRoutes
 };
+
+
+

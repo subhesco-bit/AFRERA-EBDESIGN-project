@@ -34,15 +34,15 @@ async function createNursery(nurseryData) {
 }
 
 async function getNursery(nurseryId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query('SELECT * FROM nurseries WHERE id = $1', [nurseryId]);
+  let res = await pg.query('SELECT * FROM nurseries WHERE id = $1', [nurseryId]);
   return res.rows[0] || null;
 }
 
 async function listNurseries({ page = 1, limit = 20, farmerId, type, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const offset = (page - 1) * limit;
@@ -66,7 +66,7 @@ async function listNurseries({ page = 1, limit = 20, farmerId, type, status } = 
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
 
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM nurseries`, 'SELECT COUNT(*) FROM nurseries').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
 
@@ -74,12 +74,12 @@ async function listNurseries({ page = 1, limit = 20, farmerId, type, status } = 
 }
 
 async function updateNursery(nurseryId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { name, location, area, type, capacity, irrigationType, notes, status } = updates;
 
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE nurseries
      SET nursery_name = COALESCE($1, nursery_name),
          village = COALESCE($2, village),
@@ -112,10 +112,10 @@ async function updateNursery(nurseryId, updates) {
 }
 
 async function deleteNursery(nurseryId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query('DELETE FROM nurseries WHERE id = $1 RETURNING id', [nurseryId]);
+  let res = await pg.query('DELETE FROM nurseries WHERE id = $1 RETURNING id', [nurseryId]);
 
   if (res.rows[0]) {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
@@ -133,12 +133,12 @@ async function deleteNursery(nurseryId) {
 
 // Seedling batch management
 async function createSeedlingBatch(batchData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { nurseryId, cropId, varietyId, quantity, sowingDate, expectedTransplantDate, notes } = batchData;
 
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO seedling_batches (nursery_id, crop_id, variety_id, quantity, sowing_date, expected_transplant_date, notes, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())
      RETURNING *`,
@@ -161,12 +161,12 @@ async function createSeedlingBatch(batchData) {
 }
 
 async function updateSeedlingHealth(batchId, healthData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { healthScore, growthStage, issues, observations } = healthData;
 
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO seedling_health_records (batch_id, health_score, growth_stage, issues, observations, recorded_at)
      VALUES ($1, $2, $3, $4, $5, NOW())
      RETURNING *`,
@@ -192,7 +192,7 @@ async function updateSeedlingHealth(batchId, healthData) {
 
 // AI-powered nursery optimization
 async function optimizeNurseryEnvironment(nurseryId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const nursery = await getNursery(nurseryId);
@@ -247,7 +247,7 @@ function assessNurseryRisks(nursery) {
 
 // Nursery analytics
 async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   let query = `
@@ -259,7 +259,7 @@ async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
     FROM nurseries
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
 
   if (startDate) {
@@ -277,7 +277,7 @@ async function getNurseryAnalytics({ startDate, endDate, nurseryId } = {}) {
 
   query += ` GROUP BY type ORDER BY count DESC`;
 
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
 
   return {
     byType: res.rows,

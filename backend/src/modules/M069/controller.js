@@ -33,7 +33,7 @@ async function get(req, res) {
 async function create(req, res) {
   try {
     const payload = req.body || {};
-    const item = await service.createItem(payload);
+    let item = await service.createItem(payload);
     res.status(201).json({ success: true, data: item });
   } catch (e) {
     logger.error('M069 create error', { error: e.message });
@@ -43,8 +43,8 @@ async function create(req, res) {
 
 async function update(req, res) {
   try {
-    const payload = req.body || {};
-    const item = await service.updateItem(req.params.id, payload);
+    let payload = req.body || {};
+    let item = await service.updateItem(req.params.id, payload);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: item });
   } catch (e) {

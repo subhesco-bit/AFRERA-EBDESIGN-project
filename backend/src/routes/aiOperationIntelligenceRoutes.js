@@ -77,7 +77,7 @@ router.post('/recommend', async (req, res) => {
       });
     }
     
-    const result = await aiOperationIntelligenceService.generateOptimizationRecommendations(analysis);
+    let result = await aiOperationIntelligenceService.generateOptimizationRecommendations(analysis);
     
     res.json(result);
   } catch (error) {
@@ -104,7 +104,7 @@ router.post('/optimize', async (req, res) => {
       });
     }
     
-    const result = await aiOperationIntelligenceService.executeOptimizations(optimizations);
+    let result = await aiOperationIntelligenceService.executeOptimizations(optimizations);
     
     res.json(result);
   } catch (error) {
@@ -124,7 +124,7 @@ router.post('/cycle', async (req, res) => {
   try {
     // Collect metrics
     await aiOperationIntelligenceService.collectPerformanceMetrics();
-    const metrics = aiOperationIntelligenceService.performanceMetrics.get('current');
+    let metrics = aiOperationIntelligenceService.performanceMetrics.get('current');
     
     // Analyze performance
     const analysis = await aiOperationIntelligenceService.analyzePerformance(metrics);
@@ -176,7 +176,7 @@ router.post('/cycle', async (req, res) => {
 router.get('/predict', async (req, res) => {
   try {
     const horizon = parseInt(req.query.horizon) || 24;
-    const result = await aiOperationIntelligenceService.predictiveOptimization(horizon);
+    let result = await aiOperationIntelligenceService.predictiveOptimization(horizon);
     
     res.json(result);
   } catch (error) {
@@ -194,7 +194,7 @@ router.get('/predict', async (req, res) => {
  */
 router.get('/anomalies', async (req, res) => {
   try {
-    const result = await aiOperationIntelligenceService.detectAnomalies();
+    let result = await aiOperationIntelligenceService.detectAnomalies();
     
     res.json(result);
   } catch (error) {
@@ -212,7 +212,7 @@ router.get('/anomalies', async (req, res) => {
  */
 router.get('/improvements', async (req, res) => {
   try {
-    const result = await aiOperationIntelligenceService.continuousImprovement();
+    let result = await aiOperationIntelligenceService.continuousImprovement();
     
     res.json(result);
   } catch (error) {

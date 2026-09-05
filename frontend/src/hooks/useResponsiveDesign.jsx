@@ -1,7 +1,7 @@
 /**
  * Responsive Design Hooks
  * Production-level responsive design utilities and hooks
- * 
+ *
  * Features:
  * - Breakpoint detection
  * - Orientation detection
@@ -19,7 +19,7 @@ export const BREAKPOINTS = {
   md: 768,
   lg: 1024,
   xl: 1280,
-  '2xl': 1536
+  '2xl': 1536,
 };
 
 // Hook to detect current breakpoint
@@ -27,16 +27,16 @@ export const useBreakpoint = () => {
   const [breakpoint, setBreakpoint] = useState('xs');
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
   });
 
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      
+
       setWindowSize({ width, height });
-      
+
       if (width < BREAKPOINTS.sm) {
         setBreakpoint('xs');
       } else if (width < BREAKPOINTS.md) {
@@ -54,7 +54,7 @@ export const useBreakpoint = () => {
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -67,17 +67,17 @@ export const useIsBreakpointUp = (breakpoint) => {
   const breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
   const currentIndex = breakpointOrder.indexOf(currentBreakpoint);
   const targetIndex = breakpointOrder.indexOf(breakpoint);
-  
+
   return currentIndex >= targetIndex;
 };
 
 // Hook to check if current breakpoint matches or is below
 export const useIsBreakpointDown = (breakpoint) => {
   const { breakpoint: currentBreakpoint } = useBreakpoint();
-  const breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-  const currentIndex = breakpointOrder.indexOf(currentBreakpoint);
-  const targetIndex = breakpointOrder.indexOf(breakpoint);
-  
+  let breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
+  let currentIndex = breakpointOrder.indexOf(currentBreakpoint);
+  let targetIndex = breakpointOrder.indexOf(breakpoint);
+
   return currentIndex <= targetIndex;
 };
 
@@ -94,10 +94,10 @@ export const useDeviceType = () => {
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const width = window.innerWidth;
+    let width = window.innerWidth;
 
     let type = 'desktop';
-    
+
     // Check for mobile
     if (/mobile|android|iphone|ipad|phone/i.test(userAgent) || width < 768) {
       type = 'mobile';
@@ -106,7 +106,7 @@ export const useDeviceType = () => {
     else if (/tablet|ipad/i.test(userAgent) || (width >= 768 && width < 1024)) {
       type = 'tablet';
     }
-    
+
     setDeviceType(type);
   }, []);
 
@@ -124,7 +124,7 @@ export const useOrientation = () => {
 
     handleOrientationChange();
     window.addEventListener('resize', handleOrientationChange);
-    
+
     return () => window.removeEventListener('resize', handleOrientationChange);
   }, []);
 
@@ -134,10 +134,10 @@ export const useOrientation = () => {
 // Hook to get responsive value based on breakpoint
 export const useResponsiveValue = (values) => {
   const { breakpoint } = useBreakpoint();
-  
-  const breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-  const currentIndex = breakpointOrder.indexOf(breakpoint);
-  
+
+  let breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
+  let currentIndex = breakpointOrder.indexOf(breakpoint);
+
   // Find the largest breakpoint that has a defined value
   for (let i = currentIndex; i >= 0; i--) {
     const bp = breakpointOrder[i];
@@ -145,7 +145,7 @@ export const useResponsiveValue = (values) => {
       return values[bp];
     }
   }
-  
+
   // Default to xs value if nothing else matches
   return values.xs;
 };
@@ -159,13 +159,13 @@ export const useTouchDevice = () => {
       setIsTouch(
         'ontouchstart' in window ||
         navigator.maxTouchPoints > 0 ||
-        navigator.msMaxTouchPoints > 0
+        navigator.msMaxTouchPoints > 0,
       );
     };
 
     checkTouch();
     window.addEventListener('touchstart', checkTouch, { once: true });
-    
+
     return () => window.removeEventListener('touchstart', checkTouch);
   }, []);
 
@@ -198,7 +198,7 @@ export const useRetinaDisplay = () => {
       setIsRetina(
         window.devicePixelRatio > 1 ||
         window.matchMedia('(-webkit-min-device-pixel-ratio: 2)').matches ||
-        window.matchMedia('(min-resolution: 192dpi)').matches
+        window.matchMedia('(min-resolution: 192dpi)').matches,
       );
     };
 
@@ -214,7 +214,7 @@ export const useSafeAreaInsets = () => {
     top: 0,
     right: 0,
     bottom: 0,
-    left: 0
+    left: 0,
   });
 
   useEffect(() => {
@@ -223,13 +223,13 @@ export const useSafeAreaInsets = () => {
         top: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top')) || 0,
         right: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-right')) || 0,
         bottom: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom')) || 0,
-        left: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-left')) || 0
+        left: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-left')) || 0,
       });
     };
 
     updateInsets();
     window.addEventListener('resize', updateInsets);
-    
+
     return () => window.removeEventListener('resize', updateInsets);
   }, []);
 
@@ -240,20 +240,20 @@ export const useSafeAreaInsets = () => {
 export const useViewport = () => {
   const [viewport, setViewport] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
   });
 
   useEffect(() => {
-    const handleResize = () => {
+    let handleResize = () => {
       setViewport({
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       });
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -275,14 +275,14 @@ export const useIsPortrait = () => {
 // Hook to get responsive spacing
 export const useResponsiveSpacing = () => {
   const { breakpoint } = useBreakpoint();
-  
+
   const spacingMap = {
     xs: { xs: '0.5rem', sm: '1rem', md: '1.5rem', lg: '2rem', xl: '3rem' },
     sm: { xs: '0.5rem', sm: '1rem', md: '1.5rem', lg: '2rem', xl: '3rem' },
     md: { xs: '1rem', sm: '1.5rem', md: '2rem', lg: '3rem', xl: '4rem' },
     lg: { xs: '1rem', sm: '1.5rem', md: '2rem', lg: '3rem', xl: '4rem' },
     xl: { xs: '1.5rem', sm: '2rem', md: '3rem', lg: '4rem', xl: '6rem' },
-    '2xl': { xs: '2rem', sm: '3rem', md: '4rem', lg: '6rem', xl: '8rem' }
+    '2xl': { xs: '2rem', sm: '3rem', md: '4rem', lg: '6rem', xl: '8rem' },
   };
 
   return spacingMap[breakpoint] || spacingMap.md;
@@ -299,10 +299,10 @@ export const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
+    let mediaQuery = window.matchMedia(query);
     setMatches(mediaQuery.matches);
 
-    const handler = (e) => setMatches(e.matches);
+    let handler = (e) => setMatches(e.matches);
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);
@@ -318,7 +318,7 @@ export const useIsIOS = () => {
   useEffect(() => {
     setIsIOS(
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
     );
   }, []);
 
@@ -346,22 +346,22 @@ export const ResponsiveContainer = ({ children, className = '' }) => {
 };
 
 // Responsive grid component
-export const ResponsiveGrid = ({ 
-  children, 
+export const ResponsiveGrid = ({
+  children,
   cols = { xs: 1, sm: 2, md: 3, lg: 4, xl: 6 },
   gap = { xs: 1, sm: 2, md: 4, lg: 6, xl: 8 },
-  className = '' 
+  className = '',
 }) => {
   const { breakpoint } = useBreakpoint();
   const currentCols = cols[breakpoint] || cols.md;
   const currentGap = gap[breakpoint] || gap.md;
 
   return (
-    <div 
+    <div
       className={`grid gap-${currentGap} ${className}`}
-      style={{ 
+      style={{
         gridTemplateColumns: `repeat(${currentCols}, minmax(0, 1fr))`,
-        gap: `${currentGap * 0.25}rem`
+        gap: `${currentGap * 0.25}rem`,
       }}
     >
       {children}
@@ -370,10 +370,10 @@ export const ResponsiveGrid = ({
 };
 
 // Responsive text component
-export const ResponsiveText = ({ 
-  children, 
+export const ResponsiveText = ({
+  children,
   size = { xs: 'sm', sm: 'base', md: 'lg', lg: 'xl', xl: '2xl' },
-  className = '' 
+  className = '',
 }) => {
   const sizeClasses = {
     xs: 'text-xs',
@@ -382,7 +382,7 @@ export const ResponsiveText = ({
     lg: 'text-lg',
     xl: 'text-xl',
     '2xl': 'text-2xl',
-    '3xl': 'text-3xl'
+    '3xl': 'text-3xl',
   };
 
   const { breakpoint } = useBreakpoint();
@@ -418,5 +418,5 @@ export default {
   useIsAndroid,
   ResponsiveContainer,
   ResponsiveGrid,
-  ResponsiveText
+  ResponsiveText,
 };

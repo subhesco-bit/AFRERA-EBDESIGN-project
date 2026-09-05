@@ -10,47 +10,47 @@
  * sentence in FarmerEntranceHubPage.jsx with no functional binding.
  */
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
-import { Button } from '../components/ui/button'
-import { FileCheck, Wallet as WalletIcon, ShieldCheck, Eye, EyeOff } from 'lucide-react'
-import { toast } from 'react-hot-toast'
-import { walletAPI, financeAPI } from '../services/api'
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { FileCheck, Wallet as WalletIcon, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { walletAPI, financeAPI } from '../services/api';
 
 function formatInr(amount) {
-  const n = Number(amount)
-  return Number.isFinite(n) ? `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'
+  const n = Number(amount);
+  return Number.isFinite(n) ? `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—';
 }
 
 export default function BankPassportPage() {
-  const [consentGranted, setConsentGranted] = useState(false)
-  const [transactions, setTransactions] = useState([])
-  const [receipts, setReceipts] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [consentGranted, setConsentGranted] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [receipts, setReceipts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (consentGranted) load()
-  }, [consentGranted])
+    if (consentGranted) load();
+  }, [consentGranted]);
 
   const load = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const [txRes, receiptsRes] = await Promise.all([
         walletAPI.getTransactions({ limit: 50 }),
         financeAPI.getMyEnwrReceipts(),
-      ])
-      setTransactions(txRes.data.data?.transactions || [])
-      setReceipts(receiptsRes.data.data || [])
+      ]);
+      setTransactions(txRes.data.data?.transactions || []);
+      setReceipts(receiptsRes.data.data || []);
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Failed to load Bank Passport data')
+      toast.error(error.response?.data?.error || 'Failed to load Bank Passport data');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const totalCollateralInr = receipts
     .filter((r) => r.status === 'issued' || r.status === 'partially_released')
-    .reduce((sum, r) => sum + Number(r.max_collateral_inr || 0), 0)
+    .reduce((sum, r) => sum + Number(r.max_collateral_inr || 0), 0);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -152,5 +152,5 @@ export default function BankPassportPage() {
         </>
       )}
     </div>
-  )
+  );
 }

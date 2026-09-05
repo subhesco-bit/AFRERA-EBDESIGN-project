@@ -44,7 +44,7 @@ exports.syncFarmerHarvestWithERP = async (req, res) => {
     const { farmerId } = req.params;
     const harvestData = req.body;
     
-    const result = await completeERPIntegrationService.syncFarmerHarvestWithERP(farmerId, harvestData);
+    let result = await completeERPIntegrationService.syncFarmerHarvestWithERP(farmerId, harvestData);
     
     res.status(200).json({
       success: true,
@@ -68,7 +68,7 @@ exports.syncFarmerFieldWithERP = async (req, res) => {
     const { farmerId } = req.params;
     const fieldData = req.body;
     
-    const result = await completeERPIntegrationService.syncFarmerFieldWithERP(farmerId, fieldData);
+    let result = await completeERPIntegrationService.syncFarmerFieldWithERP(farmerId, fieldData);
     
     res.status(200).json({
       success: true,
@@ -96,7 +96,7 @@ exports.syncCropLifecycleWithERP = async (req, res) => {
     const { cropId } = req.params;
     const lifecycleData = req.body;
     
-    const result = await completeERPIntegrationService.syncCropLifecycleWithERP(cropId, lifecycleData);
+    let result = await completeERPIntegrationService.syncCropLifecycleWithERP(cropId, lifecycleData);
     
     res.status(200).json({
       success: true,
@@ -120,7 +120,7 @@ exports.syncCropYieldWithERP = async (req, res) => {
     const { cropId } = req.params;
     const yieldData = req.body;
     
-    const result = await completeERPIntegrationService.syncCropYieldWithERP(cropId, yieldData);
+    let result = await completeERPIntegrationService.syncCropYieldWithERP(cropId, yieldData);
     
     res.status(200).json({
       success: true,
@@ -148,7 +148,7 @@ exports.syncLivestockWithERP = async (req, res) => {
     const { livestockId } = req.params;
     const livestockData = req.body;
     
-    const result = await completeERPIntegrationService.syncLivestockWithERP(livestockId, livestockData);
+    let result = await completeERPIntegrationService.syncLivestockWithERP(livestockId, livestockData);
     
     res.status(200).json({
       success: true,
@@ -172,7 +172,7 @@ exports.syncLivestockProductionWithERP = async (req, res) => {
     const { livestockId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncLivestockProductionWithERP(livestockId, productionData);
+    let result = await completeERPIntegrationService.syncLivestockProductionWithERP(livestockId, productionData);
     
     res.status(200).json({
       success: true,
@@ -196,7 +196,7 @@ exports.syncLivestockHealthWithERP = async (req, res) => {
     const { livestockId } = req.params;
     const healthData = req.body;
     
-    const result = await completeERPIntegrationService.syncLivestockHealthWithERP(livestockId, healthData);
+    let result = await completeERPIntegrationService.syncLivestockHealthWithERP(livestockId, healthData);
     
     res.status(200).json({
       success: true,
@@ -222,9 +222,9 @@ exports.syncLivestockHealthWithERP = async (req, res) => {
 exports.syncDairyProductionWithERP = async (req, res) => {
   try {
     const { dairyId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncDairyProductionWithERP(dairyId, productionData);
+    let result = await completeERPIntegrationService.syncDairyProductionWithERP(dairyId, productionData);
     
     res.status(200).json({
       success: true,
@@ -246,9 +246,9 @@ exports.syncDairyProductionWithERP = async (req, res) => {
 exports.syncPoultryProductionWithERP = async (req, res) => {
   try {
     const { poultryId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncPoultryProductionWithERP(poultryId, productionData);
+    let result = await completeERPIntegrationService.syncPoultryProductionWithERP(poultryId, productionData);
     
     res.status(200).json({
       success: true,
@@ -270,9 +270,9 @@ exports.syncPoultryProductionWithERP = async (req, res) => {
 exports.syncGoatProductionWithERP = async (req, res) => {
   try {
     const { goatId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncGoatProductionWithERP(goatId, productionData);
+    let result = await completeERPIntegrationService.syncGoatProductionWithERP(goatId, productionData);
     
     res.status(200).json({
       success: true,
@@ -294,9 +294,9 @@ exports.syncGoatProductionWithERP = async (req, res) => {
 exports.syncSheepProductionWithERP = async (req, res) => {
   try {
     const { sheepId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncSheepProductionWithERP(sheepId, productionData);
+    let result = await completeERPIntegrationService.syncSheepProductionWithERP(sheepId, productionData);
     
     res.status(200).json({
       success: true,
@@ -318,9 +318,9 @@ exports.syncSheepProductionWithERP = async (req, res) => {
 exports.syncPigProductionWithERP = async (req, res) => {
   try {
     const { pigId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncPigProductionWithERP(pigId, productionData);
+    let result = await completeERPIntegrationService.syncPigProductionWithERP(pigId, productionData);
     
     res.status(200).json({
       success: true,

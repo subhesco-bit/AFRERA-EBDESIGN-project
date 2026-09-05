@@ -14,9 +14,9 @@
  * - Customer ERP (CRM integration, customer data sync)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ============================================================================
 // FARMER MODULE ERP INTEGRATION
@@ -97,7 +97,7 @@ async function syncFarmerCropPlanningWithERP(farmerId, cropPlanData) {
  * Sync farmer harvest data with ERP inventory and financial ERP
  */
 async function syncFarmerHarvestWithERP(farmerId, harvestData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with harvest data
@@ -144,7 +144,7 @@ async function syncFarmerHarvestWithERP(farmerId, harvestData) {
  * Sync farmer field data with ERP asset management
  */
 async function syncFarmerFieldWithERP(farmerId, fieldData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Register field as asset in ERP
@@ -188,7 +188,7 @@ async function syncFarmerFieldWithERP(farmerId, fieldData) {
  * Sync crop lifecycle stages with ERP production tracking
  */
 async function syncCropLifecycleWithERP(cropId, lifecycleData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get crop information
@@ -254,7 +254,7 @@ async function syncCropLifecycleWithERP(cropId, lifecycleData) {
  * Sync crop yield data with ERP inventory and financial ERP
  */
 async function syncCropYieldWithERP(cropId, yieldData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Calculate yield metrics
@@ -280,7 +280,7 @@ async function syncCropYieldWithERP(cropId, yieldData) {
     }
     
     // Calculate revenue based on quality and market prices
-    const revenue = await calculateYieldRevenue(yieldData);
+    let revenue = await calculateYieldRevenue(yieldData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(null, yieldData.crop_type, revenue, 'crop_yield');
@@ -317,7 +317,7 @@ async function syncCropYieldWithERP(cropId, yieldData) {
  * Sync livestock data with ERP asset management
  */
 async function syncLivestockWithERP(livestockId, livestockData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Register livestock as asset in ERP
@@ -333,7 +333,7 @@ async function syncLivestockWithERP(livestockId, livestockData) {
         livestockData.acquisition_date, livestockData.health_status]);
     
     // Calculate depreciation and post to financial ERP
-    const depreciation = calculateLivestockDepreciation(livestockData.current_value, livestockData.age);
+    let depreciation = calculateLivestockDepreciation(livestockData.current_value, livestockData.age);
     await postDepreciationToGL(livestockData.owner_id, livestockData.name, depreciation);
     
     // Emit signal bus event
@@ -357,7 +357,7 @@ async function syncLivestockWithERP(livestockId, livestockData) {
  * Sync livestock production with ERP inventory and financial ERP
  */
 async function syncLivestockProductionWithERP(livestockId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with production data
@@ -373,7 +373,7 @@ async function syncLivestockProductionWithERP(livestockId, productionData) {
     }
     
     // Calculate revenue based on production
-    const revenue = await calculateLivestockProductionRevenue(productionData);
+    let revenue = await calculateLivestockProductionRevenue(productionData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(productionData.owner_id, productionData.livestock_type, revenue, 'livestock_production');
@@ -406,7 +406,7 @@ async function syncLivestockProductionWithERP(livestockId, productionData) {
  * Sync livestock health events with ERP asset management and financial ERP
  */
 async function syncLivestockHealthWithERP(livestockId, healthData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update asset health status in ERP
@@ -446,7 +446,7 @@ async function syncLivestockHealthWithERP(livestockId, healthData) {
  * Sync dairy production with ERP
  */
 async function syncDairyProductionWithERP(dairyId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with dairy production
@@ -462,7 +462,7 @@ async function syncDairyProductionWithERP(dairyId, productionData) {
     }
     
     // Calculate revenue
-    const revenue = await calculateDairyProductionRevenue(productionData);
+    let revenue = await calculateDairyProductionRevenue(productionData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(productionData.owner_id, 'dairy', revenue, 'dairy_production');
@@ -488,7 +488,7 @@ async function syncDairyProductionWithERP(dairyId, productionData) {
  * Sync poultry production with ERP
  */
 async function syncPoultryProductionWithERP(poultryId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with poultry production
@@ -504,7 +504,7 @@ async function syncPoultryProductionWithERP(poultryId, productionData) {
     }
     
     // Calculate revenue
-    const revenue = await calculatePoultryProductionRevenue(productionData);
+    let revenue = await calculatePoultryProductionRevenue(productionData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(productionData.owner_id, 'poultry', revenue, 'poultry_production');
@@ -530,7 +530,7 @@ async function syncPoultryProductionWithERP(poultryId, productionData) {
  * Sync goat production with ERP
  */
 async function syncGoatProductionWithERP(goatId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with goat production
@@ -546,7 +546,7 @@ async function syncGoatProductionWithERP(goatId, productionData) {
     }
     
     // Calculate revenue
-    const revenue = await calculateGoatProductionRevenue(productionData);
+    let revenue = await calculateGoatProductionRevenue(productionData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(productionData.owner_id, 'goat', revenue, 'goat_production');
@@ -572,7 +572,7 @@ async function syncGoatProductionWithERP(goatId, productionData) {
  * Sync sheep production with ERP
  */
 async function syncSheepProductionWithERP(sheepId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with sheep production
@@ -588,7 +588,7 @@ async function syncSheepProductionWithERP(sheepId, productionData) {
     }
     
     // Calculate revenue
-    const revenue = await calculateSheepProductionRevenue(productionData);
+    let revenue = await calculateSheepProductionRevenue(productionData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(productionData.owner_id, 'sheep', revenue, 'sheep_production');
@@ -614,7 +614,7 @@ async function syncSheepProductionWithERP(sheepId, productionData) {
  * Sync pig production with ERP
  */
 async function syncPigProductionWithERP(pigId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update ERP inventory with pig production
@@ -630,7 +630,7 @@ async function syncPigProductionWithERP(pigId, productionData) {
     }
     
     // Calculate revenue
-    const revenue = await calculatePigProductionRevenue(productionData);
+    let revenue = await calculatePigProductionRevenue(productionData);
     
     // Post revenue to financial ERP
     await postRevenueToGL(productionData.owner_id, 'pig', revenue, 'pig_production');
@@ -657,7 +657,7 @@ async function syncPigProductionWithERP(pigId, productionData) {
 // ============================================================================
 
 async function postCostAllocationToGL(ownerId, cropType, costAllocations) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   const totalCost = Object.values(costAllocations).reduce((sum, cost) => sum + (cost || 0), 0);
   
@@ -669,7 +669,7 @@ async function postCostAllocationToGL(ownerId, cropType, costAllocations) {
 }
 
 async function postRevenueToGL(ownerId, productType, revenue, source) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   await pg.query(`
     INSERT INTO erp_gl_entries 
@@ -679,7 +679,7 @@ async function postRevenueToGL(ownerId, productType, revenue, source) {
 }
 
 async function postDepreciationToGL(ownerId, assetName, depreciation) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   await pg.query(`
     INSERT INTO erp_gl_entries 
@@ -689,7 +689,7 @@ async function postDepreciationToGL(ownerId, assetName, depreciation) {
 }
 
 async function postProvisionToGL(ownerId, assetId, provision, source) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   await pg.query(`
     INSERT INTO erp_gl_entries 
@@ -699,9 +699,9 @@ async function postProvisionToGL(ownerId, assetId, provision, source) {
 }
 
 async function postStageCostsToGL(cropId, stage, costs) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
-  const totalCost = Object.values(costs).reduce((sum, cost) => sum + (cost || 0), 0);
+  let totalCost = Object.values(costs).reduce((sum, cost) => sum + (cost || 0), 0);
   
   await pg.query(`
     INSERT INTO erp_gl_entries 
@@ -738,14 +738,14 @@ async function calculateYieldRevenue(yieldData) {
   let totalValue = 0;
   
   for (const [qualityGrade, quantity] of Object.entries(yieldData.quality_distribution)) {
-    const marketPrices = {
+    let marketPrices = {
       'premium': 50,
       'grade_a': 40,
       'grade_b': 30,
       'grade_c': 20
     };
     
-    const pricePerKg = marketPrices[qualityGrade] || 30;
+    let pricePerKg = marketPrices[qualityGrade] || 30;
     totalValue += quantity * pricePerKg;
   }
   
@@ -759,7 +759,7 @@ async function calculateLivestockProductionRevenue(productionData) {
   let totalValue = 0;
   
   for (const product of productionData.products) {
-    const marketPrices = {
+    let marketPrices = {
       'milk': 30,
       'meat': 100,
       'eggs': 5,
@@ -780,7 +780,7 @@ async function calculateDairyProductionRevenue(productionData) {
   let totalValue = 0;
   
   for (const product of productionData.products) {
-    const pricePerUnit = product.product_type === 'milk' ? 30 : 
+    let pricePerUnit = product.product_type === 'milk' ? 30 : 
                          product.product_type === 'cheese' ? 200 : 50;
     totalValue += product.quantity * pricePerUnit;
   }
@@ -795,7 +795,7 @@ async function calculatePoultryProductionRevenue(productionData) {
   let totalValue = 0;
   
   for (const product of productionData.products) {
-    const pricePerUnit = product.product_type === 'eggs' ? 5 : 
+    let pricePerUnit = product.product_type === 'eggs' ? 5 : 
                          product.product_type === 'meat' ? 100 : 50;
     totalValue += product.quantity * pricePerUnit;
   }
@@ -810,7 +810,7 @@ async function calculateGoatProductionRevenue(productionData) {
   let totalValue = 0;
   
   for (const product of productionData.products) {
-    const pricePerUnit = product.product_type === 'milk' ? 35 : 
+    let pricePerUnit = product.product_type === 'milk' ? 35 : 
                          product.product_type === 'meat' ? 120 : 50;
     totalValue += product.quantity * pricePerUnit;
   }
@@ -825,7 +825,7 @@ async function calculateSheepProductionRevenue(productionData) {
   let totalValue = 0;
   
   for (const product of productionData.products) {
-    const pricePerUnit = product.product_type === 'milk' ? 40 : 
+    let pricePerUnit = product.product_type === 'milk' ? 40 : 
                          product.product_type === 'meat' ? 110 : 
                          product.product_type === 'wool' ? 60 : 50;
     totalValue += product.quantity * pricePerUnit;
@@ -841,7 +841,7 @@ async function calculatePigProductionRevenue(productionData) {
   let totalValue = 0;
   
   for (const product of productionData.products) {
-    const pricePerUnit = product.product_type === 'meat' ? 90 : 50;
+    let pricePerUnit = product.product_type === 'meat' ? 90 : 50;
     totalValue += product.quantity * pricePerUnit;
   }
   
@@ -867,8 +867,8 @@ function calculateLandDepreciation(value, acquisitionDate) {
 }
 
 function calculateLivestockDepreciation(value, age) {
-  const depreciationRate = 0.15; // 15% per year
-  const depreciatedValue = value * (1 - (depreciationRate * age));
+  let depreciationRate = 0.15; // 15% per year
+  let depreciatedValue = value * (1 - (depreciationRate * age));
   
   return {
     original_value: value,
@@ -889,14 +889,14 @@ async function calculateHealthEventCost(livestockId, healthData) {
   const lossFactor = lossFactors[healthData.health_status] || 0.3;
   
   // Get current value of livestock
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const asset = await pg.query(`
     SELECT current_value FROM erp_assets
     WHERE asset_id = $1
   `, [livestockId]);
   
   const currentValue = asset.rows[0]?.current_value || 0;
-  const potentialLoss = currentValue * lossFactor;
+  let potentialLoss = currentValue * lossFactor;
   
   return {
     potential_loss: potentialLoss,
@@ -931,3 +931,6 @@ module.exports = {
   syncSheepProductionWithERP,
   syncPigProductionWithERP
 };
+
+
+

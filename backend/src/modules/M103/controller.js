@@ -26,7 +26,7 @@ const getEquipment = async (req, res) => {
 
 const registerEquipment = async (req, res) => {
   try {
-    const equipment = await equipmentService.registerEquipment(req.body);
+    let equipment = await equipmentService.registerEquipment(req.body);
     res.status(201).json({ success: true, data: equipment });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

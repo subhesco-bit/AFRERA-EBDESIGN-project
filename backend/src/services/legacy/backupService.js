@@ -5,7 +5,7 @@
  * capabilities for production-ready data protection
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { exec } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
@@ -162,7 +162,7 @@ class BackupService {
 
   async restoreBackup(backupFile) {
     try {
-      const backupPath = path.join(this.backupDir, 'database', backupFile);
+      let backupPath = path.join(this.backupDir, 'database', backupFile);
       
       // Check if backup file exists
       try {
@@ -172,8 +172,8 @@ class BackupService {
       }
 
       // Get database connection details
-      const dbUrl = process.env.DATABASE_URL;
-      const dbMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
+      let dbUrl = process.env.DATABASE_URL;
+      let dbMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
       if (!dbMatch) {
         throw new Error('Invalid DATABASE_URL format');
       }
@@ -220,9 +220,9 @@ class BackupService {
   async decompressBackup(compressedPath) {
     try {
       const gunzip = require('zlib').createGunzip();
-      const input = await fs.readFile(compressedPath);
+      let input = await fs.readFile(compressedPath);
       const decompressed = await new Promise((resolve, reject) => {
-        const chunks = [];
+        let chunks = [];
         gunzip.on('data', chunk => chunks.push(chunk));
         gunzip.on('end', () => resolve(Buffer.concat(chunks)));
         gunzip.on('error', reject);
@@ -241,13 +241,13 @@ class BackupService {
 
   async listBackups() {
     try {
-      const databaseDir = path.join(this.backupDir, 'database');
-      const files = await fs.readdir(databaseDir);
+      let databaseDir = path.join(this.backupDir, 'database');
+      let files = await fs.readdir(databaseDir);
       
       const backups = [];
       for (const file of files) {
-        const filePath = path.join(databaseDir, file);
-        const stats = await fs.stat(filePath);
+        let filePath = path.join(databaseDir, file);
+        let stats = await fs.stat(filePath);
         
         backups.push({
           filename: file,
@@ -271,10 +271,10 @@ class BackupService {
     try {
       const uploadsDir = process.env.UPLOAD_DIR || './uploads';
       const backupUploadsDir = path.join(this.backupDir, 'uploads');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      let timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       
       // Create timestamped backup directory
-      const backupPath = path.join(backupUploadsDir, `uploads-backup-${timestamp}`);
+      let backupPath = path.join(backupUploadsDir, `uploads-backup-${timestamp}`);
       await fs.mkdir(backupPath, { recursive: true });
 
       // Copy uploads directory
@@ -332,3 +332,6 @@ class BackupService {
 const backupService = new BackupService();
 
 module.exports = backupService;
+
+
+

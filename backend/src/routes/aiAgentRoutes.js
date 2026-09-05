@@ -55,7 +55,7 @@ router.post('/coordinate', async (req, res) => {
       });
     }
     
-    const result = await aiAgentService.coordinateAgents(agent_names, task, context);
+    let result = await aiAgentService.coordinateAgents(agent_names, task, context);
     
     res.json(result);
   } catch (error) {
@@ -139,7 +139,7 @@ router.post('/agent', (req, res) => {
       system_prompt: system_prompt || ''
     });
     
-    const status = aiAgentService.getAgentStatus(name);
+    let status = aiAgentService.getAgentStatus(name);
     
     res.json({
       success: true,
@@ -163,7 +163,7 @@ router.put('/agent/:agent_name', (req, res) => {
     const { agent_name } = req.params;
     const updates = req.body;
     
-    const result = aiAgentService.updateAgent(agent_name, updates);
+    let result = aiAgentService.updateAgent(agent_name, updates);
     
     res.json(result);
   } catch (error) {
@@ -182,7 +182,7 @@ router.put('/agent/:agent_name', (req, res) => {
 router.delete('/agent/:agent_name/memory', (req, res) => {
   try {
     const { agent_name } = req.params;
-    const result = aiAgentService.clearAgentMemory(agent_name);
+    let result = aiAgentService.clearAgentMemory(agent_name);
     
     res.json(result);
   } catch (error) {

@@ -2,36 +2,177 @@
   "root": true,
   "env": {
     "browser": true,
-    "es2022": true
+    "es2022": true,
+    "node": true
   },
   "parserOptions": {
-    "ecmaVersion": 2022,
+    "ecmaVersion": "latest",
     "sourceType": "module",
-    "ecmaFeatures": { "jsx": true }
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
   "settings": {
-    "react": { "version": "detect" }
+    "react": {
+      "version": "detect"
+    }
   },
-  "extends": ["eslint:recommended"],
-  "plugins": ["react"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "plugins": [
+    "react",
+    "react-hooks",
+    "jsx-a11y"
+  ],
   "globals": {
     "React": "readonly",
     "process": "readonly"
   },
   "rules": {
-    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^React$" }],
-    "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "warn",
+    "react/display-name": "warn",
+    "react/no-unescaped-entities": "off",
+    "react/jsx-no-undef": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn",
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/heading-has-content": "warn",
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|^React$"
+      }
+    ],
     "no-undef": "error",
-    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
     "prefer-const": "warn",
-    "eqeqeq": ["warn", "smart"]
+    "eqeqeq": [
+      "warn",
+      "smart"
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "no-var": "error",
+    "object-shorthand": "warn",
+    "quote-props": [
+      "warn",
+      "as-needed"
+    ],
+    "prefer-template": "warn",
+    "prefer-arrow-callback": "warn",
+    "arrow-spacing": "warn",
+    "no-implicit-coercion": "warn",
+    "no-floating-decimal": "error",
+    "no-multi-spaces": "warn",
+    "space-before-blocks": "warn",
+    "keyword-spacing": "warn",
+    "space-before-function-paren": [
+      "warn",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "indent": [
+      "warn",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "warn",
+      "single",
+      {
+        "avoidEscape": true
+      }
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "comma-spacing": "warn",
+    "comma-dangle": [
+      "warn",
+      "always-multiline"
+    ],
+    "no-multiple-empty-lines": [
+      "warn",
+      {
+        "max": 1
+      }
+    ],
+    "no-trailing-spaces": "warn",
+    "eol-last": [
+      "warn",
+      "always"
+    ],
+    "operator-linebreak": [
+      "warn",
+      "after"
+    ],
+    "space-infix-ops": "warn",
+    "space-unary-ops": "warn",
+    "jsx-a11y/anchor-is-valid": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/label-has-associated-control": "warn"
   },
-  "ignorePatterns": ["node_modules/", "dist/", "coverage/"],
   "overrides": [
     {
-      "files": ["src/test/**/*.{js,jsx}", "**/*.test.{js,jsx}"],
-      "env": { "jest": true, "node": true }
+      "files": [
+        "src/**/*.test.{js,jsx}",
+        "src/**/*.spec.{js,jsx}",
+        "src/test/**/*.{js,jsx}"
+      ],
+      "env": {
+        "jest": true,
+        "node": true
+      },
+      "rules": {
+        "no-undef": "off"
+      }
+    },
+    {
+      "files": [
+        "*.config.js",
+        "*.config.cjs"
+      ],
+      "env": {
+        "node": true
+      }
     }
+  ],
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    "build/",
+    "coverage/",
+    ".next/",
+    "out/",
+    "*.min.js",
+    "vendor/"
   ]
 }

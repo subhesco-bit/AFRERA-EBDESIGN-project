@@ -70,7 +70,7 @@ async function getListings(req, res) {
       sort_order: req.query.sort_order || 'DESC'
     };
     
-    const result = await ecommerceService.getMarketplaceListings(filters, pagination);
+    let result = await ecommerceService.getMarketplaceListings(filters, pagination);
     
     res.json(result);
   } catch (error) {
@@ -91,7 +91,7 @@ async function getListing(req, res) {
     const { id } = req.params;
     const pg = require('../database/connection').getPostgreSQL();
     
-    const result = await pg.query(`
+    let result = await pg.query(`
       SELECT 
         pl.*,
         c.name as category_name,
@@ -143,10 +143,10 @@ async function getListing(req, res) {
 async function updateListing(req, res) {
   try {
     const { id } = req.params;
-    const sellerId = req.user.id;
+    let sellerId = req.user.id;
     const updates = req.body;
     
-    const pg = require('../database/connection').getPostgreSQL();
+    let pg = require('../database/connection').getPostgreSQL();
     
     // Verify ownership
     const ownership = await pg.query(
@@ -199,7 +199,7 @@ async function updateListing(req, res) {
       RETURNING *
     `;
     
-    const result = await pg.query(query, values);
+    let result = await pg.query(query, values);
     
     res.json({
       success: true,
@@ -221,12 +221,12 @@ async function updateListing(req, res) {
 async function deleteListing(req, res) {
   try {
     const { id } = req.params;
-    const sellerId = req.user.id;
+    let sellerId = req.user.id;
     
-    const pg = require('../database/connection').getPostgreSQL();
+    let pg = require('../database/connection').getPostgreSQL();
     
     // Verify ownership
-    const ownership = await pg.query(
+    let ownership = await pg.query(
       'SELECT seller_id FROM product_listings WHERE id = $1',
       [id]
     );
@@ -273,10 +273,10 @@ async function deleteListing(req, res) {
  */
 async function getSellerAnalytics(req, res) {
   try {
-    const sellerId = req.user.id;
+    let sellerId = req.user.id;
     const period = req.query.period || '30d';
     
-    const result = await ecommerceService.getSellerAnalytics(sellerId, period);
+    let result = await ecommerceService.getSellerAnalytics(sellerId, period);
     
     res.json(result);
   } catch (error) {
@@ -294,10 +294,10 @@ async function getSellerAnalytics(req, res) {
  */
 async function getSellerListings(req, res) {
   try {
-    const sellerId = req.user.id;
-    const pg = require('../database/connection').getPostgreSQL();
+    let sellerId = req.user.id;
+    let pg = require('../database/connection').getPostgreSQL();
     
-    const result = await pg.query(`
+    let result = await pg.query(`
       SELECT 
         pl.*,
         c.name as category_name,
@@ -334,12 +334,12 @@ async function getSellerListings(req, res) {
  */
 async function getGIListings(req, res) {
   try {
-    const filters = {
+    let filters = {
       state: req.query.state,
       gi_product_id: req.query.gi_product_id
     };
     
-    const result = await ecommerceService.getGIListings(filters);
+    let result = await ecommerceService.getGIListings(filters);
     
     res.json(result);
   } catch (error) {
@@ -362,9 +362,9 @@ async function getGIListings(req, res) {
 async function getPriceTrends(req, res) {
   try {
     const { categoryId } = req.params;
-    const period = req.query.period || '30d';
+    let period = req.query.period || '30d';
     
-    const result = await ecommerceService.getMarketPriceTrends(categoryId, period);
+    let result = await ecommerceService.getMarketPriceTrends(categoryId, period);
     
     res.json(result);
   } catch (error) {
@@ -384,7 +384,7 @@ async function getDemandAnalysis(req, res) {
   try {
     const { categoryId } = req.params;
     
-    const result = await ecommerceService.getMarketDemandAnalysis(categoryId);
+    let result = await ecommerceService.getMarketDemandAnalysis(categoryId);
     
     res.json(result);
   } catch (error) {
@@ -402,9 +402,9 @@ async function getDemandAnalysis(req, res) {
  */
 async function getPriceRecommendation(req, res) {
   try {
-    const listingData = req.body;
+    let listingData = req.body;
     
-    const result = await ecommerceService.getAIPriceRecommendation(listingData);
+    let result = await ecommerceService.getAIPriceRecommendation(listingData);
     
     res.json({
       success: true,

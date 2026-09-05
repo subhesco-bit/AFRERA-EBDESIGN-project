@@ -1,6 +1,6 @@
-import { Snowflake } from 'lucide-react'
-import { coldStorageAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Snowflake } from 'lucide-react';
+import { coldStorageAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/coldStorageRoutes.js +
@@ -80,7 +80,7 @@ function ColdStoragePage() {
         onRun={(v) => coldStorageAPI.updateBookingStatus(v.bookingId, v.status)}
       />
     </div>
-  )
+  );
 }
 
-export default ColdStoragePage
+export default ColdStoragePage;

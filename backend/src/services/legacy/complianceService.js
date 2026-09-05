@@ -12,8 +12,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -236,7 +236,7 @@ async function recordRcm({ invoiceRef, supplierName, supplyDescription, taxableV
     [invoiceRef ?? null, supplierName, supplyDescription, taxableValueInr,
       gstRatePct, period, itcEligible]
   );
-  const row = rows[0];
+  let row = rows[0];
   return {
     ...row,
     rcm_liability_inr: Number(row.rcm_liability_inr),
@@ -284,3 +284,6 @@ module.exports = {
   const { ...rest } = m077;
   Object.assign(module.exports, rest);
 }
+
+
+

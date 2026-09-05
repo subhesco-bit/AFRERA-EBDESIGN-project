@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
+    require('../../utils\/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
     return null;
   }
 }
@@ -265,7 +265,7 @@ class AISelfHealingService {
    */
   async performRootCauseAnalysis(error, context = {}) {
     try {
-      const prompt = `
+      let prompt = `
         Perform root cause analysis for the following error:
         
         Error: ${JSON.stringify(error)}
@@ -281,7 +281,7 @@ class AISelfHealingService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -590,10 +590,19 @@ class AISelfHealingService {
    * Start health monitoring
    */
   startHealthMonitoring() {
+    if (this._healthInterval) return;
+
     // Monitor system health every 30 seconds
-    setInterval(() => {
+    this._healthInterval = setInterval(() => {
       this.updateHealthMetrics();
     }, 30000);
+  }
+
+  stopHealthMonitoring() {
+    if (this._healthInterval) {
+      clearInterval(this._healthInterval);
+      this._healthInterval = null;
+    }
   }
   
   /**
@@ -618,7 +627,7 @@ class AISelfHealingService {
       const systemState = this.getSystemState();
       const healingHistory = this.healingHistory.slice(-100);
       
-      const prompt = `
+      let prompt = `
         Analyze the following system state and healing history to predict potential failures:
         
         System State: ${JSON.stringify(systemState)}
@@ -632,7 +641,7 @@ class AISelfHealingService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -682,3 +691,6 @@ class AISelfHealingService {
 const aiSelfHealingService = new AISelfHealingService();
 
 module.exports = aiSelfHealingService;
+
+
+

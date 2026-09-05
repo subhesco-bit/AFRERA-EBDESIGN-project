@@ -4,6 +4,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const predictiveService = require('../services/predictiveIntelligenceService');
 const apiResponseHandler = require('../middleware/apiResponseHandler');
@@ -11,17 +13,19 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/predictive/demand/:cropType
  * Predict crop demand forecast
  */
-router.get('/demand/:cropType',
+router.get
+    // Log request
+    logger.debug('router.get request');('/demand/:cropType',
   authorize(['farmer', 'admin', 'analyst', 'buyer']),
   async (req, res) => {
     try {
@@ -47,14 +51,16 @@ router.get('/demand/:cropType',
  * GET /api/predictive/pricing/:cropType
  * Predict optimal pricing
  */
-router.get('/pricing/:cropType',
+router.get
+    // Log request
+    logger.debug('router.get request');('/pricing/:cropType',
   authorize(['farmer', 'admin', 'analyst']),
   async (req, res) => {
     try {
       const { cropType } = req.params;
       const { region, qualityGrade = 'standard' } = req.query;
 
-      const result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
+      let result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Pricing prediction generated');
@@ -73,7 +79,9 @@ router.get('/pricing/:cropType',
  * POST /api/predictive/yield
  * Predict crop yield
  */
-router.post('/yield',
+router.post
+    // Log request
+    logger.debug('router.post request');('/yield',
   authorize(['farmer', 'admin', 'analyst']),
   async (req, res) => {
     try {
@@ -88,7 +96,7 @@ router.post('/yield',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      const result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
+      let result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Yield prediction generated');
@@ -105,13 +113,15 @@ router.post('/yield',
  * GET /api/predictive/seasonal/:region/:season
  * Get seasonal recommendations
  */
-router.get('/seasonal/:region/:season',
+router.get
+    // Log request
+    logger.debug('router.get request');('/seasonal/:region/:season',
   authorize(['farmer', 'admin', 'analyst']),
   async (req, res) => {
     try {
       const { region, season } = req.params;
 
-      const result = await predictiveService.getSeasonalRecommendations(region, season);
+      let result = await predictiveService.getSeasonalRecommendations(region, season);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Seasonal recommendations retrieved');
@@ -128,7 +138,9 @@ router.get('/seasonal/:region/:season',
  * GET /api/predictive/models/status
  * Get predictive models status
  */
-router.get('/models/status',
+router.get
+    // Log request
+    logger.debug('router.get request');('/models/status',
   authorize(['admin', 'analyst']),
   async (req, res) => {
     try {

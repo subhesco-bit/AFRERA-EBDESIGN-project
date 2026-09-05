@@ -11,11 +11,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/analytics/farmer/:farmerId/performance
@@ -60,7 +60,7 @@ router.get('/market/trends',
         return apiResponseHandler.sendError(res, 'Crop type is required', 400, 'MISSING_PARAMETER');
       }
 
-      const result = await analyticsService.getMarketTrendAnalytics(cropType, region, timeRange);
+      let result = await analyticsService.getMarketTrendAnalytics(cropType, region, timeRange);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Market trend analytics retrieved');
@@ -83,7 +83,7 @@ router.get('/platform',
     try {
       const { timeRange = '30d' } = req.query;
 
-      const result = await analyticsService.getPlatformAnalytics(timeRange);
+      let result = await analyticsService.getPlatformAnalytics(timeRange);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Platform analytics retrieved');
@@ -111,7 +111,7 @@ router.post('/reports/custom',
       }
 
       const config = { metrics, filters, groupBy, timeRange };
-      const result = await analyticsService.generateCustomReport(config);
+      let result = await analyticsService.generateCustomReport(config);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Custom report generated');
@@ -132,7 +132,7 @@ router.delete('/cache',
   authorize(['admin']),
   async (req, res) => {
     try {
-      const result = analyticsService.clearCache();
+      let result = analyticsService.clearCache();
       return apiResponseHandler.sendSuccess(res, null, 'Analytics cache cleared');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to clear cache', 500, 'SERVER_ERROR', error.message);

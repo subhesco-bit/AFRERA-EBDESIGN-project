@@ -20,9 +20,9 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
-const { withTransaction } = require('../../core/withTransaction');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
+const { withTransaction } = require('../../core\/withTransaction');
 
 class ColdStorageService {
   constructor() {
@@ -82,7 +82,7 @@ class ColdStorageService {
       }
 
       query += ' ORDER BY name ASC';
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error listing cold storage facilities', { error: error.message, stack: error.stack });
@@ -92,7 +92,7 @@ class ColdStorageService {
 
   async getFacility(facilityId) {
     try {
-      const result = await this.pool.query('SELECT * FROM cold_storage_facilities WHERE id = $1', [facilityId]);
+      let result = await this.pool.query('SELECT * FROM cold_storage_facilities WHERE id = $1', [facilityId]);
       if (result.rows.length === 0) throw new Error('Cold storage facility not found');
       return result.rows[0];
     } catch (error) {
@@ -104,7 +104,7 @@ class ColdStorageService {
   async updateFacility(facilityId, data) {
     try {
       const fields = [];
-      const params = [];
+      let params = [];
       const map = {
         name: 'name', location: 'location', district: 'district', state: 'state',
         capacityUnits: 'capacity_units', capacityUnitLabel: 'capacity_unit_label',
@@ -120,7 +120,7 @@ class ColdStorageService {
       if (fields.length === 0) throw new Error('No fields to update');
 
       params.push(facilityId);
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE cold_storage_facilities SET ${fields.join(', ')}, updated_at = NOW() WHERE id = $${params.length} RETURNING *`,
         params
       );
@@ -202,14 +202,14 @@ class ColdStorageService {
         JOIN cold_storage_facilities f ON f.id = b.facility_id
         WHERE 1=1
       `;
-      const params = [];
+      let params = [];
       if (filters.facilityId) { params.push(filters.facilityId); query += ` AND b.facility_id = $${params.length}`; }
       if (filters.farmerId) { params.push(filters.farmerId); query += ` AND b.farmer_id = $${params.length}`; }
       if (filters.fpoId) { params.push(filters.fpoId); query += ` AND b.fpo_id = $${params.length}`; }
       if (filters.status) { params.push(filters.status); query += ` AND b.status = $${params.length}`; }
 
       query += ' ORDER BY b.check_in_date DESC, b.created_at DESC';
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error listing cold storage bookings', { error: error.message, stack: error.stack });
@@ -222,7 +222,7 @@ class ColdStorageService {
       if (!['booked', 'checked_in', 'checked_out', 'cancelled'].includes(status)) {
         throw new Error('Invalid status');
       }
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE cold_storage_bookings SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
         [status, bookingId]
       );
@@ -263,14 +263,14 @@ class ColdStorageService {
             AND b.check_out_date >= $1
         ) booked ON TRUE
       `;
-      const params = [date];
+      let params = [date];
       if (facilityId) {
         params.push(facilityId);
         query += ` WHERE f.id = $${params.length}`;
       }
       query += ' ORDER BY f.name';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       const rows = result.rows.map((r) => {
         const capacity = Number(r.capacity_units);
         const booked = Number(r.booked_units);
@@ -302,3 +302,6 @@ module.exports = new ColdStorageService();
   const { ...rest } = m078;
   Object.assign(module.exports, rest);
 }
+
+
+

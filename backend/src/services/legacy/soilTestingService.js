@@ -3,10 +3,10 @@
  * AI-powered soil analysis and personalized fertilizer recommendations
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../middleware/auth');
-const { getPostgreSQL } = require('../../database/connection');
+const { authMiddleware } = require('../../middleware\/auth');
+const { getPostgreSQL } = require('../../database\/connection');
 
 /**
  * Submit soil sample for testing
@@ -65,7 +65,7 @@ async function submitSoilSample(sampleData) {
  */
 async function processSoilTestResults(sampleId, labResults) {
   try {
-    const sample = await getSoilSample(sampleId);
+    let sample = await getSoilSample(sampleId);
     
     // AI-powered soil analysis
     const aiRequest = {
@@ -209,8 +209,8 @@ async function processSoilTestResults(sampleId, labResults) {
  */
 async function generateFertilizerRecommendation(sampleId, additionalParams) {
   try {
-    const sample = await getSoilSample(sampleId);
-    const analysis = sample.analysis;
+    let sample = await getSoilSample(sampleId);
+    let analysis = sample.analysis;
 
     const {
       crop_type,
@@ -223,7 +223,7 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
     } = additionalParams;
 
     // AI-powered fertilizer recommendation
-    const aiRequest = {
+    let aiRequest = {
       task: 'fertilizer_recommendation',
       parameters: {
         sample_id: sampleId,
@@ -242,7 +242,7 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendation = {
       recommendation_id: generateId(),
@@ -298,7 +298,7 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
  */
 async function trackSoilSample(sampleId) {
   try {
-    const sample = await getSoilSample(sampleId);
+    let sample = await getSoilSample(sampleId);
 
     const status = {
       sample_id: sampleId,
@@ -382,7 +382,7 @@ async function getSoilHealthCard(farmerId, farmId) {
  */
 async function getIntegratedNutrientManagementPlan(sampleId, cropDetails) {
   try {
-    const sample = await getSoilSample(sampleId);
+    let sample = await getSoilSample(sampleId);
     const fertilizerRec = await generateFertilizerRecommendation(sampleId, cropDetails);
 
     const inpPlan = {
@@ -608,7 +608,7 @@ async function getMonitoringSchedule(cropType) {
 function setupRoutes(app) {
   app.post('/api/v1/soil-testing/samples', authMiddleware, async (req, res) => {
     try {
-      const sample = await submitSoilSample(req.body);
+      let sample = await submitSoilSample(req.body);
       res.json({ success: true, data: sample });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -617,7 +617,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/soil-testing/samples/:id/results', authMiddleware, async (req, res) => {
     try {
-      const analysis = await processSoilTestResults(req.params.id, req.body);
+      let analysis = await processSoilTestResults(req.params.id, req.body);
       res.json({ success: true, data: analysis });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -626,7 +626,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/soil-testing/samples/:id/fertilizer-recommendation', authMiddleware, async (req, res) => {
     try {
-      const recommendation = await generateFertilizerRecommendation(req.params.id, req.body);
+      let recommendation = await generateFertilizerRecommendation(req.params.id, req.body);
       res.json({ success: true, data: recommendation });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -635,7 +635,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/soil-testing/samples/:id/track', async (req, res) => {
     try {
-      const status = await trackSoilSample(req.params.id);
+      let status = await trackSoilSample(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -644,7 +644,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/soil-testing/health-card', async (req, res) => {
     try {
-      const healthCard = await getSoilHealthCard(req.query.farmer_id, req.query.farm_id);
+      let healthCard = await getSoilHealthCard(req.query.farmer_id, req.query.farm_id);
       res.json({ success: true, data: healthCard });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -653,7 +653,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/soil-testing/inm-plan/:sampleId', async (req, res) => {
     try {
-      const inpPlan = await getIntegratedNutrientManagementPlan(req.params.sampleId, req.query);
+      let inpPlan = await getIntegratedNutrientManagementPlan(req.params.sampleId, req.query);
       res.json({ success: true, data: inpPlan });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -664,7 +664,7 @@ function setupRoutes(app) {
   app.get('/api/v1/soil-testing/organic-input-plan', async (req, res) => {
     try {
       const { crop, acres, soil_condition: soilCondition } = req.query;
-      const plan = await getOrganicInputPlan(crop, acres, soilCondition);
+      let plan = await getOrganicInputPlan(crop, acres, soilCondition);
       res.json({ success: true, data: plan });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -686,3 +686,6 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M032 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M032/service"));
+
+
+

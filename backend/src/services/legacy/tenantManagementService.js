@@ -9,10 +9,10 @@
  * - Tenant health scoring
  */
 
-const DatabaseService = require('../../database/connection');
+const DatabaseService = require('../../database\/connection');
 const aiGatewayService = require('./aiGatewayService');
 const analyticsService = require('./analyticsService');
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class TenantManagementService {
   constructor() {
@@ -74,7 +74,7 @@ class TenantManagementService {
    */
   async getTenant(tenantId) {
     try {
-      const tenant = await this.db.query(
+      let tenant = await this.db.query(
         'SELECT * FROM tenants WHERE id = $1',
         [tenantId]
       );
@@ -185,7 +185,7 @@ class TenantManagementService {
   async recommendTier(tenantId) {
     try {
       const currentTier = await this.getCurrentTenantTier(tenantId);
-      const usageMetrics = await this.getTenantUsageMetrics(tenantId);
+      let usageMetrics = await this.getTenantUsageMetrics(tenantId);
       const growthTrajectory = await this.getGrowthTrajectory(tenantId);
       const featureUsage = await this.getFeatureUsage(tenantId);
 
@@ -224,7 +224,7 @@ class TenantManagementService {
       const usageEfficiency = await this.calculateUsageEfficiency(tenantId);
       const marketRates = await this.getCurrentMarketRates();
 
-      const optimization = await this.aiGateway.optimize({
+      let optimization = await this.aiGateway.optimize({
         type: 'tenant_cost_optimization',
         currentCosts: currentCosts,
         resourceUsage: resourceUsage,
@@ -257,7 +257,7 @@ class TenantManagementService {
    */
   async calculateTenantHealth(tenantId, metrics) {
     try {
-      const healthScore = await this.aiGateway.analyze({
+      let healthScore = await this.aiGateway.analyze({
         type: 'tenant_health_scoring',
         metrics: metrics,
         benchmarks: await this.getHealthBenchmarks(),
@@ -323,7 +323,7 @@ class TenantManagementService {
       // Enrich with AI insights for each tenant
       const enrichedTenants = await Promise.all(
         result.rows.map(async (tenant) => {
-          const healthScore = await this.calculateTenantHealth(
+          let healthScore = await this.calculateTenantHealth(
             tenant.id,
             await this.getTenantUsageMetrics(tenant.id)
           );
@@ -365,7 +365,7 @@ class TenantManagementService {
         }
       }
 
-      const result = await this.db.query(`
+      let result = await this.db.query(`
         UPDATE tenants 
         SET name = COALESCE($1, name),
             tier = COALESCE($2, tier),
@@ -405,7 +405,7 @@ class TenantManagementService {
       await this.releaseTenantResources(tenantId);
       await this.archiveTenantRecords(tenantId);
 
-      const result = await this.db.query(
+      let result = await this.db.query(
         'DELETE FROM tenants WHERE id = $1 RETURNING *',
         [tenantId]
       );
@@ -459,7 +459,7 @@ class TenantManagementService {
   }
 
   async getCurrentTenantAllocation(tenantId) {
-    const result = await this.db.query(
+    let result = await this.db.query(
       'SELECT allocated_resources FROM tenants WHERE id = $1',
       [tenantId]
     );
@@ -503,7 +503,7 @@ class TenantManagementService {
   }
 
   async getCurrentTenantTier(tenantId) {
-    const result = await this.db.query(
+    let result = await this.db.query(
       'SELECT tier FROM tenants WHERE id = $1',
       [tenantId]
     );
@@ -603,3 +603,5 @@ class TenantManagementService {
 }
 
 module.exports = new TenantManagementService();
+
+

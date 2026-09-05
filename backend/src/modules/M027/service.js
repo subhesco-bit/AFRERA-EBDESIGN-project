@@ -84,7 +84,7 @@ function buildCertificationSignals({ daysToExpiry, complianceScore, auditFinding
 }
 
 async function listItems({ page = 1, limit = 20, farmerId, type, status } = {}) {
-  const client = pg();
+  let client = pg();
   const safePage = Math.max(parseInt(page, 10) || 1, 1);
   const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
   const offset = (safePage - 1) * safeLimit;
@@ -119,14 +119,14 @@ async function listItems({ page = 1, limit = 20, farmerId, type, status } = {}) 
 }
 
 async function getItem(id) {
-  const res = await pg().query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+  let res = await pg().query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
   const row = res.rows[0];
   return row ? { ...row, data: normalizeCertification(row.data || {}, row) } : null;
 }
 
 async function createItem(payload) {
   const data = normalizeCertification(payload);
-  const res = await pg().query(
+  let res = await pg().query(
     `INSERT INTO ${tableName} (data, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING *`,
     [data]
   );
@@ -136,8 +136,8 @@ async function createItem(payload) {
 async function updateItem(id, payload) {
   const current = await getItem(id);
   if (!current) return null;
-  const data = normalizeCertification(payload, current);
-  const res = await pg().query(
+  let data = normalizeCertification(payload, current);
+  let res = await pg().query(
     `UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
     [data, id]
   );
@@ -145,7 +145,7 @@ async function updateItem(id, payload) {
 }
 
 async function deleteItem(id) {
-  const res = await pg().query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+  let res = await pg().query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
   return !!res.rows[0];
 }
 

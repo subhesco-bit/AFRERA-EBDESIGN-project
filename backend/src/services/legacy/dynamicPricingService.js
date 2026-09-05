@@ -3,10 +3,10 @@
  * Local market-based and nutrient-based dynamic pricing
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../middleware/auth');
-const { mcda } = require('../../core/mcda');
+const { authMiddleware } = require('../../middleware\/auth');
+const { mcda } = require('../../core\/mcda');
 
 /**
  * Calculate dynamic price based on local market conditions
@@ -120,7 +120,7 @@ async function calculateNutrientBasedPricing(productDetails) {
     } = productDetails;
 
     // AI-powered nutrient-based pricing
-    const aiRequest = {
+    let aiRequest = {
       task: 'nutrient_based_pricing',
       parameters: {
         product_id,
@@ -138,9 +138,9 @@ async function calculateNutrientBasedPricing(productDetails) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    const pricing = {
+    let pricing = {
       product_id: product_id,
       timestamp: new Date().toISOString(),
       base_price: base_price,
@@ -197,7 +197,7 @@ async function optimizeFarmerSelection(orderRequirements) {
     } = orderRequirements;
 
     // AI-powered farmer selection optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'farmer_selection_optimization',
       parameters: {
         product_id,
@@ -214,7 +214,7 @@ async function optimizeFarmerSelection(orderRequirements) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const optimization = {
       order_id: generateId(),
@@ -435,7 +435,7 @@ function generateId() {
 // overbooking function below and there should not be one.
 // ===========================================================================
 
-const ymPool = require('../../database/pool');
+const ymPool = require('../../database\/pool');
 
 /**
  * Price a lot right now, given time remaining and how much is unsold.
@@ -616,7 +616,7 @@ async function lotsNeedingAttention({ withinDays = 7 } = {}) {
   );
   return {
     lots: rows.map((r) => {
-      const pctSold = Number(r.lot_size_kg)
+      let pctSold = Number(r.lot_size_kg)
         ? (Number(r.sold_kg) / Number(r.lot_size_kg)) * 100 : 0;
       return {
         ...r,
@@ -713,7 +713,7 @@ async function allocScore(lotCode, dest) {
     'SELECT * FROM pricing_lots WHERE lot_code = $1', [lotCode]
   );
   if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
-  const lot = lots[0];
+  let lot = lots[0];
 
   const { rows: farmerRows } = await ymPool.query(
     `SELECT f.fdi_score, f.fdi_grade, a.state AS region
@@ -747,7 +747,7 @@ async function allocScore(lotCode, dest) {
   }
 
   const adv = Number(lot.list_price_inr_per_kg);
-  const floor = Number(lot.farmer_floor_inr_per_kg);
+  let floor = Number(lot.farmer_floor_inr_per_kg);
   const margin = adv ? (adv - floor) / adv : 0;
 
   const criteria = [
@@ -897,7 +897,7 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
     'SELECT crop_key, farmer_floor_inr_per_kg FROM pricing_lots WHERE lot_code = $1', [lotCode]
   );
   if (!lots.length) throw new Error(`Lot ${lotCode} not found`);
-  const floor = Number(lots[0].farmer_floor_inr_per_kg);
+  let floor = Number(lots[0].farmer_floor_inr_per_kg);
 
   let category = null;
   let commonName = null;
@@ -992,7 +992,7 @@ async function festivalPricingAdjustment(lotCode, { asOfDate } = {}) {
 function setupRoutes(app) {
   app.post('/api/v1/pricing/local-market', authMiddleware, async (req, res) => {
     try {
-      const pricing = await calculateLocalMarketPricing(req.body);
+      let pricing = await calculateLocalMarketPricing(req.body);
       res.json({ success: true, data: pricing });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -1001,7 +1001,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/pricing/nutrient-based', authMiddleware, async (req, res) => {
     try {
-      const pricing = await calculateNutrientBasedPricing(req.body);
+      let pricing = await calculateNutrientBasedPricing(req.body);
       res.json({ success: true, data: pricing });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -1010,7 +1010,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/pricing/farmer-optimization', authMiddleware, async (req, res) => {
     try {
-      const optimization = await optimizeFarmerSelection(req.body);
+      let optimization = await optimizeFarmerSelection(req.body);
       res.json({ success: true, data: optimization });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -1020,7 +1020,7 @@ function setupRoutes(app) {
   app.get('/api/v1/pricing/alerts/:userId', async (req, res) => {
     try {
       const productIds = req.query.productIds ? req.query.productIds.split(',') : [];
-      const alerts = await getPriceAlerts(req.params.userId, productIds);
+      let alerts = await getPriceAlerts(req.params.userId, productIds);
       res.json({ success: true, data: alerts });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -1039,7 +1039,7 @@ function setupRoutes(app) {
   // Peer floor-price benchmark — real farmer_listings data (see floorBenchmark above)
   app.get('/api/v1/pricing/floor-benchmark', async (req, res) => {
     try {
-      const result = await floorBenchmark(req.query.category || req.query.q);
+      let result = await floorBenchmark(req.query.category || req.query.q);
       res.json({ success: true, data: result });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -1049,7 +1049,7 @@ function setupRoutes(app) {
   // Order-to-farmer lot allocation score — real pricing_lots/mcda() data (see allocScore above)
   app.get('/api/v1/pricing/lots/:lotCode/alloc-score', authMiddleware, async (req, res) => {
     try {
-      const result = await allocScore(req.params.lotCode, req.query.dest);
+      let result = await allocScore(req.params.lotCode, req.query.dest);
       res.json({ success: true, data: result });
     } catch (error) {
       res.status(error.message.includes('not found') ? 404 : 500).json({ success: false, error: error.message });
@@ -1060,7 +1060,7 @@ function setupRoutes(app) {
   // ?asOf=YYYY-MM-DD to price as of a specific date; defaults to today.
   app.get('/api/v1/pricing/lots/:lotCode/festival-price', async (req, res) => {
     try {
-      const result = await festivalPricingAdjustment(req.params.lotCode, { asOfDate: req.query.asOf });
+      let result = await festivalPricingAdjustment(req.params.lotCode, { asOfDate: req.query.asOf });
       res.json({ success: true, data: result });
     } catch (error) {
       res.status(error.message.includes('not found') ? 404 : 500).json({ success: false, error: error.message });
@@ -1089,3 +1089,6 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M055 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M055/service"));
+
+
+

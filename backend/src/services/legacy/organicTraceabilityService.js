@@ -5,14 +5,14 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // ORGANIC FARM REGISTRY
@@ -63,7 +63,7 @@ async function registerOrganicFarm(data) {
  */
 router.post('/farms', authMiddleware, async (req, res) => {
   try {
-    const result = await registerOrganicFarm(req.body);
+    let result = await registerOrganicFarm(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register farm API error', { error: error.message, stack: error.stack });
@@ -76,7 +76,7 @@ router.post('/farms', authMiddleware, async (req, res) => {
  */
 async function getOrganicFarms(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT of.*, os.name as standard_name, os.code as standard_code,
        a.city, a.state, a.pincode
        FROM organic_farms of
@@ -98,7 +98,7 @@ async function getOrganicFarms(farmerId) {
  */
 router.get('/farms', authMiddleware, async (req, res) => {
   try {
-    const result = await getOrganicFarms(req.user.id);
+    let result = await getOrganicFarms(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get farms API error', { error: error.message, stack: error.stack });
@@ -126,7 +126,7 @@ async function addOrganicPlot(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO organic_plots 
        (organic_farm_id, plot_number, plot_name, area_hectares, certification_status, 
         gps_boundary, soil_type, irrigation_type)
@@ -156,7 +156,7 @@ async function addOrganicPlot(data) {
  */
 router.post('/plots', authMiddleware, async (req, res) => {
   try {
-    const result = await addOrganicPlot(req.body);
+    let result = await addOrganicPlot(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add plot API error', { error: error.message, stack: error.stack });
@@ -169,7 +169,7 @@ router.post('/plots', authMiddleware, async (req, res) => {
  */
 async function getOrganicPlots(farmId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM organic_plots WHERE organic_farm_id = $1 ORDER BY plot_number',
       [farmId]
     );
@@ -185,7 +185,7 @@ async function getOrganicPlots(farmId) {
  */
 router.get('/farms/:farmId/plots', authMiddleware, async (req, res) => {
   try {
-    const result = await getOrganicPlots(req.params.farmId);
+    let result = await getOrganicPlots(req.params.farmId);
     res.json(result);
   } catch (error) {
     logger.error('Get plots API error', { error: error.message, stack: error.stack });
@@ -218,7 +218,7 @@ async function recordOrganicCrop(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO organic_crops 
        (organic_plot_id, crop_name, variety, planting_date, expected_harvest_date, 
         area_hectares, expected_yield_kg_per_hectare, seed_source, seed_lot_number,
@@ -255,7 +255,7 @@ async function recordOrganicCrop(data) {
  */
 router.post('/crops', authMiddleware, async (req, res) => {
   try {
-    const result = await recordOrganicCrop(req.body);
+    let result = await recordOrganicCrop(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record crop API error', { error: error.message, stack: error.stack });
@@ -279,7 +279,7 @@ async function recordHarvest(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO organic_harvests 
        (organic_crop_id, harvest_number, harvest_date, total_quantity_kg, grade,
         moisture_content, quality_parameters, harvested_by, storage_location, batch_number)
@@ -317,7 +317,7 @@ async function recordHarvest(data) {
  */
 router.post('/harvests', authMiddleware, async (req, res) => {
   try {
-    const result = await recordHarvest(req.body);
+    let result = await recordHarvest(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record harvest API error', { error: error.message, stack: error.stack });
@@ -346,7 +346,7 @@ async function recordChainOfCustody(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO organic_chain_of_custody 
        (product_id, lot_number, current_holder_type, current_holder_id, 
         custody_transfer_date, transfer_from_type, transfer_from_id, quantity_kg, document_reference)
@@ -377,7 +377,7 @@ async function recordChainOfCustody(data) {
  */
 router.post('/chain-of-custody', authMiddleware, async (req, res) => {
   try {
-    const result = await recordChainOfCustody(req.body);
+    let result = await recordChainOfCustody(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record chain of custody API error', { error: error.message, stack: error.stack });
@@ -390,7 +390,7 @@ router.post('/chain-of-custody', authMiddleware, async (req, res) => {
  */
 async function getChainOfCustody(productId, lotNumber) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM organic_chain_of_custody 
        WHERE product_id = $1 OR lot_number = $2
        ORDER BY custody_transfer_date ASC`,
@@ -410,7 +410,7 @@ router.get('/chain-of-custody/:productId', authMiddleware, async (req, res) => {
   try {
     const { productId } = req.params;
     const { lot_number } = req.query;
-    const result = await getChainOfCustody(productId, lot_number);
+    let result = await getChainOfCustody(productId, lot_number);
     res.json(result);
   } catch (error) {
     logger.error('Get chain of custody API error', { error: error.message, stack: error.stack });
@@ -427,7 +427,7 @@ router.get('/chain-of-custody/:productId', authMiddleware, async (req, res) => {
  */
 async function generateQRCodeData(productId, lotNumber) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT generate_organic_qr_data($1, $2) as qr_data',
       [productId, lotNumber]
     );
@@ -450,7 +450,7 @@ router.get('/qr-data/:productId', authMiddleware, async (req, res) => {
   try {
     const { productId } = req.params;
     const { lot_number } = req.query;
-    const result = await generateQRCodeData(productId, lot_number);
+    let result = await generateQRCodeData(productId, lot_number);
     res.json(result);
   } catch (error) {
     logger.error('Generate QR data API error', { error: error.message, stack: error.stack });
@@ -481,7 +481,7 @@ async function saveConsumerTransparency(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO organic_consumer_transparency 
        (product_id, lot_number, qr_code, farmer_name, farm_location, 
         farm_certification_number, harvest_date, processing_facility, processing_date,
@@ -520,7 +520,7 @@ async function saveConsumerTransparency(data) {
  */
 router.post('/consumer-transparency', authMiddleware, async (req, res) => {
   try {
-    const result = await saveConsumerTransparency(req.body);
+    let result = await saveConsumerTransparency(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Save consumer transparency API error', { error: error.message, stack: error.stack });
@@ -533,7 +533,7 @@ router.post('/consumer-transparency', authMiddleware, async (req, res) => {
  */
 async function getConsumerTransparencyByQR(qrCode) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM organic_consumer_transparency WHERE qr_code = $1',
       [qrCode]
     );
@@ -554,7 +554,7 @@ async function getConsumerTransparencyByQR(qrCode) {
  */
 router.get('/consumer-transparency/qr/:qrCode', async (req, res) => {
   try {
-    const result = await getConsumerTransparencyByQR(req.params.qrCode);
+    let result = await getConsumerTransparencyByQR(req.params.qrCode);
     res.json(result);
   } catch (error) {
     logger.error('Get consumer transparency API error', { error: error.message, stack: error.stack });
@@ -571,7 +571,7 @@ router.get('/consumer-transparency/qr/:qrCode', async (req, res) => {
  */
 async function getOrganicStandards() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM organic_standards WHERE is_active = true ORDER BY name'
     );
     return result.rows;
@@ -586,7 +586,7 @@ async function getOrganicStandards() {
  */
 router.get('/standards', async (req, res) => {
   try {
-    const result = await getOrganicStandards();
+    let result = await getOrganicStandards();
     res.json(result);
   } catch (error) {
     logger.error('Get standards API error', { error: error.message, stack: error.stack });
@@ -612,7 +612,7 @@ async function reportFraud(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO organic_fraud_alerts 
        (alert_type, severity, entity_type, entity_id, description, evidence)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -639,7 +639,7 @@ async function reportFraud(data) {
  */
 router.post('/fraud-alerts', authMiddleware, async (req, res) => {
   try {
-    const result = await reportFraud(req.body);
+    let result = await reportFraud(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Report fraud API error', { error: error.message, stack: error.stack });
@@ -845,3 +845,6 @@ module.exports = {
   landUseSummary,
   organicSchemeStatus
 };
+
+
+

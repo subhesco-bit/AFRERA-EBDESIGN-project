@@ -1,0 +1,15 @@
+const router = require('express').Router();
+const p9 = require('../services/phase9');
+const auth = require('../middleware/auth');
+router.post('/specialization/:type', auth, async (req, res) => { try { res.json(await p9.specialization(req.params.type)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/integration/:id', auth, async (req, res) => { try { res.json(await p9.integration(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/analytics/:id', auth, async (req, res) => { try { res.json(await p9.analytics(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/third-party/:id', auth, async (req, res) => { try { res.json(await p9.thirdParty(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/mobile/:id', auth, async (req, res) => { try { res.json(await p9.mobile(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/offline/:id', auth, async (req, res) => { try { res.json(await p9.offline(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/reporting/:id', auth, async (req, res) => { try { res.json(await p9.reporting(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/notifications/:id', auth, async (req, res) => { try { res.json(await p9.notifications(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/recommendations/:id', auth, async (req, res) => { try { res.json(await p9.recommendations(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/security/:id', auth, async (req, res) => { try { res.json(await p9.security(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/performance/:id', auth, async (req, res) => { try { res.json(await p9.performance(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+module.exports = router;

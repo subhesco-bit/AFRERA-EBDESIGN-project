@@ -3,12 +3,12 @@
  * Manages farmer training programs, certifications, and FOLU (Food Systems, Land Use, and Restoration) compliance
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const aiBackbone = require('./aiBackboneService');
 const { aiAPI } = require('./aiService');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
-const { authMiddleware } = require('../../middleware/auth');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
+const { authMiddleware } = require('../../middleware\/auth');
 
 /**
  * Create training program
@@ -113,9 +113,9 @@ async function registerForTraining(registrationData) {
 
     // Check eligibility and recommend using real AI
     const farmerProfile = await getFarmerProfile(farmer_id);
-    const program = await getTrainingProgram(program_id);
+    let program = await getTrainingProgram(program_id);
 
-    const aiPrompt = `As an expert agricultural career counselor, assess the following farmer's eligibility for a training program and provide recommendations:
+    let aiPrompt = `As an expert agricultural career counselor, assess the following farmer's eligibility for a training program and provide recommendations:
 
 Farmer Profile: ${JSON.stringify(farmerProfile)}
 Program: ${JSON.stringify(program)}
@@ -127,7 +127,7 @@ Please provide:
 4. Learning readiness assessment
 5. Personalized recommendations`;
 
-    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
+    let aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
     registration.ai_assessment = aiResponse.content;
     registration.ai_provider = aiResponse.provider;
     registration.ai_model = aiResponse.model;
@@ -169,10 +169,10 @@ async function trackTrainingProgress(registrationId) {
  */
 async function assessFOLUCompliance(farmerId, assessmentPeriod) {
   try {
-    const farmerProfile = await getFarmerProfile(farmerId);
+    let farmerProfile = await getFarmerProfile(farmerId);
     
     // AI-powered FOLU compliance assessment using real AI
-    const aiPrompt = `As an expert in FOLU (Food Systems, Land Use, and Restoration) compliance, assess the following farmer's compliance with FOLU framework:
+    let aiPrompt = `As an expert in FOLU (Food Systems, Land Use, and Restoration) compliance, assess the following farmer's compliance with FOLU framework:
 
 Farmer Profile: ${JSON.stringify(farmerProfile)}
 Assessment Period: ${assessmentPeriod}
@@ -187,7 +187,7 @@ Please provide:
 7. Recommendations for improvement
 8. Confidence level in assessment`;
 
-    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
+    let aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
 
     const assessment = {
       assessment_id: generateId(),
@@ -255,7 +255,7 @@ async function trackCarbonFootprint(farmerId, period) {
  */
 async function getNortheastOrganicTracking(location, category) {
   try {
-    const tracking = {
+    let tracking = {
       location: location,
       category: category,
       timestamp: new Date().toISOString(),
@@ -283,8 +283,8 @@ async function getNortheastOrganicTracking(location, category) {
  */
 async function issueTrainingCertificate(registrationId) {
   try {
-    const registration = await getTrainingRegistration(registrationId);
-    const progress = await trackTrainingProgress(registrationId);
+    let registration = await getTrainingRegistration(registrationId);
+    let progress = await trackTrainingProgress(registrationId);
 
     if (progress.certification_eligibility.eligible) {
       const certificate = {
@@ -317,7 +317,7 @@ async function issueTrainingCertificate(registrationId) {
  */
 async function getTrainingRecommendations(farmerId) {
   try {
-    const farmerProfile = await getFarmerProfile(farmerId);
+    let farmerProfile = await getFarmerProfile(farmerId);
     
     const aiRequest = {
       task: 'training_recommendation',
@@ -331,7 +331,7 @@ async function getTrainingRecommendations(farmerId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       farmer_id: farmerId,
@@ -652,7 +652,7 @@ async function getReportRecommendations(farmerId, reportType) {
 function setupRoutes(app) {
   app.post('/api/v1/training/programs', authMiddleware, async (req, res) => {
     try {
-      const program = await createTrainingProgram(req.body);
+      let program = await createTrainingProgram(req.body);
       res.json({ success: true, data: program });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -661,7 +661,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/register', authMiddleware, async (req, res) => {
     try {
-      const registration = await registerForTraining(req.body);
+      let registration = await registerForTraining(req.body);
       res.json({ success: true, data: registration });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -670,7 +670,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/progress/:registrationId', async (req, res) => {
     try {
-      const progress = await trackTrainingProgress(req.params.registrationId);
+      let progress = await trackTrainingProgress(req.params.registrationId);
       res.json({ success: true, data: progress });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -679,7 +679,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/folu-assessment', authMiddleware, async (req, res) => {
     try {
-      const assessment = await assessFOLUCompliance(req.body.farmer_id, req.body.assessment_period);
+      let assessment = await assessFOLUCompliance(req.body.farmer_id, req.body.assessment_period);
       res.json({ success: true, data: assessment });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -688,7 +688,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/carbon-footprint/:farmerId', async (req, res) => {
     try {
-      const tracking = await trackCarbonFootprint(req.params.farmerId, req.query.period);
+      let tracking = await trackCarbonFootprint(req.params.farmerId, req.query.period);
       res.json({ success: true, data: tracking });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -697,7 +697,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/northeast-organic', async (req, res) => {
     try {
-      const tracking = await getNortheastOrganicTracking(req.query.location, req.query.category);
+      let tracking = await getNortheastOrganicTracking(req.query.location, req.query.category);
       res.json({ success: true, data: tracking });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -706,7 +706,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/certificates/:registrationId', authMiddleware, async (req, res) => {
     try {
-      const certificate = await issueTrainingCertificate(req.params.registrationId);
+      let certificate = await issueTrainingCertificate(req.params.registrationId);
       res.json({ success: true, data: certificate });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -715,7 +715,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/recommendations/:farmerId', async (req, res) => {
     try {
-      const recommendations = await getTrainingRecommendations(req.params.farmerId);
+      let recommendations = await getTrainingRecommendations(req.params.farmerId);
       res.json({ success: true, data: recommendations });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -724,7 +724,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/compliance-report', authMiddleware, async (req, res) => {
     try {
-      const report = await generateComplianceReport(req.body.farmer_id, req.body.report_type, req.body.period);
+      let report = await generateComplianceReport(req.body.farmer_id, req.body.report_type, req.body.period);
       res.json({ success: true, data: report });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -790,3 +790,6 @@ Object.assign(module.exports, require("../../modules/M023/service"));
   const { healthCheck: healthCheckFromBE030, execute: executeFromBE030, ...rest } = m030;
   Object.assign(module.exports, rest, { healthCheckFromBE030, executeFromBE030 });
 }
+
+
+

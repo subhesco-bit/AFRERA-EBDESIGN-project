@@ -11,11 +11,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * POST /api/enterprise/integrations
@@ -57,7 +57,7 @@ router.post('/integrations/:integrationId/sync',
       const { integrationId } = req.params;
       const syncConfig = req.body;
 
-      const result = await enterpriseService.syncWithERP(integrationId, syncConfig);
+      let result = await enterpriseService.syncWithERP(integrationId, syncConfig);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'ERP sync completed successfully');
@@ -81,7 +81,7 @@ router.post('/integrations/:integrationId/payments',
       const { integrationId } = req.params;
       const paymentData = req.body;
 
-      const result = await enterpriseService.processPayment(integrationId, paymentData);
+      let result = await enterpriseService.processPayment(integrationId, paymentData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Payment processed successfully');
@@ -105,7 +105,7 @@ router.post('/integrations/:integrationId/logistics',
       const { integrationId } = req.params;
       const logisticsData = req.body;
 
-      const result = await enterpriseService.syncLogistics(integrationId, logisticsData);
+      let result = await enterpriseService.syncLogistics(integrationId, logisticsData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Logistics sync completed successfully');
@@ -129,7 +129,7 @@ router.post('/integrations/:integrationId/analytics',
       const { integrationId } = req.params;
       const analyticsData = req.body;
 
-      const result = await enterpriseService.sendAnalytics(integrationId, analyticsData);
+      let result = await enterpriseService.sendAnalytics(integrationId, analyticsData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Analytics data sent successfully');
@@ -153,7 +153,7 @@ router.post('/integrations/:integrationId/communications',
       const { integrationId } = req.params;
       const messageData = req.body;
 
-      const result = await enterpriseService.sendCommunication(integrationId, messageData);
+      let result = await enterpriseService.sendCommunication(integrationId, messageData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Communication sent successfully');
@@ -207,7 +207,7 @@ router.get('/organizations/:organizationId/integrations',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      const result = await enterpriseService.getOrganizationIntegrations(organizationId);
+      let result = await enterpriseService.getOrganizationIntegrations(organizationId);
       
       if (result.success) {
         // Remove sensitive data from each integration
@@ -239,7 +239,7 @@ router.get('/integrations/:integrationId/health',
     try {
       const { integrationId } = req.params;
 
-      const result = await enterpriseService.getIntegrationHealth(integrationId);
+      let result = await enterpriseService.getIntegrationHealth(integrationId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Integration health status retrieved');
@@ -262,7 +262,7 @@ router.delete('/integrations/:integrationId',
     try {
       const { integrationId } = req.params;
 
-      const result = await enterpriseService.deactivateIntegration(integrationId);
+      let result = await enterpriseService.deactivateIntegration(integrationId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Integration deactivated successfully');
@@ -283,7 +283,7 @@ router.delete('/cache',
   authorize(['admin']),
   async (req, res) => {
     try {
-      const result = enterpriseService.clearCache();
+      let result = enterpriseService.clearCache();
       return apiResponseHandler.sendSuccess(res, null, result.message);
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to clear cache', 500, 'SERVER_ERROR', error.message);

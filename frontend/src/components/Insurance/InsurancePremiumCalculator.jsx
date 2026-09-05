@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { insuranceAPI } from '../../services/api';
+import { insuranceAPI } from '../../services/componentApi';
 
 // FE-02 note: not resolved here. Both calls are triggered by explicit user
 // actions (submitting the calculator form, requesting a quote) over
@@ -29,7 +29,7 @@ const InsurancePremiumCalculator = () => {
     areaInHectares: 1,
     sumInsuredPerHectare: 50000,
     location: 'Assam',
-    season: 'kharif'
+    season: 'kharif',
   });
 
   const [transitData, setTransitData] = useState({
@@ -39,7 +39,7 @@ const InsurancePremiumCalculator = () => {
     transportMode: 'road',
     distance: 1000,
     goodsType: 'general',
-    duration: 5
+    duration: 5,
   });
 
   const [warehouseData, setWarehouseData] = useState({
@@ -48,7 +48,7 @@ const InsurancePremiumCalculator = () => {
     buildingType: 'concrete',
     contentsValue: 2000000,
     fireProtection: 'yes',
-    securityLevel: 'high'
+    securityLevel: 'high',
   });
 
   const calculatePremium = async (type, data) => {
@@ -67,12 +67,12 @@ const InsurancePremiumCalculator = () => {
     setLoading(true);
     try {
       const data = insuranceType === 'crop' ? cropData :
-                   insuranceType === 'transit' ? transitData : warehouseData;
+        insuranceType === 'transit' ? transitData : warehouseData;
 
-      const response = await insuranceAPI.generateQuote({
+      let response = await insuranceAPI.generateQuote({
         insuranceType,
         policyholderId: 1, // Would come from auth
-        ...data
+        ...data,
       });
       alert(`Quote Generated: ${response.data.data.quoteId}`);
     } catch (error) {

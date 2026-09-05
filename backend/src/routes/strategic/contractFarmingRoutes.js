@@ -3,12 +3,12 @@
  * API endpoints for contract farming agreements
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const contractFarmingService = require('../../services/strategic/contractFarmingService');
-const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth');
+const contractFarmingService = require('../../services/strategic/contractFarmingService.js');
+const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');
 const authorize = (roles) => requireRole(...roles);
-const apiResponseHandler = require('../../middleware/apiResponseHandler');
+const apiResponseHandler = require('../../middleware/apiResponseHandler.js');
 
 const service = new contractFarmingService();
 
@@ -17,9 +17,19 @@ const service = new contractFarmingService();
  * @desc    Create a new contract farming agreement
  * @access  Private (Farmer, Buyer)
  */
-router.post('/contracts', authenticate, async (req, res) => {
+router.post('/contracts', authenticate, authorize(['farmer', 'buyer']), async (req, res) => {
   try {
-    const result = await service.createContract(req.body);
+    const contractData = { ...req.body };
+
+    // Never trust a client-supplied party ID for either side of the agreement.
+    // Farmers apply for themselves; buyers create offers for their own account.
+    if (req.user.role === 'farmer') {
+      contractData.farmer_id = req.user.id;
+    } else {
+      contractData.buyer_id = req.user.id;
+    }
+
+    const result = await service.createContract(contractData);
     apiResponseHandler.sendSuccess(res, result, 'Contract farming agreement created successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to create contract farming agreement');
@@ -33,7 +43,7 @@ router.post('/contracts', authenticate, async (req, res) => {
  */
 router.get('/contracts/:id', authenticate, async (req, res) => {
   try {
-    const result = await service.trackCompliance(req.params.id);
+    let result = await service.trackCompliance(req.params.id);
     apiResponseHandler.sendSuccess(res, result, 'Contract compliance retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve contract compliance');
@@ -47,7 +57,7 @@ router.get('/contracts/:id', authenticate, async (req, res) => {
  */
 router.post('/contracts/:id/input-usage', authenticate, requireRole('farmer'), async (req, res) => {
   try {
-    const result = await service.recordInputUsage(req.params.id, req.body);
+    let result = await service.recordInputUsage(req.params.id, req.body);
     apiResponseHandler.sendSuccess(res, result, 'Input usage recorded successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to record input usage');
@@ -61,7 +71,7 @@ router.post('/contracts/:id/input-usage', authenticate, requireRole('farmer'), a
  */
 router.post('/quality-tests/:testId/result', authenticate, authorize(['buyer', 'admin']), async (req, res) => {
   try {
-    const result = await service.submitQualityTestResult(req.params.testId, req.body);
+    let result = await service.submitQualityTestResult(req.params.testId, req.body);
     apiResponseHandler.sendSuccess(res, result, 'Quality test result submitted successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to submit quality test result');
@@ -75,7 +85,7 @@ router.post('/quality-tests/:testId/result', authenticate, authorize(['buyer', '
  */
 router.post('/contracts/:id/amend', authenticate, async (req, res) => {
   try {
-    const result = await service.amendContract(req.params.id, req.body);
+    let result = await service.amendContract(req.params.id, req.body);
     apiResponseHandler.sendSuccess(res, result, 'Contract amended successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to amend contract');
@@ -89,7 +99,7 @@ router.post('/contracts/:id/amend', authenticate, async (req, res) => {
  */
 router.get('/buyer-portfolio', authenticate, requireRole('buyer'), async (req, res) => {
   try {
-    const result = await service.getBuyerContractPortfolio(req.user.id);
+    let result = await service.getBuyerContractPortfolio(req.user.id);
     apiResponseHandler.sendSuccess(res, result, 'Buyer contract portfolio retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve buyer contract portfolio');
@@ -103,7 +113,7 @@ router.get('/buyer-portfolio', authenticate, requireRole('buyer'), async (req, r
  */
 router.get('/opportunities', authenticate, requireRole('farmer'), async (req, res) => {
   try {
-    const result = await service.getAvailableContractOpportunities(req.user.id);
+    let result = await service.getAvailableContractOpportunities(req.user.id);
     apiResponseHandler.sendSuccess(res, result, 'Contract farming opportunities retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve contract farming opportunities');
@@ -118,7 +128,7 @@ router.get('/opportunities', authenticate, requireRole('farmer'), async (req, re
 router.get('/farmer-contracts', authenticate, requireRole('farmer'), async (req, res) => {
   try {
     // Get farmer's contracts - would need to implement this method in service
-    const result = { contracts: [], message: 'Farmer contracts retrieval' };
+    let result = { contracts: [], message: 'Farmer contracts retrieval' };
     apiResponseHandler.sendSuccess(res, result, 'Farmer contracts retrieved successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message, 'Failed to retrieve farmer contracts');

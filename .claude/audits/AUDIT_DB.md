@@ -1,12 +1,31 @@
 ---
 agent: db-auditor
 status: fail
-findings: 9
+findings: 10
 ---
 
-# DB Audit — M025-M030 Tier-1 Services (Devin, 30 Aug 2026)
+# DB Audit — Migration Order, Dependencies, and Schema Consistency (3 Sep 2026)
 
-## Summary
+## Current Audit Summary
+
+The migration set is not executable as a clean PostgreSQL bootstrap without broader schema reconciliation. There are 352 SQL files, 40 repeated executable table ownership findings, and 68 mixed-type FK warnings. The ten mechanically certain UUID/integer foreign-key blockers were corrected in five migration files by aligning each FK column with its authoritative UUID primary key. The two runners now share one canonical `schema_migrations` definition with additive compatibility upgrades. Repeated filename prefixes and legacy duplicate table ownership are explicit deterministic warnings; mixed-type FK targets remain ambiguous warnings rather than asserted blockers.
+
+PostgreSQL execution was blocked because no `DATABASE_URL` or credentials were available. No `psql` binary or SQL AST parser was installed.
+
+### Current Findings
+
+- **PASS (10 resolved blockers):** Static preflight initially found 10 unambiguous UUID/integer FK mismatches in `014_platform_foundation_modules.sql`, `3017_m017_consent_management.sql`, `3019_m019_profile_management.sql`, `3100_ecommerce_tables.sql`, and `mfa_schema.sql`. Each was corrected mechanically by changing the local FK column from `INTEGER` to `UUID`; no constraints were removed and no product behavior was changed.
+- **WARN:** 40 duplicate table ownership findings and 8 repeated filename-prefix groups remain. They are classified as historical `CREATE TABLE IF NOT EXISTS` no-op/collision diagnostics and execute in lexical filename order, which is logged by both runners.
+- **WARN:** 68 FK references point at targets with both matching and conflicting historical types. They are intentionally ambiguous and are not treated as mechanically certain failures.
+- **PASS:** `schema_migrations.js` is the only executable definition. Both runners use it and add missing enhanced columns to installations created by the legacy runner.
+- **PASS:** Confirmed PostgreSQL datatype/FK failures are recorded non-destructively under `migrations/quarantined/<filename>.sql.json`; original migrations are retained and the run stops for explicit repair.
+- **WARN:** No dependency metadata exists, so dependency correctness remains unproven.
+
+### Validation
+
+`node backend/src/database/migration_preflight.js --json` exits `0` with 0 blockers, 0 UUID/integer FK mismatches, 68 ambiguous FK warnings, 40 duplicate-ownership warnings, and 8 prefix-collision warnings. `node backend/src/database/migrations/enhanced_migrate.js up --dry-run` exits `0`, enumerates all 352 files, and logs deterministic lexical ordering. The SQL scope report contains exactly 10 type substitutions across five migration files. The targeted SQL diff check is clean; workspace-wide `git diff --check` still reports unrelated pre-existing whitespace in frontend/docs files. PostgreSQL execution remains unavailable without `DATABASE_URL` and a live database.
+
+## Historical Audit Below
 
 All 6 new service files (`advancedAnalyticsService.js`, `predictiveIntelligenceService.js`,
 `iotIntegrationService.js`, `blockchainVerificationService.js`, `digitalTwinService.js`,

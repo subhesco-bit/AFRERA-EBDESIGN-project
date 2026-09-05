@@ -512,7 +512,7 @@ class DatabaseMonitor extends EventEmitter {
     const metricsCutoff = new Date();
     metricsCutoff.setDate(metricsCutoff.getDate() - this.config.metricsRetentionDays);
 
-    const tables = [
+    let tables = [
       { table: 'query_logs', cutoff: queryCutoff },
       { table: 'slow_queries', cutoff: queryCutoff },
       { table: 'error_logs', cutoff: queryCutoff },

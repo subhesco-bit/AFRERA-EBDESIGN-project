@@ -1,29 +1,34 @@
-import { errorMonitoring, logError, getErrorStats, clearErrors } from '../../utils/errorMonitoring'
+import { errorMonitoring, logError, getErrorStats, clearErrors } from '../../utils/errorMonitoring';
+import { errorMonitoringAPI } from '../../services/api';
 
-// Mock fetch for server communication
-global.fetch = jest.fn()
+jest.mock('../../services/api', () => ({
+  errorMonitoringAPI: {
+    log: jest.fn(),
+  },
+}));
 
 describe('Error Monitoring', () => {
   beforeEach(() => {
-    clearErrors()
-    fetch.mockClear()
-  })
+    clearErrors();
+    errorMonitoringAPI.log.mockClear();
+    errorMonitoringAPI.log.mockResolvedValue({ data: { success: true } });
+  });
 
   describe('logError', () => {
     it('adds error to queue', () => {
       const testError = {
         type: 'test',
         message: 'Test error message',
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      };
 
-      logError(testError)
-      const stats = getErrorStats()
+      logError(testError);
+      const stats = getErrorStats();
 
-      expect(stats.totalErrors).toBe(1)
-      expect(stats.recentErrors).toHaveLength(1)
-      expect(stats.recentErrors[0].message).toBe('Test error message')
-    })
+      expect(stats.totalErrors).toBe(1);
+      expect(stats.recentErrors).toHaveLength(1);
+      expect(stats.recentErrors[0].message).toBe('Test error message');
+    });
 
     it('limits queue size to maxQueueSize', () => {
       // Add more errors than maxQueueSize (50)
@@ -31,69 +36,59 @@ describe('Error Monitoring', () => {
         logError({
           type: 'test',
           message: `Error ${i}`,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        });
       }
 
-      const stats = getErrorStats()
-      expect(stats.totalErrors).toBe(50) // Should be capped at maxQueueSize
-    })
+      const stats = getErrorStats();
+      expect(stats.totalErrors).toBe(50); // Should be capped at maxQueueSize
+    });
 
     it('attempts to send error to server when online', async () => {
       const testError = {
         type: 'test',
         message: 'Test error',
-        timestamp: new Date().toISOString()
-      }
+        timestamp: new Date().toISOString(),
+      };
 
-      fetch.mockResolvedValueOnce({ ok: true })
-
-      logError(testError)
+      logError(testError);
 
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/v1/errors/log',
-        expect.objectContaining({
-          method: 'POST',
-          headers: expect.objectContaining({
-            'Content-Type': 'application/json'
-          })
-        })
-      )
-    })
-  })
+      expect(errorMonitoringAPI.log).toHaveBeenCalledWith(testError);
+    });
+  });
 
   describe('getErrorStats', () => {
     it('returns current error statistics', () => {
       logError({
         type: 'test',
         message: 'Error 1',
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      });
 
-      const stats = getErrorStats()
+      const stats = getErrorStats();
 
-      expect(stats).toHaveProperty('totalErrors')
-      expect(stats).toHaveProperty('isOnline')
-      expect(stats).toHaveProperty('recentErrors')
-    })
-  })
+      expect(stats).toHaveProperty('totalErrors');
+      expect(stats).toHaveProperty('isOnline');
+      expect(stats).toHaveProperty('recentErrors');
+    });
+  });
 
   describe('clearErrors', () => {
     it('clears all errors from queue', () => {
       logError({
         type: 'test',
         message: 'Test error',
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      });
 
-      clearErrors()
+      clearErrors();
 
-      const stats = getErrorStats()
-      expect(stats.totalErrors).toBe(0)
-      expect(stats.recentErrors).toHaveLength(0)
-    })
-  })
-})
+      const stats = getErrorStats();
+      expect(stats.totalErrors).toBe(0);
+      expect(stats.recentErrors).toHaveLength(0);
+    });
+  });
+});

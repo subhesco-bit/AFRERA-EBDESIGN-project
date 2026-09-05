@@ -3,13 +3,13 @@
  * Advanced ML-based fraud detection for insurance claims and policies
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class InsuranceFraudDetectionService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -157,7 +157,7 @@ class InsuranceFraudDetectionService {
    */
   async checkClaimAmountAnomaly(claim) {
     try {
-      const query = `
+      let query = `
         SELECT 
           AVG(amount) as avg_amount,
           STDDEV(amount) as std_dev,
@@ -168,10 +168,10 @@ class InsuranceFraudDetectionService {
           AND status = 'approved'
       `;
 
-      const result = await this.pool.query(query, [claim.insurance_type]);
+      let result = await this.pool.query(query, [claim.insurance_type]);
       const stats = result.rows[0];
 
-      const avgAmount = parseFloat(stats.avg_amount) || 0;
+      let avgAmount = parseFloat(stats.avg_amount) || 0;
       const stdDev = parseFloat(stats.std_dev) || 0;
       const p95 = parseFloat(stats.p95) || 0;
 
@@ -179,8 +179,8 @@ class InsuranceFraudDetectionService {
       const zScore = stdDev > 0 ? (claim.amount - avgAmount) / stdDev : 0;
 
       // Anomaly if > 2 standard deviations or > 95th percentile
-      const isSuspicious = Math.abs(zScore) > 2 || claim.amount > p95;
-      const riskScore = isSuspicious ? Math.min(Math.abs(zScore) * 20, 80) : 0;
+      let isSuspicious = Math.abs(zScore) > 2 || claim.amount > p95;
+      let riskScore = isSuspicious ? Math.min(Math.abs(zScore) * 20, 80) : 0;
 
       return {
         check: 'claim_amount_anomaly',
@@ -217,8 +217,8 @@ class InsuranceFraudDetectionService {
       // Check for weekend/holiday claims
       const isWeekend = [0, 6].includes(incidentDate.getDay());
 
-      const isSuspicious = immediateFiling || lateFiling;
-      const riskScore = immediateFiling ? 40 : lateFiling ? 30 : 0;
+      let isSuspicious = immediateFiling || lateFiling;
+      let riskScore = immediateFiling ? 40 : lateFiling ? 30 : 0;
 
       return {
         check: 'timing_patterns',
@@ -242,7 +242,7 @@ class InsuranceFraudDetectionService {
    */
   async checkDocumentConsistency(claim) {
     try {
-      const query = `
+      let query = `
         SELECT 
           COUNT(*) as document_count,
           COUNT(CASE WHEN document_type = 'police_report' THEN 1 END) as has_police_report,
@@ -252,15 +252,15 @@ class InsuranceFraudDetectionService {
         WHERE claim_id = $1
       `;
 
-      const result = await this.pool.query(query, [claim.id]);
+      let result = await this.pool.query(query, [claim.id]);
       const docs = result.rows[0];
 
       const documentCount = parseInt(docs.document_count);
       const hasRequiredDocs = docs.has_police_report > 0 || docs.has_medical_report > 0;
 
       // Suspicious if no documents or missing required docs
-      const isSuspicious = documentCount === 0 || !hasRequiredDocs;
-      const riskScore = documentCount === 0 ? 60 : !hasRequiredDocs ? 40 : 0;
+      let isSuspicious = documentCount === 0 || !hasRequiredDocs;
+      let riskScore = documentCount === 0 ? 60 : !hasRequiredDocs ? 40 : 0;
 
       return {
         check: 'document_consistency',
@@ -283,7 +283,7 @@ class InsuranceFraudDetectionService {
   async checkLocationConsistency(claim) {
     try {
       // Get policyholder's registered locations
-      const query = `
+      let query = `
         SELECT 
           address,
           district,
@@ -292,7 +292,7 @@ class InsuranceFraudDetectionService {
         WHERE id = $1
       `;
 
-      const result = await this.pool.query(query, [claim.policyholder_id]);
+      let result = await this.pool.query(query, [claim.policyholder_id]);
       const user = result.rows[0];
 
       const claimLocation = claim.incident_location.toLowerCase();
@@ -302,8 +302,8 @@ class InsuranceFraudDetectionService {
       const locationMatch = claimLocation.includes(user.district.toLowerCase()) ||
                            claimLocation.includes(user.state.toLowerCase());
 
-      const isSuspicious = !locationMatch;
-      const riskScore = isSuspicious ? 35 : 0;
+      let isSuspicious = !locationMatch;
+      let riskScore = isSuspicious ? 35 : 0;
 
       return {
         check: 'location_consistency',
@@ -333,8 +333,8 @@ class InsuranceFraudDetectionService {
       const lowFDI = fdiScore < 50;
       const unverifiedKYC = !kycVerified;
 
-      const isSuspicious = lowFDI || unverifiedKYC;
-      const riskScore = (lowFDI ? 25 : 0) + (unverifiedKYC ? 30 : 0);
+      let isSuspicious = lowFDI || unverifiedKYC;
+      let riskScore = (lowFDI ? 25 : 0) + (unverifiedKYC ? 30 : 0);
 
       return {
         check: 'policyholder_behavior',
@@ -359,7 +359,7 @@ class InsuranceFraudDetectionService {
   async checkNetworkAnalysis(claim) {
     try {
       // Check for patterns with same phone, email, or address
-      const query = `
+      let query = `
         SELECT 
           COUNT(DISTINCT id) as related_policyholders
         FROM users
@@ -369,12 +369,12 @@ class InsuranceFraudDetectionService {
            AND id != $1
       `;
 
-      const result = await this.pool.query(query, [claim.policyholder_id]);
+      let result = await this.pool.query(query, [claim.policyholder_id]);
       const relatedCount = parseInt(result.rows[0].related_policyholders);
 
       // Multiple related policyholders could indicate fraud rings
-      const isSuspicious = relatedCount > 2;
-      const riskScore = isSuspicious ? relatedCount * 15 : 0;
+      let isSuspicious = relatedCount > 2;
+      let riskScore = isSuspicious ? relatedCount * 15 : 0;
 
       return {
         check: 'network_analysis',
@@ -395,7 +395,7 @@ class InsuranceFraudDetectionService {
    */
   async checkHistoricalPatterns(claim) {
     try {
-      const query = `
+      let query = `
         SELECT 
           COUNT(*) as previous_claims,
           COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected_claims,
@@ -404,7 +404,7 @@ class InsuranceFraudDetectionService {
         WHERE policyholder_id = $1
       `;
 
-      const result = await this.pool.query(query, [claim.policyholder_id]);
+      let result = await this.pool.query(query, [claim.policyholder_id]);
       const history = result.rows[0];
 
       const previousClaims = parseInt(history.previous_claims);
@@ -412,8 +412,8 @@ class InsuranceFraudDetectionService {
       const investigatedClaims = parseInt(history.investigated_claims);
 
       // History of rejected or investigated claims is suspicious
-      const isSuspicious = rejectedClaims > 0 || investigatedClaims > 0;
-      const riskScore = (rejectedClaims * 30) + (investigatedClaims * 20);
+      let isSuspicious = rejectedClaims > 0 || investigatedClaims > 0;
+      let riskScore = (rejectedClaims * 30) + (investigatedClaims * 20);
 
       return {
         check: 'historical_patterns',
@@ -487,7 +487,7 @@ class InsuranceFraudDetectionService {
    */
   async saveFraudAnalysis(claimId, indicators, fraudScore, riskLevel) {
     try {
-      const query = `
+      let query = `
         INSERT INTO fraud_analysis 
         (claim_id, indicators, fraud_score, risk_level, analyzed_at)
         VALUES ($1, $2, $3, $4, NOW())
@@ -500,7 +500,7 @@ class InsuranceFraudDetectionService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         claimId,
         JSON.stringify(indicators),
         JSON.stringify(fraudScore),
@@ -519,14 +519,14 @@ class InsuranceFraudDetectionService {
    */
   async getFraudAnalysis(claimId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM fraud_analysis
         WHERE claim_id = $1
         ORDER BY analyzed_at DESC
         LIMIT 1
       `;
 
-      const result = await this.pool.query(query, [claimId]);
+      let result = await this.pool.query(query, [claimId]);
 
       if (result.rows.length === 0) {
         throw new Error('Fraud analysis not found');
@@ -580,7 +580,7 @@ class InsuranceFraudDetectionService {
         params.push(insuranceType);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return result.rows[0];
     } catch (error) {
@@ -591,3 +591,6 @@ class InsuranceFraudDetectionService {
 }
 
 module.exports = new InsuranceFraudDetectionService();
+
+
+

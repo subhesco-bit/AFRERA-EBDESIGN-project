@@ -3,9 +3,9 @@
  * AI-driven design, modelling, and microclimate control for greenhouses
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../middleware/auth');
+const { authMiddleware } = require('../../middleware\/auth');
 
 /**
  * Design greenhouse based on AI recommendations
@@ -103,7 +103,7 @@ async function designGreenhouse(params) {
  */
 async function optimizeMicroclimate(greenhouseId, currentConditions, targetConditions) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'microclimate_optimization',
       parameters: {
         greenhouse_id: greenhouseId,
@@ -113,7 +113,7 @@ async function optimizeMicroclimate(greenhouseId, currentConditions, targetCondi
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const optimization = {
       greenhouse_id: greenhouseId,
@@ -221,12 +221,12 @@ async function monitorGreenhouse(greenhouseId) {
     };
 
     // AI analysis of conditions
-    const aiRequest = {
+    let aiRequest = {
       task: 'greenhouse_monitoring_analysis',
       parameters: sensorData
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     sensorData.ai_analysis = aiResponse;
 
     return sensorData;
@@ -241,7 +241,7 @@ async function monitorGreenhouse(greenhouseId) {
  */
 async function predictYield(greenhouseId, cropType, growingConditions) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'yield_prediction',
       parameters: {
         greenhouse_id: greenhouseId,
@@ -251,7 +251,7 @@ async function predictYield(greenhouseId, cropType, growingConditions) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const prediction = {
       greenhouse_id: greenhouseId,
@@ -296,7 +296,7 @@ async function generateDPR(projectParams) {
     } = projectParams;
 
     // AI-powered DPR generation
-    const aiRequest = {
+    let aiRequest = {
       task: 'dpr_generation',
       parameters: {
         project_name,
@@ -311,7 +311,7 @@ async function generateDPR(projectParams) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const dpr = {
       project_id: generateId(),
@@ -379,7 +379,7 @@ async function generateDPR(projectParams) {
  */
 async function estimateProjectCost(projectDetails) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'project_cost_estimation',
       parameters: {
         ...projectDetails,
@@ -388,7 +388,7 @@ async function estimateProjectCost(projectDetails) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const estimate = {
       project_id: generateId(),
@@ -463,7 +463,7 @@ async function getRegionalFactors(location) {
 function setupRoutes(app) {
   app.post('/api/v1/greenhouse/design', authMiddleware, async (req, res) => {
     try {
-      const design = await designGreenhouse(req.body);
+      let design = await designGreenhouse(req.body);
       res.json({ success: true, data: design });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -472,7 +472,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/greenhouse/optimize', authMiddleware, async (req, res) => {
     try {
-      const optimization = await optimizeMicroclimate(
+      let optimization = await optimizeMicroclimate(
         req.body.greenhouse_id,
         req.body.current_conditions,
         req.body.target_conditions
@@ -494,7 +494,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/greenhouse/predict-yield', authMiddleware, async (req, res) => {
     try {
-      const prediction = await predictYield(
+      let prediction = await predictYield(
         req.body.greenhouse_id,
         req.body.crop_type,
         req.body.growing_conditions
@@ -507,7 +507,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/greenhouse/dpr', authMiddleware, async (req, res) => {
     try {
-      const dpr = await generateDPR(req.body);
+      let dpr = await generateDPR(req.body);
       res.json({ success: true, data: dpr });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -516,7 +516,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/greenhouse/cost-estimate', authMiddleware, async (req, res) => {
     try {
-      const estimate = await estimateProjectCost(req.body);
+      let estimate = await estimateProjectCost(req.body);
       res.json({ success: true, data: estimate });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -540,3 +540,6 @@ module.exports = {
   const { ...rest } = m144;
   Object.assign(module.exports, rest);
 }
+
+
+

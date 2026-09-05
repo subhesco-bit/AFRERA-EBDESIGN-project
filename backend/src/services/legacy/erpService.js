@@ -4,10 +4,10 @@
  * Handles data synchronization, business process automation, and financial Reconciliation
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
-const { AppError } = require('../../middleware/errorHandler');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
+const { AppError } = require('../../middleware\/errorHandler');
 
 // ERP configuration
 const ERP_CONFIG = {
@@ -163,7 +163,7 @@ async function syncProductToERP(productId, erpType = 'sap') {
  */
 async function syncOrderToERP(orderId, erpType = 'sap') {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get order data with items
     const orderQuery = `
@@ -236,7 +236,7 @@ async function syncOrderToERP(orderId, erpType = 'sap') {
  */
 async function syncFarmerToERP(farmerId, erpType = 'sap') {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get farmer data
     const farmerQuery = `
@@ -300,7 +300,7 @@ async function syncFarmerToERP(farmerId, erpType = 'sap') {
  */
 async function syncFinancialTransaction(transactionId, erpType = 'sap') {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get transaction data
     const transactionQuery = `
@@ -365,7 +365,7 @@ async function syncFinancialTransaction(transactionId, erpType = 'sap') {
  */
 async function syncAssetToERP(assetId, erpType = 'sap') {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get asset data
     const assetQuery = `
@@ -426,7 +426,7 @@ async function syncAssetToERP(assetId, erpType = 'sap') {
  * Get ERP synchronization status
  */
 async function getSyncStatus() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   const statusQuery = `
     SELECT 
@@ -476,7 +476,7 @@ async function getSyncStatus() {
  */
 async function triggerBulkSync(entityType, erpType = 'sap') {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     let query;
     if (entityType === 'product') {
@@ -760,7 +760,7 @@ function mapCategoryToMaterialGroup(category) {
 }
 
 function mapStateToTaxCode(state) {
-  const mapping = {
+  let mapping = {
     'Assam': 'AS',
     'Nagaland': 'NL',
     'Manipur': 'MN',
@@ -774,7 +774,7 @@ function mapStateToTaxCode(state) {
 }
 
 function mapAssetTypeToClass(type) {
-  const mapping = {
+  let mapping = {
     'mobile_mill': 'MACH',
     'reefer_truck': 'VEH',
     'cold_storage': 'BUILD',
@@ -827,7 +827,7 @@ async function syncToCustomERP(objectType, data) {
   
   logger.info(`Syncing ${objectType} to Custom ERP`);
   
-  const response = await fetch(`${ERP_CONFIG.custom.apiUrl}/${objectType}`, {
+  let response = await fetch(`${ERP_CONFIG.custom.apiUrl}/${objectType}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -847,7 +847,7 @@ async function syncToCustomERP(objectType, data) {
  * Log synchronization operation
  */
 async function logSyncOperation(entityType, entityId, erpType, status, details) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   await pg.query(`
     INSERT INTO erp_sync_logs (entity_type, entity_id, erp_type, status, details, created_at)
@@ -873,7 +873,7 @@ router.get('/status', async (req, res) => {
 router.post('/sync/product', authMiddleware, async (req, res) => {
   try {
     const { product_id, erp_type } = req.body;
-    const result = await syncProductToERP(product_id, erp_type);
+    let result = await syncProductToERP(product_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -883,7 +883,7 @@ router.post('/sync/product', authMiddleware, async (req, res) => {
 router.post('/sync/order', authMiddleware, async (req, res) => {
   try {
     const { order_id, erp_type } = req.body;
-    const result = await syncOrderToERP(order_id, erp_type);
+    let result = await syncOrderToERP(order_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -893,7 +893,7 @@ router.post('/sync/order', authMiddleware, async (req, res) => {
 router.post('/sync/farmer', authMiddleware, async (req, res) => {
   try {
     const { farmer_id, erp_type } = req.body;
-    const result = await syncFarmerToERP(farmer_id, erp_type);
+    let result = await syncFarmerToERP(farmer_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -903,7 +903,7 @@ router.post('/sync/farmer', authMiddleware, async (req, res) => {
 router.post('/sync/transaction', authMiddleware, async (req, res) => {
   try {
     const { transaction_id, erp_type } = req.body;
-    const result = await syncFinancialTransaction(transaction_id, erp_type);
+    let result = await syncFinancialTransaction(transaction_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -913,7 +913,7 @@ router.post('/sync/transaction', authMiddleware, async (req, res) => {
 router.post('/sync/asset', authMiddleware, async (req, res) => {
   try {
     const { asset_id, erp_type } = req.body;
-    const result = await syncAssetToERP(asset_id, erp_type);
+    let result = await syncAssetToERP(asset_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -923,7 +923,7 @@ router.post('/sync/asset', authMiddleware, async (req, res) => {
 router.post('/sync/bulk', authMiddleware, async (req, res) => {
   try {
     const { entity_type, erp_type } = req.body;
-    const result = await triggerBulkSync(entity_type, erp_type);
+    let result = await triggerBulkSync(entity_type, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -941,3 +941,6 @@ module.exports = {
   getSyncStatus,
   triggerBulkSync
 };
+
+
+

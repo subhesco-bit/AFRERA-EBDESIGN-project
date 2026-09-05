@@ -3,13 +3,13 @@
  * Intelligent crop planning based on land records, weather, and market demand
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class CropPlanningService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -135,7 +135,7 @@ class CropPlanningService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return {
         plans: result.rows,
@@ -153,12 +153,12 @@ class CropPlanningService {
   async getRecommendedCropPlan(farmerId, landRecordId) {
     try {
       // Get land details
-      const landQuery = `
+      let landQuery = `
         SELECT * FROM land_records 
         WHERE id = $1 AND farmer_id = $2
       `;
-      const landResult = await this.pool.query(landQuery, [landRecordId, farmerId]);
-      const land = landResult.rows[0];
+      let landResult = await this.pool.query(landQuery, [landRecordId, farmerId]);
+      let land = landResult.rows[0];
 
       if (!land) {
         throw new Error('Land record not found');
@@ -243,7 +243,7 @@ class CropPlanningService {
       const seasonalSuitable = seasonalCrops[season] || seasonalCrops['kharif'];
 
       // Intersection of soil-suitable and season-suitable crops
-      const suitableCrops = [...new Set([...soilSuitable, ...seasonalSuitable])];
+      let suitableCrops = [...new Set([...soilSuitable, ...seasonalSuitable])];
 
       return suitableCrops.map(crop => ({
         cropType: crop,
@@ -310,7 +310,7 @@ class CropPlanningService {
    */
   rankCrops(suitableCrops, marketDemand, weatherForecast) {
     return suitableCrops.map(crop => {
-      const marketData = marketDemand[crop.cropType] || { demand: 'medium', price: 2000, trend: 'stable' };
+      let marketData = marketDemand[crop.cropType] || { demand: 'medium', price: 2000, trend: 'stable' };
 
       let score = 0;
       score += crop.soilSuitability === 'high' ? 30 : 15;
@@ -353,7 +353,7 @@ class CropPlanningService {
    * Calculate profitability
    */
   calculateProfitability(cropType, marketPrice) {
-    const yields = this.getExpectedYield(cropType);
+    let yields = this.getExpectedYield(cropType);
     const costs = {
       'rice': 15000,
       'wheat': 12000,
@@ -453,7 +453,7 @@ class CropPlanningService {
    */
   async updateCropPlanStatus(planId, farmerId, status, updateData = {}) {
     try {
-      const query = `
+      let query = `
         UPDATE crop_plans
         SET 
           status = $1,
@@ -465,7 +465,7 @@ class CropPlanningService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         status,
         updateData.actualYield,
         updateData.harvestDate,
@@ -491,7 +491,7 @@ class CropPlanningService {
    */
   async getCropPlanningAnalytics(farmerId) {
     try {
-      const query = `
+      let query = `
         SELECT 
           crop_type,
           season,
@@ -506,7 +506,7 @@ class CropPlanningService {
         ORDER BY plan_count DESC
       `;
 
-      const result = await this.pool.query(query, [farmerId]);
+      let result = await this.pool.query(query, [farmerId]);
 
       return result.rows;
     } catch (error) {
@@ -531,3 +531,6 @@ module.exports = new CropPlanningService();
   const { ...rest } = m079;
   Object.assign(module.exports, rest);
 }
+
+
+

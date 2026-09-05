@@ -126,7 +126,7 @@ async function recordPartConsumption(consumptionData) {
     };
 
     // AI-powered consumption analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'consumption_analysis',
       parameters: {
         consumption_data: consumptionData,
@@ -137,7 +137,7 @@ async function recordPartConsumption(consumptionData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     consumption.ai_analysis = aiResponse;
 
     await pool.query(
@@ -147,7 +147,7 @@ async function recordPartConsumption(consumptionData) {
       [quantity, part_id]
     );
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO spare_parts_consumption 
        (consumption_id, part_id, equipment_id, quantity, used_by, work_order_id, 
         consumption_date, notes, ai_analysis, created_at)
@@ -261,7 +261,7 @@ async function calculateOptimalStock(partNumber, category) {
 
 async function getConsumptionHistory(partId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM spare_parts_consumption WHERE part_id = $1 ORDER BY consumption_date DESC LIMIT 10',
       [partId]
     );
@@ -287,7 +287,7 @@ async function predictReplacementNeed(partId, equipmentId) {
 
 async function calculateCostImpact(partId, quantity) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT unit_cost FROM spare_parts_inventory WHERE part_id = $1',
       [partId]
     );
@@ -303,7 +303,7 @@ async function calculateCostImpact(partId, quantity) {
 
 async function getCurrentStock(partId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT quantity_in_stock FROM spare_parts_inventory WHERE part_id = $1',
       [partId]
     );
@@ -324,7 +324,7 @@ async function getConsumptionRate(partId, period) {
 async function getReorderStatus(partId) {
   const stock = await getCurrentStock(partId);
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT reorder_level FROM spare_parts_inventory WHERE part_id = $1',
       [partId]
     );
@@ -355,7 +355,7 @@ async function generateInventoryRecommendations(partId, period) {
 
 async function getTotalParts(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM spare_parts_inventory WHERE farmer_id = $1',
       [farmerId]
     );
@@ -367,7 +367,7 @@ async function getTotalParts(farmerId) {
 
 async function getTotalInventoryValue(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(quantity_in_stock * unit_cost) as total FROM spare_parts_inventory WHERE farmer_id = $1',
       [farmerId]
     );
@@ -379,7 +379,7 @@ async function getTotalInventoryValue(farmerId) {
 
 async function getLowStockItems(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM spare_parts_inventory WHERE farmer_id = $1 AND quantity_in_stock <= reorder_level',
       [farmerId]
     );
@@ -435,7 +435,7 @@ async function listSpareParts({ page = 1, limit = 20, farmer_id = null, status =
 }
 
 async function getSparePart(id) {
-  const res = await pool.query('SELECT * FROM spare_parts_inventory WHERE part_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM spare_parts_inventory WHERE part_id = $1', [id]);
   return res.rows[0] || null;
 }
 

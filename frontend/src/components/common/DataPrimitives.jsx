@@ -25,7 +25,7 @@
  * of re-deciding it, and ARIA is built in rather than retrofitted.
  */
 
-import React from 'react'
+import React from 'react';
 
 /* ------------------------------------------------------------------ */
 /* Value — the null/zero distinction, enforced                         */
@@ -36,51 +36,51 @@ import React from 'react'
  * Never silently substitutes 0.
  */
 export function Value({ value, unit = '', prefix = '', decimals = 2, emptyLabel = 'not recorded' }) {
-  const missing = value === null || value === undefined || Number.isNaN(Number(value))
+  const missing = value === null || value === undefined || Number.isNaN(Number(value));
   if (missing) {
     return (
       <span
         className="value-missing"
-        style={{ color: 'var(--muted, #888)', fontStyle: 'italic' }}
+        style={{ color: 'hsl(var(--muted))', fontStyle: 'italic' }}
         title="No value recorded. This is an absence of data, not a zero."
       >
         {emptyLabel}
       </span>
-    )
+    );
   }
-  const n = Number(value)
+  const n = Number(value);
   return (
     <span className="value">
       {prefix}
       {n.toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
       {unit ? ` ${unit}` : ''}
     </span>
-  )
+  );
 }
 
 export const Rupees = ({ value, perKg = false, decimals = 2 }) => (
   <Value value={value} prefix="₹" unit={perKg ? '/kg' : ''} decimals={decimals} />
-)
+);
 
 /* ------------------------------------------------------------------ */
 /* Provenance — how much the number is worth                           */
 /* ------------------------------------------------------------------ */
 
 const PROVENANCE = {
-  real: { label: 'Measured', weight: '1.0', color: '#1a7f37', bg: '#e6f4ea',
+  real: { label: 'Measured', weight: '1.0', color: 'hsl(var(--data-real))', bg: 'color-mix(in srgb, hsl(var(--data-real)) 12%, transparent)',
     help: 'Observed data. Weighted 1.0 in decision scoring.' },
-  estimated: { label: 'Estimated', weight: '0.7', color: '#9a6700', bg: '#fff8c5',
+  estimated: { label: 'Estimated', weight: '0.7', color: 'hsl(var(--data-estimated))', bg: 'color-mix(in srgb, hsl(var(--data-estimated)) 16%, transparent)',
     help: 'Derived or inferred. Weighted 0.7 in decision scoring.' },
-  assumed: { label: 'Assumed', weight: '0.4', color: '#bc4c00', bg: '#ffece5',
+  assumed: { label: 'Assumed', weight: '0.4', color: 'hsl(var(--sev-critical))', bg: 'color-mix(in srgb, hsl(var(--sev-critical)) 12%, transparent)',
     help: 'A working assumption, not a measurement. Weighted 0.4 in decision scoring.' },
-}
+};
 
 /** Provenance badge. Text carries the meaning; colour only reinforces it. */
 export function ProvenanceBadge({ provenance }) {
   const p = PROVENANCE[provenance] || {
-    label: 'Unknown', weight: '—', color: '#57606a', bg: '#f6f8fa',
+    label: 'Unknown', weight: '—', color: 'hsl(var(--data-assumed))', bg: 'hsl(var(--muted))',
     help: 'Provenance not recorded — treat with the caution of an assumption.',
-  }
+  };
   return (
     <span
       className="provenance-badge"
@@ -95,7 +95,7 @@ export function ProvenanceBadge({ provenance }) {
           red/green distinction, and this one changes what a number means. */}
       {p.label} · w{p.weight}
     </span>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -116,27 +116,27 @@ export function Band({ low, central, high, label = 'Forecast band', bandPct, per
     >
       <div style={{ display: 'flex', gap: 16, alignItems: 'baseline', flexWrap: 'wrap' }}>
         <span>
-          <span style={{ fontSize: 11, color: 'var(--muted,#888)', display: 'block' }}>Low</span>
+          <span style={{ fontSize: 11, color: 'hsl(var(--muted))', display: 'block' }}>Low</span>
           <strong style={{ fontSize: 18 }}><Rupees value={low} perKg={perKg} /></strong>
         </span>
-        <span aria-hidden="true" style={{ color: 'var(--muted,#888)' }}>—</span>
+        <span aria-hidden="true" style={{ color: 'hsl(var(--muted))' }}>—</span>
         <span>
-          <span style={{ fontSize: 11, color: 'var(--muted,#888)', display: 'block' }}>Central</span>
+          <span style={{ fontSize: 11, color: 'hsl(var(--muted))', display: 'block' }}>Central</span>
           <span style={{ fontSize: 16 }}><Rupees value={central} perKg={perKg} /></span>
         </span>
-        <span aria-hidden="true" style={{ color: 'var(--muted,#888)' }}>—</span>
+        <span aria-hidden="true" style={{ color: 'hsl(var(--muted))' }}>—</span>
         <span>
-          <span style={{ fontSize: 11, color: 'var(--muted,#888)', display: 'block' }}>High</span>
+          <span style={{ fontSize: 11, color: 'hsl(var(--muted))', display: 'block' }}>High</span>
           <span style={{ fontSize: 16 }}><Rupees value={high} perKg={perKg} /></span>
         </span>
       </div>
       {bandPct && (
-        <p style={{ fontSize: 11, color: 'var(--muted,#888)', margin: '4px 0 0' }}>
+        <p style={{ fontSize: 11, color: 'hsl(var(--muted))', margin: '4px 0 0' }}>
           {bandPct} confidence band. The low end is what a commitment should be sized against.
         </p>
       )}
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -145,10 +145,10 @@ export function Band({ low, central, high, label = 'Forecast band', bandPct, per
 
 export function ConfidenceMeter({ confidence, kind = 'claimed', threshold = 0.5 }) {
   if (confidence === null || confidence === undefined) {
-    return <span style={{ color: 'var(--muted,#888)' }}>confidence unknown</span>
+    return <span style={{ color: 'hsl(var(--muted))' }}>confidence unknown</span>;
   }
-  const pct = Math.round(Number(confidence) * (Number(confidence) <= 1 ? 100 : 1))
-  const below = Number(confidence) < (Number(confidence) <= 1 ? threshold : threshold * 100)
+  const pct = Math.round(Number(confidence) * (Number(confidence) <= 1 ? 100 : 1));
+  const below = Number(confidence) < (Number(confidence) <= 1 ? threshold : threshold * 100);
   return (
     <span
       role="meter"
@@ -158,19 +158,19 @@ export function ConfidenceMeter({ confidence, kind = 'claimed', threshold = 0.5 
       aria-label={`${kind} confidence ${pct} percent`}
       style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
     >
-      <span style={{ width: 60, height: 6, background: '#eee', borderRadius: 3, overflow: 'hidden' }}>
+      <span style={{ width: 60, height: 6, background: 'hsl(var(--muted))', borderRadius: 3, overflow: 'hidden' }}>
         <span style={{
           display: 'block', width: `${pct}%`, height: '100%',
-          background: below ? '#bc4c00' : '#1a7f37',
+          background: below ? 'hsl(var(--sev-critical))' : 'hsl(var(--data-real))',
         }}
         />
       </span>
       <span style={{ fontSize: 12 }}>
         {pct}% {kind}
-        {below && <strong style={{ color: '#bc4c00' }}> · below advisory threshold</strong>}
+        {below && <strong style={{ color: 'hsl(var(--sev-critical))' }}> · below advisory threshold</strong>}
       </span>
     </span>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -191,8 +191,8 @@ export function RefusalNotice({ reason, whatWouldHelp = [] }) {
       role="note"
       aria-label="No recommendation available"
       style={{
-        border: '1px solid #d0d7de', borderLeft: '4px solid #0969da',
-        background: '#f6f8fa', borderRadius: 6, padding: '12px 14px',
+        border: '1px solid hsl(var(--border))', borderLeft: '4px solid hsl(var(--sev-info))',
+        background: 'hsl(var(--muted))', borderRadius: 6, padding: '12px 14px',
       }}
     >
       <p style={{ margin: '0 0 6px', fontWeight: 600 }}>No recommendation</p>
@@ -206,7 +206,7 @@ export function RefusalNotice({ reason, whatWouldHelp = [] }) {
         </>
       )}
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -215,23 +215,23 @@ export function RefusalNotice({ reason, whatWouldHelp = [] }) {
 
 export function AsyncState({ loading, error, empty, emptyMessage, children }) {
   if (loading) {
-    return <p role="status" aria-live="polite">Loading…</p>
+    return <p role="status" aria-live="polite">Loading…</p>;
   }
   if (error) {
     return (
-      <div role="alert" style={{ color: '#cf222e' }}>
+      <div role="alert" style={{ color: 'hsl(var(--destructive))' }}>
         <strong>Could not load.</strong> {error}
       </div>
-    )
+    );
   }
   if (empty) {
     return (
-      <p role="status" style={{ color: 'var(--muted,#888)' }}>
+      <p role="status" style={{ color: 'hsl(var(--muted))' }}>
         {emptyMessage || 'Nothing recorded yet. This is an absence of data, not a zero.'}
       </p>
-    )
+    );
   }
-  return children
+  return children;
 }
 
 /* ------------------------------------------------------------------ */
@@ -245,53 +245,53 @@ export function AsyncState({ loading, error, empty, emptyMessage, children }) {
  */
 export function DataTable({ caption, columns, rows, rowKey = (r, i) => i, emptyMessage }) {
   if (!rows || rows.length === 0) {
-    return <p role="status" style={{ color: 'var(--muted,#888)' }}>{emptyMessage || 'No rows.'}</p>
+    return <p role="status" style={{ color: 'hsl(var(--muted))' }}>{emptyMessage || 'No rows.'}</p>;
   }
   return (
     // A wide table on a narrow screen must scroll inside this wrapper, not
     // push the whole page body sideways - without it every DataTable on
     // every page built on this file breaks the same way on a phone.
     <div style={{ overflowX: 'auto' }}>
-    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
-      {/* A caption is what a screen-reader user hears first; without it a table
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+        {/* A caption is what a screen-reader user hears first; without it a table
           is announced as "table with 8 columns" and nothing else. */}
-      <caption style={{ textAlign: 'left', fontWeight: 600, padding: '6px 0' }}>{caption}</caption>
-      <thead>
-        <tr>
-          {columns.map((c) => (
-            <th
-              key={c.key}
-              scope="col"
-              style={{
-                textAlign: c.numeric ? 'right' : 'left',
-                borderBottom: '2px solid #d0d7de', padding: '6px 8px',
-              }}
-            >
-              {c.label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r, i) => (
-          <tr key={rowKey(r, i)}>
+        <caption style={{ textAlign: 'left', fontWeight: 600, padding: '6px 0' }}>{caption}</caption>
+        <thead>
+          <tr>
             {columns.map((c) => (
-              <td
+              <th
                 key={c.key}
+                scope="col"
                 style={{
                   textAlign: c.numeric ? 'right' : 'left',
-                  borderBottom: '1px solid #eaeef2', padding: '6px 8px',
+                  borderBottom: '2px solid hsl(var(--border))', padding: '6px 8px',
                 }}
               >
-                {c.render ? c.render(r) : (r[c.key] ?? <Value value={null} />)}
-              </td>
+                {c.label}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={rowKey(r, i)}>
+              {columns.map((c) => (
+                <td
+                  key={c.key}
+                  style={{
+                    textAlign: c.numeric ? 'right' : 'left',
+                    borderBottom: '1px solid hsl(var(--border))', padding: '6px 8px',
+                  }}
+                >
+                  {c.render ? c.render(r) : (r[c.key] ?? <Value value={null} />)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -314,7 +314,7 @@ export function ModulePage({ title, subtitle, migration, children }) {
       )}
       {children}
     </main>
-  )
+  );
 }
 
 export function Section({ title, children, description }) {
@@ -326,7 +326,7 @@ export function Section({ title, children, description }) {
       )}
       {children}
     </section>
-  )
+  );
 }
 
 /** Labelled field. Every input gets a real <label>, not a placeholder. */
@@ -337,10 +337,10 @@ export function Field({ label, id, hint, children }) {
       {children}
       {hint && <span id={`${id}-hint`} style={{ fontSize: 11, color: 'var(--muted,#888)' }}>{hint}</span>}
     </div>
-  )
+  );
 }
 
 export default {
   Value, Rupees, ProvenanceBadge, Band, ConfidenceMeter, RefusalNotice,
   AsyncState, DataTable, ModulePage, Section, Field,
-}
+};

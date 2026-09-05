@@ -7,9 +7,9 @@
  * - Natural language processing (document analysis, query understanding)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL, getMongoDatabase } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL, getMongoDatabase } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
 
 // AI Models configuration
 const AI_MODELS = {
@@ -115,7 +115,7 @@ async function predictDemand(productId, timeHorizon = 30) {
  */
 async function optimizePrice(productId, currentPrice) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get market data
     const marketQuery = `
@@ -175,7 +175,7 @@ async function optimizePrice(productId, currentPrice) {
  */
 async function assessCreditRisk(farmerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get farmer data
     const farmerQuery = `
@@ -353,8 +353,8 @@ async function detectFraud(transactionData) {
  */
 async function generateRecommendations(userId, context = {}) {
   try {
-    const pg = getPostgreSQL();
-    const mongo = getMongoDatabase();
+    let pg = getPostgreSQL();
+    let mongo = getMongoDatabase();
     
     // Get user's purchase history
     const historyQuery = `
@@ -546,7 +546,7 @@ function generateRecommendationExplanation(recommendations) {
 }
 
 function generateDemandRecommendations(predictedDemand, confidence) {
-  const recommendations = [];
+  let recommendations = [];
   if (predictedDemand > 1000) {
     recommendations.push('Increase inventory for this product');
   }
@@ -557,7 +557,7 @@ function generateDemandRecommendations(predictedDemand, confidence) {
 }
 
 function generatePricingRecommendations(optimalPrice, market) {
-  const recommendations = [];
+  let recommendations = [];
   if (optimalPrice > market.avg_market_price * 1.1) {
     recommendations.push('Price is above market average - monitor competition');
   }
@@ -568,7 +568,7 @@ function generatePricingRecommendations(optimalPrice, market) {
 }
 
 function generateCreditRecommendations(riskLevel, creditScore) {
-  const recommendations = [];
+  let recommendations = [];
   if (riskLevel === 'low') {
     recommendations.push('Eligible for maximum advance percentage');
     recommendations.push('Consider offering premium interest rates');
@@ -580,7 +580,7 @@ function generateCreditRecommendations(riskLevel, creditScore) {
 }
 
 function generateFraudRecommendations(decision, riskFactors) {
-  const recommendations = [];
+  let recommendations = [];
   if (decision === 'review') {
     recommendations.push('Manual review recommended');
     recommendations.push('Request additional verification');
@@ -611,7 +611,7 @@ router.post('/predict/demand', authMiddleware, async (req, res) => {
 router.post('/optimize/price', authMiddleware, async (req, res) => {
   try {
     const { product_id, current_price } = req.body;
-    const result = await optimizePrice(product_id, current_price);
+    let result = await optimizePrice(product_id, current_price);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -628,7 +628,7 @@ router.post('/assess/credit-risk', authMiddleware, async (req, res) => {
   try {
     const { farmer_id } = req.body;
     const financialService = require('./financialService');
-    const result = await financialService.farmerCreditRiskScore(farmer_id);
+    let result = await financialService.farmerCreditRiskScore(farmer_id);
     res.json({ ...result, delegatedFrom: 'aiService.assessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -637,7 +637,7 @@ router.post('/assess/credit-risk', authMiddleware, async (req, res) => {
 
 router.post('/detect/fraud', authMiddleware, async (req, res) => {
   try {
-    const result = await detectFraud(req.body);
+    let result = await detectFraud(req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -647,7 +647,7 @@ router.post('/detect/fraud', authMiddleware, async (req, res) => {
 router.post('/recommend', authMiddleware, async (req, res) => {
   try {
     const { user_id, context } = req.body;
-    const result = await generateRecommendations(user_id, context);
+    let result = await generateRecommendations(user_id, context);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -680,7 +680,7 @@ async function generateRecommendation(request = {}) {
 
   // Preserve the existing recommendation engine as the
   // canonical fallback while the task adapters are expanded.
-  const result = await generateRecommendations(
+  let result = await generateRecommendations(
     effectiveUserId,
     {
       ...context,
@@ -713,4 +713,7 @@ module.exports = {
   generateRecommendations,
   isHealthy
 };
+
+
+
 

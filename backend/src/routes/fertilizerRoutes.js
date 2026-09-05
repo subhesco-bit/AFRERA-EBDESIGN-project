@@ -31,7 +31,7 @@ router.post('/inventory', authMiddleware, async (req, res) => {
 
 router.put('/inventory/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
-    const item = await fertilizerInventoryService.updateInventoryItem(req.params.id, req.body);
+    let item = await fertilizerInventoryService.updateInventoryItem(req.params.id, req.body);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: item });
   } catch (error) {
@@ -51,7 +51,7 @@ router.delete('/inventory/:id', authMiddleware, requireRole(...FARM_OPERATIONS_R
 
 router.post('/inventory/:id/issue', authMiddleware, async (req, res) => {
   try {
-    const result = await fertilizerInventoryService.issueStock(req.params.id, req.body);
+    let result = await fertilizerInventoryService.issueStock(req.params.id, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -60,7 +60,7 @@ router.post('/inventory/:id/issue', authMiddleware, async (req, res) => {
 
 router.get('/issues', async (req, res) => {
   try {
-    const result = await fertilizerInventoryService.listIssues({ page: req.query.page, limit: req.query.limit });
+    let result = await fertilizerInventoryService.listIssues({ page: req.query.page, limit: req.query.limit });
     res.json({ success: true, data: result.items, pagination: result.pagination });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

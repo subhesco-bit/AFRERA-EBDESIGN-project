@@ -4,8 +4,8 @@
  * Real-time data processing, trend analysis, and predictive analytics
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class AnalyticsService {
   constructor() {
@@ -138,7 +138,7 @@ class AnalyticsService {
    * Financial Performance Report
    */
   async buildFinancialPerformance(parameters, options) {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const revenueData = await this.fetchRevenueData(parameters);
     const expenseData = await this.fetchExpenseData(parameters);
@@ -358,7 +358,7 @@ class AnalyticsService {
    */
   async processBatch(data) {
     // Process batch data for analytics
-    const processed = {
+    let processed = {
       batch_id: this.generateBatchId(),
       timestamp: new Date().toISOString(),
       records_processed: data.length,
@@ -375,7 +375,7 @@ class AnalyticsService {
    */
   async processEvent(data) {
     // Process individual events
-    const processed = {
+    let processed = {
       event_id: data.id || this.generateEventId(),
       timestamp: new Date().toISOString(),
       event_type: data.type,
@@ -392,10 +392,10 @@ class AnalyticsService {
    */
   async analyzeTrends(data, trendType = 'linear') {
     try {
-      const cacheKey = `${trendType}_${JSON.stringify(data)}`;
+      let cacheKey = `${trendType}_${JSON.stringify(data)}`;
       
       if (this.trendCache.has(cacheKey)) {
-        const cached = this.trendCache.get(cacheKey);
+        let cached = this.trendCache.get(cacheKey);
         if (Date.now() - cached.timestamp < 1800000) { // 30 minutes cache
           return cached.trends;
         }
@@ -419,7 +419,7 @@ class AnalyticsService {
    * Calculate trends
    */
   calculateTrends(data, trendType) {
-    const trends = {
+    let trends = {
       trend_type: trendType,
       direction: this.determineTrendDirection(data),
       magnitude: this.calculateTrendMagnitude(data),
@@ -642,3 +642,5 @@ class AnalyticsService {
 }
 
 module.exports = new AnalyticsService();
+
+

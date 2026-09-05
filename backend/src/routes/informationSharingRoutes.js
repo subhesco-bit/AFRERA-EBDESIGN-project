@@ -9,6 +9,9 @@
 const express = require('express');
 const router = express.Router();
 const informationSharingService = require('../services/legacy/informationSharingService');
+const { authMiddleware } = require('../middleware/auth');
+
+router.use(authMiddleware);
 
 /**
  * Document Management Routes
@@ -47,13 +50,13 @@ router.get('/documents', (req, res) => {
 router.get('/documents/search', (req, res) => {
   try {
     const query = req.query.q;
-    const filters = {
+    let filters = {
       status: req.query.status,
       category: req.query.category,
       type: req.query.type
     };
 
-    const documents = informationSharingService.searchDocuments(query, filters);
+    let documents = informationSharingService.searchDocuments(query, filters);
     res.json({
       success: true,
       count: documents.length,
@@ -92,7 +95,7 @@ router.get('/documents/:documentId', (req, res) => {
 // Create a new document
 router.post('/documents', (req, res) => {
   try {
-    const document = informationSharingService.createDocument(req.body);
+    let document = informationSharingService.createDocument(req.body);
     res.status(201).json({
       success: true,
       message: 'Document created successfully',
@@ -109,7 +112,7 @@ router.post('/documents', (req, res) => {
 // Update a document
 router.put('/documents/:documentId', (req, res) => {
   try {
-    const document = informationSharingService.updateDocument(req.params.documentId, req.body);
+    let document = informationSharingService.updateDocument(req.params.documentId, req.body);
     res.json({
       success: true,
       message: 'Document updated successfully',
@@ -146,7 +149,7 @@ router.delete('/documents/:documentId', (req, res) => {
 // Get all folders
 router.get('/folders', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       type: req.query.type,
       ownerId: req.query.ownerId,
       parentId: req.query.parentId
@@ -284,7 +287,7 @@ router.post('/sharing-links', (req, res) => {
 // Access resource via sharing link
 router.get('/sharing-links/access/:token', (req, res) => {
   try {
-    const link = informationSharingService.getSharingLinkByToken(req.params.token);
+    let link = informationSharingService.getSharingLinkByToken(req.params.token);
     if (!link) {
       return res.status(404).json({
         success: false,
@@ -310,7 +313,7 @@ router.get('/sharing-links/access/:token', (req, res) => {
 // Get all collaboration sessions
 router.get('/collaboration-sessions', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       resourceId: req.query.resourceId
     };
@@ -349,7 +352,7 @@ router.post('/collaboration-sessions', (req, res) => {
 // Join collaboration session
 router.post('/collaboration-sessions/:sessionId/join', (req, res) => {
   try {
-    const session = informationSharingService.joinCollaborationSession(req.params.sessionId, req.body.userId);
+    let session = informationSharingService.joinCollaborationSession(req.params.sessionId, req.body.userId);
     res.json({
       success: true,
       message: 'Joined session successfully',
@@ -366,7 +369,7 @@ router.post('/collaboration-sessions/:sessionId/join', (req, res) => {
 // End collaboration session
 router.post('/collaboration-sessions/:sessionId/end', (req, res) => {
   try {
-    const session = informationSharingService.endCollaborationSession(req.params.sessionId);
+    let session = informationSharingService.endCollaborationSession(req.params.sessionId);
     res.json({
       success: true,
       message: 'Session ended successfully',

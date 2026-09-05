@@ -6,15 +6,15 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware, requireRole } = require('../../middleware\/auth');
+const { PLATFORM_STAFF_ROLES } = require('../../middleware\/roleGroups');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // SPECIES DATABASE (CAP-217)
@@ -113,7 +113,7 @@ router.get('/species', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get species error', { error: error.message, stack: error.stack });
@@ -126,7 +126,7 @@ router.get('/species', authMiddleware, async (req, res) => {
  */
 router.get('/species/:id', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM species_database WHERE id = $1',
       [req.params.id]
     );
@@ -173,7 +173,7 @@ router.post('/native-crops', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO native_crops_database 
        (crop_name, scientific_name, indigenous_names, origin_region, growing_regions, 
         climate_requirements, soil_requirements, growing_season, nutritional_profile, 
@@ -211,7 +211,7 @@ router.get('/native-crops', authMiddleware, async (req, res) => {
     const { region, climate, soil, conservation_status, search } = req.query;
     
     let query = 'SELECT * FROM native_crops_database WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (region) {
@@ -244,7 +244,7 @@ router.get('/native-crops', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get native crops error', { error: error.message, stack: error.stack });
@@ -284,7 +284,7 @@ router.post('/traditional-varieties', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO traditional_varieties_database 
        (variety_name, crop_id, scientific_name, indigenous_names, origin_community, 
         region, characteristics, adaptation_traits, genetic_markers, cultivation_history, 
@@ -321,7 +321,7 @@ router.get('/traditional-varieties', authMiddleware, async (req, res) => {
     const { crop_id, region, community, conservation_status, search } = req.query;
     
     let query = 'SELECT * FROM traditional_varieties_database WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (crop_id) {
@@ -354,7 +354,7 @@ router.get('/traditional-varieties', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get traditional varieties error', { error: error.message, stack: error.stack });
@@ -396,7 +396,7 @@ router.post('/medicinal-plants', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO medicinal_plants_database 
        (plant_name, scientific_name, family, common_names, indigenous_names, 
         parts_used, active_compounds, traditional_uses, ailments_treated, 
@@ -435,7 +435,7 @@ router.get('/medicinal-plants', authMiddleware, async (req, res) => {
     const { family, ailment, conservation_status, region, search } = req.query;
     
     let query = 'SELECT * FROM medicinal_plants_database WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (family) {
@@ -468,7 +468,7 @@ router.get('/medicinal-plants', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get medicinal plants error', { error: error.message, stack: error.stack });
@@ -508,7 +508,7 @@ router.post('/wild-foods', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO wild_foods_database 
        (food_name, scientific_name, food_type, common_names, indigenous_names, 
         seasonality, habitat, distribution, harvesting_practices, preparation_methods, 
@@ -545,7 +545,7 @@ router.get('/wild-foods', authMiddleware, async (req, res) => {
     const { food_type, season, habitat, sustainability_status, search } = req.query;
     
     let query = 'SELECT * FROM wild_foods_database WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (food_type) {
@@ -578,7 +578,7 @@ router.get('/wild-foods', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get wild foods error', { error: error.message, stack: error.stack });
@@ -616,7 +616,7 @@ router.post('/conservation', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO conservation_tracking 
        (species_id, species_type, conservation_status, population_data, 
         threat_assessment, conservation_measures, protected_areas, breeding_programs, 
@@ -652,7 +652,7 @@ router.get('/conservation', authMiddleware, async (req, res) => {
     const { species_id, species_type, conservation_status, region } = req.query;
     
     let query = 'SELECT * FROM conservation_tracking WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (species_id) {
@@ -679,7 +679,7 @@ router.get('/conservation', authMiddleware, async (req, res) => {
       params.push(JSON.stringify([region]));
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get conservation records error', { error: error.message, stack: error.stack });
@@ -697,7 +697,7 @@ router.put('/conservation/:id', authMiddleware, requireRole(...PLATFORM_STAFF_RO
       conservation_measures, success_metrics, challenges, next_steps
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE conservation_tracking 
        SET conservation_status = COALESCE($1, conservation_status),
            population_data = COALESCE($2, population_data),
@@ -754,7 +754,7 @@ router.post('/risk-prediction', authMiddleware, async (req, res) => {
     });
 
     // Store prediction result
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO biodiversity_risk_predictions 
        (species_id, species_type, region, time_horizon, scenarios, 
         prediction_result, confidence_score, model_version, requested_by, 
@@ -818,7 +818,7 @@ router.get('/risk-predictions', authMiddleware, async (req, res) => {
     const { species_id, species_type, region } = req.query;
     
     let query = 'SELECT * FROM biodiversity_risk_predictions WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (species_id) {
@@ -841,7 +841,7 @@ router.get('/risk-predictions', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY created_at DESC LIMIT 100';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get risk predictions error', { error: error.message, stack: error.stack });
@@ -894,3 +894,6 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+

@@ -5,14 +5,14 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // Test-mode stubs
 if (process.env.NODE_ENV === 'test') {
@@ -84,7 +84,7 @@ async function createPredictiveModel(data) {
  */
 router.post('/predictive-models', authMiddleware, async (req, res) => {
   try {
-    const result = await createPredictiveModel(req.body);
+    let result = await createPredictiveModel(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create predictive model API error', { error: error.message, stack: error.stack });
@@ -107,7 +107,7 @@ async function getActiveModels(modelType = null) {
 
     query += ' ORDER BY accuracy_score DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get active models error', { error: error.message, stack: error.stack });
@@ -121,7 +121,7 @@ async function getActiveModels(modelType = null) {
 router.get('/predictive-models', async (req, res) => {
   try {
     const { model_type } = req.query;
-    const result = await getActiveModels(model_type);
+    let result = await getActiveModels(model_type);
     res.json(result);
   } catch (error) {
     logger.error('Get active models API error', { error: error.message, stack: error.stack });
@@ -152,7 +152,7 @@ async function createPrediction(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO predictions 
        (model_id, prediction_type, target_entity_id, target_entity_type, prediction_date, 
         prediction_horizon_days, predicted_value, confidence_interval_lower, confidence_interval_upper, 
@@ -186,7 +186,7 @@ async function createPrediction(data) {
  */
 router.post('/predictions', authMiddleware, async (req, res) => {
   try {
-    const result = await createPrediction(req.body);
+    let result = await createPrediction(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create prediction API error', { error: error.message, stack: error.stack });
@@ -205,7 +205,7 @@ async function getPredictions(entityId, entityType, predictionType = null) {
       LEFT JOIN predictive_models pm ON p.model_id = pm.id
       WHERE p.target_entity_id = $1 AND p.target_entity_type = $2
     `;
-    const params = [entityId, entityType];
+    let params = [entityId, entityType];
 
     if (predictionType) {
       query += ' AND p.prediction_type = $3';
@@ -214,7 +214,7 @@ async function getPredictions(entityId, entityType, predictionType = null) {
 
     query += ' ORDER BY p.prediction_date DESC LIMIT 50';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get predictions error', { error: error.message, stack: error.stack });
@@ -228,7 +228,7 @@ async function getPredictions(entityId, entityType, predictionType = null) {
 router.get('/predictions/:entityId/:entityType', async (req, res) => {
   try {
     const { prediction_type } = req.query;
-    const result = await getPredictions(req.params.entityId, req.params.entityType, prediction_type);
+    let result = await getPredictions(req.params.entityId, req.params.entityType, prediction_type);
     res.json(result);
   } catch (error) {
     logger.error('Get predictions API error', { error: error.message, stack: error.stack });
@@ -256,7 +256,7 @@ async function createForecast(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO forecasts 
        (forecast_type, entity_id, entity_type, forecast_date, forecast_horizon_days, 
         forecast_values, forecast_metadata, generated_by_model_id)
@@ -286,7 +286,7 @@ async function createForecast(data) {
  */
 router.post('/forecasts', authMiddleware, async (req, res) => {
   try {
-    const result = await createForecast(req.body);
+    let result = await createForecast(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create forecast API error', { error: error.message, stack: error.stack });
@@ -300,7 +300,7 @@ router.post('/forecasts', authMiddleware, async (req, res) => {
 async function getForecasts(entityId = null, entityType = null, forecastType = null) {
   try {
     let query = 'SELECT * FROM forecasts WHERE 1=1';
-    const params = [];
+    let params = [];
 
     if (entityId && entityType) {
       query += ' AND entity_id = $1 AND entity_type = $2';
@@ -314,7 +314,7 @@ async function getForecasts(entityId = null, entityType = null, forecastType = n
 
     query += ' ORDER BY forecast_date DESC LIMIT 50';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get forecasts error', { error: error.message, stack: error.stack });
@@ -328,7 +328,7 @@ async function getForecasts(entityId = null, entityType = null, forecastType = n
 router.get('/forecasts', async (req, res) => {
   try {
     const { entity_id, entity_type, forecast_type } = req.query;
-    const result = await getForecasts(entity_id, entity_type, forecast_type);
+    let result = await getForecasts(entity_id, entity_type, forecast_type);
     res.json(result);
   } catch (error) {
     logger.error('Get forecasts API error', { error: error.message, stack: error.stack });
@@ -353,7 +353,7 @@ async function createPredictionAlert(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO prediction_alerts 
        (prediction_id, alert_type, alert_severity, alert_message, alert_data)
        VALUES ($1, $2, $3, $4, $5)
@@ -379,7 +379,7 @@ async function createPredictionAlert(data) {
  */
 router.post('/prediction-alerts', authMiddleware, async (req, res) => {
   try {
-    const result = await createPredictionAlert(req.body);
+    let result = await createPredictionAlert(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create prediction alert API error', { error: error.message, stack: error.stack });
@@ -392,7 +392,7 @@ router.post('/prediction-alerts', authMiddleware, async (req, res) => {
  */
 async function getUnacknowledgedAlerts() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT pa.*, p.predicted_value, p.prediction_type
        FROM prediction_alerts pa
        LEFT JOIN predictions p ON pa.prediction_id = p.id
@@ -412,7 +412,7 @@ async function getUnacknowledgedAlerts() {
  */
 router.get('/prediction-alerts/unacknowledged', authMiddleware, async (req, res) => {
   try {
-    const result = await getUnacknowledgedAlerts();
+    let result = await getUnacknowledgedAlerts();
     res.json(result);
   } catch (error) {
     logger.error('Get unacknowledged alerts API error', { error: error.message, stack: error.stack });
@@ -429,7 +429,7 @@ router.get('/prediction-alerts/unacknowledged', authMiddleware, async (req, res)
  */
 async function recordPredictiveAnalytics(metrics) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO predictive_analytics 
        (date, total_predictions_made, accurate_predictions, average_confidence_score, 
         total_forecasts_generated, model_training_runs, active_models)
@@ -464,7 +464,7 @@ async function recordPredictiveAnalytics(metrics) {
 router.post('/predictive-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    const result = await recordPredictiveAnalytics(metrics);
+    let result = await recordPredictiveAnalytics(metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record predictive analytics API error', { error: error.message, stack: error.stack });
@@ -497,3 +497,6 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M080 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M080/service"));
+
+
+

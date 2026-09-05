@@ -6,12 +6,12 @@
 const express = require('express');
 const defenseFitnessPrepController = require('../controllers/defenseFitnessPrepController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 router.get('/categories', defenseFitnessPrepController.getCategories);
 router.get('/standards/:category', defenseFitnessPrepController.getStandards);

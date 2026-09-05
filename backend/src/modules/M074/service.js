@@ -33,14 +33,14 @@ async function registerSheepFlock(flockData) {
 }
 
 async function getSheepFlock(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM sheep_flocks WHERE id = $1', [flockId]);
+  let res = await pg.query('SELECT * FROM sheep_flocks WHERE id = $1', [flockId]);
   return res.rows[0] || null;
 }
 
 async function listSheepFlocks({ page = 1, limit = 20, farmId, breed, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -64,7 +64,7 @@ async function listSheepFlocks({ page = 1, limit = 20, farmId, breed, status } =
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM sheep_flocks`, 'SELECT COUNT(*) FROM sheep_flocks').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -72,12 +72,12 @@ async function listSheepFlocks({ page = 1, limit = 20, farmId, breed, status } =
 }
 
 async function updateSheepFlock(flockId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { flockName, breed, sheepCount, location, averageWoolProduction, meatProductionTarget, healthStatus, status } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE sheep_flocks 
      SET flock_name = COALESCE($1, flock_name),
          breed = COALESCE($2, breed),
@@ -107,7 +107,7 @@ async function updateSheepFlock(flockId, updates) {
 }
 
 async function analyzeSheepProduction(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const flock = await getSheepFlock(flockId);
@@ -156,7 +156,7 @@ function generateFeedOptimization(flock) {
 }
 
 function generateBreedingRecommendations(flock) {
-  const recommendations = [];
+  let recommendations = [];
   if (flock.sheep_count && flock.sheep_count < 25) {
     recommendations.push({
       type: 'breeding',
@@ -180,7 +180,7 @@ function generateHealthAlerts(flock) {
 }
 
 async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -192,7 +192,7 @@ async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
     FROM sheep_flocks
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -210,7 +210,7 @@ async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
   
   query += ` GROUP BY breed ORDER BY total_sheep DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     byBreed: res.rows,
@@ -221,7 +221,7 @@ async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
 }
 
 function generateSheepAnalyticsRecommendations(breedData) {
-  const recommendations = [];
+  let recommendations = [];
   const topBreed = breedData[0];
   if (topBreed) {
     recommendations.push({

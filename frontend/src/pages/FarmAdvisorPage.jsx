@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { farmersAPI } from '../services/api'
-import { Send, Bot, User, Clock, AlertTriangle, Lightbulb, Sparkles, Sprout, Droplets, DollarSign } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { farmersAPI } from '../services/api';
+import { Send, Bot, User, Clock, AlertTriangle, Lightbulb, Sparkles, Sprout, Droplets, DollarSign } from 'lucide-react';
 
 function FarmAdvisorPage() {
   const [messages, setMessages] = useState([
@@ -9,36 +9,36 @@ function FarmAdvisorPage() {
       id: 1,
       role: 'assistant',
       content: 'Hello! I\'m your AI Farm Advisor. I can help you with crop selection, pest management, irrigation planning, market prices, and more. What would you like to know today?',
-      timestamp: new Date().toISOString()
-    }
-  ])
-  const [inputMessage, setInputMessage] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
+      timestamp: new Date().toISOString(),
+    },
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data: advisoryContext } = useQuery({
     queryKey: ['advisory-context'],
     queryFn: () => farmersAPI.getAdvisoryContext('current-farmer-id').then(r => r.data),
-  })
+  });
 
   const { data: quickQuestions } = useQuery({
     queryKey: ['quick-questions'],
     queryFn: () => farmersAPI.getQuickQuestions().then(r => r.data),
-  })
+  });
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return
+    if (!inputMessage.trim()) return;
 
     const userMessage = {
       id: messages.length + 1,
       role: 'user',
       content: inputMessage,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    setInputMessage('')
-    setIsTyping(true)
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsTyping(true);
 
     // Simulate AI response (replace with actual API call)
     setTimeout(() => {
@@ -46,32 +46,32 @@ function FarmAdvisorPage() {
         id: messages.length + 2,
         role: 'assistant',
         content: generateAIResponse(inputMessage, advisoryContext),
-        timestamp: new Date().toISOString()
-      }
-      setMessages(prev => [...prev, aiResponse])
-      setIsTyping(false)
-    }, 1500)
-  }
+        timestamp: new Date().toISOString(),
+      };
+      setMessages(prev => [...prev, aiResponse]);
+      setIsTyping(false);
+    }, 1500);
+  };
 
   const generateAIResponse = (query, context) => {
-    const lowerQuery = query.toLowerCase()
-    
+    const lowerQuery = query.toLowerCase();
+
     if (lowerQuery.includes('pest') || lowerQuery.includes('disease')) {
-      return 'Based on current weather conditions in your region, I recommend monitoring for leaf blight and stem rot. Consider applying organic neem-based pesticides as a preventive measure. Would you like specific product recommendations?'
+      return 'Based on current weather conditions in your region, I recommend monitoring for leaf blight and stem rot. Consider applying organic neem-based pesticides as a preventive measure. Would you like specific product recommendations?';
     } else if (lowerQuery.includes('water') || lowerQuery.includes('irrigation')) {
-      return 'With the upcoming rainfall prediction, I suggest reducing irrigation frequency by 30% over the next week. Monitor soil moisture levels and maintain drainage to prevent waterlogging.'
+      return 'With the upcoming rainfall prediction, I suggest reducing irrigation frequency by 30% over the next week. Monitor soil moisture levels and maintain drainage to prevent waterlogging.';
     } else if (lowerQuery.includes('price') || lowerQuery.includes('market')) {
-      return 'Current market trends show rice prices up by 5% and wheat stable. For your region, I recommend selling rice within the next 2 weeks to capitalize on the current upward trend.'
+      return 'Current market trends show rice prices up by 5% and wheat stable. For your region, I recommend selling rice within the next 2 weeks to capitalize on the current upward trend.';
     } else if (lowerQuery.includes('fertilizer')) {
-      return 'Based on your soil analysis, I recommend applying a balanced NPK fertilizer (10-26-26) at 50kg per hectare. Consider split application - half now and half in 3 weeks for optimal absorption.'
+      return 'Based on your soil analysis, I recommend applying a balanced NPK fertilizer (10-26-26) at 50kg per hectare. Consider split application - half now and half in 3 weeks for optimal absorption.';
     } else {
-      return 'I understand you\'re asking about ' + query + '. To give you the most accurate advice, could you provide more details about your specific situation, such as your crop type, current growth stage, or any particular concerns you\'re noticing?'
+      return `I understand you're asking about ${ query }. To give you the most accurate advice, could you provide more details about your specific situation, such as your crop type, current growth stage, or any particular concerns you're noticing?`;
     }
-  }
+  };
 
   const handleQuickQuestion = (question) => {
-    setInputMessage(question)
-  }
+    setInputMessage(question);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -92,7 +92,7 @@ function FarmAdvisorPage() {
               <div>
                 <div className="font-medium text-green-800 mb-1">Context-Aware Advice</div>
                 <div className="text-sm text-green-700">
-                  I'm aware of your location ({advisoryContext.location}), current crops ({advisoryContext.crops?.join(', ')}), 
+                  I'm aware of your location ({advisoryContext.location}), current crops ({advisoryContext.crops?.join(', ')}),
                   and soil type ({advisoryContext.soil_type}). All advice is personalized to your situation.
                 </div>
               </div>
@@ -111,9 +111,9 @@ function FarmAdvisorPage() {
               >
                 <div
                   className={`max-w-[80%] rounded-lg p-4 ${
-                    message.role === 'user'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 text-gray-800'
+                    message.role === 'user' ?
+                      'bg-green-600 text-white' :
+                      'bg-gray-100 text-gray-800'
                   }`}
                 >
                   <div className="flex items-start mb-2">
@@ -252,7 +252,7 @@ function FarmAdvisorPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmAdvisorPage
+export default FarmAdvisorPage;

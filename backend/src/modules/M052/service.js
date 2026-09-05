@@ -162,7 +162,7 @@ async function listProducts({ page = 1, limit = 20, category = null, status = nu
  */
 async function getProduct(productId) {
   try {
-    const res = await pool.query('SELECT * FROM products WHERE product_id = $1', [productId]);
+    let res = await pool.query('SELECT * FROM products WHERE product_id = $1', [productId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error getting product', { error: error.message });
@@ -192,7 +192,7 @@ async function updateProduct(productId, updates) {
       metadata
     } = updates;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE products 
        SET name = COALESCE($1, name),
            description = COALESCE($2, description),
@@ -234,7 +234,7 @@ async function updateProduct(productId, updates) {
  */
 async function deleteProduct(productId) {
   try {
-    const res = await pool.query('DELETE FROM products WHERE product_id = $1 RETURNING product_id', [productId]);
+    let res = await pool.query('DELETE FROM products WHERE product_id = $1 RETURNING product_id', [productId]);
     return !!res.rows[0];
   } catch (error) {
     logger.error('Error deleting product', { error: error.message });
@@ -261,7 +261,7 @@ async function updateInventory(productId, quantity, operation = 'set') {
       params = [quantity, productId];
     }
 
-    const res = await pool.query(query, params);
+    let res = await pool.query(query, params);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error updating inventory', { error: error.message });
@@ -274,7 +274,7 @@ async function updateInventory(productId, quantity, operation = 'set') {
  */
 async function searchProducts(query, filters = {}) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'product_search_optimization',
       parameters: {
         search_query: query,
@@ -284,7 +284,7 @@ async function searchProducts(query, filters = {}) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const searchResults = {
       search_id: generateId(),
@@ -309,9 +309,9 @@ async function searchProducts(query, filters = {}) {
  */
 async function getProductRecommendations(productId, userId = null) {
   try {
-    const product = await getProduct(productId);
+    let product = await getProduct(productId);
     
-    const aiRequest = {
+    let aiRequest = {
       task: 'product_recommendations',
       parameters: {
         product_data: product,
@@ -322,7 +322,7 @@ async function getProductRecommendations(productId, userId = null) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     return {
       recommendation_id: generateId(),
@@ -418,7 +418,7 @@ async function executeProductSearch(query, filters) {
 
   sql += ' ORDER BY created_at DESC LIMIT 50';
 
-  const res = await pool.query(sql, params);
+  let res = await pool.query(sql, params);
   return res.rows;
 }
 
@@ -427,7 +427,7 @@ async function getUserPurchaseHistory(userId) {
 }
 
 async function getProductsByCategory(category) {
-  const res = await pool.query('SELECT * FROM products WHERE category = $1 LIMIT 20', [category]);
+  let res = await pool.query('SELECT * FROM products WHERE category = $1 LIMIT 20', [category]);
   return res.rows;
 }
 

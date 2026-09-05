@@ -6,17 +6,17 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
-const { authRateLimit } = require('../../middleware/rateLimiter');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware, requireRole } = require('../../middleware\/auth');
+const { PLATFORM_STAFF_ROLES } = require('../../middleware\/roleGroups');
+const { authLimiter } = require('../../middleware\/rateLimiter');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // HACCP MANAGEMENT (CAP-247)
@@ -25,7 +25,7 @@ const pool = require('../../database/pool');
 /**
  * Create HACCP plan
  */
-router.post('/haccp', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/haccp', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       plan_name,
@@ -97,7 +97,7 @@ router.get('/haccp', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get HACCP plans error', { error: error.message, stack: error.stack });
@@ -108,7 +108,7 @@ router.get('/haccp', authMiddleware, async (req, res) => {
 /**
  * Record HACCP monitoring data
  */
-router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/haccp/:id/monitoring', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       ccp_id,
@@ -120,7 +120,7 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
       corrective_action_taken
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO haccp_monitoring_records 
        (haccp_plan_id, ccp_id, monitoring_value, critical_limit, within_limits, 
         monitoring_by, comments, corrective_action_taken, monitoring_time, created_at)
@@ -147,7 +147,7 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
 /**
  * Create FSSAI compliance record
  */
-router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/fssai', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       license_number,
@@ -166,7 +166,7 @@ router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
       corrective_actions
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO fssai_compliance 
        (license_number, facility_id, license_type, license_category, valid_from, 
         valid_to, annual_turnover, manufacturing_activities, products_covered, 
@@ -199,7 +199,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
     const { facility_id, license_number, compliance_status } = req.query;
     
     let query = 'SELECT * FROM fssai_compliance WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -220,7 +220,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
       params.push(compliance_status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get FSSAI compliance records error', { error: error.message, stack: error.stack });
@@ -235,7 +235,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
 /**
  * Create ISO 22000 compliance record
  */
-router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/iso22000', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       certificate_number,
@@ -254,7 +254,7 @@ router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
       nonconformities
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO iso22000_compliance 
        (certificate_number, facility_id, scope, certification_body, issue_date, 
         expiry_date, surveillance_audits, management_review, internal_audits, 
@@ -288,7 +288,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
     const { facility_id, certificate_number, status } = req.query;
     
     let query = 'SELECT * FROM iso22000_compliance WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -309,7 +309,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get ISO 22000 compliance records error', { error: error.message, stack: error.stack });
@@ -324,7 +324,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
 /**
  * Create recall record
  */
-router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/recalls', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -342,7 +342,7 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
       communication_plan
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_safety_recalls 
        (product_id, batch_number, recall_type, recall_reason, risk_level, 
         affected_quantity, distribution_scope, notification_method, recall_initiator, 
@@ -390,11 +390,11 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update recall status
  */
-router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/recalls/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, recovery_rate, closure_notes, closed_by } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE food_safety_recalls 
        SET status = $1,
            recovery_rate = COALESCE($2, recovery_rate),
@@ -427,7 +427,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
     const { product_id, status, risk_level, start_date, end_date } = req.query;
     
     let query = 'SELECT * FROM food_safety_recalls WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -460,7 +460,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
       params.push(end_date);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get recall records error', { error: error.message, stack: error.stack });
@@ -475,7 +475,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
 /**
  * Create CAPA record
  */
-router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/capa', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       source_type,
@@ -491,7 +491,7 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
       verification_method
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO capa_records 
        (source_type, source_id, issue_description, root_cause, impact_assessment, 
         preventive_action, corrective_action, responsibility, target_date, 
@@ -517,11 +517,11 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update CAPA status
  */
-router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/capa/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE capa_records 
        SET status = $1,
            completion_notes = $2,
@@ -554,7 +554,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
     const { source_type, source_id, status, responsibility } = req.query;
     
     let query = 'SELECT * FROM capa_records WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (source_type) {
@@ -581,7 +581,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
       params.push(responsibility);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get CAPA records error', { error: error.message, stack: error.stack });
@@ -596,7 +596,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
 /**
  * Create food safety audit
  */
-router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/audits', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       audit_type,
@@ -616,7 +616,7 @@ router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
       next_audit_date
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_safety_audits 
        (audit_type, facility_id, audit_scope, audit_criteria, audit_team, 
         scheduled_date, actual_date, findings, nonconformities, observations, 
@@ -650,7 +650,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
     const { facility_id, audit_type, status, start_date, end_date } = req.query;
     
     let query = 'SELECT * FROM food_safety_audits WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -683,7 +683,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
       params.push(end_date);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get food safety audits error', { error: error.message, stack: error.stack });
@@ -698,7 +698,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
 /**
  * Create risk assessment
  */
-router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/risk-assessment', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       assessment_type,
@@ -717,7 +717,7 @@ router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) 
       review_date
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_safety_risk_assessments 
        (assessment_type, facility_id, product_id, hazard_identification, 
         risk_characterization, exposure_assessment, risk_level, likelihood, 
@@ -750,7 +750,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
     const { facility_id, product_id, assessment_type, risk_level } = req.query;
     
     let query = 'SELECT * FROM food_safety_risk_assessments WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (facility_id) {
@@ -777,7 +777,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
       params.push(risk_level);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get risk assessments error', { error: error.message, stack: error.stack });
@@ -792,7 +792,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
 /**
  * Create corrective action
  */
-router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/corrective-actions', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       source_type,
@@ -808,7 +808,7 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
       completed_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO corrective_actions 
        (source_type, source_id, issue_description, immediate_action, root_cause, 
         long_term_correction, responsibility, due_date, effectiveness_verification, 
@@ -833,11 +833,11 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
 /**
  * Update corrective action status
  */
-router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/corrective-actions/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE corrective_actions 
        SET status = $1,
            completion_notes = $2,
@@ -870,7 +870,7 @@ router.get('/corrective-actions', authMiddleware, async (req, res) => {
     const { source_type, source_id, status, responsibility } = req.query;
     
     let query = 'SELECT * FROM corrective_actions WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (source_type) {
@@ -897,7 +897,7 @@ router.get('/corrective-actions', authMiddleware, async (req, res) => {
       params.push(responsibility);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get corrective actions error', { error: error.message, stack: error.stack });
@@ -955,3 +955,7 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+
+

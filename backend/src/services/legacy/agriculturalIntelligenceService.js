@@ -4,8 +4,8 @@
  * Crop prediction, soil analysis, weather intelligence, and farming optimization
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 const aiGateway = require('./aiGatewayService');
 const analytics = require('./analyticsService');
 
@@ -98,7 +98,7 @@ class AgriculturalIntelligenceService {
    */
   async predictPestOutbreak(parameters) {
     try {
-      const prediction = await this.aiGateway.predict('pest_outbreak', parameters, {
+      let prediction = await this.aiGateway.predict('pest_outbreak', parameters, {
         crop_type: parameters.crop_type,
         location: parameters.location,
         current_conditions: parameters.current_conditions,
@@ -191,7 +191,7 @@ class AgriculturalIntelligenceService {
    */
   async recommendFertilizer(parameters) {
     try {
-      const recommendations = await this.aiGateway.recommend('fertilizer', parameters, {
+      let recommendations = await this.aiGateway.recommend('fertilizer', parameters, {
         crop_type: parameters.crop_type,
         soil_analysis: parameters.soil_analysis,
         growth_stage: parameters.growth_stage,
@@ -245,7 +245,7 @@ class AgriculturalIntelligenceService {
    * Generate yield recommendations
    */
   generateYieldRecommendations(prediction) {
-    const recommendations = [];
+    let recommendations = [];
     
     if (prediction.predicted_yield < 3) {
       recommendations.push('Consider soil amendment to improve yield potential');
@@ -266,7 +266,7 @@ class AgriculturalIntelligenceService {
    * Generate fertilizer recommendations
    */
   generateFertilizerRecommendations(analysis) {
-    const recommendations = [];
+    let recommendations = [];
     
     if (analysis.nutrient_levels?.nitrogen < 50) {
       recommendations.push({
@@ -302,7 +302,7 @@ class AgriculturalIntelligenceService {
    * Generate irrigation recommendations
    */
   generateIrrigationRecommendations(analysis) {
-    const recommendations = [];
+    let recommendations = [];
     
     if (analysis.soil_health_score < 60) {
       recommendations.push('Implement drip irrigation for water conservation');
@@ -319,7 +319,7 @@ class AgriculturalIntelligenceService {
    * Generate weather advisory
    */
   async generateWeatherAdvisory(weatherPrediction) {
-    const advisory = {
+    let advisory = {
       level: 'normal',
       actions: [],
       alerts: []
@@ -374,7 +374,7 @@ class AgriculturalIntelligenceService {
    * Generate weather recommendations
    */
   generateWeatherRecommendations(weatherPrediction) {
-    const recommendations = [];
+    let recommendations = [];
 
     if (weatherPrediction.temperature > 30) {
       recommendations.push('Provide shade for sensitive crops');
@@ -467,3 +467,5 @@ class AgriculturalIntelligenceService {
 }
 
 module.exports = new AgriculturalIntelligenceService();
+
+

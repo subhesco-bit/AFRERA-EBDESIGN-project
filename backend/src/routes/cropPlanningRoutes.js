@@ -26,7 +26,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const result = await cropPlanningService.getFarmerCropPlans(req.user.id, req.query);
+    let result = await cropPlanningService.getFarmerCropPlans(req.user.id, req.query);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -35,7 +35,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 router.get('/recommend/:landRecordId', authMiddleware, async (req, res) => {
   try {
-    const result = await cropPlanningService.getRecommendedCropPlan(req.user.id, req.params.landRecordId);
+    let result = await cropPlanningService.getRecommendedCropPlan(req.user.id, req.params.landRecordId);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -45,7 +45,7 @@ router.get('/recommend/:landRecordId', authMiddleware, async (req, res) => {
 router.get('/suitable-crops', async (req, res) => {
   try {
     const { soilType, state, district, season } = req.query;
-    const result = await cropPlanningService.getSuitableCrops(soilType, state, district, season);
+    let result = await cropPlanningService.getSuitableCrops(soilType, state, district, season);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -54,7 +54,7 @@ router.get('/suitable-crops', async (req, res) => {
 
 router.get('/market-demand', async (req, res) => {
   try {
-    const result = await cropPlanningService.getMarketDemand(req.query.season);
+    let result = await cropPlanningService.getMarketDemand(req.query.season);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -64,7 +64,7 @@ router.get('/market-demand', async (req, res) => {
 router.get('/weather-forecast', async (req, res) => {
   try {
     const { district, season } = req.query;
-    const result = await cropPlanningService.getWeatherForecast(district, season);
+    let result = await cropPlanningService.getWeatherForecast(district, season);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -74,7 +74,7 @@ router.get('/weather-forecast', async (req, res) => {
 router.patch('/:planId/status', authMiddleware, async (req, res) => {
   try {
     const { status, ...updateData } = req.body;
-    const result = await cropPlanningService.updateCropPlanStatus(req.params.planId, req.user.id, status, updateData);
+    let result = await cropPlanningService.updateCropPlanStatus(req.params.planId, req.user.id, status, updateData);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -83,7 +83,7 @@ router.patch('/:planId/status', authMiddleware, async (req, res) => {
 
 router.get('/analytics', authMiddleware, async (req, res) => {
   try {
-    const result = await cropPlanningService.getCropPlanningAnalytics(req.user.id);
+    let result = await cropPlanningService.getCropPlanningAnalytics(req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

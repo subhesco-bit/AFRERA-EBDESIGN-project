@@ -73,3 +73,6 @@ module.exports = {
   biofloccFarm, hatcheryManagement, fishFeed, fisheriesWaterQuality, fishHealth,
   fisheriesHarvest, fishProcessing, coldFishChain, aquacultureAnalytics,
 };
+
+
+

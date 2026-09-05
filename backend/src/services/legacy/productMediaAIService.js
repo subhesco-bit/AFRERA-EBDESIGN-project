@@ -20,8 +20,8 @@
  *    own even before any video-rendering provider is ever configured.
  */
 
-const { getPostgreSQL } = require('../../database/connection');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { logger } = require('../../utils\/logger');
 const nutritionIntelligenceService = require('./nutritionIntelligenceService');
 
 // ============================================================================
@@ -62,7 +62,7 @@ const VIDEO_PROVIDER_ENV = {
 };
 
 function videoProviderStatus(providerKey) {
-  const env = VIDEO_PROVIDER_ENV[providerKey];
+  let env = VIDEO_PROVIDER_ENV[providerKey];
   if (!env) return { provider: providerKey, known: false, configured: false };
   return { provider: providerKey, known: true, envVar: env.primary, configured: Boolean(process.env[env.primary]) };
 }
@@ -72,7 +72,7 @@ function listVideoProviders() {
 }
 
 async function callVideoProvider(providerKey, _script, _opts = {}) {
-  const status = videoProviderStatus(providerKey);
+  let status = videoProviderStatus(providerKey);
   if (!status.known) return { ok: false, status: 'unknown_provider', provider: providerKey };
   if (!status.configured) return { ok: false, status: 'not_configured', provider: providerKey, envVar: status.envVar };
   return { ok: false, status: 'call_intentionally_not_implemented', provider: providerKey };
@@ -91,7 +91,7 @@ async function callVideoProvider(providerKey, _script, _opts = {}) {
 async function requestProductImageGeneration(productId, prompt) {
   const pg = getPostgreSQL();
   const result = await callImageProvider('openai_images', prompt);
-  const status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
+  let status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
   await pg.query(
     `UPDATE products SET image_generation_status = $1, image_generated_at = CASE WHEN $1 = 'completed' THEN NOW() ELSE image_generated_at END
      WHERE id = $2`,
@@ -115,7 +115,7 @@ async function requestProductImageGeneration(productId, prompt) {
  * provider (once configured) or a human editor could act on directly.
  */
 async function buildNutrientComparisonScript(productId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const { rows: productRows } = await pg.query(
     `SELECT id, name, category_id, gi_status, organic, usp FROM products WHERE id = $1`,
     [productId]
@@ -170,10 +170,10 @@ async function buildNutrientComparisonScript(productId) {
 
 /** Renders the script via a real video provider once one is configured; honestly not_configured until then. */
 async function requestProductVideoGeneration(productId) {
-  const pg = getPostgreSQL();
-  const script = await buildNutrientComparisonScript(productId);
-  const result = await callVideoProvider('runway', script);
-  const status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
+  let pg = getPostgreSQL();
+  let script = await buildNutrientComparisonScript(productId);
+  let result = await callVideoProvider('runway', script);
+  let status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
   await pg.query(
     `UPDATE products SET video_generation_status = $1, video_generated_at = CASE WHEN $1 = 'completed' THEN NOW() ELSE video_generated_at END, video_url = COALESCE($2, video_url)
      WHERE id = $3`,
@@ -192,3 +192,6 @@ module.exports = {
   buildNutrientComparisonScript,
   requestProductVideoGeneration,
 };
+
+
+

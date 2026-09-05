@@ -1,8 +1,8 @@
-import { useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { analyticsAPI } from '../services/api'
-import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { TrendingUp, Sparkles, ClipboardCheck, Workflow } from 'lucide-react'
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { analyticsAPI } from '../services/api';
+import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { TrendingUp, Sparkles, ClipboardCheck, Workflow } from 'lucide-react';
 
 function AnalyticsPage() {
   // v5 react-query object syntax (see LoginPage.jsx); .then(r => r.data)
@@ -11,7 +11,7 @@ function AnalyticsPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['analytics-overview'],
     queryFn: () => analyticsAPI.getOverview().then(r => r.data),
-  })
+  });
 
   const metrics = useMemo(() => data?.analytics || {
     totals: {
@@ -19,11 +19,11 @@ function AnalyticsPage() {
       submissions: 0,
       activeForms: 0,
       draftForms: 0,
-      approvalReady: 0
+      approvalReady: 0,
     },
     trend: [],
-    recommendations: []
-  }, [data])
+    recommendations: [],
+  }, [data]);
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
@@ -74,11 +74,11 @@ function AnalyticsPage() {
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={metrics.trend}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="label" tickLine={false} axisLine={false} />
                     <YAxis tickLine={false} axisLine={false} />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#10b981" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="value" fill="hsl(var(--data-real))" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -105,7 +105,7 @@ function AnalyticsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function SummaryCard({ label, value, icon: Icon, accent }) {
@@ -114,8 +114,8 @@ function SummaryCard({ label, value, icon: Icon, accent }) {
     blue: 'bg-blue-50 text-blue-700',
     violet: 'bg-violet-50 text-violet-700',
     amber: 'bg-amber-50 text-amber-700',
-    slate: 'bg-slate-100 text-slate-700'
-  }
+    slate: 'bg-slate-100 text-slate-700',
+  };
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -125,18 +125,18 @@ function SummaryCard({ label, value, icon: Icon, accent }) {
       <p className="mt-4 text-sm text-slate-600">{label}</p>
       <p className="mt-1 text-2xl font-semibold text-slate-900">{value}</p>
     </div>
-  )
+  );
 }
 
 function priorityClasses(priority) {
   switch (priority) {
     case 'high':
-      return 'bg-rose-100 text-rose-700'
+      return 'bg-rose-100 text-rose-700';
     case 'medium':
-      return 'bg-amber-100 text-amber-700'
+      return 'bg-amber-100 text-amber-700';
     default:
-      return 'bg-emerald-100 text-emerald-700'
+      return 'bg-emerald-100 text-emerald-700';
   }
 }
 
-export default AnalyticsPage
+export default AnalyticsPage;

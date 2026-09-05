@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { predictiveAnalyticsAPI } from '../../services/api';
+import { predictiveAnalyticsAPI } from '../../services/componentApi';
 
 /**
  * Demand Forecast Component
@@ -32,7 +32,7 @@ const DemandForecast = ({ productId, forecasts: forecastsProp, predictions: pred
       const [forecastsRes, predictionsRes, alertsRes] = await Promise.all([
         predictiveAnalyticsAPI.getForecasts({ forecast_type: 'demand' }).catch(() => null),
         predictiveAnalyticsAPI.getPredictions(productId, 'product').catch(() => null),
-        predictiveAnalyticsAPI.getUnacknowledgedAlerts().catch(() => null)
+        predictiveAnalyticsAPI.getUnacknowledgedAlerts().catch(() => null),
       ]);
 
       if (forecastsRes) setForecasts(forecastsRes.data);

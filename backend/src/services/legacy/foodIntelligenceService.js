@@ -5,15 +5,15 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
-const { persistTestFallback } = require('../../utils/testFallbackStore');
+const pool = require('../../database\/pool');
+const { persistTestFallback } = require('../../utils\/testFallbackStore');
 
 // database/pool.js's in-memory test pool only recognises statements it has a
 // handler for; an INSERT ... RETURNING * this file sends that the mock
@@ -119,7 +119,7 @@ async function createFoodItem(data) {
  */
 router.post('/food-items', authMiddleware, async (req, res) => {
   try {
-    const result = await createFoodItem(req.body);
+    let result = await createFoodItem(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create food item API error', { error: error.message, stack: error.stack });
@@ -147,7 +147,7 @@ async function searchFoodItems(query, foodGroup = null) {
 
     queryText += ' ORDER BY fi.name LIMIT 50';
 
-    const result = await pool.query(queryText, queryParams);
+    let result = await pool.query(queryText, queryParams);
     return result.rows;
   } catch (error) {
     logger.error('Search food items error', { error: error.message, stack: error.stack });
@@ -164,7 +164,7 @@ router.get('/food-items/search', async (req, res) => {
     if (!q) {
       return res.status(400).json({ error: 'Query parameter q is required' });
     }
-    const result = await searchFoodItems(q, food_group);
+    let result = await searchFoodItems(q, food_group);
     res.json(result);
   } catch (error) {
     logger.error('Search food items API error', { error: error.message, stack: error.stack });
@@ -209,7 +209,7 @@ async function createQualityAssessment(data) {
 
     const grade = (gradeResult && gradeResult.rows && gradeResult.rows[0]) ? gradeResult.rows[0].grade : (overall >= 85 ? 'A' : overall >= 70 ? 'B' : overall >= 50 ? 'C' : 'D');
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_quality_assessments 
        (food_item_id, assessment_date, assessor_id, assessment_type, quality_scores, 
         overall_quality_score, quality_grade, compliance_status, recommendations)
@@ -233,7 +233,7 @@ async function createQualityAssessment(data) {
       if (!isTestMode()) {
         throw new Error('Create quality assessment failed: database returned no row for INSERT ... RETURNING *');
       }
-      const fallback = {
+      let fallback = {
         id: `fq-fallback-${Date.now()}`,
         food_item_id,
         assessment_date,
@@ -261,7 +261,7 @@ async function createQualityAssessment(data) {
  */
 router.post('/quality-assessments', authMiddleware, async (req, res) => {
   try {
-    const result = await createQualityAssessment(req.body);
+    let result = await createQualityAssessment(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create quality assessment API error', { error: error.message, stack: error.stack });
@@ -274,7 +274,7 @@ router.post('/quality-assessments', authMiddleware, async (req, res) => {
  */
 async function getQualityAssessments(foodItemId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM food_quality_assessments WHERE food_item_id = $1 ORDER BY assessment_date DESC',
       [foodItemId]
     );
@@ -291,7 +291,7 @@ async function getQualityAssessments(foodItemId) {
  */
 router.get('/food-items/:foodItemId/quality-assessments', authMiddleware, async (req, res) => {
   try {
-    const result = await getQualityAssessments(req.params.foodItemId);
+    let result = await getQualityAssessments(req.params.foodItemId);
     res.json(result);
   } catch (error) {
     logger.error('Get quality assessments API error', { error: error.message, stack: error.stack });
@@ -335,7 +335,7 @@ async function recordContaminantTest(data) {
       }
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_contaminant_tests 
        (food_item_id, contaminant_id, test_date, testing_laboratory, contaminant_level, 
         unit, detection_limit, result_status, test_method)
@@ -359,7 +359,7 @@ async function recordContaminantTest(data) {
       if (!isTestMode()) {
         throw new Error('Record contaminant test failed: database returned no row for INSERT ... RETURNING *');
       }
-      const fallback = {
+      let fallback = {
         id: `ct-${Date.now()}`,
         food_item_id,
         contaminant_id,
@@ -387,7 +387,7 @@ async function recordContaminantTest(data) {
  */
 router.post('/contaminant-tests', authMiddleware, async (req, res) => {
   try {
-    const result = await recordContaminantTest(req.body);
+    let result = await recordContaminantTest(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record contaminant test API error', { error: error.message, stack: error.stack });
@@ -400,7 +400,7 @@ router.post('/contaminant-tests', authMiddleware, async (req, res) => {
  */
 async function getContaminantTests(foodItemId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT fct.*, ct.name as contaminant_name, ct.category as contaminant_category
        FROM food_contaminant_tests fct
        LEFT JOIN contaminant_types ct ON fct.contaminant_id = ct.id
@@ -421,7 +421,7 @@ async function getContaminantTests(foodItemId) {
  */
 router.get('/food-items/:foodItemId/contaminant-tests', authMiddleware, async (req, res) => {
   try {
-    const result = await getContaminantTests(req.params.foodItemId);
+    let result = await getContaminantTests(req.params.foodItemId);
     res.json(result);
   } catch (error) {
     logger.error('Get contaminant tests API error', { error: error.message, stack: error.stack });
@@ -445,7 +445,7 @@ async function createFreshnessAssessment(data) {
   } = data;
 
   try {
-    const overallScore = await pool.query(
+    let overallScore = await pool.query(
       'SELECT calculate_overall_quality_score($1) as score',
       [JSON.stringify(freshness_scores)]
     );
@@ -453,7 +453,7 @@ async function createFreshnessAssessment(data) {
     // Defensive fallback when DB UDF not present
     let score = (overallScore && overallScore.rows && overallScore.rows[0]) ? overallScore.rows[0].score : null;
     if (score === null || typeof score === 'undefined') {
-      const vals = Object.values(freshness_scores).filter(v => typeof v === 'number');
+      let vals = Object.values(freshness_scores).filter(v => typeof v === 'number');
       score = vals.length ? Math.round(vals.reduce((a,b) => a+b,0) / vals.length) : 0;
     }
 
@@ -477,7 +477,7 @@ async function createFreshnessAssessment(data) {
       remainingDays = 0;
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_freshness_assessments 
        (food_item_id, assessment_date, freshness_scores, overall_freshness_score, 
         freshness_status, estimated_remaining_days, storage_recommendations)
@@ -499,7 +499,7 @@ async function createFreshnessAssessment(data) {
       if (!isTestMode()) {
         throw new Error('Create freshness assessment failed: database returned no row for INSERT ... RETURNING *');
       }
-      const fallback = {
+      let fallback = {
         id: `fr-${Date.now()}`,
         food_item_id,
         assessment_date,
@@ -525,7 +525,7 @@ async function createFreshnessAssessment(data) {
  */
 router.post('/freshness-assessments', authMiddleware, async (req, res) => {
   try {
-    const result = await createFreshnessAssessment(req.body);
+    let result = await createFreshnessAssessment(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create freshness assessment API error', { error: error.message, stack: error.stack });
@@ -554,7 +554,7 @@ async function createFoodRecall(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_recalls 
        (food_item_id, recall_number, recall_date, recall_type, recall_reason, hazard_level, 
         affected_batches, affected_regions, recalling_firm, recall_status)
@@ -578,7 +578,7 @@ async function createFoodRecall(data) {
       if (!isTestMode()) {
         throw new Error('Create food recall failed: database returned no row for INSERT ... RETURNING *');
       }
-      const fallback = {
+      let fallback = {
         id: `recall-${Date.now()}`,
         food_item_id,
         recall_number: recall_number || `R-${Date.now()}`,
@@ -607,7 +607,7 @@ async function createFoodRecall(data) {
  */
 router.post('/food-recalls', authMiddleware, async (req, res) => {
   try {
-    const result = await createFoodRecall(req.body);
+    let result = await createFoodRecall(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create food recall API error', { error: error.message, stack: error.stack });
@@ -620,7 +620,7 @@ router.post('/food-recalls', authMiddleware, async (req, res) => {
  */
 async function getActiveRecalls() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT fr.*, fi.name as food_name 
        FROM food_recalls fr
        LEFT JOIN food_items fi ON fr.food_item_id = fi.id
@@ -640,7 +640,7 @@ async function getActiveRecalls() {
  */
 router.get('/food-recalls/active', async (req, res) => {
   try {
-    const result = await getActiveRecalls();
+    let result = await getActiveRecalls();
     res.json(result);
   } catch (error) {
     logger.error('Get active recalls API error', { error: error.message, stack: error.stack });
@@ -657,7 +657,7 @@ router.get('/food-recalls/active', async (req, res) => {
  */
 async function recordFoodIntelligence(foodItemId, metrics) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO food_intelligence_analytics 
        (food_item_id, date, total_inspections, quality_pass_rate, safety_incidents, 
         consumer_complaints, average_freshness_score, market_price, demand_index, supply_index)
@@ -686,7 +686,7 @@ async function recordFoodIntelligence(foodItemId, metrics) {
       if (!isTestMode()) {
         throw new Error('Record food intelligence failed: database returned no row for INSERT ... RETURNING *');
       }
-      const fallback = {
+      let fallback = {
         id: `fia-${Date.now()}`,
         food_item_id: foodItemId,
         date: new Date().toISOString().slice(0,10),
@@ -716,7 +716,7 @@ async function recordFoodIntelligence(foodItemId, metrics) {
 router.post('/food-intelligence', authMiddleware, async (req, res) => {
   try {
     const { food_item_id, metrics } = req.body;
-    const result = await recordFoodIntelligence(food_item_id, metrics);
+    let result = await recordFoodIntelligence(food_item_id, metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record food intelligence API error', { error: error.message, stack: error.stack });
@@ -788,3 +788,6 @@ module.exports = {
   const { ...rest } = m087;
   Object.assign(module.exports, rest);
 }
+
+
+

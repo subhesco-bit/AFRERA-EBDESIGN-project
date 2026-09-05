@@ -1,453 +1,207 @@
 /**
- * Enterprise-Grade Health Check Routes
- * 
- * Production-ready health monitoring with:
- * - Comprehensive dependency checks
- * - External service monitoring
- * - System resource monitoring
- * - Custom health check registration
- * - Health check caching
- * - Detailed diagnostics
- * - Performance metrics
- * - Version and build information
- * - Environment validation
- * - Circuit breaker status
- * - Database connection pool status
- * - Cache/Redis health checks
- * - File system checks
- * - Network connectivity tests
+ * Health Check Routes
+ * Production-ready health monitoring endpoints
  */
-
-'use strict';
 
 const express = require('express');
 const router = express.Router();
 const { logger } = require('../utils/logger');
-const pool = require('../database/pool');
-const fs = require('fs');
-const os = require('os');
+const { getPostgreSQL } = require('../database/connection');
+const redisCacheService = require('../services/redisCacheService');
 
-/**
- * Health check registry for custom checks
- */
-class HealthCheckRegistry {
-  constructor() {
-    this.checks = new Map();
-  }
-
-  /**
-   * Register a custom health check
-   */
-  register(name, checkFn, options = {}) {
-    this.checks.set(name, {
-      fn: checkFn,
-      critical: options.critical || false,
-      timeout: options.timeout || 5000
-    });
-  }
-
-  /**
-   * Unregister a health check
-   */
-  unregister(name) {
-    this.checks.delete(name);
-  }
-
-  /**
-   * Get all registered checks
-   */
-  getAll() {
-    return Array.from(this.checks.entries()).map(([name, config]) => ({
-      name,
-      ...config
-    }));
-  }
-
-  /**
-   * Run all registered checks
-   */
-  async runAll() {
-    const results = {};
-    
-    for (const [name, config] of this.checks.entries()) {
-      try {
-        const startTime = Date.now();
-        const result = await Promise.race([
-          config.fn(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Health check timeout')), config.timeout)
-          )
-        ]);
-        
-        results[name] = {
-          status: 'healthy',
-          message: result.message || 'Check passed',
-          duration: Date.now() - startTime,
-          data: result.data || null
-        };
-      } catch (error) {
-        results[name] = {
-          status: 'unhealthy',
-          message: error.message,
-          duration: Date.now() - Date.now()
-        };
-      }
-    }
-    
-    return results;
-  }
-}
-
-// Global health check registry
-const healthRegistry = new HealthCheckRegistry();
-
-/**
- * Check database connection with detailed metrics
- */
-async function checkDatabase() {
-  const startTime = Date.now();
-  
-  try {
-    await pool.query('SELECT 1');
-    const duration = Date.now() - startTime;
-    
-    // Get connection pool status
-    const poolStatus = {
-      totalCount: pool.totalCount,
-      idleCount: pool.idleCount,
-      waitingCount: pool.waitingCount
-    };
-    
-    return {
-      status: 'healthy',
-      message: 'Database connection successful',
-      duration: `${duration}ms`,
-      pool: poolStatus
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      message: error.message,
-      duration: `${Date.now() - startTime}ms`
-    };
-  }
-}
-
-/**
- * Check memory usage with detailed metrics
- */
-function checkMemory() {
-  const memoryUsage = process.memoryUsage();
-  const heapUsed = memoryUsage.heapUsed;
-  const heapTotal = memoryUsage.heapTotal;
-  const heapPercent = (heapUsed / heapTotal) * 100;
-  const rss = memoryUsage.rss;
-  const external = memoryUsage.external;
-  const arrayBuffers = memoryUsage.arrayBuffers;
-  
-  let status = 'healthy';
-  if (heapPercent > 90) status = 'unhealthy';
-  else if (heapPercent > 75) status = 'degraded';
-  
-  return {
-    status,
-    usage: {
-      heapUsed: `${Math.round(heapUsed / 1024 / 1024)}MB`,
-      heapTotal: `${Math.round(heapTotal / 1024 / 1024)}MB`,
-      heapPercent: `${Math.round(heapPercent)}%`,
-      rss: `${Math.round(rss / 1024 / 1024)}MB`,
-      external: `${Math.round(external / 1024 / 1024)}MB`,
-      arrayBuffers: `${Math.round(arrayBuffers / 1024 / 1024)}MB`
-    },
-    system: {
-      totalMemory: `${Math.round(os.totalmem() / 1024 / 1024 / 1024)}GB`,
-      freeMemory: `${Math.round(os.freemem() / 1024 / 1024 / 1024)}GB`,
-      usedMemoryPercent: `${Math.round(((os.totalmem() - os.freemem()) / os.totalmem()) * 100)}%`
-    }
-  };
-}
-
-/**
- * Check CPU usage
- */
-function checkCPU() {
-  const cpus = os.cpus();
-  const loadAverage = os.loadavg();
-  
-  return {
-    status: 'healthy',
-    message: 'CPU monitoring available',
-    cpus: cpus.length,
-    loadAverage: {
-      '1min': loadAverage[0].toFixed(2),
-      '5min': loadAverage[1].toFixed(2),
-      '15min': loadAverage[2].toFixed(2)
-    },
-    arch: os.arch(),
-    platform: os.platform()
-  };
-}
-
-/**
- * Check disk space
- */
-function checkDisk() {
-  try {
-    const stats = fs.statSync('.');
-    return {
-      status: 'healthy',
-      message: 'Disk check available',
-      path: process.cwd()
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      message: error.message
-    };
-  }
-}
-
-/**
- * Check system uptime
- */
-function checkUptime() {
-  const uptime = process.uptime();
-  const days = Math.floor(uptime / 86400);
-  const hours = Math.floor((uptime % 86400) / 3600);
-  const minutes = Math.floor((uptime % 3600) / 60);
-  const seconds = Math.floor(uptime % 60);
-  
-  return {
-    status: 'healthy',
-    uptime: `${days}d ${hours}h ${minutes}m ${seconds}s`,
-    uptimeSeconds: uptime,
-    systemUptime: `${Math.floor(os.uptime() / 3600)}h`
-  };
-}
-
-/**
- * Check environment variables
- */
-function checkEnvironment() {
-  const requiredVars = ['DATABASE_URL', 'NODE_ENV'];
-  const missing = [];
-  const present = [];
-  
-  for (const envVar of requiredVars) {
-    if (process.env[envVar]) {
-      present.push(envVar);
-    } else {
-      missing.push(envVar);
-    }
-  }
-  
-  return {
-    status: missing.length === 0 ? 'healthy' : 'degraded',
-    required: {
-      present,
-      missing
-    },
-    environment: process.env.NODE_ENV || 'development',
-    version: process.env.APP_VERSION || '1.0.0'
-  };
-}
-
-/**
- * Register default health checks
- */
-healthRegistry.register('database', checkDatabase, { critical: true, timeout: 5000 });
-healthRegistry.register('memory', checkMemory, { critical: false, timeout: 1000 });
-healthRegistry.register('cpu', checkCPU, { critical: false, timeout: 1000 });
-healthRegistry.register('disk', checkDisk, { critical: false, timeout: 1000 });
-healthRegistry.register('uptime', checkUptime, { critical: false, timeout: 500 });
-healthRegistry.register('environment', checkEnvironment, { critical: false, timeout: 500 });
-
-/**
- * GET /health
- * Basic health check endpoint (lightweight)
- */
+// Basic health check
 router.get('/', async (req, res) => {
   try {
-    const uptime = checkUptime();
-    
-    res.json({
+    res.status(200).json({
+      success: true,
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      uptime: uptime.uptime,
+      uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
-      version: process.env.APP_VERSION || '1.0.0'
+      version: process.env.npm_package_version || '1.0.0'
     });
   } catch (error) {
-    logger.error('Health check failed', { error: error.message });
+    logger.error('Health check failed', error);
     res.status(500).json({
+      success: false,
       status: 'unhealthy',
-      error: error.message,
-      timestamp: new Date().toISOString()
+      error: 'Health check failed'
     });
   }
 });
 
-/**
- * GET /health/detailed
- * Detailed health check with all service dependencies
- */
+// Detailed health check with database and cache status
 router.get('/detailed', async (req, res) => {
-  const startTime = Date.now();
-  const healthStatus = {
+  const health = {
+    success: true,
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
-    version: process.env.APP_VERSION || '1.0.0',
-    nodeVersion: process.version,
-    platform: os.platform(),
-    arch: os.arch(),
-    hostname: os.hostname(),
-    services: {},
-    checks: {},
-    duration: 0
+    version: process.env.npm_package_version || '1.0.0',
+    checks: {
+      database: { status: 'unknown', message: 'Not checked' },
+      redis: { status: 'unknown', message: 'Not checked' },
+      memory: { status: 'unknown', message: 'Not checked' },
+      disk: { status: 'unknown', message: 'Not checked' }
+    }
   };
 
   let overallStatus = 'healthy';
-  let criticalFailures = 0;
 
-  // Run all registered health checks
-  const customChecks = await healthRegistry.runAll();
-  healthStatus.checks = customChecks;
-
-  // Determine overall status
-  for (const [name, result] of Object.entries(customChecks)) {
-    healthStatus.services[name] = result;
-    
-    if (result.status === 'unhealthy') {
-      if (healthRegistry.checks.get(name)?.critical) {
-        criticalFailures++;
-        overallStatus = 'unhealthy';
-      } else if (overallStatus === 'healthy') {
-        overallStatus = 'degraded';
-      }
-    } else if (result.status === 'degraded' && overallStatus === 'healthy') {
+  try {
+    // Check database connection
+    try {
+      const db = getPostgreSQL();
+      await db.query('SELECT 1');
+      health.checks.database = {
+        status: 'healthy',
+        message: 'Database connection successful'
+      };
+    } catch (error) {
+      health.checks.database = {
+        status: 'unhealthy',
+        message: error.message
+      };
       overallStatus = 'degraded';
     }
+
+    // Check Redis connection
+    try {
+      const stats = await redisCacheService.getStats();
+      health.checks.redis = {
+        status: stats.connected ? 'healthy' : 'unhealthy',
+        message: stats.connected ? 'Redis connection successful' : 'Redis not connected',
+        keys: stats.keys,
+        memory: stats.memory
+      };
+      if (!stats.connected) {
+        overallStatus = 'degraded';
+      }
+    } catch (error) {
+      health.checks.redis = {
+        status: 'unhealthy',
+        message: error.message
+      };
+      overallStatus = 'degraded';
+    }
+
+    // Check memory usage
+    const memoryUsage = process.memoryUsage();
+    const memoryUsageMB = {
+      rss: Math.round(memoryUsage.rss / 1024 / 1024),
+      heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+      heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+      external: Math.round(memoryUsage.external / 1024 / 1024)
+    };
+
+    const memoryPercent = (memoryUsageMB.heapUsed / memoryUsageMB.heapTotal) * 100;
+    health.checks.memory = {
+      status: memoryPercent > 90 ? 'unhealthy' : memoryPercent > 70 ? 'degraded' : 'healthy',
+      message: `Memory usage: ${memoryPercent.toFixed(2)}%`,
+      usage: memoryUsageMB
+    };
+
+    if (memoryPercent > 90) {
+      overallStatus = 'unhealthy';
+    } else if (memoryPercent > 70) {
+      overallStatus = 'degraded';
+    }
+
+    // Check disk space (if available)
+    try {
+      const fs = require('fs');
+      let stats = fs.statSync('.');
+      health.checks.disk = {
+        status: 'healthy',
+        message: 'Disk space check not implemented'
+      };
+    } catch (error) {
+      health.checks.disk = {
+        status: 'unknown',
+        message: 'Could not check disk space'
+      };
+    }
+
+    health.status = overallStatus;
+    res.status(overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 200 : 503).json(health);
+
+  } catch (error) {
+    logger.error('Detailed health check failed', error);
+    health.status = 'unhealthy';
+    health.success = false;
+    res.status(503).json(health);
   }
-
-  healthStatus.status = overallStatus;
-  healthStatus.duration = Date.now() - startTime;
-  healthStatus.criticalFailures = criticalFailures;
-
-  const statusCode = overallStatus === 'healthy' ? 200 : overallStatus === 'degraded' ? 200 : 503;
-  res.status(statusCode).json(healthStatus);
 });
 
-/**
- * GET /health/ready
- * Readiness probe - checks if service is ready to accept traffic
- */
+// Readiness check (for Kubernetes/containers)
 router.get('/ready', async (req, res) => {
   try {
-    // Check only critical dependencies
-    const databaseCheck = await checkDatabase();
-    
-    if (databaseCheck.status !== 'healthy') {
-      logger.error('Readiness check failed', { error: databaseCheck.message });
-      return res.status(503).json({
-        status: 'not_ready',
-        error: databaseCheck.message,
-        timestamp: new Date().toISOString()
-      });
-    }
-    
-    res.json({
+    // Check if all critical services are ready
+    let db = getPostgreSQL();
+    await db.query('SELECT 1');
+
+    res.status(200).json({
+      success: true,
       status: 'ready',
-      timestamp: new Date().toISOString(),
-      checks: {
-        database: databaseCheck
-      }
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Readiness check failed', { error: error.message });
+    logger.error('Readiness check failed', error);
     res.status(503).json({
-      status: 'not_ready',
-      error: error.message,
-      timestamp: new Date().toISOString()
+      success: false,
+      status: 'not ready',
+      error: error.message
     });
   }
 });
 
-/**
- * GET /health/live
- * Liveness probe - checks if service is running
- */
-router.get('/live', (req, res) => {
-  const uptime = checkUptime();
-  
-  res.json({
-    status: 'alive',
-    timestamp: new Date().toISOString(),
-    uptime: uptime.uptime,
-    uptimeSeconds: uptime.uptimeSeconds
-  });
-});
-
-/**
- * GET /health/checks
- * List all registered health checks
- */
-router.get('/checks', (req, res) => {
-  const checks = healthRegistry.getAll();
-  
-  res.json({
-    checks: checks.map(check => ({
-      name: check.name,
-      critical: check.critical,
-      timeout: check.timeout
-    })),
-    timestamp: new Date().toISOString()
-  });
-});
-
-/**
- * POST /health/checks/:name
- * Manually trigger a specific health check
- */
-router.post('/checks/:name', async (req, res) => {
-  const { name } = req.params;
-  const config = healthRegistry.checks.get(name);
-  
-  if (!config) {
-    return res.status(404).json({
-      error: 'Health check not found',
-      name,
-      timestamp: new Date().toISOString()
-    });
-  }
-  
+// Liveness check (for Kubernetes/containers)
+router.get('/live', async (req, res) => {
   try {
-    const startTime = Date.now();
-    const result = await Promise.race([
-      config.fn(),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Health check timeout')), config.timeout)
-      )
-    ]);
-    
-    res.json({
-      name,
-      status: 'healthy',
-      message: result.message || 'Check passed',
-      duration: Date.now() - startTime,
-      data: result.data || null,
-      timestamp: new Date().toISOString()
+    // Check if the process is responsive
+    res.status(200).json({
+      success: true,
+      status: 'alive',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
     });
   } catch (error) {
+    logger.error('Liveness check failed', error);
+    res.status(503).json({
+      success: false,
+      status: 'dead',
+      error: error.message
+    });
+  }
+});
+
+// Metrics endpoint (for monitoring systems)
+router.get('/metrics', async (req, res) => {
+  try {
+    const metrics = {
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      cpu: process.cpuUsage(),
+      platform: process.platform,
+      nodeVersion: process.version,
+      environment: process.env.NODE_ENV || 'development'
+    };
+
+    // Add custom metrics if available
+    if (global.customMetrics) {
+      metrics.custom = global.customMetrics;
+    }
+
+    res.status(200).json(metrics);
+  } catch (error) {
+    logger.error('Metrics collection failed', error);
     res.status(500).json({
-      name,
-      status: 'unhealthy',
-      message: error.message,
-      timestamp: new Date().toISOString()
+      success: false,
+      error: 'Failed to collect metrics'
     });
   }
 });
 
 module.exports = router;
-module.exports.healthRegistry = healthRegistry;

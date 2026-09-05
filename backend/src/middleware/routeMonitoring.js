@@ -63,9 +63,9 @@ const routeMonitoring = (req, res, next) => {
 };
 
 const criticalRouteMonitoring = (req, res, next) => {
-  const startTime = Date.now();
-  const routePath = req.path;
-  const method = req.method;
+  let startTime = Date.now();
+  let routePath = req.path;
+  let method = req.method;
 
   // Enhanced monitoring for critical routes
   logger.info('Critical route accessed', {
@@ -78,8 +78,8 @@ const criticalRouteMonitoring = (req, res, next) => {
 
   // Track response time with detailed metrics
   res.on('finish', () => {
-    const duration = Date.now() - startTime;
-    const statusCode = res.statusCode;
+    let duration = Date.now() - startTime;
+    let statusCode = res.statusCode;
 
     logger.info('Critical route completed', {
       method,
@@ -114,10 +114,10 @@ const criticalRouteMonitoring = (req, res, next) => {
 };
 
 const healthCheckMonitoring = (req, res, next) => {
-  const startTime = Date.now();
+  let startTime = Date.now();
 
   res.on('finish', () => {
-    const duration = Date.now() - startTime;
+    let duration = Date.now() - startTime;
     
     // Health checks should be very fast
     if (duration > 100) {

@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Toast Notification Component
- * 
+ *
  * Production-ready toast system with:
  * - Multiple toast types (success, error, warning, info)
  * - Auto-dismiss with configurable duration
@@ -13,10 +13,10 @@
  * - Rich content support
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
-import { create } from 'zustand'
-import { cn } from '../../lib/utils'
+import { create } from 'zustand';
+import { cn } from '../../lib/utils';
 
 /**
  * Toast types
@@ -25,8 +25,8 @@ export const ToastType = {
   SUCCESS: 'success',
   ERROR: 'error',
   WARNING: 'warning',
-  INFO: 'info'
-}
+  INFO: 'info',
+};
 
 /**
  * Toast store for managing toasts globally
@@ -34,13 +34,13 @@ export const ToastType = {
 const useToastStore = create((set) => ({
   toasts: [],
   addToast: (toast) => set((state) => ({
-    toasts: [...state.toasts, { ...toast, id: Date.now() }]
+    toasts: [...state.toasts, { ...toast, id: Date.now() }],
   })),
   removeToast: (id) => set((state) => ({
-    toasts: state.toasts.filter((toast) => toast.id !== id)
+    toasts: state.toasts.filter((toast) => toast.id !== id),
   })),
-  clearToasts: () => set({ toasts: [] })
-}))
+  clearToasts: () => set({ toasts: [] }),
+}));
 
 /**
  * Toast icons by type
@@ -65,8 +65,8 @@ const ToastIcons = {
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
-  )
-}
+  ),
+};
 
 /**
  * Toast styles by type
@@ -75,8 +75,8 @@ const ToastStyles = {
   success: 'bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200',
   error: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200',
   warning: 'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-200',
-  info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200'
-}
+  info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200',
+};
 
 /**
  * Toast icon colors by type
@@ -85,47 +85,47 @@ const IconColors = {
   success: 'text-green-600 dark:text-green-400',
   error: 'text-red-600 dark:text-red-400',
   warning: 'text-yellow-600 dark:text-yellow-400',
-  info: 'text-blue-600 dark:text-blue-400'
-}
+  info: 'text-blue-600 dark:text-blue-400',
+};
 
 /**
  * Individual Toast component
  */
 function Toast({ toast, onClose }) {
-  const [progress, setProgress] = useState(100)
-  const [isPaused, setIsPaused] = useState(false)
+  const [progress, setProgress] = useState(100);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    if (isPaused) return
+    if (isPaused) return;
 
-    const duration = toast.duration || 5000
-    const interval = 50
-    const decrement = (interval / duration) * 100
+    const duration = toast.duration || 5000;
+    const interval = 50;
+    const decrement = (interval / duration) * 100;
 
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev <= decrement) {
-          clearInterval(timer)
-          onClose()
-          return 0
+          clearInterval(timer);
+          onClose();
+          return 0;
         }
-        return prev - decrement
-      })
-    }, interval)
+        return prev - decrement;
+      });
+    }, interval);
 
-    return () => clearInterval(timer)
-  }, [toast.duration, isPaused, onClose])
+    return () => clearInterval(timer);
+  }, [toast.duration, isPaused, onClose]);
 
-  const handleMouseEnter = () => setIsPaused(true)
-  const handleMouseLeave = () => setIsPaused(false)
-  const handleClose = () => onClose()
+  const handleMouseEnter = () => setIsPaused(true);
+  const handleMouseLeave = () => setIsPaused(false);
+  const handleClose = () => onClose();
 
   return (
     <div
       className={cn(
         'flex items-start gap-3 p-4 rounded-lg border shadow-lg transition-all duration-300 transform',
         'animate-in slide-in-from-right-full fade-in',
-        ToastStyles[toast.type] || ToastStyles.info
+        ToastStyles[toast.type] || ToastStyles.info,
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -175,14 +175,14 @@ function Toast({ toast, onClose }) {
         />
       </div>
     </div>
-  )
+  );
 }
 
 /**
  * Toast Container component
  */
 function ToastContainer({ position = 'top-right' }) {
-  const { toasts, removeToast } = useToastStore()
+  const { toasts, removeToast } = useToastStore();
 
   const positionClasses = {
     'top-right': 'top-4 right-4',
@@ -190,14 +190,14 @@ function ToastContainer({ position = 'top-right' }) {
     'bottom-right': 'bottom-4 right-4',
     'bottom-left': 'bottom-4 left-4',
     'top-center': 'top-4 left-1/2 -translate-x-1/2',
-    'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2'
-  }
+    'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2',
+  };
 
   return (
     <div
       className={cn(
         'fixed z-toast flex flex-col gap-2 max-w-sm w-full',
-        positionClasses[position] || positionClasses['top-right']
+        positionClasses[position] || positionClasses['top-right'],
       )}
       role="region"
       aria-label="Notifications"
@@ -210,34 +210,34 @@ function ToastContainer({ position = 'top-right' }) {
         />
       ))}
     </div>
-  )
+  );
 }
 
 /**
  * Toast hook for easy usage
  */
 function useToast() {
-  const { addToast, removeToast, clearToasts } = useToastStore()
+  const { addToast, removeToast, clearToasts } = useToastStore();
 
   const toast = (props) => {
-    addToast(props)
-  }
+    addToast(props);
+  };
 
   const success = (message, options = {}) => {
-    toast({ type: ToastType.SUCCESS, message, ...options })
-  }
+    toast({ type: ToastType.SUCCESS, message, ...options });
+  };
 
   const error = (message, options = {}) => {
-    toast({ type: ToastType.ERROR, message, ...options })
-  }
+    toast({ type: ToastType.ERROR, message, ...options });
+  };
 
   const warning = (message, options = {}) => {
-    toast({ type: ToastType.WARNING, message, ...options })
-  }
+    toast({ type: ToastType.WARNING, message, ...options });
+  };
 
   const info = (message, options = {}) => {
-    toast({ type: ToastType.INFO, message, ...options })
-  }
+    toast({ type: ToastType.INFO, message, ...options });
+  };
 
   return {
     toast,
@@ -246,8 +246,8 @@ function useToast() {
     warning,
     info,
     removeToast,
-    clearToasts
-  }
+    clearToasts,
+  };
 }
 
-export { Toast, ToastContainer, useToast, useToastStore }
+export { Toast, ToastContainer, useToast, useToastStore };

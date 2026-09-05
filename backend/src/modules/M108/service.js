@@ -121,7 +121,7 @@ async function recordFuelConsumption(consumptionData) {
     };
 
     // AI-powered consumption analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'fuel_consumption_analysis',
       parameters: {
         consumption_data: consumptionData,
@@ -132,10 +132,10 @@ async function recordFuelConsumption(consumptionData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     consumption.ai_analysis = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO fuel_consumption 
        (consumption_id, vehicle_id, equipment_id, fuel_type, quantity_liters, 
         odometer_reading, work_hours, operation_type, operator_id, consumption_date, ai_analysis, created_at)
@@ -325,7 +325,7 @@ async function generateEfficiencyRecommendations(vehicleId, period) {
 
 async function getTotalPurchases(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(quantity_liters) as total, SUM(total_cost) as cost FROM fuel_purchases WHERE farmer_id = $1',
       [farmerId]
     );
@@ -337,7 +337,7 @@ async function getTotalPurchases(farmerId) {
 
 async function getTotalConsumption(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(quantity_liters) as total FROM fuel_consumption WHERE vehicle_id IN (SELECT vehicle_id FROM fleet_vehicles WHERE farmer_id = $1)',
       [farmerId]
     );
@@ -401,7 +401,7 @@ async function listFuelPurchases({ page = 1, limit = 20, farmer_id = null } = {}
 }
 
 async function getFuelPurchase(id) {
-  const res = await pool.query('SELECT * FROM fuel_purchases WHERE purchase_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM fuel_purchases WHERE purchase_id = $1', [id]);
   return res.rows[0] || null;
 }
 

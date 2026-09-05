@@ -13,8 +13,8 @@
  * eat toward a published, cited physical standard," not a vague fitness app.
  */
 
-const { getPostgreSQL } = require('../../database/connection');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { logger } = require('../../utils\/logger');
 
 async function getStandardCategories() {
   const pg = getPostgreSQL();
@@ -25,7 +25,7 @@ async function getStandardCategories() {
 }
 
 async function getStandardsForCategory(category, gender) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const { rows } = await pg.query(
     `SELECT test_component, threshold_value, threshold_type, unit, notes, source_url, last_verified_date
      FROM defense_fitness_standards
@@ -38,7 +38,7 @@ async function getStandardsForCategory(category, gender) {
 
 /** Record a self-reported or wearable-derived test attempt. */
 async function recordAttempt(userId, category, testComponent, recordedValue, source = 'manual') {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const { rows } = await pg.query(
     `INSERT INTO defense_fitness_prep_attempts (user_id, category, test_component, recorded_value, source)
      VALUES ($1, $2, $3, $4, $5)
@@ -54,7 +54,7 @@ async function recordAttempt(userId, category, testComponent, recordedValue, sou
  * for a component the user hasn't attempted — returns null for those.
  */
 async function getReadinessComparison(userId, category, gender) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const standards = await getStandardsForCategory(category, gender);
 
   const { rows: attempts } = await pg.query(
@@ -90,3 +90,6 @@ module.exports = {
   recordAttempt,
   getReadinessComparison,
 };
+
+
+

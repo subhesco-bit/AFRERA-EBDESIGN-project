@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Route Configuration
- * 
+ *
  * Centralized route configuration with:
  * - Route metadata for SEO
  * - Authentication requirements
@@ -12,217 +12,392 @@
  * - Loading states
  */
 
-import { lazy } from 'react'
-
+import { lazy } from 'react';
+import MobileWallet from '../pages/MobileWallet';
+import MobileSettings from '../pages/MobileSettings';
+import MobileProfile from '../pages/MobileProfile';
+import MobilePayments from '../pages/MobilePayments';
+import MobileOffers from '../pages/MobileOffers';
+import MobileNotifications from '../pages/MobileNotifications';
+import MobileMarketplace from '../pages/MobileMarketplace';
+import MobileHomepage from '../pages/MobileHomepage';
+import MobileHelp from '../pages/MobileHelp';
+import MobileChat from '../pages/MobileChat';
+import SubsidyApplicationPage from '../pages/SubsidyApplicationPage';
+import SchemeVerificationPage from '../pages/SchemeVerificationPage';
+import SchemeUpdate Notifier from '../pages/SchemeUpdate Notifier';
+import SchemeReportGenerator from '../pages/SchemeReportGenerator';
+import SchemeEligibilityChecker from '../pages/SchemeEligibilityChecker';
+import SchemeBeneficiaryList from '../pages/SchemeBeneficiaryList';
+import MobileVerification from '../pages/MobileVerification';
+import GovernmentSchemeDashboard from '../pages/GovernmentSchemeDashboard';
+import GovernmentNotificationCenter from '../pages/GovernmentNotificationCenter';
+import DocumentUploadPage from '../pages/DocumentUploadPage';
+import DisputeResolutionPage from '../pages/DisputeResolutionPage';
+import DeadlineTracker from '../pages/DeadlineTracker';
+import ComplianceValidator from '../pages/ComplianceValidator';
+import CancellationManagement from '../pages/CancellationManagement';
+import BiometricAuthentication from '../pages/BiometricAuthentication';
+import BeneficiaryManagement from '../pages/BeneficiaryManagement';
+import AuditLogPage from '../pages/AuditLogPage';
+import ApprovalWorkflow from '../pages/ApprovalWorkflow';
+import ApplicationStatusTracker from '../pages/ApplicationStatusTracker';
+import AnnouncementBoard from '../pages/AnnouncementBoard';
+import Page9 from '../pages/Page9';
+import Page88 from '../pages/Page88';
+import Page87 from '../pages/Page87';
+import Page86 from '../pages/Page86';
+import Page85 from '../pages/Page85';
+import Page84 from '../pages/Page84';
+import Page83 from '../pages/Page83';
+import Page82 from '../pages/Page82';
+import Page81 from '../pages/Page81';
+import Page80 from '../pages/Page80';
+import Page79 from '../pages/Page79';
+import Page78 from '../pages/Page78';
+import Page77 from '../pages/Page77';
+import Page76 from '../pages/Page76';
+import Page75 from '../pages/Page75';
+import Page74 from '../pages/Page74';
+import Page73 from '../pages/Page73';
+import Page72 from '../pages/Page72';
+import Page71 from '../pages/Page71';
+import Page70 from '../pages/Page70';
+import Page69 from '../pages/Page69';
+import Page68 from '../pages/Page68';
+import Page67 from '../pages/Page67';
+import Page66 from '../pages/Page66';
+import Page65 from '../pages/Page65';
+import Page64 from '../pages/Page64';
+import Page63 from '../pages/Page63';
+import Page62 from '../pages/Page62';
+import Page61 from '../pages/Page61';
+import Page60 from '../pages/Page60';
+import Page59 from '../pages/Page59';
+import Page58 from '../pages/Page58';
+import Page57 from '../pages/Page57';
+import Page56 from '../pages/Page56';
+import Page55 from '../pages/Page55';
+import Page54 from '../pages/Page54';
+import Page53 from '../pages/Page53';
+import Page52 from '../pages/Page52';
+import Page51 from '../pages/Page51';
+import Page50 from '../pages/Page50';
+import Page49 from '../pages/Page49';
+import Page48 from '../pages/Page48';
+import Page47 from '../pages/Page47';
+import Page46 from '../pages/Page46';
+import Page45 from '../pages/Page45';
+import Page44 from '../pages/Page44';
+import Page43 from '../pages/Page43';
+import Page42 from '../pages/Page42';
+import Page41 from '../pages/Page41';
+import Page40 from '../pages/Page40';
+import Page39 from '../pages/Page39';
+import Page38 from '../pages/Page38';
+import Page37 from '../pages/Page37';
+import Page36 from '../pages/Page36';
+import Page35 from '../pages/Page35';
+import Page34 from '../pages/Page34';
+import Page33 from '../pages/Page33';
+import Page32 from '../pages/Page32';
+import Page31 from '../pages/Page31';
+import Page30 from '../pages/Page30';
+import Page29 from '../pages/Page29';
+import Page28 from '../pages/Page28';
+import Page27 from '../pages/Page27';
+import Page26 from '../pages/Page26';
+import Page25 from '../pages/Page25';
+import Page24 from '../pages/Page24';
+import Page23 from '../pages/Page23';
+import Page22 from '../pages/Page22';
+import Page21 from '../pages/Page21';
+import Page20 from '../pages/Page20';
+import Page19 from '../pages/Page19';
+import Page18 from '../pages/Page18';
+import Page17 from '../pages/Page17';
+import Page16 from '../pages/Page16';
+import Page15 from '../pages/Page15';
+import Page14 from '../pages/Page14';
+import Page13 from '../pages/Page13';
+import Page12 from '../pages/Page12';
+import Page11 from '../pages/Page11';
+import Page10 from '../pages/Page10';
+import Page0 from '../pages/Page0';
+import EconomicDashboard from '../pages/EconomicDashboard';
+import WeatherImpactAssessment from '../pages/WeatherImpactAssessment';
+import UserEngagementStats from '../pages/UserEngagementStats';
+import SystemHealthMonitor from '../pages/SystemHealthMonitor';
+import SubsidyDistributionMap from '../pages/SubsidyDistributionMap';
+import RiskAssessment from '../pages/RiskAssessment';
+import ResponseTimeMetrics from '../pages/ResponseTimeMetrics';
+import RegionalComparison from '../pages/RegionalComparison';
+import PriceVolatilityChart from '../pages/PriceVolatilityChart';
+import PerformanceMetrics from '../pages/PerformanceMetrics';
+import OpportunitiesIdentifier from '../pages/OpportunitiesIdentifier';
+import MarketTrendAnalysis from '../pages/MarketTrendAnalysis';
+import IntelligenceReports from '../pages/IntelligenceReports';
+import HistoricalDataView from '../pages/HistoricalDataView';
+import ForecastingDashboard from '../pages/ForecastingDashboard';
+import FarmerBehaviorAnalytics from '../pages/FarmerBehaviorAnalytics';
+import ErrorRateAnalysis from '../pages/ErrorRateAnalysis';
+import DataQualityReport from '../pages/DataQualityReport';
+import CustomReportBuilder from '../pages/CustomReportBuilder';
+import CropYieldPrediction from '../pages/CropYieldPrediction';
+import AnomalyDetection from '../pages/AnomalyDetection';
+import UserManagement from '../pages/UserManagement';
+import SystemConfiguration from '../pages/SystemConfiguration';
+import SecuritySettings from '../pages/SecuritySettings';
+import RolePermissions from '../pages/RolePermissions';
+import ResourceMonitoring from '../pages/ResourceMonitoring';
+import PerformanceTuning from '../pages/PerformanceTuning';
+import NotificationPreferences from '../pages/NotificationPreferences';
+import LogViewer from '../pages/LogViewer';
+import IntegrationSettings from '../pages/IntegrationSettings';
+import ErrorHandling from '../pages/ErrorHandling';
+import DatabaseManagement from '../pages/DatabaseManagement';
+import CacheManagement from '../pages/CacheManagement';
+import BackupRecovery from '../pages/BackupRecovery';
+import AuditLogs from '../pages/AuditLogs';
+import APIManagement from '../pages/APIManagement';
 
 /**
  * Lazy load page components
  */
-const HomePage = lazy(() => import('../pages/HomePage'))
-const AboutPage = lazy(() => import('../pages/AboutPage'))
-const MarketplacePage = lazy(() => import('../pages/MarketplacePage'))
-const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'))
-const CartPage = lazy(() => import('../pages/CartPage'))
-const CheckoutPage = lazy(() => import('../pages/CheckoutPage'))
-const OrderDetailPage = lazy(() => import('../pages/OrderDetailPage'))
-const LoginPage = lazy(() => import('../pages/LoginPage'))
-const RegisterPage = lazy(() => import('../pages/RegisterPage'))
-const FarmerPortalPage = lazy(() => import('../pages/FarmerPortalPage'))
-const FarmerHomePage = lazy(() => import('../pages/FarmerHomePage'))
-const FarmerSellPage = lazy(() => import('../pages/FarmerSellPage'))
-const FarmerFieldPage = lazy(() => import('../pages/FarmerFieldPage'))
-const HarvestPlanPage = lazy(() => import('../pages/HarvestPlanPage'))
-const HarvestScorePage = lazy(() => import('../pages/HarvestScorePage'))
-const WhatGrowPage = lazy(() => import('../pages/WhatGrowPage'))
-const SeedVaultPage = lazy(() => import('../pages/SeedVaultPage'))
-const FarmAdvisorPage = lazy(() => import('../pages/FarmAdvisorPage'))
-const PriceCheckPage = lazy(() => import('../pages/PriceCheckPage'))
-const PriceBuildPage = lazy(() => import('../pages/PriceBuildPage'))
-const DynamicPricingPage = lazy(() => import('../pages/DynamicPricingPage'))
-const SellTimingPage = lazy(() => import('../pages/SellTimingPage'))
-const ComparePage = lazy(() => import('../pages/ComparePage'))
-const DiscoverPage = lazy(() => import('../pages/DiscoverPage'))
-const PreOrderPage = lazy(() => import('../pages/PreOrderPage'))
-const LogisticsPage = lazy(() => import('../pages/LogisticsPage'))
-const InsurancePage = lazy(() => import('../pages/InsurancePage'))
-const DashboardPage = lazy(() => import('../pages/DashboardPage'))
-const WalletPage = lazy(() => import('../pages/WalletPage'))
-const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
+const HomePage = lazy(() => import('../pages/HomePage'));
+const AboutPage = lazy(() => import('../pages/AboutPage'));
+const MarketplacePage = lazy(() => import('../pages/MarketplacePage'));
+const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'));
+const CartPage = lazy(() => import('../pages/CartPage'));
+const CheckoutPage = lazy(() => import('../pages/CheckoutPage'));
+const OrderDetailPage = lazy(() => import('../pages/OrderDetailPage'));
+const LoginPage = lazy(() => import('../pages/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/RegisterPage'));
+const FarmerPortalPage = lazy(() => import('../pages/FarmerPortalPage'));
+const FarmerHomePage = lazy(() => import('../pages/FarmerHomePage'));
+const FarmerSellPage = lazy(() => import('../pages/FarmerSellPage'));
+const FarmerFieldPage = lazy(() => import('../pages/FarmerFieldPage'));
+const HarvestPlanPage = lazy(() => import('../pages/HarvestPlanPage'));
+const HarvestScorePage = lazy(() => import('../pages/HarvestScorePage'));
+const WhatGrowPage = lazy(() => import('../pages/WhatGrowPage'));
+const SeedVaultPage = lazy(() => import('../pages/SeedVaultPage'));
+const FarmAdvisorPage = lazy(() => import('../pages/FarmAdvisorPage'));
+const PriceCheckPage = lazy(() => import('../pages/PriceCheckPage'));
+const PriceBuildPage = lazy(() => import('../pages/PriceBuildPage'));
+const DynamicPricingPage = lazy(() => import('../pages/DynamicPricingPage'));
+const SellTimingPage = lazy(() => import('../pages/SellTimingPage'));
+const ComparePage = lazy(() => import('../pages/ComparePage'));
+const DiscoverPage = lazy(() => import('../pages/DiscoverPage'));
+const PreOrderPage = lazy(() => import('../pages/PreOrderPage'));
+const LogisticsPage = lazy(() => import('../pages/LogisticsPage'));
+const InsurancePage = lazy(() => import('../pages/InsurancePage'));
+const DashboardPage = lazy(() => import('../pages/DashboardPage'));
+const WalletPage = lazy(() => import('../pages/WalletPage'));
+const EscrowPage = lazy(() => import('../pages/EscrowPage'));
+const FarmerRevenueLedgerPage = lazy(() => import('../pages/FarmerRevenueLedgerPage'));
+const BankPassportPage = lazy(() => import('../pages/BankPassportPage'));
+const DisruptionPage = lazy(() => import('../pages/DisruptionPage'));
+// Financial and Reporting Pages
+const AuditReportPage = lazy(() => import('../pages/AuditReportPage'));
+const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'));
+const ContractListingPage = lazy(() => import('../pages/ContractListingPage'));
+const CreditScorePage = lazy(() => import('../pages/CreditScorePage'));
+const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'));
+const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'));
+const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'));
+const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'));
+const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'));
+const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'));
+const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'));
+const SalesReportPage = lazy(() => import('../pages/SalesReportPage'));
+// Additional Advanced Features Pages
+const AdvancedSearchPage = lazy(() => import('../pages/AdvancedSearchPage'));
+const WeatherAnalyticsPage = lazy(() => import('../pages/WeatherAnalyticsPage'));
+const MarketIntelligencePage = lazy(() => import('../pages/MarketIntelligencePage'));
+const SupplyChainAnalyticsPage = lazy(() => import('../pages/SupplyChainAnalyticsPage'));
+const RiskManagementPage = lazy(() => import('../pages/RiskManagementPage'));
+const SustainabilityDashboardPage = lazy(() => import('../pages/SustainabilityDashboardPage'));
+const ComplianceDashboardPage = lazy(() => import('../pages/ComplianceDashboardPage'));
+const QualityControlPage = lazy(() => import('../pages/QualityControlPage'));
+const ExportDocumentationPage = lazy(() => import('../pages/ExportDocumentationPage'));
+const TraceabilityPage = lazy(() => import('../pages/TraceabilityPage'));
+const KnowledgeBasePage = lazy(() => import('../pages/KnowledgeBasePage'));
+const TrainingAcademyPage = lazy(() => import('../pages/TrainingAcademyPage'));
+const CommunityForumPage = lazy(() => import('../pages/CommunityForumPage'));
+const SupportCenterPage = lazy(() => import('../pages/SupportCenterPage'));
 
 // Tier 1 Advanced Services Pages (M025-M030)
-const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'))
-const PredictiveIntelligencePage = lazy(() => import('../pages/PredictiveIntelligencePage'))
-const IoTMonitoringDashboard = lazy(() => import('../pages/IoTMonitoringDashboard'))
-const BlockchainVerificationPage = lazy(() => import('../pages/BlockchainVerificationPage'))
-const DigitalTwinPage = lazy(() => import('../pages/DigitalTwinPage'))
-const EnterpriseIntegrationPage = lazy(() => import('../pages/EnterpriseIntegrationPage'))
+const AdvancedAnalyticsDashboard = lazy(() => import('../pages/AdvancedAnalyticsDashboard'));
+const PredictiveIntelligencePage = lazy(() => import('../pages/PredictiveIntelligencePage'));
+const IoTMonitoringDashboard = lazy(() => import('../pages/IoTMonitoringDashboard'));
+const BlockchainVerificationPage = lazy(() => import('../pages/BlockchainVerificationPage'));
+const DigitalTwinPage = lazy(() => import('../pages/DigitalTwinPage'));
+const EnterpriseIntegrationPage = lazy(() => import('../pages/EnterpriseIntegrationPage'));
 
 // Additional Dashboard Pages
-const FinancialServicesDashboard = lazy(() => import('../pages/FinancialServicesDashboard'))
-const OperationalDashboard = lazy(() => import('../pages/OperationalDashboard'))
+const FinancialServicesDashboard = lazy(() => import('../pages/FinancialServicesDashboard'));
+const OperationalDashboard = lazy(() => import('../pages/OperationalDashboard'));
 
 // Financial Services Pages
-const LoanManagementPage = lazy(() => import('../pages/LoanManagementPage'))
-const InsuranceManagementPage = lazy(() => import('../pages/InsuranceManagementPage'))
-const PaymentProcessingPage = lazy(() => import('../pages/PaymentProcessingPage'))
-const FarmerEntranceHubPage = lazy(() => import('../pages/FarmerEntranceHubPage'))
-const FarmerSellDoorPage = lazy(() => import('../pages/FarmerSellDoorPage'))
-const FarmerHouseholdDoorPage = lazy(() => import('../pages/FarmerHouseholdDoorPage'))
-const FarmerFieldDoorPage = lazy(() => import('../pages/FarmerFieldDoorPage'))
-const FarmerSharedDoorPage = lazy(() => import('../pages/FarmerSharedDoorPage'))
-const ForwardPricingPage = lazy(() => import('../pages/ForwardPricingPage'))
-const ClimateWeatherPage = lazy(() => import('../pages/ClimateWeatherPage'))
-const LedgerPage = lazy(() => import('../pages/LedgerPage'))
-const CompliancePage = lazy(() => import('../pages/CompliancePage'))
-const RfqPage = lazy(() => import('../pages/RfqPage'))
-const CorridorEconomicsPage = lazy(() => import('../pages/CorridorEconomicsPage'))
-const LandUseCarbonPage = lazy(() => import('../pages/LandUseCarbonPage'))
-const AssetAccountingPage = lazy(() => import('../pages/AssetAccountingPage'))
-const CostControlPage = lazy(() => import('../pages/CostControlPage'))
-const ProjectSystemsPage = lazy(() => import('../pages/ProjectSystemsPage'))
-const YieldManagementPage = lazy(() => import('../pages/YieldManagementPage'))
-const CompetitivePositionPage = lazy(() => import('../pages/CompetitivePositionPage'))
-const ExperienceLayerPage = lazy(() => import('../pages/ExperienceLayerPage'))
-const FormManagementPage = lazy(() => import('../pages/FormManagementPage'))
-const AnalyticsPage = lazy(() => import('../pages/AnalyticsPage'))
-const ModuleHubPage = lazy(() => import('../pages/ModuleHubPage'))
-const CorporateBuyerPage = lazy(() => import('../pages/CorporateBuyerPage'))
-const LogisticsProviderPage = lazy(() => import('../pages/LogisticsProviderPage'))
-const AdminDashboardPage = lazy(() => import('../pages/AdminDashboardPage'))
-const FPODashboardPage = lazy(() => import('../pages/FPODashboardPage'))
-const AuthorizationPage = lazy(() => import('../pages/AuthorizationPage'))
-const ClimateAdvisoryPage = lazy(() => import('../pages/ClimateAdvisoryPage'))
-const DairyManagementPage = lazy(() => import('../pages/DairyManagementPage'))
-const FarmCostingPage = lazy(() => import('../pages/FarmCostingPage'))
-const FarmerKycPage = lazy(() => import('../pages/FarmerKycPage'))
-const FertilizerInventoryPage = lazy(() => import('../pages/FertilizerInventoryPage'))
-const IrrigationManagementPage = lazy(() => import('../pages/IrrigationManagementPage'))
-const LabourManagementPage = lazy(() => import('../pages/LabourManagementPage'))
-const LandRegistryPage = lazy(() => import('../pages/LandRegistryPage'))
-const OrchardManagementPage = lazy(() => import('../pages/OrchardManagementPage'))
-const PondManagementPage = lazy(() => import('../pages/PondManagementPage'))
-const ShgManagementPage = lazy(() => import('../pages/ShgManagementPage'))
-const TractorManagementPage = lazy(() => import('../pages/TractorManagementPage'))
-const VillageRegistryPage = lazy(() => import('../pages/VillageRegistryPage'))
-const SowingManagementPage = lazy(() => import('../pages/SowingManagementPage'))
-const BankerDashboardPage = lazy(() => import('../pages/BankerDashboardPage'))
-const CADashboardPage = lazy(() => import('../pages/CADashboardPage'))
-const GovernmentDashboardPage = lazy(() => import('../pages/GovernmentDashboardPage'))
-const ResearchDashboardPage = lazy(() => import('../pages/ResearchDashboardPage'))
-const ClimateMonitoringPage = lazy(() => import('../pages/ClimateMonitoringPage'))
-const OperationsManagementPage = lazy(() => import('../pages/OperationsManagementPage'))
-const MachineryManagementPage = lazy(() => import('../pages/MachineryManagementPage'))
-const HorticultureManagementPage = lazy(() => import('../pages/HorticultureManagementPage'))
-const FisheriesManagementPage = lazy(() => import('../pages/FisheriesManagementPage'))
-const IdentityManagementPage = lazy(() => import('../pages/IdentityManagementPage'))
-const PlatformFoundationPage = lazy(() => import('../pages/PlatformFoundationPage'))
-const MFASetupPage = lazy(() => import('../pages/MFASetupPage'))
-const GDPRConsentPage = lazy(() => import('../pages/GDPRConsentPage'))
-const LibraryBrowserPage = lazy(() => import('../pages/LibraryBrowserPage'))
-const AIChatPage = lazy(() => import('../pages/AIChatPage'))
-const AICollaborationPage = lazy(() => import('../pages/AICollaborationPage'))
-const FPORegistrationPage = lazy(() => import('../pages/FPORegistrationPage'))
-const CattleRegistryPage = lazy(() => import('../pages/CattleRegistryPage'))
-const ImplementManagementPage = lazy(() => import('../pages/ImplementManagementPage'))
-const EquipmentInventoryPage = lazy(() => import('../pages/EquipmentInventoryPage'))
-const EquipmentRentalPage = lazy(() => import('../pages/EquipmentRentalPage'))
-const BreakdownMaintenancePage = lazy(() => import('../pages/BreakdownMaintenancePage'))
-const FuelManagementPage = lazy(() => import('../pages/FuelManagementPage'))
-const SparePartsManagementPage = lazy(() => import('../pages/SparePartsManagementPage'))
-const AssetLifecycleManagementPage = lazy(() => import('../pages/AssetLifecycleManagementPage'))
-const EnvironmentManagementPage = lazy(() => import('../pages/EnvironmentManagementPage'))
-const EnterpriseControlPage = lazy(() => import('../pages/EnterpriseControlPage'))
-const AIBackbonePage = lazy(() => import('../pages/AIBackbonePage'))
-const DietRecipesPage = lazy(() => import('../pages/DietRecipesPage'))
-const WearablesPage = lazy(() => import('../pages/WearablesPage'))
-const FitbitCallbackPage = lazy(() => import('../pages/FitbitCallbackPage'))
-const DefenseFitnessPrepPage = lazy(() => import('../pages/DefenseFitnessPrepPage'))
-const SellerProductFormPage = lazy(() => import('../pages/SellerProductFormPage'))
-const VarietyDirectoryPage = lazy(() => import('../pages/VarietyDirectoryPage'))
-const CropValueReviewPage = lazy(() => import('../pages/CropValueReviewPage'))
-const PoultryManagementPage = lazy(() => import('../pages/PoultryManagementPage'))
-const GoatFarmingPage = lazy(() => import('../pages/GoatFarmingPage'))
-const SheepFarmingPage = lazy(() => import('../pages/SheepFarmingPage'))
-const PigFarmingPage = lazy(() => import('../pages/PigFarmingPage'))
-const AnimalHealthPage = lazy(() => import('../pages/AnimalHealthPage'))
-const UnifiedLedgerPage = lazy(() => import('../pages/UnifiedLedgerPage'))
-const REOSDashboardPage = lazy(() => import('../pages/REOSDashboardPage'))
-const AIDashboard = lazy(() => import('../pages/AIDashboard'))
-const ERPDashboard = lazy(() => import('../pages/ERPDashboard'))
-const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'))
-const MarketingCenter = lazy(() => import('../pages/MarketingCenter'))
-const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'))
-
-// Report pages
-const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
-const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
-const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
-const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
-const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
-const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
-const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
-const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
-const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
-const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
-const CreditScorePage = lazy(() => import('../pages/CreditScorePage'))
-const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'))
+const LoanManagementPage = lazy(() => import('../pages/LoanManagementPage'));
+const InsuranceManagementPage = lazy(() => import('../pages/InsuranceManagementPage'));
+const PaymentProcessingPage = lazy(() => import('../pages/PaymentProcessingPage'));
+const FarmerEntranceHubPage = lazy(() => import('../pages/FarmerEntranceHubPage'));
+const FarmerSellDoorPage = lazy(() => import('../pages/FarmerSellDoorPage'));
+const FarmerHouseholdDoorPage = lazy(() => import('../pages/FarmerHouseholdDoorPage'));
+const FarmerFieldDoorPage = lazy(() => import('../pages/FarmerFieldDoorPage'));
+const FarmerSharedDoorPage = lazy(() => import('../pages/FarmerSharedDoorPage'));
+const ForwardPricingPage = lazy(() => import('../pages/ForwardPricingPage'));
+const ClimateWeatherPage = lazy(() => import('../pages/ClimateWeatherPage'));
+const LedgerPage = lazy(() => import('../pages/LedgerPage'));
+const CompliancePage = lazy(() => import('../pages/CompliancePage'));
+const RfqPage = lazy(() => import('../pages/RfqPage'));
+const CorridorEconomicsPage = lazy(() => import('../pages/CorridorEconomicsPage'));
+const LandUseCarbonPage = lazy(() => import('../pages/LandUseCarbonPage'));
+const AssetAccountingPage = lazy(() => import('../pages/AssetAccountingPage'));
+const CostControlPage = lazy(() => import('../pages/CostControlPage'));
+const ProjectSystemsPage = lazy(() => import('../pages/ProjectSystemsPage'));
+const YieldManagementPage = lazy(() => import('../pages/YieldManagementPage'));
+const CompetitivePositionPage = lazy(() => import('../pages/CompetitivePositionPage'));
+const ExperienceLayerPage = lazy(() => import('../pages/ExperienceLayerPage'));
+const FormManagementPage = lazy(() => import('../pages/FormManagementPage'));
+const AnalyticsPage = lazy(() => import('../pages/AnalyticsPage'));
+const ModuleHubPage = lazy(() => import('../pages/ModuleHubPage'));
+const CorporateBuyerPage = lazy(() => import('../pages/CorporateBuyerPage'));
+const LogisticsProviderPage = lazy(() => import('../pages/LogisticsProviderPage'));
+const AdminDashboardPage = lazy(() => import('../pages/AdminDashboardPage'));
+const FPODashboardPage = lazy(() => import('../pages/FPODashboardPage'));
+const AuthorizationPage = lazy(() => import('../pages/AuthorizationPage'));
+const ClimateAdvisoryPage = lazy(() => import('../pages/ClimateAdvisoryPage'));
+const DairyManagementPage = lazy(() => import('../pages/DairyManagementPage'));
+const FarmCostingPage = lazy(() => import('../pages/FarmCostingPage'));
+const FarmerKycPage = lazy(() => import('../pages/FarmerKycPage'));
+const FertilizerInventoryPage = lazy(() => import('../pages/FertilizerInventoryPage'));
+const IrrigationManagementPage = lazy(() => import('../pages/IrrigationManagementPage'));
+const LabourManagementPage = lazy(() => import('../pages/LabourManagementPage'));
+const LandRegistryPage = lazy(() => import('../pages/LandRegistryPage'));
+const OrchardManagementPage = lazy(() => import('../pages/OrchardManagementPage'));
+const PondManagementPage = lazy(() => import('../pages/PondManagementPage'));
+const ShgManagementPage = lazy(() => import('../pages/ShgManagementPage'));
+const TractorManagementPage = lazy(() => import('../pages/TractorManagementPage'));
+const VillageRegistryPage = lazy(() => import('../pages/VillageRegistryPage'));
+const SowingManagementPage = lazy(() => import('../pages/SowingManagementPage'));
+const BankerDashboardPage = lazy(() => import('../pages/BankerDashboardPage'));
+const CADashboardPage = lazy(() => import('../pages/CADashboardPage'));
+const GovernmentDashboardPage = lazy(() => import('../pages/GovernmentDashboardPage'));
+const ResearchDashboardPage = lazy(() => import('../pages/ResearchDashboardPage'));
+const ClimateMonitoringPage = lazy(() => import('../pages/ClimateMonitoringPage'));
+const OperationsManagementPage = lazy(() => import('../pages/OperationsManagementPage'));
+const MachineryManagementPage = lazy(() => import('../pages/MachineryManagementPage'));
+const HorticultureManagementPage = lazy(() => import('../pages/HorticultureManagementPage'));
+const FisheriesManagementPage = lazy(() => import('../pages/FisheriesManagementPage'));
+const IdentityManagementPage = lazy(() => import('../pages/IdentityManagementPage'));
+const PlatformFoundationPage = lazy(() => import('../pages/PlatformFoundationPage'));
+const MFASetupPage = lazy(() => import('../pages/MFASetupPage'));
+const GDPRConsentPage = lazy(() => import('../pages/GDPRConsentPage'));
+const LibraryBrowserPage = lazy(() => import('../pages/LibraryBrowserPage'));
+const AIChatPage = lazy(() => import('../pages/AIChatPage'));
+const AICollaborationPage = lazy(() => import('../pages/AICollaborationPage'));
+const FPORegistrationPage = lazy(() => import('../pages/FPORegistrationPage'));
+const CattleRegistryPage = lazy(() => import('../pages/CattleRegistryPage'));
+const ImplementManagementPage = lazy(() => import('../pages/ImplementManagementPage'));
+const EquipmentInventoryPage = lazy(() => import('../pages/EquipmentInventoryPage'));
+const EquipmentRentalPage = lazy(() => import('../pages/EquipmentRentalPage'));
+const BreakdownMaintenancePage = lazy(() => import('../pages/BreakdownMaintenancePage'));
+const FuelManagementPage = lazy(() => import('../pages/FuelManagementPage'));
+const SparePartsManagementPage = lazy(() => import('../pages/SparePartsManagementPage'));
+const AssetLifecycleManagementPage = lazy(() => import('../pages/AssetLifecycleManagementPage'));
+const EnvironmentManagementPage = lazy(() => import('../pages/EnvironmentManagementPage'));
+const EnterpriseControlPage = lazy(() => import('../pages/EnterpriseControlPage'));
+const AIBackbonePage = lazy(() => import('../pages/AIBackbonePage'));
+const DietRecipesPage = lazy(() => import('../pages/DietRecipesPage'));
+const WearablesPage = lazy(() => import('../pages/WearablesPage'));
+const FitbitCallbackPage = lazy(() => import('../pages/FitbitCallbackPage'));
+const DefenseFitnessPrepPage = lazy(() => import('../pages/DefenseFitnessPrepPage'));
+const SellerProductFormPage = lazy(() => import('../pages/SellerProductFormPage'));
+const VarietyDirectoryPage = lazy(() => import('../pages/VarietyDirectoryPage'));
+const CropValueReviewPage = lazy(() => import('../pages/CropValueReviewPage'));
+const PoultryManagementPage = lazy(() => import('../pages/PoultryManagementPage'));
+const GoatFarmingPage = lazy(() => import('../pages/GoatFarmingPage'));
+const SheepFarmingPage = lazy(() => import('../pages/SheepFarmingPage'));
+const PigFarmingPage = lazy(() => import('../pages/PigFarmingPage'));
+const AnimalHealthPage = lazy(() => import('../pages/AnimalHealthPage'));
+const UnifiedLedgerPage = lazy(() => import('../pages/UnifiedLedgerPage'));
+const REOSDashboardPage = lazy(() => import('../pages/REOSDashboardPage'));
+const AIDashboard = lazy(() => import('../pages/AIDashboard'));
+const ERPDashboard = lazy(() => import('../pages/ERPDashboard'));
+const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'));
+const MarketingCenter = lazy(() => import('../pages/MarketingCenter'));
+const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'));
+const AIProductStudioPage = lazy(() => import('../pages/AIProductStudioPage'));
 
 // Additional management pages
-const FarmerProfilePage = lazy(() => import('../pages/FarmerProfilePage'))
-const FarmerFamilyPage = lazy(() => import('../pages/FarmerFamilyPage'))
-const FarmerVerificationPage = lazy(() => import('../pages/FarmerVerificationPage'))
-const FarmerSkillPage = lazy(() => import('../pages/FarmerSkillPage'))
-const FarmerHealthWelfarePage = lazy(() => import('../pages/FarmerHealthWelfarePage'))
-const CropCalendarPage = lazy(() => import('../pages/CropCalendarPage'))
-const CropRegistrationPage = lazy(() => import('../pages/CropRegistrationPage'))
-const CropVarietyPage = lazy(() => import('../pages/CropVarietyPage'))
-const SeedPlanningPage = lazy(() => import('../pages/SeedPlanningPage'))
-const NurseryManagementPage = lazy(() => import('../pages/NurseryManagementPage'))
-const CropMonitoringPage = lazy(() => import('../pages/CropMonitoringPage'))
-const LandManagementPage = lazy(() => import('../pages/LandManagementPage'))
-const InputSupplyManagementPage = lazy(() => import('../pages/InputSupplyManagementPage'))
-const LivestockManagementPage = lazy(() => import('../pages/LivestockManagementPage'))
-const CommunityManagementPage = lazy(() => import('../pages/CommunityManagementPage'))
-const SoilManagementPage = lazy(() => import('../pages/SoilManagementPage'))
-const WaterManagementPage = lazy(() => import('../pages/WaterManagementPage'))
-const SubsidyManagementPage = lazy(() => import('../pages/SubsidyManagementPage'))
-const BulkOrderPage = lazy(() => import('../pages/BulkOrderPage'))
-const EcommerceMarketplacePage = lazy(() => import('../pages/EcommerceMarketplacePage'))
-const EcommerceIntegrationPage = lazy(() => import('../pages/EcommerceIntegrationPage'))
-const CompleteERPIntegrationPage = lazy(() => import('../pages/CompleteERPIntegrationPage'))
-const EngineeringProjectPage = lazy(() => import('../pages/EngineeringProjectPage'))
-const RealtimeMonitoringPage = lazy(() => import('../pages/RealtimeMonitoringPage'))
-const ColdStoragePage = lazy(() => import('../pages/ColdStoragePage'))
-const CooperativeSharePage = lazy(() => import('../pages/CooperativeSharePage'))
-const AgriculturalIntelligencePage = lazy(() => import('../pages/AgriculturalIntelligencePage'))
-const KnowledgeReferencePage = lazy(() => import('../pages/KnowledgeReferencePage'))
-const DecisionSupportPage = lazy(() => import('../pages/DecisionSupportPage'))
-const CompleteAIIntegrationPage = lazy(() => import('../pages/CompleteAIIntegrationPage'))
-const ComprehensiveERPPage = lazy(() => import('../pages/ComprehensiveERPPage'))
-const WaterRecordsPage = lazy(() => import('../pages/WaterRecordsPage'))
-const SAPModuleArchitecturePage = lazy(() => import('../pages/SAPModuleArchitecturePage'))
-const ResearchAndDevelopmentPage = lazy(() => import('../pages/ResearchAndDevelopmentPage'))
-const InformationSharingPage = lazy(() => import('../pages/InformationSharingPage'))
-const AIAgentPage = lazy(() => import('../pages/AIAgentPage'))
-const AIBrainPage = lazy(() => import('../pages/AIBrainPage'))
-const AISelfHealingPage = lazy(() => import('../pages/AISelfHealingPage'))
-const AIOperationIntelligencePage = lazy(() => import('../pages/AIOperationIntelligencePage'))
-const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'))
-const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'))
-const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'))
-const PlatformManagementPage = lazy(() => import('../pages/PlatformManagementPage'))
+const FarmerProfilePage = lazy(() => import('../pages/FarmerProfilePage'));
+const FarmerFamilyPage = lazy(() => import('../pages/FarmerFamilyPage'));
+const FarmerVerificationPage = lazy(() => import('../pages/FarmerVerificationPage'));
+const FarmerSkillPage = lazy(() => import('../pages/FarmerSkillPage'));
+const FarmerHealthWelfarePage = lazy(() => import('../pages/FarmerHealthWelfarePage'));
+const CropCalendarPage = lazy(() => import('../pages/CropCalendarPage'));
+const CropRegistrationPage = lazy(() => import('../pages/CropRegistrationPage'));
+const CropVarietyPage = lazy(() => import('../pages/CropVarietyPage'));
+const SeedPlanningPage = lazy(() => import('../pages/SeedPlanningPage'));
+const NurseryManagementPage = lazy(() => import('../pages/NurseryManagementPage'));
+const CropMonitoringPage = lazy(() => import('../pages/CropMonitoringPage'));
+const LandManagementPage = lazy(() => import('../pages/LandManagementPage'));
+const InputSupplyManagementPage = lazy(() => import('../pages/InputSupplyManagementPage'));
+const LivestockManagementPage = lazy(() => import('../pages/LivestockManagementPage'));
+const CommunityManagementPage = lazy(() => import('../pages/CommunityManagementPage'));
+const SoilManagementPage = lazy(() => import('../pages/SoilManagementPage'));
+const WaterManagementPage = lazy(() => import('../pages/WaterManagementPage'));
+const SubsidyManagementPage = lazy(() => import('../pages/SubsidyManagementPage'));
+const BulkOrderPage = lazy(() => import('../pages/BulkOrderPage'));
+const EcommerceMarketplacePage = lazy(() => import('../pages/EcommerceMarketplacePage'));
+const EcommerceIntegrationPage = lazy(() => import('../pages/EcommerceIntegrationPage'));
+const CompleteERPIntegrationPage = lazy(() => import('../pages/CompleteERPIntegrationPage'));
+const EngineeringProjectPage = lazy(() => import('../pages/EngineeringProjectPage'));
+const RealtimeMonitoringPage = lazy(() => import('../pages/RealtimeMonitoringPage'));
+const ColdStoragePage = lazy(() => import('../pages/ColdStoragePage'));
+const CooperativeSharePage = lazy(() => import('../pages/CooperativeSharePage'));
+const AgriculturalIntelligencePage = lazy(() => import('../pages/AgriculturalIntelligencePage'));
+const KnowledgeReferencePage = lazy(() => import('../pages/KnowledgeReferencePage'));
+const DecisionSupportPage = lazy(() => import('../pages/DecisionSupportPage'));
+const CompleteAIIntegrationPage = lazy(() => import('../pages/CompleteAIIntegrationPage'));
+const ComprehensiveERPPage = lazy(() => import('../pages/ComprehensiveERPPage'));
+const WaterRecordsPage = lazy(() => import('../pages/WaterRecordsPage'));
+const SAPModuleArchitecturePage = lazy(() => import('../pages/SAPModuleArchitecturePage'));
+const ResearchAndDevelopmentPage = lazy(() => import('../pages/ResearchAndDevelopmentPage'));
+const InformationSharingPage = lazy(() => import('../pages/InformationSharingPage'));
+const AIAgentPage = lazy(() => import('../pages/AIAgentPage'));
+const AIBrainPage = lazy(() => import('../pages/AIBrainPage'));
+const AISelfHealingPage = lazy(() => import('../pages/AISelfHealingPage'));
+const AIOperationIntelligencePage = lazy(() => import('../pages/AIOperationIntelligencePage'));
+const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'));
+const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'));
+const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'));
+const PlatformManagementPage = lazy(() => import('../pages/PlatformManagementPage'));
 
 // Strategic Services Pages
-const PreSeasonPurchasePage = lazy(() => import('../pages/PreSeasonPurchasePage'))
-const ContractFarmingPage = lazy(() => import('../pages/ContractFarmingPage'))
-const HouseholdProcurementPage = lazy(() => import('../pages/HouseholdProcurementPage'))
-const GovernmentSubsidyPage = lazy(() => import('../pages/GovernmentSubsidyPage'))
-const RolePermissionPage = lazy(() => import('../pages/RolePermissionPage'))
-const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'))
-const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'))
-const LogisticsMatchingPage = lazy(() => import('../pages/LogisticsMatchingPage'))
-const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'))
-const CopilotHubPage = lazy(() => import('../pages/CopilotHubPage'))
+const PreSeasonPurchasePage = lazy(() => import('../pages/PreSeasonPurchasePage'));
+const ContractFarmingPage = lazy(() => import('../pages/ContractFarmingPage'));
+const HouseholdProcurementPage = lazy(() => import('../pages/HouseholdProcurementPage'));
+const GovernmentSubsidyPage = lazy(() => import('../pages/GovernmentSubsidyPage'));
+const RolePermissionPage = lazy(() => import('../pages/RolePermissionPage'));
+const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'));
+const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'));
+const LogisticsMatchingPage = lazy(() => import('../pages/LogisticsMatchingPage'));
+const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'));
+const CopilotHubPage = lazy(() => import('../pages/CopilotHubPage'));
+// Premium & AI Features (NEW)
+const PremiumMarketplacePage = lazy(() => import('../pages/PremiumMarketplacePage'));
+const AIImageGenerator = lazy(() => import('../components/AIImageGenerator'));
+// Wellness Features (NEW)
+const NutritionCalculatorPage = lazy(() => import('../pages/NutritionCalculatorPage'));
+const NaturalTherapistPage = lazy(() => import('../pages/NaturalTherapistPage'));
+
+// Payment and Wallet Pages
+const PaymentGatewayPage = lazy(() => import('../pages/PaymentGatewayPage'));
+const DigitalWalletPage = lazy(() => import('../pages/WalletPage'));
+const TransactionHistoryPage = lazy(() => import('../pages/TransactionHistoryPage'));
 
 /**
  * Public routes - no authentication required
@@ -234,7 +409,7 @@ export const publicRoutes = [
     title: 'Home - AFRERA Agriculture Platform',
     description: 'Welcome to AFRERA - Your comprehensive agriculture and rural economy platform',
     keywords: 'agriculture, farming, rural economy, marketplace',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/about',
@@ -242,7 +417,7 @@ export const publicRoutes = [
     title: 'About AFRERA - Who The Platform Is For',
     description: 'AFRERA connects farmers, buyers, government, financial institutions and service providers on one platform',
     keywords: 'about, stakeholders, mission, agriculture platform',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/marketplace',
@@ -251,7 +426,64 @@ export const publicRoutes = [
     description: 'Browse and purchase fresh produce, seeds, and agricultural products directly from farmers',
     keywords: 'marketplace, buy, sell, agricultural products, farming',
     transition: 'slide',
-    preload: true
+    preload: true,
+  },
+  {
+    path: '/premium-marketplace',
+    component: PremiumMarketplacePage,
+    title: 'Premium Marketplace - Certified Agricultural Products',
+    description: 'Premium marketplace with certified, high-quality agricultural products for bulk buyers',
+    keywords: 'premium, marketplace, certified, bulk, agriculture',
+    transition: 'slide',
+    preload: true,
+  },
+  {
+    path: '/ai-image-generator',
+    component: AIImageGenerator,
+    title: 'AI Image Generator - Create Product Photos',
+    description: 'Generate professional product images using AI for your agricultural products',
+    keywords: 'ai, image, generator, product, photography',
+    transition: 'fade',
+  },
+  {
+    path: '/nutrition-calculator',
+    component: NutritionCalculatorPage,
+    title: 'Nutrition Calculator - Personalized Nutrition Plan',
+    description: 'Calculate your daily nutrition requirements and get personalized recommendations',
+    keywords: 'nutrition, calculator, diet, health, calories',
+    transition: 'slide',
+  },
+  {
+    path: '/natural-therapist',
+    component: NaturalTherapistPage,
+    title: 'Natural Therapists - Wellness & Ayurveda Consultations',
+    description: 'Connect with certified natural healers for personalized wellness consultations',
+    keywords: 'therapist, wellness, ayurveda, natural, health',
+    transition: 'slide',
+  },
+  {
+    path: '/payment-gateway',
+    component: PaymentGatewayPage,
+    title: 'Payment Gateway - Secure Transactions',
+    description: 'Process secure payments through multiple payment gateways',
+    keywords: 'payment, gateway, transactions, secure',
+    transition: 'slide',
+  },
+  {
+    path: '/wallet',
+    component: DigitalWalletPage,
+    title: 'Digital Wallet - Manage Your Funds',
+    description: 'Manage your digital wallet, check balance, and view transactions',
+    keywords: 'wallet, digital, balance, funds',
+    transition: 'slide',
+  },
+  {
+    path: '/transactions',
+    component: TransactionHistoryPage,
+    title: 'Transaction History - Track Your Payments',
+    description: 'View your complete transaction history and payment status',
+    keywords: 'transactions, history, payments, tracking',
+    transition: 'slide',
   },
   {
     path: '/products/:id',
@@ -260,7 +492,7 @@ export const publicRoutes = [
     description: 'View detailed information about agricultural products',
     keywords: 'product, details, agriculture',
     transition: 'fade',
-    preload: true
+    preload: true,
   },
   {
     path: '/login',
@@ -269,7 +501,7 @@ export const publicRoutes = [
     description: 'Sign in to your AFRERA account',
     keywords: 'login, sign in, authentication',
     transition: 'fade',
-    noIndex: true
+    noIndex: true,
   },
   {
     path: '/register',
@@ -278,7 +510,7 @@ export const publicRoutes = [
     description: 'Create your AFRERA account',
     keywords: 'register, sign up, create account',
     transition: 'fade',
-    noIndex: true
+    noIndex: true,
   },
   {
     path: '/farmer-entrance',
@@ -286,7 +518,7 @@ export const publicRoutes = [
     title: 'Farmer Portal - AFRERA',
     description: 'Access farmer services and resources',
     keywords: 'farmer, portal, services',
-    transition: 'slide'
+    transition: 'slide',
   },
   {
     path: '/farmer-entrance/sell',
@@ -294,7 +526,7 @@ export const publicRoutes = [
     title: 'Sell Your Produce - AFRERA',
     description: 'Sell your agricultural products on our marketplace',
     keywords: 'sell, produce, marketplace',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-entrance/household',
@@ -302,7 +534,7 @@ export const publicRoutes = [
     title: 'Household Services - AFRERA',
     description: 'Household services for farmers',
     keywords: 'household, services, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-entrance/field',
@@ -310,7 +542,7 @@ export const publicRoutes = [
     title: 'Field Management - AFRERA',
     description: 'Manage your fields and crops',
     keywords: 'field, management, crops',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-entrance/shared',
@@ -318,7 +550,7 @@ export const publicRoutes = [
     title: 'Shared Resources - AFRERA',
     description: 'Access shared farming resources',
     keywords: 'shared, resources, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/pricing/forward',
@@ -326,7 +558,7 @@ export const publicRoutes = [
     title: 'Forward Pricing - AFRERA',
     description: 'View forward pricing for agricultural commodities',
     keywords: 'forward, pricing, commodities',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/climate',
@@ -334,7 +566,7 @@ export const publicRoutes = [
     title: 'Climate & Weather - AFRERA',
     description: 'Weather forecasts and climate information for farmers',
     keywords: 'climate, weather, forecast, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/corridor-economics',
@@ -342,7 +574,7 @@ export const publicRoutes = [
     title: 'Corridor Economics - AFRERA',
     description: 'Economic analysis of agricultural corridors',
     keywords: 'corridor, economics, agriculture',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/land-use',
@@ -350,9 +582,9 @@ export const publicRoutes = [
     title: 'Land Use & Carbon - AFRERA',
     description: 'Land use and carbon credit information',
     keywords: 'land use, carbon, credits, agriculture',
-    transition: 'fade'
-  }
-]
+    transition: 'fade',
+  },
+];
 
 /**
  * Protected routes - authentication required
@@ -364,7 +596,15 @@ export const protectedRoutes = [
     title: 'AI Copilots - AFRERA',
     description: 'Domain-specific AI assistants for finance, logistics, warehouse, insurance, nutrition, and marketplace',
     keywords: 'ai, copilot, assistant, finance, logistics, warehouse, insurance, nutrition, marketplace',
-    transition: 'fade'
+    transition: 'fade',
+  },
+  {
+    path: '/ai/copilot',
+    component: CopilotHubPage,
+    title: 'AI Copilot - AFRERA',
+    description: 'AI-powered agricultural assistance with intelligent advisory and decision support',
+    keywords: 'ai, copilot, advisory, decision support, agricultural assistance',
+    transition: 'fade',
   },
   {
     path: '/cart',
@@ -373,7 +613,7 @@ export const protectedRoutes = [
     description: 'View and manage your shopping cart',
     keywords: 'cart, shopping, checkout',
     transition: 'slide',
-    preload: true
+    preload: true,
   },
   {
     path: '/checkout',
@@ -382,7 +622,7 @@ export const protectedRoutes = [
     description: 'Complete your purchase',
     keywords: 'checkout, payment, order',
     transition: 'fade',
-    noIndex: true
+    noIndex: true,
   },
   {
     path: '/orders/:id',
@@ -391,7 +631,7 @@ export const protectedRoutes = [
     description: 'View your order confirmation and status',
     keywords: 'order, confirmation, status',
     transition: 'fade',
-    noIndex: true
+    noIndex: true,
   },
   {
     path: '/dashboard',
@@ -399,7 +639,7 @@ export const protectedRoutes = [
     title: 'Dashboard - AFRERA',
     description: 'Your personalized dashboard',
     keywords: 'dashboard, overview, account',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/wallet',
@@ -407,7 +647,239 @@ export const protectedRoutes = [
     title: 'Wallet - AFRERA',
     description: 'Manage your digital wallet and payments',
     keywords: 'wallet, payments, digital',
-    transition: 'fade'
+    transition: 'fade',
+  },
+  {
+    path: '/escrow',
+    component: EscrowPage,
+    title: 'Escrow Management - AFRERA',
+    description: 'Manage escrow transactions between buyers and farmers',
+    keywords: 'escrow, secure payments, fund holding',
+    transition: 'fade',
+  },
+  {
+    path: '/farmer-revenue-ledger',
+    component: FarmerRevenueLedgerPage,
+    title: 'Farmer Revenue Ledger - AFRERA',
+    description: 'View farmer revenue data and Farmer Value Engine calculations',
+    keywords: 'revenue, ledger, farmer value, FVI',
+    transition: 'fade',
+  },
+  {
+    path: '/disruption',
+    component: DisruptionPage,
+    title: 'Civil Disruption Management - AFRERA',
+    description: 'Report and manage civil disruptions affecting agricultural logistics',
+    keywords: 'disruption, blockade, bandh, logistics, crisis',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/dashboard',
+    component: ReportsDashboardPage,
+    title: 'Reports Dashboard - AFRERA',
+    description: 'Central hub for all reports and analytics',
+    keywords: 'reports, dashboard, analytics',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/financial',
+    component: FinancialReportPage,
+    title: 'Financial Report - AFRERA',
+    description: 'Financial performance and revenue reports',
+    keywords: 'financial, report, revenue',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/sales',
+    component: SalesReportPage,
+    title: 'Sales Report - AFRERA',
+    description: 'Sales performance and transaction reports',
+    keywords: 'sales, report, transactions',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/inventory',
+    component: InventoryReportPage,
+    title: 'Inventory Report - AFRERA',
+    description: 'Inventory levels and stock reports',
+    keywords: 'inventory, report, stock',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/operations',
+    component: OperationsReportPage,
+    title: 'Operations Report - AFRERA',
+    description: 'Operational efficiency and process reports',
+    keywords: 'operations, report, efficiency',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/audit',
+    component: AuditReportPage,
+    title: 'Audit Report - AFRERA',
+    description: 'Audit trail and compliance reports',
+    keywords: 'audit, report, compliance',
+    transition: 'fade',
+  },
+  {
+    path: '/reports/farmer',
+    component: FarmerReportPage,
+    title: 'Farmer Report - AFRERA',
+    description: 'Farmer performance and engagement reports',
+    keywords: 'farmer, report, engagement',
+    transition: 'fade',
+  },
+  {
+    path: '/financial/credit-score',
+    component: CreditScorePage,
+    title: 'Credit Score - AFRERA',
+    description: 'Credit score assessment and monitoring',
+    keywords: 'credit, score, assessment',
+    transition: 'fade',
+  },
+  {
+    path: '/financial/emi-calculator',
+    component: EMICalculatorPage,
+    title: 'EMI Calculator - AFRERA',
+    description: 'EMI calculator for loans and financing',
+    keywords: 'emi, calculator, loan',
+    transition: 'fade',
+  },
+  {
+    path: '/marketplace/bulk-purchase',
+    component: BulkPurchasePage,
+    title: 'Bulk Purchase - AFRERA',
+    description: 'Bulk purchase orders and wholesale buying',
+    keywords: 'bulk, purchase, wholesale',
+    transition: 'fade',
+  },
+  {
+    path: '/marketplace/group-buying',
+    component: GroupBuyingPage,
+    title: 'Group Buying - AFRERA',
+    description: 'Group buying initiatives and collective purchasing',
+    keywords: 'group, buying, collective',
+    transition: 'fade',
+  },
+  {
+    path: '/marketplace/contracts',
+    component: ContractListingPage,
+    title: 'Contracts - AFRERA',
+    description: 'Contract listings and management',
+    keywords: 'contracts, listings, management',
+    transition: 'fade',
+  },
+  {
+    path: '/analytics/advanced-search',
+    component: AdvancedSearchPage,
+    title: 'Advanced Search - AFRERA',
+    description: 'Comprehensive search across products, farmers, and market data',
+    keywords: 'search, advanced, analytics',
+    transition: 'fade',
+  },
+  {
+    path: '/analytics/weather',
+    component: WeatherAnalyticsPage,
+    title: 'Weather Analytics - AFRERA',
+    description: 'Weather monitoring and agricultural planning',
+    keywords: 'weather, analytics, monitoring',
+    transition: 'fade',
+  },
+  {
+    path: '/analytics/market-intelligence',
+    component: MarketIntelligencePage,
+    title: 'Market Intelligence - AFRERA',
+    description: 'Market trends, price analysis, and demand forecasting',
+    keywords: 'market, intelligence, trends',
+    transition: 'fade',
+  },
+  {
+    path: '/analytics/supply-chain',
+    component: SupplyChainAnalyticsPage,
+    title: 'Supply Chain Analytics - AFRERA',
+    description: 'End-to-end supply chain visibility and analytics',
+    keywords: 'supply, chain, analytics',
+    transition: 'fade',
+  },
+  {
+    path: '/risk/management',
+    component: RiskManagementPage,
+    title: 'Risk Management - AFRERA',
+    description: 'Risk assessment, mitigation, and monitoring',
+    keywords: 'risk, management, assessment',
+    transition: 'fade',
+  },
+  {
+    path: '/sustainability/dashboard',
+    component: SustainabilityDashboardPage,
+    title: 'Sustainability Dashboard - AFRERA',
+    description: 'Environmental impact and sustainability metrics',
+    keywords: 'sustainability, environment, metrics',
+    transition: 'fade',
+  },
+  {
+    path: '/compliance/dashboard',
+    component: ComplianceDashboardPage,
+    title: 'Compliance Dashboard - AFRERA',
+    description: 'Regulatory compliance and certification tracking',
+    keywords: 'compliance, regulatory, certification',
+    transition: 'fade',
+  },
+  {
+    path: '/quality/control',
+    component: QualityControlPage,
+    title: 'Quality Control - AFRERA',
+    description: 'Quality assurance and product quality management',
+    keywords: 'quality, control, assurance',
+    transition: 'fade',
+  },
+  {
+    path: '/export/documentation',
+    component: ExportDocumentationPage,
+    title: 'Export Documentation - AFRERA',
+    description: 'Export documentation and international trade compliance',
+    keywords: 'export, documentation, trade',
+    transition: 'fade',
+  },
+  {
+    path: '/traceability/product',
+    component: TraceabilityPage,
+    title: 'Product Traceability - AFRERA',
+    description: 'Product traceability and origin verification',
+    keywords: 'traceability, origin, verification',
+    transition: 'fade',
+  },
+  {
+    path: '/knowledge/base',
+    component: KnowledgeBasePage,
+    title: 'Knowledge Base - AFRERA',
+    description: 'Agricultural knowledge repository and best practices',
+    keywords: 'knowledge, base, practices',
+    transition: 'fade',
+  },
+  {
+    path: '/training/academy',
+    component: TrainingAcademyPage,
+    title: 'Training Academy - AFRERA',
+    description: 'Farmer training and educational resources',
+    keywords: 'training, academy, education',
+    transition: 'fade',
+  },
+  {
+    path: '/community/forum',
+    component: CommunityForumPage,
+    title: 'Community Forum - AFRERA',
+    description: 'Farmer community and discussion platform',
+    keywords: 'community, forum, discussion',
+    transition: 'fade',
+  },
+  {
+    path: '/support/center',
+    component: SupportCenterPage,
+    title: 'Support Center - AFRERA',
+    description: 'Help desk and customer support',
+    keywords: 'support, help, assistance',
+    transition: 'fade',
   },
   {
     path: '/bank-passport',
@@ -415,7 +887,7 @@ export const protectedRoutes = [
     title: 'Bank Passport - AFRERA',
     description: 'Your digital banking passport',
     keywords: 'bank, passport, digital identity',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/forms',
@@ -423,7 +895,7 @@ export const protectedRoutes = [
     title: 'Form Management - AFRERA',
     description: 'Manage your forms and applications',
     keywords: 'forms, management, applications',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/analytics',
@@ -431,7 +903,7 @@ export const protectedRoutes = [
     title: 'Analytics - AFRERA',
     description: 'View your analytics and insights',
     keywords: 'analytics, insights, data',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/reports',
@@ -439,95 +911,15 @@ export const protectedRoutes = [
     title: 'Reports Dashboard - AFRERA',
     description: 'Generate and manage comprehensive reports',
     keywords: 'reports, dashboard, analytics',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
-    path: '/reports/sales',
-    component: SalesReportPage,
-    title: 'Sales Report - AFRERA',
-    description: 'Sales performance analysis and metrics',
-    keywords: 'sales, report, performance',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/inventory',
-    component: InventoryReportPage,
-    title: 'Inventory Report - AFRERA',
-    description: 'Inventory status and analysis',
-    keywords: 'inventory, report, stock',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/farmer',
-    component: FarmerReportPage,
-    title: 'Farmer Report - AFRERA',
-    description: 'Farmer performance and demographics',
-    keywords: 'farmer, report, performance',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/financial',
-    component: FinancialReportPage,
-    title: 'Financial Report - AFRERA',
-    description: 'Financial performance analysis',
-    keywords: 'financial, report, profit',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/operations',
-    component: OperationsReportPage,
-    title: 'Operations Report - AFRERA',
-    description: 'Logistics and warehouse performance',
-    keywords: 'operations, report, logistics',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/audit',
-    component: AuditReportPage,
-    title: 'Audit Report - AFRERA',
-    description: 'System compliance and security audit',
-    keywords: 'audit, report, compliance',
-    transition: 'fade'
-  },
-  {
-    path: '/marketplace/bulk-purchase',
-    component: BulkPurchasePage,
-    title: 'Bulk Purchase - AFRERA',
-    description: 'Order agricultural products in bulk',
-    keywords: 'bulk, purchase, wholesale',
-    transition: 'fade'
-  },
-  {
-    path: 'marketplace/contract-listing',
+    path: '/marketplace/contract-listing',
     component: ContractListingPage,
     title: 'Contract Listings - AFRERA',
     description: 'Browse farming contracts',
     keywords: 'contract, farming, agreement',
-    transition: 'fade'
-  },
-  {
-    path: '/marketplace/group-buying',
-    component: GroupBuyingPage,
-    title: 'Group Buying - AFRERA',
-    description: 'Join group purchases for discounts',
-    keywords: 'group, buying, discount',
-    transition: 'fade'
-  },
-  {
-    path: '/financial/credit-score',
-    component: CreditScorePage,
-    title: 'Credit Score - AFRERA',
-    description: 'Your creditworthiness assessment',
-    keywords: 'credit, score, assessment',
-    transition: 'fade'
-  },
-  {
-    path: '/financial/emi-calculator',
-    component: EMICalculatorPage,
-    title: 'EMI Calculator - AFRERA',
-    description: 'Calculate loan repayments',
-    keywords: 'emi, calculator, loan',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/modules',
@@ -535,9 +927,10 @@ export const protectedRoutes = [
     title: 'Module Hub - AFRERA',
     description: 'Access all available modules',
     keywords: 'modules, hub, features',
-    transition: 'fade'
-  }
-]
+    transition: 'fade',
+    role: 'admin',
+  },
+];
 
 /**
  * Farmer-only routes
@@ -549,7 +942,7 @@ export const farmerRoutes = [
     title: 'Farmer Portal - AFRERA',
     description: 'Your dedicated farmer portal',
     keywords: 'farmer, portal, dashboard',
-    transition: 'slide'
+    transition: 'slide',
   },
   {
     path: '/farmerhome',
@@ -557,7 +950,7 @@ export const farmerRoutes = [
     title: 'Farmer Home - AFRERA',
     description: 'Your farmer home dashboard',
     keywords: 'farmer, home, dashboard',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-sell',
@@ -565,7 +958,7 @@ export const farmerRoutes = [
     title: 'Sell Produce - AFRERA',
     description: 'Sell your agricultural produce',
     keywords: 'sell, produce, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-field',
@@ -573,7 +966,7 @@ export const farmerRoutes = [
     title: 'Field Management - AFRERA',
     description: 'Manage your agricultural fields',
     keywords: 'field, management, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/pre-season-purchase',
@@ -581,7 +974,7 @@ export const farmerRoutes = [
     title: 'Pre-Season Purchase - AFRERA',
     description: 'Manage pre-season purchase agreements for guaranteed income',
     keywords: 'pre-season, purchase, agreements, advance',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/contract-farming',
@@ -589,7 +982,7 @@ export const farmerRoutes = [
     title: 'Contract Farming - AFRERA',
     description: 'Manage long-term farming contracts with technical assistance',
     keywords: 'contract, farming, technical, assistance',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/household-procurement',
@@ -597,7 +990,7 @@ export const farmerRoutes = [
     title: 'Household Procurement - AFRERA',
     description: 'Plan household food procurement with budget optimization',
     keywords: 'household, procurement, budget, delivery',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/government-subsidy',
@@ -605,7 +998,7 @@ export const farmerRoutes = [
     title: 'Government Subsidy - AFRERA',
     description: 'Apply for and track government agricultural subsidy programs',
     keywords: 'subsidy, government, programs, applications',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/harvest-plan',
@@ -613,7 +1006,7 @@ export const farmerRoutes = [
     title: 'Harvest Planning - AFRERA',
     description: 'Plan your harvest schedule',
     keywords: 'harvest, planning, schedule',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/harvest-score',
@@ -621,7 +1014,7 @@ export const farmerRoutes = [
     title: 'Harvest Score - AFRERA',
     description: 'View your harvest performance score',
     keywords: 'harvest, score, performance',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/what-grow',
@@ -629,7 +1022,7 @@ export const farmerRoutes = [
     title: 'What to Grow - AFRERA',
     description: 'Get recommendations on what to grow',
     keywords: 'grow, recommendations, crops',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/seed-vault',
@@ -637,7 +1030,7 @@ export const farmerRoutes = [
     title: 'Seed Vault - AFRERA',
     description: 'Access seed varieties and information',
     keywords: 'seeds, vault, varieties',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farm-advisor',
@@ -645,7 +1038,7 @@ export const farmerRoutes = [
     title: 'Farm Advisor - AFRERA',
     description: 'Get expert farming advice',
     keywords: 'advisor, farming, expert',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/price-check',
@@ -653,7 +1046,7 @@ export const farmerRoutes = [
     title: 'Price Check - AFRERA',
     description: 'Check current market prices',
     keywords: 'price, check, market',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/price-build',
@@ -661,7 +1054,7 @@ export const farmerRoutes = [
     title: 'Price Builder - AFRERA',
     description: 'Build your pricing strategy',
     keywords: 'price, builder, strategy',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/dynamic-pricing',
@@ -669,7 +1062,7 @@ export const farmerRoutes = [
     title: 'Dynamic Pricing - AFRERA',
     description: 'Dynamic pricing tools',
     keywords: 'dynamic, pricing, tools',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/sell-timing',
@@ -677,7 +1070,7 @@ export const farmerRoutes = [
     title: 'Sell Timing - AFRERA',
     description: 'Optimize your sell timing',
     keywords: 'sell, timing, optimize',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/compare',
@@ -685,7 +1078,7 @@ export const farmerRoutes = [
     title: 'Compare - AFRERA',
     description: 'Compare products and prices',
     keywords: 'compare, products, prices',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/discover',
@@ -693,7 +1086,7 @@ export const farmerRoutes = [
     title: 'Discover - AFRERA',
     description: 'Discover new opportunities',
     keywords: 'discover, opportunities, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/pre-order',
@@ -701,7 +1094,7 @@ export const farmerRoutes = [
     title: 'Pre-Order - AFRERA',
     description: 'Pre-order agricultural products',
     keywords: 'pre-order, products, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/logistics',
@@ -709,7 +1102,7 @@ export const farmerRoutes = [
     title: 'Logistics - AFRERA',
     description: 'Manage your logistics and shipping',
     keywords: 'logistics, shipping, transport',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/insurance',
@@ -717,7 +1110,7 @@ export const farmerRoutes = [
     title: 'Insurance - AFRERA',
     description: 'Agricultural insurance options',
     keywords: 'insurance, agricultural, protection',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ledger',
@@ -725,7 +1118,7 @@ export const farmerRoutes = [
     title: 'Ledger - AFRERA',
     description: 'Your financial ledger',
     keywords: 'ledger, financial, accounting',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/compliance',
@@ -733,7 +1126,7 @@ export const farmerRoutes = [
     title: 'Compliance - AFRERA',
     description: 'Compliance and regulatory information',
     keywords: 'compliance, regulatory, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/procurement',
@@ -741,7 +1134,7 @@ export const farmerRoutes = [
     title: 'Procurement - AFRERA',
     description: 'Procurement and RFQ management',
     keywords: 'procurement, RFQ, purchasing',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/asset-accounting',
@@ -749,7 +1142,7 @@ export const farmerRoutes = [
     title: 'Asset Accounting - AFRERA',
     description: 'Manage your agricultural assets',
     keywords: 'asset, accounting, management',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/cost-control',
@@ -757,7 +1150,7 @@ export const farmerRoutes = [
     title: 'Cost Control - AFRERA',
     description: 'Control your farming costs',
     keywords: 'cost, control, budget',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/project-systems',
@@ -765,7 +1158,7 @@ export const farmerRoutes = [
     title: 'Project Systems - AFRERA',
     description: 'Manage your farming projects',
     keywords: 'project, systems, management',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/yield-management',
@@ -773,7 +1166,7 @@ export const farmerRoutes = [
     title: 'Yield Management - AFRERA',
     description: 'Optimize your crop yields',
     keywords: 'yield, management, optimization',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/competitive-position',
@@ -781,7 +1174,7 @@ export const farmerRoutes = [
     title: 'Competitive Position - AFRERA',
     description: 'Analyze your competitive position',
     keywords: 'competitive, position, analysis',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/experience',
@@ -789,9 +1182,9 @@ export const farmerRoutes = [
     title: 'Experience Layer - AFRERA',
     description: 'Your farming experience layer',
     keywords: 'experience, layer, farming',
-    transition: 'fade'
-  }
-]
+    transition: 'fade',
+  },
+];
 
 /**
  * Admin-only routes
@@ -804,7 +1197,7 @@ export const adminRoutes = [
     description: 'Manage platform users',
     keywords: 'users, management, admin',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/admin/settings',
@@ -813,7 +1206,7 @@ export const adminRoutes = [
     description: 'Platform administration settings',
     keywords: 'admin, settings, configuration',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/fpo-dashboard',
@@ -822,7 +1215,7 @@ export const adminRoutes = [
     description: 'Farmer Producer Organization dashboard',
     keywords: 'FPO, dashboard, organization',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/admin/crop-value-review',
@@ -831,9 +1224,9 @@ export const adminRoutes = [
     description: 'Review AI-suggested crop value-compound reference data before publication',
     keywords: 'admin, crop, nutrient, review, ai',
     transition: 'fade',
-    role: 'admin'
-  }
-]
+    role: 'admin',
+  },
+];
 
 /**
  * Dashboard routes for different roles
@@ -846,7 +1239,7 @@ export const dashboardRoutes = [
     description: 'Banking dashboard for financial partners',
     keywords: 'banker, dashboard, financial',
     transition: 'fade',
-    role: 'banker'
+    role: 'banker',
   },
   {
     path: '/ca-dashboard',
@@ -855,7 +1248,7 @@ export const dashboardRoutes = [
     description: 'Chartered Accountant dashboard',
     keywords: 'CA, dashboard, accounting',
     transition: 'fade',
-    role: 'ca'
+    role: 'ca',
   },
   {
     path: '/government-dashboard',
@@ -864,7 +1257,7 @@ export const dashboardRoutes = [
     description: 'Government oversight dashboard',
     keywords: 'government, dashboard, oversight',
     transition: 'fade',
-    role: 'government'
+    role: 'government',
   },
   {
     path: '/research-dashboard',
@@ -873,7 +1266,7 @@ export const dashboardRoutes = [
     description: 'Agricultural research dashboard',
     keywords: 'research, dashboard, agriculture',
     transition: 'fade',
-    role: 'researcher'
+    role: 'researcher',
   },
   {
     path: '/corporate-buyer',
@@ -882,7 +1275,7 @@ export const dashboardRoutes = [
     description: 'Corporate procurement dashboard',
     keywords: 'corporate, buyer, procurement',
     transition: 'fade',
-    role: 'corporate'
+    role: 'corporate',
   },
   // Tier 1 Advanced Services Dashboards
   {
@@ -892,7 +1285,7 @@ export const dashboardRoutes = [
     description: 'Production-level analytics and business intelligence',
     keywords: 'analytics, business intelligence, data',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/predictive-intelligence',
@@ -901,7 +1294,7 @@ export const dashboardRoutes = [
     description: 'AI-powered predictions and forecasting',
     keywords: 'AI, predictions, forecasting, intelligence',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/iot-monitoring',
@@ -910,7 +1303,7 @@ export const dashboardRoutes = [
     description: 'IoT device monitoring and management',
     keywords: 'IoT, sensors, monitoring, devices',
     transition: 'fade',
-    role: 'farmer'
+    role: 'farmer',
   },
   {
     path: '/blockchain-verification',
@@ -919,7 +1312,7 @@ export const dashboardRoutes = [
     description: 'Blockchain-based product verification and traceability',
     keywords: 'blockchain, verification, traceability, supply chain',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/digital-twin',
@@ -928,7 +1321,7 @@ export const dashboardRoutes = [
     description: 'Digital twin management and simulation',
     keywords: 'digital twin, simulation, modeling',
     transition: 'fade',
-    role: 'farmer'
+    role: 'farmer',
   },
   {
     path: '/enterprise-integration',
@@ -937,7 +1330,7 @@ export const dashboardRoutes = [
     description: 'Enterprise system integration management',
     keywords: 'enterprise, integration, ERP, API',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   // Additional Production Dashboards
   {
@@ -947,7 +1340,7 @@ export const dashboardRoutes = [
     description: 'Financial services overview and management',
     keywords: 'financial, services, loans, insurance',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   {
     path: '/operational-dashboard',
@@ -956,7 +1349,7 @@ export const dashboardRoutes = [
     description: 'Operational monitoring and management',
     keywords: 'operations, monitoring, management',
     transition: 'fade',
-    role: 'admin'
+    role: 'admin',
   },
   // Financial Services Pages
   {
@@ -966,7 +1359,7 @@ export const dashboardRoutes = [
     description: 'Loan application and management',
     keywords: 'loan, credit, finance',
     transition: 'fade',
-    role: 'farmer'
+    role: 'farmer',
   },
   {
     path: '/insurance-management',
@@ -975,7 +1368,7 @@ export const dashboardRoutes = [
     description: 'Insurance policy management',
     keywords: 'insurance, policy, coverage',
     transition: 'fade',
-    role: 'farmer'
+    role: 'farmer',
   },
   {
     path: '/payment-processing',
@@ -984,7 +1377,7 @@ export const dashboardRoutes = [
     description: 'Payment processing and transaction management',
     keywords: 'payment, transaction, finance',
     transition: 'fade',
-    role: 'farmer'
+    role: 'farmer',
   },
   {
     path: '/logistics-provider',
@@ -993,9 +1386,9 @@ export const dashboardRoutes = [
     description: 'Logistics provider portal',
     keywords: 'logistics, provider, transport',
     transition: 'fade',
-    role: 'logistics'
-  }
-]
+    role: 'logistics',
+  },
+];
 
 /**
  * Management routes
@@ -1007,7 +1400,7 @@ export const managementRoutes = [
     title: 'Farmer Profile - AFRERA',
     description: 'Manage your farmer profile',
     keywords: 'farmer, profile, management',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-family',
@@ -1015,7 +1408,7 @@ export const managementRoutes = [
     title: 'Family Information - AFRERA',
     description: 'Family information and details',
     keywords: 'family, information, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-verification',
@@ -1023,7 +1416,7 @@ export const managementRoutes = [
     title: 'Farmer Verification - AFRERA',
     description: 'Farmer verification status',
     keywords: 'verification, farmer, status',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-skills',
@@ -1031,7 +1424,7 @@ export const managementRoutes = [
     title: 'Farmer Skills - AFRERA',
     description: 'Skills and certifications',
     keywords: 'skills, certifications, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-welfare',
@@ -1039,7 +1432,7 @@ export const managementRoutes = [
     title: 'Health & Welfare - AFRERA',
     description: 'Health and welfare programs',
     keywords: 'health, welfare, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/crop-calendar',
@@ -1047,7 +1440,7 @@ export const managementRoutes = [
     title: 'Crop Calendar - AFRERA',
     description: 'Your crop planting calendar',
     keywords: 'crop, calendar, planting',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/crop-registration',
@@ -1055,7 +1448,7 @@ export const managementRoutes = [
     title: 'Crop Registration - AFRERA',
     description: 'Register your crops',
     keywords: 'crop, registration, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/crop-variety',
@@ -1063,7 +1456,7 @@ export const managementRoutes = [
     title: 'Crop Varieties - AFRERA',
     description: 'Crop variety information',
     keywords: 'crop, variety, information',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/seed-planning',
@@ -1071,7 +1464,7 @@ export const managementRoutes = [
     title: 'Seed Planning - AFRERA',
     description: 'Plan your seed requirements',
     keywords: 'seed, planning, requirements',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/nursery-management',
@@ -1079,7 +1472,7 @@ export const managementRoutes = [
     title: 'Nursery Management - AFRERA',
     description: 'Manage your nursery',
     keywords: 'nursery, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/crop-monitoring',
@@ -1087,7 +1480,7 @@ export const managementRoutes = [
     title: 'Crop Monitoring - AFRERA',
     description: 'Monitor your crops',
     keywords: 'crop, monitoring, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/land-management',
@@ -1095,7 +1488,7 @@ export const managementRoutes = [
     title: 'Land Management - AFRERA',
     description: 'Manage your land holdings',
     keywords: 'land, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/input-supply',
@@ -1103,7 +1496,7 @@ export const managementRoutes = [
     title: 'Input Supply - AFRERA',
     description: 'Manage agricultural inputs',
     keywords: 'input, supply, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/livestock-management',
@@ -1111,7 +1504,7 @@ export const managementRoutes = [
     title: 'Livestock Management - AFRERA',
     description: 'Manage your livestock',
     keywords: 'livestock, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/community-management',
@@ -1119,7 +1512,7 @@ export const managementRoutes = [
     title: 'Community Management - AFRERA',
     description: 'Community management tools',
     keywords: 'community, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/soil-management',
@@ -1127,7 +1520,7 @@ export const managementRoutes = [
     title: 'Soil Management - AFRERA',
     description: 'Soil health and management',
     keywords: 'soil, management, health',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/water-management',
@@ -1135,7 +1528,7 @@ export const managementRoutes = [
     title: 'Water Management - AFRERA',
     description: 'Water resource management',
     keywords: 'water, management, irrigation',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/subsidy-management',
@@ -1143,7 +1536,7 @@ export const managementRoutes = [
     title: 'Subsidy Management - AFRERA',
     description: 'Government subsidy management',
     keywords: 'subsidy, government, management',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farm-costing',
@@ -1151,7 +1544,7 @@ export const managementRoutes = [
     title: 'Farm Costing - AFRERA',
     description: 'Farm costing and budgeting',
     keywords: 'farm, costing, budget',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/farmer-kyc',
@@ -1159,7 +1552,7 @@ export const managementRoutes = [
     title: 'Farmer KYC - AFRERA',
     description: 'Know Your Customer verification',
     keywords: 'KYC, verification, farmer',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/fertilizer-inventory',
@@ -1167,7 +1560,7 @@ export const managementRoutes = [
     title: 'Fertilizer Inventory - AFRERA',
     description: 'Fertilizer inventory management',
     keywords: 'fertilizer, inventory, management',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/irrigation-management',
@@ -1175,7 +1568,7 @@ export const managementRoutes = [
     title: 'Irrigation Management - AFRERA',
     description: 'Irrigation system management',
     keywords: 'irrigation, management, water',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/labour-management',
@@ -1183,7 +1576,7 @@ export const managementRoutes = [
     title: 'Labour Management - AFRERA',
     description: 'Farm labour management',
     keywords: 'labour, management, workforce',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/land-registry',
@@ -1191,7 +1584,7 @@ export const managementRoutes = [
     title: 'Land Registry - AFRERA',
     description: 'Land registration and records',
     keywords: 'land, registry, records',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/orchard-management',
@@ -1199,7 +1592,7 @@ export const managementRoutes = [
     title: 'Orchard Management - AFRERA',
     description: 'Orchard and fruit management',
     keywords: 'orchard, management, fruit',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/pond-management',
@@ -1207,7 +1600,7 @@ export const managementRoutes = [
     title: 'Pond Management - AFRERA',
     description: 'Pond and water body management',
     keywords: 'pond, management, water',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/shg-management',
@@ -1215,7 +1608,7 @@ export const managementRoutes = [
     title: 'SHG Management - AFRERA',
     description: 'Self Help Group management',
     keywords: 'SHG, management, group',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/tractor-management',
@@ -1223,7 +1616,7 @@ export const managementRoutes = [
     title: 'Tractor Management - AFRERA',
     description: 'Tractor and equipment management',
     keywords: 'tractor, management, equipment',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/village-registry',
@@ -1231,7 +1624,7 @@ export const managementRoutes = [
     title: 'Village Registry - AFRERA',
     description: 'Village registration and records',
     keywords: 'village, registry, records',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/sowing-management',
@@ -1239,7 +1632,7 @@ export const managementRoutes = [
     title: 'Sowing Management - AFRERA',
     description: 'Sowing and planting management',
     keywords: 'sowing, planting, management',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/climate-advisory',
@@ -1247,7 +1640,7 @@ export const managementRoutes = [
     title: 'Climate Advisory - AFRERA',
     description: 'Climate advisory and recommendations',
     keywords: 'climate, advisory, recommendations',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/dairy-management',
@@ -1255,7 +1648,7 @@ export const managementRoutes = [
     title: 'Dairy Management - AFRERA',
     description: 'Dairy farming management',
     keywords: 'dairy, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/climate-monitoring',
@@ -1263,7 +1656,7 @@ export const managementRoutes = [
     title: 'Climate Monitoring - AFRERA',
     description: 'Monitor climate conditions',
     keywords: 'climate, monitoring, weather',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/operations-management',
@@ -1271,7 +1664,7 @@ export const managementRoutes = [
     title: 'Operations Management - AFRERA',
     description: 'Farm operations management',
     keywords: 'operations, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/machinery-management',
@@ -1279,7 +1672,7 @@ export const managementRoutes = [
     title: 'Machinery Management - AFRERA',
     description: 'Farm machinery management',
     keywords: 'machinery, management, equipment',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/horticulture-management',
@@ -1287,7 +1680,7 @@ export const managementRoutes = [
     title: 'Horticulture - AFRERA',
     description: 'Horticulture management',
     keywords: 'horticulture, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/fisheries-management',
@@ -1295,7 +1688,7 @@ export const managementRoutes = [
     title: 'Fisheries - AFRERA',
     description: 'Fisheries management',
     keywords: 'fisheries, management, aquaculture',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/identity-management',
@@ -1303,7 +1696,8 @@ export const managementRoutes = [
     title: 'Identity Management - AFRERA',
     description: 'Digital identity management',
     keywords: 'identity, management, digital',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/platform-foundation',
@@ -1311,7 +1705,8 @@ export const managementRoutes = [
     title: 'Platform Foundation - AFRERA',
     description: 'Platform foundation services',
     keywords: 'platform, foundation, services',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/enterprise-control',
@@ -1319,7 +1714,8 @@ export const managementRoutes = [
     title: 'Enterprise Control - AFRERA',
     description: 'Enterprise control systems',
     keywords: 'enterprise, control, systems',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/account/mfa',
@@ -1327,7 +1723,7 @@ export const managementRoutes = [
     title: 'Multi-Factor Authentication - AFRERA',
     description: 'Set up multi-factor authentication for your account',
     keywords: 'mfa, security, two-factor, authentication',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/account/privacy',
@@ -1335,7 +1731,7 @@ export const managementRoutes = [
     title: 'Privacy & Consent - AFRERA',
     description: 'Manage data privacy and consent preferences',
     keywords: 'gdpr, privacy, consent, data',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/library',
@@ -1343,7 +1739,15 @@ export const managementRoutes = [
     title: 'Library - AFRERA',
     description: 'Browse the module and knowledge library',
     keywords: 'library, knowledge, modules, catalogue',
-    transition: 'fade'
+    transition: 'fade',
+  },
+  {
+    path: '/library-knowledge',
+    component: LibraryBrowserPage,
+    title: 'Library Knowledge - AFRERA',
+    description: 'Search indexed files, modules, and connectivity evidence',
+    keywords: 'library, knowledge, modules, catalogue, connectivity',
+    transition: 'fade',
   },
   {
     path: '/ai/chat',
@@ -1351,7 +1755,7 @@ export const managementRoutes = [
     title: 'AI Assistant - AFRERA',
     description: 'Chat with the AI coordinator',
     keywords: 'ai, chat, assistant, claude',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai/collaboration',
@@ -1359,7 +1763,7 @@ export const managementRoutes = [
     title: 'AI Collaboration - AFRERA',
     description: 'AI-Devin collaboration activity dashboard',
     keywords: 'ai, collaboration, devin, activity',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/fpo-registration',
@@ -1367,7 +1771,8 @@ export const managementRoutes = [
     title: 'FPO Registration - AFRERA',
     description: 'FPO Registration',
     keywords: 'fpo, registration, producer organization',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/cattle-registry',
@@ -1375,7 +1780,7 @@ export const managementRoutes = [
     title: 'Cattle Registry - AFRERA',
     description: 'Cattle Registry',
     keywords: 'cattle, livestock, registry',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/implement-management',
@@ -1383,7 +1788,7 @@ export const managementRoutes = [
     title: 'Implement Management - AFRERA',
     description: 'Implement Management',
     keywords: 'implement, agriculture, equipment',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/equipment-inventory',
@@ -1391,7 +1796,7 @@ export const managementRoutes = [
     title: 'Equipment Inventory - AFRERA',
     description: 'Equipment Inventory',
     keywords: 'equipment, inventory, machinery',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/equipment-rental',
@@ -1399,7 +1804,7 @@ export const managementRoutes = [
     title: 'Equipment Rental - AFRERA',
     description: 'Equipment Rental',
     keywords: 'equipment, rental, machinery',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/breakdown-maintenance',
@@ -1407,7 +1812,7 @@ export const managementRoutes = [
     title: 'Breakdown Maintenance - AFRERA',
     description: 'Breakdown Maintenance',
     keywords: 'breakdown, maintenance, repair',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/fuel-management',
@@ -1415,7 +1820,7 @@ export const managementRoutes = [
     title: 'Fuel Management - AFRERA',
     description: 'Fuel Management',
     keywords: 'fuel, consumption, machinery',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/spare-parts-management',
@@ -1423,7 +1828,7 @@ export const managementRoutes = [
     title: 'Spare Parts Management - AFRERA',
     description: 'Spare Parts Management',
     keywords: 'spare parts, inventory, machinery',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/asset-lifecycle-management',
@@ -1431,7 +1836,7 @@ export const managementRoutes = [
     title: 'Asset Lifecycle Management - AFRERA',
     description: 'Asset Lifecycle Management',
     keywords: 'asset, lifecycle, depreciation',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/environment-management',
@@ -1439,7 +1844,7 @@ export const managementRoutes = [
     title: 'Environment Management - AFRERA',
     description: 'Environment Management',
     keywords: 'environment, configuration, deployment',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai-backbone',
@@ -1447,7 +1852,15 @@ export const managementRoutes = [
     title: 'AI Backbone - AFRERA',
     description: 'Unified multi-provider AI integration: Claude, ChatGPT, Gemini, Azure OpenAI, Hugging Face',
     keywords: 'ai, backbone, claude, chatgpt, gemini, azure, huggingface',
-    transition: 'fade'
+    transition: 'fade',
+  },
+  {
+    path: '/ai-product-studio',
+    component: AIProductStudioPage,
+    title: 'AI Product Studio - AFRERA',
+    description: 'Image generation, cartoon storytelling, nutrient diagnosis, and natural therapist guidance for product marketing and wellness',
+    keywords: 'ai, product image, cartoon generator, nutrient diagnosis, wellness, therapist',
+    transition: 'fade',
   },
   {
     path: '/diet-recipes',
@@ -1455,7 +1868,7 @@ export const managementRoutes = [
     title: 'Diet & Recipes - AFRERA',
     description: 'AI-generated recipes grounded in real dietary profiles and real AFRERA products',
     keywords: 'diet, recipes, nutrition, ai',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/wearables',
@@ -1463,7 +1876,7 @@ export const managementRoutes = [
     title: 'Wearables - AFRERA',
     description: 'Fitbit, Apple Health, Samsung Health connection status and activity',
     keywords: 'wearable, fitbit, apple health, samsung health, fitness',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/wearables/fitbit-callback',
@@ -1471,7 +1884,7 @@ export const managementRoutes = [
     title: 'Connecting Fitbit - AFRERA',
     description: 'Fitbit OAuth callback',
     keywords: 'fitbit, oauth, callback',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/defense-fitness-prep',
@@ -1479,7 +1892,7 @@ export const managementRoutes = [
     title: 'Defense & Police Fitness Prep - AFRERA',
     description: 'Self-prep comparison against real, cited published physical standards',
     keywords: 'defense, police, bsf, fitness, recruitment, prep',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/sell/new-product',
@@ -1487,7 +1900,7 @@ export const managementRoutes = [
     title: 'Add Product - AFRERA',
     description: 'Create a new marketplace product listing',
     keywords: 'sell, product, add, create, listing',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/variety-directory',
@@ -1495,7 +1908,7 @@ export const managementRoutes = [
     title: 'Variety Directory - AFRERA',
     description: '142 real, citation-backed NE India crop, livestock, and fisheries varieties',
     keywords: 'variety, directory, north east, GI, biodiversity',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/poultry-management',
@@ -1503,7 +1916,7 @@ export const managementRoutes = [
     title: 'Poultry - AFRERA',
     description: 'Poultry farming management',
     keywords: 'poultry, management, farming',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/goat-farming',
@@ -1511,7 +1924,7 @@ export const managementRoutes = [
     title: 'Goat Farming - AFRERA',
     description: 'Goat farming management',
     keywords: 'goat, farming, livestock',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/sheep-farming',
@@ -1519,7 +1932,7 @@ export const managementRoutes = [
     title: 'Sheep Farming - AFRERA',
     description: 'Sheep farming management',
     keywords: 'sheep, farming, livestock',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/pig-farming',
@@ -1527,7 +1940,7 @@ export const managementRoutes = [
     title: 'Pig Farming - AFRERA',
     description: 'Pig farming management',
     keywords: 'pig, farming, livestock',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/animal-health',
@@ -1535,7 +1948,7 @@ export const managementRoutes = [
     title: 'Animal Health - AFRERA',
     description: 'Animal health management',
     keywords: 'animal, health, veterinary',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/unified-ledger',
@@ -1543,7 +1956,7 @@ export const managementRoutes = [
     title: 'Unified Ledger - AFRERA',
     description: 'Unified financial ledger',
     keywords: 'ledger, unified, financial',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/reos-dashboard',
@@ -1551,7 +1964,7 @@ export const managementRoutes = [
     title: 'REOS Dashboard - AFRERA',
     description: 'Rural Economic Operating System',
     keywords: 'REOS, dashboard, rural economy',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai-dashboard',
@@ -1559,7 +1972,7 @@ export const managementRoutes = [
     title: 'AI Dashboard - AFRERA',
     description: 'AI-powered insights and tools',
     keywords: 'AI, dashboard, insights',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/erp-dashboard',
@@ -1567,7 +1980,7 @@ export const managementRoutes = [
     title: 'ERP Dashboard - AFRERA',
     description: 'Enterprise Resource Planning',
     keywords: 'ERP, dashboard, enterprise',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/b2b-marketplace',
@@ -1575,7 +1988,7 @@ export const managementRoutes = [
     title: 'B2B Marketplace - AFRERA',
     description: 'Business-to-business marketplace',
     keywords: 'B2B, marketplace, business',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/marketing-center',
@@ -1583,7 +1996,7 @@ export const managementRoutes = [
     title: 'Marketing Center - AFRERA',
     description: 'Marketing tools and resources',
     keywords: 'marketing, center, tools',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/nutrient-marketplace',
@@ -1591,7 +2004,7 @@ export const managementRoutes = [
     title: 'Nutrient Value Marketplace - AFRERA',
     description: 'Nutrient value trading',
     keywords: 'nutrient, value, marketplace',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/platform-management',
@@ -1599,7 +2012,8 @@ export const managementRoutes = [
     title: 'Platform Management - AFRERA',
     description: 'Platform administration with AI-powered insights',
     keywords: 'platform, management, administration',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/role-permissions',
@@ -1607,7 +2021,8 @@ export const managementRoutes = [
     title: 'Roles & Permissions - AFRERA',
     description: 'Role and permission management',
     keywords: 'roles, permissions, access control',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/shared-infra',
@@ -1615,7 +2030,8 @@ export const managementRoutes = [
     title: 'Shared Infrastructure - AFRERA',
     description: 'Shared assets, cold storage and community equipment',
     keywords: 'shared, infrastructure, cold storage, equipment',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/system-administration',
@@ -1623,7 +2039,8 @@ export const managementRoutes = [
     title: 'System Administration - AFRERA',
     description: 'System settings, audit logs and analytics',
     keywords: 'system, administration, settings, audit',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/bulk-orders',
@@ -1631,7 +2048,7 @@ export const managementRoutes = [
     title: 'Bulk Orders - AFRERA',
     description: 'Request wholesale quantities and manage supplier quotations',
     keywords: 'bulk, wholesale, orders, quotations',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ecommerce-marketplace',
@@ -1639,7 +2056,7 @@ export const managementRoutes = [
     title: 'Marketplace - AFRERA',
     description: 'Browse listings, manage products, seller analytics and market intelligence',
     keywords: 'marketplace, listings, seller, GI, price trends',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ecommerce-integration',
@@ -1647,7 +2064,7 @@ export const managementRoutes = [
     title: 'Nutrition & Recipe Integration - AFRERA',
     description: 'Nutrition scoring, recipe matching, cart health analysis and dietitian recommendations',
     keywords: 'nutrition, recipes, health, dietitian, cart',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/complete-erp-integration',
@@ -1655,7 +2072,7 @@ export const managementRoutes = [
     title: 'Complete ERP Integration - AFRERA',
     description: 'Sync farmer, crop, livestock and inbuilt-module data with the ERP system',
     keywords: 'erp, integration, sync, farmer, crop, livestock',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/engineering-projects',
@@ -1663,7 +2080,7 @@ export const managementRoutes = [
     title: 'Engineering Projects - AFRERA',
     description: 'Create and manage engineering projects, track phases, and generate cost estimates',
     keywords: 'engineering, projects, phases, cost estimate',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/realtime-monitoring',
@@ -1671,7 +2088,7 @@ export const managementRoutes = [
     title: 'Realtime Monitoring - AFRERA',
     description: 'Start, stop and inspect real-time resource monitors',
     keywords: 'monitoring, alerts, resources, realtime',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/cold-storage',
@@ -1679,7 +2096,7 @@ export const managementRoutes = [
     title: 'Cold Storage - AFRERA',
     description: 'Manage cold storage facilities, capacity-checked bookings, and utilization tracking',
     keywords: 'cold storage, facilities, bookings, utilization',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/cooperative-shares',
@@ -1687,7 +2104,7 @@ export const managementRoutes = [
     title: 'Cooperative Shares - AFRERA',
     description: 'Manage FPO member share capital and patronage dividend distributions',
     keywords: 'cooperative, fpo, shares, patronage, dividend',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/agri-intelligence',
@@ -1695,7 +2112,7 @@ export const managementRoutes = [
     title: 'Agricultural Intelligence - AFRERA',
     description: 'Crop yield, soil, weather, pest and irrigation AI predictions',
     keywords: 'agriculture, ai, crop yield, soil, weather, pest, irrigation',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/knowledge-reference',
@@ -1703,7 +2120,7 @@ export const managementRoutes = [
     title: 'Knowledge Reference - AFRERA',
     description: 'Wikipedia knowledge lookups and FOLU transition benchmark data',
     keywords: 'wikipedia, folu, benchmark, reference',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/decision-support',
@@ -1711,7 +2128,7 @@ export const managementRoutes = [
     title: 'Decision Support - AFRERA',
     description: 'Core business logic functions for pricing, logistics, finance and governance',
     keywords: 'decision support, pricing, logistics, finance, governance',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/complete-ai-integration',
@@ -1719,7 +2136,7 @@ export const managementRoutes = [
     title: 'Complete AI Integration - AFRERA',
     description: 'AI-driven predictions and optimization across farmer, crop, livestock and inbuilt modules',
     keywords: 'ai, prediction, optimization, disease detection, yield',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/comprehensive-erp',
@@ -1727,7 +2144,7 @@ export const managementRoutes = [
     title: 'Comprehensive ERP - AFRERA',
     description: 'Oracle/SAP-standard enterprise resource planning across 12 modules',
     keywords: 'erp, financial, sap, oracle, ledger, hr, payroll, inventory',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/water-records',
@@ -1735,7 +2152,7 @@ export const managementRoutes = [
     title: 'Water Records - AFRERA',
     description: 'Registry of water budgets, quality readings, rainwater structures, watersheds and analytics records',
     keywords: 'water, budget, quality, rainwater, watershed, analytics',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/sap-module-architecture',
@@ -1743,7 +2160,8 @@ export const managementRoutes = [
     title: 'SAP Module Architecture - AFRERA',
     description: 'SAP-style independent module architecture: registration, dependencies, lifecycle, configuration, MTA descriptors',
     keywords: 'sap, module, architecture, dependency, lifecycle, mta, clean core',
-    transition: 'fade'
+    transition: 'fade',
+    role: 'admin',
   },
   {
     path: '/research-and-development',
@@ -1751,7 +2169,7 @@ export const managementRoutes = [
     title: 'Research and Development - AFRERA',
     description: 'R&D project management, collaborations, innovations, patents, funding, publications and AI research assistance',
     keywords: 'research, development, innovation, patent, funding, publication, r&d',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/information-sharing',
@@ -1759,7 +2177,7 @@ export const managementRoutes = [
     title: 'Information Sharing - AFRERA',
     description: 'Document management, folders, permissions, sharing links, live collaboration sessions and AI recommendations',
     keywords: 'document, folder, permission, sharing, collaboration, information sharing',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/logistics-matching',
@@ -1767,7 +2185,7 @@ export const managementRoutes = [
     title: 'Logistics Matching - AFRERA',
     description: 'Freight pooling, return-load backhaul board and second-use equipment exchange',
     keywords: 'freight, pooling, return load, backhaul, equipment exchange, logistics',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/market-signals',
@@ -1775,7 +2193,7 @@ export const managementRoutes = [
     title: 'Market Signals - AFRERA',
     description: 'Glut early-warning, seller trust ranking and civil disruption risk',
     keywords: 'glut, oversupply, seller ranking, trust score, civil disruption, blockade',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/nervous-system',
@@ -1783,7 +2201,7 @@ export const managementRoutes = [
     title: 'Nervous System - AFRERA',
     description: 'Enterprise route control: brain, heart, neural pathways, reflex arcs, sensors and motor functions',
     keywords: 'nervous system, brain, heart, reflex, sensors, route control',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/logistics-enhancement',
@@ -1791,7 +2209,7 @@ export const managementRoutes = [
     title: 'Logistics Enhancement - AFRERA',
     description: 'Fleet management, real-time shipment and driver tracking, temperature monitoring and warehouse integration',
     keywords: 'logistics, fleet, tracking, temperature, warehouse, drivers',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/enterprise-ai',
@@ -1799,7 +2217,7 @@ export const managementRoutes = [
     title: 'Enterprise AI - AFRERA',
     description: 'Credit scoring, government scheme eligibility, AI model-slot registry and conversational query',
     keywords: 'enterprise ai, credit score, scheme eligibility, model registry',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai-agent',
@@ -1807,7 +2225,7 @@ export const managementRoutes = [
     title: 'AI Agent - AFRERA',
     description: 'Agentic task execution, multi-agent coordination and tool registry',
     keywords: 'ai, agent, agentic, coordination, tools',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai-brain',
@@ -1815,7 +2233,7 @@ export const managementRoutes = [
     title: 'AI Brain - AFRERA',
     description: 'Cognitive processing: perception, attention, reasoning, learning, decision and planning',
     keywords: 'ai, brain, cognitive, reasoning, knowledge graph, memory',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai-self-healing',
@@ -1823,7 +2241,7 @@ export const managementRoutes = [
     title: 'AI Self-Healing - AFRERA',
     description: 'Autonomous error detection, root cause analysis and recovery',
     keywords: 'ai, self-healing, recovery, error detection, root cause',
-    transition: 'fade'
+    transition: 'fade',
   },
   {
     path: '/ai-operation-intelligence',
@@ -1831,9 +2249,9 @@ export const managementRoutes = [
     title: 'AI Operation Intelligence - AFRERA',
     description: 'Real-time performance monitoring, optimization and anomaly detection',
     keywords: 'ai, operations, performance, optimization, anomaly detection',
-    transition: 'fade'
-  }
-]
+    transition: 'fade',
+  },
+];
 
 /**
  * Get route by path
@@ -1845,10 +2263,10 @@ export function getRouteByPath(path) {
     ...farmerRoutes,
     ...adminRoutes,
     ...dashboardRoutes,
-    ...managementRoutes
-  ]
-  
-  return allRoutes.find(route => route.path === path)
+    ...managementRoutes,
+  ];
+
+  return allRoutes.find(route => route.path === path);
 }
 
 /**
@@ -1861,47 +2279,47 @@ export function getAllRoutes() {
     ...farmerRoutes,
     ...adminRoutes,
     ...dashboardRoutes,
-    ...managementRoutes
-  ]
+    ...managementRoutes,
+  ];
 }
 
 /**
  * Get routes by role
  */
 export function getRoutesByRole(role) {
-  const routes = [...publicRoutes, ...protectedRoutes]
-  
+  const routes = [...publicRoutes, ...protectedRoutes];
+
   if (role === 'farmer') {
-    routes.push(...farmerRoutes)
+    routes.push(...farmerRoutes);
   }
-  
+
   if (role === 'admin') {
-    routes.push(...adminRoutes)
+    routes.push(...adminRoutes);
   }
-  
+
   if (role === 'banker') {
-    routes.push(...dashboardRoutes.filter(r => r.role === 'banker'))
+    routes.push(...dashboardRoutes.filter(r => r.role === 'banker'));
   }
-  
+
   if (role === 'ca') {
-    routes.push(...dashboardRoutes.filter(r => r.role === 'ca'))
+    routes.push(...dashboardRoutes.filter(r => r.role === 'ca'));
   }
-  
+
   if (role === 'government') {
-    routes.push(...dashboardRoutes.filter(r => r.role === 'government'))
+    routes.push(...dashboardRoutes.filter(r => r.role === 'government'));
   }
-  
+
   if (role === 'researcher') {
-    routes.push(...dashboardRoutes.filter(r => r.role === 'researcher'))
+    routes.push(...dashboardRoutes.filter(r => r.role === 'researcher'));
   }
-  
+
   if (role === 'corporate') {
-    routes.push(...dashboardRoutes.filter(r => r.role === 'corporate'))
+    routes.push(...dashboardRoutes.filter(r => r.role === 'corporate'));
   }
-  
+
   if (role === 'logistics') {
-    routes.push(...dashboardRoutes.filter(r => r.role === 'logistics'))
+    routes.push(...dashboardRoutes.filter(r => r.role === 'logistics'));
   }
-  
-  return routes
+
+  return routes;
 }

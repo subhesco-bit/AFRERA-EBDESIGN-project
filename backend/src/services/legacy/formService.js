@@ -6,9 +6,9 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware, requireRole } = require('../../middleware\/auth');
 
 const router = express.Router();
 const STORE_PATH = path.join(__dirname, '..', '..', 'database', 'form_store.json');
@@ -77,7 +77,7 @@ async function ensureDatabaseSchema() {
 }
 
 async function loadFormsFromDb() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) {
     return null;
   }
@@ -210,7 +210,7 @@ async function getFormById(formId) {
 
 async function createForm(formData) {
   const normalized = normalizeForm(formData);
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
 
   if (pg) {
     try {
@@ -238,10 +238,10 @@ async function updateForm(formId, formData) {
     throw new Error('Form not found');
   }
 
-  const normalized = normalizeForm({ ...existingForm, ...formData }, existingForm);
+  let normalized = normalizeForm({ ...existingForm, ...formData }, existingForm);
   normalized.version = (existingForm.version || 1) + 1;
 
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
@@ -255,14 +255,14 @@ async function updateForm(formId, formData) {
     }
   }
 
-  const store = await readStore();
+  let store = await readStore();
   store.forms = store.forms.map((form) => (form.id === formId ? normalized : form));
   await writeStore(store);
   return normalized;
 }
 
 async function deleteForm(formId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
@@ -273,7 +273,7 @@ async function deleteForm(formId) {
     }
   }
 
-  const store = await readStore();
+  let store = await readStore();
   store.forms = store.forms.filter((form) => form.id !== formId);
   await writeStore(store);
   return { success: true, id: formId };
@@ -294,7 +294,7 @@ async function submitForm(formId, payload) {
     reviewState: 'pending'
   };
 
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
@@ -308,14 +308,14 @@ async function submitForm(formId, payload) {
     }
   }
 
-  const store = await readStore();
+  let store = await readStore();
   store.submissions.unshift(submission);
   await writeStore(store);
   return submission;
 }
 
 async function listSubmissions(formId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
@@ -326,14 +326,14 @@ async function listSubmissions(formId) {
     }
   }
 
-  const store = await readStore();
+  let store = await readStore();
   return store.submissions.filter((submission) => submission.formId === formId).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 }
 
 router.get('/', async (req, res) => {
   try {
     const { search = '', category = '', status = '' } = req.query;
-    const forms = await listForms(search, category, status);
+    let forms = await listForms(search, category, status);
     res.json({ forms });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -371,7 +371,7 @@ router.get('/templates', async (req, res) => {
 
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const form = await createForm(req.body);
+    let form = await createForm(req.body);
     res.status(201).json(form);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -380,7 +380,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const form = await getFormById(req.params.id);
+    let form = await getFormById(req.params.id);
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
     }
@@ -396,7 +396,7 @@ router.get('/:id', async (req, res) => {
 // authenticated user could previously edit or delete any form definition.
 router.put('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
-    const form = await updateForm(req.params.id, req.body);
+    let form = await updateForm(req.params.id, req.body);
     res.json(form);
   } catch (error) {
     res.status(404).json({ error: error.message });
@@ -405,7 +405,7 @@ router.put('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
 
 router.delete('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
-    const result = await deleteForm(req.params.id);
+    let result = await deleteForm(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -414,7 +414,7 @@ router.delete('/:id', authMiddleware, requireRole('admin'), async (req, res) => 
 
 router.post('/:id/submit', authMiddleware, async (req, res) => {
   try {
-    const submission = await submitForm(req.params.id, req.body);
+    let submission = await submitForm(req.params.id, req.body);
     res.status(201).json(submission);
   } catch (error) {
     res.status(404).json({ error: error.message });
@@ -441,3 +441,6 @@ module.exports = {
   listSubmissions,
   buildAiInsights
 };
+
+
+

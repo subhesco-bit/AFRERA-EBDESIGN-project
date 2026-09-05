@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class LibraryKnowledgeService {
   constructor() {
@@ -63,8 +63,8 @@ class LibraryKnowledgeService {
       const componentFiles = fs.readdirSync(componentsDir).filter(f => f.endsWith('.md'));
       
       for (const file of componentFiles) {
-        const filePath = path.join(componentsDir, file);
-        const content = fs.readFileSync(filePath, 'utf8');
+        let filePath = path.join(componentsDir, file);
+        let content = fs.readFileSync(filePath, 'utf8');
         const componentData = this.parseComponentCard(content);
         
         this.index.set(file, {
@@ -86,7 +86,7 @@ class LibraryKnowledgeService {
     console.log('Computing content hashes...');
     
     for (const [filename, item] of this.index) {
-      const content = fs.readFileSync(item.path, 'utf8');
+      let content = fs.readFileSync(item.path, 'utf8');
       const hash = crypto.createHash('sha256').update(content).digest('hex');
       
       this.contentHashes.set(filename, {
@@ -190,7 +190,7 @@ class LibraryKnowledgeService {
    * Parse module card from markdown
    */
   parseModuleCard(content) {
-    const moduleData = {
+    let moduleData = {
       id: '',
       name: '',
       domain: '',
@@ -221,7 +221,7 @@ class LibraryKnowledgeService {
    * Parse component card from markdown
    */
   parseComponentCard(content) {
-    const componentData = {
+    let componentData = {
       id: '',
       name: '',
       type: '',
@@ -229,7 +229,7 @@ class LibraryKnowledgeService {
       status: ''
     };
 
-    const lines = content.split('\n');
+    let lines = content.split('\n');
     for (const line of lines) {
       if (line.startsWith('# Component ID:')) {
         componentData.id = line.replace('# Component ID:', '').trim();
@@ -255,7 +255,7 @@ class LibraryKnowledgeService {
     const lowerQuery = query.toLowerCase();
 
     for (const [filename, item] of this.index) {
-      const content = JSON.stringify(item.data).toLowerCase();
+      let content = JSON.stringify(item.data).toLowerCase();
       if (content.includes(lowerQuery)) {
         results.push({
           filename,
@@ -344,3 +344,6 @@ class LibraryKnowledgeService {
 }
 
 module.exports = new LibraryKnowledgeService();
+
+
+

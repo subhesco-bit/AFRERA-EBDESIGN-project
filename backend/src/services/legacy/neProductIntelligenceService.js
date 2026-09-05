@@ -28,8 +28,8 @@
  */
 
 const express = require('express');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 
@@ -248,7 +248,7 @@ function emiSchedule({ principal, annualRatePct, tenureMonths } = {}) {
  * — the single most commercially load-bearing calculation recovered.
  */
 function landedCostModel({ product, volumeKg = 1 } = {}) {
-  const key = String(product || '').toLowerCase();
+  let key = String(product || '').toLowerCase();
   const c = LANDED_COSTS[key];
   if (!c) {
     throw new Error(`Unknown product "${product}". Known: ${Object.keys(LANDED_COSTS).join(', ')}`);
@@ -272,7 +272,7 @@ function landedCostModel({ product, volumeKg = 1 } = {}) {
   };
 
   const totalCost = Object.values(breakdown).reduce((s, v) => s + v, 0);
-  const pct = (num, den) => (den === 0 ? 0 : Math.round((1 - num / den) * 100));
+  let pct = (num, den) => (den === 0 ? 0 : Math.round((1 - num / den) * 100));
 
   return {
     product: key,
@@ -344,3 +344,6 @@ module.exports = {
   TURMERIC_CURCUMIN_PCT,
   LANDED_COSTS
 };
+
+
+

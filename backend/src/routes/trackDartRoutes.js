@@ -9,6 +9,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const pool = require('../database/pool');
 const { authMiddleware } = require('../middleware/auth');
@@ -37,7 +39,9 @@ async function trackOneKey(key) {
   return { queriedKey: trimmed, matchType: 'not_found', shipment: null };
 }
 
-router.get('/', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/', authMiddleware, async (req, res) => {
   try {
     const { keys } = req.query;
     if (!keys) return res.status(400).json({ success: false, error: 'keys query parameter is required (comma-separated for multi-query)' });

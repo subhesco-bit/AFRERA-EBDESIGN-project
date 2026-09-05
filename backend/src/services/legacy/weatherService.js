@@ -15,9 +15,9 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 const r2 = (n) => (n === null || n === undefined ? null : Math.round(n * 100) / 100);
 
@@ -457,3 +457,6 @@ module.exports = {
   listAdvisories, getAdvisory, createAdvisory, updateAdvisory,
   getAdvisoryTriggers,
 };
+
+
+

@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { Sprout, ArrowLeft, ArrowRight, LogIn } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { Sprout, ArrowLeft, ArrowRight, LogIn } from 'lucide-react';
 
 // Public door #3 of 4 — "Field consumables". See FarmerEntranceHubPage.jsx
 // for background on why this exists. This page is intentionally NOT wrapped
@@ -32,7 +32,7 @@ const ACTIONS = [
     to: '/farm-advisor',
     note: 'Requires signing in to this section',
   },
-]
+];
 
 function FarmerFieldDoorPage() {
   return (
@@ -100,7 +100,7 @@ function FarmerFieldDoorPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerFieldDoorPage
+export default FarmerFieldDoorPage;

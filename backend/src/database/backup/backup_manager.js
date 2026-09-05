@@ -215,20 +215,20 @@ class BackupManager {
    * Perform incremental backup (using WAL archiving)
    */
   async performIncrementalBackup() {
-    const filename = this.generateBackupFilename('incremental');
-    const filepath = path.join(this.config.localBackupDir, filename);
-    const startTime = Date.now();
+    let filename = this.generateBackupFilename('incremental');
+    let filepath = path.join(this.config.localBackupDir, filename);
+    let startTime = Date.now();
 
     logger.info('Starting incremental database backup', { filename });
 
     try {
       // For incremental backups, we use pg_dump with --section=data
       // This is a simplified approach - true incremental requires WAL archiving
-      const command = `pg_dump ${process.env.DATABASE_URL} --section=data --format=plain --no-owner --no-acl --file=${filepath}`;
+      let command = `pg_dump ${process.env.DATABASE_URL} --section=data --format=plain --no-owner --no-acl --file=${filepath}`;
       execSync(command, { stdio: 'inherit' });
 
-      const duration = Date.now() - startTime;
-      const fileSize = fs.statSync(filepath).size;
+      let duration = Date.now() - startTime;
+      let fileSize = fs.statSync(filepath).size;
 
       logger.info('Incremental backup completed', {
         filename,
@@ -311,12 +311,12 @@ class BackupManager {
     }
 
     const decryptedPath = encryptedPath.replace('.enc', '');
-    const algorithm = 'aes-256-cbc';
-    const key = crypto.scryptSync(this.config.encryptionKey, 'salt', 32);
+    let algorithm = 'aes-256-cbc';
+    let key = crypto.scryptSync(this.config.encryptionKey, 'salt', 32);
 
     // Read IV from the end of the file
     const fileBuffer = fs.readFileSync(encryptedPath);
-    const iv = fileBuffer.slice(-16);
+    let iv = fileBuffer.slice(-16);
     const encryptedData = fileBuffer.slice(0, -16);
 
     const decipher = crypto.createDecipheriv(algorithm, key, iv);
@@ -337,11 +337,11 @@ class BackupManager {
     }
 
     try {
-      const key = `${this.config.s3Prefix}/${new Date().toISOString().split('T')[0]}/${filename}`;
+      let key = `${this.config.s3Prefix}/${new Date().toISOString().split('T')[0]}/${filename}`;
       const fileStream = fs.createReadStream(filepath);
       const fileStats = fs.statSync(filepath);
 
-      const command = new PutObjectCommand({
+      let command = new PutObjectCommand({
         Bucket: this.config.s3Bucket,
         Key: key,
         Body: fileStream,
@@ -366,13 +366,13 @@ class BackupManager {
     }
 
     try {
-      const command = new GetObjectCommand({
+      let command = new GetObjectCommand({
         Bucket: this.config.s3Bucket,
         Key: key
       });
 
       const response = await this.s3Client.send(command);
-      const fileStream = fs.createWriteStream(localPath);
+      let fileStream = fs.createWriteStream(localPath);
       
       await new Promise((resolve, reject) => {
         response.Body.pipe(fileStream);
@@ -398,7 +398,7 @@ class BackupManager {
     try {
       const files = fs.readdirSync(this.config.localBackupDir);
       for (const file of files) {
-        const filepath = path.join(this.config.localBackupDir, file);
+        let filepath = path.join(this.config.localBackupDir, file);
         const stats = fs.statSync(filepath);
         backups.push({
           filename: file,
@@ -415,12 +415,12 @@ class BackupManager {
     // List cloud backups
     if (this.s3Client && this.config.s3Bucket) {
       try {
-        const command = new ListObjectsV2Command({
+        let command = new ListObjectsV2Command({
           Bucket: this.config.s3Bucket,
           Prefix: this.config.s3Prefix
         });
 
-        const response = await this.s3Client.send(command);
+        let response = await this.s3Client.send(command);
         for (const object of response.Contents || []) {
           backups.push({
             filename: object.Key.split('/').pop(),
@@ -442,7 +442,7 @@ class BackupManager {
    * Restore database from backup
    */
   async restoreFromBackup(backupInfo) {
-    const startTime = Date.now();
+    let startTime = Date.now();
     let filepath;
 
     try {
@@ -462,10 +462,10 @@ class BackupManager {
       }
 
       // Restore using psql
-      const command = `psql ${process.env.DATABASE_URL} < ${filepath}`;
+      let command = `psql ${process.env.DATABASE_URL} < ${filepath}`;
       execSync(command, { stdio: 'inherit' });
 
-      const duration = Date.now() - startTime;
+      let duration = Date.now() - startTime;
       logger.info('Database restore completed', { duration: duration + 'ms' });
 
       await this.sendNotification({
@@ -532,7 +532,7 @@ class BackupManager {
     logger.info('Starting backup cleanup', { cutoffDate: cutoffDate.toISOString() });
 
     try {
-      const backups = await this.listBackups();
+      let backups = await this.listBackups();
       let deletedCount = 0;
 
       for (const backup of backups) {
@@ -546,7 +546,7 @@ class BackupManager {
 
             // Delete from cloud
             if (backup.location === 'cloud' && this.s3Client) {
-              const command = new DeleteObjectCommand({
+              let command = new DeleteObjectCommand({
                 Bucket: this.config.s3Bucket,
                 Key: backup.key
               });

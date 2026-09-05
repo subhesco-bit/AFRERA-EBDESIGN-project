@@ -1,124 +1,170 @@
 /**
- * Rate Limiter Middleware
- * Provides rate limiting for API endpoints to prevent abuse
+ * Professional Rate Limiting Middleware
+ * Protects API endpoints from abuse and DDoS attacks
  */
 
-const { RateLimiterMemory } = require('rate-limiter-flexible');
+const rateLimit = require('express-rate-limit');
 const { logger } = require('../utils/logger');
 
-// In-memory only - every limiter below is per-process. Behind more than one
-// backend instance (the normal production topology), each process tracks
-// its own counts, so the real per-client limit is (configured limit) x
-// (instance count), not the configured value. A Redis-backed limiter
-// (rate-limiter-flexible exports RateLimiterRedis for this) would fix it,
-// but nothing here establishes a Redis connection to hand it, so it isn't
-// wired - documenting the gap rather than importing a class nothing uses.
-const rateLimiter = new RateLimiterMemory({
-  points: 100, // Number of requests
-  duration: 60, // Per 60 seconds
-  blockDuration: 60 // Block for 60 seconds if limit exceeded
-});
+// Create different rate limiters for different endpoint types
 
-// Strict rate limiter for sensitive endpoints
-const strictRateLimiter = new RateLimiterMemory({
-  points: 10,
-  duration: 60,
-  blockDuration: 300
-});
-
-// Auth endpoint rate limiter (prevent brute force)
-const authRateLimiter = new RateLimiterMemory({
-  points: 5,
-  duration: 60,
-  blockDuration: 300
-});
-
-/**
- * General rate limiter middleware
- */
-async function rateLimitMiddleware(req, res, next) {
-  try {
-    const key = req.ip || req.connection.remoteAddress;
-    
-    await rateLimiter.consume(key);
-    
-    // Add rate limit headers
-    res.setHeader('X-RateLimit-Limit', rateLimiter.points);
-    res.setHeader('X-RateLimit-Remaining', rateLimiter.getRemainingPoints ? 
-      rateLimiter.getRemainingPoints(key) : 'unknown');
-    
-    next();
-  } catch (rej) {
-    const secs = Math.round(rej.msBeforeNext / 1000) || 1;
-    
-    res.setHeader('Retry-After', secs);
-    res.setHeader('X-RateLimit-Limit', rateLimiter.points);
-    res.setHeader('X-RateLimit-Remaining', 0);
-    
-    logger.warn(`Rate limit exceeded for IP: ${req.ip}`);
-    
+// General API rate limiter (100 requests per 15 minutes)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    error: 'Too many requests from this IP, please try again after 15 minutes'
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  handler: (req, res) => {
+    logger.warn('Rate limit exceeded', {
+      ip: req.ip,
+      path: req.path,
+      method: req.method
+    });
     res.status(429).json({
-      error: 'Too many requests',
-      code: 'RATE_LIMIT_EXCEEDED',
-      retryAfter: secs
+      success: false,
+      error: 'Too many requests from this IP, please try again after 15 minutes'
     });
   }
-}
-
-/**
- * Strict rate limiter for sensitive endpoints
- */
-async function strictRateLimit(req, res, next) {
-  try {
-    const key = req.ip || req.connection.remoteAddress;
-    
-    await strictRateLimiter.consume(key);
-    
-    next();
-  } catch (rej) {
-    const secs = Math.round(rej.msBeforeNext / 1000) || 1;
-    
-    res.setHeader('Retry-After', secs);
-    
-    logger.warn(`Strict rate limit exceeded for IP: ${req.ip}`);
-    
-    res.status(429).json({
-      error: 'Too many requests',
-      code: 'RATE_LIMIT_EXCEEDED',
-      retryAfter: secs
-    });
-  }
-}
-
-/**
- * Auth-specific rate limiter
- */
-async function authRateLimit(req, res, next) {
-  try {
-    const key = req.ip || req.connection.remoteAddress;
-    
-    await authRateLimiter.consume(key);
-    
-    next();
-  } catch (rej) {
-    const secs = Math.round(rej.msBeforeNext / 1000) || 1;
-    
-    res.setHeader('Retry-After', secs);
-    
-    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}`);
-    
-    res.status(429).json({
-      error: 'Too many authentication attempts',
-      code: 'AUTH_RATE_LIMIT_EXCEEDED',
-      retryAfter: secs
-    });
-  }
-}
-
-module.exports = Object.assign(rateLimitMiddleware, {
-  rateLimiter: rateLimitMiddleware,
-  rateLimitMiddleware,
-  strictRateLimit,
-  authRateLimit
 });
-module.exports.default = rateLimitMiddleware;
+
+// Strict rate limiter for sensitive operations (10 requests per hour)
+const strictLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  message: {
+    success: false,
+    error: 'Too many sensitive operations, please try again later'
+  },
+  handler: (req, res) => {
+    logger.warn('Strict rate limit exceeded', {
+      ip: req.ip,
+      path: req.path,
+      method: req.method
+    });
+    res.status(429).json({
+      success: false,
+      error: 'Too many sensitive operations, please try again later'
+    });
+  }
+});
+
+// Authentication rate limiter (5 requests per 15 minutes)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    success: false,
+    error: 'Too many authentication attempts, please try again later'
+  },
+  handler: (req, res) => {
+    logger.warn('Auth rate limit exceeded', {
+      ip: req.ip,
+      path: req.path,
+      method: req.method
+    });
+    res.status(429).json({
+      success: false,
+      error: 'Too many authentication attempts, please try again later'
+    });
+  }
+});
+
+// API key rate limiter (1000 requests per hour)
+const apiKeyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 1000,
+  keyGenerator: (req) => {
+    return req.headers['x-api-key'] || req.ip;
+  },
+  message: {
+    success: false,
+    error: 'API key rate limit exceeded'
+  },
+  handler: (req, res) => {
+    logger.warn('API key rate limit exceeded', {
+      apiKey: req.headers['x-api-key'] ? '***REDACTED***' : 'none',
+      path: req.path,
+      method: req.method
+    });
+    res.status(429).json({
+      success: false,
+      error: 'API key rate limit exceeded'
+    });
+  }
+});
+
+// Upload rate limiter (5 uploads per hour)
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: {
+    success: false,
+    error: 'Too many file uploads, please try again later'
+  },
+  handler: (req, res) => {
+    logger.warn('Upload rate limit exceeded', {
+      ip: req.ip,
+      path: req.path,
+      method: req.method
+    });
+    res.status(429).json({
+      success: false,
+      error: 'Too many file uploads, please try again later'
+    });
+  }
+});
+
+// Custom rate limiter with dynamic configuration
+const createCustomLimiter = (windowMs, max, message) => {
+  return rateLimit({
+    windowMs,
+    max,
+    message: {
+      success: false,
+      error: message || 'Rate limit exceeded'
+    },
+    handler: (req, res) => {
+      logger.warn('Custom rate limit exceeded', {
+        ip: req.ip,
+        path: req.path,
+        method: req.method
+      });
+      res.status(429).json({
+        success: false,
+        error: message || 'Rate limit exceeded'
+      });
+    }
+  });
+};
+
+// Whitelist for bypassing rate limiting (for testing or trusted IPs)
+const trustedIPs = process.env.TRUSTED_IPS ? process.env.TRUSTED_IPS.split(',') : [];
+
+const isTrustedIP = (req) => {
+  return trustedIPs.includes(req.ip);
+};
+
+// Conditional rate limiter (skips trusted IPs)
+const conditionalLimiter = (limiter) => {
+  return (req, res, next) => {
+    if (isTrustedIP(req)) {
+      return next();
+    }
+    return limiter(req, res, next);
+  };
+};
+
+module.exports = {
+  apiLimiter,
+  strictLimiter,
+  authLimiter,
+  apiKeyLimiter,
+  uploadLimiter,
+  createCustomLimiter,
+  conditionalLimiter,
+  isTrustedIP
+};

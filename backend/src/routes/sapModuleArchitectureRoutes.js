@@ -12,6 +12,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const sapModuleArchitectureService = require('../services/legacy/sapModuleArchitectureService');
 
@@ -19,7 +21,9 @@ const sapModuleArchitectureService = require('../services/legacy/sapModuleArchit
  * Get all modules
  * GET /api/sap-module-architecture/modules
  */
-router.get('/modules', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules', (req, res) => {
   try {
     const modules = sapModuleArchitectureService.getAllModules();
     
@@ -40,7 +44,9 @@ router.get('/modules', (req, res) => {
  * Get module by ID
  * GET /api/sap-module-architecture/modules/:id
  */
-router.get('/modules/:id', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id', (req, res) => {
   try {
     const { id } = req.params;
     const module = sapModuleArchitectureService.getModule(id);
@@ -69,10 +75,12 @@ router.get('/modules/:id', (req, res) => {
  * Get modules by type
  * GET /api/sap-module-architecture/modules/type/:type
  */
-router.get('/modules/type/:type', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/type/:type', (req, res) => {
   try {
     const { type } = req.params;
-    const modules = sapModuleArchitectureService.getModulesByType(type);
+    let modules = sapModuleArchitectureService.getModulesByType(type);
     
     res.json({
       success: true,
@@ -91,7 +99,9 @@ router.get('/modules/type/:type', (req, res) => {
  * Register a new module
  * POST /api/sap-module-architecture/modules
  */
-router.post('/modules', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/modules', (req, res) => {
   try {
     const { id, name, description, type, version, dependencies, capabilities } = req.body;
     
@@ -111,7 +121,7 @@ router.post('/modules', (req, res) => {
       capabilities: capabilities || []
     });
     
-    const module = sapModuleArchitectureService.getModule(id);
+    let module = sapModuleArchitectureService.getModule(id);
     
     res.json({
       success: true,
@@ -130,7 +140,9 @@ router.post('/modules', (req, res) => {
  * Update module
  * PUT /api/sap-module-architecture/modules/:id
  */
-router.put('/modules/:id', (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/modules/:id', (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -151,10 +163,12 @@ router.put('/modules/:id', (req, res) => {
  * Delete module
  * DELETE /api/sap-module-architecture/modules/:id
  */
-router.delete('/modules/:id', (req, res) => {
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/modules/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const result = sapModuleArchitectureService.deleteModule(id);
+    let result = sapModuleArchitectureService.deleteModule(id);
     
     res.json(result);
   } catch (error) {
@@ -170,7 +184,9 @@ router.delete('/modules/:id', (req, res) => {
  * Get module dependencies
  * GET /api/sap-module-architecture/modules/:id/dependencies
  */
-router.get('/modules/:id/dependencies', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/dependencies', (req, res) => {
   try {
     const { id } = req.params;
     const dependencies = sapModuleArchitectureService.getModuleDependencies(id);
@@ -192,7 +208,9 @@ router.get('/modules/:id/dependencies', (req, res) => {
  * Get dependency graph
  * GET /api/sap-module-architecture/dependency-graph
  */
-router.get('/dependency-graph', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/dependency-graph', (req, res) => {
   try {
     const graph = sapModuleArchitectureService.getDependencyGraph();
     
@@ -213,7 +231,9 @@ router.get('/dependency-graph', (req, res) => {
  * Resolve dependencies
  * GET /api/sap-module-architecture/modules/:id/resolve-dependencies
  */
-router.get('/modules/:id/resolve-dependencies', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/resolve-dependencies', (req, res) => {
   try {
     const { id } = req.params;
     const resolved = sapModuleArchitectureService.resolveDependencies(id);
@@ -235,7 +255,9 @@ router.get('/modules/:id/resolve-dependencies', (req, res) => {
  * Get module configuration
  * GET /api/sap-module-architecture/modules/:id/configuration
  */
-router.get('/modules/:id/configuration', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/configuration', (req, res) => {
   try {
     const { id } = req.params;
     const configuration = sapModuleArchitectureService.getModuleConfiguration(id);
@@ -257,12 +279,14 @@ router.get('/modules/:id/configuration', (req, res) => {
  * Set module configuration
  * PUT /api/sap-module-architecture/modules/:id/configuration
  */
-router.put('/modules/:id/configuration', (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/modules/:id/configuration', (req, res) => {
   try {
     const { id } = req.params;
     const config = req.body;
     
-    const result = sapModuleArchitectureService.setModuleConfiguration(id, config);
+    let result = sapModuleArchitectureService.setModuleConfiguration(id, config);
     
     res.json(result);
   } catch (error) {
@@ -278,7 +302,9 @@ router.put('/modules/:id/configuration', (req, res) => {
  * Get module version
  * GET /api/sap-module-architecture/modules/:id/version
  */
-router.get('/modules/:id/version', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/version', (req, res) => {
   try {
     const { id } = req.params;
     const version = sapModuleArchitectureService.getModuleVersion(id);
@@ -300,7 +326,9 @@ router.get('/modules/:id/version', (req, res) => {
  * Update module version
  * PUT /api/sap-module-architecture/modules/:id/version
  */
-router.put('/modules/:id/version', (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/modules/:id/version', (req, res) => {
   try {
     const { id } = req.params;
     const { version } = req.body;
@@ -312,7 +340,7 @@ router.put('/modules/:id/version', (req, res) => {
       });
     }
     
-    const result = sapModuleArchitectureService.updateModuleVersion(id, version);
+    let result = sapModuleArchitectureService.updateModuleVersion(id, version);
     
     res.json(result);
   } catch (error) {
@@ -328,7 +356,9 @@ router.put('/modules/:id/version', (req, res) => {
  * Transition module state
  * POST /api/sap-module-architecture/modules/:id/transition
  */
-router.post('/modules/:id/transition', (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/modules/:id/transition', (req, res) => {
   try {
     const { id } = req.params;
     const { new_state } = req.body;
@@ -340,7 +370,7 @@ router.post('/modules/:id/transition', (req, res) => {
       });
     }
     
-    const result = sapModuleArchitectureService.transitionModuleState(id, new_state);
+    let result = sapModuleArchitectureService.transitionModuleState(id, new_state);
     
     res.json(result);
   } catch (error) {
@@ -356,7 +386,9 @@ router.post('/modules/:id/transition', (req, res) => {
  * Get module lifecycle
  * GET /api/sap-module-architecture/modules/:id/lifecycle
  */
-router.get('/modules/:id/lifecycle', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/lifecycle', (req, res) => {
   try {
     const { id } = req.params;
     const lifecycle = sapModuleArchitectureService.getModuleLifecycle(id);
@@ -378,7 +410,9 @@ router.get('/modules/:id/lifecycle', (req, res) => {
  * Get module compatibility
  * GET /api/sap-module-architecture/modules/:id/compatibility
  */
-router.get('/modules/:id/compatibility', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/compatibility', (req, res) => {
   try {
     const { id } = req.params;
     const compatibility = sapModuleArchitectureService.getModuleCompatibility(id);
@@ -400,7 +434,9 @@ router.get('/modules/:id/compatibility', (req, res) => {
  * Generate MTA descriptor
  * GET /api/sap-module-architecture/modules/:id/mta-descriptor
  */
-router.get('/modules/:id/mta-descriptor', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/modules/:id/mta-descriptor', (req, res) => {
   try {
     const { id } = req.params;
     const descriptor = sapModuleArchitectureService.generateMTADescriptor(id);
@@ -422,7 +458,9 @@ router.get('/modules/:id/mta-descriptor', (req, res) => {
  * Get architecture overview
  * GET /api/sap-module-architecture/overview
  */
-router.get('/overview', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/overview', (req, res) => {
   try {
     const overview = sapModuleArchitectureService.getArchitectureOverview();
     
@@ -443,7 +481,9 @@ router.get('/overview', (req, res) => {
  * Health check for SAP Module Architecture service
  * GET /api/sap-module-architecture/service-health
  */
-router.get('/service-health', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/service-health', (req, res) => {
   res.json({
     success: true,
     status: 'healthy',

@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Wrench, Package, CalendarDays, Truck, ShieldCheck, AlertTriangle, Fuel, Cog, Boxes, Clock } from 'lucide-react'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Wrench, Package, CalendarDays, Truck, ShieldCheck, AlertTriangle, Fuel, Cog, Boxes, Clock } from 'lucide-react';
 import {
   implementManagementAPI,
   equipmentInventoryAPI,
@@ -11,8 +11,8 @@ import {
   fuelManagementAPI,
   sparePartsAPI,
   assetLifecycleAPI,
-} from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+} from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
 /**
  * Consolidated Machinery domain sub-modules, batch 4: M102 (Implement
@@ -43,24 +43,24 @@ const TABS = [
   { id: 'fuel', label: 'Fuel', icon: Fuel },
   { id: 'parts', label: 'Spare Parts', icon: Cog },
   { id: 'lifecycle', label: 'Asset Lifecycle', icon: Boxes },
-]
+];
 
-const IMPLEMENT_TYPES = ['Plough', 'Harrow', 'Seeder', 'Sprayer', 'Cultivator', 'Other']
+const IMPLEMENT_TYPES = ['Plough', 'Harrow', 'Seeder', 'Sprayer', 'Cultivator', 'Other'];
 // equipment_inventory.status has no CHECK constraint (added 2026-08-24
 // alongside the table) - matches the real column's default ('available').
-const EQUIPMENT_STATUS = ['available', 'in_use', 'under_repair', 'retired']
-const VEHICLE_STATUS = ['Active', 'In Maintenance', 'Idle', 'Retired']
-const MAINT_STATUS = ['Scheduled', 'Completed', 'Overdue']
-const FUEL_TYPES = ['Diesel', 'Petrol', 'Electric']
+const EQUIPMENT_STATUS = ['available', 'in_use', 'under_repair', 'retired'];
+const VEHICLE_STATUS = ['Active', 'In Maintenance', 'Idle', 'Retired'];
+const MAINT_STATUS = ['Scheduled', 'Completed', 'Overdue'];
+const FUEL_TYPES = ['Diesel', 'Petrol', 'Electric'];
 // asset_lifecycle.status has no CHECK constraint - matches the real
 // column's default ('active').
-const ASSET_STATUS = ['active', 'disposed', 'written_off']
+const ASSET_STATUS = ['active', 'disposed', 'written_off'];
 
 function FleetMaintenanceDuePanel() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['fleet-maintenance-due'],
     queryFn: async () => (await fleetManagementAPI.getMaintenanceDue()).data?.data ?? null,
-  })
+  });
 
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -90,9 +90,9 @@ function FleetMaintenanceDuePanel() {
                       {v.overdueWorkOrders > 0 && <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800">{v.overdueWorkOrders} overdue work order{v.overdueWorkOrders === 1 ? '' : 's'}</span>}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {v.nextMaintenanceDate
-                        ? `Next maintenance ${v.nextMaintenanceDate} (${v.daysUntilNextMaintenance} day${Math.abs(v.daysUntilNextMaintenance) === 1 ? '' : 's'} ${v.daysUntilNextMaintenance < 0 ? 'overdue' : 'from now'})`
-                        : 'No next-maintenance date on record.'}
+                      {v.nextMaintenanceDate ?
+                        `Next maintenance ${v.nextMaintenanceDate} (${v.daysUntilNextMaintenance} day${Math.abs(v.daysUntilNextMaintenance) === 1 ? '' : 's'} ${v.daysUntilNextMaintenance < 0 ? 'overdue' : 'from now'})` :
+                        'No next-maintenance date on record.'}
                       {v.mileage !== null && ` — ${v.mileage} km recorded`}
                     </div>
                   </div>
@@ -107,11 +107,11 @@ function FleetMaintenanceDuePanel() {
         </>
       )}
     </div>
-  )
+  );
 }
 
 function MachineryManagementPage() {
-  const [activeTab, setActiveTab] = useState('implements')
+  const [activeTab, setActiveTab] = useState('implements');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -259,41 +259,41 @@ function MachineryManagementPage() {
 
       {activeTab === 'fleet' && (
         <>
-        <FleetMaintenanceDuePanel />
-        <ResourceManager
-          compact
-          accent="teal"
-          queryKey="fleet-management"
-          idField="id"
-          list={(params) => fleetManagementAPI.getFleet(params)}
-          create={(data) => fleetManagementAPI.addVehicle(data)}
-          update={(id, data) => fleetManagementAPI.updateVehicle(id, data)}
-          searchPlaceholder="Search by vehicle..."
-          emptyMessage="No fleet vehicles recorded yet."
-          newLabel="Add Vehicle"
-          backendNote="Real backend at /api/v1/logistics/fleet (logisticsEnhancementService) — this tab reads and writes it directly. There is no DELETE route, so removal is not available from here."
-          initialForm={{ registration_number: '', vehicle_type: '', capacity: '', driver_name: '', status: 'Active', notes: '' }}
-          requiredFields={['registration_number']}
-          columns={[
-            { key: 'registration_number', label: 'Registration' },
-            { key: 'vehicle_type', label: 'Type' },
-            { key: 'driver_name', label: 'Driver' },
-            { key: 'capacity', label: 'Capacity' },
-            { key: 'status', label: 'Status' },
-          ]}
-          fields={[
-            { name: 'registration_number', label: 'Registration number', required: true },
-            { name: 'vehicle_type', label: 'Vehicle type' },
-            { name: 'capacity', label: 'Capacity' },
-            { name: 'driver_name', label: 'Driver name' },
-            { name: 'status', label: 'Status', type: 'select', options: VEHICLE_STATUS },
-            { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
-          ]}
-          stats={(items) => [
-            { label: 'Vehicles', value: items.length },
-            { label: 'Active', value: items.filter((i) => i.status === 'Active').length },
-          ]}
-        />
+          <FleetMaintenanceDuePanel />
+          <ResourceManager
+            compact
+            accent="teal"
+            queryKey="fleet-management"
+            idField="id"
+            list={(params) => fleetManagementAPI.getFleet(params)}
+            create={(data) => fleetManagementAPI.addVehicle(data)}
+            update={(id, data) => fleetManagementAPI.updateVehicle(id, data)}
+            searchPlaceholder="Search by vehicle..."
+            emptyMessage="No fleet vehicles recorded yet."
+            newLabel="Add Vehicle"
+            backendNote="Real backend at /api/v1/logistics/fleet (logisticsEnhancementService) — this tab reads and writes it directly. There is no DELETE route, so removal is not available from here."
+            initialForm={{ registration_number: '', vehicle_type: '', capacity: '', driver_name: '', status: 'Active', notes: '' }}
+            requiredFields={['registration_number']}
+            columns={[
+              { key: 'registration_number', label: 'Registration' },
+              { key: 'vehicle_type', label: 'Type' },
+              { key: 'driver_name', label: 'Driver' },
+              { key: 'capacity', label: 'Capacity' },
+              { key: 'status', label: 'Status' },
+            ]}
+            fields={[
+              { name: 'registration_number', label: 'Registration number', required: true },
+              { name: 'vehicle_type', label: 'Vehicle type' },
+              { name: 'capacity', label: 'Capacity' },
+              { name: 'driver_name', label: 'Driver name' },
+              { name: 'status', label: 'Status', type: 'select', options: VEHICLE_STATUS },
+              { name: 'notes', label: 'Notes', type: 'textarea', span: 2 },
+            ]}
+            stats={(items) => [
+              { label: 'Vehicles', value: items.length },
+              { label: 'Active', value: items.filter((i) => i.status === 'Active').length },
+            ]}
+          />
         </>
       )}
 
@@ -494,7 +494,7 @@ function MachineryManagementPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default MachineryManagementPage
+export default MachineryManagementPage;

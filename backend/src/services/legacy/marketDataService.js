@@ -25,8 +25,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 // ---------------------------------------------------------------------------
 // Agmarknet / e-NAM
@@ -390,3 +390,6 @@ module.exports = {
   recordCompetitorPrice, competitivePosition,
   reconcileDbt, unclaimedEntitlements,
 };
+
+
+

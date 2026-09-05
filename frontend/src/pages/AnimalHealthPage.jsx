@@ -1,175 +1,175 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { animalHealthAPI } from '../services/api'
-import { HeartPulse, Plus, X, Trash2, Edit, Pill, AlertTriangle, ShieldAlert, Activity } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { animalHealthAPI } from '../services/api';
+import { HeartPulse, Plus, X, Trash2, Edit, Pill, AlertTriangle, ShieldAlert, Activity } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const SPECIES = ['Poultry', 'Goat', 'Sheep', 'Pig', 'Cattle', 'Other']
-const EXAMINATION_TYPES = ['Routine', 'Emergency', 'Follow-up', 'Preventive']
-const TREATMENT_TYPES = ['Medication', 'Vaccination', 'Surgery', 'Therapy', 'Nutritional']
-const DISEASE_SEVERITY = ['Mild', 'Moderate', 'Severe', 'Critical']
-const QUARANTINE_STATUS = ['Active', 'Released', 'Deceased']
+const SPECIES = ['Poultry', 'Goat', 'Sheep', 'Pig', 'Cattle', 'Other'];
+const EXAMINATION_TYPES = ['Routine', 'Emergency', 'Follow-up', 'Preventive'];
+const TREATMENT_TYPES = ['Medication', 'Vaccination', 'Surgery', 'Therapy', 'Nutritional'];
+const DISEASE_SEVERITY = ['Mild', 'Moderate', 'Severe', 'Critical'];
+const QUARANTINE_STATUS = ['Active', 'Released', 'Deceased'];
 
 const emptyExamination = {
-  animal_id: '', species: 'Cattle', examination_type: 'Routine', examination_date: '', 
+  animal_id: '', species: 'Cattle', examination_type: 'Routine', examination_date: '',
   findings: '', diagnosis: '', examiner_name: '', notes: '',
-}
+};
 
 const emptyTreatment = {
-  examination_id: '', treatment_type: 'Medication', medication_name: '', dosage: '', 
+  examination_id: '', treatment_type: 'Medication', medication_name: '', dosage: '',
   administration_route: '', start_date: '', end_date: '', notes: '',
-}
+};
 
 const emptyOutbreak = {
-  disease_name: '', species: 'Cattle', start_date: '', severity: 'Moderate', 
+  disease_name: '', species: 'Cattle', start_date: '', severity: 'Moderate',
   affected_count: '', location: '', notes: '',
-}
+};
 
 const emptyQuarantine = {
-  animal_id: '', species: 'Cattle', reason: '', start_date: '', 
+  animal_id: '', species: 'Cattle', reason: '', start_date: '',
   expected_end_date: '', status: 'Active', notes: '',
-}
+};
 
 function AnimalHealthPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [formType, setFormType] = useState('examination')
-  const [editingId, setEditingId] = useState(null)
-  const [examinationForm, setExaminationForm] = useState(emptyExamination)
-  const [treatmentForm, setTreatmentForm] = useState(emptyTreatment)
-  const [outbreakForm, setOutbreakForm] = useState(emptyOutbreak)
-  const [quarantineForm, setQuarantineForm] = useState(emptyQuarantine)
-  const [tab, setTab] = useState('examinations')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [formType, setFormType] = useState('examination');
+  const [editingId, setEditingId] = useState(null);
+  const [examinationForm, setExaminationForm] = useState(emptyExamination);
+  const [treatmentForm, setTreatmentForm] = useState(emptyTreatment);
+  const [outbreakForm, setOutbreakForm] = useState(emptyOutbreak);
+  const [quarantineForm, setQuarantineForm] = useState(emptyQuarantine);
+  const [tab, setTab] = useState('examinations');
 
   const { data: examinationsData, isLoading, error } = useQuery({
     queryKey: ['animal-health-examinations'],
     queryFn: async () => (await animalHealthAPI.listExaminations()).data?.data ?? [],
-  })
+  });
 
   const { data: treatmentsData, isLoading: treatmentsLoading, error: treatmentsError } = useQuery({
     queryKey: ['animal-health-treatments'],
     queryFn: async () => (await animalHealthAPI.listTreatments()).data?.data ?? [],
-  })
+  });
 
   const { data: outbreaksData, isLoading: outbreaksLoading, error: outbreaksError } = useQuery({
     queryKey: ['animal-health-outbreaks'],
     queryFn: async () => (await animalHealthAPI.listDiseaseOutbreaks()).data?.data ?? [],
-  })
+  });
 
   const { data: quarantinesData, isLoading: quarantinesLoading, error: quarantinesError } = useQuery({
     queryKey: ['animal-health-quarantines'],
     queryFn: async () => (await animalHealthAPI.listQuarantineRecords()).data?.data ?? [],
-  })
+  });
 
   const { data: healthOverviewData, isLoading: healthOverviewLoading, error: healthOverviewError } = useQuery({
     queryKey: ['animal-health-overview'],
     queryFn: async () => (await animalHealthAPI.getHealthOverview()).data?.data ?? null,
     enabled: tab === 'overview',
-  })
+  });
 
   const { data: activeOutbreaksData, isLoading: activeOutbreaksLoading, error: activeOutbreaksError } = useQuery({
     queryKey: ['animal-health-active-outbreaks'],
     queryFn: async () => (await animalHealthAPI.getActiveOutbreaks()).data?.data ?? null,
     enabled: tab === 'overview',
-  })
+  });
 
   const { data: activeQuarantinesData, isLoading: activeQuarantinesLoading, error: activeQuarantinesError } = useQuery({
     queryKey: ['animal-health-active-quarantines'],
     queryFn: async () => (await animalHealthAPI.getActiveQuarantines()).data?.data ?? null,
     enabled: tab === 'overview',
-  })
+  });
 
   const saveExaminationMutation = useMutation({
     mutationFn: (payload) => (editingId ? animalHealthAPI.updateExamination(editingId, payload) : animalHealthAPI.createExamination(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Examination updated' : 'Examination recorded')
-      queryClient.invalidateQueries({ queryKey: ['animal-health-examinations'] })
-      closeForm()
+      toast.success(editingId ? 'Examination updated' : 'Examination recorded');
+      queryClient.invalidateQueries({ queryKey: ['animal-health-examinations'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save examination'),
-  })
+  });
 
   const deleteExaminationMutation = useMutation({
     mutationFn: (id) => animalHealthAPI.deleteExamination(id),
-    onSuccess: () => { toast.success('Examination removed'); queryClient.invalidateQueries({ queryKey: ['animal-health-examinations'] }) },
+    onSuccess: () => { toast.success('Examination removed'); queryClient.invalidateQueries({ queryKey: ['animal-health-examinations'] }); },
     onError: () => toast.error('Failed to remove examination'),
-  })
+  });
 
   const saveTreatmentMutation = useMutation({
     mutationFn: (payload) => (editingId ? animalHealthAPI.updateTreatment(editingId, payload) : animalHealthAPI.createTreatment(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Treatment updated' : 'Treatment recorded')
-      queryClient.invalidateQueries({ queryKey: ['animal-health-treatments'] })
-      closeForm()
+      toast.success(editingId ? 'Treatment updated' : 'Treatment recorded');
+      queryClient.invalidateQueries({ queryKey: ['animal-health-treatments'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save treatment'),
-  })
+  });
 
   const saveOutbreakMutation = useMutation({
     mutationFn: (payload) => (editingId ? animalHealthAPI.updateOutbreak(editingId, payload) : animalHealthAPI.createOutbreak(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Outbreak updated' : 'Outbreak recorded')
-      queryClient.invalidateQueries({ queryKey: ['animal-health-outbreaks'] })
-      closeForm()
+      toast.success(editingId ? 'Outbreak updated' : 'Outbreak recorded');
+      queryClient.invalidateQueries({ queryKey: ['animal-health-outbreaks'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save outbreak'),
-  })
+  });
 
   const saveQuarantineMutation = useMutation({
     mutationFn: (payload) => (editingId ? animalHealthAPI.updateQuarantine(editingId, payload) : animalHealthAPI.createQuarantine(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Quarantine updated' : 'Quarantine recorded')
-      queryClient.invalidateQueries({ queryKey: ['animal-health-quarantines'] })
-      closeForm()
+      toast.success(editingId ? 'Quarantine updated' : 'Quarantine recorded');
+      queryClient.invalidateQueries({ queryKey: ['animal-health-quarantines'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save quarantine'),
-  })
+  });
 
-  const closeForm = () => { 
-    setShowForm(false); 
-    setEditingId(null); 
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingId(null);
     setExaminationForm(emptyExamination);
     setTreatmentForm(emptyTreatment);
     setOutbreakForm(emptyOutbreak);
     setQuarantineForm(emptyQuarantine);
-  }
+  };
 
   const openExaminationForm = () => {
     setFormType('examination');
     setExaminationForm(emptyExamination);
     setEditingId(null);
     setShowForm(true);
-  }
+  };
 
   const openTreatmentForm = () => {
     setFormType('treatment');
     setTreatmentForm(emptyTreatment);
     setEditingId(null);
     setShowForm(true);
-  }
+  };
 
   const openOutbreakForm = () => {
     setFormType('outbreak');
     setOutbreakForm(emptyOutbreak);
     setEditingId(null);
     setShowForm(true);
-  }
+  };
 
   const openQuarantineForm = () => {
     setFormType('quarantine');
     setQuarantineForm(emptyQuarantine);
     setEditingId(null);
     setShowForm(true);
-  }
+  };
 
-  const examinations = examinationsData || []
-  const treatments = treatmentsData || []
-  const outbreaks = outbreaksData || []
-  const quarantines = quarantinesData || []
+  const examinations = examinationsData || [];
+  const treatments = treatmentsData || [];
+  const outbreaks = outbreaksData || [];
+  const quarantines = quarantinesData || [];
 
-  const activeQuarantines = quarantines.filter((q) => q.status === 'Active').length
-  const activeOutbreaks = outbreaks.filter((o) => o.status === 'Active').length
+  const activeQuarantines = quarantines.filter((q) => q.status === 'Active').length;
+  const activeOutbreaks = outbreaks.filter((o) => o.status === 'Active').length;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -344,7 +344,7 @@ function AnimalHealthPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default AnimalHealthPage
+export default AnimalHealthPage;

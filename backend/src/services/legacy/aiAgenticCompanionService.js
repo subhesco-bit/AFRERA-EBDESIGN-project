@@ -4,8 +4,8 @@
  * Inspired by AgriERP's AgriCompanion and next-gen agricultural AI systems
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class AIAgenticCompanionService {
   constructor() {
@@ -330,7 +330,7 @@ class AIAgenticCompanionService {
   }
 
   async getHarvestTimingAdvice(crop, fieldData) {
-    const cropGuideline = this.knowledgeBase.get(`crop_${crop}`);
+    let cropGuideline = this.knowledgeBase.get(`crop_${crop}`);
     
     return {
       crop,
@@ -516,7 +516,7 @@ class AIAgenticCompanionService {
   }
 
   async forecastRevenue(cropData, marketData) {
-    const crop = cropData.crop_type;
+    let crop = cropData.crop_type;
     const expectedYield = cropData.expected_yield || 0;
     const marketPrice = marketData.current_price || 0;
     const priceTrend = marketData.price_trend || 'stable';
@@ -556,7 +556,7 @@ class AIAgenticCompanionService {
           });
         }
 
-        const result = await this.processTask(taskType, taskData, userId);
+        let result = await this.processTask(taskType, taskData, userId);
         res.json(result);
       } catch (error) {
         logger.error('AI companion task error', { error: error.message });
@@ -625,7 +625,7 @@ class AIAgenticCompanionService {
 
   async generateFarmInsights(farmId) {
     // Generate comprehensive insights for a specific farm
-    const insights = {
+    let insights = {
       crop_recommendations: [],
       irrigation_suggestions: [],
       pest_alerts: [],
@@ -858,3 +858,6 @@ class AIAgenticCompanionService {
 }
 
 module.exports = new AIAgenticCompanionService();
+
+
+

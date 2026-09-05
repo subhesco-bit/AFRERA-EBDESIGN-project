@@ -6,15 +6,15 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware, requireRole } = require('../../middleware\/auth');
+const { PLATFORM_STAFF_ROLES } = require('../../middleware\/roleGroups');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // TRADITIONAL RECIPES DATABASE (CAP-209)
@@ -97,7 +97,7 @@ router.get('/traditional-recipes', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get traditional recipes error', { error: error.message, stack: error.stack });
@@ -110,7 +110,7 @@ router.get('/traditional-recipes', authMiddleware, async (req, res) => {
  */
 router.get('/traditional-recipes/:id', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM traditional_recipes WHERE id = $1',
       [req.params.id]
     );
@@ -151,7 +151,7 @@ router.post('/traditional-medicine', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO traditional_medicine 
        (name, indigenous_community, region, medicinal_plants, preparation_method, 
         traditional_uses, dosage, contraindications, scientific_validation, 
@@ -182,7 +182,7 @@ router.get('/traditional-medicine', authMiddleware, async (req, res) => {
     const { community, region, ailment, search } = req.query;
     
     let query = 'SELECT * FROM traditional_medicine WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (community) {
@@ -209,7 +209,7 @@ router.get('/traditional-medicine', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get traditional medicine error', { error: error.message, stack: error.stack });
@@ -244,7 +244,7 @@ router.post('/indigenous-farming', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO indigenous_farming_practices 
        (practice_name, indigenous_community, region, crops, techniques, 
         seasonal_calendar, soil_management, water_management, pest_management, 
@@ -277,7 +277,7 @@ router.get('/indigenous-farming', authMiddleware, async (req, res) => {
     const { community, region, crop, technique } = req.query;
     
     let query = 'SELECT * FROM indigenous_farming_practices WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (community) {
@@ -304,7 +304,7 @@ router.get('/indigenous-farming', authMiddleware, async (req, res) => {
       params.push(JSON.stringify([technique]));
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get indigenous farming practices error', { error: error.message, stack: error.stack });
@@ -341,7 +341,7 @@ router.post('/oral-history', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO oral_history 
        (title, indigenous_community, region, narrator, narrator_age, narrator_role, 
         recording_date, language, transcript, summary, topics, historical_period, 
@@ -373,7 +373,7 @@ router.get('/oral-history', authMiddleware, async (req, res) => {
     const { community, region, topic, period } = req.query;
     
     let query = 'SELECT * FROM oral_history WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (community) {
@@ -400,7 +400,7 @@ router.get('/oral-history', authMiddleware, async (req, res) => {
       params.push(period);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get oral history error', { error: error.message, stack: error.stack });
@@ -433,7 +433,7 @@ router.post('/tribal-knowledge', authMiddleware, async (req, res) => {
       verified_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO tribal_knowledge 
        (knowledge_type, indigenous_community, region, title, description, 
         knowledge_holders, transmission_method, restrictions, applications, 
@@ -464,7 +464,7 @@ router.get('/tribal-knowledge', authMiddleware, async (req, res) => {
     const { community, region, type, search } = req.query;
     
     let query = 'SELECT * FROM tribal_knowledge WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (community) {
@@ -491,7 +491,7 @@ router.get('/tribal-knowledge', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get tribal knowledge error', { error: error.message, stack: error.stack });
@@ -522,7 +522,7 @@ router.post('/documentation', authMiddleware, async (req, res) => {
       approved_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO indigenous_documentation 
        (knowledge_id, knowledge_type, documentation_type, document_format, 
         content, metadata, location, access_level, contributors, reviewed_by, 
@@ -552,7 +552,7 @@ router.get('/documentation', authMiddleware, async (req, res) => {
     const { knowledge_type, access_level, format } = req.query;
     
     let query = 'SELECT * FROM indigenous_documentation WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (knowledge_type) {
@@ -573,7 +573,7 @@ router.get('/documentation', authMiddleware, async (req, res) => {
       params.push(format);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get documentation error', { error: error.message, stack: error.stack });
@@ -603,7 +603,7 @@ router.post('/protection', authMiddleware, async (req, res) => {
       conditions
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO indigenous_protection 
        (knowledge_id, knowledge_type, protection_type, reason, requested_by, 
         community_consent, legal_basis, scope, duration, conditions, 
@@ -631,7 +631,7 @@ router.put('/protection/:id/status', authMiddleware, requireRole(...PLATFORM_STA
   try {
     const { status, reviewed_by, notes } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE indigenous_protection 
        SET status = $1, reviewed_by = $2, review_notes = $3, reviewed_at = NOW(), updated_at = NOW()
        WHERE id = $4
@@ -659,7 +659,7 @@ router.get('/protection', authMiddleware, async (req, res) => {
     const { status, knowledge_type, requested_by } = req.query;
     
     let query = 'SELECT * FROM indigenous_protection WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (status) {
@@ -680,7 +680,7 @@ router.get('/protection', authMiddleware, async (req, res) => {
       params.push(requested_by);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get protection requests error', { error: error.message, stack: error.stack });
@@ -713,7 +713,7 @@ router.post('/ip-management', authMiddleware, async (req, res) => {
       jurisdiction
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO indigenous_ip_management 
        (knowledge_id, knowledge_type, ip_type, registration_type, indigenous_community, 
         ownership_structure, commercial_rights, licensing_terms, benefit_sharing, 
@@ -746,7 +746,7 @@ router.get('/ip-management', authMiddleware, async (req, res) => {
     const { community, ip_type, status } = req.query;
     
     let query = 'SELECT * FROM indigenous_ip_management WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (community) {
@@ -767,7 +767,7 @@ router.get('/ip-management', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get IP registrations error', { error: error.message, stack: error.stack });
@@ -784,7 +784,7 @@ router.put('/ip-management/:id', authMiddleware, requireRole(...PLATFORM_STAFF_R
       legal_protection_status, licensing_terms, benefit_sharing, expiry_date
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE indigenous_ip_management 
        SET legal_protection_status = COALESCE($1, legal_protection_status),
            licensing_terms = COALESCE($2, licensing_terms),
@@ -823,3 +823,6 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+

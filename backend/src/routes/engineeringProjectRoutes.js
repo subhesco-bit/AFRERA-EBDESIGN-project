@@ -2,12 +2,12 @@
 
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 const service = require('../services/legacy/engineeringProjectService');
 
 const router = express.Router();
 
-router.post('/projects', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/projects', authLimiter, authMiddleware, async (req, res) => {
   try {
     const project = await service.createProject(req.user.id, req.body);
     res.status(201).json({ success: true, data: project });
@@ -27,16 +27,16 @@ router.get('/projects', authMiddleware, async (req, res) => {
 
 router.get('/projects/:id', authMiddleware, async (req, res) => {
   try {
-    const project = await service.getProject(req.params.id, req.user.id, req.user.role === 'admin');
+    let project = await service.getProject(req.params.id, req.user.id, req.user.role === 'admin');
     res.json({ success: true, data: project });
   } catch (error) {
     res.status(error.message === 'Project not found' ? 404 : 500).json({ success: false, error: error.message });
   }
 });
 
-router.put('/projects/:id/phase', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/projects/:id/phase', authLimiter, authMiddleware, async (req, res) => {
   try {
-    const project = await service.updateProjectPhase(
+    let project = await service.updateProjectPhase(
       req.params.id, req.user.id, req.user.role === 'admin', req.body
     );
     res.json({ success: true, data: project });
@@ -45,7 +45,7 @@ router.put('/projects/:id/phase', authRateLimit, authMiddleware, async (req, res
   }
 });
 
-router.post('/projects/:id/cost-estimates', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/projects/:id/cost-estimates', authLimiter, authMiddleware, async (req, res) => {
   try {
     const result = await service.createCostEstimate(
       req.params.id, req.user.id, req.user.role === 'admin', req.body
@@ -69,3 +69,4 @@ router.get('/projects/:id/cost-estimates', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+

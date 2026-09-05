@@ -6,15 +6,15 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
+const { authLimiter } = require('../../middleware\/rateLimiter');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // RECIPE DATABASE (CAP-281)
@@ -23,7 +23,7 @@ const pool = require('../../database/pool');
 /**
  * Create recipe entry
  */
-router.post('/recipes', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/recipes', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       recipe_name,
@@ -118,7 +118,7 @@ router.get('/recipes', authMiddleware, async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get recipes error', { error: error.message, stack: error.stack });
@@ -131,7 +131,7 @@ router.get('/recipes', authMiddleware, async (req, res) => {
  */
 router.get('/recipes/:id', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM recipe_database WHERE id = $1',
       [req.params.id]
     );
@@ -154,7 +154,7 @@ router.get('/recipes/:id', authMiddleware, async (req, res) => {
 /**
  * Generate recipe using AI
  */
-router.post('/generate-recipe', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/generate-recipe', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       available_ingredients,
@@ -182,7 +182,7 @@ router.post('/generate-recipe', authRateLimit, authMiddleware, async (req, res) 
     });
 
     // Store generated recipe
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO recipe_database 
        (recipe_name, cuisine_type, meal_type, difficulty_level, preparation_time, 
         cooking_time, servings, ingredients, instructions, nutritional_info, 
@@ -287,7 +287,7 @@ async function generateAIRecipe(params) {
 /**
  * Calculate nutrition for recipe
  */
-router.post('/nutrition-calculation', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/nutrition-calculation', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { ingredients, servings } = req.body;
 
@@ -388,7 +388,7 @@ router.get('/nutrition-data/:ingredient', authMiddleware, async (req, res) => {
 /**
  * Get ingredient substitutions
  */
-router.post('/ingredient-substitution', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/ingredient-substitution', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { ingredient, dietary_restrictions, availability, cuisine_type } = req.body;
 
@@ -447,7 +447,7 @@ async function findIngredientSubstitutions(params) {
 /**
  * Calculate recipe cost
  */
-router.post('/cost-calculation', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/cost-calculation', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { ingredients, servings, location } = req.body;
 
@@ -490,7 +490,7 @@ async function calculateRecipeCost(ingredients, servings, location) {
 
     const category = ingredient.category || 'vegetables';
     const price = pricePerUnit[category] || 0.05;
-    const quantity = parseFloat(ingredient.quantity) || 1;
+    let quantity = parseFloat(ingredient.quantity) || 1;
     const ingredientCost = price * quantity;
 
     totalCost += ingredientCost;
@@ -550,7 +550,7 @@ router.get('/seasonal-recipes', authMiddleware, async (req, res) => {
     // Determine season if not provided
     const currentSeason = season || determineSeason(month);
 
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM recipe_database 
        WHERE is_verified = true 
          AND seasonal_availability @> $1::jsonb
@@ -590,7 +590,7 @@ router.get('/seasonal-ingredients', authMiddleware, async (req, res) => {
   try {
     const { season, region } = req.query;
 
-    const currentSeason = season || determineSeason();
+    let currentSeason = season || determineSeason();
 
     // Mock seasonal ingredients - in production, would query database
     const seasonalIngredients = {
@@ -623,7 +623,7 @@ router.get('/regional-recipes', authMiddleware, async (req, res) => {
     const { region, state, city, cuisine_type } = req.query;
 
     let query = 'SELECT * FROM recipe_database WHERE is_verified = true';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (region) {
@@ -652,7 +652,7 @@ router.get('/regional-recipes', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY popularity DESC LIMIT 20';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get regional recipes error', { error: error.message, stack: error.stack });
@@ -691,7 +691,7 @@ router.get('/regional-cuisine/:region', authMiddleware, async (req, res) => {
 /**
  * Create institutional recipe
  */
-router.post('/institutional-recipes', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/institutional-recipes', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -712,7 +712,7 @@ router.post('/institutional-recipes', authRateLimit, authMiddleware, async (req,
       status
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO institutional_recipes 
        (institution_id, recipe_name, meal_type, target_servings, dietary_requirements, 
         nutritional_targets, budget_constraints, equipment_available, staff_skill_level, 
@@ -746,7 +746,7 @@ router.get('/institutional-recipes', authMiddleware, async (req, res) => {
     const { institution_id, meal_type, status, dietary_requirements } = req.query;
     
     let query = 'SELECT * FROM institutional_recipes WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (institution_id) {
@@ -773,7 +773,7 @@ router.get('/institutional-recipes', authMiddleware, async (req, res) => {
       params.push(JSON.stringify([dietary_requirements]));
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get institutional recipes error', { error: error.message, stack: error.stack });
@@ -784,7 +784,7 @@ router.get('/institutional-recipes', authMiddleware, async (req, res) => {
 /**
  * Scale recipe for institutional use
  */
-router.post('/scale-recipe', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/scale-recipe', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { recipe_id, target_servings, institutional_constraints } = req.body;
 
@@ -904,3 +904,7 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+
+

@@ -24,6 +24,8 @@ const multer = require('multer');
 const { authMiddleware } = require('../middleware/auth');
 const { route } = require('../core/aiOrchestrator');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 const upload = multer({
@@ -48,7 +50,9 @@ function requireFile(req, res) {
 }
 
 /** POST /analyze-quality — real sharp-based blur/brightness heuristic. */
-router.post('/analyze-quality', upload.single('image'), async (req, res, next) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/analyze-quality', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
     const result = await route(
@@ -63,10 +67,12 @@ router.post('/analyze-quality', upload.single('image'), async (req, res, next) =
 });
 
 /** POST /metadata — real sharp(buffer).metadata() (dimensions, format, size). */
-router.post('/metadata', upload.single('image'), async (req, res, next) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/metadata', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
-    const result = await route(
+    let result = await route(
       'vision_engine',
       { buffer: req.file.buffer, operation: 'metadata' },
       { actorId: 'visionRoutes:metadata' }
@@ -78,11 +84,13 @@ router.post('/metadata', upload.single('image'), async (req, res, next) => {
 });
 
 /** POST /thumbnail — real sharp resize; returns the encoded image bytes directly. */
-router.post('/thumbnail', upload.single('image'), async (req, res, next) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/thumbnail', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
     const { width, height, fit, format } = req.body;
-    const result = await route(
+    let result = await route(
       'vision_engine',
       {
         buffer: req.file.buffer,
@@ -110,11 +118,13 @@ router.post('/thumbnail', upload.single('image'), async (req, res, next) => {
  * body field additionally persists the extracted text into the matching
  * `certification_reports.report_data` row (see services/ocrService.js).
  */
-router.post('/ocr', upload.single('image'), async (req, res, next) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/ocr', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
     const { language, reportNumber } = req.body;
-    const result = await route(
+    let result = await route(
       'ocr_engine',
       { buffer: req.file.buffer, language, reportNumber },
       { actorId: 'visionRoutes:ocr' }

@@ -1,121 +1,121 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { goatAPI, goatAIAPI } from '../services/api'
-import { Rabbit, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { goatAPI, goatAIAPI } from '../services/api';
+import { Rabbit, Plus, X, Trash2, Edit, Syringe, AlertTriangle, TrendingDown, TrendingUp, Wheat, Baby } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
+import ActionCard from '../components/common/ActionCard';
 
-const BREEDS = ['Jamunapari', 'Beetal', 'Sirohi', 'Barbari', 'Black Bengal', 'Osmanabadi', 'Local / Desi', 'Crossbred']
-const STATUSES = ['Lactating', 'Dry', 'Pregnant', 'Kid', 'Buck', 'Sold', 'Deceased']
+const BREEDS = ['Jamunapari', 'Beetal', 'Sirohi', 'Barbari', 'Black Bengal', 'Osmanabadi', 'Local / Desi', 'Crossbred'];
+const STATUSES = ['Lactating', 'Dry', 'Pregnant', 'Kid', 'Buck', 'Sold', 'Deceased'];
 
 const emptyAnimal = {
   tag_id: '', breed: 'Local / Desi', dob: '', sex: 'female', status: 'Lactating', notes: '',
   last_vaccination_date: '', last_breeding_date: '',
-}
+};
 
 function GoatFarmingPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyAnimal)
-  const [milkForm, setMilkForm] = useState({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
-  const [feedForm, setFeedForm] = useState({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
-  const [breedingForm, setBreedingForm] = useState({ female_id: '', male_id: '', breeding_date: '', expected_kidding_date: '' })
-  const [tab, setTab] = useState('herd')
-  const [aiAnimalId, setAiAnimalId] = useState('')
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyAnimal);
+  const [milkForm, setMilkForm] = useState({ animal_id: '', date: '', session: 'morning', quantity_liters: '' });
+  const [feedForm, setFeedForm] = useState({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
+  const [breedingForm, setBreedingForm] = useState({ female_id: '', male_id: '', breeding_date: '', expected_kidding_date: '' });
+  const [tab, setTab] = useState('herd');
+  const [aiAnimalId, setAiAnimalId] = useState('');
 
   const { data: herdData, isLoading, error } = useQuery({
     queryKey: ['goat-herd'],
     queryFn: async () => (await goatAPI.listHerd()).data?.data ?? [],
-  })
+  });
 
   const { data: milkData, isLoading: milkLoading, error: milkError } = useQuery({
     queryKey: ['goat-milk-production'],
     queryFn: async () => (await goatAPI.listMilkProduction()).data?.data ?? [],
-  })
+  });
 
   const { data: performanceData, isLoading: performanceLoading, error: performanceError } = useQuery({
     queryKey: ['goat-herd-performance'],
     queryFn: async () => (await goatAPI.getHerdPerformance()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: breedingAlertsData, isLoading: breedingAlertsLoading, error: breedingAlertsError } = useQuery({
     queryKey: ['goat-breeding-alerts'],
     queryFn: async () => (await goatAPI.getBreedingAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const { data: vaccinationAlertsData, isLoading: vaccinationAlertsLoading, error: vaccinationAlertsError } = useQuery({
     queryKey: ['goat-vaccination-alerts'],
     queryFn: async () => (await goatAPI.getVaccinationAlerts()).data?.data ?? null,
     enabled: tab === 'insights',
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? goatAPI.updateAnimal(editingId, payload) : goatAPI.createAnimal(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Animal updated' : 'Animal registered')
-      queryClient.invalidateQueries({ queryKey: ['goat-herd'] })
-      closeForm()
+      toast.success(editingId ? 'Animal updated' : 'Animal registered');
+      queryClient.invalidateQueries({ queryKey: ['goat-herd'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save animal'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => goatAPI.deleteAnimal(id),
-    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['goat-herd'] }) },
+    onSuccess: () => { toast.success('Animal removed'); queryClient.invalidateQueries({ queryKey: ['goat-herd'] }); },
     onError: () => toast.error('Failed to remove animal'),
-  })
+  });
 
   const recordMilkMutation = useMutation({
     mutationFn: (payload) => goatAPI.recordMilkProduction(payload),
     onSuccess: () => {
-      toast.success('Milk production recorded')
-      queryClient.invalidateQueries({ queryKey: ['goat-milk-production'] })
-      setMilkForm({ animal_id: '', date: '', session: 'morning', quantity_liters: '' })
+      toast.success('Milk production recorded');
+      queryClient.invalidateQueries({ queryKey: ['goat-milk-production'] });
+      setMilkForm({ animal_id: '', date: '', session: 'morning', quantity_liters: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record milk production'),
-  })
+  });
 
   const recordFeedMutation = useMutation({
     mutationFn: (payload) => goatAPI.recordFeedConsumption(payload),
     onSuccess: () => {
-      toast.success('Feed consumption recorded')
-      queryClient.invalidateQueries({ queryKey: ['goat-feed-consumption'] })
-      setFeedForm({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' })
+      toast.success('Feed consumption recorded');
+      queryClient.invalidateQueries({ queryKey: ['goat-feed-consumption'] });
+      setFeedForm({ animal_id: '', date: '', feed_type: '', quantity_kg: '', cost_per_kg: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record feed consumption'),
-  })
+  });
 
   const recordBreedingMutation = useMutation({
     mutationFn: (payload) => goatAPI.recordBreeding(payload),
     onSuccess: () => {
-      toast.success('Breeding recorded')
-      queryClient.invalidateQueries({ queryKey: ['goat-breeding-records'] })
-      setBreedingForm({ female_id: '', male_id: '', breeding_date: '', expected_kidding_date: '' })
+      toast.success('Breeding recorded');
+      queryClient.invalidateQueries({ queryKey: ['goat-breeding-records'] });
+      setBreedingForm({ female_id: '', male_id: '', breeding_date: '', expected_kidding_date: '' });
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to record breeding'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyAnimal); };
 
   const openEdit = (a) => {
     setForm({
-      tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '', 
+      tag_id: a.tag_id || '', breed: a.breed || 'Local / Desi', dob: a.dob ? a.dob.slice(0, 10) : '',
       sex: a.sex || 'female', status: a.status || 'Lactating', notes: a.notes || '',
       last_vaccination_date: a.last_vaccination_date ? a.last_vaccination_date.slice(0, 10) : '',
       last_breeding_date: a.last_breeding_date ? a.last_breeding_date.slice(0, 10) : '',
-    })
-    setEditingId(a.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(a.id);
+    setShowForm(true);
+  };
 
-  const herd = herdData || []
-  const milkRecords = milkData || []
-  const lactating = herd.filter((a) => a.status === 'Lactating').length
-  const totalMilkToday = milkRecords.reduce((s, m) => s + (Number(m.quantity_liters) || 0), 0)
+  const herd = herdData || [];
+  const milkRecords = milkData || [];
+  const lactating = herd.filter((a) => a.status === 'Lactating').length;
+  const totalMilkToday = milkRecords.reduce((s, m) => s + (Number(m.quantity_liters) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -130,7 +130,7 @@ function GoatFarmingPage() {
           <p className="text-gray-600">Track herd health, milk production, and breeding records</p>
         </div>
         {tab === 'herd' && (
-          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true) }}
+          <button onClick={() => { setForm(emptyAnimal); setEditingId(null); setShowForm(true); }}
             className="px-4 py-2 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 transition flex items-center">
             <Plus className="w-4 h-4 mr-2" /> Add Animal
           </button>
@@ -318,7 +318,7 @@ function GoatFarmingPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default GoatFarmingPage
+export default GoatFarmingPage;

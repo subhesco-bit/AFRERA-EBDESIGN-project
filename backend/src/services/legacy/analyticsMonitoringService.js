@@ -5,8 +5,8 @@
  * for production-ready system health and performance tracking
  */
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
 
 class AnalyticsMonitoringService {
   constructor() {
@@ -121,7 +121,7 @@ class AnalyticsMonitoringService {
       }
 
       // Store in database
-      const query = `
+      let query = `
         INSERT INTO performance_metrics (endpoint, response_time, status_code, user_id)
         VALUES ($1, $2, $3, $4)
       `;
@@ -329,7 +329,7 @@ class AnalyticsMonitoringService {
         const isHealthy = await this.checkServiceHealth(service);
         const responseTime = Date.now() - startTime;
 
-        const query = `
+        let query = `
           INSERT INTO system_health (service_name, status, response_time)
           VALUES ($1, $2, $3)
         `;
@@ -427,3 +427,6 @@ module.exports = analyticsMonitoringService;
 // Merged unique operations from backend/src/modules/M086 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M086/service"));
+
+
+

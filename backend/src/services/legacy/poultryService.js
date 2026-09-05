@@ -18,9 +18,9 @@
  *  - ASSUMED_TARGET_FCR_LAYER: target FCR for layer flocks
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ---- Assumed constants (not stored in the schema; poultry industry standards)
 const ASSUMED_VACCINATION_INTERVAL_DAYS = 30; // monthly vaccination cycle
@@ -60,13 +60,13 @@ async function listFlocks({ page = 1, limit = 50, status = null } = {}) {
 }
 
 async function createFlock(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { flock_code, flock_type, breed, placement_date, initial_bird_count, house_id, notes } = payload || {};
   if (!flock_code || !flock_type || !placement_date || !initial_bird_count) {
     throw new Error('flock_code, flock_type, placement_date and initial_bird_count are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO poultry_flocks (flock_code, flock_type, breed, placement_date, initial_bird_count, current_bird_count, house_id, status, notes)
      VALUES ($1, $2, $3, $4, $5, $5, $6, 'active', $7)
      RETURNING *`,
@@ -76,10 +76,10 @@ async function createFlock(payload) {
 }
 
 async function updateFlock(id, payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { flock_code, flock_type, breed, placement_date, initial_bird_count, current_bird_count, house_id, status, notes, last_vaccination_date } = payload || {};
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE poultry_flocks SET
        flock_code = COALESCE($1, flock_code),
        flock_type = COALESCE($2, flock_type),
@@ -100,9 +100,9 @@ async function updateFlock(id, payload) {
 }
 
 async function deleteFlock(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM poultry_flocks WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM poultry_flocks WHERE id = $1 RETURNING id', [id]);
   return !!res.rows[0];
 }
 
@@ -111,12 +111,12 @@ async function deleteFlock(id) {
 // ---------------------------------------------------------------------
 
 async function listEggProduction(flockId, { page = 1, limit = 100 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
-  const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_egg_production WHERE flock_id = $1', [flockId]);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
-  const res = await pg.query(
+  let offset = (Number(page) - 1) * Number(limit);
+  let totalRes = await pg.query('SELECT COUNT(*) FROM poultry_egg_production WHERE flock_id = $1', [flockId]);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
+  let res = await pg.query(
     `SELECT * FROM poultry_egg_production WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
     [flockId, limit, offset]
   );
@@ -124,13 +124,13 @@ async function listEggProduction(flockId, { page = 1, limit = 100 } = {}) {
 }
 
 async function recordEggProduction(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { flock_id, record_date, total_eggs, good_eggs, damaged_eggs, average_weight_grams, notes } = payload || {};
   if (!flock_id || !record_date || total_eggs === undefined || total_eggs === null) {
     throw new Error('flock_id, record_date and total_eggs are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO poultry_egg_production (flock_id, record_date, total_eggs, good_eggs, damaged_eggs, average_weight_grams, notes)
      VALUES ($1, $2, $3, COALESCE($4, $3), COALESCE($5, 0), $6, $7)
      ON CONFLICT (flock_id, record_date)
@@ -146,12 +146,12 @@ async function recordEggProduction(payload) {
 // ---------------------------------------------------------------------
 
 async function listFeedConsumption(flockId, { page = 1, limit = 100 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
-  const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_feed_consumption WHERE flock_id = $1', [flockId]);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
-  const res = await pg.query(
+  let offset = (Number(page) - 1) * Number(limit);
+  let totalRes = await pg.query('SELECT COUNT(*) FROM poultry_feed_consumption WHERE flock_id = $1', [flockId]);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
+  let res = await pg.query(
     `SELECT * FROM poultry_feed_consumption WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
     [flockId, limit, offset]
   );
@@ -159,13 +159,13 @@ async function listFeedConsumption(flockId, { page = 1, limit = 100 } = {}) {
 }
 
 async function recordFeedConsumption(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { flock_id, record_date, feed_type, quantity_kg, cost_per_kg, notes } = payload || {};
   if (!flock_id || !record_date || !feed_type || quantity_kg === undefined || quantity_kg === null) {
     throw new Error('flock_id, record_date, feed_type and quantity_kg are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO poultry_feed_consumption (flock_id, record_date, feed_type, quantity_kg, cost_per_kg, notes)
      VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (flock_id, record_date, feed_type)
@@ -181,12 +181,12 @@ async function recordFeedConsumption(payload) {
 // ---------------------------------------------------------------------
 
 async function listMortality(flockId, { page = 1, limit = 100 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
-  const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_mortality WHERE flock_id = $1', [flockId]);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
-  const res = await pg.query(
+  let offset = (Number(page) - 1) * Number(limit);
+  let totalRes = await pg.query('SELECT COUNT(*) FROM poultry_mortality WHERE flock_id = $1', [flockId]);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
+  let res = await pg.query(
     `SELECT * FROM poultry_mortality WHERE flock_id = $1 ORDER BY record_date DESC LIMIT $2 OFFSET $3`,
     [flockId, limit, offset]
   );
@@ -194,13 +194,13 @@ async function listMortality(flockId, { page = 1, limit = 100 } = {}) {
 }
 
 async function recordMortality(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { flock_id, record_date, bird_count, cause, notes } = payload || {};
   if (!flock_id || !record_date || !bird_count) {
     throw new Error('flock_id, record_date and bird_count are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO poultry_mortality (flock_id, record_date, bird_count, cause, notes)
      VALUES ($1, $2, $3, $4, $5)
      ON CONFLICT (flock_id, record_date)
@@ -216,12 +216,12 @@ async function recordMortality(payload) {
 // ---------------------------------------------------------------------
 
 async function listVaccinationRecords(flockId, { page = 1, limit = 50 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const offset = (Number(page) - 1) * Number(limit);
-  const totalRes = await pg.query('SELECT COUNT(*) FROM poultry_vaccination_records WHERE flock_id = $1', [flockId]);
-  const total = parseInt(totalRes.rows[0].count || '0', 10);
-  const res = await pg.query(
+  let offset = (Number(page) - 1) * Number(limit);
+  let totalRes = await pg.query('SELECT COUNT(*) FROM poultry_vaccination_records WHERE flock_id = $1', [flockId]);
+  let total = parseInt(totalRes.rows[0].count || '0', 10);
+  let res = await pg.query(
     `SELECT * FROM poultry_vaccination_records WHERE flock_id = $1 ORDER BY vaccination_date DESC LIMIT $2 OFFSET $3`,
     [flockId, limit, offset]
   );
@@ -229,13 +229,13 @@ async function listVaccinationRecords(flockId, { page = 1, limit = 50 } = {}) {
 }
 
 async function recordVaccination(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { flock_id, vaccine_name, vaccination_date, next_due_date, administered_by, notes } = payload || {};
   if (!flock_id || !vaccine_name || !vaccination_date) {
     throw new Error('flock_id, vaccine_name and vaccination_date are required');
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO poultry_vaccination_records (flock_id, vaccine_name, vaccination_date, next_due_date, administered_by, notes)
      VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
@@ -249,7 +249,7 @@ async function recordVaccination(payload) {
 // ---------------------------------------------------------------------
 
 async function getFlockPerformance(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     // Get flock details
@@ -332,7 +332,7 @@ async function getFlockPerformance(flockId) {
 // ---------------------------------------------------------------------
 
 async function getVaccinationAlerts() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(
@@ -404,7 +404,7 @@ async function getVaccinationAlerts() {
  * Analyzes egg production data and provides optimization recommendations
  */
 async function optimizeEggProduction(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -508,7 +508,7 @@ async function optimizeEggProduction(flockId) {
  * Predicts health risks based on production patterns and mortality data
  */
 async function monitorFlockHealth(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -532,15 +532,15 @@ async function monitorFlockHealth(flockId) {
       };
     }
     
-    const flock = rows[0];
+    let flock = rows[0];
     const riskFactors = [];
     let overallRisk = 'low';
     
     // Analyze production patterns for health indicators
     const productionRecords = rows.filter(r => r.eggs_produced !== null);
     if (productionRecords.length >= 7) {
-      const recentProduction = productionRecords.slice(0, 7).reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
-      const olderProduction = productionRecords.slice(7, 14).reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
+      let recentProduction = productionRecords.slice(0, 7).reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
+      let olderProduction = productionRecords.slice(7, 14).reduce((sum, r) => sum + r.eggs_produced, 0) / 7;
       
       const productionDecline = ((olderProduction - recentProduction) / olderProduction) * 100;
       
@@ -648,7 +648,7 @@ async function monitorFlockHealth(flockId) {
  * Recommends optimal feed composition based on production goals
  */
 async function optimizePoultryFeed(flockId, productionGoal) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -666,7 +666,7 @@ async function optimizePoultryFeed(flockId, productionGoal) {
       };
     }
     
-    const flock = rows[0];
+    let flock = rows[0];
     
     // AI feed optimization logic
     const baseFeed = {
@@ -699,14 +699,14 @@ async function optimizePoultryFeed(flockId, productionGoal) {
     
     // Adjust based on flock age
     if (flock.stocking_date) {
-      const flockAge = (new Date() - new Date(flock.stocking_date)) / (30 * 24 * 60 * 60 * 1000);
+      let flockAge = (new Date() - new Date(flock.stocking_date)) / (30 * 24 * 60 * 60 * 1000);
       if (flockAge > 12) {
         baseFeed.protein_percentage -= 1;
         baseFeed.energy_mj_kg -= 0.5;
       }
     }
     
-    const optimization = {
+    let optimization = {
       flockId,
       flockName: flock.flock_name,
       flockType: flock.flock_type,
@@ -748,7 +748,7 @@ async function optimizePoultryFeed(flockId, productionGoal) {
  * Predicts mortality risks based on production patterns and historical data
  */
 async function predictMortalityRisk(flockId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   try {
@@ -771,18 +771,18 @@ async function predictMortalityRisk(flockId) {
       };
     }
     
-    const flock = rows[0];
-    const mortalityRecords = rows.filter(r => r.mortality_count !== null);
+    let flock = rows[0];
+    let mortalityRecords = rows.filter(r => r.mortality_count !== null);
     
-    const riskFactors = [];
+    let riskFactors = [];
     let overallRisk = 'low';
     
     // Analyze mortality patterns
     if (mortalityRecords.length >= 4) {
-      const recentMortality = mortalityRecords.slice(0, 4).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
-      const olderMortality = mortalityRecords.slice(4, 8).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
+      let recentMortality = mortalityRecords.slice(0, 4).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
+      let olderMortality = mortalityRecords.slice(4, 8).reduce((sum, r) => sum + r.mortality_count, 0) / 4;
       
-      const mortalityIncrease = ((recentMortality - olderMortality) / olderMortality) * 100;
+      let mortalityIncrease = ((recentMortality - olderMortality) / olderMortality) * 100;
       
       if (mortalityIncrease > 25) {
         riskFactors.push({
@@ -870,7 +870,7 @@ async function predictMortalityRisk(flockId) {
 
 // Helper function to generate health recommendations
 function generateHealthRecommendations(riskFactors) {
-  const recommendations = [];
+  let recommendations = [];
   
   riskFactors.forEach(factor => {
     if (factor.factor === 'significant_production_decline' || factor.factor === 'moderate_production_decline') {
@@ -892,7 +892,7 @@ function generateHealthRecommendations(riskFactors) {
 
 // Helper function to generate mortality recommendations
 function generateMortalityRecommendations(riskFactors) {
-  const recommendations = [];
+  let recommendations = [];
   
   riskFactors.forEach(factor => {
     if (factor.factor === 'rapid_mortality_increase' || factor.factor === 'significant_mortality_increase') {
@@ -948,3 +948,6 @@ module.exports = {
   const { registerPoultryFlock: registerPoultryFlockFromBE123, ...rest } = m123;
   Object.assign(module.exports, rest, { registerPoultryFlockFromBE123 });
 }
+
+
+

@@ -12,10 +12,10 @@
  */
 
 const express = require('express');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
-const { adminMiddleware } = require('../../middleware/admin');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
+const { adminMiddleware } = require('../../middleware\/admin');
+const { logger } = require('../../utils\/logger');
 
 const router = express.Router();
 
@@ -87,7 +87,7 @@ async function resolveCrop(query, limit = 10) {
 
 /** Every term the platform knows for one concept — used to expand a search. */
 async function getConceptTerms(conceptKey) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `SELECT c.label, c.scientific_name, t.lang, t.term
        FROM crop_concepts c
@@ -129,7 +129,7 @@ async function quoteFreight({ laneCode, weightKg, perishable }) {
   const w = Number(weightKg);
   if (!Number.isFinite(w) || w <= 0) throw new Error('weightKg must be a positive number');
 
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows: lanes } = await db.query(
     'SELECT * FROM freight_lanes WHERE lane_code = $1 AND is_active = TRUE', [laneCode]
   );
@@ -195,10 +195,10 @@ async function quoteFreight({ laneCode, weightKg, perishable }) {
  * observe the same free capacity and both succeed.
  */
 async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
-  const w = Number(weightKg);
+  let w = Number(weightKg);
   if (!Number.isFinite(w) || w <= 0) throw new Error('weightKg must be a positive number');
 
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -267,7 +267,7 @@ async function bookFreightSlot({ slotCode, weightKg, isFpo, bookedBy }) {
 }
 
 async function listSlotAvailability(laneCode) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const params = [];
   let where = '';
   if (laneCode) { params.push(laneCode); where = 'WHERE lane_code = $1'; }
@@ -287,7 +287,7 @@ async function listSlotAvailability(laneCode) {
  * ₹40 short of the minimum will simply abandon the order.
  */
 async function validatePromo({ code, orderValue, hasGiItems }) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     'SELECT * FROM promo_codes WHERE upper(code) = upper($1) AND is_active = TRUE', [code]
   );
@@ -340,8 +340,8 @@ async function validatePromo({ code, orderValue, hasGiItems }) {
 // ===========================================================================
 
 async function getEngineRules(engineCode) {
-  const db = getPostgreSQL();
-  const params = [];
+  let db = getPostgreSQL();
+  let params = [];
   let where = '';
   if (engineCode) { params.push(engineCode); where = 'WHERE e.engine_code = $1'; }
   const { rows } = await db.query(
@@ -397,7 +397,7 @@ router.get('/freight/slots', async (req, res) => {
 
 router.post('/freight/slots/:slotCode/book', authMiddleware, async (req, res) => {
   try {
-    const data = await bookFreightSlot({
+    let data = await bookFreightSlot({
       slotCode: req.params.slotCode, ...req.body, bookedBy: req.user?.id
     });
     res.json({ success: true, data });
@@ -418,7 +418,7 @@ router.get('/engines', async (req, res) => {
 
 router.get('/organic-inputs', async (req, res) => {
   try {
-    const db = getPostgreSQL();
+    let db = getPostgreSQL();
     const { rows } = await db.query('SELECT * FROM organic_input_rates ORDER BY input_name');
     res.json({ success: true, data: rows });
   } catch (e) { return fail(res, e, 'organicInputs'); }
@@ -426,7 +426,7 @@ router.get('/organic-inputs', async (req, res) => {
 
 router.get('/insurance-plans', async (req, res) => {
   try {
-    const db = getPostgreSQL();
+    let db = getPostgreSQL();
     const { rows } = await db.query(
       'SELECT * FROM insurance_plan_catalog WHERE is_active = TRUE ORDER BY plan_name'
     );
@@ -436,7 +436,7 @@ router.get('/insurance-plans', async (req, res) => {
 
 router.get('/accessibility-modes', async (req, res) => {
   try {
-    const db = getPostgreSQL();
+    let db = getPostgreSQL();
     const { rows } = await db.query('SELECT * FROM accessibility_modes ORDER BY mode_code');
     res.json({ success: true, data: rows });
   } catch (e) { return fail(res, e, 'accessibilityModes'); }
@@ -444,7 +444,7 @@ router.get('/accessibility-modes', async (req, res) => {
 
 router.post('/freight/slots/:slotCode/release', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const db = getPostgreSQL();
+    let db = getPostgreSQL();
     const { rows } = await db.query(
       'UPDATE freight_slots SET released = TRUE WHERE slot_code = $1 RETURNING *',
       [req.params.slotCode]
@@ -464,3 +464,6 @@ module.exports = {
   validatePromo,
   getEngineRules
 };
+
+
+

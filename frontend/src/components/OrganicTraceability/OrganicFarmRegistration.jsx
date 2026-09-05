@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { organicTraceabilityAPI } from '../../services/api';
+import { organicTraceabilityAPI } from '../../services/componentApi';
 
 /**
  * Organic Farm Registration Component
@@ -18,7 +18,7 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
     organic_area_hectares: '',
     in_conversion_area_hectares: '',
     location_id: '',
-    gps_coordinates: { lat: '', lng: '' }
+    gps_coordinates: { lat: '', lng: '' },
   });
   const [standards, setStandards] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -43,11 +43,11 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
     setError(null);
 
     try {
-      const response = await organicTraceabilityAPI.registerFarm({
+      let response = await organicTraceabilityAPI.registerFarm({
         ...formData,
         total_area_hectares: parseFloat(formData.total_area_hectares),
         organic_area_hectares: parseFloat(formData.organic_area_hectares),
-        in_conversion_area_hectares: parseFloat(formData.in_conversion_area_hectares) || 0
+        in_conversion_area_hectares: parseFloat(formData.in_conversion_area_hectares) || 0,
       });
 
       onSuccess?.(response.data);
@@ -58,7 +58,7 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
         organic_area_hectares: '',
         in_conversion_area_hectares: '',
         location_id: '',
-        gps_coordinates: { lat: '', lng: '' }
+        gps_coordinates: { lat: '', lng: '' },
       });
     } catch (err) {
       setError(err.message);
@@ -71,7 +71,7 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -80,15 +80,15 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
       ...prev,
       gps_coordinates: {
         ...prev.gps_coordinates,
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Register Organic Farm</h2>
-      
+
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
           {error}

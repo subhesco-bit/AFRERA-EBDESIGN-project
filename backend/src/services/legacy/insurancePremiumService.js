@@ -3,13 +3,13 @@
  * Handles premium calculation for various insurance types
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class InsurancePremiumService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -91,7 +91,7 @@ class InsurancePremiumService {
         'multimodal': 0.01 // 1.0% of value
       };
 
-      const baseRate = transportRates[transportMode] || 0.01;
+      let baseRate = transportRates[transportMode] || 0.01;
 
       // Risk factors based on route
       const routeRisk = await this.getRouteRisk(origin, destination);
@@ -109,7 +109,7 @@ class InsurancePremiumService {
       };
       const goodsRisk = goodsRiskFactors[goodsType] || 1.0;
 
-      const grossPremium = shipmentValue * baseRate * routeRisk * durationRisk * goodsRisk;
+      let grossPremium = shipmentValue * baseRate * routeRisk * durationRisk * goodsRisk;
 
       return {
         shipmentValue,
@@ -211,7 +211,7 @@ class InsurancePremiumService {
         'pig': 0.06        // 6%
       };
 
-      const baseRate = animalRates[animalType] || 0.05;
+      let baseRate = animalRates[animalType] || 0.05;
 
       // Age factor (older animals = higher risk)
       const ageFactor = age > 5 ? 1.3 : age > 3 ? 1.1 : 1.0;
@@ -222,10 +222,10 @@ class InsurancePremiumService {
                           healthStatus === 'fair' ? 1.2 : 1.5;
 
       // Location risk
-      const locationRisk = await this.getLocationRisk(location);
+      let locationRisk = await this.getLocationRisk(location);
 
       const totalValue = count * valuePerAnimal;
-      const grossPremium = totalValue * baseRate * ageFactor * healthFactor * locationRisk;
+      let grossPremium = totalValue * baseRate * ageFactor * healthFactor * locationRisk;
 
       return {
         animalType,
@@ -322,7 +322,7 @@ class InsurancePremiumService {
   async getLocationRisk(location) {
     try {
       const highRiskLocations = ['assam', 'meghalaya', 'manipur'];
-      const state = location.toLowerCase().split(' ')[0];
+      let state = location.toLowerCase().split(' ')[0];
 
       return highRiskLocations.includes(state) ? 1.2 : 1.0;
     } catch (error) {
@@ -399,7 +399,7 @@ class InsurancePremiumService {
         WHERE iq.id = $1
       `;
 
-      const result = await this.pool.query(query, [quoteId]);
+      let result = await this.pool.query(query, [quoteId]);
 
       if (result.rows.length === 0) {
         throw new Error('Quote not found');
@@ -414,3 +414,6 @@ class InsurancePremiumService {
 }
 
 module.exports = new InsurancePremiumService();
+
+
+

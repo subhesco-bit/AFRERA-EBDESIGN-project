@@ -2,11 +2,11 @@
  * MFA Routes - Multi-Factor Authentication API Endpoints
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const mfaService = require('../../services/dual-use/mfaService');
-const { authMiddleware } = require('../../middleware/auth');
-const { adminMiddleware } = require('../../middleware/admin');
+const mfaService = require('../../services/dual-use/mfaService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
+const { adminMiddleware } = require('../../middleware/admin.js');
 
 /**
  * POST /api/v1/mfa/setup
@@ -123,7 +123,7 @@ router.post('/backup/sms', authMiddleware, async (req, res) => {
     const { userId } = req.user;
     
     // Get user phone number
-    const phoneNumber = req.user.phoneNumber;
+    let phoneNumber = req.user.phoneNumber;
     
     // Generate new backup code
     const backupCode = mfaService.generateBackupCode();

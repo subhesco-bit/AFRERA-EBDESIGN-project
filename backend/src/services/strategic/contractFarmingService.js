@@ -347,11 +347,11 @@ class ContractFarmingService {
    */
   async trackCompliance(contractId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get contract details
-        const contractResult = await client.query(
+        let contractResult = await client.query(
           `SELECT c.*, f.name as farmer_name, b.name as buyer_name
            FROM contract_farming_agreements c
            JOIN farmers f ON c.farmer_id = f.id
@@ -463,7 +463,7 @@ class ContractFarmingService {
    */
   async recordInputUsage(contractId, usageData) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO contract_input_usage 
          (contract_id, input_type, planned_quantity, actual_quantity, 
           usage_date, notes)
@@ -496,7 +496,7 @@ class ContractFarmingService {
    */
   async submitQualityTestResult(testId, testResult) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         await client.query('BEGIN');
@@ -519,7 +519,7 @@ class ContractFarmingService {
         );
         
         // Update contract compliance score
-        const contractId = updateResult.rows[0].contract_id;
+        let contractId = updateResult.rows[0].contract_id;
         await this.updateContractComplianceScore(client, contractId);
         
         await client.query('COMMIT');
@@ -547,7 +547,7 @@ class ContractFarmingService {
    */
   async updateContractComplianceScore(client, contractId) {
     try {
-      const result = await client.query(
+      let result = await client.query(
         `SELECT AVG(quality_score) as avg_score, 
                 COUNT(*) as total_tests,
                 SUM(CASE WHEN passed_standards THEN 1 ELSE 0 END) as passed_tests
@@ -558,7 +558,7 @@ class ContractFarmingService {
       
       if (result.rows.length > 0 && result.rows[0].total_tests > 0) {
         const { avg_score, passed_tests, total_tests } = result.rows[0];
-        const complianceScore = (passed_tests / total_tests) * 100;
+        let complianceScore = (passed_tests / total_tests) * 100;
         
         await client.query(
           `UPDATE contract_farming_agreements 
@@ -581,13 +581,13 @@ class ContractFarmingService {
    * @returns {Object} Amendment result
    */
   async amendContract(contractId, amendmentData) {
-    const client = await this.pool.connect();
+    let client = await this.pool.connect();
     
     try {
       await client.query('BEGIN');
       
       // Get current contract
-      const contractResult = await client.query(
+      let contractResult = await client.query(
         `SELECT * FROM contract_farming_agreements WHERE id = $1`,
         [contractId]
       );
@@ -596,7 +596,7 @@ class ContractFarmingService {
         throw new Error('Contract not found');
       }
       
-      const contract = contractResult.rows[0];
+      let contract = contractResult.rows[0];
       
       // Record amendment
       await client.query(
@@ -691,7 +691,7 @@ class ContractFarmingService {
    */
   async getBuyerContractPortfolio(buyerId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get portfolio summary
@@ -735,7 +735,7 @@ class ContractFarmingService {
         );
         
         // Get crop variety distribution
-        const cropResult = await client.query(
+        let cropResult = await client.query(
           `SELECT crop_variety, 
                   COUNT(*) as contract_count,
                   SUM(expected_yield_tons) as total_yield
@@ -772,7 +772,7 @@ class ContractFarmingService {
   async getAvailableContractOpportunities(farmerId) {
     try {
       // Get farmer's region and capabilities
-      const farmerResult = await this.pool.query(
+      let farmerResult = await this.pool.query(
         `SELECT district, state, total_land_hectares, irrigation_access
          FROM farmers WHERE id = $1`,
         [farmerId]
@@ -782,10 +782,10 @@ class ContractFarmingService {
         throw new Error('Farmer not found');
       }
       
-      const farmer = farmerResult.rows[0];
+      let farmer = farmerResult.rows[0];
       
       // Get matching opportunities
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT o.id, o.buyer_id, b.name as buyer_name, o.crop_variety,
                 o.minimum_hectares, o.maximum_hectares, o.base_price,
                 o.quality_bonus_structure, o.contract_duration_months,

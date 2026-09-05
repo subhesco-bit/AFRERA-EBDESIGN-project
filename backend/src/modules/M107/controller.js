@@ -26,7 +26,7 @@ const getBreakdown = async (req, res) => {
 
 const reportBreakdown = async (req, res) => {
   try {
-    const breakdown = await breakdownService.reportBreakdown(req.body);
+    let breakdown = await breakdownService.reportBreakdown(req.body);
     res.status(201).json({ success: true, data: breakdown });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

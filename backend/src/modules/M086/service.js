@@ -86,7 +86,7 @@ async function addMonitoringMetric(metricData) {
       thresholds
     } = metricData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO monitoring_metrics 
        (metric_id, source_id, metric_name, metric_type, data_path, 
         aggregation_method, unit, thresholds, status, created_at)
@@ -120,7 +120,7 @@ async function addMonitoringMetric(metricData) {
 async function ingestRealTimeData(metricId, value, timestamp, metadata = {}) {
   try {
     // AI-powered data quality assessment
-    const aiRequest = {
+    let aiRequest = {
       task: 'data_quality_assessment',
       parameters: {
         metric_id: metricId,
@@ -130,7 +130,7 @@ async function ingestRealTimeData(metricId, value, timestamp, metadata = {}) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const data = {
       data_id: generateId(),
@@ -142,7 +142,7 @@ async function ingestRealTimeData(metricId, value, timestamp, metadata = {}) {
       ingested_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO real_time_data 
        (data_id, metric_id, value, timestamp, quality_score, metadata, ingested_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -193,7 +193,7 @@ async function getRealTimeData(metricId, filters = {}) {
 
     query += ' ORDER BY timestamp DESC LIMIT 1000';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting real-time data', { error: error.message });
@@ -215,7 +215,7 @@ async function createMonitoringDashboard(dashboardData) {
       created_by
     } = dashboardData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO monitoring_dashboards 
        (dashboard_id, dashboard_name, dashboard_type, layout_config, 
         refresh_interval, is_public, created_by, status, created_at)
@@ -258,7 +258,7 @@ async function addDashboardWidget(widgetData) {
       height
     } = widgetData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dashboard_widgets 
        (widget_id, dashboard_id, metric_id, widget_type, widget_config, 
         position_x, position_y, width, height, status, created_at)
@@ -304,7 +304,7 @@ async function createMonitoringAlert(alertData) {
       cooldown_period
     } = alertData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO monitoring_alerts 
        (alert_id, metric_id, alert_name, alert_type, condition_type, 
         threshold_value, severity, notification_channels, recipients, 
@@ -340,7 +340,7 @@ async function createMonitoringAlert(alertData) {
  */
 async function getMonitoringAlerts(metricId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM monitoring_alerts WHERE metric_id = $1 AND is_active = $2',
       [metricId, true]
     );
@@ -366,7 +366,7 @@ async function logMonitoringEvent(eventData) {
       timestamp
     } = eventData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO monitoring_events 
        (event_id, event_type, entity_id, entity_type, event_data, 
         severity, source, timestamp, processed_at)
@@ -400,7 +400,7 @@ async function getAlertHistory(alertId, filters = {}) {
   try {
     const { start_time, end_time } = filters;
     let query = 'SELECT * FROM alert_history WHERE alert_id = $1';
-    const params = [alertId];
+    let params = [alertId];
     let paramCount = 1;
 
     if (start_time) {
@@ -417,7 +417,7 @@ async function getAlertHistory(alertId, filters = {}) {
 
     query += ' ORDER BY triggered_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting alert history', { error: error.message });
@@ -440,7 +440,7 @@ async function getMonitoringBestPractices(sourceType) {
 
 async function getSimilarSources(sourceType) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM monitoring_sources WHERE source_type = $1 LIMIT 5',
       [sourceType]
     );
@@ -452,7 +452,7 @@ async function getSimilarSources(sourceType) {
 
 async function getHistoricalData(metricId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT value, timestamp FROM real_time_data WHERE metric_id = $1 ORDER BY timestamp DESC LIMIT 100',
       [metricId]
     );
@@ -464,7 +464,7 @@ async function getHistoricalData(metricId) {
 
 async function getExpectedRange(metricId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT thresholds FROM monitoring_metrics WHERE metric_id = $1',
       [metricId]
     );

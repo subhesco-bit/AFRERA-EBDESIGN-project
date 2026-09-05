@@ -35,7 +35,7 @@ const createIncident = async (req, res) => {
 const acknowledgeIncident = async (req, res) => {
   try {
     const { acknowledged_by } = req.body;
-    const incident = await alertService.acknowledgeIncident(req.params.id, acknowledged_by);
+    let incident = await alertService.acknowledgeIncident(req.params.id, acknowledged_by);
     res.status(200).json({ success: true, data: incident });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -45,7 +45,7 @@ const acknowledgeIncident = async (req, res) => {
 const resolveIncident = async (req, res) => {
   try {
     const { resolved_by, resolution_details } = req.body;
-    const incident = await alertService.resolveIncident(req.params.id, resolved_by, resolution_details);
+    let incident = await alertService.resolveIncident(req.params.id, resolved_by, resolution_details);
     res.status(200).json({ success: true, data: incident });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

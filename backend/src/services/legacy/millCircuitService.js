@@ -18,12 +18,12 @@
  */
 
 const express = require('express');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 // Shared pool convention (2026-08-04, see database/pool.js).
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // MILL CIRCUIT
@@ -62,7 +62,7 @@ router.post('/mill-circuit/slots', authMiddleware, async (req, res) => {
       return res.status(400).json({ success: false, error: 'week_label, cluster and days are required' });
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO mill_circuit_slots (week_label, cluster, days, capacity_kg, status, slot_date)
        VALUES ($1, $2, $3, $4, COALESCE($5, 'open'), $6)
        RETURNING *`,
@@ -139,13 +139,13 @@ router.post('/mill-circuit/bookings', authMiddleware, async (req, res) => {
 router.get('/mill-circuit/bookings', authMiddleware, async (req, res) => {
   try {
     const { farmer_id, slot_id } = req.query;
-    const conditions = [];
-    const params = [];
+    let conditions = [];
+    let params = [];
     if (farmer_id) { params.push(farmer_id); conditions.push(`b.farmer_id = $${params.length}`); }
     if (slot_id) { params.push(slot_id); conditions.push(`b.slot_id = $${params.length}`); }
 
-    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    const result = await pool.query(
+    let where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    let result = await pool.query(
       `SELECT b.*, s.week_label, s.cluster, s.days
        FROM mill_circuit_bookings b
        JOIN mill_circuit_slots s ON s.id = b.slot_id
@@ -167,13 +167,13 @@ router.get('/mill-circuit/bookings', authMiddleware, async (req, res) => {
 router.get('/fpo-ledger/entries', authMiddleware, async (req, res) => {
   try {
     const { fpo_id, farmer_id } = req.query;
-    const conditions = [];
-    const params = [];
+    let conditions = [];
+    let params = [];
     if (fpo_id) { params.push(fpo_id); conditions.push(`fpo_id = $${params.length}`); }
     if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
 
-    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    const result = await pool.query(
+    let where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    let result = await pool.query(
       `SELECT * FROM fpo_ledger_entries ${where} ORDER BY entry_date DESC, created_at DESC`,
       params
     );
@@ -191,7 +191,7 @@ router.post('/fpo-ledger/entries', authMiddleware, async (req, res) => {
       return res.status(400).json({ success: false, error: 'fpo_id, farmer_id and description are required' });
     }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO fpo_ledger_entries
         (fpo_id, farmer_id, entry_date, description, quantity_kg, amount_inr, entry_type)
        VALUES ($1, $2, COALESCE($3, CURRENT_DATE), $4, $5, $6, COALESCE($7, 'credit'))
@@ -214,3 +214,6 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+

@@ -4,8 +4,8 @@
  * Provides standardized AI capabilities: prediction, optimization, analysis, recommendations
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class AiGatewayService {
   constructor() {
@@ -105,16 +105,16 @@ class AiGatewayService {
    */
   async optimize(modelType, parameters, constraints = {}) {
     try {
-      const startTime = Date.now();
+      let startTime = Date.now();
       
-      const model = this.aiModels.get(modelType);
+      let model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
       }
 
-      const result = await this.performOptimization(modelType, parameters, constraints);
+      let result = await this.performOptimization(modelType, parameters, constraints);
       
-      const latency = Date.now() - startTime;
+      let latency = Date.now() - startTime;
       this.trackPerformance(modelType, latency, true);
 
       logger.info(`Optimization completed for ${modelType} in ${latency}ms`);
@@ -131,16 +131,16 @@ class AiGatewayService {
    */
   async analyze(modelType, data, analysisType = 'standard') {
     try {
-      const startTime = Date.now();
+      let startTime = Date.now();
       
-      const model = this.aiModels.get(modelType);
+      let model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
       }
 
-      const result = await this.performAnalysis(modelType, data, analysisType);
+      let result = await this.performAnalysis(modelType, data, analysisType);
       
-      const latency = Date.now() - startTime;
+      let latency = Date.now() - startTime;
       this.trackPerformance(modelType, latency, true);
 
       logger.info(`Analysis completed for ${modelType} in ${latency}ms`);
@@ -157,16 +157,16 @@ class AiGatewayService {
    */
   async recommend(modelType, context, options = {}) {
     try {
-      const startTime = Date.now();
+      let startTime = Date.now();
       
-      const model = this.aiModels.get(modelType);
+      let model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
       }
 
-      const result = await this.performRecommendation(modelType, context, options);
+      let result = await this.performRecommendation(modelType, context, options);
       
-      const latency = Date.now() - startTime;
+      let latency = Date.now() - startTime;
       this.trackPerformance(modelType, latency, true);
 
       logger.info(`Recommendation completed for ${modelType} in ${latency}ms`);
@@ -322,19 +322,11 @@ class AiGatewayService {
   }
 
   recommendFertilizer(context, options) {
-    return {
-      fertilizer_type: 'NPK_10_26_26',
-      application_rate: '50kg/acre',
-      timing: 'before_sowing'
-    };
+    return { fertilizer_type: null, application_rate: null, timing: null, implemented: false, reason: 'No real fertilizer-recommendation model is connected to this gateway.' };
   }
 
   recommendIrrigation(context, options) {
-    return {
-      irrigation_method: 'drip',
-      frequency: 'daily',
-      duration: '2_hours'
-    };
+    return { irrigation_method: null, frequency: null, duration: null, implemented: false, reason: 'No real irrigation-recommendation model is connected to this gateway.' };
   }
 
   recommendPestControl(context, options) {
@@ -426,3 +418,5 @@ class AiGatewayService {
 }
 
 module.exports = new AiGatewayService();
+
+

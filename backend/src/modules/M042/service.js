@@ -129,7 +129,7 @@ async function recordEquipmentUsage(equipmentId, usageData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO equipment_usage_log 
        (usage_id, equipment_id, user_id, usage_date, start_time, end_time, hours_used, 
         task_performed, location, fuel_consumed, notes, created_at)
@@ -158,7 +158,7 @@ async function recordEquipmentUsage(equipmentId, usageData) {
 
 async function getEquipmentByOwner(ownerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM equipment_inventory WHERE owner_id = $1 ORDER BY created_at DESC',
       [ownerId]
     );
@@ -178,7 +178,7 @@ async function getEquipmentByOwner(ownerId) {
 
 async function getMaintenancePredictions(category) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM equipment_inventory WHERE category = $1 AND status = $2',
       [category, 'active']
     );

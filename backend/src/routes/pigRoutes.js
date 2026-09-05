@@ -30,13 +30,15 @@ const {
   recommendPigBreeding,
 } = require('../services/legacy/pigService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
+protectLivestockRouter(router);
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/v1/pig/herd
@@ -73,8 +75,8 @@ router.post('/herd', async (req, res, next) => {
  */
 router.get('/herd/:id', async (req, res, next) => {
   try {
-    const result = await listHerd({});
-    const animal = result.items.find((a) => a.id === req.params.id);
+    let result = await listHerd({});
+    let animal = result.items.find((a) => a.id === req.params.id);
     if (!animal) {
       return res.status(404).json({ success: false, error: 'Animal not found' });
     }
@@ -91,7 +93,7 @@ router.get('/herd/:id', async (req, res, next) => {
  */
 router.put('/herd/:id', async (req, res, next) => {
   try {
-    const animal = await updateAnimal(req.params.id, req.body);
+    let animal = await updateAnimal(req.params.id, req.body);
     if (!animal) {
       return res.status(404).json({ success: false, error: 'Animal not found' });
     }
@@ -126,7 +128,7 @@ router.delete('/herd/:id', async (req, res, next) => {
 router.get('/herd/:animalId/weight-records', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listWeightRecords(req.params.animalId, { page, limit });
+    let result = await listWeightRecords(req.params.animalId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('pigRoutes:listWeightRecords', { error: error.message });
@@ -155,7 +157,7 @@ router.post('/herd/:animalId/weight-records', async (req, res, next) => {
 router.get('/herd/:animalId/feed-consumption', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listFeedConsumption(req.params.animalId, { page, limit });
+    let result = await listFeedConsumption(req.params.animalId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('pigRoutes:listFeedConsumption', { error: error.message });
@@ -169,7 +171,7 @@ router.get('/herd/:animalId/feed-consumption', async (req, res, next) => {
  */
 router.post('/herd/:animalId/feed-consumption', async (req, res, next) => {
   try {
-    const record = await recordFeedConsumption({ ...req.body, animal_id: req.params.animalId });
+    let record = await recordFeedConsumption({ ...req.body, animal_id: req.params.animalId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('pigRoutes:recordFeedConsumption', { error: error.message });
@@ -184,7 +186,7 @@ router.post('/herd/:animalId/feed-consumption', async (req, res, next) => {
 router.get('/herd/:sowId/breeding', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listBreedingRecords(req.params.sowId, { page, limit });
+    let result = await listBreedingRecords(req.params.sowId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('pigRoutes:listBreedingRecords', { error: error.message });
@@ -198,7 +200,7 @@ router.get('/herd/:sowId/breeding', async (req, res, next) => {
  */
 router.post('/herd/:sowId/breeding', async (req, res, next) => {
   try {
-    const record = await recordBreeding({ ...req.body, sow_id: req.params.sowId });
+    let record = await recordBreeding({ ...req.body, sow_id: req.params.sowId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('pigRoutes:recordBreeding', { error: error.message });
@@ -218,7 +220,7 @@ router.post('/herd/:sowId/breeding', async (req, res, next) => {
  */
 router.put(['/breeding/:id', '/breeding/:id/farrowing-outcome'], async (req, res, next) => {
   try {
-    const record = await updateFarrowingOutcome(req.params.id, req.body);
+    let record = await updateFarrowingOutcome(req.params.id, req.body);
     if (!record) {
       return res.status(404).json({ success: false, error: 'Breeding record not found' });
     }
@@ -236,7 +238,7 @@ router.put(['/breeding/:id', '/breeding/:id/farrowing-outcome'], async (req, res
 router.get('/herd/:animalId/vaccinations', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listVaccinationRecords(req.params.animalId, { page, limit });
+    let result = await listVaccinationRecords(req.params.animalId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('pigRoutes:listVaccinationRecords', { error: error.message });
@@ -250,7 +252,7 @@ router.get('/herd/:animalId/vaccinations', async (req, res, next) => {
  */
 router.post('/herd/:animalId/vaccinations', async (req, res, next) => {
   try {
-    const record = await recordVaccination({ ...req.body, animal_id: req.params.animalId });
+    let record = await recordVaccination({ ...req.body, animal_id: req.params.animalId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('pigRoutes:recordVaccination', { error: error.message });
@@ -285,7 +287,7 @@ router.get('/herd/:animalId/performance', async (req, res, next) => {
  */
 router.get('/herd/:animalId/fcr', async (req, res, next) => {
   try {
-    const performance = await getHerdPerformance(req.params.animalId);
+    let performance = await getHerdPerformance(req.params.animalId);
     res.json({
       success: true,
       data: {
@@ -327,7 +329,7 @@ router.get('/breeding-alerts', async (req, res, next) => {
  */
 router.get('/vaccination-alerts', async (req, res, next) => {
   try {
-    const alerts = await getVaccinationAlerts();
+    let alerts = await getVaccinationAlerts();
     res.json({ success: true, data: alerts });
   } catch (error) {
     logger.error('pigRoutes:getVaccinationAlerts', { error: error.message });
@@ -345,7 +347,7 @@ router.get('/vaccination-alerts', async (req, res, next) => {
  */
 router.post('/ai/optimize-meat/:animalId', async (req, res, next) => {
   try {
-    const result = await optimizeMeatProduction(req.params.animalId);
+    let result = await optimizeMeatProduction(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('pigRoutes:optimizeMeatProduction', { error: error.message });
@@ -359,7 +361,7 @@ router.post('/ai/optimize-meat/:animalId', async (req, res, next) => {
  */
 router.post('/ai/monitor-health/:animalId', async (req, res, next) => {
   try {
-    const result = await monitorPigHealth(req.params.animalId);
+    let result = await monitorPigHealth(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('pigRoutes:monitorPigHealth', { error: error.message });
@@ -374,7 +376,7 @@ router.post('/ai/monitor-health/:animalId', async (req, res, next) => {
 router.post('/ai/optimize-feed/:animalId', async (req, res, next) => {
   try {
     const { productionGoal } = req.body;
-    const result = await optimizePigFeed(req.params.animalId, productionGoal);
+    let result = await optimizePigFeed(req.params.animalId, productionGoal);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('pigRoutes:optimizePigFeed', { error: error.message });
@@ -388,7 +390,7 @@ router.post('/ai/optimize-feed/:animalId', async (req, res, next) => {
  */
 router.post('/ai/recommend-breeding/:animalId', async (req, res, next) => {
   try {
-    const result = await recommendPigBreeding(req.params.animalId);
+    let result = await recommendPigBreeding(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('pigRoutes:recommendPigBreeding', { error: error.message });

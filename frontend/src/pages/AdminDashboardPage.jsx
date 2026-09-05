@@ -1,27 +1,27 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { LayoutDashboard, Users, ShoppingCart, Shield, FileText, Settings, AlertTriangle, CheckCircle, Database, Truck, DollarSign, Activity } from 'lucide-react'
-import { analyticsAPI, adminAPI, systemAPI } from '../services/api'
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { LayoutDashboard, Users, ShoppingCart, Shield, FileText, Settings, AlertTriangle, CheckCircle, Database, Truck, DollarSign, Activity } from 'lucide-react';
+import { analyticsAPI, adminAPI, systemAPI } from '../services/api';
 
 function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('overview');
 
   // v5 react-query object syntax (see LoginPage.jsx) — bare string-key form
   // is removed in the installed v5; this page threw on render.
   const { data: platformStats } = useQuery({
     queryKey: ['platform-stats'],
     queryFn: () => analyticsAPI.getPlatformStats().then(r => r.data),
-  })
+  });
 
   const { data: recentActivity } = useQuery({
     queryKey: ['recent-activity'],
     queryFn: () => adminAPI.getRecentAudit().then(r => r.data),
-  })
+  });
 
   const { data: systemHealth } = useQuery({
     queryKey: ['system-health'],
     queryFn: () => systemAPI.getHealth().then(r => r.data),
-  })
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -34,7 +34,7 @@ function AdminDashboardPage() {
       {systemHealth && (
         <div className={`rounded-lg p-4 mb-6 ${
           systemHealth.status === 'healthy' ? 'bg-green-50 border border-green-200' :
-          'bg-yellow-50 border border-yellow-200'
+            'bg-yellow-50 border border-yellow-200'
         }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -69,15 +69,15 @@ function AdminDashboardPage() {
           { id: 'audit', label: 'Audit Trail', icon: FileText },
           { id: 'schemes', label: 'Schemes', icon: Shield },
           { id: 'data', label: 'Data Console', icon: Database },
-          { id: 'settings', label: 'Settings', icon: Settings }
+          { id: 'settings', label: 'Settings', icon: Settings },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center whitespace-nowrap ${
-              activeTab === tab.id
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+              activeTab === tab.id ?
+                'bg-green-600 text-white' :
+                'bg-white text-gray-700 hover:bg-gray-100'
             }`}
           >
             <tab.icon className="w-5 h-5 mr-2" />
@@ -143,7 +143,7 @@ function AdminDashboardPage() {
                   { role: 'Corporate Buyers', count: platformStats?.role_counts?.corporate || 0, color: 'bg-blue-500' },
                   { role: 'Logistics Providers', count: platformStats?.role_counts?.logistics || 0, color: 'bg-purple-500' },
                   { role: 'FPOs', count: platformStats?.role_counts?.fpo || 0, color: 'bg-orange-500' },
-                  { role: 'Admins', count: platformStats?.role_counts?.admin || 0, color: 'bg-gray-500' }
+                  { role: 'Admins', count: platformStats?.role_counts?.admin || 0, color: 'bg-gray-500' },
                 ].map((item) => (
                   <div key={item.role} className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -163,9 +163,9 @@ function AdminDashboardPage() {
                   <div key={activity.id} className="flex items-start text-sm">
                     <div className={`w-2 h-2 rounded-full mt-2 mr-3 ${
                       activity.type === 'order' ? 'bg-green-500' :
-                      activity.type === 'registration' ? 'bg-blue-500' :
-                      activity.type === 'audit' ? 'bg-orange-500' :
-                      'bg-gray-500'
+                        activity.type === 'registration' ? 'bg-blue-500' :
+                          activity.type === 'audit' ? 'bg-orange-500' :
+                            'bg-gray-500'
                     }`} />
                     <div className="flex-1">
                       <div className="text-gray-800">{activity.event}</div>
@@ -437,7 +437,7 @@ function AdminDashboardPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default AdminDashboardPage
+export default AdminDashboardPage;

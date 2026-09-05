@@ -13,8 +13,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -323,9 +323,9 @@ async function getCostSharingAnalytics(district) {
  */
 async function getResourceAllocationRecommendations(villageId) {
   try {
-    const accessRecords = await getSharedInfrastructureAccessByVillage(villageId);
+    let accessRecords = await getSharedInfrastructureAccessByVillage(villageId);
     
-    const recommendations = {
+    let recommendations = {
       villageId,
       generatedAt: new Date().toISOString(),
       recommendations: []
@@ -395,7 +395,7 @@ async function getRealTimeMonitoringInsights(infrastructureId) {
 function setupRoutes(app) {
   const express = require('express');
   const router = express.Router();
-  const authMiddleware = require('../../middleware/auth');
+  const authMiddleware = require('../../middleware\/auth');
 
   router.use(authMiddleware);
 
@@ -410,7 +410,7 @@ function setupRoutes(app) {
 
   router.get('/access/village/:villageId', async (req, res) => {
     try {
-      const accessRecords = await getSharedInfrastructureAccessByVillage(req.params.villageId);
+      let accessRecords = await getSharedInfrastructureAccessByVillage(req.params.villageId);
       res.json({ success: true, data: accessRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -419,7 +419,7 @@ function setupRoutes(app) {
 
   router.get('/access/type/:infrastructureType', async (req, res) => {
     try {
-      const accessRecords = await getSharedInfrastructureAccessByType(req.params.infrastructureType);
+      let accessRecords = await getSharedInfrastructureAccessByType(req.params.infrastructureType);
       res.json({ success: true, data: accessRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -428,7 +428,7 @@ function setupRoutes(app) {
 
   router.get('/access/village/:villageId/summary', async (req, res) => {
     try {
-      const summary = await getVillageInfrastructureSummary(req.params.villageId);
+      let summary = await getVillageInfrastructureSummary(req.params.villageId);
       res.json({ success: true, data: summary });
     } catch (error) {
       res.status(404).json({ success: false, error: error.message });
@@ -437,7 +437,7 @@ function setupRoutes(app) {
 
   router.post('/access', async (req, res) => {
     try {
-      const access = await upsertSharedInfrastructureAccess(req.body);
+      let access = await upsertSharedInfrastructureAccess(req.body);
       res.status(201).json({ success: true, data: access });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -447,7 +447,7 @@ function setupRoutes(app) {
   // AI-powered endpoints
   router.get('/ai/usage-optimization/:villageId', async (req, res) => {
     try {
-      const recommendations = await generateAIUsageOptimization(req.params.villageId);
+      let recommendations = await generateAIUsageOptimization(req.params.villageId);
       res.json({ success: true, data: recommendations });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -456,7 +456,7 @@ function setupRoutes(app) {
 
   router.get('/ai/predictive-maintenance/:infrastructureType', async (req, res) => {
     try {
-      const schedule = await generatePredictiveMaintenance(req.params.infrastructureType);
+      let schedule = await generatePredictiveMaintenance(req.params.infrastructureType);
       res.json({ success: true, data: schedule });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -474,7 +474,7 @@ function setupRoutes(app) {
 
   router.get('/ai/resource-allocation/:villageId', async (req, res) => {
     try {
-      const recommendations = await getResourceAllocationRecommendations(req.params.villageId);
+      let recommendations = await getResourceAllocationRecommendations(req.params.villageId);
       res.json({ success: true, data: recommendations });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -502,3 +502,6 @@ module.exports = {
   getVillageInfrastructureSummary,
   setupRoutes
 };
+
+
+

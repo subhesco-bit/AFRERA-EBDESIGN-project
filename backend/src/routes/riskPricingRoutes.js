@@ -24,6 +24,8 @@
 
 const express = require('express');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const risk = require('../services/legacy/riskPricingService');
 const { authMiddleware } = require('../middleware/auth');
@@ -35,7 +37,9 @@ function fail(res, error) {
 }
 
 /** Crop parameters, with their provenance visible. */
-router.get('/crops/:cropKey', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/crops/:cropKey', async (req, res) => {
   try {
     res.json({ success: true, data: await risk.cropParams(req.params.cropKey) });
   } catch (error) { fail(res, error); }
@@ -45,7 +49,9 @@ router.get('/crops/:cropKey', async (req, res) => {
  * Indicative forward curve. Public.
  * GET /forward?crop=lakadong_turmeric&months=6&spot=180&state=..&district=..
  */
-router.get('/forward', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/forward', async (req, res) => {
   try {
     const { crop, months, spot, state, district, rainfall, temp, heatDays } = req.query;
     if (!crop || !months || !spot) {
@@ -69,7 +75,9 @@ router.get('/forward', async (req, res) => {
 });
 
 /** Is the model entitled to speak about this district+crop at all? */
-router.get('/calibration/:state/:district/:cropKey', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/calibration/:state/:district/:cropKey', async (req, res) => {
   try {
     const { state, district, cropKey } = req.params;
     const c = await risk.districtConfidence(state, district, cropKey);
@@ -94,7 +102,9 @@ router.get('/calibration/:state/:district/:cropKey', async (req, res) => {
  * That is a 200, not an error — the model declining is a real answer, and
  * returning 4xx would make callers treat a correct refusal as a fault.
  */
-router.post('/advise', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/advise', authMiddleware, async (req, res) => {
   try {
     const b = req.body || {};
     for (const k of ['cropKey', 'qtyKg', 'floorPerKg', 'participationShare', 'spotPerKg', 'monthsAhead']) {
@@ -103,13 +113,15 @@ router.post('/advise', authMiddleware, async (req, res) => {
     if (b.participationShare < 0 || b.participationShare > 1) {
       throw new Error('participationShare must be between 0 and 1');
     }
-    const data = await risk.adviseCommitment({ ...b, farmerId: b.farmerId || req.user?.id });
+    let data = await risk.adviseCommitment({ ...b, farmerId: b.farmerId || req.user?.id });
     res.json({ success: true, data });
   } catch (error) { fail(res, error); }
 });
 
 /** Publish an advance rate. Authenticated and attributed. */
-router.post('/publish', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/publish', authMiddleware, async (req, res) => {
   try {
     const rate = await risk.computeAdvanceRate(req.body || {});
     // An uncalibrated rate is indicative only and must not be published as a
@@ -130,9 +142,11 @@ router.post('/publish', authMiddleware, async (req, res) => {
 });
 
 /** Record and decompose an observed farmgate-to-delivered spread. */
-router.post('/basis', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/basis', authMiddleware, async (req, res) => {
   try {
-    const b = req.body || {};
+    let b = req.body || {};
     for (const k of ['cropKey', 'farmgatePerKg', 'ncrDeliveredPerKg', 'freightPerKg', 'expectedLossPct']) {
       if (b[k] === undefined) throw new Error(`${k} is required`);
     }
@@ -147,31 +161,41 @@ router.post('/basis', authMiddleware, async (req, res) => {
 // ---------------------------------------------------------------------------
 const dynamicPricing = require('../services/legacy/dynamicPricingService');
 
-router.get('/lots/:lotCode/price', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/lots/:lotCode/price', async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.priceForLot(req.params.lotCode) });
   } catch (e) { fail(res, e); }
 });
 
-router.post('/lots/:lotCode/open-bucket', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/lots/:lotCode/open-bucket', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.openNextBucket(req.params.lotCode) });
   } catch (e) { fail(res, e); }
 });
 
-router.get('/booking-curve/:cropKey', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/booking-curve/:cropKey', async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.bookingCurve(req.params.cropKey) });
   } catch (e) { fail(res, e); }
 });
 
-router.post('/booking-curve', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/booking-curve', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.recordBookingPoint(req.body) });
   } catch (e) { fail(res, e); }
 });
 
-router.get('/lots/attention', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/lots/attention', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.lotsNeedingAttention(req.query) });
   } catch (e) { fail(res, e); }

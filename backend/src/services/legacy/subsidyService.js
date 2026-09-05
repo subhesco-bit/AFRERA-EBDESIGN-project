@@ -4,9 +4,9 @@
  * Specifically for India and Northeast region
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../middleware/auth');
+const { authMiddleware } = require('../../middleware\/auth');
 
 /**
  * Check subsidy eligibility for a project
@@ -101,7 +101,7 @@ async function checkEquipmentSubsidyEligibility(equipmentDetails) {
       power_source
     } = equipmentDetails;
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'subsidy_eligibility_check',
       parameters: {
         subsidy_type: 'equipment',
@@ -122,9 +122,9 @@ async function checkEquipmentSubsidyEligibility(equipmentDetails) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    const eligibility = {
+    let eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       equipment_details: equipmentDetails,
@@ -179,7 +179,7 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
       is_interstate
     } = logisticsDetails;
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'subsidy_eligibility_check',
       parameters: {
         subsidy_type: 'logistics',
@@ -200,9 +200,9 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    const eligibility = {
+    let eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       logistics_details: logisticsDetails,
@@ -428,7 +428,7 @@ function generateTrackingNumber() {
 
 async function getGovernmentSchemes(state, projectType) {
   // In production, fetch from government schemes database
-  const schemes = [
+  let schemes = [
     {
       name: 'Mission for Integrated Development of Horticulture (MIDH)',
       code: 'MIDH',
@@ -482,7 +482,7 @@ async function getEquipmentSchemes(state, equipmentCategory) {
 }
 
 async function getLogisticsSchemes(state, isNortheastRoute) {
-  const schemes = [];
+  let schemes = [];
   
   if (isNortheastRoute) {
     schemes.push({
@@ -517,7 +517,7 @@ async function getProcessingTime(schemeCode) {
 function setupRoutes(app) {
   app.post('/api/v1/subsidy/project/check', authMiddleware, async (req, res) => {
     try {
-      const eligibility = await checkProjectSubsidyEligibility(req.body);
+      let eligibility = await checkProjectSubsidyEligibility(req.body);
       res.json({ success: true, data: eligibility });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -526,7 +526,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/subsidy/equipment/check', authMiddleware, async (req, res) => {
     try {
-      const eligibility = await checkEquipmentSubsidyEligibility(req.body);
+      let eligibility = await checkEquipmentSubsidyEligibility(req.body);
       res.json({ success: true, data: eligibility });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -535,7 +535,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/subsidy/logistics/check', authMiddleware, async (req, res) => {
     try {
-      const eligibility = await checkLogisticsSubsidyEligibility(req.body);
+      let eligibility = await checkLogisticsSubsidyEligibility(req.body);
       res.json({ success: true, data: eligibility });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -544,7 +544,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/subsidy/schemes', async (req, res) => {
     try {
-      const schemes = await getApplicableSchemes(req.query);
+      let schemes = await getApplicableSchemes(req.query);
       res.json({ success: true, data: schemes });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -553,7 +553,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/subsidy/apply', authMiddleware, async (req, res) => {
     try {
-      const application = await submitSubsidyApplication(req.body);
+      let application = await submitSubsidyApplication(req.body);
       res.json({ success: true, data: application });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -562,7 +562,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/subsidy/track/:id', async (req, res) => {
     try {
-      const status = await trackSubsidyApplication(req.params.id);
+      let status = await trackSubsidyApplication(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -589,3 +589,6 @@ module.exports = {
   calculateGSTApplicability,
   setupRoutes
 };
+
+
+

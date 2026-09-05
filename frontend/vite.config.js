@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 import viteCompression from 'vite-plugin-compression'
 
@@ -9,6 +10,7 @@ export default defineConfig(async () => {
   return {
     plugins: [
       react(),
+      tailwindcss(),
       // Bundle analyzer for development
       visualizer && visualizer({
         open: true,
@@ -42,10 +44,10 @@ export default defineConfig(async () => {
       },
     },
     server: {
-      port: 3000,
+      port: 5173,
       proxy: {
         '/api': {
-          target: 'http://localhost:3001',
+          target: 'http://localhost:3000',
           changeOrigin: true,
         },
       },
@@ -53,10 +55,16 @@ export default defineConfig(async () => {
     build: {
       outDir: 'dist',
       sourcemap: process.env.NODE_ENV !== 'production',
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 1500, // Increased to reduce warnings for legitimate large chunks
       minify: 'terser',
       target: 'es2015',
       cssCodeSplit: true,
+      // Additional optimization for production builds
+      reportCompressedSize: false, // Reduces build time
+      // Optimize dependency pre-bundling
+      commonjsOptions: {
+        transformMixedEsModules: true
+      },
       terserOptions: {
         compress: {
           drop_console: process.env.NODE_ENV === 'production',
@@ -133,10 +141,9 @@ export default defineConfig(async () => {
               return 'vendor';
             }
 
-            // App chunks
-            if (id.includes('/pages/')) {
-              return 'pages';
-            }
+            // Keep lazily imported pages in their own Rollup chunks. Grouping
+            // every page into one manual chunk defeats route-level code
+            // splitting and creates a large first-navigation payload.
             if (id.includes('/components/')) {
               return 'components';
             }

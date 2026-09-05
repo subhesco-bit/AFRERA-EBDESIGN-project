@@ -1,58 +1,58 @@
-import { Routes, Route } from 'react-router-dom'
-import { useAuthStore } from './store/authStore'
-import { useEffect, lazy, Suspense } from 'react'
-import { useLocation } from 'react-router-dom'
-import ErrorBoundary from './components/ErrorBoundary'
-import Layout from './components/Layout'
-import { errorMonitoring } from './utils/errorMonitoring'
-import { LoadingSpinner } from './components/ui/Skeleton'
-import { ProtectedRoute, PublicRoute, RoleRoute } from './components/RouteGuard'
-import { PageTransition } from './components/RouteTransition'
-import { RouteAnalytics, RouteMetadata, UserJourneyTracker, ScrollTracker, EngagementTracker } from './components/RouteAnalytics'
-import { RouteErrorBoundary, ErrorPage, NotFoundPage, UnauthorizedPage } from './components/RouteErrorBoundary'
-import { RouteSuspense, SmartRouteLoading } from './components/RouteLoading'
-import { RoutePreloader } from './utils/routePreloader'
-import { publicRoutes, protectedRoutes, farmerRoutes, adminRoutes, dashboardRoutes, managementRoutes, getRouteByPath, getAllRoutes } from './config/routes'
-import config from './config/env'
-import monitoring from './utils/monitoring'
-import analytics from './utils/analytics'
-import { MultilingualProvider } from './components/Multilingual/MultilingualProvider'
-import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider'
+import { Routes, Route } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
+import { useEffect, lazy, Suspense } from 'react';
+import { useLocation } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
+import Layout from './components/Layout';
+import { errorMonitoring } from './utils/errorMonitoring';
+import { LoadingSpinner } from './components/ui/Skeleton';
+import { ProtectedRoute, RoleRoute } from './components/RouteGuard';
+import { PageTransition } from './components/RouteTransition';
+import { RouteAnalytics, RouteMetadata, UserJourneyTracker, ScrollTracker, EngagementTracker } from './components/RouteAnalytics';
+import { ErrorPage, NotFoundPage, UnauthorizedPage } from './components/RouteErrorBoundary';
+import { RouteSuspense } from './components/RouteLoading';
+import { RoutePreloader } from './utils/routePreloader';
+import { publicRoutes, protectedRoutes, farmerRoutes, adminRoutes, dashboardRoutes, managementRoutes, getRouteByPath } from './config/routes';
+import config from './config/env';
+import monitoring from './utils/monitoring';
+import analytics from './utils/analytics';
+import { MultilingualProvider } from './components/Multilingual/MultilingualProvider';
+import { AccessibilityProvider } from './components/Accessibility/AccessibilityProvider';
 
 // Lazy load EconomicDashboard (not in centralized routes yet)
-const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'))
+const EconomicDashboard = lazy(() => import('./pages/economic/EconomicDashboard'));
 
 function App() {
-  const { user, checkAuth } = useAuthStore()
-  const location = useLocation()
+  const { user, checkAuth } = useAuthStore();
+  const location = useLocation();
 
   // Initialize authentication check
   useEffect(() => {
-    checkAuth()
-  }, [checkAuth])
+    checkAuth();
+  }, [checkAuth]);
 
   // Initialize monitoring
   useEffect(() => {
     if (config.ENABLE_ERROR_REPORTING) {
-      monitoring.init()
+      monitoring.init();
     }
-  }, [])
+  }, []);
 
   // Initialize analytics
   useEffect(() => {
     if (config.ENABLE_ANALYTICS) {
-      analytics.init()
+      analytics.init();
     }
-  }, [])
+  }, []);
 
   // Track active user in monitoring
   useEffect(() => {
     if (user) {
-      errorMonitoring.trackActiveUser(user.id, user.sessionId)
-      monitoring.setUser(user)
-      analytics.setUserId(user.id)
+      errorMonitoring.trackActiveUser(user.id, user.sessionId);
+      monitoring.setUser(user);
+      analytics.setUserId(user.id);
     }
-  }, [user])
+  }, [user]);
 
   // Register service worker for PWA
   useEffect(() => {
@@ -63,17 +63,17 @@ function App() {
     // production builds, where this is actually wanted.
     if (import.meta.env.PROD && config.ENABLE_PWA && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          
+        .then(() => {
+          // Service worker registered successfully
         })
-        .catch((error) => {
-          
-        })
+        .catch((_error) => {
+          // Service worker registration failed
+        });
     }
-  }, [])
+  }, []);
 
   // Get current route configuration
-  const currentRoute = getRouteByPath(location.pathname)
+  const currentRoute = getRouteByPath(location.pathname);
 
   return (
     <ErrorBoundary>
@@ -113,7 +113,7 @@ function App() {
                     key={route.path}
                     path={route.path}
                     element={
-                      <ProtectedRoute>
+                      <ProtectedRoute requiredRole={route.role}>
                         <PageTransition transition={route.transition}>
                           <RouteSuspense route={route}>
                             <route.component />
@@ -181,13 +181,13 @@ function App() {
                     key={route.path}
                     path={route.path}
                     element={
-                      <ProtectedRoute>
+                      <RoleRoute allowedRoles={route.role ? [route.role] : []}>
                         <PageTransition transition={route.transition}>
                           <RouteSuspense route={route}>
                             <route.component />
                           </RouteSuspense>
                         </PageTransition>
-                      </ProtectedRoute>
+                      </RoleRoute>
                     }
                   />
                 ))}
@@ -208,29 +208,29 @@ function App() {
 
                 {/* Module Routes (M001-M150) */}
                 {Array.from({ length: 150 }, (_, i) => {
-                  const moduleNum = i + 1
-                  const ModulePage = lazy(() => import(`./modules/M${String(moduleNum).padStart(3, '0')}/M${String(moduleNum).padStart(3, '0')}Page.jsx`))
+                  const moduleNum = i + 1;
+                  const ModulePage = lazy(() => import(`./modules/M${String(moduleNum).padStart(3, '0')}/M${String(moduleNum).padStart(3, '0')}Page.jsx`));
                   return (
                     <Route
                       key={`/module/M${String(moduleNum).padStart(3, '0')}`}
                       path={`/module/M${String(moduleNum).padStart(3, '0')}`}
                       element={
-                        <ProtectedRoute>
+                        <RoleRoute allowedRoles={['admin']}>
                           <PageTransition transition="fade">
                             <RouteSuspense>
                               <ModulePage />
                             </RouteSuspense>
                           </PageTransition>
-                        </ProtectedRoute>
+                        </RoleRoute>
                       }
                     />
-                  )
+                  );
                 })}
 
                 {/* Error Pages */}
                 <Route path="/error" element={<ErrorPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                
+
                 {/* 404 */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
@@ -239,7 +239,7 @@ function App() {
         </MultilingualProvider>
       </AccessibilityProvider>
     </ErrorBoundary>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -7,8 +7,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -171,7 +171,7 @@ async function getVillageFinanceSummary(villageId) {
 function setupRoutes(app) {
   const express = require('express');
   const router = express.Router();
-  const authMiddleware = require('../../middleware/auth');
+  const authMiddleware = require('../../middleware\/auth');
 
   router.use(authMiddleware);
 
@@ -195,7 +195,7 @@ function setupRoutes(app) {
 
   router.get('/finance/service/:serviceType', async (req, res) => {
     try {
-      const financeRecords = await getRuralFinanceByServiceType(req.params.serviceType);
+      let financeRecords = await getRuralFinanceByServiceType(req.params.serviceType);
       res.json({ success: true, data: financeRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -213,7 +213,7 @@ function setupRoutes(app) {
 
   router.post('/finance', async (req, res) => {
     try {
-      const finance = await upsertRuralFinance(req.body);
+      let finance = await upsertRuralFinance(req.body);
       res.status(201).json({ success: true, data: finance });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -232,3 +232,6 @@ module.exports = {
   getVillageFinanceSummary,
   setupRoutes
 };
+
+
+

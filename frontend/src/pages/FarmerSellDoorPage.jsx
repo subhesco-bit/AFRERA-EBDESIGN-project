@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { Wheat, ArrowLeft, ArrowRight, LogIn } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { Wheat, ArrowLeft, ArrowRight, LogIn } from 'lucide-react';
 
 // Public door #1 of 4 — "Sell my harvest". See FarmerEntranceHubPage.jsx for
 // background on why this exists. This page is intentionally NOT wrapped in
@@ -27,7 +27,7 @@ const ACTIONS = [
     to: '/farmer-sell',
     note: 'Requires signing in to this section',
   },
-]
+];
 
 function FarmerSellDoorPage() {
   return (
@@ -94,7 +94,7 @@ function FarmerSellDoorPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerSellDoorPage
+export default FarmerSellDoorPage;

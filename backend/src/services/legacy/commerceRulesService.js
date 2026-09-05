@@ -19,9 +19,9 @@
  */
 
 const express = require('express');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
-const pool = require('../../database/pool');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
+const pool = require('../../database\/pool');
 
 const router = express.Router();
 
@@ -356,3 +356,6 @@ module.exports = {
   PRICE_FREEZE_MS,
   LOYALTY_MIN_REDEEM
 };
+
+
+

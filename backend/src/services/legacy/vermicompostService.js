@@ -3,7 +3,7 @@
  * Complete vermicompost management with earthworm and organic waste management
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class VermicompostService {
   constructor() {
@@ -58,7 +58,7 @@ class VermicompostService {
   async getVermicompostById(vermicompostId) {
     try {
       const query = 'SELECT * FROM vermicompost WHERE id = $1';
-      const result = await this.pool.query(query, [vermicompostId]);
+      let result = await this.pool.query(query, [vermicompostId]);
       
       if (result.rows.length === 0) {
         throw new Error('Vermicompost not found');
@@ -87,13 +87,13 @@ class VermicompostService {
         expected_output_kg
       } = vermicompostData;
 
-      const query = `
+      let query = `
         INSERT INTO vermicompost (farmer_id, name, location, worm_type, bed_size_sqft, earthworm_count, waste_input_kg, expected_output_kg)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         farmer_id, name, location, worm_type, bed_size_sqft, earthworm_count, waste_input_kg, expected_output_kg
       ]);
 
@@ -109,13 +109,13 @@ class VermicompostService {
    */
   async getEarthwormManagement(vermicompostId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM earthworm_management
         WHERE vermicompost_id = $1
         ORDER BY inspection_date DESC
       `;
 
-      const result = await this.pool.query(query, [vermicompostId]);
+      let result = await this.pool.query(query, [vermicompostId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting earthworm management:', error);
@@ -128,13 +128,13 @@ class VermicompostService {
    */
   async getOrganicWaste(vermicompostId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM organic_waste
         WHERE vermicompost_id = $1
         ORDER BY waste_date DESC
       `;
 
-      const result = await this.pool.query(query, [vermicompostId]);
+      let result = await this.pool.query(query, [vermicompostId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting organic waste:', error);
@@ -144,3 +144,6 @@ class VermicompostService {
 }
 
 module.exports = new VermicompostService();
+
+
+

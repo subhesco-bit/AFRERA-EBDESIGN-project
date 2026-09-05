@@ -37,10 +37,10 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
-const geo = require('../../utils/geo');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
+const geo = require('../../utils\/geo');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 class GeofencingService {
   // ==========================================================================
@@ -226,8 +226,8 @@ class GeofencingService {
   }
 
   async checkInHistory({ userId, geofenceId, limit = 50 } = {}) {
-    const conditions = ["source = 'manual_checkin'"];
-    const params = [];
+    let conditions = ["source = 'manual_checkin'"];
+    let params = [];
     if (userId) { params.push(userId); conditions.push(`user_id = $${params.length}`); }
     if (geofenceId) { params.push(geofenceId); conditions.push(`geofence_id = $${params.length}`); }
     params.push(Math.min(Number(limit) || 50, 200));
@@ -258,12 +258,12 @@ class GeofencingService {
     if (!geofenceId || !driverId) {
       throw new Error('geofenceId and driverId are required');
     }
-    const geofence = await this.getGeofence(geofenceId);
+    let geofence = await this.getGeofence(geofenceId);
     if (!geofence.is_active) {
       throw new Error('This geofence is not active');
     }
 
-    const params = [driverId];
+    let params = [driverId];
     let shipmentClause = '';
     if (shipmentId) {
       params.push(shipmentId);
@@ -305,3 +305,6 @@ class GeofencingService {
 }
 
 module.exports = new GeofencingService();
+
+
+

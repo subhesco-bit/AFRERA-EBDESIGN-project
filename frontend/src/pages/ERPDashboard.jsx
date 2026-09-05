@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ecommerceERPAPI } from '../services/api';
-import { 
-  FileText, 
-  Calculator, 
-  Truck, 
-  Factory, 
-  Users, 
+import {
+  FileText,
+  Calculator,
+  Truck,
+  Factory,
+  Users,
   PackageCheck,
   IndianRupee,
   CheckCircle,
   AlertCircle,
-  Clock
+  Clock,
 } from 'lucide-react';
 
 /**
  * AFRERA ERP Dashboard
- * 
+ *
  * Complete ERP integration dashboard:
  * - Financial ERP (GL posting, GST invoicing)
  * - Supply Chain ERP (inventory sync, purchase orders)
@@ -44,14 +44,14 @@ const ERPDashboard = () => {
   const { data: gstInvoice, isLoading: gstLoading } = useQuery({
     queryKey: ['gstInvoice', selectedOrderId],
     queryFn: () => selectedOrderId ? ecommerceERPAPI.generateGSTInvoice(selectedOrderId) : null,
-    enabled: !!selectedOrderId
+    enabled: Boolean(selectedOrderId),
   });
 
   // Sync Inventory
   const { data: inventorySync, isLoading: inventoryLoading } = useQuery({
     queryKey: ['inventorySync', selectedProductId],
     queryFn: () => selectedProductId ? ecommerceERPAPI.syncInventoryWithERP(selectedProductId) : null,
-    enabled: !!selectedProductId
+    enabled: Boolean(selectedProductId),
   });
 
   // Sync Customer to CRM
@@ -86,7 +86,7 @@ const ERPDashboard = () => {
             <FileText className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between">
             <div>
@@ -96,7 +96,7 @@ const ERPDashboard = () => {
             <IndianRupee className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
           <div className="flex items-center justify-between">
             <div>
@@ -106,7 +106,7 @@ const ERPDashboard = () => {
             <Truck className="h-8 w-8 text-purple-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
           <div className="flex items-center justify-between">
             <div>
@@ -173,7 +173,7 @@ const ERPDashboard = () => {
           <IndianRupee className="h-5 w-5" />
           Financial ERP
         </h3>
-        
+
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Generate GST Invoice
@@ -186,7 +186,7 @@ const ERPDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedOrderId && (
           <div>
             {gstLoading ? (
@@ -217,7 +217,7 @@ const ERPDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-blue-50 rounded">
                   <h4 className="font-medium mb-2">Line Items</h4>
                   <div className="space-y-2">
@@ -251,7 +251,7 @@ const ERPDashboard = () => {
           <Truck className="h-5 w-5" />
           Supply Chain ERP
         </h3>
-        
+
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Sync Inventory with ERP
@@ -264,7 +264,7 @@ const ERPDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedProductId && (
           <div>
             {inventoryLoading ? (
@@ -325,7 +325,7 @@ const ERPDashboard = () => {
           <Factory className="h-5 w-5" />
           Production ERP
         </h3>
-        
+
         <div className="p-4 bg-orange-50 rounded mb-4">
           <h4 className="font-medium mb-2">Create Production Order</h4>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -372,7 +372,7 @@ const ERPDashboard = () => {
           <Users className="h-5 w-5" />
           Customer ERP (CRM)
         </h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Sync Customer to CRM
@@ -385,7 +385,7 @@ const ERPDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         <button
           onClick={() => selectedUserId && handleSyncCustomer(selectedUserId)}
           disabled={!selectedUserId}
@@ -393,7 +393,7 @@ const ERPDashboard = () => {
         >
           Sync Customer to CRM
         </button>
-        
+
         <div className="mt-6 p-4 bg-blue-50 rounded">
           <h4 className="font-medium mb-2">CRM Integration Features</h4>
           <ul className="space-y-2 text-sm text-gray-600">

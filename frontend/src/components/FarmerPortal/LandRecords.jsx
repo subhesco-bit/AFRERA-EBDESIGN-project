@@ -13,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { MapPin, FileText, RefreshCw, CheckCircle, Clock, XCircle } from 'lucide-react';
-import { farmerPortalAPI } from '../../services/api';
+import { farmerPortalAPI } from '../../services/componentApi';
 
 // FE-02 note: not resolved here. Every call in this component is either an
 // authenticated read scoped to the logged-in farmer or a form
@@ -37,7 +37,7 @@ const LandRecords = ({ farmerId }) => {
     soilType: 'alluvial',
     irrigationType: 'canal',
     ownershipType: 'own',
-    landUseType: 'cultivation'
+    landUseType: 'cultivation',
   });
 
   useEffect(() => {
@@ -61,8 +61,8 @@ const LandRecords = ({ farmerId }) => {
   const addLandRecord = async () => {
     setLoading(true);
     try {
-      const response = await farmerPortalAPI.addLandRecord(newRecord);
-      const data = response.data;
+      let response = await farmerPortalAPI.addLandRecord(newRecord);
+      let data = response.data;
       if (data.success) {
         setDialogOpen(false);
         setNewRecord({
@@ -75,7 +75,7 @@ const LandRecords = ({ farmerId }) => {
           soilType: 'alluvial',
           irrigationType: 'canal',
           ownershipType: 'own',
-          landUseType: 'cultivation'
+          landUseType: 'cultivation',
         });
         loadLandRecords();
       }
@@ -89,8 +89,8 @@ const LandRecords = ({ farmerId }) => {
   const syncWithGovernment = async () => {
     setLoading(true);
     try {
-      const response = await farmerPortalAPI.syncGovernmentLandRecords();
-      const data = response.data;
+      let response = await farmerPortalAPI.syncGovernmentLandRecords();
+      let data = response.data;
       alert(`Synced ${data.data.syncedCount} records from government`);
       loadLandRecords();
     } catch (error) {

@@ -1,6 +1,6 @@
 # CLAUDE AI PLUG-AND-PLAY MODULE STRATEGY
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Version:** 1.0  
 **Created:** 24 August 2026  
 **Status:** PRODUCTION LAUNCH LEVEL

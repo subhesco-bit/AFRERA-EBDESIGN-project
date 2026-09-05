@@ -27,8 +27,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -182,7 +182,7 @@ async function freightRate({ laneKm, classKey, utilisationPct }) {
     'SELECT * FROM transport_classes WHERE class_key = $1', [classKey]
   );
   if (!cls.length) throw new Error(`Unknown transport class: ${classKey}`);
-  const c = cls[0];
+  let c = cls[0];
 
   // v42: km * 0.0055 * class multiplier.
   const base = Number(laneKm) * 0.0055;
@@ -263,7 +263,7 @@ async function partyRisk(partyId) {
           + 'a party nobody has transacted with has an unknown risk, not a low one.',
     };
   }
-  const r = rows[0];
+  let r = rows[0];
   return {
     partyId,
     riskScore: Number(r.risk_score),
@@ -304,3 +304,6 @@ module.exports = {
   freightRate,
   equipmentSubsidy, recordRiskEvent, partyRisk, certExpiryAlerts,
 };
+
+
+

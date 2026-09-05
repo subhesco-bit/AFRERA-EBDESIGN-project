@@ -3,10 +3,10 @@
  * AI-powered pre-season order placement, contract farming, and escrow management
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { socketServer } = require('../../websocket');
-const { authMiddleware } = require('../../middleware/auth');
+const { socketServer } = require('../../../websocket');
+const { authMiddleware } = require('../../middleware\/auth');
 const { createEscrowTransaction } = require('./escrowService');
 
 /**
@@ -114,7 +114,7 @@ async function submitBid(bidData) {
     };
 
     // AI-powered bid evaluation
-    const aiRequest = {
+    let aiRequest = {
       task: 'bid_evaluation',
       parameters: {
         bid_data: bidData,
@@ -127,12 +127,12 @@ async function submitBid(bidData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     bid.ai_evaluation = aiResponse;
     bid.match_score = aiResponse.match_score;
 
     // Notify buyer
-    const order = await getPreSeasonOrder(order_id);
+    let order = await getPreSeasonOrder(order_id);
     socketServer.sendNotification(order.buyer_id, {
       type: 'new_bid_received',
       order_id: order_id,
@@ -155,11 +155,11 @@ async function submitBid(bidData) {
  */
 async function selectWinningBid(orderId, selectionCriteria) {
   try {
-    const order = await getPreSeasonOrder(orderId);
+    let order = await getPreSeasonOrder(orderId);
     const bids = await getOrderBids(orderId);
 
     // AI-powered bid selection
-    const aiRequest = {
+    let aiRequest = {
       task: 'bid_selection',
       parameters: {
         order_details: order,
@@ -171,7 +171,7 @@ async function selectWinningBid(orderId, selectionCriteria) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const selection = {
       selection_id: generateId(),
@@ -248,7 +248,7 @@ async function createContractAgreement(agreementData) {
     };
 
     // AI-powered contract optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'contract_optimization',
       parameters: {
         agreement_data: agreementData,
@@ -259,7 +259,7 @@ async function createContractAgreement(agreementData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     agreement.ai_recommendations = aiResponse;
 
     logger.info(`Contract agreement created: ${agreement.agreement_id}`);
@@ -296,7 +296,7 @@ async function updateContractMilestone(contractId, milestoneData) {
     };
 
     // AI-powered milestone validation
-    const aiRequest = {
+    let aiRequest = {
       task: 'milestone_validation',
       parameters: {
         milestone_data: milestoneData,
@@ -307,7 +307,7 @@ async function updateContractMilestone(contractId, milestoneData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     milestone.ai_validation = aiResponse;
 
     // Trigger escrow release if applicable
@@ -718,7 +718,7 @@ async function getContractOpportunities(userId, userType) {
 function setupRoutes(app) {
   app.post('/api/v1/pre-season/orders', authMiddleware, async (req, res) => {
     try {
-      const order = await createPreSeasonOrder(req.body);
+      let order = await createPreSeasonOrder(req.body);
       res.json({ success: true, data: order });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -727,7 +727,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/pre-season/bids', authMiddleware, async (req, res) => {
     try {
-      const bid = await submitBid(req.body);
+      let bid = await submitBid(req.body);
       res.json({ success: true, data: bid });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -736,7 +736,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/pre-season/orders/:orderId/select-bid', authMiddleware, async (req, res) => {
     try {
-      const selection = await selectWinningBid(req.params.orderId, req.body);
+      let selection = await selectWinningBid(req.params.orderId, req.body);
       res.json({ success: true, data: selection });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -745,7 +745,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/pre-season/contracts', authMiddleware, async (req, res) => {
     try {
-      const agreement = await createContractAgreement(req.body);
+      let agreement = await createContractAgreement(req.body);
       res.json({ success: true, data: agreement });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -754,7 +754,7 @@ function setupRoutes(app) {
 
   app.put('/api/v1/pre-season/contracts/:contractId/milestones', authMiddleware, async (req, res) => {
     try {
-      const milestone = await updateContractMilestone(req.params.contractId, req.body);
+      let milestone = await updateContractMilestone(req.params.contractId, req.body);
       res.json({ success: true, data: milestone });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -763,7 +763,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/pre-season/analytics', async (req, res) => {
     try {
-      const analytics = await getPreSeasonAnalytics(req.query);
+      let analytics = await getPreSeasonAnalytics(req.query);
       res.json({ success: true, data: analytics });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -772,7 +772,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/pre-season/dashboard', async (req, res) => {
     try {
-      const dashboard = await getContractDashboard(req.query.user_id, req.query.user_type);
+      let dashboard = await getContractDashboard(req.query.user_id, req.query.user_type);
       res.json({ success: true, data: dashboard });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -790,3 +790,6 @@ module.exports = {
   getContractDashboard,
   setupRoutes
 };
+
+
+

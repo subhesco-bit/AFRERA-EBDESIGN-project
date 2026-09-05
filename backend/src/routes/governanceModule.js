@@ -9,7 +9,7 @@ const governanceService = require('../services/legacy/governanceService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PROCUREMENT_ROLES } = require('../middleware/roleGroups');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // Village Management Routes
 router.post('/villages', authMiddleware, adminMiddleware, async (req, res) => {
@@ -33,7 +33,7 @@ router.get('/villages', authMiddleware, async (req, res) => {
 router.get('/villages/:villageId', authMiddleware, async (req, res) => {
   try {
     const { villageId } = req.params;
-    const village = await governanceService.getVillage(villageId);
+    let village = await governanceService.getVillage(villageId);
     res.json({ success: true, data: village });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -43,7 +43,7 @@ router.get('/villages/:villageId', authMiddleware, async (req, res) => {
 router.put('/villages/:villageId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { villageId } = req.params;
-    const village = await governanceService.updateVillage(villageId, req.body);
+    let village = await governanceService.updateVillage(villageId, req.body);
     res.json({ success: true, data: village });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -72,7 +72,7 @@ router.get('/panchayats', authMiddleware, async (req, res) => {
 router.get('/panchayats/:panchayatId', authMiddleware, async (req, res) => {
   try {
     const { panchayatId } = req.params;
-    const panchayat = await governanceService.getPanchayat(panchayatId);
+    let panchayat = await governanceService.getPanchayat(panchayatId);
     res.json({ success: true, data: panchayat });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -90,7 +90,7 @@ router.post('/panchayats/:panchayatId/schemes', authMiddleware, adminMiddleware,
 });
 
 // CSR Tracking Routes
-router.post('/csr-projects', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/csr-projects', authLimiter, authMiddleware, async (req, res) => {
   try {
     const project = await governanceService.createCSRProject(req.body);
     res.json({ success: true, data: project });
@@ -111,24 +111,24 @@ router.get('/csr-projects', authMiddleware, async (req, res) => {
 router.get('/csr-projects/:projectId', authMiddleware, async (req, res) => {
   try {
     const { projectId } = req.params;
-    const project = await governanceService.getCSRProject(projectId);
+    let project = await governanceService.getCSRProject(projectId);
     res.json({ success: true, data: project });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-router.put('/csr-projects/:projectId', authRateLimit, authMiddleware, requireRole(...PROCUREMENT_ROLES), async (req, res) => {
+router.put('/csr-projects/:projectId', authLimiter, authMiddleware, requireRole(...PROCUREMENT_ROLES), async (req, res) => {
   try {
     const { projectId } = req.params;
-    const project = await governanceService.updateCSRProject(projectId, req.body);
+    let project = await governanceService.updateCSRProject(projectId, req.body);
     res.json({ success: true, data: project });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-router.post('/csr-projects/:projectId/contributions', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/csr-projects/:projectId/contributions', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { projectId } = req.params;
     const contribution = await governanceService.addCSRContribution(projectId, req.user.id, req.body);
@@ -148,7 +148,7 @@ router.get('/csr/statistics', authMiddleware, adminMiddleware, async (req, res) 
 });
 
 // Compliance Routes
-router.post('/compliance-reports', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/compliance-reports', authLimiter, authMiddleware, async (req, res) => {
   try {
     const report = await governanceService.createComplianceReport(req.body);
     res.json({ success: true, data: report });
@@ -169,7 +169,7 @@ router.get('/compliance-reports', authMiddleware, async (req, res) => {
 router.get('/compliance-reports/:reportId', authMiddleware, async (req, res) => {
   try {
     const { reportId } = req.params;
-    const report = await governanceService.getComplianceReport(reportId);
+    let report = await governanceService.getComplianceReport(reportId);
     res.json({ success: true, data: report });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -179,7 +179,7 @@ router.get('/compliance-reports/:reportId', authMiddleware, async (req, res) => 
 router.put('/compliance-reports/:reportId/review', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { reportId } = req.params;
-    const report = await governanceService.reviewComplianceReport(reportId, req.user.id, req.body);
+    let report = await governanceService.reviewComplianceReport(reportId, req.user.id, req.body);
     res.json({ success: true, data: report });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -188,7 +188,7 @@ router.put('/compliance-reports/:reportId/review', authMiddleware, adminMiddlewa
 
 router.get('/compliance/statistics', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const stats = await governanceService.getComplianceStatistics(req.query);
+    let stats = await governanceService.getComplianceStatistics(req.query);
     res.json({ success: true, data: stats });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -233,7 +233,7 @@ router.get('/cooperatives', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/cooperatives/:cooperativeId/members', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/cooperatives/:cooperativeId/members', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { cooperativeId } = req.params;
     const membership = await governanceService.addCooperativeMember(cooperativeId, req.user.id, req.body);
@@ -244,3 +244,4 @@ router.post('/cooperatives/:cooperativeId/members', authRateLimit, authMiddlewar
 });
 
 module.exports = router;
+

@@ -53,7 +53,7 @@ const mfaRequired = async (req, res, next) => {
  */
 const mfaEnforced = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     
     if (!userId) {
       return res.status(401).json({
@@ -63,7 +63,7 @@ const mfaEnforced = async (req, res, next) => {
     }
     
     // Check if MFA is enabled for user
-    const isMFAEnabled = await mfaService.isMFAEnabled(userId);
+    let isMFAEnabled = await mfaService.isMFAEnabled(userId);
     
     if (!isMFAEnabled) {
       return res.status(403).json({
@@ -100,7 +100,7 @@ const mfaEnforced = async (req, res, next) => {
 const verifyMFAToken = async (req, res, next) => {
   try {
     const { mfaToken } = req.body;
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     
     if (!mfaToken) {
       return res.status(400).json({

@@ -9,7 +9,7 @@
  */
 
 const express = require('express');
-const decisionSupportRoutes = require('../../routes/decisionSupportRoutes');
+const decisionSupportRoutes = require('../../routes\/decisionSupportRoutes');
 
 class DecisionSupportService {
   /**
@@ -207,7 +207,7 @@ class DecisionSupportService {
     }
     
     const extra = Math.round((lane.km - shortest) / shortest * 100);
-    const score = Math.max(10, 95 - extra);
+    let score = Math.max(10, 95 - extra);
     const reason = `${extra}% longer than shortest lane — extra emissions penalty`;
     
     return {
@@ -232,7 +232,7 @@ class DecisionSupportService {
     ];
 
     // Calculate points from transaction history
-    const orders = (user.orders || []).length;
+    let orders = (user.orders || []).length;
     const subs = (user.subscriptions || []).length;
     const gifts = (user.giftOrders || []).length;
     
@@ -414,3 +414,5 @@ class DecisionSupportService {
 }
 
 module.exports = new DecisionSupportService();
+
+

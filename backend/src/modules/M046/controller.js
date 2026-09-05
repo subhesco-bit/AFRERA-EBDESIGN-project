@@ -15,7 +15,7 @@ async function createNursery(req, res) {
 
 async function getNursery(req, res) {
   try {
-    const nursery = await service.getNursery(req.params.nurseryId);
+    let nursery = await service.getNursery(req.params.nurseryId);
     if (!nursery) return res.status(404).json({ success: false, error: 'Nursery not found' });
     res.json({ success: true, data: nursery });
   } catch (error) {
@@ -37,7 +37,7 @@ async function listNurseries(req, res) {
 
 async function updateNursery(req, res) {
   try {
-    const nursery = await service.updateNursery(req.params.nurseryId, req.body);
+    let nursery = await service.updateNursery(req.params.nurseryId, req.body);
     if (!nursery) return res.status(404).json({ success: false, error: 'Nursery not found' });
     res.json({ success: true, data: nursery });
   } catch (error) {

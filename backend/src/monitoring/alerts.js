@@ -138,7 +138,7 @@ class AlertManager {
 
   // Resolve alert
   resolveAlert(alertId) {
-    const alert = this.alerts.get(alertId);
+    let alert = this.alerts.get(alertId);
     if (alert) {
       alert.resolve();
       alertLogger.info('Alert resolved', alert.toJSON());

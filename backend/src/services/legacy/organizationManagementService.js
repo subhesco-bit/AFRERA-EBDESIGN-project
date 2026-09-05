@@ -9,10 +9,10 @@
  * - Change impact analysis
  */
 
-const DatabaseService = require('../../database/connection');
+const DatabaseService = require('../../database\/connection');
 const aiGatewayService = require('./aiGatewayService');
 const analyticsService = require('./analyticsService');
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class OrganizationManagementService {
   constructor() {
@@ -74,7 +74,7 @@ class OrganizationManagementService {
    */
   async getOrganization(orgId) {
     try {
-      const organization = await this.db.query(
+      let organization = await this.db.query(
         'SELECT * FROM organizations WHERE id = $1',
         [orgId]
       );
@@ -150,7 +150,7 @@ class OrganizationManagementService {
   async recommendHierarchyChanges(orgId) {
     try {
       const currentHierarchy = await this.getCurrentHierarchy(orgId);
-      const performanceMetrics = await this.getUnitPerformance(orgId);
+      let performanceMetrics = await this.getUnitPerformance(orgId);
       const growthTrajectory = await this.getGrowthTrajectory(orgId);
       const industryBenchmarks = await this.getIndustryBenchmarks(orgId);
 
@@ -221,7 +221,7 @@ class OrganizationManagementService {
       const organizationalGoals = await this.getOrganizationalGoals(orgId);
       const budgetConstraints = await this.getBudgetConstraints(orgId);
 
-      const optimization = await this.aiGateway.optimize({
+      let optimization = await this.aiGateway.optimize({
         type: 'resource_allocation',
         currentAllocation: currentAllocation,
         unitPerformance: unitPerformance,
@@ -436,7 +436,7 @@ class OrganizationManagementService {
   }
 
   async getCurrentStructure(orgId) {
-    const result = await this.db.query(
+    let result = await this.db.query(
       'SELECT structure FROM organizations WHERE id = $1',
       [orgId]
     );
@@ -541,3 +541,5 @@ class OrganizationManagementService {
 }
 
 module.exports = new OrganizationManagementService();
+
+

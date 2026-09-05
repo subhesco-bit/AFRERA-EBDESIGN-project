@@ -1,0 +1,12 @@
+const router = require('express').Router();
+const biometricService = require('../services/biometricService');
+const auth = require('../middleware/auth');
+
+router.post('/biometric/verify/:userId', auth, async (req, res) => {
+  try {
+    const result = await biometricService.verifyBiometric(req.params.userId, req.body);
+    res.json(result);
+  } catch (error) { res.status(500).json({ error: error.message }); }
+});
+
+module.exports = router;

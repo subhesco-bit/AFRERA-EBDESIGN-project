@@ -8,6 +8,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const pool = require('../database/pool');
 const seedVaultService = require('../services/legacy/seedVaultService');
@@ -26,7 +28,9 @@ async function resolveFarmerId(req, res, next) {
   }
 }
 
-router.get('/', authMiddleware, resolveFarmerId, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const seeds = await seedVaultService.listSeeds(req.farmerId);
     res.json({ success: true, data: seeds });
@@ -35,7 +39,9 @@ router.get('/', authMiddleware, resolveFarmerId, async (req, res) => {
   }
 });
 
-router.get('/categories', authMiddleware, resolveFarmerId, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/categories', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const categories = await seedVaultService.listCategories(req.farmerId);
     res.json({ success: true, data: categories });
@@ -44,7 +50,9 @@ router.get('/categories', authMiddleware, resolveFarmerId, async (req, res) => {
   }
 });
 
-router.post('/', authMiddleware, resolveFarmerId, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const seed = await seedVaultService.addSeed(req.farmerId, req.body);
     res.status(201).json({ success: true, data: seed });
@@ -53,27 +61,33 @@ router.post('/', authMiddleware, resolveFarmerId, async (req, res) => {
   }
 });
 
-router.put('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const seed = await seedVaultService.updateSeed(req.params.seedId, req.farmerId, req.body);
+    let seed = await seedVaultService.updateSeed(req.params.seedId, req.farmerId, req.body);
     res.json({ success: true, data: seed });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 });
 
-router.post('/:seedId/record-usage', authMiddleware, resolveFarmerId, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/:seedId/record-usage', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const seed = await seedVaultService.recordUsage(req.params.seedId, req.farmerId, req.body?.amountUsed);
+    let seed = await seedVaultService.recordUsage(req.params.seedId, req.farmerId, req.body?.amountUsed);
     res.json({ success: true, data: seed });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 });
 
-router.delete('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const result = await seedVaultService.deleteSeed(req.params.seedId, req.farmerId);
+    let result = await seedVaultService.deleteSeed(req.params.seedId, req.farmerId);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

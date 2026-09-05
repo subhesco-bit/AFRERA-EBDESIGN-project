@@ -3,13 +3,13 @@
  * Comprehensive audit trail and reporting system
  */
 
-const logger = require('../../utils/logger');
+const logger = require('../../utils\/logger');
 
 class AuditService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -109,7 +109,7 @@ class AuditService {
         params.push(limit);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting entity logs', { error: error.message, stack: error.stack });
@@ -130,7 +130,7 @@ class AuditService {
         WHERE al.user_id = $1
       `;
 
-      const params = [userId];
+      let params = [userId];
       let paramCount = 1;
 
       if (startDate) {
@@ -165,7 +165,7 @@ class AuditService {
         params.push(limit);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting user logs', { error: error.message, stack: error.stack });
@@ -178,14 +178,14 @@ class AuditService {
    */
   async getRecentEvents(limit = 20) {
     try {
-      const query = `
+      let query = `
         SELECT al.*, u.name as user_name, u.email as user_email
         FROM audit_logs al
         LEFT JOIN users u ON al.user_id = u.id
         ORDER BY al.created_at DESC
         LIMIT $1
       `;
-      const result = await this.pool.query(query, [limit]);
+      let result = await this.pool.query(query, [limit]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting recent events', { error: error.message, stack: error.stack });
@@ -212,7 +212,7 @@ class AuditService {
         WHERE 1=1
       `;
 
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (startDate) {
@@ -242,7 +242,7 @@ class AuditService {
       query += groupBy === 'user' ? ' GROUP BY al.user_id, u.name' : ' GROUP BY al.entity_type, al.entity_id';
       query += ' ORDER BY event_count DESC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return {
         reportType: groupBy,
@@ -262,7 +262,7 @@ class AuditService {
    */
   async getComplianceAudit(complianceType, period) {
     try {
-      const query = `
+      let query = `
         SELECT 
           al.*,
           u.name as user_name,
@@ -277,7 +277,7 @@ class AuditService {
         ORDER BY al.created_at DESC
       `;
 
-      const result = await this.pool.query(query, [complianceType, period]);
+      let result = await this.pool.query(query, [complianceType, period]);
 
       return {
         complianceType,
@@ -310,7 +310,7 @@ class AuditService {
         WHERE al.action = ANY($1)
       `;
 
-      const params = [securityActions];
+      let params = [securityActions];
       let paramCount = 1;
 
       if (startDate) {
@@ -333,7 +333,7 @@ class AuditService {
 
       query += ' ORDER BY al.created_at DESC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return {
         securityEvents: result.rows,
@@ -367,3 +367,6 @@ class AuditService {
 }
 
 module.exports = new AuditService();
+
+
+

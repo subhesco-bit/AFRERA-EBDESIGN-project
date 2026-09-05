@@ -3,7 +3,7 @@
  * Complete apiculture management with beekeeping and honey production
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class ApicultureService {
   constructor() {
@@ -58,7 +58,7 @@ class ApicultureService {
   async getApicultureById(apicultureId) {
     try {
       const query = 'SELECT * FROM apiculture WHERE id = $1';
-      const result = await this.pool.query(query, [apicultureId]);
+      let result = await this.pool.query(query, [apicultureId]);
       
       if (result.rows.length === 0) {
         throw new Error('Apiculture not found');
@@ -86,13 +86,13 @@ class ApicultureService {
         expected_honey_kg
       } = apicultureData;
 
-      const query = `
+      let query = `
         INSERT INTO apiculture (farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg
       ]);
 
@@ -108,13 +108,13 @@ class ApicultureService {
    */
   async getHoneyProduction(apicultureId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM honey_production
         WHERE apiculture_id = $1
         ORDER BY harvest_date DESC
       `;
 
-      const result = await this.pool.query(query, [apicultureId]);
+      let result = await this.pool.query(query, [apicultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting honey production:', error);
@@ -127,13 +127,13 @@ class ApicultureService {
    */
   async getHiveHealth(apicultureId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM hive_health
         WHERE apiculture_id = $1
         ORDER BY inspection_date DESC
       `;
 
-      const result = await this.pool.query(query, [apicultureId]);
+      let result = await this.pool.query(query, [apicultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting hive health:', error);
@@ -143,3 +143,6 @@ class ApicultureService {
 }
 
 module.exports = new ApicultureService();
+
+
+

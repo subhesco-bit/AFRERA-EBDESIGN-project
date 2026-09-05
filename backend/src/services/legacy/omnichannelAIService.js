@@ -7,15 +7,15 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware, requireRole } = require('../../middleware\/auth');
+const { PLATFORM_STAFF_ROLES } = require('../../middleware\/roleGroups');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // OMNICHANNEL ORCHESTRATION (CAP-246)
@@ -727,7 +727,7 @@ router.get('/analytics', authMiddleware, async (req, res) => {
  */
 router.get('/config/:channel_type', authMiddleware, async (req, res) => {
   try {
-    const config = await pool.query(
+    let config = await pool.query(
       'SELECT * FROM omnichannel_config WHERE channel_type = $1',
       [req.params.channel_type]
     );
@@ -750,7 +750,7 @@ router.put('/config/:channel_type', authMiddleware, requireRole(...PLATFORM_STAF
   try {
     const { capabilities, settings, enabled } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE omnichannel_config 
        SET capabilities = COALESCE($1, capabilities),
            settings = COALESCE($2, settings),
@@ -787,3 +787,6 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+

@@ -8,12 +8,12 @@
 const express = require('express');
 const cropValueResearchController = require('../controllers/cropValueResearchController');
 const { authMiddleware, requireRole } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 router.get('/status', cropValueResearchController.getProviderStatus);
 router.post('/research', cropValueResearchController.research);

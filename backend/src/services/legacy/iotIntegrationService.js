@@ -5,10 +5,10 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { FARM_OPERATIONS_ROLES } = require('../../middleware/roleGroups');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware, requireRole } = require('../../middleware\/auth');
+const { FARM_OPERATIONS_ROLES } = require('../../middleware\/roleGroups');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 // Standard perishable cold-chain band. Readings outside this range are
 // published as breach signals for cross-module correlation.
@@ -19,7 +19,7 @@ const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // Test-mode lightweight stubs for IoT service
 if (process.env.NODE_ENV === 'test') {
@@ -97,7 +97,7 @@ async function registerIoTDevice(data) {
  */
 router.post('/iot-devices', authMiddleware, async (req, res) => {
   try {
-    const result = await registerIoTDevice(req.body);
+    let result = await registerIoTDevice(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register IoT device API error', { error: error.message, stack: error.stack });
@@ -130,7 +130,7 @@ async function getIoTDevices(filters = {}) {
 
     query += ' ORDER BY created_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get IoT devices error', { error: error.message, stack: error.stack });
@@ -144,7 +144,7 @@ async function getIoTDevices(filters = {}) {
 router.get('/iot-devices', authMiddleware, async (req, res) => {
   try {
     const { device_type, status, assigned_to } = req.query;
-    const result = await getIoTDevices({ device_type, status, assigned_to });
+    let result = await getIoTDevices({ device_type, status, assigned_to });
     res.json(result);
   } catch (error) {
     logger.error('Get IoT devices API error', { error: error.message, stack: error.stack });
@@ -157,7 +157,7 @@ router.get('/iot-devices', authMiddleware, async (req, res) => {
  */
 async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE iot_devices
        SET status = $1, battery_level = $2, signal_strength = $3, last_seen = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
        WHERE id = $4
@@ -203,7 +203,7 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
 router.patch('/iot-devices/:deviceId/status', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const { status, battery_level, signal_strength } = req.body;
-    const result = await updateDeviceStatus(req.params.deviceId, status, battery_level, signal_strength);
+    let result = await updateDeviceStatus(req.params.deviceId, status, battery_level, signal_strength);
     res.json(result);
   } catch (error) {
     logger.error('Update device status API error', { error: error.message, stack: error.stack });
@@ -231,7 +231,7 @@ async function recordSensorData(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO sensor_data 
        (device_id, sensor_type, sensor_value, unit, reading_timestamp, location_id, quality_score, metadata)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -282,7 +282,7 @@ async function recordSensorData(data) {
  */
 router.post('/sensor-data', authMiddleware, async (req, res) => {
   try {
-    const result = await recordSensorData(req.body);
+    let result = await recordSensorData(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record sensor data API error', { error: error.message, stack: error.stack });
@@ -296,7 +296,7 @@ router.post('/sensor-data', authMiddleware, async (req, res) => {
 async function getSensorData(deviceId, sensorType = null, startDate = null, endDate = null, limit = 100) {
   try {
     let query = 'SELECT * FROM sensor_data WHERE device_id = $1';
-    const params = [deviceId];
+    let params = [deviceId];
 
     if (sensorType) {
       query += ' AND sensor_type = $2';
@@ -316,7 +316,7 @@ async function getSensorData(deviceId, sensorType = null, startDate = null, endD
     query += ' ORDER BY reading_timestamp DESC LIMIT $' + (params.length + 1);
     params.push(limit);
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get sensor data error', { error: error.message, stack: error.stack });
@@ -330,7 +330,7 @@ async function getSensorData(deviceId, sensorType = null, startDate = null, endD
 router.get('/sensor-data/:deviceId', async (req, res) => {
   try {
     const { sensor_type, start_date, end_date, limit } = req.query;
-    const result = await getSensorData(
+    let result = await getSensorData(
       req.params.deviceId,
       sensor_type,
       start_date,
@@ -359,7 +359,7 @@ async function sendDeviceCommand(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO device_commands 
        (device_id, command_type, command_payload, status, sent_at)
        VALUES ($1, $2, $3, 'sent', CURRENT_TIMESTAMP)
@@ -379,7 +379,7 @@ async function sendDeviceCommand(data) {
  */
 router.post('/device-commands', authMiddleware, async (req, res) => {
   try {
-    const result = await sendDeviceCommand(req.body);
+    let result = await sendDeviceCommand(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Send device command API error', { error: error.message, stack: error.stack });
@@ -393,7 +393,7 @@ router.post('/device-commands', authMiddleware, async (req, res) => {
 async function getDeviceCommands(deviceId, status = null) {
   try {
     let query = 'SELECT * FROM device_commands WHERE device_id = $1';
-    const params = [deviceId];
+    let params = [deviceId];
 
     if (status) {
       query += ' AND status = $2';
@@ -402,7 +402,7 @@ async function getDeviceCommands(deviceId, status = null) {
 
     query += ' ORDER BY sent_at DESC LIMIT 50';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get device commands error', { error: error.message, stack: error.stack });
@@ -416,7 +416,7 @@ async function getDeviceCommands(deviceId, status = null) {
 router.get('/device-commands/:deviceId', authMiddleware, async (req, res) => {
   try {
     const { status } = req.query;
-    const result = await getDeviceCommands(req.params.deviceId, status);
+    let result = await getDeviceCommands(req.params.deviceId, status);
     res.json(result);
   } catch (error) {
     logger.error('Get device commands API error', { error: error.message, stack: error.stack });
@@ -441,7 +441,7 @@ async function createDeviceAlert(data) {
   } = data;
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO device_alerts 
        (device_id, alert_type, alert_severity, alert_message, alert_data)
        VALUES ($1, $2, $3, $4, $5)
@@ -467,7 +467,7 @@ async function createDeviceAlert(data) {
  */
 router.post('/device-alerts', authMiddleware, async (req, res) => {
   try {
-    const result = await createDeviceAlert(req.body);
+    let result = await createDeviceAlert(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create device alert API error', { error: error.message, stack: error.stack });
@@ -480,7 +480,7 @@ router.post('/device-alerts', authMiddleware, async (req, res) => {
  */
 async function getUnacknowledgedAlerts() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT da.*, d.device_name, d.device_type
        FROM device_alerts da
        LEFT JOIN iot_devices d ON da.device_id = d.id
@@ -500,7 +500,7 @@ async function getUnacknowledgedAlerts() {
  */
 router.get('/device-alerts/unacknowledged', authMiddleware, async (req, res) => {
   try {
-    const result = await getUnacknowledgedAlerts();
+    let result = await getUnacknowledgedAlerts();
     res.json(result);
   } catch (error) {
     logger.error('Get unacknowledged alerts API error', { error: error.message, stack: error.stack });
@@ -517,7 +517,7 @@ router.get('/device-alerts/unacknowledged', authMiddleware, async (req, res) => 
  */
 async function checkDeviceHealth(deviceId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT check_device_health($1) as health',
       [deviceId]
     );
@@ -534,7 +534,7 @@ async function checkDeviceHealth(deviceId) {
  */
 router.get('/iot-devices/:deviceId/health', authMiddleware, async (req, res) => {
   try {
-    const result = await checkDeviceHealth(req.params.deviceId);
+    let result = await checkDeviceHealth(req.params.deviceId);
     res.json(result);
   } catch (error) {
     logger.error('Check device health API error', { error: error.message, stack: error.stack });
@@ -551,7 +551,7 @@ router.get('/iot-devices/:deviceId/health', authMiddleware, async (req, res) => 
  */
 async function recordIoTAnalytics(metrics) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO iot_analytics 
        (date, total_devices, active_devices, offline_devices, total_sensor_readings, 
         anomaly_count, alert_count, average_signal_strength, average_battery_level)
@@ -587,7 +587,7 @@ async function recordIoTAnalytics(metrics) {
 router.post('/iot-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    const result = await recordIoTAnalytics(metrics);
+    let result = await recordIoTAnalytics(metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record IoT analytics API error', { error: error.message, stack: error.stack });
@@ -618,3 +618,6 @@ module.exports = {
   recordIoTAnalytics,
   isHealthy
 };
+
+
+

@@ -1,5 +1,18 @@
-import { Link } from 'react-router-dom'
-import { ArrowRight, Leaf, Truck, Shield, TrendingUp, Users, Award, Sprout, ShoppingBag, Landmark, Building2, Wheat } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Leaf, Truck, Shield, TrendingUp, Users, Award, Sprout, ShoppingBag, Landmark, Building2, Wheat } from 'lucide-react';
+import { productsAPI } from '../services/api';
+
+const CATEGORY_ICONS = {
+  'Grains & Millets': '🌾',
+  Spices: '🌶️',
+  Fruits: '🍊',
+  Vegetables: '🥬',
+  'Tea & Beverages': '🍵',
+  Honey: '🍯',
+  'Bamboo Foods': '🎋',
+  Mushrooms: '🍄',
+};
 
 const doors = [
   { icon: Sprout, label: 'Farmer', to: '/farmer-entrance', blurb: 'Sell produce, plan harvests' },
@@ -8,9 +21,28 @@ const doors = [
   { icon: Landmark, label: 'Bank', to: '/banker-dashboard', blurb: 'Farmer credit & repayment data' },
   { icon: Wheat, label: 'Government', to: '/government-dashboard', blurb: 'Scheme & subsidy tracking' },
   { icon: Truck, label: 'Logistics partner', to: '/logistics-provider', blurb: 'Coordinate pickup & cold chain' },
-]
+];
 
 function HomePage() {
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    productsAPI
+      .getCategories()
+      .then((res) => {
+        if (cancelled) return;
+        const rows = Array.isArray(res.data) ? res.data : res.data?.categories || [];
+        setCategories(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setCategories([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="font-body">
       {/* Hero Section — NE Harvest design system (afrera_platform_v42.html) */}
@@ -42,10 +74,10 @@ function HomePage() {
                 Farmer Entrance
               </Link>
               <Link
-                to="/modules"
+                to="/analytics"
                 className="px-8 py-3 bg-v42-forest text-v42-paddy rounded-lg font-semibold hover:bg-v42-forest/80 transition inline-flex items-center justify-center"
               >
-                Explore Platform Hub
+                Explore Platform Insights
               </Link>
             </div>
           </div>
@@ -86,7 +118,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-16 bg-v42-paddy">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-display font-bold text-center mb-12 text-v42-ink">
@@ -124,6 +155,49 @@ function HomePage() {
         </div>
       </section>
 
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="mb-10 text-center">
+            <div className="text-v42-turmeric text-sm font-semibold tracking-wide uppercase mb-3">
+              Public browsing • secure ordering • enterprise controls
+            </div>
+            <h2 className="text-3xl font-display font-bold text-v42-ink">One platform for every stakeholder experience</h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl border border-v42-line bg-v42-paddy p-6 shadow-sm">
+              <div className="mb-4 inline-flex rounded-full bg-v42-forest/10 p-2 text-v42-forest">
+                <Users className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-display font-semibold text-v42-ink mb-2">Open marketplace experience</h3>
+              <p className="text-v42-mut">
+                Anyone can browse categories, view products, compare pricing, and explore supply chains.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-v42-line bg-v42-paddy p-6 shadow-sm">
+              <div className="mb-4 inline-flex rounded-full bg-v42-turmeric/15 p-2 text-v42-turmericink">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-display font-semibold text-v42-ink mb-2">Login for ordering</h3>
+              <p className="text-v42-mut">
+                Cart, checkout, payments, and sensitive transactions require login to keep buying secure.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-v42-line bg-v42-paddy p-6 shadow-sm">
+              <div className="mb-4 inline-flex rounded-full bg-v42-indigo/10 p-2 text-v42-indigo">
+                <Shield className="h-5 w-5" />
+              </div>
+              <h3 className="text-xl font-display font-semibold text-v42-ink mb-2">Protected admin and enterprise zones</h3>
+              <p className="text-v42-mut">
+               Staff, enterprise partners, and platform admins access only the workflows and client data meant for them.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Categories Section */}
       <section className="py-16 bg-v42-paddy2">
         <div className="container mx-auto px-4">
@@ -131,24 +205,19 @@ function HomePage() {
             Explore Categories
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { name: 'Grains & Millets', icon: '🌾', count: 120 },
-              { name: 'Spices', icon: '🌶️', count: 85 },
-              { name: 'Fruits', icon: '🍊', count: 65 },
-              { name: 'Vegetables', icon: '🥬', count: 95 },
-              { name: 'Tea & Beverages', icon: '🍵', count: 45 },
-              { name: 'Honey', icon: '🍯', count: 30 },
-              { name: 'Bamboo Foods', icon: '🎋', count: 25 },
-              { name: 'Mushrooms', icon: '🍄', count: 20 },
-            ].map((category) => (
+            {(categories.length > 0 ? categories : Object.keys(CATEGORY_ICONS).map((name) => ({ name }))).map((category) => (
               <Link
-                key={category.name}
-                to="/marketplace"
+                key={category.id || category.name}
+                to={`/marketplace${category.id ? `?category=${category.id}` : ''}`}
                 className="bg-v42-paddy border border-v42-line rounded-lg p-6 text-center hover:shadow-lg hover:border-v42-turmeric transition cursor-pointer"
               >
-                <div className="text-4xl mb-3">{category.icon}</div>
+                <div className="text-4xl mb-3">{CATEGORY_ICONS[category.name] || '🌱'}</div>
                 <h3 className="font-display font-semibold text-v42-ink">{category.name}</h3>
-                <p className="text-sm text-v42-mut mt-1">{category.count} products</p>
+                <p className="text-sm text-v42-mut mt-1">
+                  {typeof category.product_count !== 'undefined'
+                    ? `${category.product_count} products`
+                    : 'Browse'}
+                </p>
               </Link>
             ))}
           </div>
@@ -215,7 +284,7 @@ function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

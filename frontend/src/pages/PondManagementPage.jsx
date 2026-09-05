@@ -1,60 +1,60 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { pondAPI } from '../services/api'
-import { Fish, Plus, X, Trash2, Edit } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { pondAPI } from '../services/api';
+import { Fish, Plus, X, Trash2, Edit } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
-const SPECIES = ['Rohu', 'Catla', 'Mrigal', 'Common Carp', 'Tilapia', 'Magur (Catfish)', 'Prawn']
+const SPECIES = ['Rohu', 'Catla', 'Mrigal', 'Common Carp', 'Tilapia', 'Magur (Catfish)', 'Prawn'];
 
-const emptyForm = { name: '', species: 'Rohu', area_sqm: '', stocking_date: '', stock_count: '', location: '' }
+const emptyForm = { name: '', species: 'Rohu', area_sqm: '', stocking_date: '', stock_count: '', location: '' };
 
 function PondManagementPage() {
-  const queryClient = useQueryClient()
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState(emptyForm)
+  const queryClient = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
 
   // v5 react-query object syntax (see LoginPage.jsx)
   const { data, isLoading, error } = useQuery({
     queryKey: ['ponds'],
     // listPonds returns { items, pagination }, not a bare array
     queryFn: async () => (await pondAPI.getPonds()).data?.data?.items ?? [],
-  })
+  });
 
   const saveMutation = useMutation({
     mutationFn: (payload) => (editingId ? pondAPI.updatePond(editingId, payload) : pondAPI.createPond(payload)),
     onSuccess: () => {
-      toast.success(editingId ? 'Pond updated' : 'Pond registered')
-      queryClient.invalidateQueries({ queryKey: ['ponds'] })
-      closeForm()
+      toast.success(editingId ? 'Pond updated' : 'Pond registered');
+      queryClient.invalidateQueries({ queryKey: ['ponds'] });
+      closeForm();
     },
     onError: (err) => toast.error(err?.response?.data?.error || 'Failed to save pond'),
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => pondAPI.deletePond(id),
-    onSuccess: () => { toast.success('Pond removed'); queryClient.invalidateQueries({ queryKey: ['ponds'] }) },
+    onSuccess: () => { toast.success('Pond removed'); queryClient.invalidateQueries({ queryKey: ['ponds'] }); },
     onError: () => toast.error('Failed to remove pond'),
-  })
+  });
 
-  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm) }
+  const closeForm = () => { setShowForm(false); setEditingId(null); setForm(emptyForm); };
 
   // Real DB column is `area` (not area_sqm); species/stock_count/stocking_date
   // live inside the real `metadata` jsonb column (see submit handler above).
   const openEdit = (p) => {
-    const meta = p.metadata || {}
+    const meta = p.metadata || {};
     setForm({
       name: p.name || '', species: meta.species || 'Rohu', area_sqm: p.area ?? '',
       stocking_date: meta.stocking_date ? meta.stocking_date.slice(0, 10) : '', stock_count: meta.stock_count ?? '', location: p.location || '',
-    })
-    setEditingId(p.id)
-    setShowForm(true)
-  }
+    });
+    setEditingId(p.id);
+    setShowForm(true);
+  };
 
-  const ponds = data || []
-  const totalArea = ponds.reduce((s, p) => s + (Number(p.area) || 0), 0)
-  const totalStock = ponds.reduce((s, p) => s + (Number(p.metadata?.stock_count) || 0), 0)
+  const ponds = data || [];
+  const totalArea = ponds.reduce((s, p) => s + (Number(p.area) || 0), 0);
+  const totalStock = ponds.reduce((s, p) => s + (Number(p.metadata?.stock_count) || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -66,7 +66,7 @@ function PondManagementPage() {
           </h1>
           <p className="text-gray-600">Track fish ponds, stocking and water quality</p>
         </div>
-        <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true) }}
+        <button onClick={() => { setForm(emptyForm); setEditingId(null); setShowForm(true); }}
           className="px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700 transition flex items-center">
           <Plus className="w-5 h-5 mr-2" />Register Pond
         </button>
@@ -120,7 +120,7 @@ function PondManagementPage() {
                   <td className="px-4 py-3 text-gray-700">{p.metadata?.stocking_date ? p.metadata.stocking_date.slice(0, 10) : '—'}</td>
                   <td className="px-4 py-3 text-right space-x-2">
                     <button onClick={() => openEdit(p)} className="p-2 text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => { if (confirm('Remove this pond?')) deleteMutation.mutate(p.id) }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => { if (confirm('Remove this pond?')) deleteMutation.mutate(p.id); }} className="p-2 text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                   </td>
                 </tr>
               ))}
@@ -139,8 +139,8 @@ function PondManagementPage() {
               </div>
               <form
                 onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!form.name) { toast.error('Pond name is required'); return }
+                  e.preventDefault();
+                  if (!form.name) { toast.error('Pond name is required'); return; }
                   // Real backend fields (M132 createPond/updatePond) don't have
                   // dedicated columns for species/stock_count/stocking_date - stored
                   // in the real, persisted `metadata` field instead of dropped silently.
@@ -153,7 +153,7 @@ function PondManagementPage() {
                       stock_count: form.stock_count === '' ? null : Number(form.stock_count),
                       stocking_date: form.stocking_date || null,
                     },
-                  })
+                  });
                 }}
                 className="space-y-4"
               >
@@ -206,7 +206,7 @@ function PondManagementPage() {
       )}
 
     </div>
-  )
+  );
 }
 
-export default PondManagementPage
+export default PondManagementPage;

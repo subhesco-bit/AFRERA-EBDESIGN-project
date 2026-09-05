@@ -8,7 +8,7 @@ const router = express.Router();
 const advancedFeaturesService = require('../services/legacy/advancedFeaturesService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // AI Recommendations Routes
 router.post('/ai/recommendations', authMiddleware, async (req, res) => {
@@ -53,7 +53,7 @@ router.post('/iot/devices', authMiddleware, async (req, res) => {
 router.post('/iot/devices/:deviceId/data', authMiddleware, async (req, res) => {
   try {
     const { deviceId } = req.params;
-    const result = await advancedFeaturesService.processIoTData(deviceId, req.body);
+    let result = await advancedFeaturesService.processIoTData(deviceId, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -74,7 +74,7 @@ router.post('/analytics/demand-forecast', authMiddleware, async (req, res) => {
 router.post('/voice/commands', authMiddleware, async (req, res) => {
   try {
     const { command } = req.body;
-    const result = await advancedFeaturesService.processVoiceCommand(command, req.user.id);
+    let result = await advancedFeaturesService.processVoiceCommand(command, req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

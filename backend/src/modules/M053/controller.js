@@ -25,7 +25,7 @@ const listOrders = async (req, res) => {
 
 const getOrder = async (req, res) => {
   try {
-    const order = await orderService.getOrder(req.params.id);
+    let order = await orderService.getOrder(req.params.id);
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found' });
     }
@@ -37,7 +37,7 @@ const getOrder = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
   try {
-    const order = await orderService.updateOrderStatus(req.params.id, req.body.status, req.body.notes);
+    let order = await orderService.updateOrderStatus(req.params.id, req.body.status, req.body.notes);
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found' });
     }
@@ -49,7 +49,7 @@ const updateOrderStatus = async (req, res) => {
 
 const cancelOrder = async (req, res) => {
   try {
-    const order = await orderService.cancelOrder(req.params.id, req.body.reason);
+    let order = await orderService.cancelOrder(req.params.id, req.body.reason);
     res.status(200).json({ success: true, data: order });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

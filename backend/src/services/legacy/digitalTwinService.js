@@ -5,8 +5,8 @@
  * Based on latest research in agricultural digital twins (2024-2025)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class DigitalTwinService {
   constructor() {
@@ -122,7 +122,7 @@ class DigitalTwinService {
 
   async createDigitalTwin(farmId, configuration) {
     try {
-      const result = await getPostgreSQL().query(`
+      let result = await getPostgreSQL().query(`
         INSERT INTO digital_twins (farm_id, name, configuration, created_at, updated_at)
         VALUES ($1, $2, $3, NOW(), NOW())
         RETURNING id, farm_id, name, configuration
@@ -155,7 +155,7 @@ class DigitalTwinService {
 
   async updateDigitalTwin(twinId, updates) {
     try {
-      const twin = this.activeTwins.get(twinId);
+      let twin = this.activeTwins.get(twinId);
       
       if (!twin) {
         throw new Error(`Digital twin not found: ${twinId}`);
@@ -198,7 +198,7 @@ class DigitalTwinService {
 
   async ingestSensorData(twinId, sensorData) {
     try {
-      const twin = this.activeTwins.get(twinId);
+      let twin = this.activeTwins.get(twinId);
       
       if (!twin) {
         throw new Error(`Digital twin not found: ${twinId}`);
@@ -266,7 +266,7 @@ class DigitalTwinService {
 
   async runSimulation(twinId, modelType) {
     try {
-      const twin = this.activeTwins.get(twinId);
+      let twin = this.activeTwins.get(twinId);
       
       if (!twin) {
         throw new Error(`Digital twin not found: ${twinId}`);
@@ -504,9 +504,9 @@ class DigitalTwinService {
   }
 
   calculateYield(crop, soil, weather) {
-    const baseYield = this.getBaseYield(crop.name);
-    const soilFactor = soil.moisture / 100;
-    const weatherFactor = 1 - (Math.abs(weather.temperature - 25) / 30);
+    let baseYield = this.getBaseYield(crop.name);
+    let soilFactor = soil.moisture / 100;
+    let weatherFactor = 1 - (Math.abs(weather.temperature - 25) / 30);
     
     return baseYield * soilFactor * weatherFactor;
   }
@@ -582,7 +582,7 @@ class DigitalTwinService {
       maize: ['fall_armyworm', 'stem_borer', 'aphids']
     };
 
-    const likelyPests = [];
+    let likelyPests = [];
     crops.forEach(crop => {
       if (pestMap[crop.name]) {
         likelyPests.push(...pestMap[crop.name]);
@@ -628,8 +628,8 @@ class DigitalTwinService {
   }
 
   calculateWeatherYieldFactor(weather, crop) {
-    const optimalTemp = 25;
-    const tempDiff = Math.abs(weather.temperature - optimalTemp);
+    let optimalTemp = 25;
+    let tempDiff = Math.abs(weather.temperature - optimalTemp);
     return Math.max(0.5, 1 - (tempDiff / 20));
   }
 
@@ -647,7 +647,7 @@ class DigitalTwinService {
   }
 
   calculateYieldImpact(conditions, crop) {
-    const baseYield = this.getBaseYield(crop.name);
+    let baseYield = this.getBaseYield(crop.name);
     let impact = 0;
 
     if (conditions.rainfall < 50) impact -= 0.3; // Drought impact
@@ -690,7 +690,7 @@ class DigitalTwinService {
   }
 
   getClimateAdaptationRecommendations(scenarios) {
-    const recommendations = [];
+    let recommendations = [];
     
     scenarios.forEach(scenario => {
       if (scenario.overallRisk === 'high') {
@@ -710,7 +710,7 @@ class DigitalTwinService {
     app.post('/api/v1/digital-twin', async (req, res) => {
       try {
         const { farmId, configuration } = req.body;
-        const result = await this.createDigitalTwin(farmId, configuration);
+        let result = await this.createDigitalTwin(farmId, configuration);
         res.json(result);
       } catch (error) {
         logger.error('Failed to create digital twin', { error: error.message });
@@ -722,7 +722,7 @@ class DigitalTwinService {
     app.put('/api/v1/digital-twin/:twinId', async (req, res) => {
       try {
         const { twinId } = req.params;
-        const result = await this.updateDigitalTwin(twinId, req.body);
+        let result = await this.updateDigitalTwin(twinId, req.body);
         res.json(result);
       } catch (error) {
         logger.error('Failed to update digital twin', { error: error.message });
@@ -734,7 +734,7 @@ class DigitalTwinService {
     app.post('/api/v1/digital-twin/:twinId/sensor-data', async (req, res) => {
       try {
         const { twinId } = req.params;
-        const result = await this.ingestSensorData(twinId, req.body);
+        let result = await this.ingestSensorData(twinId, req.body);
         res.json(result);
       } catch (error) {
         logger.error('Failed to ingest sensor data', { error: error.message });
@@ -747,7 +747,7 @@ class DigitalTwinService {
       try {
         const { twinId } = req.params;
         const { modelType } = req.body;
-        const result = await this.runSimulation(twinId, modelType);
+        let result = await this.runSimulation(twinId, modelType);
         res.json(result);
       } catch (error) {
         logger.error('Failed to run simulation', { error: error.message });
@@ -759,7 +759,7 @@ class DigitalTwinService {
     app.get('/api/v1/digital-twin/:twinId', async (req, res) => {
       try {
         const { twinId } = req.params;
-        const twin = this.activeTwins.get(twinId);
+        let twin = this.activeTwins.get(twinId);
         
         if (!twin) {
           return res.status(404).json({ success: false, error: 'Digital twin not found' });
@@ -810,7 +810,7 @@ class DigitalTwinService {
         const { twinId } = req.params;
         const { limit = 10 } = req.query;
 
-        const result = await getPostgreSQL().query(`
+        let result = await getPostgreSQL().query(`
           SELECT model_type, result, timestamp
           FROM simulation_results
           WHERE twin_id = $1
@@ -831,3 +831,6 @@ class DigitalTwinService {
 }
 
 module.exports = new DigitalTwinService();
+
+
+

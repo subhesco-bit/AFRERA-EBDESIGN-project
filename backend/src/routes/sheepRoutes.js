@@ -31,13 +31,15 @@ const {
   recommendSheepBreeding,
 } = require('../services/legacy/sheepService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
+protectLivestockRouter(router);
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/v1/sheep/flock
@@ -74,8 +76,8 @@ router.post('/flock', async (req, res, next) => {
  */
 router.get('/flock/:id', async (req, res, next) => {
   try {
-    const result = await listFlock({});
-    const animal = result.items.find((a) => a.id === req.params.id);
+    let result = await listFlock({});
+    let animal = result.items.find((a) => a.id === req.params.id);
     if (!animal) {
       return res.status(404).json({ success: false, error: 'Animal not found' });
     }
@@ -92,7 +94,7 @@ router.get('/flock/:id', async (req, res, next) => {
  */
 router.put('/flock/:id', async (req, res, next) => {
   try {
-    const animal = await updateAnimal(req.params.id, req.body);
+    let animal = await updateAnimal(req.params.id, req.body);
     if (!animal) {
       return res.status(404).json({ success: false, error: 'Animal not found' });
     }
@@ -127,7 +129,7 @@ router.delete('/flock/:id', async (req, res, next) => {
 router.get('/flock/:animalId/wool-production', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listWoolProduction(req.params.animalId, { page, limit });
+    let result = await listWoolProduction(req.params.animalId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('sheepRoutes:listWoolProduction', { error: error.message });
@@ -156,7 +158,7 @@ router.post('/flock/:animalId/wool-production', async (req, res, next) => {
 router.get('/flock/:animalId/feed-consumption', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listFeedConsumption(req.params.animalId, { page, limit });
+    let result = await listFeedConsumption(req.params.animalId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('sheepRoutes:listFeedConsumption', { error: error.message });
@@ -170,7 +172,7 @@ router.get('/flock/:animalId/feed-consumption', async (req, res, next) => {
  */
 router.post('/flock/:animalId/feed-consumption', async (req, res, next) => {
   try {
-    const record = await recordFeedConsumption({ ...req.body, animal_id: req.params.animalId });
+    let record = await recordFeedConsumption({ ...req.body, animal_id: req.params.animalId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('sheepRoutes:recordFeedConsumption', { error: error.message });
@@ -185,7 +187,7 @@ router.post('/flock/:animalId/feed-consumption', async (req, res, next) => {
 router.get('/flock/:femaleId/breeding', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listBreedingRecords(req.params.femaleId, { page, limit });
+    let result = await listBreedingRecords(req.params.femaleId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('sheepRoutes:listBreedingRecords', { error: error.message });
@@ -199,7 +201,7 @@ router.get('/flock/:femaleId/breeding', async (req, res, next) => {
  */
 router.post('/flock/:femaleId/breeding', async (req, res, next) => {
   try {
-    const record = await recordBreeding({ ...req.body, female_id: req.params.femaleId });
+    let record = await recordBreeding({ ...req.body, female_id: req.params.femaleId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('sheepRoutes:recordBreeding', { error: error.message });
@@ -219,7 +221,7 @@ router.post('/flock/:femaleId/breeding', async (req, res, next) => {
  */
 router.put(['/breeding/:id', '/breeding/:id/lambing-outcome'], async (req, res, next) => {
   try {
-    const record = await updateLambingOutcome(req.params.id, req.body);
+    let record = await updateLambingOutcome(req.params.id, req.body);
     if (!record) {
       return res.status(404).json({ success: false, error: 'Breeding record not found' });
     }
@@ -237,7 +239,7 @@ router.put(['/breeding/:id', '/breeding/:id/lambing-outcome'], async (req, res, 
 router.get('/flock/:animalId/vaccinations', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listVaccinationRecords(req.params.animalId, { page, limit });
+    let result = await listVaccinationRecords(req.params.animalId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('sheepRoutes:listVaccinationRecords', { error: error.message });
@@ -251,7 +253,7 @@ router.get('/flock/:animalId/vaccinations', async (req, res, next) => {
  */
 router.post('/flock/:animalId/vaccinations', async (req, res, next) => {
   try {
-    const record = await recordVaccination({ ...req.body, animal_id: req.params.animalId });
+    let record = await recordVaccination({ ...req.body, animal_id: req.params.animalId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('sheepRoutes:recordVaccination', { error: error.message });
@@ -293,7 +295,7 @@ router.get('/breeding-alerts', async (req, res, next) => {
  */
 router.get('/vaccination-alerts', async (req, res, next) => {
   try {
-    const alerts = await getVaccinationAlerts();
+    let alerts = await getVaccinationAlerts();
     res.json({ success: true, data: alerts });
   } catch (error) {
     logger.error('sheepRoutes:getVaccinationAlerts', { error: error.message });
@@ -307,7 +309,7 @@ router.get('/vaccination-alerts', async (req, res, next) => {
  */
 router.get('/shearing-alerts', async (req, res, next) => {
   try {
-    const alerts = await getShearingAlerts();
+    let alerts = await getShearingAlerts();
     res.json({ success: true, data: alerts });
   } catch (error) {
     logger.error('sheepRoutes:getShearingAlerts', { error: error.message });
@@ -325,7 +327,7 @@ router.get('/shearing-alerts', async (req, res, next) => {
  */
 router.post('/ai/optimize-wool/:animalId', async (req, res, next) => {
   try {
-    const result = await optimizeWoolProduction(req.params.animalId);
+    let result = await optimizeWoolProduction(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('sheepRoutes:optimizeWoolProduction', { error: error.message });
@@ -339,7 +341,7 @@ router.post('/ai/optimize-wool/:animalId', async (req, res, next) => {
  */
 router.post('/ai/monitor-health/:animalId', async (req, res, next) => {
   try {
-    const result = await monitorSheepHealth(req.params.animalId);
+    let result = await monitorSheepHealth(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('sheepRoutes:monitorSheepHealth', { error: error.message });
@@ -354,7 +356,7 @@ router.post('/ai/monitor-health/:animalId', async (req, res, next) => {
 router.post('/ai/optimize-feed/:animalId', async (req, res, next) => {
   try {
     const { productionGoal } = req.body;
-    const result = await optimizeSheepFeed(req.params.animalId, productionGoal);
+    let result = await optimizeSheepFeed(req.params.animalId, productionGoal);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('sheepRoutes:optimizeSheepFeed', { error: error.message });
@@ -368,7 +370,7 @@ router.post('/ai/optimize-feed/:animalId', async (req, res, next) => {
  */
 router.post('/ai/recommend-breeding/:animalId', async (req, res, next) => {
   try {
-    const result = await recommendSheepBreeding(req.params.animalId);
+    let result = await recommendSheepBreeding(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('sheepRoutes:recommendSheepBreeding', { error: error.message });

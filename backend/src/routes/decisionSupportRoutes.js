@@ -10,6 +10,9 @@ const router = express.Router();
 const decisionSupportService = require('../services/legacy/decisionSupportService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
+const { protectRouter } = require('./enterpriseRouteSupport');
+
+protectRouter(router, { signal: 'enterprise.decision_support.changed' });
 
 /**
  * 1. Corporate Credit Eligibility Check
@@ -48,7 +51,7 @@ router.post('/floor-benchmark', authMiddleware, async (req, res) => {
       });
     }
     
-    const result = decisionSupportService.floorBenchmark(categoryOrName, catalog);
+    let result = decisionSupportService.floorBenchmark(categoryOrName, catalog);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -70,7 +73,7 @@ router.post('/eco-logistics-miles', authMiddleware, async (req, res) => {
       });
     }
     
-    const result = decisionSupportService.ecoLogisticsMiles(ctx, lanes);
+    let result = decisionSupportService.ecoLogisticsMiles(ctx, lanes);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -92,7 +95,7 @@ router.post('/harvest-points', authMiddleware, async (req, res) => {
       });
     }
     
-    const result = decisionSupportService.harvestPoints(user);
+    let result = decisionSupportService.harvestPoints(user);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -114,7 +117,7 @@ router.post('/alloc-score', authMiddleware, async (req, res) => {
       });
     }
     
-    const result = decisionSupportService.allocScore(lot, dest, regionDist);
+    let result = decisionSupportService.allocScore(lot, dest, regionDist);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -136,7 +139,7 @@ router.post('/compost-plan', authMiddleware, async (req, res) => {
       });
     }
     
-    const result = decisionSupportService.compostPlan(crop, acres, soilCond);
+    let result = decisionSupportService.compostPlan(crop, acres, soilCond);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -149,7 +152,7 @@ router.post('/compost-plan', authMiddleware, async (req, res) => {
  */
 router.get('/scheme-expiry-status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const result = decisionSupportService.schemeExpiryStatus();
+    let result = decisionSupportService.schemeExpiryStatus();
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -164,7 +167,7 @@ router.post('/compliance-gaps', authMiddleware, adminMiddleware, async (req, res
   try {
     const { complianceRecord } = req.body;
     
-    const result = decisionSupportService.complianceGaps(complianceRecord);
+    let result = decisionSupportService.complianceGaps(complianceRecord);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

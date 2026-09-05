@@ -35,15 +35,15 @@ async function registerCrop(cropData) {
 }
 
 async function getCropRegistration(registrationId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query('SELECT * FROM crop_registrations WHERE id = $1', [registrationId]);
+  let res = await pg.query('SELECT * FROM crop_registrations WHERE id = $1', [registrationId]);
   return res.rows[0] || null;
 }
 
 async function listCropRegistrations({ page = 1, limit = 20, farmerId, cropName, villageId, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const offset = (page - 1) * limit;
@@ -71,7 +71,7 @@ async function listCropRegistrations({ page = 1, limit = 20, farmerId, cropName,
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
 
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM crop_registrations`, 'SELECT COUNT(*) FROM crop_registrations').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
 
@@ -79,12 +79,12 @@ async function listCropRegistrations({ page = 1, limit = 20, farmerId, cropName,
 }
 
 async function updateCropRegistration(registrationId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { cropName, variety, area, soilType, irrigationType, plantingDate, expectedYield, notes, status } = updates;
 
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE crop_registrations
      SET crop_name = COALESCE($1, crop_name),
          variety = COALESCE($2, variety),
@@ -116,10 +116,10 @@ async function updateCropRegistration(registrationId, updates) {
 }
 
 async function deleteCropRegistration(registrationId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query('DELETE FROM crop_registrations WHERE id = $1 RETURNING id', [registrationId]);
+  let res = await pg.query('DELETE FROM crop_registrations WHERE id = $1 RETURNING id', [registrationId]);
 
   if (res.rows[0]) {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
@@ -137,7 +137,7 @@ async function deleteCropRegistration(registrationId) {
 
 // AI-powered crop recommendation
 async function recommendCrops(farmerId, constraints = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const farmer = await pg.query('SELECT * FROM farmers WHERE id = $1', [farmerId]);
@@ -161,7 +161,7 @@ async function recommendCrops(farmerId, constraints = {}) {
 }
 
 function generatePrimaryRecommendations(farmerData, constraints) {
-  const recommendations = [];
+  let recommendations = [];
 
   // Based on land size
   if (farmerData.land_size < 2) {
@@ -281,7 +281,7 @@ function assessCropRisks(farmerData) {
 
 // Yield estimation
 async function estimateYield(registrationId, factors = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const registration = await getCropRegistration(registrationId);
@@ -334,7 +334,7 @@ function identifyInfluencingFactors(registration, factors) {
 
 // Crop analytics
 async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   let query = `
@@ -347,7 +347,7 @@ async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}
     FROM crop_registrations
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
 
   if (startDate) {
@@ -369,7 +369,7 @@ async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}
 
   query += ` GROUP BY crop_name, variety ORDER BY count DESC`;
 
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
 
   return {
     byCrop: res.rows,
@@ -380,7 +380,7 @@ async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}
 }
 
 function generateCropAnalyticsRecommendations(cropData) {
-  const recommendations = [];
+  let recommendations = [];
 
   const topCrop = cropData[0];
   if (topCrop) {

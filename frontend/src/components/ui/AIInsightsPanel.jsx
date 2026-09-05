@@ -30,7 +30,7 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
   const toggleExpand = (insightId) => {
     setExpandedInsights(prev => ({
       ...prev,
-      [insightId]: !prev[insightId]
+      [insightId]: !prev[insightId],
     }));
   };
 
@@ -71,9 +71,9 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
         <div className="text-center p-8 text-gray-500">
           <div className="text-4xl mb-2">🤖</div>
           <p>No AI insights available at this time</p>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={onRefresh}
             className="mt-4"
           >
@@ -95,7 +95,7 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
           </Badge>
         </h3>
         <div className="flex items-center space-x-2">
-          <select 
+          <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="text-sm border rounded px-2 py-1"
@@ -106,9 +106,9 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
             <option value="info">Info</option>
             <option value="success">Success</option>
           </select>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onRefresh}
             title="Refresh insights"
           >
@@ -135,11 +135,11 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
                       {insight.severity}
                     </Badge>
                   </div>
-                  
+
                   {expandedInsights[insight.id] && (
                     <div className="mt-3 space-y-2">
                       <p className="text-sm text-gray-700">{insight.description}</p>
-                      
+
                       {insight.data && (
                         <div className="bg-gray-50 rounded p-3 mt-2">
                           <h5 className="text-xs font-semibold text-gray-600 mb-2">DATA ANALYSIS</h5>
@@ -166,9 +166,9 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
                             ))}
                           </ul>
                           {onApplyRecommendation && (
-                            <Button 
-                              variant="primary" 
-                              size="sm" 
+                            <Button
+                              variant="primary"
+                              size="sm"
                               className="mt-3"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -188,7 +188,7 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
                             <span>{(insight.confidence * 100).toFixed(0)}%</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-blue-600 h-2 rounded-full transition-all"
                               style={{ width: `${insight.confidence * 100}%` }}
                             />
@@ -203,8 +203,8 @@ const AIInsightsPanel = ({ insights, loading, onRefresh, onApplyRecommendation }
                   )}
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 className="ml-2"
               >

@@ -18,8 +18,8 @@
  */
 
 const fetch = require('node-fetch');
-const { getPostgreSQL } = require('../../database/connection');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { logger } = require('../../utils\/logger');
 const aiBackboneService = require('./aiBackboneService');
 
 const SEARCH_PROVIDER_ENV = {
@@ -48,10 +48,10 @@ async function callBingSearch(query) {
 }
 
 async function callSerpApiSearch(query) {
-  const apiKey = process.env.SERPAPI_KEY;
-  const response = await fetch(`https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}&num=5`);
+  let apiKey = process.env.SERPAPI_KEY;
+  let response = await fetch(`https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${apiKey}&num=5`);
   if (!response.ok) throw new Error(`SerpAPI search failed: ${response.status} - ${await response.text()}`);
-  const data = await response.json();
+  let data = await response.json();
   return (data.organic_results || []).map((r) => ({ title: r.title, snippet: r.snippet, url: r.link }));
 }
 
@@ -141,7 +141,7 @@ async function researchOnProductAdded(varietyName, compoundKeys) {
 }
 
 async function getPendingSuggestions() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const { rows } = await pg.query(
     `SELECT * FROM crop_value_compound_reference WHERE verified = FALSE ORDER BY created_at DESC`
   );
@@ -149,7 +149,7 @@ async function getPendingSuggestions() {
 }
 
 async function reviewSuggestion(id, approve, userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (approve) {
     const { rows } = await pg.query(
       `UPDATE crop_value_compound_reference SET verified = TRUE, verified_by = $1, verified_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *`,
@@ -168,3 +168,6 @@ module.exports = {
   getPendingSuggestions,
   reviewSuggestion,
 };
+
+
+

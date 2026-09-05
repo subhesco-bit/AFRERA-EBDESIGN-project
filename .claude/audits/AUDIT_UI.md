@@ -1,10 +1,127 @@
 ---
 agent: ui-auditor
+status: fail
+findings: 8
+---
+
+# UI/UX Audit
+
+## Summary
+
+The application has a wide route and API surface, but several enterprise workflows are presented as if they are operational while their primary controls are inert, their navigation access model is inconsistent with route guards, or their UI is a generic JSON-operation console. The highest-impact risk is user trust: a user can reach a polished page, click an action such as register, sync, configure, or deactivate, and receive no request, feedback, or state change.
+
+## Findings
+
+### P0. Enterprise integration actions are visible but non-functional
+
+- **Location:** [frontend/src/pages/EnterpriseIntegrationPage.jsx](frontend/src/pages/EnterpriseIntegrationPage.jsx#L186), [frontend/src/services/api.js](frontend/src/services/api.js#L170), [backend/src/routes/enterpriseIntegrationRoutes.js](backend/src/routes/enterpriseIntegrationRoutes.js#L1)
+- **Description:** The integration detail view renders `Test Connection`, `Configure`, `Deactivate`, `Sync Now`, `View Logs`, `Test Payment`, `Test Logistics`, and `Execute Sync` buttons without handlers. The registration form also has no controlled values, submit handler, or mutation. The corresponding frontend API export only reads organization integrations, system status, and health; it does not provide mutations for these visible controls. This creates a false-success interaction: controls look production-ready but are no-ops.
+- **Impact:** Administrators cannot complete the advertised integration lifecycle from the UI and receive no error or success feedback.
+- **Remediation:** Either wire each control to a verified backend contract with loading, confirmation, success, and failure states, or remove/label the controls as unavailable until the contract exists. Add an integration-page test that asserts each primary action invokes the expected API mutation and updates the visible state.
+- **Validation:** In a browser, select an integration, click each action, and assert a network request plus an observable state/toast change. In Jest/RTL, mock `enterpriseIntegrationAPI` and verify the handlers are called.
+
+### P0. Navigation exposes protected workflows before the route guard can reject them
+
+- **Location:** [frontend/src/components/Sidebar.jsx](frontend/src/components/Sidebar.jsx#L212), [frontend/src/components/RouteGuard.jsx](frontend/src/components/RouteGuard.jsx#L104), [frontend/src/App.jsx](frontend/src/App.jsx#L121)
+- **Description:** `Sidebar` explicitly documents that it has no role gating and `canAccess` returns `true` for every non-special path. The same sidebar therefore offers links such as enterprise, ERP, AI, and operational pages to authenticated users regardless of role. `App` then applies `RoleRoute` to role-specific route groups, which redirects unauthorized users to `/unauthorized`. The result is a navigation model that advertises destinations the user cannot use.
+- **Impact:** Users encounter avoidable unauthorized dead ends, especially on a large sidebar where role ownership is not obvious. It also exposes admin and institutional capability names to users who cannot access them.
+- **Remediation:** Derive navigation visibility from the same route metadata used by `RoleRoute`, including farmer/admin/institutional roles. Keep a direct URL guard as defense in depth, but do not render a known-inaccessible link. Add tests for each role against the sidebar link set.
+- **Validation:** Log in as farmer, banker, government, researcher, and admin; compare rendered links with the route role metadata and assert no visible link navigates immediately to `/unauthorized`.
+
+### P1. The enterprise page is not keyboard-operable for integration selection
+
+- **Location:** [frontend/src/pages/EnterpriseIntegrationPage.jsx](frontend/src/pages/EnterpriseIntegrationPage.jsx#L166)
+- **Description:** Each integration is a clickable `div` with an `onClick`, but it is not a button, has no `tabIndex`, keyboard handler, focus styling, or selected-state semantics. A keyboard-only user cannot reliably select an integration to load its health details.
+- **Impact:** The main detail workflow is inaccessible and the page fails the expected interaction pattern for a selectable list.
+- **Remediation:** Use a button/listbox pattern or an actual link-like control with `aria-current`/`aria-selected`, visible focus, and arrow-key behavior where appropriate. Preserve the selected integration in the URL when deep-linking is useful.
+- **Validation:** Navigate the page using Tab and Enter/Space only; verify every integration can be selected and that a screen reader announces its name, type, and status.
+
+### P1. The generic module operation panel creates duplicate form IDs
+
+- **Location:** [frontend/src/components/common/ModuleOperationPanel.jsx](frontend/src/components/common/ModuleOperationPanel.jsx#L87)
+- **Description:** Every `OperationCard` renders the same `label htmlFor="arguments-json-passed-as-this-operation-"` and the same textarea `id`. A module with multiple operations therefore produces duplicate IDs and labels that can target the wrong textarea.
+- **Impact:** Screen readers receive ambiguous field associations; browser label clicks and automated tests may operate on the first operation instead of the intended one.
+- **Remediation:** Generate a stable ID from `moduleId` and `operation`, sanitize it for HTML, and associate each label with its unique textarea. Add `aria-describedby` for JSON validation errors and `aria-invalid` when parsing fails.
+- **Validation:** Render a module with at least two operations and assert all IDs are unique; click each label and verify focus moves to its own textarea.
+
+### P1. Enterprise and information-sharing workflows fall back to operator-only JSON consoles
+
+- **Location:** [frontend/src/pages/InformationSharingPage.jsx](frontend/src/pages/InformationSharingPage.jsx#L49), [frontend/src/pages/CompleteERPIntegrationPage.jsx](frontend/src/pages/CompleteERPIntegrationPage.jsx#L31), [frontend/src/pages/WaterManagementPage.jsx](frontend/src/pages/WaterManagementPage.jsx#L158), [frontend/src/components/common/ModuleOperationPanel.jsx](frontend/src/components/common/ModuleOperationPanel.jsx#L1)
+- **Description:** Major domain pages expose actions through repeated ID fields plus raw JSON payloads rather than domain forms, record pickers, validation, or guided workflows. Information sharing asks users to enter document IDs and JSON; ERP sync asks for IDs and JSON; water management similarly exposes backend operations. This is technically callable but not a professional workflow for farmers, finance staff, or enterprise operators.
+- **Impact:** High input error rate, poor discoverability of required fields, no protection against syncing the wrong entity, and a high training burden. It also makes the UI look like an internal API console rather than a product surface.
+- **Remediation:** Build resource-aware forms around existing API contracts: searchable entity selectors, schema-specific fields, inline validation, confirmation summaries, and result history. Keep a restricted developer/admin diagnostics view for raw JSON rather than making it the primary user journey.
+- **Validation:** Conduct task tests for “sync one farmer harvest,” “create a document,” and “record a water budget” with a non-technical user; measure completion without reading source/API docs and verify invalid payloads are blocked before network submission.
+
+### P1. The route preloader silently attempts the wrong dynamic imports
+
+- **Location:** [frontend/src/App.jsx](frontend/src/App.jsx#L84), [frontend/src/utils/routePreloader.js](frontend/src/utils/routePreloader.js#L76)
+- **Description:** `App` passes route objects from `getAllRoutes()` to `RoutePreloader`. The preloader filters routes and calls `preloadRoute(route.component.name)`, then constructs `import('../pages/${routePath}.jsx')`. The route component is a lazy wrapper, not the page module name, so this path is not a reliable mapping to a file; failures are caught and discarded. The component also has no user-visible telemetry for preload failures.
+- **Impact:** Intended navigation performance improvements do not reliably occur, while idle work can generate failed chunk requests and mask regressions in route loading.
+- **Remediation:** Store an explicit loader function or module key in route metadata and invoke that loader directly. Remove the duplicate path-based preloader implementation or make one canonical preloading utility. Add a test that verifies a flagged route resolves its actual chunk.
+- **Validation:** Run a production build with network logging, visit the marketplace route after idle time, and assert the expected chunk is prefetched rather than `undefined`/component-name-derived requests.
+
+### P2. Loading and error UX is globally generic and sometimes loses recovery context
+
+- **Location:** [frontend/src/App.jsx](frontend/src/App.jsx#L91), [frontend/src/components/RouteLoading.jsx](frontend/src/components/RouteLoading.jsx#L14), [frontend/src/components/RouteErrorBoundary.jsx](frontend/src/components/RouteErrorBoundary.jsx#L223)
+- **Description:** The outer application Suspense uses a full-screen spinner even though route-level `RouteSuspense` has contextual skeletons, making the actual page structure disappear during chunk loading. The dedicated `ErrorPage` renders the raw error message from navigation state and only offers back/home, without a request ID, retry path, or route-specific recovery. The result is inconsistent and low-information failure handling across a very large route surface.
+- **Impact:** Slow or failing routes look stalled; support staff cannot correlate failures, and users may lose their intended workflow.
+- **Remediation:** Use one route-aware loading boundary with `aria-busy`/status text and preserve the last stable layout. Add retry/reload and a support-safe error reference while avoiding raw internal error details in user-facing copy.
+- **Validation:** Throttle the network and force a lazy chunk failure; verify a contextual skeleton appears, focus moves to the error heading, and retry returns to the requested route when the chunk becomes available.
+
+### P2. Placeholder/generated UI remains present in the shipped frontend tree
+
+- **Location:** [frontend/src/pages/Generated/Page10.jsx](frontend/src/pages/Generated/Page10.jsx#L4), [frontend/src/components/Atomic/Button.jsx](frontend/src/components/Atomic/Button.jsx#L4), [frontend/src/components/forms/ClaimForm.jsx](frontend/src/components/forms/ClaimForm.jsx#L5)
+- **Description:** The repository contains many generated pages and atomic/form components whose rendered output is only an empty wrapper with `TODO: Implement`. Even if not currently linked by the primary route table, these files are part of the available component/page inventory and are likely candidates for future imports or generated module composition.
+- **Impact:** A future route or component import can produce a blank page with no runtime error, and the codebase gives no reliable distinction between production-ready and scaffolded UI.
+- **Remediation:** Remove unused scaffolds from the production import graph or mark them explicitly as non-production and exclude them from route/module generation. Add a CI check that fails when a routed page renders a TODO-only implementation.
+- **Validation:** Build a route manifest from `routes.js` and module imports, scan each referenced page for TODO-only output, and smoke-test every generated module route at least once.
+
+## Metrics
+
+- Frontend route configuration contains a very large multi-category surface, including 150 generated module routes in [frontend/src/App.jsx](frontend/src/App.jsx#L201), but navigation and role metadata are maintained separately in [frontend/src/components/Sidebar.jsx](frontend/src/components/Sidebar.jsx#L4).
+- Backend mounting is extensive and includes the enterprise, domain, livestock, ERP, climate, water, and information-sharing families in [backend/src/index.js](backend/src/index.js#L882), [backend/src/index.js](backend/src/index.js#L931), and [backend/src/index.js](backend/src/index.js#L1103). The dominant audit risk is therefore UI contract quality and discoverability, not only missing Express mounts.
+- A repository search found 85 generated/page files with TODO-only output under `frontend/src/pages/Generated`; this metric should be split into “reachable” and “unreachable” before release decisions.
+
+## Recommended Validation Order
+
+1. Run browser smoke tests for the enterprise integration page and assert every visible primary action produces a request or is removed.
+2. Run role-based navigation tests for all sidebar groups and institutional dashboards.
+3. Add an accessibility test for duplicate IDs and keyboard selection in enterprise lists/module operation cards.
+4. Run a route-manifest smoke test covering all configured routes and M001-M150 lazy imports.
+5. Run throttled-network tests for route loading, chunk failure, and retry/error recovery.
+
+### What's left
+- [ ] Confirm which generated TODO-only pages are reachable through module imports before treating them as release blockers.
+- [ ] Execute browser and role-based validation in a running frontend/backend environment.
+
+*verified by vibecheck*---
+agent: ui-auditor
 status: warn
 findings: 8
 ---
 
 # UI Audit — Linkage/Wiring Focus
+
+## Routing Follow-up (2026-09-03)
+
+The requested routing/navigation slice was rechecked against the actual page
+tree. Four defects were found and fixed:
+
+- Removed 10 duplicate route declarations in `frontend/src/config/routes.js`
+  for reports, bulk purchase, group buying, credit score, and EMI routes.
+- Normalized `marketplace/contract-listing` to `/marketplace/contract-listing`.
+- Changed the Sidebar `Admin` link from unregistered `/admin-dashboard` to the
+  registered `/admin/settings` route.
+- Added `role: 'admin'` to management routes already classified as admin-only
+  by Sidebar policy, and changed `App.jsx` to enforce `route.role` with
+  `RoleRoute`.
+
+All 211 centralized lazy imports resolve to existing `.js` or `.jsx` page
+modules. `BottomNav.jsx` had no evidenced route defect and was left unchanged.
+
+Focused validation: `npm run build` passed with Vite transforming 3,675
+modules and completing in 1m 28s. The existing BottomNav test remains the
+next narrow executable check.
 
 **Scope note:** per explicit brief, this pass prioritizes UI-to-API wiring gaps over
 general accessibility/responsive issues, and deliberately does NOT re-report items

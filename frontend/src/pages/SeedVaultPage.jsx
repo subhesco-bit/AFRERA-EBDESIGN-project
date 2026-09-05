@@ -1,69 +1,69 @@
-import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { seedVaultAPI } from '../services/api'
-import { Package, Search, Plus, Edit, Trash2, Thermometer, Droplets, Sprout, AlertCircle } from 'lucide-react'
-import toast from 'react-hot-toast'
-import Modal from '../components/common/Modal'
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { seedVaultAPI } from '../services/api';
+import { Package, Search, Plus, Edit, Trash2, Thermometer, Droplets, Sprout, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+import Modal from '../components/common/Modal';
 
 function SeedVaultPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [selectedSeed, setSelectedSeed] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedSeed, setSelectedSeed] = useState(null);
   const [newSeed, setNewSeed] = useState({
     name: '', variety: '', category: '', quantity: '', unit: 'kg',
     purchaseDate: '', minStock: '', supplier: '',
-  })
-  const queryClient = useQueryClient()
+  });
+  const queryClient = useQueryClient();
 
   const { data: seeds } = useQuery({
     queryKey: ['seed-vault'],
     queryFn: async () => (await seedVaultAPI.getSeeds()).data.data,
-  })
+  });
 
   const { data: categories } = useQuery({
     queryKey: ['seed-categories'],
     queryFn: async () => (await seedVaultAPI.getCategories()).data.data,
-  })
+  });
 
   const addSeedMutation = useMutation({
     mutationFn: (data) => seedVaultAPI.addSeed(data),
     onSuccess: () => {
-      toast.success('Seed added to vault')
-      queryClient.invalidateQueries({ queryKey: ['seed-vault'] })
-      queryClient.invalidateQueries({ queryKey: ['seed-categories'] })
-      setShowAddModal(false)
-      setNewSeed({ name: '', variety: '', category: '', quantity: '', unit: 'kg', purchaseDate: '', minStock: '', supplier: '' })
+      toast.success('Seed added to vault');
+      queryClient.invalidateQueries({ queryKey: ['seed-vault'] });
+      queryClient.invalidateQueries({ queryKey: ['seed-categories'] });
+      setShowAddModal(false);
+      setNewSeed({ name: '', variety: '', category: '', quantity: '', unit: 'kg', purchaseDate: '', minStock: '', supplier: '' });
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to add seed')
+      toast.error(error.response?.data?.error || 'Failed to add seed');
     },
-  })
+  });
 
   const deleteSeedMutation = useMutation({
     mutationFn: (seedId) => seedVaultAPI.deleteSeed(seedId),
     onSuccess: () => {
-      toast.success('Seed removed from vault')
-      queryClient.invalidateQueries({ queryKey: ['seed-vault'] })
+      toast.success('Seed removed from vault');
+      queryClient.invalidateQueries({ queryKey: ['seed-vault'] });
     },
     onError: () => {
-      toast.error('Failed to remove seed')
+      toast.error('Failed to remove seed');
     },
-  })
+  });
 
   const handleAddSeedSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!newSeed.name || !newSeed.category || newSeed.quantity === '') {
-      toast.error('Seed name, category, and quantity are required')
-      return
+      toast.error('Seed name, category, and quantity are required');
+      return;
     }
-    addSeedMutation.mutate(newSeed)
-  }
+    addSeedMutation.mutate(newSeed);
+  };
 
   const filteredSeeds = seeds?.filter(seed =>
     seed.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (selectedCategory === 'all' || seed.category === selectedCategory)
-  )
+    (selectedCategory === 'all' || seed.category === selectedCategory),
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -100,9 +100,9 @@ function SeedVaultPage() {
             <button
               onClick={() => setSelectedCategory('all')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
-                selectedCategory === 'all'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                selectedCategory === 'all' ?
+                  'bg-green-600 text-white' :
+                  'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               All
@@ -112,9 +112,9 @@ function SeedVaultPage() {
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-2 rounded-lg font-medium transition ${
-                  selectedCategory === cat.id
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  selectedCategory === cat.id ?
+                    'bg-green-600 text-white' :
+                    'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {cat.name}
@@ -129,13 +129,13 @@ function SeedVaultPage() {
         {filteredSeeds?.map((seed) => (
           <div
             key={seed.id}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                // Enter and Space are what a native <button> responds to.
-                // Without this the card is unreachable by keyboard entirely.
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click() }
-              }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              // Enter and Space are what a native <button> responds to.
+              // Without this the card is unreachable by keyboard entirely.
+              if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); }
+            }}
             className="bg-white rounded-lg shadow hover:shadow-lg transition cursor-pointer"
             onClick={() => setSelectedSeed(seed)}
           >
@@ -176,20 +176,20 @@ function SeedVaultPage() {
                   <span className="text-xs text-gray-600">Stock Level</span>
                   <span className={`text-xs font-medium ${
                     seed.quantity > seed.min_stock * 2 ? 'text-green-600' :
-                    seed.quantity > seed.min_stock ? 'text-yellow-600' :
-                    'text-red-600'
+                      seed.quantity > seed.min_stock ? 'text-yellow-600' :
+                        'text-red-600'
                   }`}>
                     {seed.quantity > seed.min_stock * 2 ? 'Good' :
-                     seed.quantity > seed.min_stock ? 'Low' :
-                     'Critical'}
+                      seed.quantity > seed.min_stock ? 'Low' :
+                        'Critical'}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className={`h-2 rounded-full ${
                       seed.quantity > seed.min_stock * 2 ? 'bg-green-600' :
-                      seed.quantity > seed.min_stock ? 'bg-yellow-600' :
-                      'bg-red-600'
+                        seed.quantity > seed.min_stock ? 'bg-yellow-600' :
+                          'bg-red-600'
                     }`}
                     style={{ width: `${Math.min((seed.quantity / (seed.min_stock * 3)) * 100, 100)}%` }}
                   />
@@ -200,7 +200,7 @@ function SeedVaultPage() {
               <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
                 <button
                   onClick={(e) => {
-                    e.stopPropagation()
+                    e.stopPropagation();
                     // Edit logic
                   }}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded"
@@ -209,9 +209,9 @@ function SeedVaultPage() {
                 </button>
                 <button
                   onClick={(e) => {
-                    e.stopPropagation()
+                    e.stopPropagation();
                     if (confirm('Are you sure you want to remove this seed?')) {
-                      deleteSeedMutation.mutate(seed.id)
+                      deleteSeedMutation.mutate(seed.id);
                     }
                   }}
                   className="p-2 text-red-600 hover:bg-red-50 rounded"
@@ -462,7 +462,7 @@ function SeedVaultPage() {
         </Modal>
       )}
     </div>
-  )
+  );
 }
 
-export default SeedVaultPage
+export default SeedVaultPage;

@@ -129,7 +129,7 @@ async function bookEquipmentRental(bookingData) {
     };
 
     // AI-powered booking optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'rental_booking_optimization',
       parameters: {
         booking_data: bookingData,
@@ -140,10 +140,10 @@ async function bookEquipmentRental(bookingData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     booking.ai_assessment = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO equipment_rental_bookings 
        (booking_id, rental_listing_id, renter_id, start_date, end_date, 
         delivery_required, delivery_location, operator_required, special_requirements, 
@@ -261,7 +261,7 @@ async function getCompetitorPricing(category, state) {
 
 async function getListingDetails(listingId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM equipment_rental_listings WHERE rental_listing_id = $1',
       [listingId]
     );
@@ -337,7 +337,7 @@ async function generatePerformanceRecommendations(listingId, period) {
 
 async function getTotalListings(ownerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM equipment_rental_listings WHERE owner_id = $1',
       [ownerId]
     );
@@ -349,7 +349,7 @@ async function getTotalListings(ownerId) {
 
 async function getTotalBookings(ownerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT COUNT(*) as count FROM equipment_rental_bookings br
        JOIN equipment_rental_listings rl ON br.rental_listing_id = rl.rental_listing_id
        WHERE rl.owner_id = $1`,
@@ -418,7 +418,7 @@ async function listRentalListings({ page = 1, limit = 20, owner_id = null, statu
 }
 
 async function getRentalListing(id) {
-  const res = await pool.query('SELECT * FROM equipment_rental_listings WHERE rental_listing_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM equipment_rental_listings WHERE rental_listing_id = $1', [id]);
   return res.rows[0] || null;
 }
 

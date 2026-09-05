@@ -16,7 +16,7 @@ async function createProfile(req, res) {
 async function getProfile(req, res) {
   try {
     const userId = req.params.userId || req.user?.id;
-    const profile = await service.getProfile(userId);
+    let profile = await service.getProfile(userId);
     if (!profile) return res.status(404).json({ success: false, error: 'Profile not found' });
     res.json({ success: true, data: profile });
   } catch (error) {
@@ -27,8 +27,8 @@ async function getProfile(req, res) {
 
 async function updateProfile(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
-    const profile = await service.updateProfile(userId, req.body);
+    let userId = req.params.userId || req.user?.id;
+    let profile = await service.updateProfile(userId, req.body);
     if (!profile) return res.status(404).json({ success: false, error: 'Profile not found' });
     res.json({ success: true, data: profile });
   } catch (error) {
@@ -39,7 +39,7 @@ async function updateProfile(req, res) {
 
 async function deleteProfile(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const deleted = await service.deleteProfile(userId);
     if (!deleted) return res.status(404).json({ success: false, error: 'Profile not found' });
     res.json({ success: true });
@@ -52,7 +52,7 @@ async function deleteProfile(req, res) {
 // Profile enrichment
 async function enrichProfile(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const result = await service.enrichProfile(userId, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
@@ -64,7 +64,7 @@ async function enrichProfile(req, res) {
 // AI-powered completion
 async function suggestProfileCompletion(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const suggestions = await service.suggestProfileCompletion(userId);
     res.json({ success: true, data: suggestions });
   } catch (error) {
@@ -76,9 +76,9 @@ async function suggestProfileCompletion(req, res) {
 // Social media integration
 async function linkSocialAccount(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { platform, accountData } = req.body;
-    const result = await service.linkSocialAccount(userId, platform, accountData);
+    let result = await service.linkSocialAccount(userId, platform, accountData);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('linkSocialAccount error', { error: error.message });
@@ -88,9 +88,9 @@ async function linkSocialAccount(req, res) {
 
 async function unlinkSocialAccount(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { platform } = req.body;
-    const result = await service.unlinkSocialAccount(userId, platform);
+    let result = await service.unlinkSocialAccount(userId, platform);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('unlinkSocialAccount error', { error: error.message });
@@ -101,8 +101,8 @@ async function unlinkSocialAccount(req, res) {
 // Visibility controls
 async function setProfileVisibility(req, res) {
   try {
-    const userId = req.user?.id;
-    const result = await service.setProfileVisibility(userId, req.body);
+    let userId = req.user?.id;
+    let result = await service.setProfileVisibility(userId, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('setProfileVisibility error', { error: error.message });
@@ -112,8 +112,8 @@ async function setProfileVisibility(req, res) {
 
 async function getProfileVisibility(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
-    const result = await service.getProfileVisibility(userId);
+    let userId = req.params.userId || req.user?.id;
+    let result = await service.getProfileVisibility(userId);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('getProfileVisibility error', { error: error.message });
@@ -124,7 +124,7 @@ async function getProfileVisibility(req, res) {
 // Activity tracking
 async function logProfileActivity(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { activityType, details } = req.body;
     await service.logProfileActivity(userId, activityType, details);
     res.json({ success: true });
@@ -136,7 +136,7 @@ async function logProfileActivity(req, res) {
 
 async function getProfileActivity(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const { limit } = req.query;
     const activity = await service.getProfileActivity(userId, { limit });
     res.json({ success: true, data: activity });
@@ -159,7 +159,7 @@ async function searchProfiles(req, res) {
 
 async function getProfileRecommendations(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const recommendations = await service.getProfileRecommendations(userId);
     res.json({ success: true, data: recommendations });
   } catch (error) {
@@ -171,7 +171,7 @@ async function getProfileRecommendations(req, res) {
 // Analytics
 async function getProfileAnalytics(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const analytics = await service.getProfileAnalytics(userId);
     res.json({ success: true, data: analytics });
   } catch (error) {
@@ -184,7 +184,7 @@ async function getProfileAnalytics(req, res) {
 async function bulkUpdateProfiles(req, res) {
   try {
     const { updates } = req.body;
-    const result = await service.bulkUpdateProfiles(updates);
+    let result = await service.bulkUpdateProfiles(updates);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('bulkUpdateProfiles error', { error: error.message });

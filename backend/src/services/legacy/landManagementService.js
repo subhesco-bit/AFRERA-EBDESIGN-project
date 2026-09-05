@@ -47,3 +47,6 @@ const surveyManagement = createCrudService('land_surveys', {
 module.exports = {
   landLease, gisLandMapping, soilMapping, waterResourceMapping, geoBoundary, surveyManagement,
 };
+
+
+

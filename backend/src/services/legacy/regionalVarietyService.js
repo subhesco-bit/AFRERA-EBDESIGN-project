@@ -10,8 +10,8 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
 const productMediaAIService = require('./productMediaAIService');
 const cropValueResearchService = require('./cropValueResearchService');
 
@@ -32,13 +32,13 @@ class RegionalVarietyService {
   }
 
   async getById(id) {
-    const result = await pool.query('SELECT * FROM regional_variety_directory WHERE id = $1', [id]);
+    let result = await pool.query('SELECT * FROM regional_variety_directory WHERE id = $1', [id]);
     if (result.rows.length === 0) throw new Error('Variety not found');
     return result.rows[0];
   }
 
   async listCategories() {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT category, COUNT(*) AS variety_count FROM regional_variety_directory GROUP BY category ORDER BY category`
     );
     return result.rows;
@@ -57,7 +57,7 @@ class RegionalVarietyService {
       (variety.scientific_name ? ` (${variety.scientific_name})` : '') +
       `, a regional variety from ${variety.primary_states}, Northeast India. Natural lighting, clean background, realistic.`;
 
-    const result = await productMediaAIService.callImageProvider('openai_images', prompt);
+    let result = await productMediaAIService.callImageProvider('openai_images', prompt);
     const status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
     await pool.query(
       `UPDATE regional_variety_directory
@@ -76,7 +76,7 @@ class RegionalVarietyService {
    * data of its own.
    */
   async createListingFromVariety(varietyId, sellerFields) {
-    const variety = await this.getById(varietyId);
+    let variety = await this.getById(varietyId);
     const { basePrice, unitId, stateId, description, sellerId } = sellerFields || {};
     if (!(Number(basePrice) > 0)) throw new Error('basePrice is required and must be > 0');
     if (!sellerId) throw new Error('sellerId is required');
@@ -114,3 +114,6 @@ class RegionalVarietyService {
 }
 
 module.exports = new RegionalVarietyService();
+
+
+

@@ -1,6 +1,6 @@
-import { Utensils } from 'lucide-react'
-import { ecommerceIntegrationAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { Utensils } from 'lucide-react';
+import { ecommerceIntegrationAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/ecommerceIntegrationRoutes.js +
@@ -77,7 +77,7 @@ function EcommerceIntegrationPage() {
         onRun={() => ecommerceIntegrationAPI.getDietitianRecommendation()}
       />
     </div>
-  )
+  );
 }
 
-export default EcommerceIntegrationPage
+export default EcommerceIntegrationPage;

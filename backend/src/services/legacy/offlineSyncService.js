@@ -16,16 +16,16 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
+const { authLimiter } = require('../../middleware\/rateLimiter');
 const crypto = require('crypto');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // Offline Sync Configuration
 const OFFLINE_SYNC_CONFIG = {
@@ -116,7 +116,7 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
 async function processSyncQueue(userId) {
   try {
     // Get pending sync items for user
-    const query = `
+    let query = `
       SELECT * FROM sync_queue
       WHERE user_id = $1
         AND status = 'pending'
@@ -125,7 +125,7 @@ async function processSyncQueue(userId) {
       LIMIT 50
     `;
 
-    const result = await pool.query(query, [userId, OFFLINE_SYNC_CONFIG.max_retry_attempts]);
+    let result = await pool.query(query, [userId, OFFLINE_SYNC_CONFIG.max_retry_attempts]);
     const syncItems = result.rows;
 
     let processedCount = 0;
@@ -224,7 +224,7 @@ async function processSyncItem(syncItem) {
     throw new Error('Invalid JSON data in sync item');
   }
   
-  const syncToken = generateSyncToken(entityData);
+  let syncToken = generateSyncToken(entityData);
 
   // Verify data integrity
   if (syncToken !== syncItem.sync_token) {
@@ -307,7 +307,7 @@ async function syncProduct(productData, operation) {
   try {
     switch (operation) {
       case 'create': {
-        const createQuery = `
+        let createQuery = `
           INSERT INTO products (id, name, category, price, stock, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
           ON CONFLICT (id) DO NOTHING
@@ -326,7 +326,7 @@ async function syncProduct(productData, operation) {
       }
 
       case 'update': {
-        const updateQuery = `
+        let updateQuery = `
           UPDATE products
           SET name = $2, category = $3, price = $4, stock = $5, metadata = $6, updated_at = NOW()
           WHERE id = $1
@@ -362,7 +362,7 @@ async function syncUserProfile(profileData, operation) {
   try {
     switch (operation) {
       case 'update': {
-        const updateQuery = `
+        let updateQuery = `
           UPDATE user_profiles
           SET first_name = $2, last_name = $3, phone = $4, address = $5, preferences = $6, updated_at = NOW()
           WHERE user_id = $1
@@ -394,7 +394,7 @@ async function syncInventory(inventoryData, operation) {
   try {
     switch (operation) {
       case 'update': {
-        const updateQuery = `
+        let updateQuery = `
           UPDATE inventory
           SET quantity = $2, location = $3, metadata = $4, updated_at = NOW()
           WHERE product_id = $1 AND warehouse_id = $5
@@ -425,7 +425,7 @@ async function syncPayment(paymentData, operation) {
   try {
     switch (operation) {
       case 'create': {
-        const createQuery = `
+        let createQuery = `
           INSERT INTO transactions (transaction_id, user_id, type, amount, status, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
           ON CONFLICT (transaction_id) DO NOTHING
@@ -444,7 +444,7 @@ async function syncPayment(paymentData, operation) {
       }
 
       case 'update': {
-        const updateQuery = `
+        let updateQuery = `
           UPDATE transactions
           SET status = $2, metadata = $3, updated_at = NOW()
           WHERE transaction_id = $1
@@ -472,7 +472,7 @@ async function syncPayment(paymentData, operation) {
 async function syncGenericEntity(entityData, entityType, operation) {
   try {
     // Generic sync handler for entities without specific handlers
-    const query = `
+    let query = `
       INSERT INTO generic_entities
       (entity_type, entity_id, entity_data, operation, created_at)
       VALUES ($1, $2, $3, $4, NOW())
@@ -607,12 +607,12 @@ async function getSyncStatus(userId) {
  */
 async function isSyncEnabled(userId) {
   try {
-    const query = `
+    let query = `
       SELECT sync_enabled FROM user_sync_preferences
       WHERE user_id = $1
     `;
 
-    const result = await pool.query(query, [userId]);
+    let result = await pool.query(query, [userId]);
 
     if (result.rows.length > 0) {
       return result.rows[0].sync_enabled;
@@ -630,13 +630,13 @@ async function isSyncEnabled(userId) {
  */
 async function getLastSuccessfulSync(userId) {
   try {
-    const query = `
+    let query = `
       SELECT MAX(synced_at) as last_sync
       FROM sync_queue
       WHERE user_id = $1 AND status = 'completed'
     `;
 
-    const result = await pool.query(query, [userId]);
+    let result = await pool.query(query, [userId]);
 
     return result.rows[0].last_sync || null;
   } catch (error) {
@@ -704,7 +704,7 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
  * POST /api/v1/offline-sync/queue
  * Add data to sync queue
  */
-router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/queue', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { entity_type, entity_data, operation, priority } = req.body;
 
@@ -712,7 +712,7 @@ router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Entity type, data, and operation are required' });
     }
 
-    const result = await addToSyncQueue(req.user.id, entity_type, entity_data, operation, priority);
+    let result = await addToSyncQueue(req.user.id, entity_type, entity_data, operation, priority);
     res.json(result);
   } catch (error) {
     logger.error('Add to sync queue API error', { error: error.message, stack: error.stack });
@@ -724,9 +724,9 @@ router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
  * POST /api/v1/offline-sync/process
  * Process sync queue for user
  */
-router.post('/process', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/process', authLimiter, authMiddleware, async (req, res) => {
   try {
-    const result = await processSyncQueue(req.user.id);
+    let result = await processSyncQueue(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Process sync queue API error', { error: error.message, stack: error.stack });
@@ -740,7 +740,7 @@ router.post('/process', authRateLimit, authMiddleware, async (req, res) => {
  */
 router.get('/status', authMiddleware, async (req, res) => {
   try {
-    const result = await getSyncStatus(req.user.id);
+    let result = await getSyncStatus(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get sync status API error', { error: error.message, stack: error.stack });
@@ -752,7 +752,7 @@ router.get('/status', authMiddleware, async (req, res) => {
  * POST /api/v1/offline-sync/resolve-conflict
  * Resolve sync conflict
  */
-router.post('/resolve-conflict', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/resolve-conflict', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { conflict_id, resolution, resolved_data } = req.body;
 
@@ -760,7 +760,7 @@ router.post('/resolve-conflict', authRateLimit, authMiddleware, async (req, res)
       return res.status(400).json({ error: 'Conflict ID and resolution are required' });
     }
 
-    const result = await resolveSyncConflict(conflict_id, resolution, resolved_data);
+    let result = await resolveSyncConflict(conflict_id, resolution, resolved_data);
     res.json(result);
   } catch (error) {
     logger.error('Resolve conflict API error', { error: error.message, stack: error.stack });
@@ -775,7 +775,7 @@ router.post('/resolve-conflict', authRateLimit, authMiddleware, async (req, res)
 router.get('/snapshot/:entityType', authMiddleware, async (req, res) => {
   try {
     const { last_sync } = req.query;
-    const result = await getOfflineDataSnapshot(req.user.id, req.params.entityType, last_sync);
+    let result = await getOfflineDataSnapshot(req.user.id, req.params.entityType, last_sync);
     res.json(result);
   } catch (error) {
     logger.error('Get offline snapshot API error', { error: error.message, stack: error.stack });
@@ -787,11 +787,11 @@ router.get('/snapshot/:entityType', authMiddleware, async (req, res) => {
  * PUT /api/v1/offline-sync/preferences
  * Update sync preferences
  */
-router.put('/preferences', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/preferences', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { sync_enabled, sync_frequency, sync_on_wifi_only } = req.body;
 
-    const query = `
+    let query = `
       INSERT INTO user_sync_preferences (user_id, sync_enabled, sync_frequency, sync_on_wifi_only)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (user_id) 
@@ -799,7 +799,7 @@ router.put('/preferences', authRateLimit, authMiddleware, async (req, res) => {
       RETURNING *
     `;
 
-    const result = await pool.query(query, [
+    let result = await pool.query(query, [
       req.user.id,
       sync_enabled !== undefined ? sync_enabled : true,
       sync_frequency || 5,
@@ -819,12 +819,12 @@ router.put('/preferences', authRateLimit, authMiddleware, async (req, res) => {
  */
 router.get('/preferences', authMiddleware, async (req, res) => {
   try {
-    const query = `
+    let query = `
       SELECT * FROM user_sync_preferences
       WHERE user_id = $1
     `;
 
-    const result = await pool.query(query, [req.user.id]);
+    let result = await pool.query(query, [req.user.id]);
 
     if (result.rows.length === 0) {
       // Return default preferences
@@ -869,3 +869,6 @@ module.exports = {
   getSyncStatus,
   getOfflineDataSnapshot
 };
+
+
+

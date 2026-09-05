@@ -12,7 +12,7 @@ import {
   Search,
   ShieldCheck,
 } from 'lucide-react';
-import { libraryAPI } from '../../services/api';
+import { libraryAPI } from '../../services/componentApi';
 
 const moduleTypes = new Set(['runtime-module', 'backend-module', 'library-module-card']);
 const catalogueTypes = new Set(['catalogue']);
@@ -104,9 +104,9 @@ function StatusBanner({ error, notice, verification }) {
   return (
     <div
       className={`flex items-start gap-3 rounded-md border p-4 ${
-        verification.verified
-          ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-          : 'border-amber-200 bg-amber-50 text-amber-900'
+        verification.verified ?
+          'border-emerald-200 bg-emerald-50 text-emerald-800' :
+          'border-amber-200 bg-amber-50 text-amber-900'
       }`}
     >
       <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
@@ -115,9 +115,9 @@ function StatusBanner({ error, notice, verification }) {
           {verification.verified ? 'Catalog integrity verified' : 'Catalog warnings found'}
         </p>
         <p className="text-sm">
-          {verification.verified
-            ? `${verification.totalItems} items checked and ${verification.hashedFiles} files hashed.`
-            : `${verification.issues?.length || 0} issues and ${verification.warnings?.length || 0} warnings reported.`}
+          {verification.verified ?
+            `${verification.totalItems} items checked and ${verification.hashedFiles} files hashed.` :
+            `${verification.issues?.length || 0} issues and ${verification.warnings?.length || 0} warnings reported.`}
         </p>
       </div>
     </div>
@@ -209,11 +209,11 @@ export default function LibraryBrowser() {
     setNotice('');
 
     try {
-      const response = await libraryAPI.initialize();
+      let response = await libraryAPI.initialize();
       const result = unwrap(response);
       await loadLibrary();
       setNotice(
-        `Library initialized: ${result?.indexedItems || 0} indexed items, ${result?.contentHashes || 0} content hashes.`
+        `Library initialized: ${result?.indexedItems || 0} indexed items, ${result?.contentHashes || 0} content hashes.`,
       );
     } catch (err) {
       setError(err.response?.data?.error?.message || err.message || 'Initialization failed');
@@ -228,7 +228,7 @@ export default function LibraryBrowser() {
     setNotice('');
 
     try {
-      const response = await libraryAPI.verifyCatalog();
+      let response = await libraryAPI.verifyCatalog();
       setVerification(unwrap(response));
     } catch (err) {
       setError(err.response?.data?.error?.message || err.message || 'Verification failed');
@@ -247,7 +247,7 @@ export default function LibraryBrowser() {
     }
 
     try {
-      const response = await libraryAPI.getModule(moduleId);
+      let response = await libraryAPI.getModule(moduleId);
       setSelectedItem(response.data?.module || item);
     } catch (_err) {
       setSelectedItem(item);
@@ -335,9 +335,9 @@ export default function LibraryBrowser() {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`rounded-md border px-3 py-1.5 text-sm font-medium ${
-                  activeTab === tab.id
-                    ? 'border-emerald-700 bg-emerald-50 text-emerald-800'
-                    : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
+                  activeTab === tab.id ?
+                    'border-emerald-700 bg-emerald-50 text-emerald-800' :
+                    'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 {tab.label}
@@ -367,7 +367,7 @@ export default function LibraryBrowser() {
               <div className="divide-y divide-slate-100">
                 {items.map((item) => {
                   const type = getItemType(item);
-                  const moduleId = getModuleId(item);
+                  let moduleId = getModuleId(item);
 
                   return (
                     <article key={`${type}:${moduleId || item.path}`} className="p-4 hover:bg-slate-50">

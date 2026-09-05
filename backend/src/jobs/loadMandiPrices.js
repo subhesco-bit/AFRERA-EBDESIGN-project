@@ -84,7 +84,7 @@ async function run({ state, dryRun = false, maxPages = 30 } = {}) {
   let total = null;
 
   for (let page = 0; page < maxPages; page += 1) {
-    const body = await fetchPage({ offset, state });
+    let body = await fetchPage({ offset, state });
     total = body.total;
     const records = body.records || [];
     all.push(...records);

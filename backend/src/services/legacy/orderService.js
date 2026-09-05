@@ -4,11 +4,11 @@
  */
 
 const crypto = require('crypto');
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
-const { adminMiddleware } = require('../../middleware/admin');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
+const { adminMiddleware } = require('../../middleware\/admin');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 const gstService = require('./gstService');
 
 /**
@@ -63,7 +63,7 @@ async function getCart(userId) {
  */
 async function addToCart(userId, productId, quantity = 1, attributes = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Check if product exists
     const productQuery = 'SELECT id, base_price, is_active FROM products WHERE id = $1';
@@ -124,7 +124,7 @@ async function addToCart(userId, productId, quantity = 1, attributes = {}) {
  */
 async function updateCartItem(userId, cartItemId, quantity) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     if (quantity <= 0) {
       // Remove item
@@ -139,14 +139,14 @@ async function updateCartItem(userId, cartItemId, quantity) {
       return deleteResult.rows[0];
     } else {
       // Update quantity
-      const updateQuery = `
+      let updateQuery = `
         UPDATE cart
         SET quantity = $1, updated_at = NOW()
         WHERE id = $2 AND user_id = $3
         RETURNING *
       `;
       
-      const updateResult = await pg.query(updateQuery, [quantity, cartItemId, userId]);
+      let updateResult = await pg.query(updateQuery, [quantity, cartItemId, userId]);
       
       if (updateResult.rows.length === 0) {
         throw new Error('Cart item not found');
@@ -166,10 +166,10 @@ async function updateCartItem(userId, cartItemId, quantity) {
  */
 async function removeFromCart(userId, cartItemId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
-    const result = await pg.query(query, [cartItemId, userId]);
+    let query = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
+    let result = await pg.query(query, [cartItemId, userId]);
     
     if (result.rows.length === 0) {
       throw new Error('Cart item not found');
@@ -188,9 +188,9 @@ async function removeFromCart(userId, cartItemId) {
  */
 async function clearCart(userId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = 'DELETE FROM cart WHERE user_id = $1';
+    let query = 'DELETE FROM cart WHERE user_id = $1';
     await pg.query(query, [userId]);
     
     logger.info(`Cart cleared for user: ${userId}`);
@@ -206,7 +206,7 @@ async function clearCart(userId) {
  */
 async function createOrder(userId, orderData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get cart items — pulls the same HSN/branding columns gstService.calculateOrderGST
     // uses, so tax can be computed for real per item instead of guessed as a flat rate.
@@ -226,7 +226,7 @@ async function createOrder(userId, orderData) {
       throw new Error('Cart is empty');
     }
 
-    const cartItems = cartResult.rows;
+    let cartItems = cartResult.rows;
 
     // Real stock check — nothing here previously verified availability before
     // creating an order, so two buyers could both "successfully" order the
@@ -318,7 +318,7 @@ async function createOrder(userId, orderData) {
           [cartItem.quantity, cartItem.product_id]
         );
         if (stockResult.rows.length === 0) {
-          const err = new Error(`Not enough stock for ${cartItem.product_name}`);
+          let err = new Error(`Not enough stock for ${cartItem.product_name}`);
           err.code = 'insufficient_stock';
           throw err;
         }
@@ -348,7 +348,7 @@ async function createOrder(userId, orderData) {
     // ---- end transaction -------------------------------------------------
 
     // Emit WebSocket event
-    const io = require('../../index').app.get('io');
+    const io = require('../../../index').app.get('io');
     if (io) {
       io.to(`user:${userId}`).emit('order_created', {
         order_id: order.id,
@@ -371,7 +371,7 @@ async function createOrder(userId, orderData) {
  */
 async function getOrderById(orderId, userId = null) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     let query = `
       SELECT o.*, u.name as customer_name, u.email as customer_email,
@@ -394,7 +394,7 @@ async function getOrderById(orderId, userId = null) {
       params.push(userId);
     }
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     if (result.rows.length === 0) {
       throw new Error('Order not found');
@@ -426,7 +426,7 @@ async function getOrderById(orderId, userId = null) {
  */
 async function getUserOrders(userId, filters = {}, pagination = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { status, search } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
@@ -440,7 +440,7 @@ async function getUserOrders(userId, filters = {}, pagination = {}) {
       WHERE o.user_id = $1
     `;
     
-    const params = [userId];
+    let params = [userId];
     let paramCount = 1;
     
     if (status) {
@@ -458,7 +458,7 @@ async function getUserOrders(userId, filters = {}, pagination = {}) {
     query += ` GROUP BY o.id ORDER BY o.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     // Get total count
     const countQuery = `
@@ -472,7 +472,7 @@ async function getUserOrders(userId, filters = {}, pagination = {}) {
     if (search) countParams.push(`%${search}%`);
     
     const countResult = await pg.query(countQuery, countParams);
-    const total = parseInt(countResult.rows[0].count);
+    let total = parseInt(countResult.rows[0].count);
     
     return {
       orders: result.rows,
@@ -494,25 +494,25 @@ async function getUserOrders(userId, filters = {}, pagination = {}) {
  */
 async function updateOrderStatus(orderId, status, notes = null) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       UPDATE orders
       SET status = $1, notes = COALESCE($2, notes), updated_at = NOW()
       WHERE id = $3
       RETURNING *
     `;
     
-    const result = await pg.query(query, [status, notes, orderId]);
+    let result = await pg.query(query, [status, notes, orderId]);
     
     if (result.rows.length === 0) {
       throw new Error('Order not found');
     }
     
-    const order = result.rows[0];
+    let order = result.rows[0];
     
     // Emit WebSocket event
-    const io = require('../../index').app.get('io');
+    let io = require('../../../index').app.get('io');
     if (io) {
       io.to(`order:${orderId}`).emit('order_status_updated', {
         order_id: orderId,
@@ -540,7 +540,7 @@ async function updateOrderStatus(orderId, status, notes = null) {
  */
 async function processPayment(orderId, paymentData, userId = null) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get order with optional ownership check
     let orderQuery = 'SELECT * FROM orders WHERE id = $1';
@@ -551,13 +551,13 @@ async function processPayment(orderId, paymentData, userId = null) {
       queryParams.push(userId);
     }
     
-    const orderResult = await pg.query(orderQuery, queryParams);
+    let orderResult = await pg.query(orderQuery, queryParams);
     
     if (orderResult.rows.length === 0) {
       throw new Error('Order not found');
     }
     
-    const order = orderResult.rows[0];
+    let order = orderResult.rows[0];
     
     if (order.payment_status === 'completed') {
       throw new Error('Payment already completed');
@@ -643,9 +643,9 @@ async function processPayment(orderId, paymentData, userId = null) {
  */
 async function calculateDiscount(couponCode, orderAmount) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT * FROM coupons
       WHERE code = $1
         AND is_active = TRUE
@@ -653,7 +653,7 @@ async function calculateDiscount(couponCode, orderAmount) {
         AND (valid_until IS NULL OR valid_until >= NOW())
     `;
     
-    const result = await pg.query(query, [couponCode.toUpperCase()]);
+    let result = await pg.query(query, [couponCode.toUpperCase()]);
     
     if (result.rows.length === 0) {
       return 0;
@@ -746,7 +746,7 @@ router.get('/cart', authMiddleware, async (req, res) => {
 // Add to cart
 router.post('/cart', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     const { product_id, quantity, attributes } = req.body;
     const cartItem = await addToCart(userId, product_id, quantity, attributes);
     res.json(cartItem);
@@ -758,9 +758,9 @@ router.post('/cart', authMiddleware, async (req, res) => {
 // Update cart item
 router.put('/cart/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     const { quantity } = req.body;
-    const cartItem = await updateCartItem(userId, req.params.id, quantity);
+    let cartItem = await updateCartItem(userId, req.params.id, quantity);
     res.json(cartItem);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -770,8 +770,8 @@ router.put('/cart/:id', authMiddleware, async (req, res) => {
 // Remove from cart
 router.delete('/cart/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const cartItem = await removeFromCart(userId, req.params.id);
+    let userId = req.user.id;
+    let cartItem = await removeFromCart(userId, req.params.id);
     res.json(cartItem);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -781,8 +781,8 @@ router.delete('/cart/:id', authMiddleware, async (req, res) => {
 // Clear cart
 router.delete('/cart', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const result = await clearCart(userId);
+    let userId = req.user.id;
+    let result = await clearCart(userId);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -792,8 +792,8 @@ router.delete('/cart', authMiddleware, async (req, res) => {
 // Create order
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const order = await createOrder(userId, req.body);
+    let userId = req.user.id;
+    let order = await createOrder(userId, req.body);
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -803,8 +803,8 @@ router.post('/', authMiddleware, async (req, res) => {
 // Get order by ID
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
-    const order = await getOrderById(req.params.id, userId);
+    let userId = req.user.id;
+    let order = await getOrderById(req.params.id, userId);
     res.json(order);
   } catch (error) {
     if (error.message === 'Order not found') {
@@ -818,7 +818,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // Get user orders
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
+    let userId = req.user.id;
     const filters = {
       status: req.query.status,
       search: req.query.search
@@ -829,7 +829,7 @@ router.get('/', authMiddleware, async (req, res) => {
       sort_by: req.query.sort_by,
       sort_order: req.query.sort_order
     };
-    const result = await getUserOrders(userId, filters, pagination);
+    let result = await getUserOrders(userId, filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -843,7 +843,7 @@ router.get('/', authMiddleware, async (req, res) => {
 router.put('/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { status, notes } = req.body;
-    const order = await updateOrderStatus(req.params.id, status, notes);
+    let order = await updateOrderStatus(req.params.id, status, notes);
     res.json(order);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -879,3 +879,6 @@ module.exports = {
   updateOrderStatus,
   processPayment
 };
+
+
+

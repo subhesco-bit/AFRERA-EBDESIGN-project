@@ -3,13 +3,13 @@
  * Handles bulk/wholesale orders for AFRERA marketplace
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 
 class BulkOrderService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -104,7 +104,7 @@ class BulkOrderService {
         params.push(userId);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       if (result.rows.length === 0) {
         throw new Error('Bulk order not found');
@@ -134,7 +134,7 @@ class BulkOrderService {
         WHERE bo.user_id = $1
       `;
 
-      const params = [userId];
+      let params = [userId];
       let paramCount = 1;
 
       if (status) {
@@ -154,7 +154,7 @@ class BulkOrderService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return {
         orders: result.rows,
@@ -186,7 +186,7 @@ class BulkOrderService {
         WHERE 1=1
       `;
 
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (status) {
@@ -203,7 +203,7 @@ class BulkOrderService {
 
       query += ' ORDER BY bo.created_at DESC';
 
-      const offset = (page - 1) * limit;
+      let offset = (page - 1) * limit;
       paramCount++;
       query += ` LIMIT $${paramCount}`;
       params.push(limit);
@@ -212,7 +212,7 @@ class BulkOrderService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return {
         orders: result.rows,
@@ -229,7 +229,7 @@ class BulkOrderService {
    */
   async updateBulkOrderStatus(orderId, status, adminId, notes = null) {
     try {
-      const query = `
+      let query = `
         UPDATE bulk_orders
         SET 
           status = $1,
@@ -241,7 +241,7 @@ class BulkOrderService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [status, adminId, notes, orderId]);
+      let result = await this.pool.query(query, [status, adminId, notes, orderId]);
 
       if (result.rows.length === 0) {
         throw new Error('Bulk order not found');
@@ -264,7 +264,7 @@ class BulkOrderService {
   // createQuotation() just below.
   async getQuotationsForOrder(orderId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT * FROM bulk_order_quotations WHERE bulk_order_id = $1 ORDER BY created_at DESC`,
         [orderId]
       );
@@ -287,7 +287,7 @@ class BulkOrderService {
     } = quotationData;
 
     try {
-      const query = `
+      let query = `
         INSERT INTO bulk_order_quotations 
         (bulk_order_id, price_per_unit, total_price, valid_until, terms,
          conditions, delivery_timeline, payment_terms, status)
@@ -295,7 +295,7 @@ class BulkOrderService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         orderId,
         pricePerUnit,
         totalPrice,
@@ -322,7 +322,7 @@ class BulkOrderService {
    */
   async acceptQuotation(quotationId, userId) {
     try {
-      const query = `
+      let query = `
         UPDATE bulk_order_quotations
         SET 
           status = 'accepted',
@@ -332,7 +332,7 @@ class BulkOrderService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [userId, quotationId]);
+      let result = await this.pool.query(query, [userId, quotationId]);
 
       if (result.rows.length === 0) {
         throw new Error('Quotation not found');
@@ -415,7 +415,7 @@ class BulkOrderService {
    */
   async rejectQuotation(quotationId, userId, reason) {
     try {
-      const query = `
+      let query = `
         UPDATE bulk_order_quotations
         SET 
           status = 'rejected',
@@ -426,14 +426,14 @@ class BulkOrderService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [userId, reason, quotationId]);
+      let result = await this.pool.query(query, [userId, reason, quotationId]);
 
       if (result.rows.length === 0) {
         throw new Error('Quotation not found');
       }
 
       // Update bulk order status back to pending
-      const quotation = result.rows[0];
+      let quotation = result.rows[0];
       await this.updateBulkOrderStatus(quotation.bulk_order_id, 'pending', null);
 
       logger.info(`Quotation ${quotationId} rejected by user ${userId}`);
@@ -464,7 +464,7 @@ class BulkOrderService {
         WHERE 1=1
       `;
 
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (startDate) {
@@ -485,7 +485,7 @@ class BulkOrderService {
         params.push(productId);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return result.rows[0];
     } catch (error) {
@@ -499,7 +499,7 @@ class BulkOrderService {
    */
   async cancelBulkOrder(orderId, userId) {
     try {
-      const query = `
+      let query = `
         UPDATE bulk_orders
         SET 
           status = 'cancelled',
@@ -509,7 +509,7 @@ class BulkOrderService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [userId, orderId]);
+      let result = await this.pool.query(query, [userId, orderId]);
 
       if (result.rows.length === 0) {
         throw new Error('Bulk order not found or cannot be cancelled');
@@ -532,3 +532,6 @@ module.exports = new BulkOrderService();
   const { ...rest } = m053;
   Object.assign(module.exports, rest);
 }
+
+
+

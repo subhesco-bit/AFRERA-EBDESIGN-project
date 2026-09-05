@@ -1,12 +1,10 @@
 {
-  "generated": "2026-08-07T05:20:15.515Z",
+  "generated": "2026-09-02T16:12:37.332Z",
   "tally": {
     "UNSCORABLE": 1,
     "LEAD": 49,
-    "HIDDEN": 73,
-    "CLUBBED": 20,
-    "ABSENT": 4,
-    "FOUND": 3
+    "HIDDEN": 68,
+    "FOUND": 32
   },
   "modules": [
     {
@@ -25,16 +23,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/database/conversational_ai_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/ai/aiProviderAdapters.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/aiOrchestrator.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/gst_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/claudeAICoordinator.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -49,15 +47,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/signalBus.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/migrations/000_base_schema.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/database/migrations/060_experience_layer_dxp.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/994_recovered_capabilities.sql",
+          "file": "backend/src/database/migrations/014_platform_foundation_modules.sql",
           "area": "schema"
         }
       ],
@@ -73,16 +71,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/database/gi_intelligence_schema.sql",
-          "area": "schema"
+          "file": "backend/src/controllers/comprehensiveERPController.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/moduleRegistry.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/migrations/012_governance_module.sql",
-          "area": "schema"
+          "file": "backend/src/core/signalBus.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -97,15 +95,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/ai/aiProviderAdapters.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/aiOrchestrator.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/ar_vr_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/017_ar_vr_schema.sql",
           "area": "schema"
         }
       ],
@@ -121,15 +119,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/database/migrations/071_animal_health_schema.sql",
+          "area": "schema"
+        },
+        {
           "file": "backend/src/database/migrations/1002_system_administration.sql",
           "area": "schema"
         },
         {
           "file": "backend/src/index.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M006/controller.js",
           "area": "other"
         }
       ],
@@ -148,19 +146,19 @@
           "kind": "phrase",
           "file": "backend/src/database/migrations/1001_platform_configuration.sql",
           "area": "schema",
-          "line": 16
+          "line": 20
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M007/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/9500_m001_platform_core.sql",
+          "area": "schema",
+          "line": 57
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M007/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/9501_m002_platform_configuration.sql",
+          "area": "schema",
+          "line": 2
         }
       ],
       "terms": [
@@ -176,16 +174,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/modules/M008/controller.js",
-          "area": "other"
+          "file": "backend/src/database/migrations/014_platform_foundation_modules.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/gdpr_schema.sql",
+          "area": "schema"
         },
         {
           "file": "backend/src/modules/M008/index.js",
           "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M008/model.sql",
-          "area": "schema"
         }
       ],
       "terms": [
@@ -209,13 +207,13 @@
           "kind": "phrase",
           "file": "backend/src/database/migrations/000_base_schema.sql",
           "area": "schema",
-          "line": 66
+          "line": 68
         },
         {
           "kind": "phrase",
-          "file": "backend/src/database/migrations/026_form_management_schema.sql",
+          "file": "backend/src/database/migrations/014_platform_foundation_modules.sql",
           "area": "schema",
-          "line": 11
+          "line": 115
         }
       ],
       "terms": [
@@ -231,16 +229,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/database/conversational_ai_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/ai/aiProviderAdapters.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/aiOrchestrator.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/gst_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/claudeAICoordinator.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -255,15 +253,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/core/effectors.js",
+          "file": "backend/src/controllers/aiBackboneController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/erpAgents.js",
+          "file": "backend/src/controllers/bulkOrderController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/mcda.js",
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
           "area": "other"
         }
       ],
@@ -279,15 +277,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/ecommerceController.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/businessCell.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
           "area": "schema"
         }
       ],
@@ -303,16 +301,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/ai/aiGuardrails.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/ai/aiOrchestratorCore.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/migrations/000_base_schema.sql",
           "area": "schema"
-        },
-        {
-          "file": "backend/src/database/schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/index.js",
-          "area": "other"
         }
       ],
       "terms": [
@@ -327,15 +325,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/nervousSystemController.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/ai/aiGuardrails.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/core/effectors.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/core/erpAgents.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/core/signalBus.js",
           "area": "other"
         }
       ],
@@ -351,15 +349,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/ai/aiGuardrails.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/engineering_schema.sql",
           "area": "schema"
         },
         {
           "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/014_audit_system.sql",
           "area": "schema"
         }
       ],
@@ -382,13 +380,13 @@
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M016/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/014_platform_foundation_modules.sql",
+          "area": "schema",
+          "line": 217
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M016/index.js",
+          "file": "backend/src/modules/M014/controller.js",
           "area": "other",
           "line": 1
         }
@@ -402,30 +400,27 @@
       "id": "M017",
       "name": "Multi-Factor Authentication",
       "domain": "Identity",
-      "status": "CLUBBED",
-      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/3015_m015_mfa.sql",
+          "area": "schema",
+          "line": 1
         },
         {
-          "file": "backend/src/database/pool.js",
-          "area": "other"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/mfa_schema.sql",
+          "area": "schema",
+          "line": 2
         },
         {
-          "file": "backend/src/database/schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/services/authService.js",
-          "area": "service"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 203
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service"
       ],
       "terms": [
         "multi",
@@ -445,12 +440,12 @@
           "area": "other"
         },
         {
-          "file": "backend/src/core/signalBus.js",
+          "file": "backend/src/core/nervousSystem.js",
           "area": "other"
         },
         {
-          "file": "backend/src/database/gst_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/reflexEngine.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -469,11 +464,11 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
+          "file": "backend/src/database/migrations/014_platform_foundation_modules.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
+          "file": "backend/src/database/migrations/029_indigenous_knowledge_schema.sql",
           "area": "schema"
         }
       ],
@@ -489,15 +484,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/aiOrchestrator.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/claudeAICoordinator.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/ai_copilot_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/ar_vr_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/conversational_ai_schema.sql",
           "area": "schema"
         }
       ],
@@ -509,30 +504,15 @@
       "id": "M021",
       "name": "Farmer Registry",
       "domain": "Farmer",
-      "status": "CLUBBED",
-      "why": "key terms spread across 14 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/038_organic_traceability_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/modules/M021/M021Page.jsx",
+          "area": "other",
+          "line": 9
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service"
       ],
       "terms": [
         "farmer",
@@ -543,26 +523,16 @@
       "id": "M022",
       "name": "Farmer Profile",
       "domain": "Farmer",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/database/conversational_ai_schema.sql",
-          "area": "schema",
-          "line": 27
+          "file": "backend/src/database/migrations/9505_m022_farmer_profiles.sql",
+          "area": "schema"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema",
-          "line": 1062
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/database/migrations/021_conversational_ai_schema.sql",
-          "area": "schema",
-          "line": 32
+          "file": "frontend/src/pages/FarmerProfilePage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -574,30 +544,21 @@
       "id": "M023",
       "name": "Farmer Family",
       "domain": "Farmer",
-      "status": "CLUBBED",
-      "why": "key terms spread across 5 files — features likely folded into larger modules",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema"
+          "file": "backend/src/routes/farmerFamilyRoutes.js",
+          "area": "route"
         },
         {
-          "file": "backend/src/database/migrations/994_recovered_capabilities.sql",
-          "area": "schema"
+          "file": "backend/src/services/legacy/farmerFamilyService.js",
+          "area": "service"
         },
         {
-          "file": "backend/src/database/pool.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/database/rural_life_os_schema.sql",
-          "area": "schema"
+          "file": "frontend/src/pages/FarmerFamilyPage.jsx",
+          "area": "page"
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service"
       ],
       "terms": [
         "farmer",
@@ -608,30 +569,13 @@
       "id": "M024",
       "name": "Farmer KYC",
       "domain": "Farmer",
-      "status": "CLUBBED",
-      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/services/authService.js",
-          "area": "service"
-        },
-        {
-          "file": "backend/src/tests/e2e/farmer-journey.test.js",
-          "area": "other"
+          "file": "frontend/src/pages/FarmerKycPage.jsx",
+          "area": "page"
         }
-      ],
-      "areas": [
-        "schema",
-        "service",
-        "other"
       ],
       "terms": [
         "farmer",
@@ -642,32 +586,13 @@
       "id": "M025",
       "name": "Farmer Verification",
       "domain": "Farmer",
-      "status": "CLUBBED",
-      "why": "key terms spread across 34 files — features likely folded into larger modules",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/database/blockchain_traceability_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/digital_product_passport_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
+          "file": "frontend/src/pages/FarmerVerificationPage.jsx",
+          "area": "page"
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service",
-        "component",
-        "page"
       ],
       "terms": [
         "farmer",
@@ -678,14 +603,12 @@
       "id": "M026",
       "name": "Farmer Skill Management",
       "domain": "Farmer",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/services/farmerTrainingService.js",
-          "area": "service",
-          "line": 314
+          "file": "frontend/src/pages/FarmerSkillPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -702,21 +625,21 @@
       "evidence": [
         {
           "kind": "phrase",
+          "file": "backend/src/core/aiOrchestrator.js",
+          "area": "other",
+          "line": 450
+        },
+        {
+          "kind": "phrase",
           "file": "backend/src/database/migrations/000_base_schema.sql",
           "area": "schema",
-          "line": 361
+          "line": 394
         },
         {
           "kind": "phrase",
           "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
           "area": "schema",
-          "line": 230
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/database/schema.sql",
-          "area": "schema",
-          "line": 354
+          "line": 235
         }
       ],
       "terms": [
@@ -728,14 +651,12 @@
       "id": "M028",
       "name": "Farmer Advisory",
       "domain": "Farmer",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/database/migrations/058_sam_ai_orchestration.sql",
-          "area": "schema",
-          "line": 114
+          "file": "backend/src/database/migrations/3030_m030_farmer_advisory.sql",
+          "area": "schema"
         }
       ],
       "terms": [
@@ -747,9 +668,18 @@
       "id": "M029",
       "name": "Farmer Health & Welfare",
       "domain": "Farmer",
-      "status": "ABSENT",
-      "why": "no occurrence of these terms anywhere in backend or frontend",
-      "evidence": [],
+      "status": "FOUND",
+      "why": "file named for this module",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/013_farmer_health_welfare_module.sql",
+          "area": "schema"
+        },
+        {
+          "file": "frontend/src/pages/FarmerHealthWelfarePage.jsx",
+          "area": "page"
+        }
+      ],
       "terms": [
         "farmer",
         "health",
@@ -765,15 +695,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/services/dynamicPricingService.js",
-          "area": "service",
-          "line": 210
+          "file": "backend/src/modules/M023/service.js",
+          "area": "other",
+          "line": 333
         },
         {
           "kind": "phrase",
-          "file": "backend/src/services/preSeasonOrderService.js",
-          "area": "service",
-          "line": 122
+          "file": "backend/src/modules/M030/service.js",
+          "area": "other",
+          "line": 521
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/advancedAnalyticsRoutes.js",
+          "area": "route",
+          "line": 22
         }
       ],
       "terms": [
@@ -785,30 +721,13 @@
       "id": "M031",
       "name": "Land Registry",
       "domain": "Land",
-      "status": "CLUBBED",
-      "why": "key terms spread across 10 files — features likely folded into larger modules",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/core/erpAgents.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/038_organic_traceability_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
+          "file": "frontend/src/pages/LandRegistryPage.jsx",
+          "area": "page"
         }
-      ],
-      "areas": [
-        "other",
-        "schema",
-        "service"
       ],
       "terms": [
         "land",
@@ -824,15 +743,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/services/landRecordsService.js",
-          "area": "service",
-          "line": 357
+          "file": "backend/src/database/migrations/015_authorization_service.sql",
+          "area": "schema",
+          "line": 192
         },
         {
           "kind": "phrase",
-          "file": "backend/src/services/subsidyService.js",
-          "area": "service",
-          "line": 23
+          "file": "backend/src/database/migrations/strategic_services_schema.sql",
+          "area": "schema",
+          "line": 402
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/modules/M031/controller.js",
+          "area": "other",
+          "line": 16
         }
       ],
       "terms": [
@@ -844,30 +769,27 @@
       "id": "M033",
       "name": "Land Lease Management",
       "domain": "Land",
-      "status": "CLUBBED",
-      "why": "key terms spread across 22 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/core/erpAgents.js",
-          "area": "other"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "area": "schema",
+          "line": 24
         },
         {
-          "file": "backend/src/core/withTransaction.js",
-          "area": "other"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 304
         },
         {
-          "file": "backend/src/database/connection.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/database/migrate.js",
-          "area": "other"
+          "kind": "phrase",
+          "file": "backend/src/routes/landManagementRoutes.js",
+          "area": "route",
+          "line": 5
         }
-      ],
-      "areas": [
-        "other",
-        "schema",
-        "service"
       ],
       "terms": [
         "land",
@@ -883,21 +805,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M034/controller.js",
+          "file": "frontend/src/modules/M034/M034Component.jsx",
           "area": "other",
-          "line": 1
+          "line": 3
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M034/index.js",
+          "file": "frontend/src/modules/M034/M034Page.jsx",
           "area": "other",
-          "line": 1
+          "line": 9
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M034/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/LandManagementPage.jsx",
+          "area": "page",
+          "line": 51
         }
       ],
       "terms": [
@@ -914,21 +836,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M035/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M035/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M035/model.sql",
+          "file": "backend/src/database/migrations/9997_geofencing.sql",
           "area": "schema",
-          "line": 1
+          "line": 6
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "area": "schema",
+          "line": 40
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 307
         }
       ],
       "terms": [
@@ -942,15 +864,26 @@
       "name": "Soil Mapping",
       "domain": "Land",
       "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/tests/e2e/farmer-journey.test.js",
-          "area": "other"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
+          "area": "schema",
+          "line": 53
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 304
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/landManagementRoutes.js",
+          "area": "route",
+          "line": 14
         }
-      ],
-      "areas": [
-        "other"
       ],
       "terms": [
         "soil",
@@ -966,21 +899,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M037/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M037/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M037/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzz_farmer_land_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 66
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 304
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/landManagementRoutes.js",
+          "area": "route",
+          "line": 14
         }
       ],
       "terms": [
@@ -998,21 +931,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M038/controller.js",
+          "file": "backend/src/index.js",
           "area": "other",
-          "line": 1
+          "line": 304
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M038/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/routes/landManagementRoutes.js",
+          "area": "route",
+          "line": 14
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M038/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "backend/src/services/legacy/landManagementService.js",
+          "area": "service",
+          "line": 5
         }
       ],
       "terms": [
@@ -1052,12 +985,16 @@
       "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/services/landRecordsService.js",
-          "area": "service"
+          "file": "backend/src/database/migrations/9510_m032_land_records_extra.sql",
+          "area": "schema"
         },
         {
-          "file": "frontend/src/components/FarmerPortal/LandRecords.jsx",
-          "area": "component"
+          "file": "backend/src/routes/landRecordsRoutes.js",
+          "area": "route"
+        },
+        {
+          "file": "backend/src/services/legacy/landRecordsService.js",
+          "area": "service"
         }
       ],
       "terms": [
@@ -1069,26 +1006,12 @@
       "id": "M041",
       "name": "Village Registry",
       "domain": "Community",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M041/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M041/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M041/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/VillageRegistryPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1108,12 +1031,12 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/routes/governanceModule.js",
-          "area": "route"
+          "file": "backend/src/database/migrations/3106_fpo_member_shares_schema.sql",
+          "area": "schema"
         },
         {
-          "file": "backend/src/services/governanceService.js",
-          "area": "service"
+          "file": "backend/src/index.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -1128,15 +1051,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/ai/aiGuardrails.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/core/decisionEngine.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/effectors.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/core/erpAgents.js",
+          "file": "backend/src/core/disruptionRoutingAgent.js",
           "area": "other"
         }
       ],
@@ -1152,15 +1075,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/ecommerceController.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/disruptionRoutingAgent.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/012_governance_module.sql",
           "area": "schema"
         }
       ],
@@ -1176,15 +1099,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/core/effectors.js",
+          "file": "backend/src/controllers/ecommerceController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/erpAgents.js",
+          "file": "backend/src/core/ai/aiCostController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/mcda.js",
+          "file": "backend/src/core/ai/aiOrchestratorCore.js",
           "area": "other"
         }
       ],
@@ -1244,31 +1167,27 @@
       "id": "M048",
       "name": "Producer Group Management",
       "domain": "Community",
-      "status": "CLUBBED",
-      "why": "key terms spread across 8 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9507_m024_farmer_groups.sql",
+          "area": "schema",
+          "line": 2
         },
         {
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "area": "schema",
+          "line": 42
         },
         {
-          "file": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 280
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service",
-        "page"
       ],
       "terms": [
         "producer",
@@ -1284,21 +1203,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M049/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M049/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M049/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 53
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 280
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/communityManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
       ],
       "terms": [
@@ -1310,9 +1229,28 @@
       "id": "M050",
       "name": "Rural Development Management",
       "domain": "Community",
-      "status": "ABSENT",
-      "why": "no occurrence of these terms anywhere in backend or frontend",
-      "evidence": [],
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzz_community_management_schema.sql",
+          "area": "schema",
+          "line": 64
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 280
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/communityManagementRoutes.js",
+          "area": "route",
+          "line": 15
+        }
+      ],
       "terms": [
         "rural",
         "development"
@@ -1322,26 +1260,12 @@
       "id": "M051",
       "name": "FPO Registration",
       "domain": "FPO",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M051/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M051/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M051/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/FPORegistrationPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1353,31 +1277,15 @@
       "id": "M052",
       "name": "FPO Governance",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 9 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/060_experience_layer_dxp.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/services/api.js",
+          "area": "service",
+          "line": 2025
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service",
-        "page"
       ],
       "terms": [
         "fpo",
@@ -1388,29 +1296,27 @@
       "id": "M053",
       "name": "FPO Membership",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 5 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9513_m051_m051.sql",
+          "area": "schema",
+          "line": 5
         },
         {
-          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/modules/M051/model.sql",
+          "area": "schema",
+          "line": 27
         },
         {
-          "file": "backend/src/database/rural_life_os_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/modules/M051/service.js",
+          "area": "other",
+          "line": 90
         }
-      ],
-      "areas": [
-        "schema",
-        "service"
       ],
       "terms": [
         "fpo",
@@ -1421,31 +1327,15 @@
       "id": "M054",
       "name": "FPO Finance",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 12 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/053_v42_recovered_finance.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/rural_life_os_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/modules/M054/M054Page.jsx",
+          "area": "other",
+          "line": 9
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service",
-        "page"
       ],
       "terms": [
         "fpo",
@@ -1456,31 +1346,21 @@
       "id": "M055",
       "name": "FPO Procurement",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 13 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/3000_M055_generated.sql",
+          "area": "schema",
+          "line": 6
         },
         {
-          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/services/api.js",
+          "area": "service",
+          "line": 2034
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service",
-        "page"
       ],
       "terms": [
         "fpo",
@@ -1491,30 +1371,27 @@
       "id": "M056",
       "name": "FPO Inventory",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 6 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/3000_M056_generated.sql",
+          "area": "schema",
+          "line": 6
         },
         {
-          "file": "backend/src/database/migrations/059_yield_management_pricing.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/modules/M056/M056Page.jsx",
+          "area": "other",
+          "line": 9
         },
         {
-          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/services/dynamicPricingService.js",
-          "area": "service"
+          "kind": "phrase",
+          "file": "frontend/src/pages/FPODashboardPage.jsx",
+          "area": "page",
+          "line": 28
         }
-      ],
-      "areas": [
-        "schema",
-        "service",
-        "page"
       ],
       "terms": [
         "fpo",
@@ -1526,25 +1403,14 @@
       "name": "FPO Marketing",
       "domain": "FPO",
       "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/middleware/compliance.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/services/neProductIntelligenceService.js",
-          "area": "service"
+          "kind": "phrase",
+          "file": "frontend/src/services/api.js",
+          "area": "service",
+          "line": 2061
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service"
       ],
       "terms": [
         "fpo",
@@ -1555,30 +1421,15 @@
       "id": "M058",
       "name": "FPO Sales",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 10 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/027_gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/modules/M058/M058Page.jsx",
+          "area": "other",
+          "line": 9
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service"
       ],
       "terms": [
         "fpo",
@@ -1594,21 +1445,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M059/controller.js",
+          "file": "frontend/src/modules/M059/M059Component.jsx",
           "area": "other",
-          "line": 1
+          "line": 3
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M059/index.js",
+          "file": "frontend/src/modules/M059/M059Page.jsx",
           "area": "other",
-          "line": 1
+          "line": 6
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M059/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/services/api.js",
+          "area": "service",
+          "line": 2052
         }
       ],
       "terms": [
@@ -1620,31 +1471,15 @@
       "id": "M060",
       "name": "FPO Analytics",
       "domain": "FPO",
-      "status": "CLUBBED",
-      "why": "key terms spread across 21 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/blockchain_traceability_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/gi_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/019_blockchain_traceability_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "frontend/src/modules/M060/M060Page.jsx",
+          "area": "other",
+          "line": 9
         }
-      ],
-      "areas": [
-        "schema",
-        "other",
-        "service",
-        "page"
       ],
       "terms": [
         "fpo",
@@ -1659,7 +1494,11 @@
       "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/services/cropPlanningService.js",
+          "file": "backend/src/routes/cropPlanningRoutes.js",
+          "area": "route"
+        },
+        {
+          "file": "backend/src/services/legacy/cropPlanningService.js",
           "area": "service"
         }
       ],
@@ -1672,26 +1511,12 @@
       "id": "M062",
       "name": "Crop Calendar",
       "domain": "Crop",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M062/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M062/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M062/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/CropCalendarPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1703,26 +1528,12 @@
       "id": "M063",
       "name": "Crop Registration",
       "domain": "Crop",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M063/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M063/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M063/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/CropRegistrationPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1734,26 +1545,12 @@
       "id": "M064",
       "name": "Crop Variety Management",
       "domain": "Crop",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M064/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M064/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M064/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/CropVarietyPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1765,26 +1562,12 @@
       "id": "M065",
       "name": "Seed Planning",
       "domain": "Crop",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M065/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M065/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M065/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/SeedPlanningPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1800,16 +1583,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
+          "area": "schema"
+        },
+        {
           "file": "backend/src/database/migrations/055_business_report_recovery.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/modules/M066/controller.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M066/index.js",
-          "area": "other"
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_seedling_batch_tracking.sql",
+          "area": "schema"
         }
       ],
       "terms": [
@@ -1824,16 +1607,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/core/businessCell.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
           "area": "schema"
         },
         {
           "file": "backend/src/database/migrations/992_v42_recovered_intelligence.sql",
           "area": "schema"
-        },
-        {
-          "file": "backend/src/database/pool.js",
-          "area": "other"
         }
       ],
       "terms": [
@@ -1844,26 +1627,12 @@
       "id": "M068",
       "name": "Crop Monitoring",
       "domain": "Crop",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M068/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M068/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M068/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/CropMonitoringPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -1911,21 +1680,15 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M070/controller.js",
+          "file": "frontend/src/modules/M070/M070Component.jsx",
           "area": "other",
-          "line": 1
+          "line": 3
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M070/index.js",
+          "file": "frontend/src/modules/M070/M070Page.jsx",
           "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M070/model.sql",
-          "area": "schema",
-          "line": 1
+          "line": 9
         }
       ],
       "terms": [
@@ -1972,7 +1735,7 @@
       "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/services/soilTestingService.js",
+          "file": "backend/src/services/legacy/soilTestingService.js",
           "area": "service"
         }
       ],
@@ -1989,16 +1752,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/database/consumer_health_schema.sql",
-          "area": "schema"
+          "file": "backend/src/controllers/ecommerceIntegrationController.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/knowledge_graph_schema.sql",
-          "area": "schema"
+          "file": "backend/src/controllers/nutrientValueSalesController.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/laboratory_erp_schema.sql",
-          "area": "schema"
+          "file": "backend/src/controllers/productMediaAIController.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -2013,16 +1776,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/modules/M074/controller.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M074/index.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M074/model.sql",
+          "file": "backend/src/database/migrations/9510_m032_land_records_extra.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzz_soil_management_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -2037,15 +1800,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/digital_product_passport_schema.sql",
           "area": "schema"
         },
         {
           "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/011_farmer_portal_enhancements.sql",
           "area": "schema"
         }
       ],
@@ -2062,21 +1825,21 @@
       "evidence": [
         {
           "kind": "phrase",
+          "file": "backend/src/database/migrations/9522_m076_m076.sql",
+          "area": "schema",
+          "line": 2
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 267
+        },
+        {
+          "kind": "phrase",
           "file": "backend/src/modules/M076/controller.js",
           "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M076/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M076/model.sql",
-          "area": "schema",
-          "line": 1
+          "line": 2
         }
       ],
       "terms": [
@@ -2093,20 +1856,20 @@
       "evidence": [
         {
           "kind": "phrase",
+          "file": "backend/src/database/migrations/9523_m077_m077.sql",
+          "area": "schema",
+          "line": 2
+        },
+        {
+          "kind": "phrase",
           "file": "backend/src/modules/M077/controller.js",
           "area": "other",
-          "line": 1
+          "line": 2
         },
         {
           "kind": "phrase",
           "file": "backend/src/modules/M077/index.js",
           "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M077/model.sql",
-          "area": "schema",
           "line": 1
         }
       ],
@@ -2125,21 +1888,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M078/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M078/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M078/model.sql",
+          "file": "backend/src/database/migrations/9524_m078_m078.sql",
           "area": "schema",
-          "line": 1
+          "line": 2
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "area": "schema",
+          "line": 7
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzz_hidden_modules_schema_recovery.sql",
+          "area": "schema",
+          "line": 67
         }
       ],
       "terms": [
@@ -2155,16 +1918,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/modules/M079/controller.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M079/index.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M079/model.sql",
+          "file": "backend/src/database/migrations/9525_m079_m079.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -2180,21 +1943,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M080/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M080/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M080/model.sql",
+          "file": "backend/src/database/migrations/9526_m080_m080.sql",
           "area": "schema",
-          "line": 1
+          "line": 2
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzz_water_management_schema.sql",
+          "area": "schema",
+          "line": 61
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 273
         }
       ],
       "terms": [
@@ -2214,6 +1977,18 @@
           "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
           "area": "schema",
           "line": 17
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/legacy/agriculturalIntelligenceService.js",
+          "area": "service",
+          "line": 259
+        },
+        {
+          "kind": "phrase",
+          "file": "frontend/src/config/routes.js",
+          "area": "other",
+          "line": 570
         }
       ],
       "terms": [
@@ -2233,6 +2008,18 @@
           "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
           "area": "schema",
           "line": 18
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/claude/aiAgentService.js",
+          "area": "service",
+          "line": 190
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/legacy/aiAgenticCompanionService.js",
+          "area": "service",
+          "line": 139
         }
       ],
       "terms": [
@@ -2244,26 +2031,16 @@
       "id": "M083",
       "name": "Climate Advisory",
       "domain": "Climate",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
-          "area": "schema",
-          "line": 19
+          "file": "backend/src/routes/climateAdvisoryRoutes.js",
+          "area": "route"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M083/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M083/index.js",
-          "area": "other",
-          "line": 1
+          "file": "frontend/src/pages/ClimateAdvisoryPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -2302,6 +2079,18 @@
           "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
           "area": "schema",
           "line": 21
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 258
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/climateMonitoringRoutes.js",
+          "area": "route",
+          "line": 7
         }
       ],
       "terms": [
@@ -2320,6 +2109,18 @@
           "kind": "phrase",
           "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
           "area": "schema",
+          "line": 17
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 258
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/climateMonitoringRoutes.js",
+          "area": "route",
           "line": 17
         }
       ],
@@ -2343,9 +2144,9 @@
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M087/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzz_alert_management_schema.sql",
+          "area": "schema",
+          "line": 4
         },
         {
           "kind": "phrase",
@@ -2374,15 +2175,15 @@
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M088/controller.js",
+          "file": "backend/src/index.js",
           "area": "other",
-          "line": 1
+          "line": 258
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M088/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/routes/climateMonitoringRoutes.js",
+          "area": "route",
+          "line": 17
         }
       ],
       "terms": [
@@ -2405,15 +2206,15 @@
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M089/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+          "area": "schema",
+          "line": 51
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M089/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/services/legacy/climateMonitoringService.js",
+          "area": "service",
+          "line": 34
         }
       ],
       "terms": [
@@ -2434,6 +2235,18 @@
           "file": "backend/src/database/migrations/057_climate_weather_d14.sql",
           "area": "schema",
           "line": 21
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzz_climate_monitoring_schema.sql",
+          "area": "schema",
+          "line": 5
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 258
         }
       ],
       "terms": [
@@ -2445,31 +2258,27 @@
       "id": "M091",
       "name": "Farm Activity Management",
       "domain": "Operations",
-      "status": "CLUBBED",
-      "why": "key terms spread across 18 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/core/erpAgents.js",
-          "area": "other"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 263
         },
         {
-          "file": "backend/src/database/conversational_ai_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/routes/operationsManagementRoutes.js",
+          "area": "route",
+          "line": 53
         },
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/021_conversational_ai_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/services/legacy/operationsManagementService.js",
+          "area": "service",
+          "line": 3
         }
-      ],
-      "areas": [
-        "other",
-        "schema",
-        "service",
-        "page"
       ],
       "terms": [
         "farm",
@@ -2481,15 +2290,26 @@
       "name": "Farm Task Scheduling",
       "domain": "Operations",
       "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/services/legacy/operationsManagementService.js",
+          "area": "service",
+          "line": 4
+        },
+        {
+          "kind": "phrase",
+          "file": "frontend/src/pages/OperationsManagementPage.jsx",
+          "area": "page",
+          "line": 17
+        },
+        {
+          "kind": "phrase",
+          "file": "frontend/src/services/api.js",
+          "area": "service",
+          "line": 2527
         }
-      ],
-      "areas": [
-        "schema"
       ],
       "terms": [
         "farm",
@@ -2506,6 +2326,14 @@
       "evidence": [
         {
           "file": "backend/src/database/migrations/993_enterprise_control_layer.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/9996_project_systems_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/9997_geofencing.sql",
           "area": "schema"
         }
       ],
@@ -2546,21 +2374,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M095/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M095/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M095/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 53
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 263
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/operationsManagementRoutes.js",
+          "area": "route",
+          "line": 14
         }
       ],
       "terms": [
@@ -2577,21 +2405,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M096/controller.js",
+          "file": "backend/src/index.js",
           "area": "other",
-          "line": 1
+          "line": 259
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M096/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/routes/operationsManagementRoutes.js",
+          "area": "route",
+          "line": 15
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M096/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "backend/src/services/legacy/operationsManagementService.js",
+          "area": "service",
+          "line": 5
         }
       ],
       "terms": [
@@ -2608,21 +2436,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M097/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M097/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M097/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 80
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 264
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/operationsManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
       ],
       "terms": [
@@ -2634,21 +2462,13 @@
       "id": "M098",
       "name": "Farm Costing",
       "domain": "Operations",
-      "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/054_v8_v9_commerce_recovery.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/services/recipeIntelligenceService.js",
-          "area": "service"
+          "file": "frontend/src/pages/FarmCostingPage.jsx",
+          "area": "page"
         }
-      ],
-      "areas": [
-        "schema",
-        "service"
       ],
       "terms": [
         "farm",
@@ -2659,30 +2479,27 @@
       "id": "M099",
       "name": "Farm Productivity",
       "domain": "Operations",
-      "status": "CLUBBED",
-      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "area": "schema",
+          "line": 93
         },
         {
-          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 264
         },
         {
-          "file": "backend/src/services/moduleCatalogService.js",
-          "area": "service"
-        },
-        {
-          "file": "frontend/src/pages/SubsidyManagementPage.jsx",
-          "area": "page"
+          "kind": "phrase",
+          "file": "backend/src/routes/operationsManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
-      ],
-      "areas": [
-        "schema",
-        "service",
-        "page"
       ],
       "terms": [
         "farm",
@@ -2704,9 +2521,15 @@
         },
         {
           "kind": "phrase",
-          "file": "backend/src/services/advancedAIService.js",
-          "area": "service",
-          "line": 354
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzz_operations_management_schema.sql",
+          "area": "schema",
+          "line": 106
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 265
         }
       ],
       "terms": [
@@ -2746,16 +2569,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/ai/aiEngineRegistry.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/migrations/009_marketplace_enhancements.sql",
-          "area": "schema"
+          "file": "backend/src/core/ai/aiGuardrails.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/migrations/010_insurance_enhancements.sql",
-          "area": "schema"
+          "file": "backend/src/core/ai/aiOrchestratorCore.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -2766,26 +2589,12 @@
       "id": "M103",
       "name": "Equipment Inventory",
       "domain": "Machinery",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M103/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M103/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M103/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/EquipmentInventoryPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -2797,26 +2606,12 @@
       "id": "M104",
       "name": "Equipment Rental",
       "domain": "Machinery",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
-          "area": "schema",
-          "line": 74
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M104/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M104/index.js",
-          "area": "other",
-          "line": 1
+          "file": "frontend/src/pages/EquipmentRentalPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -2852,24 +2647,21 @@
       "id": "M106",
       "name": "Preventive Maintenance",
       "domain": "Machinery",
-      "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/database/engineering_schema.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzz_preventive_maintenance_schema.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
-          "area": "schema"
+          "file": "backend/src/routes/preventiveMaintenanceRoutes.js",
+          "area": "route"
         },
         {
-          "file": "backend/src/database/migrations/995_erp_process_layer.sql",
-          "area": "schema"
+          "file": "backend/src/services/legacy/preventiveMaintenanceService.js",
+          "area": "service"
         }
-      ],
-      "areas": [
-        "schema"
       ],
       "terms": [
         "preventive",
@@ -2880,26 +2672,12 @@
       "id": "M107",
       "name": "Breakdown Maintenance",
       "domain": "Machinery",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M107/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M107/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M107/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/BreakdownMaintenancePage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -2935,26 +2713,12 @@
       "id": "M109",
       "name": "Spare Parts Management",
       "domain": "Machinery",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M109/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M109/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M109/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/SparePartsManagementPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -2966,26 +2730,16 @@
       "id": "M110",
       "name": "Asset Lifecycle Management",
       "domain": "Machinery",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M110/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzz_asset_lifecycle_schema.sql",
+          "area": "schema"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M110/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M110/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/AssetLifecycleManagementPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -3002,9 +2756,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "frontend/src/pages/SeedVaultPage.jsx",
-          "area": "page",
-          "line": 45
+          "file": "backend/src/database/migrations/9999_zzzzzz_seed_vault_schema.sql",
+          "area": "schema",
+          "line": 1
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/legacy/inputSupplyManagementService.js",
+          "area": "service",
+          "line": 6
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/services/legacy/seedVaultService.js",
+          "area": "service",
+          "line": 2
         }
       ],
       "terms": [
@@ -3016,26 +2782,20 @@
       "id": "M112",
       "name": "Fertilizer Inventory",
       "domain": "Input Supply",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M112/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/066_fertilizer_inventory_schema.sql",
+          "area": "schema"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M112/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/services/legacy/fertilizerInventoryService.js",
+          "area": "service"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M112/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/FertilizerInventoryPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -3059,7 +2819,7 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/database/rural_life_os_schema.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
           "area": "schema"
         }
       ],
@@ -3072,15 +2832,26 @@
       "name": "Pesticide Inventory",
       "domain": "Input Supply",
       "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "area": "schema",
+          "line": 22
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 291
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/inputSupplyManagementRoutes.js",
+          "area": "route",
+          "line": 14
         }
-      ],
-      "areas": [
-        "schema"
       ],
       "terms": [
         "pesticide",
@@ -3177,31 +2948,27 @@
       "id": "M118",
       "name": "Input Procurement",
       "domain": "Input Supply",
-      "status": "CLUBBED",
-      "why": "key terms spread across 15 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/000_base_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "area": "schema",
+          "line": 72
         },
         {
-          "file": "backend/src/database/migrations/042_rural_procurement_logistics_mobility_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 288
         },
         {
-          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/056_named_missing_modules.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/routes/inputSupplyManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
-      ],
-      "areas": [
-        "schema",
-        "route",
-        "service",
-        "page"
       ],
       "terms": [
         "input",
@@ -3212,31 +2979,27 @@
       "id": "M119",
       "name": "Input Distribution",
       "domain": "Input Supply",
-      "status": "CLUBBED",
-      "why": "key terms spread across 5 files — features likely folded into larger modules",
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/054_v8_v9_commerce_recovery.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "area": "schema",
+          "line": 86
         },
         {
-          "file": "backend/src/database/migrations/995_erp_process_layer.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 288
         },
         {
-          "file": "backend/src/routes/vendorRoutes.js",
-          "area": "route"
-        },
-        {
-          "file": "frontend/src/components/Marketplace/ProductReview.jsx",
-          "area": "component"
+          "kind": "phrase",
+          "file": "backend/src/routes/inputSupplyManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
-      ],
-      "areas": [
-        "schema",
-        "route",
-        "component",
-        "page"
       ],
       "terms": [
         "input",
@@ -3252,9 +3015,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/services/rfqService.js",
-          "area": "service",
-          "line": null
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzz_input_supply_management_schema.sql",
+          "area": "schema",
+          "line": 98
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 288
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/inputSupplyManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
       ],
       "terms": [
@@ -3270,15 +3045,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/controllers/completeERPIntegrationController.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/food_intelligence_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/009_marketplace_enhancements.sql",
           "area": "schema"
         }
       ],
@@ -3290,26 +3065,12 @@
       "id": "M122",
       "name": "Cattle Registry",
       "domain": "Livestock",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M122/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M122/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M122/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/pages/CattleRegistryPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -3325,16 +3086,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/controllers/completeERPIntegrationController.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
           "area": "schema"
-        },
-        {
-          "file": "backend/src/database/rural_life_os_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/modules/M123/controller.js",
-          "area": "other"
         }
       ],
       "terms": [
@@ -3345,20 +3106,16 @@
       "id": "M124",
       "name": "Goat Farming Management",
       "domain": "Livestock",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema",
-          "line": 376
+          "file": "backend/src/database/migrations/068_goat_farming_schema.sql",
+          "area": "schema"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/database/rural_life_os_schema.sql",
-          "area": "schema",
-          "line": 335
+          "file": "frontend/src/pages/GoatFarmingPage.jsx",
+          "area": "page"
         }
       ],
       "terms": [
@@ -3370,9 +3127,18 @@
       "id": "M125",
       "name": "Sheep Farming Management",
       "domain": "Livestock",
-      "status": "ABSENT",
-      "why": "no occurrence of these terms anywhere in backend or frontend",
-      "evidence": [],
+      "status": "FOUND",
+      "why": "file named for this module",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/069_sheep_farming_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "frontend/src/pages/SheepFarmingPage.jsx",
+          "area": "page"
+        }
+      ],
       "terms": [
         "sheep",
         "farming"
@@ -3382,29 +3148,17 @@
       "id": "M126",
       "name": "Pig Farming Management",
       "domain": "Livestock",
-      "status": "CLUBBED",
-      "why": "key terms spread across 7 files — features likely folded into larger modules",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "file": "backend/src/services/catalogIntelligenceService.js",
-          "area": "service"
+          "file": "backend/src/database/migrations/070_pig_farming_schema.sql",
+          "area": "schema"
         },
         {
-          "file": "backend/src/services/farmerTrainingService.js",
-          "area": "service"
-        },
-        {
-          "file": "backend/src/services/preSeasonOrderService.js",
-          "area": "service"
-        },
-        {
-          "file": "backend/src/services/soilTestingService.js",
-          "area": "service"
+          "file": "frontend/src/pages/PigFarmingPage.jsx",
+          "area": "page"
         }
-      ],
-      "areas": [
-        "service",
-        "page"
       ],
       "terms": [
         "pig",
@@ -3415,26 +3169,20 @@
       "id": "M127",
       "name": "Animal Health Management",
       "domain": "Livestock",
-      "status": "HIDDEN",
-      "why": "exact capability phrase present, but no file is named for it",
+      "status": "FOUND",
+      "why": "file named for this module",
       "evidence": [
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M127/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/071_animal_health_schema.sql",
+          "area": "schema"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M127/index.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/routes/animalHealthRoutes.js",
+          "area": "route"
         },
         {
-          "kind": "phrase",
-          "file": "backend/src/modules/M127/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "backend/src/services/legacy/animalHealthService.js",
+          "area": "service"
         }
       ],
       "terms": [
@@ -3450,15 +3198,15 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/core/decisionEngine.js",
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/effectors.js",
+          "file": "backend/src/core/businessCell.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/outcomeSink.js",
+          "file": "backend/src/core/claudeAICoordinator.js",
           "area": "other"
         }
       ],
@@ -3474,16 +3222,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/core/signalBus.js",
+          "area": "other"
+        },
+        {
           "file": "backend/src/database/biodiversity_schema.sql",
           "area": "schema"
-        },
-        {
-          "file": "backend/src/database/migrations/018_biodiversity_schema.sql",
-          "area": "schema"
-        },
-        {
-          "file": "backend/src/modules/M129/controller.js",
-          "area": "other"
         }
       ],
       "terms": [
@@ -3499,21 +3247,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M130/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M130/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M130/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzz_livestock_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 92
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 300
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/livestockManagementRoutes.js",
+          "area": "route",
+          "line": 14
         }
       ],
       "terms": [
@@ -3530,21 +3278,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M131/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M131/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M131/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 11
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 995
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/fisheriesManagementRoutes.js",
+          "area": "route",
+          "line": 5
         }
       ],
       "terms": [
@@ -3560,16 +3308,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/core/withTransaction.js",
+          "file": "backend/src/core/ai/aiEngineRegistry.js",
           "area": "other"
         },
         {
-          "file": "backend/src/database/engineering_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/ai/aiOrchestratorCore.js",
+          "area": "other"
         },
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
-          "area": "schema"
+          "file": "backend/src/core/withTransaction.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -3588,12 +3336,12 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/database/rural_life_os_schema.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/modules/M133/controller.js",
-          "area": "other"
+          "file": "backend/src/database/rural_life_os_schema.sql",
+          "area": "schema"
         }
       ],
       "terms": [
@@ -3609,21 +3357,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M134/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M134/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M134/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 36
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 339
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/fisheriesManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
       ],
       "terms": [
@@ -3640,21 +3388,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M135/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/services/legacy/fisheriesManagementService.js",
+          "area": "service",
+          "line": 5
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M135/index.js",
+          "file": "frontend/src/modules/M135/M135Component.jsx",
           "area": "other",
-          "line": 1
+          "line": 3
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M135/model.sql",
-          "area": "schema",
-          "line": 1
+          "file": "frontend/src/modules/M135/M135Page.jsx",
+          "area": "other",
+          "line": 6
         }
       ],
       "terms": [
@@ -3672,21 +3420,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M136/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M136/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M136/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 60
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 339
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/fisheriesManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
       ],
       "terms": [
@@ -3702,16 +3450,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/core/effectors.js",
+          "file": "backend/src/controllers/completeAIIntegrationController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/core/erpAgents.js",
+          "file": "backend/src/controllers/completeERPIntegrationController.js",
           "area": "other"
         },
         {
-          "file": "backend/src/database/biodiversity_schema.sql",
-          "area": "schema"
+          "file": "backend/src/controllers/ecommerceController.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -3733,15 +3481,15 @@
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M138/controller.js",
-          "area": "other",
-          "line": 1
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "area": "schema",
+          "line": 85
         },
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M138/index.js",
+          "file": "backend/src/index.js",
           "area": "other",
-          "line": 1
+          "line": 340
         }
       ],
       "terms": [
@@ -3754,23 +3502,26 @@
       "name": "Cold Fish Chain",
       "domain": "Fisheries",
       "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
+          "area": "schema",
+          "line": 97
         },
         {
-          "file": "backend/src/database/migrations/055_business_report_recovery.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 340
         },
         {
-          "file": "backend/src/database/migrations/991_aeos_folu_ne_policy.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/routes/fisheriesManagementRoutes.js",
+          "area": "route",
+          "line": 16
         }
-      ],
-      "areas": [
-        "schema"
       ],
       "terms": [
         "cold",
@@ -3787,21 +3538,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M140/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M140/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M140/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 111
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 340
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/fisheriesManagementRoutes.js",
+          "area": "route",
+          "line": 16
         }
       ],
       "terms": [
@@ -3817,16 +3568,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/modules/M141/controller.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M141/index.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M141/model.sql",
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/modules/M021/service.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/modules/M030/service.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -3842,21 +3593,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M142/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M142/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M142/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
           "area": "schema",
-          "line": 1
+          "line": 9
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 327
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/horticultureManagementRoutes.js",
+          "area": "route",
+          "line": 5
         }
       ],
       "terms": [
@@ -3872,16 +3623,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/modules/M143/controller.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M143/index.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M143/model.sql",
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
         }
       ],
       "terms": [
@@ -3904,7 +3655,7 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
           "area": "schema"
         }
       ],
@@ -3924,12 +3675,12 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/modules/M145/controller.js",
-          "area": "other"
+          "file": "backend/src/database/migrations/023_engineering_schema.sql",
+          "area": "schema"
         }
       ],
       "terms": [
@@ -3944,16 +3695,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
+          "area": "schema"
+        },
+        {
           "file": "backend/src/database/migrations/041_rural_life_os_schema.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/database/rural_life_os_schema.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
           "area": "schema"
-        },
-        {
-          "file": "backend/src/modules/M146/controller.js",
-          "area": "other"
         }
       ],
       "terms": [
@@ -3968,16 +3719,16 @@
       "why": "single-word match only — must be checked by hand before building",
       "evidence": [
         {
-          "file": "backend/src/modules/M147/controller.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M147/index.js",
-          "area": "other"
-        },
-        {
-          "file": "backend/src/modules/M147/model.sql",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/routes/horticultureManagementRoutes.js",
+          "area": "route"
         }
       ],
       "terms": [
@@ -3988,9 +3739,28 @@
       "id": "M148",
       "name": "Precision Horticulture",
       "domain": "Horticulture",
-      "status": "ABSENT",
-      "why": "no occurrence of these terms anywhere in backend or frontend",
-      "evidence": [],
+      "status": "HIDDEN",
+      "why": "exact capability phrase present, but no file is named for it",
+      "evidence": [
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "area": "schema",
+          "line": 73
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 323
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/routes/horticultureManagementRoutes.js",
+          "area": "route",
+          "line": 15
+        }
+      ],
       "terms": [
         "precision",
         "horticulture"
@@ -4001,24 +3771,26 @@
       "name": "Protected Cultivation",
       "domain": "Horticulture",
       "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "why": "exact capability phrase present, but no file is named for it",
       "evidence": [
         {
-          "file": "backend/src/database/biodiversity_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "area": "schema",
+          "line": 85
         },
         {
-          "file": "backend/src/database/migrations/018_biodiversity_schema.sql",
-          "area": "schema"
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 324
         },
         {
-          "file": "backend/src/services/biodiversityService.js",
-          "area": "service"
+          "kind": "phrase",
+          "file": "backend/src/routes/horticultureManagementRoutes.js",
+          "area": "route",
+          "line": 15
         }
-      ],
-      "areas": [
-        "schema",
-        "service"
       ],
       "terms": [
         "protected",
@@ -4034,21 +3806,21 @@
       "evidence": [
         {
           "kind": "phrase",
-          "file": "backend/src/modules/M150/controller.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M150/index.js",
-          "area": "other",
-          "line": 1
-        },
-        {
-          "kind": "phrase",
-          "file": "backend/src/modules/M150/model.sql",
+          "file": "backend/src/database/migrations/014_horticulture_module.sql",
           "area": "schema",
-          "line": 1
+          "line": 144
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/database/migrations/9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzz_horticulture_management_schema.sql",
+          "area": "schema",
+          "line": 96
+        },
+        {
+          "kind": "phrase",
+          "file": "backend/src/index.js",
+          "area": "other",
+          "line": 324
         }
       ],
       "terms": [
@@ -4093,7 +3865,7 @@
           "area": "schema"
         },
         {
-          "file": "backend/src/services/commerceRulesService.js",
+          "file": "backend/src/services/legacy/commerceRulesService.js",
           "area": "service"
         }
       ],
@@ -4113,27 +3885,28 @@
       "domain": "named-missing",
       "purpose": "Track why quotes are lost (price vs. delivery). This gives the sales team data to adjust pricing dynamically based on real buyer behavior, not just competitor scrapes.",
       "status": "CLUBBED",
-      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "why": "key terms spread across 9 files — features likely folded into larger modules",
       "evidence": [
         {
           "file": "backend/src/database/migrations/056_named_missing_modules.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/services/enterpriseControlService.js",
+          "file": "backend/src/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/services/legacy/commerceRulesService.js",
           "area": "service"
         },
         {
-          "file": "backend/src/services/rfqService.js",
+          "file": "backend/src/services/legacy/ecommerceBusinessSalesService.js",
           "area": "service"
-        },
-        {
-          "file": "frontend/src/pages/RfqPage.jsx",
-          "area": "page"
         }
       ],
       "areas": [
         "schema",
+        "other",
         "service",
         "page"
       ],
@@ -4174,10 +3947,15 @@
         {
           "file": "backend/src/database/migrations/056_named_missing_modules.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/services/legacy/ecommerceMarketingService.js",
+          "area": "service"
         }
       ],
       "areas": [
-        "schema"
+        "schema",
+        "service"
       ],
       "terms": [
         "affiliate",
@@ -4233,12 +4011,12 @@
       "why": "all key terms appear together in a small number of files",
       "evidence": [
         {
-          "file": "backend/src/database/migrations/023_engineering_schema.sql",
-          "area": "schema"
+          "file": "frontend/src/services/api.js",
+          "area": "service"
         }
       ],
       "areas": [
-        "schema"
+        "service"
       ],
       "terms": [
         "automated",
@@ -4266,20 +4044,29 @@
       "name": "E-Invoice IRN (Invoice Reference Number) Generation",
       "domain": "named-missing",
       "purpose": "Directly integrate with the NIC (National Informatics Centre) IRP sandbox. The moment an order is placed, the platform generates the legally valid IRN and QR code. Taxation Hook: \"One click to a legally valid invoice; no manual portal entry.\"",
-      "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
       "evidence": [
         {
           "file": "backend/src/database/migrations/056_named_missing_modules.sql",
           "area": "schema"
         },
         {
-          "file": "backend/src/services/complianceService.js",
+          "file": "backend/src/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/services/legacy/complianceService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/services/api.js",
           "area": "service"
         }
       ],
       "areas": [
         "schema",
+        "other",
         "service"
       ],
       "terms": [
@@ -4329,10 +4116,15 @@
         {
           "file": "backend/src/database/migrations/056_named_missing_modules.sql",
           "area": "schema"
+        },
+        {
+          "file": "frontend/src/services/api.js",
+          "area": "service"
         }
       ],
       "areas": [
-        "schema"
+        "schema",
+        "service"
       ],
       "terms": [
         "farm",
@@ -4346,16 +4138,31 @@
       "name": "Agri-Input Inventory (Seed/Fertilizer/PPE) Tracking",
       "domain": "named-missing",
       "purpose": "Track the inputs issued to farmers (via the Pre-Season Advance). Link these inputs to the final harvest yield. If a farmer uses banned pesticides, the lot is automatically flagged for export rejection.",
-      "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "status": "CLUBBED",
+      "why": "key terms spread across 6 files — features likely folded into larger modules",
       "evidence": [
         {
           "file": "backend/src/database/migrations/056_named_missing_modules.sql",
           "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/services/legacy/aiBackboneService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/components/Sidebar.jsx",
+          "area": "component"
         }
       ],
       "areas": [
-        "schema"
+        "schema",
+        "other",
+        "service",
+        "component"
       ],
       "terms": [
         "agri",
@@ -4373,7 +4180,7 @@
       "why": "all key terms appear together in a small number of files",
       "evidence": [
         {
-          "file": "backend/src/services/marketDataService.js",
+          "file": "backend/src/services/legacy/marketDataService.js",
           "area": "service"
         }
       ],
@@ -4392,21 +4199,30 @@
       "name": "Quality Control (QC) Hold & Release Workflow",
       "domain": "named-missing",
       "purpose": "If a lab report fails (e.g., Aflatoxin > limit), the system automatically blocks that lot from \"Ready for Dispatch\" status. Only the QC manager can \"Override/Hold-Release\" with a digital signature.",
-      "status": "HIDDEN",
-      "why": "all key terms appear together in a small number of files",
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
       "evidence": [
         {
           "file": "backend/src/core/erpAgents.js",
           "area": "other"
         },
         {
-          "file": "backend/src/services/enterpriseControlService.js",
+          "file": "backend/src/services/legacy/enterpriseControlService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/pages/ComprehensiveERPPage.jsx",
+          "area": "page"
+        },
+        {
+          "file": "frontend/src/services/api.js",
           "area": "service"
         }
       ],
       "areas": [
         "other",
-        "service"
+        "service",
+        "page"
       ],
       "terms": [
         "quality",
@@ -4421,9 +4237,31 @@
       "name": "Multi-Location FPO Cost Centers",
       "domain": "named-missing",
       "purpose": "Allow a single large FPO to manage multiple collection centers. Each center has its own P&L (Profit & Loss) statement. CAs can audit center-wise performance, preventing internal fraud.",
-      "status": "ABSENT",
-      "why": "no occurrence of these terms anywhere in backend or frontend",
-      "evidence": [],
+      "status": "CLUBBED",
+      "why": "key terms spread across 4 files — features likely folded into larger modules",
+      "evidence": [
+        {
+          "file": "backend/src/database/migrations/998_foreign_key_indexes.sql",
+          "area": "schema"
+        },
+        {
+          "file": "backend/src/index.js",
+          "area": "other"
+        },
+        {
+          "file": "backend/src/services/legacy/comprehensiveERPService.js",
+          "area": "service"
+        },
+        {
+          "file": "frontend/src/services/api.js",
+          "area": "service"
+        }
+      ],
+      "areas": [
+        "schema",
+        "other",
+        "service"
+      ],
       "terms": [
         "multi",
         "location",

@@ -1,15 +1,15 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ShieldCheck, Check, X as XIcon } from 'lucide-react'
-import toast from 'react-hot-toast'
-import { farmerVerificationAPI } from '../services/api'
-import ResourceManager from '../components/common/ResourceManager'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ShieldCheck, Check, X as XIcon } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { farmerVerificationAPI } from '../services/api';
+import ResourceManager from '../components/common/ResourceManager';
 
-const VERIFICATION_TYPES = ['Land Ownership', 'Cropping Pattern', 'FPO Membership', 'Income Declaration', 'Address']
+const VERIFICATION_TYPES = ['Land Ownership', 'Cropping Pattern', 'FPO Membership', 'Income Declaration', 'Address'];
 const STATUS_COLOR = {
   Verified: 'bg-green-100 text-green-800',
   Pending: 'bg-yellow-100 text-yellow-800',
   Rejected: 'bg-red-100 text-red-800',
-}
+};
 
 const initialForm = {
   farmer_name: '',
@@ -17,7 +17,7 @@ const initialForm = {
   claim_details: '',
   verifier_name: '',
   status: 'Pending',
-}
+};
 
 /**
  * M025 — Farmer Verification. Distinct from M024 Farmer KYC (identity
@@ -27,18 +27,18 @@ const initialForm = {
  * verify/reject quick actions that the generic component doesn't cover.
  */
 function FarmerVerificationPage() {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const verifyMutation = useMutation({
     mutationFn: (id) => farmerVerificationAPI.verifyRequest(id, {}),
-    onSuccess: () => { toast.success('Marked verified'); queryClient.invalidateQueries({ queryKey: ['farmer-verification'] }) },
+    onSuccess: () => { toast.success('Marked verified'); queryClient.invalidateQueries({ queryKey: ['farmer-verification'] }); },
     onError: () => toast.error('Failed to update — backend endpoint not available yet'),
-  })
+  });
   const rejectMutation = useMutation({
     mutationFn: (id) => farmerVerificationAPI.rejectRequest(id, {}),
-    onSuccess: () => { toast.success('Marked rejected'); queryClient.invalidateQueries({ queryKey: ['farmer-verification'] }) },
+    onSuccess: () => { toast.success('Marked rejected'); queryClient.invalidateQueries({ queryKey: ['farmer-verification'] }); },
     onError: () => toast.error('Failed to update — backend endpoint not available yet'),
-  })
+  });
 
   return (
     <ResourceManager
@@ -93,7 +93,7 @@ function FarmerVerificationPage() {
         { label: 'Pending', value: items.filter((i) => !i.status || i.status === 'Pending').length },
       ]}
     />
-  )
+  );
 }
 
-export default FarmerVerificationPage
+export default FarmerVerificationPage;

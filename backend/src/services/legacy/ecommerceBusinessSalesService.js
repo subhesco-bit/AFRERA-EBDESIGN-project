@@ -14,9 +14,9 @@
  * - Negotiation Support (counter-offers, revision tracking)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ============================================================================
 // B2B BULK ORDER MANAGEMENT
@@ -105,10 +105,10 @@ async function createBulkOrder(buyerId, orderData) {
  * Find potential sellers for bulk order
  */
 async function findPotentialSellers(categoryId, quantity, targetPrice) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const sellers = await pg.query(`
+    let sellers = await pg.query(`
       SELECT 
         pl.seller_id,
         u.full_name as seller_name,
@@ -139,7 +139,7 @@ async function findPotentialSellers(categoryId, quantity, targetPrice) {
  * Submit quotation for bulk order
  */
 async function submitQuotation(bulkOrderId, sellerId, quotationData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -210,11 +210,11 @@ async function submitQuotation(bulkOrderId, sellerId, quotationData) {
  * Accept quotation and create order
  */
 async function acceptQuotation(quotationId, buyerId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get quotation details
-    const quotation = await pg.query(`
+    let quotation = await pg.query(`
       SELECT q.*, bo.*, u.full_name as seller_name
       FROM quotations q
       JOIN bulk_orders bo ON q.bulk_order_id = bo.id
@@ -300,7 +300,7 @@ async function acceptQuotation(quotationId, buyerId) {
  * Create contract farming agreement
  */
 async function createContractFarming(buyerId, contractData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -375,7 +375,7 @@ async function createContractFarming(buyerId, contractData) {
  * Record contract milestone
  */
 async function recordContractMilestone(contractId, milestoneData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -438,7 +438,7 @@ async function recordContractMilestone(contractId, milestoneData) {
  * Get comprehensive sales analytics
  */
 async function getSalesAnalytics(filters = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -529,7 +529,7 @@ async function getSalesAnalytics(filters = {}) {
  * Get B2B conversion metrics
  */
 async function getB2BConversionMetrics(periodDays = 30) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const metrics = await pg.query(`
@@ -578,11 +578,11 @@ async function getB2BConversionMetrics(periodDays = 30) {
  * Calculate platform commission for order
  */
 async function calculateCommission(orderId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get order details
-    const order = await pg.query(`
+    let order = await pg.query(`
       SELECT 
         o.*,
         o.total_amount,
@@ -664,3 +664,6 @@ module.exports = {
   // Commission Management
   calculateCommission
 };
+
+
+

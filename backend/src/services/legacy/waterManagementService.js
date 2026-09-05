@@ -48,3 +48,6 @@ const waterAnalytics = createCrudService('water_analytics_records', {
 });
 
 module.exports = { waterBudgeting, waterQuality, rainwaterHarvesting, watershedManagement, waterAnalytics };
+
+
+

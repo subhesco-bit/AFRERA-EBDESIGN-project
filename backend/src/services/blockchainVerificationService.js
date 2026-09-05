@@ -110,7 +110,7 @@ class BlockchainVerificationService {
         };
       }
 
-      const transaction = {
+      let transaction = {
         id: this.generateTransactionId(),
         type: 'custody_transfer',
         productId,
@@ -126,7 +126,7 @@ class BlockchainVerificationService {
       };
 
       this.pendingTransactions.push(transaction);
-      const block = await this.mineBlock([transaction]);
+      let block = await this.mineBlock([transaction]);
       await this.storeTransaction(transaction, block);
 
       return {
@@ -228,7 +228,7 @@ class BlockchainVerificationService {
    * Get current custody
    */
   async getCurrentCustody(productId) {
-    const query = `
+    let query = `
       SELECT 
         bt.transaction_data->>'toEntity' as entity,
         bt.transaction_data->>'location' as location,
@@ -240,7 +240,7 @@ class BlockchainVerificationService {
       LIMIT 1
     `;
 
-    const result = await db.query(query, [productId]);
+    let result = await db.query(query, [productId]);
     return result.rows[0];
   }
 
@@ -248,13 +248,13 @@ class BlockchainVerificationService {
    * Verify product exists
    */
   async verifyProduct(productId) {
-    const query = `
+    let query = `
       SELECT id, name AS product_name, created_by AS farmer_id, is_active AS status
       FROM products
       WHERE id = $1
     `;
 
-    const result = await db.query(query, [productId]);
+    let result = await db.query(query, [productId]);
     return result.rows[0];
   }
 
@@ -262,7 +262,7 @@ class BlockchainVerificationService {
    * Store transaction in database
    */
   async storeTransaction(transaction, block) {
-    const query = `
+    let query = `
       INSERT INTO product_custody_transactions (
         transaction_id, transaction_type, transaction_data,
         block_height, block_hash, timestamp
@@ -435,8 +435,8 @@ class BlockchainVerificationService {
     if (custodyChain.length < 2) return false;
     
     for (let i = 1; i < custodyChain.length; i++) {
-      const current = custodyChain[i];
-      const previous = custodyChain[i - 1];
+      let current = custodyChain[i];
+      let previous = custodyChain[i - 1];
       
       // Check if custody transfer is sequential
       if (current.fromEntity !== previous.toEntity) {
@@ -459,7 +459,7 @@ class BlockchainVerificationService {
    */
   async getBlockchainStats() {
     try {
-      const query = `
+      let query = `
         SELECT 
           COUNT(*) as total_transactions,
           COUNT(DISTINCT transaction_data->>'productId') as unique_products,
@@ -469,7 +469,7 @@ class BlockchainVerificationService {
         FROM product_custody_transactions
       `;
 
-      const result = await db.query(query);
+      let result = await db.query(query);
       
       return {
         success: true,
@@ -498,8 +498,8 @@ class BlockchainVerificationService {
    */
   async getProductTraceabilityReport(productId) {
     try {
-      const history = await this.getProductTransactionHistory(productId);
-      const custodyChain = this.extractCustodyChain(history);
+      let history = await this.getProductTransactionHistory(productId);
+      let custodyChain = this.extractCustodyChain(history);
       
       const report = {
         productId,
@@ -577,7 +577,7 @@ class BlockchainVerificationService {
     const transactionsToProcess = [...this.pendingTransactions];
     this.pendingTransactions = [];
 
-    const block = await this.mineBlock(transactionsToProcess);
+    let block = await this.mineBlock(transactionsToProcess);
 
     for (const transaction of transactionsToProcess) {
       await this.storeTransaction(transaction, block);

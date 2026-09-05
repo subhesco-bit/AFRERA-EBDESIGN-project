@@ -28,13 +28,15 @@ const {
   predictMortalityRisk,
 } = require('../services/legacy/poultryService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
+const { protectLivestockRouter } = require('./livestockRouteSupport');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
+protectLivestockRouter(router);
 
 /**
  * GET /api/v1/poultry/flocks
@@ -72,8 +74,8 @@ router.post('/flocks', async (req, res, next) => {
 router.get('/flocks/:id', async (req, res, next) => {
   try {
     // For now, we'll use listFlocks and filter, or add a getFlockById function later
-    const result = await listFlocks({});
-    const flock = result.items.find((f) => f.id === req.params.id);
+    let result = await listFlocks({});
+    let flock = result.items.find((f) => f.id === req.params.id);
     if (!flock) {
       return res.status(404).json({ success: false, error: 'Flock not found' });
     }
@@ -90,7 +92,7 @@ router.get('/flocks/:id', async (req, res, next) => {
  */
 router.put('/flocks/:id', async (req, res, next) => {
   try {
-    const flock = await updateFlock(req.params.id, req.body);
+    let flock = await updateFlock(req.params.id, req.body);
     if (!flock) {
       return res.status(404).json({ success: false, error: 'Flock not found' });
     }
@@ -125,7 +127,7 @@ router.delete('/flocks/:id', async (req, res, next) => {
 router.get('/flocks/:flockId/egg-production', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listEggProduction(req.params.flockId, { page, limit });
+    let result = await listEggProduction(req.params.flockId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('poultryRoutes:listEggProduction', { error: error.message });
@@ -154,7 +156,7 @@ router.post('/flocks/:flockId/egg-production', async (req, res, next) => {
 router.get('/flocks/:flockId/feed-consumption', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listFeedConsumption(req.params.flockId, { page, limit });
+    let result = await listFeedConsumption(req.params.flockId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('poultryRoutes:listFeedConsumption', { error: error.message });
@@ -168,7 +170,7 @@ router.get('/flocks/:flockId/feed-consumption', async (req, res, next) => {
  */
 router.post('/flocks/:flockId/feed-consumption', async (req, res, next) => {
   try {
-    const record = await recordFeedConsumption({ ...req.body, flock_id: req.params.flockId });
+    let record = await recordFeedConsumption({ ...req.body, flock_id: req.params.flockId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('poultryRoutes:recordFeedConsumption', { error: error.message });
@@ -183,7 +185,7 @@ router.post('/flocks/:flockId/feed-consumption', async (req, res, next) => {
 router.get('/flocks/:flockId/mortality', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listMortality(req.params.flockId, { page, limit });
+    let result = await listMortality(req.params.flockId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('poultryRoutes:listMortality', { error: error.message });
@@ -197,7 +199,7 @@ router.get('/flocks/:flockId/mortality', async (req, res, next) => {
  */
 router.post('/flocks/:flockId/mortality', async (req, res, next) => {
   try {
-    const record = await recordMortality({ ...req.body, flock_id: req.params.flockId });
+    let record = await recordMortality({ ...req.body, flock_id: req.params.flockId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('poultryRoutes:recordMortality', { error: error.message });
@@ -212,7 +214,7 @@ router.post('/flocks/:flockId/mortality', async (req, res, next) => {
 router.get('/flocks/:flockId/vaccinations', async (req, res, next) => {
   try {
     const { page, limit } = req.query;
-    const result = await listVaccinationRecords(req.params.flockId, { page, limit });
+    let result = await listVaccinationRecords(req.params.flockId, { page, limit });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('poultryRoutes:listVaccinationRecords', { error: error.message });
@@ -226,7 +228,7 @@ router.get('/flocks/:flockId/vaccinations', async (req, res, next) => {
  */
 router.post('/flocks/:flockId/vaccinations', async (req, res, next) => {
   try {
-    const record = await recordVaccination({ ...req.body, flock_id: req.params.flockId });
+    let record = await recordVaccination({ ...req.body, flock_id: req.params.flockId });
     res.json({ success: true, data: record });
   } catch (error) {
     logger.error('poultryRoutes:recordVaccination', { error: error.message });
@@ -272,7 +274,7 @@ router.get('/vaccination-alerts', async (req, res, next) => {
  */
 router.post('/ai/optimize-production/:flockId', async (req, res, next) => {
   try {
-    const result = await optimizeEggProduction(req.params.flockId);
+    let result = await optimizeEggProduction(req.params.flockId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('poultryRoutes:optimizeEggProduction', { error: error.message });
@@ -286,7 +288,7 @@ router.post('/ai/optimize-production/:flockId', async (req, res, next) => {
  */
 router.post('/ai/monitor-health/:flockId', async (req, res, next) => {
   try {
-    const result = await monitorFlockHealth(req.params.flockId);
+    let result = await monitorFlockHealth(req.params.flockId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('poultryRoutes:monitorFlockHealth', { error: error.message });
@@ -301,7 +303,7 @@ router.post('/ai/monitor-health/:flockId', async (req, res, next) => {
 router.post('/ai/optimize-feed/:flockId', async (req, res, next) => {
   try {
     const { productionGoal } = req.body;
-    const result = await optimizePoultryFeed(req.params.flockId, productionGoal);
+    let result = await optimizePoultryFeed(req.params.flockId, productionGoal);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('poultryRoutes:optimizePoultryFeed', { error: error.message });
@@ -315,7 +317,7 @@ router.post('/ai/optimize-feed/:flockId', async (req, res, next) => {
  */
 router.post('/ai/predict-mortality/:flockId', async (req, res, next) => {
   try {
-    const result = await predictMortalityRisk(req.params.flockId);
+    let result = await predictMortalityRisk(req.params.flockId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     logger.error('poultryRoutes:predictMortalityRisk', { error: error.message });

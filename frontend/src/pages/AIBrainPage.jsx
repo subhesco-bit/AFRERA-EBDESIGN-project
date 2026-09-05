@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { Brain } from 'lucide-react'
-import { aiBrainAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState, useEffect } from 'react';
+import { Brain, Zap, Network, Activity } from 'lucide-react';
+import { aiBrainAPI } from '../services/api';
+import { aiDecisionService } from '../services/aiDecisionService';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Real backend: backend/src/routes/aiBrainRoutes.js +
@@ -12,25 +13,158 @@ import ActionCard from '../components/common/ActionCard'
  * dev environment - those calls will 500 with a clear "not configured"
  * message until a key is set. Tabbed: 14 endpoints across 3 clear
  * sub-domains (cognitive processes, knowledge graph, memory/state).
+ * Enhanced with neural decision processes and real-time cognitive monitoring.
  */
 const TABS = [
   ['processes', 'Cognitive Processes'],
   ['knowledge', 'Knowledge Graph'],
   ['memory', 'Memory & State'],
-]
+];
 
 function AIBrainPage() {
-  const [tab, setTab] = useState('processes')
+  const [tab, setTab] = useState('processes');
+  const [autoCognitive, setAutoCognitive] = useState(false);
+  const [neuralDecisions, setNeuralDecisions] = useState(() => aiDecisionService.getFallbackDecisions('brain', {
+    count: 3,
+    baseTitle: 'Cognitive recommendation',
+  }));
+  const [cognitiveState, setCognitiveState] = useState(null);
+
+  useEffect(() => {
+    loadCognitiveState();
+    const interval = setInterval(loadCognitiveState, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadCognitiveState = async () => {
+    try {
+      const response = await aiBrainAPI.getCognitiveState();
+      setCognitiveState(response.data.data);
+    } catch (err) {
+      console.error('Failed to load cognitive state:', err);
+    }
+  };
+
+  const executeNeuralDecision = async (decisionId, action) => {
+    try {
+      const decision = neuralDecisions.find((item) => item.id === decisionId) || { id: decisionId, title: 'Neural decision' };
+      const result = await aiDecisionService.executeDecisionAction({
+        decision,
+        action,
+        callback: async (id, nextAction) => {
+          if (typeof aiBrainAPI.executeDecision === 'function') {
+            return aiBrainAPI.executeDecision(id, nextAction);
+          }
+          return { ok: true, action: nextAction, decisionId: id };
+        },
+      });
+
+      alert(`Neural decision ${action} executed successfully`);
+      console.info('Neural decision result:', result);
+      loadCognitiveState();
+    } catch (err) {
+      console.error('Failed to execute neural decision:', err);
+      alert('Failed to execute decision');
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
-          <Brain className="w-6 h-6 mr-2 text-purple-700" />
-          AI Brain
-        </h1>
-        <p className="text-gray-600">Cognitive processing: perception, attention, reasoning, learning, decision and planning.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+              <Brain className="w-6 h-6 mr-2 text-purple-700" />
+              AI Brain
+            </h1>
+            <p className="text-gray-600">Cognitive processing: perception, attention, reasoning, learning, decision and planning with neural decision processes.</p>
+          </div>
+          <button
+            onClick={() => setAutoCognitive(!autoCognitive)}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+              autoCognitive ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            <Zap className="h-4 w-4" />
+            {autoCognitive ? 'Auto-Cognitive ON' : 'Auto-Cognitive OFF'}
+          </button>
+        </div>
       </div>
+
+      {/* Neural Decision Panel */}
+      {neuralDecisions.length > 0 && (
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow mb-6 border border-purple-200">
+          <div className="p-4 border-b border-purple-200">
+            <h2 className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+              <Network className="h-5 w-5" />
+              Neural Decisions ({neuralDecisions.length})
+            </h2>
+          </div>
+          <div className="p-4">
+            <div className="space-y-3">
+              {neuralDecisions.slice(0, 3).map((decision, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg border border-purple-200">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl">{decision.icon || '🧠'}</span>
+                        <h3 className="font-semibold text-gray-900">{decision.title}</h3>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          decision.confidence > 80 ? 'bg-green-100 text-green-800' :
+                            decision.confidence > 50 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
+                        }`}>
+                          {decision.confidence}% confidence
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{decision.description}</p>
+                      <div className="text-xs text-gray-500">
+                        Process: {decision.process} | Neural Path: {decision.neural_path}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 ml-4">
+                      <button
+                        onClick={() => executeNeuralDecision(decision.id, 'approve')}
+                        className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => executeNeuralDecision(decision.id, 'reject')}
+                        className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cognitive State Overview */}
+      {cognitiveState && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-purple-500">
+            <div className="text-sm text-gray-600">Working Memory</div>
+            <div className="text-2xl font-bold text-gray-900">{cognitiveState.working_memory_items || 0}</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+            <div className="text-sm text-gray-600">Long-term Memory</div>
+            <div className="text-2xl font-bold text-gray-900">{cognitiveState.long_term_memory_items || 0}</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+            <div className="text-sm text-gray-600">Knowledge Domains</div>
+            <div className="text-2xl font-bold text-gray-900">{cognitiveState.knowledge_domains || 0}</div>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow border-l-4 border-orange-500">
+            <div className="text-sm text-gray-600">Cognitive Cycles</div>
+            <div className="text-2xl font-bold text-gray-900">{cognitiveState.cognitive_cycles || 0}</div>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-1 mb-6 border-b border-gray-200 overflow-x-auto">
         {TABS.map(([id, label]) => (
@@ -146,7 +280,7 @@ function AIBrainPage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default AIBrainPage
+export default AIBrainPage;

@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
+    require('../../utils\/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
     return null;
   }
 }
@@ -180,7 +180,7 @@ class AIBrainService {
    */
   async attentionProcess(perception, goals = []) {
     try {
-      const prompt = `
+      let prompt = `
         You are an attention engine. Given the perception and goals, identify:
         1. Most relevant information
         2. Priority ranking of elements
@@ -194,7 +194,7 @@ class AIBrainService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -223,7 +223,7 @@ class AIBrainService {
    */
   async reasoningProcess(attention, knowledge) {
     try {
-      const prompt = `
+      let prompt = `
         You are a reasoning engine. Given the attention focus and knowledge, perform:
         1. Logical inference
         2. Causal reasoning
@@ -238,7 +238,7 @@ class AIBrainService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -267,7 +267,7 @@ class AIBrainService {
    */
   async learningProcess(experience, outcome) {
     try {
-      const prompt = `
+      let prompt = `
         You are a learning engine. Given the experience and outcome, perform:
         1. Knowledge extraction
         2. Pattern identification
@@ -282,7 +282,7 @@ class AIBrainService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -315,7 +315,7 @@ class AIBrainService {
    */
   async decisionProcess(reasoning, context, constraints = {}) {
     try {
-      const prompt = `
+      let prompt = `
         You are a decision engine. Given the reasoning, context, and constraints, perform:
         1. Option generation
         2. Option evaluation
@@ -331,7 +331,7 @@ class AIBrainService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -360,7 +360,7 @@ class AIBrainService {
    */
   async planningProcess(decision, current_state, target_state) {
     try {
-      const prompt = `
+      let prompt = `
         You are a planning engine. Given the decision, current state, and target state, perform:
         1. Goal decomposition
         2. Action sequence generation
@@ -376,7 +376,7 @@ class AIBrainService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -403,24 +403,24 @@ class AIBrainService {
   async executeCognitiveCycle(input, context = {}, goals = [], constraints = {}) {
     try {
       // Step 1: Perception
-      const perception = await this.perceptionProcess(input, context);
+      let perception = await this.perceptionProcess(input, context);
       if (!perception.success) return perception;
       
       // Step 2: Attention
-      const attention = await this.attentionProcess(perception.perception, goals);
+      let attention = await this.attentionProcess(perception.perception, goals);
       if (!attention.success) return attention;
       
       // Step 3: Reasoning
       const relevantKnowledge = this.getRelevantKnowledge(attention.attention);
-      const reasoning = await this.reasoningProcess(attention.attention, relevantKnowledge);
+      let reasoning = await this.reasoningProcess(attention.attention, relevantKnowledge);
       if (!reasoning.success) return reasoning;
       
       // Step 4: Decision
-      const decision = await this.decisionProcess(reasoning.reasoning, context, constraints);
+      let decision = await this.decisionProcess(reasoning.reasoning, context, constraints);
       if (!decision.success) return decision;
       
       // Step 5: Planning
-      const planning = await this.planningProcess(
+      let planning = await this.planningProcess(
         decision.decision,
         context.current_state || {},
         context.target_state || {}
@@ -503,3 +503,6 @@ class AIBrainService {
 const aiBrainService = new AIBrainService();
 
 module.exports = aiBrainService;
+
+
+

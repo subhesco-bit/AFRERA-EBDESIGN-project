@@ -41,7 +41,7 @@ router.post('/employees', async (req, res) => {
  */
 router.get('/employees/:employeeId/attrition-risk', async (req, res) => {
   try {
-    const result = await hrService.predictEmployeeAttrition(req.params.employeeId);
+    let result = await hrService.predictEmployeeAttrition(req.params.employeeId);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -55,7 +55,7 @@ router.get('/employees/:employeeId/attrition-risk', async (req, res) => {
 router.get('/employees/:employeeId/sentiment', async (req, res) => {
   try {
     const timeframe = req.query.timeframe || '30 days';
-    const result = await hrService.analyzeEmployeeSentiment(req.params.employeeId, timeframe);
+    let result = await hrService.analyzeEmployeeSentiment(req.params.employeeId, timeframe);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -68,7 +68,7 @@ router.get('/employees/:employeeId/sentiment', async (req, res) => {
  */
 router.get('/employees/:employeeId/training-recommendations', async (req, res) => {
   try {
-    const result = await hrService.recommendTraining(req.params.employeeId);
+    let result = await hrService.recommendTraining(req.params.employeeId);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -86,7 +86,7 @@ router.get('/employees/:employeeId/training-recommendations', async (req, res) =
 router.post('/shifts/optimize', async (req, res) => {
   try {
     const { departmentId, startDate, endDate } = req.body;
-    const result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
+    let result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -103,7 +103,7 @@ router.post('/shifts/optimize', async (req, res) => {
  */
 router.post('/timesheets/analyze-anomalies', async (req, res) => {
   try {
-    const result = await hrService.detectTimesheetAnomalies(req.body);
+    let result = await hrService.detectTimesheetAnomalies(req.body);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

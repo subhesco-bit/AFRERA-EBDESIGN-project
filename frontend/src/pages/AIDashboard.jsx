@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ecommerceAIAPI } from '../services/api';
-import { 
-  Users, 
-  TrendingUp, 
-  Package, 
-  DollarSign, 
-  BarChart3, 
+import {
+  Users,
+  TrendingUp,
+  Package,
+  DollarSign,
+  BarChart3,
   Brain,
   Activity,
   Target,
   PieChart,
-  LineChart
+  LineChart,
+  Lightbulb,
+  Zap,
+  AlertTriangle,
 } from 'lucide-react';
 
 /**
  * AFRERA AI Dashboard
- * 
- * Comprehensive AI-powered marketplace dashboard:
+ *
+ * Comprehensive AI-powered marketplace dashboard with real-time decision-making:
  * - Customer Segmentation (RFM, behavioral)
  * - Demand Forecasting
  * - Inventory Optimization
@@ -25,12 +28,18 @@ import {
  * - Sales Prediction
  * - Customer Lifetime Value
  * - Market Basket Analysis
+ * - AI Decision Support (NEW)
+ * - Real-time Alerts (NEW)
+ * - Process Optimization (NEW)
  */
 
 const AIDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedProduct, setSelectedProduct] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
+  const [aiAlerts, setAiAlerts] = useState([]);
+  const [aiDecisions, setAiDecisions] = useState([]);
+  const [autoOptimize, setAutoOptimize] = useState(false);
 
   // 2026-08-31: every useQuery below was missing the .then(r => r.data) unwrap
   // (ecommerceAIAPI.* returns the raw axios response, not the payload, so
@@ -43,59 +52,90 @@ const AIDashboard = () => {
   // Customer Segmentation Data
   const { data: rfmSegments, isLoading: rfmLoading, refetch: refetchRfmSegments } = useQuery({
     queryKey: ['rfmSegments'],
-    queryFn: () => ecommerceAIAPI.segmentCustomersRFM().then(r => r.data)
+    queryFn: () => ecommerceAIAPI.segmentCustomersRFM().then(r => r.data),
   });
 
   const { data: behavioralSegments, isLoading: behavioralLoading, refetch: refetchBehavioralSegments } = useQuery({
     queryKey: ['behavioralSegments'],
-    queryFn: () => ecommerceAIAPI.segmentCustomersBehavioral().then(r => r.data)
+    queryFn: () => ecommerceAIAPI.segmentCustomersBehavioral().then(r => r.data),
   });
 
   // Demand Forecasting Data
   const { data: demandForecast, isLoading: demandLoading, refetch: refetchDemandForecast } = useQuery({
     queryKey: ['demandForecast', selectedProduct],
     queryFn: () => selectedProduct ? ecommerceAIAPI.forecastProductDemand(selectedProduct, 30).then(r => r.data) : null,
-    enabled: !!selectedProduct
+    enabled: Boolean(selectedProduct),
   });
 
   // Inventory Optimization Data
   const { data: inventoryOptimization, isLoading: inventoryLoading, refetch: refetchInventoryOptimization } = useQuery({
     queryKey: ['inventoryOptimization', selectedProduct],
     queryFn: () => selectedProduct ? ecommerceAIAPI.optimizeInventory(selectedProduct).then(r => r.data) : null,
-    enabled: !!selectedProduct
+    enabled: Boolean(selectedProduct),
   });
 
   // Personalized Recommendations Data
   const { data: recommendations, isLoading: recommendationsLoading, refetch: refetchRecommendations } = useQuery({
     queryKey: ['recommendations', selectedUser],
     queryFn: () => selectedUser ? ecommerceAIAPI.getPersonalizedRecommendations(selectedUser, 10).then(r => r.data) : null,
-    enabled: !!selectedUser
+    enabled: Boolean(selectedUser),
   });
 
   // Sales Prediction Data
   const { data: salesPrediction, isLoading: salesLoading, refetch: refetchSalesPrediction } = useQuery({
     queryKey: ['salesPrediction'],
-    queryFn: () => ecommerceAIAPI.predictSales(null, 30).then(r => r.data)
+    queryFn: () => ecommerceAIAPI.predictSales(null, 30).then(r => r.data),
   });
 
   // Customer Lifetime Value Data
   const { data: clvData, isLoading: clvLoading, refetch: refetchClvData } = useQuery({
     queryKey: ['clv', selectedUser],
     queryFn: () => selectedUser ? ecommerceAIAPI.calculateCustomerLifetimeValue(selectedUser).then(r => r.data) : null,
-    enabled: !!selectedUser
+    enabled: Boolean(selectedUser),
   });
 
   // Market Basket Analysis Data
   const { data: marketBasket, isLoading: basketLoading, refetch: refetchMarketBasket } = useQuery({
     queryKey: ['marketBasket'],
-    queryFn: () => ecommerceAIAPI.analyzeMarketBasket().then(r => r.data)
+    queryFn: () => ecommerceAIAPI.analyzeMarketBasket().then(r => r.data),
   });
+
+  // Load AI alerts and decisions
+  useEffect(() => {
+    loadAIInsights();
+    const interval = setInterval(loadAIInsights, 60000); // Refresh every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadAIInsights = async () => {
+    try {
+      const [alertsRes, decisionsRes] = await Promise.all([
+        ecommerceAIAPI.getAIAlerts(),
+        ecommerceAIAPI.getAIDecisions(),
+      ]);
+      setAiAlerts(alertsRes.data.data || []);
+      setAiDecisions(decisionsRes.data.data || []);
+    } catch (err) {
+      console.error('Failed to load AI insights:', err);
+    }
+  };
 
   const handleRunSegmentation = (type) => {
     if (type === 'rfm') {
       refetchRfmSegments();
     } else if (type === 'behavioral') {
       refetchBehavioralSegments();
+    }
+  };
+
+  const executeAIDecision = async (decisionId, action) => {
+    try {
+      await ecommerceAIAPI.executeAIDecision(decisionId, action);
+      alert(`Decision ${action} executed successfully`);
+      loadAIInsights();
+    } catch (err) {
+      console.error('Failed to execute decision:', err);
+      alert('Failed to execute decision');
     }
   };
 
@@ -113,7 +153,7 @@ const AIDashboard = () => {
             <Users className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between">
             <div>
@@ -125,7 +165,7 @@ const AIDashboard = () => {
             <TrendingUp className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
           <div className="flex items-center justify-between">
             <div>
@@ -137,7 +177,7 @@ const AIDashboard = () => {
             <Activity className="h-8 w-8 text-purple-500" />
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
           <div className="flex items-center justify-between">
             <div>
@@ -171,7 +211,7 @@ const AIDashboard = () => {
               Run Behavioral Segmentation
             </button>
           </div>
-          
+
           {rfmSegments?.segments && (
             <div className="mt-4">
               <h4 className="font-medium mb-2">RFM Segments</h4>
@@ -235,7 +275,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Customer Segmentation Analysis</h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 className="font-medium mb-3">RFM Segmentation</h4>
@@ -264,7 +304,7 @@ const AIDashboard = () => {
               </button>
             )}
           </div>
-          
+
           <div>
             <h4 className="font-medium mb-3">Behavioral Segmentation</h4>
             {behavioralLoading ? (
@@ -301,7 +341,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Demand Forecasting</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Product
@@ -314,7 +354,7 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedProduct && (
           <div>
             {demandLoading ? (
@@ -344,7 +384,7 @@ const AIDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-green-50 rounded">
                   <h4 className="font-medium mb-2">7-Day Forecast</h4>
                   <div className="space-y-2">
@@ -375,7 +415,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Inventory Optimization</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Product
@@ -388,7 +428,7 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedProduct && (
           <div>
             {inventoryLoading ? (
@@ -419,7 +459,7 @@ const AIDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {inventoryOptimization.optimization.order_recommendation === 'ORDER NOW' && (
                   <div className="p-4 bg-orange-50 rounded border-2 border-orange-500">
                     <h4 className="font-medium mb-2 text-orange-800">⚠️ Action Required</h4>
@@ -450,7 +490,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Personalized Recommendations</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select User ID
@@ -463,48 +503,48 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedUser && (
           <div>
             {recommendationsLoading ? (
               <p className="text-gray-500">Loading recommendations...</p>
             ) : recommendations ? (
-            <div className="space-y-4">
-              <div className="p-4 bg-purple-50 rounded">
-                <h4 className="font-medium mb-2">User Segment: {recommendations.user_segment}</h4>
-                <p className="text-sm text-gray-600">
-                  {recommendations.recommendations.length} personalized recommendations
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendations.recommendations.map((product, index) => (
-                  <div key={index} className="p-4 border rounded hover:shadow-md transition">
-                    <div className="flex justify-between items-start mb-2">
-                      <h5 className="font-medium">{product.product_name}</h5>
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        {product.recommendation_score.toFixed(2)}
-                      </span>
+              <div className="space-y-4">
+                <div className="p-4 bg-purple-50 rounded">
+                  <h4 className="font-medium mb-2">User Segment: {recommendations.user_segment}</h4>
+                  <p className="text-sm text-gray-600">
+                    {recommendations.recommendations.length} personalized recommendations
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recommendations.recommendations.map((product, index) => (
+                    <div key={index} className="p-4 border rounded hover:shadow-md transition">
+                      <div className="flex justify-between items-start mb-2">
+                        <h5 className="font-medium">{product.product_name}</h5>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {product.recommendation_score.toFixed(2)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{product.recommendation_reason}</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Price: ₹{product.base_price}</span>
+                        <span className="text-gray-500">Nutrition: {product.nutrition_grade}</span>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{product.recommendation_reason}</p>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Price: ₹{product.base_price}</span>
-                      <span className="text-gray-500">Nutrition: {product.nutrition_grade}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => refetchRecommendations()}
-              className="w-full bg-purple-500 text-white py-2 px-4 rounded"
-            >
+            ) : (
+              <button
+                onClick={() => refetchRecommendations()}
+                className="w-full bg-purple-500 text-white py-2 px-4 rounded"
+              >
               Get Recommendations
-            </button>
-          )}
-        </div>
-      )}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -513,7 +553,7 @@ const AIDashboard = () => {
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Customer Lifetime Value</h3>
-        
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select User ID
@@ -526,7 +566,7 @@ const AIDashboard = () => {
             className="w-full p-2 border rounded"
           />
         </div>
-        
+
         {selectedUser && (
           <div>
             {clvLoading ? (
@@ -593,7 +633,7 @@ const AIDashboard = () => {
           <PieChart className="h-5 w-5" />
           Market Basket Analysis
         </h3>
-        
+
         {basketLoading ? (
           <p className="text-gray-500">Loading market basket data...</p>
         ) : marketBasket?.recommendations ? (
@@ -601,7 +641,7 @@ const AIDashboard = () => {
             <p className="text-sm text-gray-600">
               {marketBasket.recommendations.length} cross-sell opportunities found
             </p>
-            
+
             <div className="space-y-3">
               {marketBasket.recommendations.map((pair, index) => (
                 <div key={index} className="p-4 border rounded hover:shadow-md transition">
@@ -643,56 +683,154 @@ const AIDashboard = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Brain className="h-8 w-8 text-purple-600" />
-            AI Dashboard
-          </h1>
-          <p className="text-gray-600 mt-2">
-            AI-powered marketplace intelligence and optimization
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                <Brain className="h-8 w-8 text-purple-600" />
+                AI Dashboard
+              </h1>
+              <p className="text-gray-600 mt-2">
+                AI-powered marketplace intelligence and optimization with real-time decision support
+              </p>
+            </div>
+            <button
+              onClick={() => setAutoOptimize(!autoOptimize)}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+                autoOptimize ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              <Zap className="h-4 w-4" />
+              {autoOptimize ? 'Auto-Optimize ON' : 'Auto-Optimize OFF'}
+            </button>
+          </div>
         </div>
 
+        {/* AI Alerts Banner */}
+        {aiAlerts.length > 0 && (
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg shadow mb-6 border border-orange-200">
+            <div className="p-4 border-b border-orange-200">
+              <h2 className="text-lg font-semibold text-orange-800 flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                AI Alerts ({aiAlerts.length})
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="space-y-2">
+                {aiAlerts.slice(0, 3).map((alert, index) => (
+                  <div key={index} className="bg-white p-3 rounded-lg border border-orange-200 flex items-start gap-3">
+                    <span className="text-2xl">{alert.icon || '⚠️'}</span>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{alert.title}</div>
+                      <div className="text-sm text-gray-600">{alert.message}</div>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      alert.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                        alert.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-blue-100 text-blue-800'
+                    }`}>
+                      {alert.severity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* AI Decisions Panel */}
+        {aiDecisions.length > 0 && (
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg shadow mb-6 border border-purple-200">
+            <div className="p-4 border-b border-purple-200">
+              <h2 className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                AI Decisions ({aiDecisions.length})
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="space-y-3">
+                {aiDecisions.slice(0, 3).map((decision, index) => (
+                  <div key={index} className="bg-white p-4 rounded-lg border border-purple-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{decision.icon || '🎯'}</span>
+                          <h3 className="font-semibold text-gray-900">{decision.title}</h3>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            decision.priority === 'high' ? 'bg-red-100 text-red-800' :
+                              decision.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-green-100 text-green-800'
+                          }`}>
+                            {decision.priority}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{decision.description}</p>
+                        <div className="text-xs text-gray-500">
+                          Confidence: {decision.confidence}% | Impact: {decision.impact}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <button
+                          onClick={() => executeAIDecision(decision.id, 'approve')}
+                          className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => executeAIDecision(decision.id, 'reject')}
+                          className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow mb-6">
-          <div className="flex space-x-4 border-b">
+          <div className="flex space-x-4 border-b overflow-x-auto">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-3 font-medium ${activeTab === 'overview' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'overview' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('segmentation')}
-              className={`px-4 py-3 font-medium ${activeTab === 'segmentation' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'segmentation' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Segmentation
             </button>
             <button
               onClick={() => setActiveTab('forecasting')}
-              className={`px-4 py-3 font-medium ${activeTab === 'forecasting' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'forecasting' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Forecasting
             </button>
             <button
               onClick={() => setActiveTab('inventory')}
-              className={`px-4 py-3 font-medium ${activeTab === 'inventory' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'inventory' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Inventory
             </button>
             <button
               onClick={() => setActiveTab('recommendations')}
-              className={`px-4 py-3 font-medium ${activeTab === 'recommendations' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'recommendations' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Recommendations
             </button>
             <button
               onClick={() => setActiveTab('clv')}
-              className={`px-4 py-3 font-medium ${activeTab === 'clv' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'clv' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Customer Lifetime Value
             </button>
             <button
               onClick={() => setActiveTab('marketbasket')}
-              className={`px-4 py-3 font-medium ${activeTab === 'marketbasket' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
+              className={`px-4 py-3 font-medium whitespace-nowrap ${activeTab === 'marketbasket' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
             >
               Market Basket
             </button>

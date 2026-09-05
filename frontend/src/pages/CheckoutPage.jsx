@@ -1,21 +1,22 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ordersAPI } from '../services/api'
-import { MapPin, CreditCard, Truck, ShieldCheck, CheckCircle2 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ordersAPI } from '../services/api';
+import { MapPin, CreditCard, Truck, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import JourneyStepper from '../components/common/JourneyStepper';
 
 function CheckoutPage() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const [step, setStep] = useState(1)
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [step, setStep] = useState(1);
   const [shippingAddress, setShippingAddress] = useState({
     address_line1: '',
     city: '',
     state: '',
     pincode: '',
-  })
-  const [paymentMethod, setPaymentMethod] = useState('cod')
+  });
+  const [paymentMethod, setPaymentMethod] = useState('cod');
 
   // NOTE: this page was calling useQuery/useMutation with the removed v3/v4
   // tuple signature (`useQuery('cart', fn)`) against an installed v5
@@ -25,32 +26,32 @@ function CheckoutPage() {
   const { data: cartData, isLoading: cartLoading, error: cartError } = useQuery({
     queryKey: ['cart'],
     queryFn: () => ordersAPI.getCart().then((r) => r.data),
-  })
+  });
 
   const createOrderMutation = useMutation({
     mutationFn: ordersAPI.createOrder,
     onSuccess: (res) => {
-      toast.success('Order created successfully')
-      queryClient.invalidateQueries({ queryKey: ['cart'] })
-      navigate(`/orders/${res.data.id}`)
+      toast.success('Order created successfully');
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      navigate(`/orders/${res.data.id}`);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.error || 'Failed to create order')
+      toast.error(error.response?.data?.error || 'Failed to create order');
     },
-  })
+  });
 
   const handleAddressSubmit = (e) => {
-    e.preventDefault()
-    setStep(2)
-  }
+    e.preventDefault();
+    setStep(2);
+  };
 
   const handlePaymentSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     createOrderMutation.mutate({
       shipping_address: shippingAddress,
       payment_method: paymentMethod,
-    })
-  }
+    });
+  };
 
   if (cartLoading) {
     return (
@@ -66,7 +67,7 @@ function CheckoutPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (cartError) {
@@ -78,10 +79,10 @@ function CheckoutPage() {
           Back to Cart
         </button>
       </div>
-    )
+    );
   }
 
-  const { items, total_amount } = cartData || { items: [], total_amount: 0 }
+  const { items, total_amount } = cartData || { items: [], total_amount: 0 };
 
   if (items.length === 0) {
     return (
@@ -92,12 +93,17 @@ function CheckoutPage() {
           Browse Marketplace
         </button>
       </div>
-    )
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-v42-ink mb-8">Checkout</h1>
+      <JourneyStepper
+        steps={['Delivery', 'Payment']}
+        currentStep={step}
+        className="mb-8 max-w-xl"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Checkout Steps */}
@@ -278,7 +284,7 @@ function CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default CheckoutPage
+export default CheckoutPage;

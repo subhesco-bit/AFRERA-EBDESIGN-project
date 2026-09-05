@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { BookOpen } from 'lucide-react'
-import { wikipediaAPI, foluBenchmarkAPI } from '../services/api'
-import ActionCard from '../components/common/ActionCard'
+import { useState } from 'react';
+import { BookOpen } from 'lucide-react';
+import { wikipediaAPI, foluBenchmarkAPI } from '../services/api';
+import ActionCard from '../components/common/ActionCard';
 
 /**
  * Combines two small, topically-adjacent reference/benchmark route files
@@ -13,7 +13,7 @@ import ActionCard from '../components/common/ActionCard'
  * Both are read-oriented reference lookups - ActionCard pattern with tabs.
  */
 function KnowledgeReferencePage() {
-  const [tab, setTab] = useState('wikipedia')
+  const [tab, setTab] = useState('wikipedia');
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -72,7 +72,7 @@ function KnowledgeReferencePage() {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default KnowledgeReferencePage
+export default KnowledgeReferencePage;

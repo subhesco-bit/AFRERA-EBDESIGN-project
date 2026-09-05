@@ -28,8 +28,8 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
 const PDFDocument = require('pdfkit');
 
 class DprGenerationService {
@@ -51,12 +51,12 @@ class DprGenerationService {
   }
 
   async _getFpo(fpoId) {
-    const result = await this.pool.query('SELECT * FROM fpos WHERE id = $1', [fpoId]);
+    let result = await this.pool.query('SELECT * FROM fpos WHERE id = $1', [fpoId]);
     return result.rows[0] || null;
   }
 
   async _getLandRecords(farmerId) {
-    const result = await this.pool.query(
+    let result = await this.pool.query(
       `SELECT id, survey_number, village, district, state, area_in_hectares, area_in_acres,
               soil_type, irrigation_type, ownership_type, land_use_type, verification_status
        FROM land_records WHERE farmer_id = $1 ORDER BY created_at DESC`,
@@ -68,13 +68,13 @@ class DprGenerationService {
   /** Most recent crop plan for the farmer, or a specific one if cropPlanId is given. */
   async _getCropPlan(farmerId, cropPlanId) {
     if (cropPlanId) {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT * FROM crop_plans WHERE id = $1 AND farmer_id = $2`,
         [cropPlanId, farmerId]
       );
       return result.rows[0] || null;
     }
-    const result = await this.pool.query(
+    let result = await this.pool.query(
       `SELECT * FROM crop_plans WHERE farmer_id = $1 ORDER BY planting_date DESC, created_at DESC LIMIT 1`,
       [farmerId]
     );
@@ -118,7 +118,7 @@ class DprGenerationService {
    */
   async _getHistoricalRevenueByCrop(farmerId, cropType, district, state) {
     if (!cropType) return [];
-    const result = await this.pool.query(
+    let result = await this.pool.query(
       `SELECT id, season, planting_date, expected_harvest_date, estimated_yield, actual_yield, status
          FROM crop_plans
         WHERE farmer_id = $1 AND crop_type = $2
@@ -188,7 +188,7 @@ class DprGenerationService {
     if (cropPlan) {
       const district = landRecords[0]?.district || farmer?.district || null;
       const state = landRecords[0]?.state || farmer?.state || null;
-      const mandiPrice = await this._getLatestMandiPrice(cropPlan.crop_type, district, state);
+      let mandiPrice = await this._getLatestMandiPrice(cropPlan.crop_type, district, state);
       const estimatedYield = cropPlan.estimated_yield !== null && cropPlan.estimated_yield !== undefined
         ? Number(cropPlan.estimated_yield) : null;
 
@@ -225,8 +225,8 @@ class DprGenerationService {
         'rather than inventing a cost figure.',
     };
 
-    const district = landRecords[0]?.district || farmer?.district || null;
-    const state = landRecords[0]?.state || farmer?.state || null;
+    let district = landRecords[0]?.district || farmer?.district || null;
+    let state = landRecords[0]?.state || farmer?.state || null;
 
     const historicalRevenue = cropPlan
       ? await this._getHistoricalRevenueByCrop(farmerId, cropPlan.crop_type, district, state)
@@ -291,7 +291,7 @@ class DprGenerationService {
     const document = await this.assemble({ farmerId, fpoId, cropPlanId, purpose, financingAskInr });
 
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO dpr_documents (farmer_id, fpo_id, crop_plan_id, purpose, financing_ask_inr, document_json, generated_by)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING *`,
@@ -313,19 +313,26 @@ class DprGenerationService {
     }
   }
 
-  async getById(dprId) {
-    const result = await this.pool.query('SELECT * FROM dpr_documents WHERE id = $1', [dprId]);
+  async getById(dprId, access = {}) {
+    let params = [dprId];
+    let accessClause = '';
+    if (!access.isAdmin) {
+      params.push(access.userId);
+      accessClause = ` AND (generated_by = $${params.length} OR farmer_id IN (SELECT id FROM farmers WHERE user_id = $${params.length}))`;
+    }
+    let result = await this.pool.query(`SELECT * FROM dpr_documents WHERE id = $1${accessClause}`, params);
     if (result.rows.length === 0) throw new Error('DPR not found');
     return result.rows[0];
   }
 
-  async list(filters = {}) {
+  async list(filters = {}, access = {}) {
     let query = 'SELECT id, farmer_id, fpo_id, crop_plan_id, purpose, financing_ask_inr, created_at FROM dpr_documents WHERE 1=1';
-    const params = [];
+    let params = [];
     if (filters.farmerId) { params.push(filters.farmerId); query += ` AND farmer_id = $${params.length}`; }
     if (filters.fpoId) { params.push(filters.fpoId); query += ` AND fpo_id = $${params.length}`; }
+    if (!access.isAdmin) { params.push(access.userId); query += ` AND (generated_by = $${params.length} OR farmer_id IN (SELECT id FROM farmers WHERE user_id = $${params.length}))`; }
     query += ' ORDER BY created_at DESC';
-    const result = await this.pool.query(query, params);
+    let result = await this.pool.query(query, params);
     return result.rows;
   }
 
@@ -333,8 +340,8 @@ class DprGenerationService {
    * Stream a formatted PDF of a stored DPR directly to an HTTP response.
    * pdfkit is already a backend dependency (package.json) — no new library added.
    */
-  async streamPdf(dprId, res) {
-    const row = await this.getById(dprId);
+  async streamPdf(dprId, res, access = {}) {
+    const row = await this.getById(dprId, access);
     const doc = row.document_json;
 
     await this.pool.query('UPDATE dpr_documents SET pdf_downloaded_at = NOW() WHERE id = $1', [dprId]);
@@ -449,3 +456,6 @@ class DprGenerationService {
 }
 
 module.exports = new DprGenerationService();
+
+
+

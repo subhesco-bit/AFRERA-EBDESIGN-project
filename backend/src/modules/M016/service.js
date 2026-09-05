@@ -4,12 +4,43 @@ const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const TRUST_LEVELS = new Set(['trusted', 'verified', 'unknown', 'revoked']);
+
+function validationError(message) {
+  const error = new Error(message);
+  error.code = 'VALIDATION_ERROR';
+  error.statusCode = 400;
+  return error;
+}
+
+function requireIdentityId(identityId) {
+  if (!/^[1-9][0-9]*$/.test(String(identityId))) throw validationError('identityId must be a positive integer');
+  return Number(identityId);
+}
+
+function requireProvider(provider) {
+  if (typeof provider !== 'string' || provider.trim().length === 0 || provider.length > 100) {
+    throw validationError('provider is required and must be at most 100 characters');
+  }
+  return provider.trim();
+}
+
+function requireObject(value, name) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw validationError(`${name} must be an object`);
+}
+
 // Federated identity management
 async function createFederatedIdentity(identityData) {
+  requireObject(identityData, 'identity payload');
+  const { userId, provider, providerUserId, attributes, trustLevel } = identityData;
+  if (typeof userId !== 'string' || !UUID_RE.test(userId)) throw validationError('userId must be a valid UUID');
+  requireProvider(provider);
+  if (typeof providerUserId !== 'string' || providerUserId.trim().length === 0 || providerUserId.length > 255) throw validationError('providerUserId is required and must be at most 255 characters');
+  if (attributes !== undefined) requireObject(attributes, 'attributes');
+  if (trustLevel !== undefined && !TRUST_LEVELS.has(trustLevel)) throw validationError('trustLevel is invalid');
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  const { userId, provider, providerUserId, attributes, trustLevel } = identityData;
   
   const res = await pg.query(
     `INSERT INTO federated_identities (user_id, provider, provider_user_id, attributes, trust_level, created_at, updated_at)
@@ -39,10 +70,11 @@ async function createFederatedIdentity(identityData) {
 }
 
 async function getFederatedIdentities(userId) {
-  const pg = getPostgreSQL();
+  if (typeof userId !== 'string' || !UUID_RE.test(userId)) throw validationError('userId must be a valid UUID');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM federated_identities WHERE user_id = $1 ORDER BY created_at DESC',
     [userId]
   );
@@ -51,10 +83,11 @@ async function getFederatedIdentities(userId) {
 }
 
 async function getFederatedIdentity(identityId) {
-  const pg = getPostgreSQL();
+  identityId = requireIdentityId(identityId);
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM federated_identities WHERE id = $1',
     [identityId]
   );
@@ -63,12 +96,16 @@ async function getFederatedIdentity(identityId) {
 }
 
 async function updateFederatedIdentity(identityId, updates) {
-  const pg = getPostgreSQL();
+  identityId = requireIdentityId(identityId);
+  requireObject(updates, 'update payload');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { attributes, trustLevel } = updates;
+  if (attributes !== undefined) requireObject(attributes, 'attributes');
+  if (trustLevel !== undefined && !TRUST_LEVELS.has(trustLevel)) throw validationError('trustLevel is invalid');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE federated_identities 
      SET attributes = COALESCE($1, attributes),
          trust_level = COALESCE($2, trust_level),
@@ -82,10 +119,11 @@ async function updateFederatedIdentity(identityId, updates) {
 }
 
 async function revokeFederatedIdentity(identityId) {
-  const pg = getPostgreSQL();
+  identityId = requireIdentityId(identityId);
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'UPDATE federated_identities SET trust_level = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
     ['revoked', identityId]
   );
@@ -106,12 +144,17 @@ async function revokeFederatedIdentity(identityId) {
 
 // Identity attribute mapping
 async function createAttributeMapping(mappingData) {
-  const pg = getPostgreSQL();
+  requireObject(mappingData, 'mapping payload');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { provider, sourceAttribute, targetAttribute, transformation, isRequired } = mappingData;
+  requireProvider(provider);
+  if (typeof sourceAttribute !== 'string' || sourceAttribute.trim().length === 0 || typeof targetAttribute !== 'string' || targetAttribute.trim().length === 0) throw validationError('sourceAttribute and targetAttribute are required');
+  if (transformation !== undefined) requireObject(transformation, 'transformation');
+  if (isRequired !== undefined && typeof isRequired !== 'boolean') throw validationError('isRequired must be boolean');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO identity_attribute_mappings (provider, source_attribute, target_attribute, transformation, is_required, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
      ON CONFLICT (provider, source_attribute) DO UPDATE SET
@@ -127,10 +170,11 @@ async function createAttributeMapping(mappingData) {
 }
 
 async function getAttributeMappings(provider) {
-  const pg = getPostgreSQL();
+  requireProvider(provider);
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM identity_attribute_mappings WHERE provider = $1 ORDER BY source_attribute',
     [provider]
   );
@@ -139,7 +183,9 @@ async function getAttributeMappings(provider) {
 }
 
 async function applyAttributeMapping(provider, sourceAttributes) {
-  const pg = getPostgreSQL();
+  requireProvider(provider);
+  requireObject(sourceAttributes, 'sourceAttributes');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const mappings = await getAttributeMappings(provider);
@@ -189,12 +235,17 @@ function applyTransformation(value, transformation) {
 
 // Federation trust management
 async function createTrustRelationship(trustData) {
-  const pg = getPostgreSQL();
+  requireObject(trustData, 'trust payload');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { provider, trustLevel, trustScore, metadata } = trustData;
+  requireProvider(provider);
+  if (!TRUST_LEVELS.has(trustLevel)) throw validationError('trustLevel is invalid');
+  if (trustScore !== undefined && (!Number.isInteger(trustScore) || trustScore < 0 || trustScore > 100)) throw validationError('trustScore must be an integer between 0 and 100');
+  if (metadata !== undefined) requireObject(metadata, 'metadata');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO federation_trust (provider, trust_level, trust_score, metadata, created_at, updated_at)
      VALUES ($1, $2, $3, $4, NOW(), NOW())
      ON CONFLICT (provider) DO UPDATE SET
@@ -220,18 +271,21 @@ async function createTrustRelationship(trustData) {
 }
 
 async function getTrustRelationships() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM federation_trust ORDER BY trust_score DESC');
+  let res = await pg.query('SELECT * FROM federation_trust ORDER BY trust_score DESC');
   return res.rows;
 }
 
 async function updateTrustScore(provider, delta, reason) {
-  const pg = getPostgreSQL();
+  requireProvider(provider);
+  if (!Number.isInteger(delta) || delta < -100 || delta > 100) throw validationError('delta must be an integer between -100 and 100');
+  if (reason !== undefined && (typeof reason !== 'string' || reason.length > 1000)) throw validationError('reason must be at most 1000 characters');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE federation_trust 
      SET trust_score = GREATEST(0, LEAST(100, trust_score + $1)),
          updated_at = NOW()
@@ -266,10 +320,14 @@ async function updateTrustScore(provider, delta, reason) {
 
 // Centralized identity directory
 async function searchIdentities(searchCriteria) {
-  const pg = getPostgreSQL();
+  requireObject(searchCriteria, 'search criteria');
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { provider, userId, email, name, limit = 20 } = searchCriteria;
+  if (provider !== undefined) requireProvider(provider);
+  if (userId !== undefined && !UUID_RE.test(String(userId))) throw validationError('userId must be a valid UUID');
+  if (!Number.isInteger(Number(limit)) || Number(limit) < 1 || Number(limit) > 100) throw validationError('limit must be between 1 and 100');
   
   let query = `
     SELECT fi.*, u.name, u.email 
@@ -300,13 +358,13 @@ async function searchIdentities(searchCriteria) {
   query += ` ORDER BY fi.created_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 // AI-powered identity pattern analysis
 async function analyzeIdentityPatterns() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Analyze provider distribution
@@ -386,7 +444,7 @@ function generateIdentityRecommendations(providerDistribution, attributeUsage) {
 
 // Federation health monitoring
 async function getFederationHealth() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get overall statistics

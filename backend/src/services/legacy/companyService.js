@@ -6,8 +6,8 @@
  * instead of requiring manual ID entry.
  */
 
-const { getPostgreSQL } = require('../../database/connection');
-const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { logger } = require('../../utils\/logger');
 
 /**
  * List all active companies.
@@ -28,7 +28,7 @@ async function listCompanies() {
  * Get a single company by ID.
  */
 async function getCompanyById(id) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `SELECT * FROM companies WHERE id = $1`,
     [Number(id)]
@@ -41,7 +41,7 @@ async function getCompanyById(id) {
  * Get fiscal years for a company.
  */
 async function getFiscalYears(companyId) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `SELECT id, code, start_date, end_date, status 
        FROM fiscal_years 
@@ -56,7 +56,7 @@ async function getFiscalYears(companyId) {
  * Get chart of accounts for a company (postable accounts only).
  */
 async function getChartOfAccounts(companyId) {
-  const db = getPostgreSQL();
+  let db = getPostgreSQL();
   const { rows } = await db.query(
     `SELECT id, account_code, account_name, account_type, normal_balance, is_postable
        FROM chart_of_accounts 
@@ -73,3 +73,6 @@ module.exports = {
   getFiscalYears,
   getChartOfAccounts,
 };
+
+
+

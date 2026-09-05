@@ -130,7 +130,7 @@ async function createDispatchSchedule(dispatchData) {
     };
 
     // AI-powered dispatch optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'dispatch_optimization',
       parameters: {
         dispatch_data: dispatchData,
@@ -141,10 +141,10 @@ async function createDispatchSchedule(dispatchData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     dispatch.ai_optimization = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO fleet_dispatches 
        (dispatch_id, vehicle_id, driver_id, route_id, start_time, end_time, 
         cargo_details, destination, priority, status, ai_optimization, created_at)
@@ -334,7 +334,7 @@ async function generatePerformanceRecommendations(vehicleId, period) {
 
 async function getTotalVehicles(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM fleet_vehicles WHERE farmer_id = $1',
       [farmerId]
     );
@@ -346,7 +346,7 @@ async function getTotalVehicles(farmerId) {
 
 async function getTotalDispatches(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT COUNT(*) as count FROM fleet_dispatches fd
        JOIN fleet_vehicles fv ON fd.vehicle_id = fv.fleet_vehicle_id
        WHERE fv.farmer_id = $1`,

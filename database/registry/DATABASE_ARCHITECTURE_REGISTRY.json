@@ -1,7 +1,7 @@
-﻿{
+{
   "system":"SUBH",
   "source_project":"EBDESIGN",
-  "existing_system":"SVESCO",
+  "existing_system":"Subhesco",
   "primary_transactional_database":"PostgreSQL",
   "database_role":"system_of_record",
 
@@ -55,3 +55,4 @@
     "duplicate_migrations_require_reconciliation":true
   }
 }
+

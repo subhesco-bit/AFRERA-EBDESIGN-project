@@ -43,7 +43,7 @@ async function submitQuotation(req, res) {
   try {
     const { bulkOrderId, sellerId, quotationData } = req.body;
     
-    const result = await ecommerceBusinessSalesService.submitQuotation(bulkOrderId, sellerId, quotationData);
+    let result = await ecommerceBusinessSalesService.submitQuotation(bulkOrderId, sellerId, quotationData);
     
     res.json(result);
   } catch (error) {
@@ -62,9 +62,9 @@ async function submitQuotation(req, res) {
 async function acceptQuotation(req, res) {
   try {
     const { quotationId } = req.params;
-    const buyerId = req.user.id;
+    let buyerId = req.user.id;
     
-    const result = await ecommerceBusinessSalesService.acceptQuotation(quotationId, buyerId);
+    let result = await ecommerceBusinessSalesService.acceptQuotation(quotationId, buyerId);
     
     res.json(result);
   } catch (error) {
@@ -86,8 +86,8 @@ async function acceptQuotation(req, res) {
  */
 async function createContractFarming(req, res) {
   try {
-    const buyerId = req.user.id;
-    const result = await ecommerceBusinessSalesService.createContractFarming(buyerId, req.body);
+    let buyerId = req.user.id;
+    let result = await ecommerceBusinessSalesService.createContractFarming(buyerId, req.body);
     
     res.json(result);
   } catch (error) {
@@ -107,7 +107,7 @@ async function recordContractMilestone(req, res) {
   try {
     const { contractId, milestoneData } = req.body;
     
-    const result = await ecommerceBusinessSalesService.recordContractMilestone(contractId, milestoneData);
+    let result = await ecommerceBusinessSalesService.recordContractMilestone(contractId, milestoneData);
     
     res.json(result);
   } catch (error) {
@@ -131,7 +131,7 @@ async function getSalesAnalytics(req, res) {
   try {
     const filters = req.query;
     
-    const result = await ecommerceBusinessSalesService.getSalesAnalytics(filters);
+    let result = await ecommerceBusinessSalesService.getSalesAnalytics(filters);
     
     res.json(result);
   } catch (error) {
@@ -151,7 +151,7 @@ async function getB2BConversionMetrics(req, res) {
   try {
     const { periodDays } = req.query;
     
-    const result = await ecommerceBusinessSalesService.getB2BConversionMetrics(parseInt(periodDays) || 30);
+    let result = await ecommerceBusinessSalesService.getB2BConversionMetrics(parseInt(periodDays) || 30);
     
     res.json(result);
   } catch (error) {
@@ -175,7 +175,7 @@ async function calculateCommission(req, res) {
   try {
     const { orderId } = req.params;
     
-    const result = await ecommerceBusinessSalesService.calculateCommission(orderId);
+    let result = await ecommerceBusinessSalesService.calculateCommission(orderId);
     
     res.json(result);
   } catch (error) {

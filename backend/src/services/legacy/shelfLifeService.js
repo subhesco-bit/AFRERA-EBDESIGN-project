@@ -6,16 +6,16 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 // Afferent wiring 2026-08-04: connects this module to the nervous system.
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // TEMPERATURE MONITORING (CAP-255)
@@ -124,7 +124,7 @@ router.get('/temperature', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY timestamp DESC LIMIT 1000';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get temperature readings error', { error: error.message, stack: error.stack });
@@ -182,7 +182,7 @@ router.post('/humidity', authMiddleware, async (req, res) => {
       alert_triggered
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO humidity_monitoring 
        (product_id, batch_id, location_id, sensor_id, humidity, unit, 
         timestamp, threshold_violation, alert_triggered, created_at)
@@ -210,7 +210,7 @@ router.get('/humidity', authMiddleware, async (req, res) => {
     const { product_id, batch_id, location_id, start_date, end_date } = req.query;
     
     let query = 'SELECT * FROM humidity_monitoring WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -245,7 +245,7 @@ router.get('/humidity', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY timestamp DESC LIMIT 1000';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get humidity readings error', { error: error.message, stack: error.stack });
@@ -279,7 +279,7 @@ router.post('/packaging-analysis', authMiddleware, async (req, res) => {
       analyzed_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO packaging_analysis 
        (product_id, batch_id, packaging_type, material_composition, barrier_properties, 
         seal_integrity, oxygen_transmission_rate, moisture_vapor_transmission_rate, 
@@ -311,7 +311,7 @@ router.get('/packaging-analysis', authMiddleware, async (req, res) => {
     const { product_id, batch_id, packaging_type } = req.query;
     
     let query = 'SELECT * FROM packaging_analysis WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -332,7 +332,7 @@ router.get('/packaging-analysis', authMiddleware, async (req, res) => {
       params.push(packaging_type);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get packaging analyses error', { error: error.message, stack: error.stack });
@@ -367,7 +367,7 @@ router.post('/transport-analysis', authMiddleware, async (req, res) => {
       analyzed_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO transport_analysis 
        (shipment_id, product_id, batch_id, transport_mode, route, duration, 
         temperature_conditions, humidity_conditions, vibration_levels, 
@@ -400,7 +400,7 @@ router.get('/transport-analysis', authMiddleware, async (req, res) => {
     const { shipment_id, product_id, batch_id, transport_mode } = req.query;
     
     let query = 'SELECT * FROM transport_analysis WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (shipment_id) {
@@ -427,7 +427,7 @@ router.get('/transport-analysis', authMiddleware, async (req, res) => {
       params.push(transport_mode);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get transport analyses error', { error: error.message, stack: error.stack });
@@ -463,7 +463,7 @@ router.post('/storage-analysis', authMiddleware, async (req, res) => {
       analyzed_by
     } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO storage_analysis 
        (product_id, batch_id, warehouse_id, storage_location, storage_conditions, 
         temperature_history, humidity_history, ventilation_status, light_exposure, 
@@ -497,7 +497,7 @@ router.get('/storage-analysis', authMiddleware, async (req, res) => {
     const { product_id, batch_id, warehouse_id } = req.query;
     
     let query = 'SELECT * FROM storage_analysis WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -518,7 +518,7 @@ router.get('/storage-analysis', authMiddleware, async (req, res) => {
       params.push(warehouse_id);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get storage analyses error', { error: error.message, stack: error.stack });
@@ -561,7 +561,7 @@ router.post('/shelf-life-prediction', authMiddleware, async (req, res) => {
     });
 
     // Store prediction
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO shelf_life_predictions 
        (product_id, batch_id, production_date, prediction_date, storage_conditions, 
         transport_history, packaging_analysis, temperature_history, humidity_history, 
@@ -630,7 +630,7 @@ router.get('/shelf-life-prediction', authMiddleware, async (req, res) => {
     const { product_id, batch_id } = req.query;
     
     let query = 'SELECT * FROM shelf_life_predictions WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -647,7 +647,7 @@ router.get('/shelf-life-prediction', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY prediction_date DESC LIMIT 100';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get shelf life predictions error', { error: error.message, stack: error.stack });
@@ -677,7 +677,7 @@ router.post('/spoilage-risk', authMiddleware, async (req, res) => {
     } = req.body;
 
     // Run AI spoilage risk prediction
-    const prediction = await predictSpoilageRisk({
+    let prediction = await predictSpoilageRisk({
       product_id,
       batch_id,
       current_date,
@@ -690,7 +690,7 @@ router.post('/spoilage-risk', authMiddleware, async (req, res) => {
     });
 
     // Store prediction
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO spoilage_risk_predictions 
        (product_id, batch_id, prediction_date, shelf_life_remaining, storage_conditions, 
         temperature_violations, humidity_violations, handling_incidents, age_in_days, 
@@ -767,7 +767,7 @@ async function predictSpoilageRisk(params) {
   else if (riskScore >= 0.5) riskLevel = 'high';
   else if (riskScore >= 0.3) riskLevel = 'medium';
 
-  const result = {
+  let result = {
     risk_level: riskLevel,
     risk_probability: Math.min(riskScore, 1.0),
     risk_factors: riskFactors,
@@ -807,7 +807,7 @@ router.get('/spoilage-risk', authMiddleware, async (req, res) => {
     const { product_id, batch_id, risk_level } = req.query;
     
     let query = 'SELECT * FROM spoilage_risk_predictions WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -830,7 +830,7 @@ router.get('/spoilage-risk', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY prediction_date DESC LIMIT 100';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get spoilage risk predictions error', { error: error.message, stack: error.stack });
@@ -878,3 +878,6 @@ module.exports = {
   router,
   isHealthy
 };
+
+
+

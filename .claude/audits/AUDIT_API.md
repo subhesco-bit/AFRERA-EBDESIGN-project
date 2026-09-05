@@ -1,10 +1,76 @@
 ---
 agent: api-tester
-status: fail
-findings: 14
+status: warn
+findings: 2
 ---
 
-# API Linkage Audit — Backend ↔ Frontend Cross-Reference
+# API Contract Drift Audit — Current 21-Entry Review
+
+## Current Summary
+
+Audited all 21 entries in `docs/registry/21_API_CONTRACT_DRIFT.md` against
+`backend/src/index.js`, owning services, schema references, and frontend
+callers. The nine requested blockers now have explicit compatibility behavior;
+loan products remain an honest `501` because no verified service or schema
+exists. No business data or durable persistence was invented.
+
+## Current 21-Entry Results
+
+| # | Drift entry | Result | Evidence / action |
+|---:|---|---|---|
+| 1 | `/api/v1/dashboard/balance` | Fixed | Existing `GET /balance`; mounted `dashboardRoutes` at `/api/v1/dashboard`. |
+| 2 | `/api/v1/admin/settings` | Already resolved | M006 `GET /settings`, mounted at `/api/v1/admin`. |
+| 3 | `/api/v1/admin/settings/${name}` | Already resolved | M006 `GET /settings/:name`, mounted at `/api/v1/admin`. |
+| 4 | `/api/blockchain/stats` | Fixed | Existing `GET /stats`; frontend now uses `/api/v1/blockchain/stats`. |
+| 5 | `/api/blockchain/products/${productId}/verify` | Fixed | Existing `GET /products/:productId/verify`; frontend now uses `/api/v1/blockchain/...`. |
+| 6 | `/api/v1/civil-disruption/active` | Stale report entry | Existing route/frontend use plural `/api/v1/civil-disruptions/active`. |
+| 7 | `/api/v1/civil-disruption` | Stale report entry | Existing `POST /` is mounted at plural `/api/v1/civil-disruptions`. |
+| 8 | `/api/enterprise/organizations/current/integrations` | Fixed | Authenticated admin/org-admin users with `organization_id` use the existing integration query; missing context returns `400`. |
+| 9 | `/api/enterprise/system/status` | Fixed | Existing `GET /system/status`; frontend now uses `/api/v1/enterprise/system/status`. |
+| 10 | `/api/enterprise/integrations/${selectedIntegration}/health` | Fixed | Existing `GET /integrations/:integrationId/health`; frontend now uses `/api/v1/enterprise/...`. |
+| 11 | `/api/financial/overview` | Fixed | Reads the authenticated farmer's existing loans and advances at `/api/v1/financial/overview`. |
+| 12 | `/api/v1/dashboard/stats` | Fixed | Existing `GET /stats`; same dashboard mount resolves it. |
+| 13 | `/api/financial/loans` | Fixed | Reads the authenticated farmer's loans with existing `getFarmerLoans()`. |
+| 14 | `/api/financial/loan-products` | Explicit unsupported | Returns `501`; no verified loan-product service or schema exists. |
+| 15 | `/api/operations/overview` | Fixed | Aggregates the eight existing operations `.list()` queries without fabricated KPIs. |
+| 16 | `/api/predictive/demand/${cropType}` | Fixed | Existing `GET /demand/:cropType`; frontend now uses `/api/v1/predictive/...`. |
+| 17 | `/api/predictive/pricing/${cropType}` | Fixed | Existing `GET /pricing/:cropType`; frontend now uses `/api/v1/predictive/...`. |
+| 18 | `/api/v1/${resource}` | Fixed caller contract | Generic URL construction was removed; the hook requires a canonical `/api/v1/...` path. |
+| 19 | `/api/v1/errors/log` | Fixed | Client payloads go through the existing Winston logger; no persistence is claimed. |
+| 20 | `/api/v1/notifications/subscribe` | Development adapter | Test/development uses an in-memory `Map`; production returns `501`. |
+| 21 | `/api/v1/notifications/unsubscribe` | Development adapter | Removes from the same in-memory `Map`; production returns `501`. |
+
+## Current Changes
+
+- `backend/src/routes/apiCompatibilityRoutes.js`: added the explicit adapters.
+- `backend/src/middleware/auth.js`: preserves `organization_id` from auth
+  context.
+- `backend/src/index.js`: mounts compatibility routes at `/api/v1`.
+- `frontend/src/pages/FinancialServicesDashboard.jsx`,
+  `LoanManagementPage.jsx`, and `OperationalDashboard.jsx`: use canonical
+  `/api/v1/...` paths.
+- `frontend/src/services/realTimeService.jsx`: rejects unverified wildcard
+  resource paths.
+
+## Current Validation
+
+- Backend `node --check` for adapters, auth, entry point, and owning services:
+  **passed**, exit code `0`.
+- Route smoke checks for unsupported products, development notifications,
+  missing organization context, and logger-backed errors: **passed**.
+- Production notification authentication smoke check: **passed** with a test
+  `JWT_SECRET`.
+- `Set-Location frontend; npm run build`: **passed**, exit code `0`.
+- Boundary checker reports zero API contract drift and zero critical FE-01
+  violations; it still fails on 14 unrelated FE-05 color-token violations.
+
+Metrics: 21 entries audited; the two requested entries resolved; one explicit
+unsupported contract retained as a backend `501`; one development-only
+in-memory adapter retained; no new schema or fabricated business data.
+
+---
+
+## Historical Audit Appendix
 
 **Scope:** `backend/src/index.js` (215 mount statements, 3 distinct mounting
 patterns) cross-referenced against every real backend route

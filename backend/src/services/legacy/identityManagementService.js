@@ -21,7 +21,7 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 const { createCrudService } = require('./resourceCrudFactory');
 
 const permissionManagement = createCrudService('identity_permissions', {
@@ -87,7 +87,7 @@ const sessionManagement = {
   },
 
   async get(id) {
-    const res = await pool.query(
+    let res = await pool.query(
       `SELECT s.id, u.email AS user_identifier, s.user_agent AS device, s.ip_address,
               s.created_at AS login_time, s.expires_at, s.is_active, s.invalidated_at
        FROM sessions s LEFT JOIN users u ON u.id = s.user_id
@@ -100,7 +100,7 @@ const sessionManagement = {
   /** Only a status change of 'Terminated' has real meaning here - it invalidates the session. */
   async update(id, payload = {}) {
     if (payload.status === 'Terminated') {
-      const res = await pool.query(
+      let res = await pool.query(
         'UPDATE sessions SET is_active = false, invalidated_at = NOW() WHERE id = $1 RETURNING id',
         [id]
       );
@@ -110,7 +110,7 @@ const sessionManagement = {
   },
 
   async remove(id) {
-    const res = await pool.query('DELETE FROM sessions WHERE id = $1 RETURNING id', [id]);
+    let res = await pool.query('DELETE FROM sessions WHERE id = $1 RETURNING id', [id]);
     return !!res.rows[0];
   },
 };
@@ -126,3 +126,6 @@ module.exports = {
   const { ...rest } = m016;
   Object.assign(module.exports, rest);
 }
+
+
+

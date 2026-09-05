@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { Wheat, Home, Sprout, Tractor, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Link } from 'react-router-dom';
+import { Wheat, Home, Sprout, Tractor, ArrowRight, ShieldCheck } from 'lucide-react';
 
 // Central hub for the four "farmer doors" — public landing pages that let a
 // first-time visitor see what a section offers before being asked to log in.
@@ -45,7 +45,7 @@ const DOORS = [
     accent: 'border-v42-line hover:border-v42-indigo',
     iconBg: 'bg-v42-indigo/10 text-v42-indigo',
   },
-]
+];
 
 function FarmerEntranceHubPage() {
   return (
@@ -64,7 +64,7 @@ function FarmerEntranceHubPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
         {DOORS.map((door) => {
-          const Icon = door.icon
+          const Icon = door.icon;
           return (
             <Link
               key={door.path}
@@ -80,7 +80,7 @@ function FarmerEntranceHubPage() {
                 Look inside <ArrowRight className="w-4 h-4 ml-1" />
               </span>
             </Link>
-          )
+          );
         })}
       </div>
 
@@ -95,7 +95,7 @@ function FarmerEntranceHubPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default FarmerEntranceHubPage
+export default FarmerEntranceHubPage;

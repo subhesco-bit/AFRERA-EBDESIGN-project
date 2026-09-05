@@ -128,14 +128,14 @@ class IoTIntegrationService {
    * Get device by device ID
    */
   async getDeviceByDeviceId(deviceId) {
-    const query = `
+    let query = `
       SELECT id, device_id, device_type, farmer_id, 
              specifications, status, last_active
       FROM iot_devices
       WHERE device_id = $1 AND status = 'active'
     `;
 
-    const result = await db.query(query, [deviceId]);
+    let result = await db.query(query, [deviceId]);
     return result.rows[0];
   }
 
@@ -190,7 +190,7 @@ class IoTIntegrationService {
    * Check thresholds and generate alerts
    */
   checkThresholds(processedData, specifications) {
-    const alerts = [];
+    let alerts = [];
     
     if (!specifications || !specifications.thresholds) {
       return alerts;
@@ -233,7 +233,7 @@ class IoTIntegrationService {
     if (this.dataBuffer.length === 0) return;
     
     try {
-      const query = `
+      let query = `
         INSERT INTO iot_sensor_data (
           device_id, sensor_type, value, unit, 
           quality, metadata, timestamp
@@ -266,7 +266,7 @@ class IoTIntegrationService {
    * Update device activity
    */
   async updateDeviceActivity(deviceId) {
-    const query = `
+    let query = `
       UPDATE iot_devices 
       SET last_active = NOW()
       WHERE device_id = $1
@@ -280,7 +280,7 @@ class IoTIntegrationService {
    */
   async getDeviceStatus(deviceId) {
     try {
-      const device = await this.getDeviceByDeviceId(deviceId);
+      let device = await this.getDeviceByDeviceId(deviceId);
       if (!device) {
         return {
           success: false,
@@ -318,7 +318,7 @@ class IoTIntegrationService {
    * Get recent device data
    */
   async getRecentDeviceData(deviceId, hours) {
-    const query = `
+    let query = `
       SELECT sensor_type, value, unit, quality, timestamp
       FROM iot_sensor_data
       WHERE device_id = $1
@@ -327,7 +327,7 @@ class IoTIntegrationService {
       LIMIT 1000
     `;
 
-    const result = await db.query(query, [deviceId]);
+    let result = await db.query(query, [deviceId]);
     return result.rows;
   }
 
@@ -358,7 +358,7 @@ class IoTIntegrationService {
    */
   async getFarmerDevices(farmerId) {
     try {
-      const query = `
+      let query = `
         SELECT id, device_id, device_type, location, 
                specifications, status, last_active, registered_at
         FROM iot_devices
@@ -366,11 +366,11 @@ class IoTIntegrationService {
         ORDER BY registered_at DESC
       `;
 
-      const result = await db.query(query, [farmerId]);
+      let result = await db.query(query, [farmerId]);
       
       const devices = await Promise.all(
         result.rows.map(async (device) => {
-          const recentData = await this.getRecentDeviceData(device.device_id, 24);
+          let recentData = await this.getRecentDeviceData(device.device_id, 24);
           return {
             ...device,
             recentDataPoints: recentData.length,
@@ -402,7 +402,7 @@ class IoTIntegrationService {
    */
   async configureDevice(deviceId, configuration) {
     try {
-      const device = await this.getDeviceByDeviceId(deviceId);
+      let device = await this.getDeviceByDeviceId(deviceId);
       if (!device) {
         return {
           success: false,
@@ -411,7 +411,7 @@ class IoTIntegrationService {
         };
       }
 
-      const query = `
+      let query = `
         UPDATE iot_devices
         SET specifications = $1,
             updated_at = NOW()
@@ -419,7 +419,7 @@ class IoTIntegrationService {
         RETURNING device_id, specifications
       `;
 
-      const result = await db.query(query, [
+      let result = await db.query(query, [
         JSON.stringify({ ...device.specifications, ...configuration }),
         deviceId
       ]);
@@ -455,7 +455,7 @@ class IoTIntegrationService {
    */
   async getAggregatedData(farmerId, sensorType, timeRange = '24h') {
     try {
-      const query = `
+      let query = `
         SELECT 
           DATE_TRUNC('hour', timestamp) as hour,
           AVG(value) as avg_value,
@@ -471,7 +471,7 @@ class IoTIntegrationService {
         ORDER BY hour ASC
       `;
 
-      const result = await db.query(query, [farmerId, sensorType]);
+      let result = await db.query(query, [farmerId, sensorType]);
 
       return {
         success: true,

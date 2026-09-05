@@ -3,16 +3,16 @@
  * CSR integration, government support schemes, weather alerts, and official announcements
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { socketServer } = require('../../websocket');
-const { authMiddleware } = require('../../middleware/auth');
+const { socketServer } = require('../../../websocket');
+const { authMiddleware } = require('../../middleware\/auth');
 // Shared pool (2026-08-04 convention, see database/pool.js): the AI-matching
 // functions above never touched Postgres, but the scheme registry added in
 // migration 9995_scheme_verification_map_protection.sql does — every scheme
 // those functions return was AI-generated or hardcoded, with no stored
 // verification status/expiry anywhere (see that migration's header).
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 /**
  * List verified schemes from the registry table (government_schemes).
@@ -48,7 +48,7 @@ async function listSchemeRegistry(filters = {}) {
 }
 
 async function getSchemeByCode(code) {
-  const result = await pool.query('SELECT * FROM government_schemes WHERE code = $1', [code]);
+  let result = await pool.query('SELECT * FROM government_schemes WHERE code = $1', [code]);
   if (result.rows.length === 0) {
     throw new Error('Scheme not found');
   }
@@ -67,7 +67,7 @@ async function updateSchemeRegistry(code, updates, verifiedBy) {
     status, expiry_date, verification_source, notes, effective_from, applicable_states
   } = updates;
 
-  const result = await pool.query(
+  let result = await pool.query(
     `UPDATE government_schemes SET
        status = COALESCE($1, status),
        expiry_date = COALESCE($2, expiry_date),
@@ -96,7 +96,7 @@ async function updateSchemeRegistry(code, updates, verifiedBy) {
  * workflows per AdminDashboardPage.jsx / GovernmentDashboardPage.jsx).
  */
 async function getExpiringSchemeRegistry(days = 30) {
-  const result = await pool.query(
+  let result = await pool.query(
     `SELECT * FROM government_schemes
      WHERE expiry_date IS NOT NULL
        AND expiry_date <= CURRENT_DATE + ($1 || ' days')::INTERVAL
@@ -400,7 +400,7 @@ async function getCSROpportunities(params) {
     } = params;
 
     // AI-powered CSR matching
-    const aiRequest = {
+    let aiRequest = {
       task: 'csr_opportunity_matching',
       parameters: {
         location,
@@ -414,7 +414,7 @@ async function getCSROpportunities(params) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const opportunities = {
       search_id: generateId(),
@@ -482,7 +482,7 @@ async function submitCSRProposal(proposalData) {
     };
 
     // AI-powered proposal assessment
-    const aiRequest = {
+    let aiRequest = {
       task: 'csr_proposal_assessment',
       parameters: {
         proposal_data: proposalData,
@@ -492,7 +492,7 @@ async function submitCSRProposal(proposalData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     proposal.ai_assessment = aiResponse;
 
     logger.info(`CSR proposal submitted: ${proposal.proposal_id}`);
@@ -776,7 +776,7 @@ async function getPendingDocuments(applicationId) {
 function setupRoutes(app) {
   app.get('/api/v1/government/schemes', async (req, res) => {
     try {
-      const schemes = await getApplicableSchemes(req.query);
+      let schemes = await getApplicableSchemes(req.query);
       res.json({ success: true, data: schemes });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -785,7 +785,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/weather/alerts', async (req, res) => {
     try {
-      const alerts = await getWeatherAlerts(req.query.location);
+      let alerts = await getWeatherAlerts(req.query.location);
       res.json({ success: true, data: alerts });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -794,7 +794,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/government/announcements', authMiddleware, async (req, res) => {
     try {
-      const announcement = await createGovernmentAnnouncement(req.body);
+      let announcement = await createGovernmentAnnouncement(req.body);
       res.json({ success: true, data: announcement });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -803,7 +803,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/announcements', async (req, res) => {
     try {
-      const announcements = await getGovernmentAnnouncements(req.query);
+      let announcements = await getGovernmentAnnouncements(req.query);
       res.json({ success: true, data: announcements });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -812,7 +812,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/government/official/login', async (req, res) => {
     try {
-      const official = await governmentOfficialLogin(req.body);
+      let official = await governmentOfficialLogin(req.body);
       res.json({ success: true, data: official });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -821,7 +821,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/csr/opportunities', async (req, res) => {
     try {
-      const opportunities = await getCSROpportunities(req.query);
+      let opportunities = await getCSROpportunities(req.query);
       res.json({ success: true, data: opportunities });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -830,7 +830,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/government/csr/proposals', authMiddleware, async (req, res) => {
     try {
-      const proposal = await submitCSRProposal(req.body);
+      let proposal = await submitCSRProposal(req.body);
       res.json({ success: true, data: proposal });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -848,7 +848,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/schemes/track/:id', async (req, res) => {
     try {
-      const status = await trackSchemeApplication(req.params.id);
+      let status = await trackSchemeApplication(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -863,7 +863,7 @@ function setupRoutes(app) {
   app.get('/api/v1/government/schemes/registry', async (req, res) => {
     try {
       const { status, category, state } = req.query;
-      const schemes = await listSchemeRegistry({ status, category, state });
+      let schemes = await listSchemeRegistry({ status, category, state });
       res.json({ success: true, data: schemes, total: schemes.length });
     } catch (error) {
       logger.error('List scheme registry error', { error: error.message, stack: error.stack });
@@ -873,8 +873,8 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/schemes/registry/expiring', async (req, res) => {
     try {
-      const days = Number(req.query.days) || 30;
-      const schemes = await getExpiringSchemeRegistry(days);
+      let days = Number(req.query.days) || 30;
+      let schemes = await getExpiringSchemeRegistry(days);
       res.json({ success: true, data: schemes, total: schemes.length });
     } catch (error) {
       logger.error('Get expiring schemes error', { error: error.message, stack: error.stack });
@@ -884,7 +884,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/schemes/checker', async (req, res) => {
     try {
-      const result = await checkSchemeEligibility(req.query);
+      let result = await checkSchemeEligibility(req.query);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Scheme eligibility checker error', { error: error.message, stack: error.stack });
@@ -907,7 +907,7 @@ function setupRoutes(app) {
   // used for /government/announcements above.
   app.put('/api/v1/government/schemes/registry/:code', authMiddleware, async (req, res) => {
     try {
-      const scheme = await updateSchemeRegistry(req.params.code, req.body, req.user && req.user.id);
+      let scheme = await updateSchemeRegistry(req.params.code, req.body, req.user && req.user.id);
       logger.info(`Scheme registry updated: ${req.params.code} -> ${scheme.status}`);
       res.json({ success: true, data: scheme });
     } catch (error) {
@@ -945,3 +945,6 @@ module.exports = {
   checkSchemeEligibility,
   setupRoutes
 };
+
+
+

@@ -35,7 +35,7 @@ async function createConsent(consentData) {
 }
 
 async function getUserConsents(userId, { category, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM consents WHERE user_id = $1';
@@ -53,25 +53,25 @@ async function getUserConsents(userId, { category, status } = {}) {
   
   query += ' ORDER BY created_at DESC';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 async function getConsent(consentId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM consents WHERE id = $1', [consentId]);
+  let res = await pg.query('SELECT * FROM consents WHERE id = $1', [consentId]);
   return res.rows[0] || null;
 }
 
 async function updateConsent(consentId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { consentText, dataCategories, status } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE consents 
      SET consent_text = COALESCE($1, consent_text),
          data_categories = COALESCE($2, data_categories),
@@ -97,10 +97,10 @@ async function updateConsent(consentId, updates) {
 }
 
 async function revokeConsent(consentId, reason) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE consents 
      SET status = 'revoked', revoked_at = NOW(), revoked_reason = $1, updated_at = NOW()
      WHERE id = $2
@@ -125,12 +125,12 @@ async function revokeConsent(consentId, reason) {
 
 // Consent category management
 async function createConsentCategory(categoryData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, description, required, dataTypes, retentionPeriod } = categoryData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO consent_categories (name, description, required, data_types, retention_period, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
      RETURNING *`,
@@ -141,21 +141,21 @@ async function createConsentCategory(categoryData) {
 }
 
 async function getConsentCategories() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM consent_categories ORDER BY name');
+  let res = await pg.query('SELECT * FROM consent_categories ORDER BY name');
   return res.rows;
 }
 
 // Consent template management
 async function createConsentTemplate(templateData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, consentType, consentCategory, consentText, dataCategories, validityPeriod } = templateData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO consent_templates (name, consent_type, consent_category, consent_text, data_categories, validity_period, is_active, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW())
      RETURNING *`,
@@ -166,11 +166,11 @@ async function createConsentTemplate(templateData) {
 }
 
 async function getConsentTemplates({ consentType, consentCategory } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM consent_templates WHERE is_active = true';
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (consentType) {
@@ -184,12 +184,12 @@ async function getConsentTemplates({ consentType, consentCategory } = {}) {
   
   query += ' ORDER BY name';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 async function applyConsentTemplate(userId, templateId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get template
@@ -215,7 +215,7 @@ async function applyConsentTemplate(userId, templateId) {
 
 // AI-powered consent analysis
 async function analyzeConsentCompliance(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get user's consents
@@ -284,10 +284,10 @@ function generateConsentRecommendations(missingConsents, expiredConsents) {
 
 // Consent history and audit
 async function getConsentHistory(consentId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM consent_history 
      WHERE consent_id = $1 
      ORDER BY created_at DESC`,
@@ -298,7 +298,7 @@ async function getConsentHistory(consentId) {
 }
 
 async function logConsentEvent(consentId, eventType, details) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -310,10 +310,10 @@ async function logConsentEvent(consentId, eventType, details) {
 
 // Automated consent expiration
 async function checkExpiredConsents() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE consents 
      SET status = 'expired', updated_at = NOW()
      WHERE status = 'active' AND valid_until < NOW()
@@ -342,7 +342,7 @@ async function checkExpiredConsents() {
 
 // Consent analytics
 async function getConsentAnalytics({ startDate, endDate, consentCategory } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -354,7 +354,7 @@ async function getConsentAnalytics({ startDate, endDate, consentCategory } = {})
     FROM consents
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -372,7 +372,7 @@ async function getConsentAnalytics({ startDate, endDate, consentCategory } = {})
   
   query += ` GROUP BY consent_category, status, DATE(created_at) ORDER BY date DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     data: res.rows,
@@ -391,14 +391,14 @@ function groupBy(array, key) {
 
 // Bulk consent operations
 async function bulkCreateConsents(consents) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const results = [];
   
   for (const consentData of consents) {
     try {
-      const consent = await createConsent(consentData);
+      let consent = await createConsent(consentData);
       results.push({ success: true, consent });
     } catch (error) {
       results.push({ success: false, error: error.message, consentData });

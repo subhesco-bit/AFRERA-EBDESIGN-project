@@ -138,7 +138,7 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
     };
 
     // AI-powered maintenance analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'implement_maintenance_analysis',
       parameters: {
         registry_id: registryId,
@@ -149,7 +149,7 @@ async function updateImplementMaintenance(registryId, maintenanceData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     maintenanceRecord.ai_analysis = aiResponse;
 
     await pool.query(
@@ -279,7 +279,7 @@ async function getUsageRecommendations(implementType, workingWidth) {
 
 async function getImplementMaintenanceHistory(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM implement_maintenance_records WHERE registry_id = $1 ORDER BY service_date DESC LIMIT 10',
       [registryId]
     );
@@ -299,7 +299,7 @@ async function analyzeWearPatterns(registryId) {
 
 async function getImplementSpecs(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM implement_registry WHERE implement_registry_id = $1',
       [registryId]
     );
@@ -351,7 +351,7 @@ async function generateUsageRecommendations(registryId, period) {
 
 async function getImplementCount(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM implement_registry WHERE farmer_id = $1',
       [farmerId]
     );
@@ -363,7 +363,7 @@ async function getImplementCount(farmerId) {
 
 async function getTypeDistribution(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT implement_type, COUNT(*) as count FROM implement_registry WHERE farmer_id = $1 GROUP BY implement_type',
       [farmerId]
     );
@@ -432,7 +432,7 @@ async function listImplements({ page = 1, limit = 20, farmer_id = null, status =
 }
 
 async function getImplement(id) {
-  const res = await pool.query('SELECT * FROM implement_registry WHERE implement_registry_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM implement_registry WHERE implement_registry_id = $1', [id]);
   return res.rows[0] || null;
 }
 

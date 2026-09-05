@@ -5,6 +5,8 @@ jest.mock('../../utils/logger');
 jest.mock('fs', () => ({
   promises: {
     mkdir: jest.fn(() => Promise.resolve()),
+    readFile: jest.fn(() => Promise.resolve(Buffer.from('backup'))),
+    writeFile: jest.fn(() => Promise.resolve()),
     readdir: jest.fn(() => Promise.resolve([])),
     unlink: jest.fn(() => Promise.resolve()),
     copyFile: jest.fn(() => Promise.resolve()),

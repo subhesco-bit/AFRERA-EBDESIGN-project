@@ -1,6 +1,6 @@
 # SYSTEM ARCHITECTURE
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Version:** 1.0  
 **Last Updated:** 24 August 2026
 
@@ -8,7 +8,7 @@
 
 ### Pattern: Microservices with Unified AI Layer
 
-The SVESCO/EBDESIGN platform follows a microservices architecture with a unified AI orchestration layer that enables Claude AI integration across all services.
+The Subhesco/EBDESIGN platform follows a microservices architecture with a unified AI orchestration layer that enables Claude AI integration across all services.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -374,3 +374,4 @@ claudeAICoordinator.coordinateAIRequest({
 ---
 
 *This architecture document must be updated when structural changes are made to the system.*
+

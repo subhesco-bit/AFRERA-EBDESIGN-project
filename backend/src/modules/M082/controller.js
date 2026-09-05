@@ -16,7 +16,7 @@ const createKPIDefinition = async (req, res) => {
 
 const getKPIDefinition = async (req, res) => {
   try {
-    const kpi = await kpiService.getKPIDefinition(req.params.id);
+    let kpi = await kpiService.getKPIDefinition(req.params.id);
     if (!kpi) {
       return res.status(404).json({ success: false, error: 'KPI definition not found' });
     }

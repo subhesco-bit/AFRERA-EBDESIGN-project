@@ -3,12 +3,12 @@
  * RESTful API endpoints for sericulture management (M027)
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const sericultureService = require('../../services/legacy/sericultureService');
+const sericultureService = require('../../services/legacy/sericultureService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/sericulture - Get all sericulture
 router.get('/', authenticate, async (req, res) => {
@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/sericulture/:id - Get sericulture by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const sericulture = await sericultureService.getSericultureById(req.params.id);
+    let sericulture = await sericultureService.getSericultureById(req.params.id);
     res.json({ success: true, data: sericulture });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/sericulture - Create sericulture
 router.post('/', authenticate, async (req, res) => {
   try {
-    const sericulture = await sericultureService.createSericulture(req.body);
+    let sericulture = await sericultureService.createSericulture(req.body);
     res.status(201).json({ success: true, data: sericulture });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

@@ -1,6 +1,6 @@
 # PROJECT CONTEXT
 
-**Project:** SVESCO/EBDESIGN Agricultural Digital Operating System  
+**Project:** Subhesco/EBDESIGN Agricultural Digital Operating System  
 **Primary Implementation Agent:** Devin  
 **Architectural Agent:** Claude Code/Claude AI  
 **Created:** 24 August 2026  
@@ -8,7 +8,7 @@
 
 ## Project Overview
 
-SVESCO/EBDESIGN is a comprehensive agricultural digital operating system designed to empower farmers across Northeast India through technology, fair trade practices, and intelligent decision-making. The platform connects farmers directly with consumers, provides financial services, logistics support, insurance coverage, and integrates with enterprise ERP systems.
+Subhesco/EBDESIGN is a comprehensive agricultural digital operating system designed to empower farmers across Northeast India through technology, fair trade practices, and intelligent decision-making. The platform connects farmers directly with consumers, provides financial services, logistics support, insurance coverage, and integrates with enterprise ERP systems.
 
 ## Current Implementation Status
 
@@ -245,3 +245,4 @@ This project must evolve as ONE continuous Claude + Devin project. No new task s
 ---
 
 *This document is the single source of truth for project context and must be updated by both agents as the project evolves.*
+

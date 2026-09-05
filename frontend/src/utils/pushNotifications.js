@@ -1,16 +1,21 @@
 /**
  * Push Notifications Utility
- * 
+ *
  * Provides push notification functionality for web, mobile, and desktop
  * using the Web Push API and service workers
  */
+
+import { pushNotificationsAPI } from '../services/api';
 
 class PushNotificationManager {
   constructor() {
     this.registration = null;
     this.subscription = null;
-    this.isSupported = 'serviceWorker' in navigator && 'PushManager' in window;
     this.permission = 'default';
+  }
+
+  get isSupported() {
+    return 'serviceWorker' in navigator && 'PushManager' in window;
   }
 
   async initialize() {
@@ -26,7 +31,7 @@ class PushNotificationManager {
 
       // Get current subscription
       this.subscription = await this.registration.pushManager.getSubscription();
-      
+
       // Get current permission
       this.permission = Notification.permission;
 
@@ -43,7 +48,7 @@ class PushNotificationManager {
     try {
       const permission = await Notification.requestPermission();
       this.permission = permission;
-      
+
       if (permission === 'granted') {
         console.log('Notification permission granted');
         return true;
@@ -74,7 +79,7 @@ class PushNotificationManager {
       // Subscribe to push
       const subscription = await this.registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: convertedVapidKey
+        applicationServerKey: convertedVapidKey,
       });
 
       this.subscription = subscription;
@@ -98,7 +103,7 @@ class PushNotificationManager {
 
     try {
       await this.subscription.unsubscribe();
-      
+
       // Remove subscription from server
       await this.removeSubscriptionFromServer(this.subscription);
 
@@ -112,21 +117,7 @@ class PushNotificationManager {
 
   async sendSubscriptionToServer(subscription) {
     try {
-      const response = await fetch('/api/v1/notifications/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          subscription: subscription,
-          userAgent: navigator.userAgent
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send subscription to server');
-      }
+      await pushNotificationsAPI.subscribe(subscription, navigator.userAgent);
 
       console.log('Subscription sent to server successfully');
     } catch (error) {
@@ -137,20 +128,7 @@ class PushNotificationManager {
 
   async removeSubscriptionFromServer(subscription) {
     try {
-      const response = await fetch('/api/v1/notifications/unsubscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          subscription: subscription
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to remove subscription from server');
-      }
+      await pushNotificationsAPI.unsubscribe(subscription);
 
       console.log('Subscription removed from server successfully');
     } catch (error) {
@@ -176,8 +154,8 @@ class PushNotificationManager {
     return {
       isSupported: this.isSupported,
       permission: this.permission,
-      isSubscribed: !!this.subscription,
-      subscription: this.subscription
+      isSubscribed: Boolean(this.subscription),
+      subscription: this.subscription,
     };
   }
 
@@ -191,7 +169,7 @@ class PushNotificationManager {
       const notification = new Notification(title, {
         icon: '/icons/icon-192x192.png',
         badge: '/icons/icon-72x72.png',
-        ...options
+        ...options,
       });
 
       notification.onclick = (event) => {

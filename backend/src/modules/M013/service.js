@@ -59,16 +59,16 @@ class AuthorizationService {
   }
 
   async getAuthorization(id) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-    const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
     return res.rows[0] || null;
   }
 
   async createAuthorization(payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { userId, roleId, permissions, context, expiresAt, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `INSERT INTO ${tableName} (user_id, role_id, permissions, context, expires_at, metadata, created_at) 
        VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
       [userId, roleId, JSON.stringify(permissions || []), JSON.stringify(context || {}), expiresAt, JSON.stringify(metadata || {})]
@@ -81,10 +81,10 @@ class AuthorizationService {
   }
 
   async updateAuthorization(id, payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { roleId, permissions, context, expiresAt, status, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `UPDATE ${tableName} 
        SET role_id = $1, permissions = $2, context = $3, expires_at = $4, status = $5, metadata = $6, updated_at = NOW() 
        WHERE id = $7 RETURNING *`,
@@ -99,7 +99,7 @@ class AuthorizationService {
   }
 
   async deleteAuthorization(id) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Get user_id before deletion
     const auth = await this.getAuthorization(id);
@@ -107,7 +107,7 @@ class AuthorizationService {
       this.clearUserCache(auth.user_id);
     }
     
-    const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+    let res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
     return !!res.rows[0];
   }
 
@@ -123,10 +123,10 @@ class AuthorizationService {
       }
     }
     
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Get user's authorizations
-    const res = await pg.query(
+    let res = await pg.query(
       `SELECT a.*, r.hierarchy_level, r.name as role_name 
        FROM ${tableName} a 
        JOIN roles r ON a.role_id = r.id 
@@ -238,7 +238,7 @@ class AuthorizationService {
     }
     
     // After-hours authorization for high-level roles
-    const maxLevel = Math.max(...authorizations.map(a => a.hierarchy_level || 0));
+    let maxLevel = Math.max(...authorizations.map(a => a.hierarchy_level || 0));
     if (maxLevel >= 90 && factors.timeOfDay >= 17 && factors.timeOfDay <= 22) {
       return {
         authorized: true,
@@ -251,7 +251,7 @@ class AuthorizationService {
   }
 
   async grantPermission(userId, resource, action, conditions = {}) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Get existing authorization for user
     const existingRes = await pg.query(
@@ -263,8 +263,8 @@ class AuthorizationService {
       throw new Error('No active authorization found for user');
     }
     
-    const auth = existingRes.rows[0];
-    const permissions = auth.permissions || [];
+    let auth = existingRes.rows[0];
+    let permissions = auth.permissions || [];
     
     // Add new permission if not exists
     if (!permissions.some(p => p.resource === resource && p.action === action)) {
@@ -284,9 +284,9 @@ class AuthorizationService {
   }
 
   async revokePermission(userId, resource, action) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
-    const existingRes = await pg.query(
+    let existingRes = await pg.query(
       `SELECT * FROM ${tableName} WHERE user_id = $1 AND status = 'ACTIVE' LIMIT 1`,
       [userId]
     );
@@ -295,8 +295,8 @@ class AuthorizationService {
       throw new Error('No active authorization found for user');
     }
     
-    const auth = existingRes.rows[0];
-    const permissions = (auth.permissions || []).filter(
+    let auth = existingRes.rows[0];
+    let permissions = (auth.permissions || []).filter(
       p => !(p.resource === resource && p.action === action)
     );
     
@@ -307,9 +307,9 @@ class AuthorizationService {
   }
 
   async getUserPermissions(userId) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
-    const res = await pg.query(
+    let res = await pg.query(
       `SELECT permissions FROM ${tableName} WHERE user_id = $1 AND status = 'ACTIVE'`,
       [userId]
     );
@@ -326,10 +326,10 @@ class AuthorizationService {
   }
 
   async createRole(payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { name, description, hierarchyLevel, defaultPermissions, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `INSERT INTO roles (name, description, hierarchy_level, default_permissions, metadata, created_at) 
        VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *`,
       [name, description, hierarchyLevel, JSON.stringify(defaultPermissions || []), JSON.stringify(metadata || {})]
@@ -339,10 +339,10 @@ class AuthorizationService {
   }
 
   async assignRole(userId, roleId) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Check if user already has this role
-    const existingRes = await pg.query(
+    let existingRes = await pg.query(
       `SELECT * FROM ${tableName} WHERE user_id = $1 AND role_id = $2`,
       [userId, roleId]
     );
@@ -359,7 +359,7 @@ class AuthorizationService {
     
     const role = roleRes.rows[0];
     
-    const res = await pg.query(
+    let res = await pg.query(
       `INSERT INTO ${tableName} (user_id, role_id, permissions, status, created_at) 
        VALUES ($1, $2, $3, 'ACTIVE', NOW()) RETURNING *`,
       [userId, roleId, JSON.stringify(role.default_permissions || [])]
@@ -380,8 +380,8 @@ class AuthorizationService {
   }
 
   async getAuthorizationAuditLog(userId, { page = 1, limit = 20, startDate, endDate } = {}) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-    const offset = (page - 1) * limit;
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let offset = (page - 1) * limit;
     
     let query = `SELECT COUNT(*) FROM authorization_audit_logs WHERE user_id = $1`;
     let countParams = [userId];
@@ -395,8 +395,8 @@ class AuthorizationService {
       countParams.push(endDate);
     }
     
-    const totalRes = await pg.query(query, countParams);
-    const total = parseInt(totalRes.rows[0].count || '0');
+    let totalRes = await pg.query(query, countParams);
+    let total = parseInt(totalRes.rows[0].count || '0');
     
     let dataQuery = `SELECT * FROM authorization_audit_logs WHERE user_id = $1`;
     let dataParams = [...countParams];
@@ -413,12 +413,12 @@ class AuthorizationService {
     dataQuery += ' ORDER BY created_at DESC LIMIT $' + (dataParams.length + 1) + ' OFFSET $' + (dataParams.length + 2);
     dataParams.push(limit, offset);
     
-    const res = await pg.query(dataQuery, dataParams);
+    let res = await pg.query(dataQuery, dataParams);
     return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
   }
 
   async logAuthorizationEvent(userId, event, details) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     await pg.query(
       `INSERT INTO authorization_audit_logs (user_id, event, details, created_at) 

@@ -3,9 +3,9 @@
  * Manages farmer profiles, FPOs, certifications, FDI calculations, and Wallet
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
 
 /**
  * Get farmer by ID
@@ -41,7 +41,7 @@ async function getFarmerById(farmerId) {
  */
 async function getFarmers(filters = {}, pagination = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { fpo_id, min_fdi, max_fdi, certification_count_min, status } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
@@ -96,7 +96,7 @@ async function getFarmers(filters = {}, pagination = {}) {
     query += ` ORDER BY f.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return {
       farmers: result.rows,
@@ -118,7 +118,7 @@ async function getFarmers(filters = {}, pagination = {}) {
  */
 async function calculateFDI(farmerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get farmer data
     const farmerQuery = `
@@ -208,16 +208,16 @@ async function calculateFDI(farmerId) {
  */
 async function addFarmerCertification(farmerId, certificationData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       INSERT INTO farmer_certifications (farmer_id, certification_type, certificate_number,
                                          issuing_authority, issue_date, expiry_date, document_url)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `;
     
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       farmerId,
       certificationData.certification_type,
       certificationData.certificate_number,
@@ -250,15 +250,15 @@ async function addFarmerCertification(farmerId, certificationData) {
  */
 async function getFarmerCertifications(farmerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT * FROM farmer_certifications
       WHERE farmer_id = $1
       ORDER BY issue_date DESC
     `;
     
-    const result = await pg.query(query, [farmerId]);
+    let result = await pg.query(query, [farmerId]);
     
     return result.rows;
   } catch (error) {
@@ -272,7 +272,7 @@ async function getFarmerCertifications(farmerId) {
  */
 async function getFPOs(filters = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     const { state, min_members } = filters;
 
@@ -292,7 +292,7 @@ async function getFPOs(filters = {}) {
       WHERE 1=1
     `;
 
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     if (state) {
@@ -309,7 +309,7 @@ async function getFPOs(filters = {}) {
 
     query += ' ORDER BY fpo.name';
 
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
 
     return result.rows;
   } catch (error) {
@@ -324,15 +324,15 @@ async function getFPOs(filters = {}) {
 
 async function getFarmerWallet(farmerId) {
   try {
-    const pg = getPostgreSQL();
-    const query = `
+    let pg = getPostgreSQL();
+    let query = `
       SELECT fw.*,
              (SELECT COUNT(*) FROM wallet_transactions WHERE wallet_id = fw.id) as transaction_count
       FROM farmer_wallets fw
       WHERE fw.farmer_id = $1
     `;
 
-    const result = await pg.query(query, [farmerId]);
+    let result = await pg.query(query, [farmerId]);
 
     if (result.rows.length === 0) {
       // Create wallet if doesn't exist
@@ -354,7 +354,7 @@ async function getFarmerWallet(farmerId) {
 
 async function getWalletTransactions(farmerId, filters = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     const wallet = await getFarmerWallet(farmerId);
     const { type, status, page = 1, limit = 20 } = filters;
 
@@ -366,7 +366,7 @@ async function getWalletTransactions(farmerId, filters = {}) {
       WHERE wt.wallet_id = $1
     `;
 
-    const params = [wallet.id];
+    let params = [wallet.id];
     let paramCount = 1;
 
     if (type) {
@@ -383,7 +383,7 @@ async function getWalletTransactions(farmerId, filters = {}) {
 
     query += ' ORDER BY wt.created_at DESC';
 
-    const offset = (page - 1) * limit;
+    let offset = (page - 1) * limit;
     paramCount++;
     query += ` LIMIT $${paramCount}`;
     params.push(limit);
@@ -392,7 +392,7 @@ async function getWalletTransactions(farmerId, filters = {}) {
     query += ` OFFSET $${paramCount}`;
     params.push(offset);
 
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
 
     return {
       transactions: result.rows,
@@ -406,8 +406,8 @@ async function getWalletTransactions(farmerId, filters = {}) {
 
 async function depositToWallet(farmerId, amount, paymentMethod, reference) {
   try {
-    const pg = getPostgreSQL();
-    const wallet = await getFarmerWallet(farmerId);
+    let pg = getPostgreSQL();
+    let wallet = await getFarmerWallet(farmerId);
 
     const amt = parseFloat(amount);
     if (!(amt > 0)) {
@@ -462,10 +462,10 @@ async function depositToWallet(farmerId, amount, paymentMethod, reference) {
 
 async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
   try {
-    const pg = getPostgreSQL();
-    const wallet = await getFarmerWallet(farmerId);
+    let pg = getPostgreSQL();
+    let wallet = await getFarmerWallet(farmerId);
 
-    const amt = parseFloat(amount);
+    let amt = parseFloat(amount);
     if (!(amt > 0)) {
       throw new Error('Withdrawal amount must be positive');
     }
@@ -479,12 +479,12 @@ async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
     // statement, so Postgres's own row-level locking during the UPDATE
     // prevents both problems at once. If the WHERE clause doesn't match
     // (insufficient funds), RETURNING yields no row.
-    const txClient = await pg.connect();
+    let txClient = await pg.connect();
     let result;
     try {
       await txClient.query('BEGIN');
 
-      const updateResult = await txClient.query(
+      let updateResult = await txClient.query(
         `UPDATE farmer_wallets SET balance = balance - $1, updated_at = NOW()
          WHERE id = $2 AND balance >= $1 RETURNING balance`,
         [amt, wallet.id]
@@ -493,9 +493,9 @@ async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
       if (updateResult.rows.length === 0) {
         throw new Error('Insufficient balance');
       }
-      const newBalance = updateResult.rows[0].balance;
+      let newBalance = updateResult.rows[0].balance;
 
-      const insertResult = await txClient.query(
+      let insertResult = await txClient.query(
         `INSERT INTO wallet_transactions
            (wallet_id, type, amount, balance_after, description, reference_id, bank_account, status)
          VALUES ($1, 'debit', $2, $3, $4, $5, $6, 'completed')
@@ -522,7 +522,7 @@ async function withdrawFromWallet(farmerId, amount, bankAccount, reference) {
 
 async function transferFromWallet(senderId, recipientId, amount, description) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     const senderWallet = await getFarmerWallet(senderId);
 
     if (parseFloat(senderWallet.balance) < parseFloat(amount)) {
@@ -557,7 +557,7 @@ async function transferFromWallet(senderId, recipientId, amount, description) {
     //   * Consistent lock ORDER prevents deadlock when two farmers transfer to
     //     each other at the same moment. Without it, transfer A holds wallet 1
     //     and wants 2 while B holds 2 and wants 1, and PostgreSQL kills one.
-    const txClient = await pg.connect();
+    let txClient = await pg.connect();
     let debitResult;
     try {
       await txClient.query('BEGIN');
@@ -623,8 +623,8 @@ async function transferFromWallet(senderId, recipientId, amount, description) {
 
 async function getWalletBalance(farmerId) {
   try {
-    const pg = getPostgreSQL();
-    const wallet = await getFarmerWallet(farmerId);
+    let pg = getPostgreSQL();
+    let wallet = await getFarmerWallet(farmerId);
     return {
       balance: wallet.balance,
       currency: wallet.currency,
@@ -638,7 +638,7 @@ async function getWalletBalance(farmerId) {
 
 async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, accountHolder) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     // Previously every linked account was inserted with is_primary=true - no
     // constraint stops that, so a farmer's second/third account would each
@@ -652,14 +652,14 @@ async function linkBankAccount(farmerId, bankName, accountNumber, ifscCode, acco
     );
     const isPrimary = parseInt(existing.rows[0].count, 10) === 0;
 
-    const query = `
+    let query = `
       INSERT INTO farmer_bank_accounts
       (farmer_id, bank_name, account_number, ifsc_code, account_holder, is_primary, verified)
       VALUES ($1, $2, $3, $4, $5, $6, false)
       RETURNING *
     `;
 
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       farmerId,
       bankName,
       accountNumber,
@@ -691,3 +691,6 @@ module.exports = {
   getWalletBalance,
   linkBankAccount
 };
+
+
+

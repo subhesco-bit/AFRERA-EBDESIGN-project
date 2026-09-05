@@ -224,7 +224,7 @@ function evalSqlValueExpr(expr, params) {
   // A cast such as `$1::jsonb` still carries its parameter.
   const cast = e.match(/^\$(\d+)::/);
   if (cast) {
-    const value = params ? params[Number(cast[1]) - 1] : undefined;
+    let value = params ? params[Number(cast[1]) - 1] : undefined;
     return value === undefined ? null : value;
   }
 
@@ -261,12 +261,12 @@ function parseInsertReturning(text, params) {
 
 /** `UPDATE t SET a = $1, b = 'x' WHERE id = $3 RETURNING *` -> { table, patch, whereParam } | null */
 function parseUpdateReturning(text, params) {
-  const m = String(text).match(
+  let m = String(text).match(
     /update\s+"?([a-z_][a-z0-9_]*)"?\s+set\s+([\s\S]*?)(?:\s+where\s+([\s\S]*?))?\s*(?:returning|;|$)/i
   );
   if (!m) return null;
 
-  const table = m[1].toLowerCase();
+  let table = m[1].toLowerCase();
   const patch = {};
   for (const pair of splitTopLevelCommas(m[2])) {
     const eq = pair.indexOf('=');
@@ -343,7 +343,7 @@ function makeTestPool() {
       // INSERT INTO health_profiles ... RETURNING *
       if (t.includes('insert into health_profiles')) {
         const userId = params[0];
-        const row = {
+        let row = {
           id: `hp-${Date.now()}`,
           user_id: userId,
           profile_name: params[1] || 'Test Profile',
@@ -356,8 +356,8 @@ function makeTestPool() {
 
       // SELECT * FROM health_profiles WHERE user_id = $1
       if (t.includes('select * from health_profiles') && t.includes('where user_id')) {
-        const userId = params[0];
-        const row = testStores.health_profiles.get(userId);
+        let userId = params[0];
+        let row = testStores.health_profiles.get(userId);
         return { rows: row ? [row] : [] };
       }
 
@@ -388,8 +388,8 @@ function makeTestPool() {
 
       // INSERT into gi_products
       if (t.includes('insert into gi_products')) {
-        const productId = params[0] || `gi-${Date.now()}`;
-        const row = {
+        let productId = params[0] || `gi-${Date.now()}`;
+        let row = {
           id: `gi-${Date.now()}`,
           product_id: productId,
           gi_name: params[1] || 'Test GI',
@@ -424,7 +424,7 @@ function makeTestPool() {
       if (t.includes('insert into gi_producers')) {
         const giProductId = params[0];
         const producerId = params[1] || `producer-${Date.now()}`;
-        const row = {
+        let row = {
           id: `gip-${Date.now()}`,
           gi_product_id: giProductId,
           producer_id: producerId,
@@ -445,16 +445,16 @@ function makeTestPool() {
 
       // SELECT ... FROM gi_producers WHERE gi_product_id = $1 ...
       if (t.includes('from gi_producers')) {
-        const giProductId = params[0];
-        const arr = testStores.gi_producers.get(giProductId) || [];
+        let giProductId = params[0];
+        let arr = testStores.gi_producers.get(giProductId) || [];
         return { rows: arr };
       }
 
       // INSERT into gi_product_pricing
       if (t.includes('insert into gi_product_pricing')) {
-        const productId = params[0];
-        const giProductId = params[1];
-        const row = {
+        let productId = params[0];
+        let giProductId = params[1];
+        let row = {
           id: `gipricing-${Date.now()}`,
           product_id: productId,
           gi_product_id: giProductId,
@@ -464,7 +464,7 @@ function makeTestPool() {
           premium_percentage: params[5] || 0,
           pricing_factors: params[6] ? JSON.parse(params[6]) : {}
         };
-        const arr = testStores.gi_product_pricing.get(productId) || [];
+        let arr = testStores.gi_product_pricing.get(productId) || [];
         arr.push(row);
         testStores.gi_product_pricing.set(productId, arr);
         return { rows: [row] };
@@ -472,11 +472,11 @@ function makeTestPool() {
 
       // INSERT into gi_authentication
       if (t.includes('insert into gi_authentication')) {
-        const productId = params[0] || null;
+        let productId = params[0] || null;
         const batchNumber = params[1] || null;
         const authCode = params[2] || `GI-AUTH-${Date.now()}`;
-        const producerId = params[3] || null;
-        const row = {
+        let producerId = params[3] || null;
+        let row = {
           id: `gia-${Date.now()}`,
           product_id: productId,
           batch_number: batchNumber,
@@ -491,8 +491,8 @@ function makeTestPool() {
 
       // SELECT ... FROM gi_authentication WHERE authentication_code = $1
       if (t.includes('from gi_authentication')) {
-        const authCode = params[0];
-        const row = testStores.gi_authentication.get(authCode);
+        let authCode = params[0];
+        let row = testStores.gi_authentication.get(authCode);
         return { rows: row ? [row] : [] };
       }
 
@@ -500,8 +500,8 @@ function makeTestPool() {
       // INSERT into gi_marketplace_listings
       if (t.includes('insert into gi_marketplace_listings')) {
         // SQL in service: VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9, $10, $11, $12, 'active')
-        const giProductId = params && params[0] ? params[0] : null;
-        const productId = params && params[1] ? params[1] : null;
+        let giProductId = params && params[0] ? params[0] : null;
+        let productId = params && params[1] ? params[1] : null;
         const sellerId = params && params[2] ? params[2] : `seller-${Date.now()}`;
         const listingTitle = params && params[3] ? params[3] : 'Listing';
         const description = params && params[4] ? params[4] : null;
@@ -513,7 +513,7 @@ function makeTestPool() {
         const qualityTier = params && params[9] ? params[9] : null;
         const harvestDate = params && params[10] ? params[10] : null;
         const locationId = params && params[11] ? params[11] : null;
-        const row = {
+        let row = {
           id: `gml-${Date.now()}`,
           gi_product_id: giProductId,
           product_id: productId,
@@ -537,17 +537,17 @@ function makeTestPool() {
 
       // SELECT ... FROM gi_marketplace_listings
       if (t.includes('from gi_marketplace_listings')) {
-        const all = Array.from(testStores.gi_marketplace.values());
+        let all = Array.from(testStores.gi_marketplace.values());
         // Attempt to filter by gi_product_id if provided as param
         const filterId = params && params.length > 0 ? params[0] : null;
-        const filtered = filterId ? all.filter(r => r.gi_product_id === filterId) : all;
+        let filtered = filterId ? all.filter(r => r.gi_product_id === filterId) : all;
         return { rows: filtered };
       }
 
       // INSERT into gi_analytics
       if (t.includes('insert into gi_analytics')) {
-        const giProductId = params[0];
-        const row = {
+        let giProductId = params[0];
+        let row = {
           id: `gian-${Date.now()}`,
           gi_product_id: giProductId,
           date: new Date().toISOString().split('T')[0],
@@ -559,7 +559,7 @@ function makeTestPool() {
           average_premium_percentage: params[6] || 0,
           unique_consumers: params[7] || 0
         };
-        const arr = testStores.gi_analytics.get(giProductId) || [];
+        let arr = testStores.gi_analytics.get(giProductId) || [];
         arr.push(row);
         testStores.gi_analytics.set(giProductId, arr);
         return { rows: [row] };
@@ -568,7 +568,7 @@ function makeTestPool() {
       // INSERT into blockchain_transactions
       if (t.includes('insert into blockchain_transactions')) {
         const txHash = params[0] || `0x${Math.random().toString(16).slice(2,66)}`;
-        const row = {
+        let row = {
           transaction_hash: txHash,
           block_number: params[1] || null,
           block_hash: params[2] || null,
@@ -587,7 +587,7 @@ function makeTestPool() {
 
       // SELECT * FROM blockchain_transactions WHERE transaction_hash = $1
       if (t.includes('from blockchain_transactions')) {
-        const txHash = params[0];
+        let txHash = params[0];
         // Direct key lookup first
         let row = testStores.blockchain_transactions.get(txHash);
         
@@ -595,7 +595,7 @@ function makeTestPool() {
         if (!row) {
           const normalize = (h) => (h || '').toString().toLowerCase().replace(/^0x/, '');
           const targetNorm = normalize(txHash);
-          const all = Array.from(testStores.blockchain_transactions.values());
+          let all = Array.from(testStores.blockchain_transactions.values());
           row = all.find(r => {
             if (!r || !r.transaction_hash) return false;
             const candidate = normalize(r.transaction_hash);
@@ -609,8 +609,8 @@ function makeTestPool() {
 
       // INSERT into dietary_profiles
       if (t.includes('insert into dietary_profiles')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `dp-${Date.now()}`,
           user_id: userId,
           profile_type: params[1] || 'balanced',
@@ -628,7 +628,7 @@ function makeTestPool() {
       // INSERT into blockchain_certificates
       if (t.includes('insert into blockchain_certificates')) {
         const certificateNumber = params[1] || `CERT-${Date.now()}`;
-        const row = {
+        let row = {
           id: `cert-${Date.now()}`,
           certificate_type: params[0] || null,
           certificate_number: certificateNumber,
@@ -650,14 +650,14 @@ function makeTestPool() {
       // SELECT * FROM blockchain_certificates WHERE certificate_number = $1 AND is_revoked = false
       if (t.includes('from blockchain_certificates')) {
         const certNum = params[0];
-        const row = testStores.blockchain_certificates.get(certNum);
+        let row = testStores.blockchain_certificates.get(certNum);
         return { rows: row ? [row] : [] };
       }
 
       // INSERT into blockchain_analytics
       if (t.includes('insert into blockchain_analytics')) {
         const key = new Date().toISOString().split('T')[0];
-        const row = {
+        let row = {
           id: `ban-${Date.now()}`,
           date: key,
           total_transactions: params[0] || 0,
@@ -675,8 +675,8 @@ function makeTestPool() {
 
       // INSERT into health_metrics
       if (t.includes('insert into health_metrics')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `hm-${Date.now()}`,
           user_id: userId,
           metric_type: params[1] || 'unknown',
@@ -685,7 +685,7 @@ function makeTestPool() {
           notes: params[4] || null,
           source: params[5] || 'manual'
         };
-        const arr = testStores.health_metrics.get(userId) || [];
+        let arr = testStores.health_metrics.get(userId) || [];
         arr.push(row);
         testStores.health_metrics.set(userId, arr);
         return { rows: [row] };
@@ -695,7 +695,7 @@ function makeTestPool() {
       if (t.includes('insert into food_items')) {
         // VALUES ($1..$15)
         const name = params[0] || 'Test Food';
-        const row = {
+        let row = {
           id: `food-${Date.now()}`,
           name,
           scientific_name: params[1] || null,
@@ -720,8 +720,8 @@ function makeTestPool() {
       // SEARCH / ts_query against food_items
       if (t.includes('to_tsquery') && t.includes('from food_items')) {
         const q = (params && params[0]) ? String(params[0]).toLowerCase() : '';
-        const all = Array.from(testStores.food_items.values());
-        const filtered = all.filter(f => (f.name && f.name.toLowerCase().includes(q)) || (f.scientific_name && f.scientific_name.toLowerCase().includes(q)));
+        let all = Array.from(testStores.food_items.values());
+        let filtered = all.filter(f => (f.name && f.name.toLowerCase().includes(q)) || (f.scientific_name && f.scientific_name.toLowerCase().includes(q)));
         return { rows: filtered };
       }
 
@@ -757,7 +757,7 @@ function makeTestPool() {
         const overall = params[5] || 0;
         const grade = params[6] || 'D';
         const recommendations = params[7] ? JSON.parse(params[7]) : [];
-        const row = {
+        let row = {
           id: `fq-${Date.now()}`,
           food_item_id: foodItemId,
           assessment_date: assessmentDate,
@@ -769,7 +769,7 @@ function makeTestPool() {
           compliance_status: 'compliant',
           recommendations
         };
-        const arr = testStores.food_quality_assessments.get(foodItemId) || [];
+        let arr = testStores.food_quality_assessments.get(foodItemId) || [];
         arr.push(row);
         testStores.food_quality_assessments.set(foodItemId, arr);
         return { rows: [row] };
@@ -777,15 +777,15 @@ function makeTestPool() {
 
       // SELECT * FROM food_quality_assessments WHERE food_item_id = $1
       if (t.includes('from food_quality_assessments')) {
-        const foodItemId = params[0];
-        const arr = testStores.food_quality_assessments.get(foodItemId) || [];
+        let foodItemId = params[0];
+        let arr = testStores.food_quality_assessments.get(foodItemId) || [];
         return { rows: arr };
       }
 
       // INSERT into health_goals
       if (t.includes('insert into health_goals')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `hg-${Date.now()}`,
           user_id: userId,
           goal_type: params[1] || null,
@@ -796,7 +796,7 @@ function makeTestPool() {
           target_date: params[6] || null,
           status: 'active'
         };
-        const arr = testStores.health_goals.get(userId) || [];
+        let arr = testStores.health_goals.get(userId) || [];
         arr.push(row);
         testStores.health_goals.set(userId, arr);
         return { rows: [row] };
@@ -804,8 +804,8 @@ function makeTestPool() {
 
       // INSERT into dietary_recommendations
       if (t.includes('insert into dietary_recommendations')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `dr-${Date.now()}`,
           user_id: userId,
           recommendation_type: params[1] || null,
@@ -814,7 +814,7 @@ function makeTestPool() {
           category: params[4] || null,
           reasoning: params[5] || null
         };
-        const arr = testStores.dietary_recommendations.get(userId) || [];
+        let arr = testStores.dietary_recommendations.get(userId) || [];
         arr.push(row);
         testStores.dietary_recommendations.set(userId, arr);
         return { rows: [row] };
@@ -822,8 +822,8 @@ function makeTestPool() {
 
       // INSERT into health_alerts
       if (t.includes('insert into health_alerts')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `ha-${Date.now()}`,
           user_id: userId,
           alert_type: params[1] || null,
@@ -831,7 +831,7 @@ function makeTestPool() {
           alert_message: params[3] || null,
           trigger_data: params[4] || null
         };
-        const arr = testStores.health_alerts.get(userId) || [];
+        let arr = testStores.health_alerts.get(userId) || [];
         arr.push(row);
         testStores.health_alerts.set(userId, arr);
         return { rows: [row] };
@@ -839,8 +839,8 @@ function makeTestPool() {
 
       // INSERT into food_consumption_logs
       if (t.includes('insert into food_consumption_logs')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `fc-${Date.now()}`,
           user_id: userId,
           food_item_id: params[1] || null,
@@ -851,7 +851,7 @@ function makeTestPool() {
           nutritional_intake: params[6] || null,
           notes: params[7] || null
         };
-        const arr = testStores.food_consumption_logs.get(userId) || [];
+        let arr = testStores.food_consumption_logs.get(userId) || [];
         arr.push(row);
         testStores.food_consumption_logs.set(userId, arr);
         return { rows: [row] };
@@ -869,16 +869,16 @@ function makeTestPool() {
 
       // INSERT into food_contaminant_tests
       if (t.includes('insert into food_contaminant_tests')) {
-        const foodItemId = params[0];
+        let foodItemId = params[0];
         const contaminantId = params[1];
         const testDate = params[2] || new Date().toISOString();
         const lab = params[3] || null;
         const level = params[4] || 0;
-        const unit = params[5] || null;
+        let unit = params[5] || null;
         const detectionLimit = params[6] || 0;
-        const status = params[7] || 'compliant';
+        let status = params[7] || 'compliant';
         const method = params[8] || null;
-        const row = {
+        let row = {
           id: `fct-${Date.now()}`,
           food_item_id: foodItemId,
           contaminant_id: contaminantId,
@@ -890,7 +890,7 @@ function makeTestPool() {
           result_status: status,
           test_method: method
         };
-        const arr = testStores.food_contaminant_tests.get(foodItemId) || [];
+        let arr = testStores.food_contaminant_tests.get(foodItemId) || [];
         arr.push(row);
         testStores.food_contaminant_tests.set(foodItemId, arr);
         return { rows: [row] };
@@ -898,21 +898,21 @@ function makeTestPool() {
 
       // SELECT contaminant tests for food item
       if (t.includes('from food_contaminant_tests')) {
-        const foodItemId = params[0];
-        const arr = testStores.food_contaminant_tests.get(foodItemId) || [];
+        let foodItemId = params[0];
+        let arr = testStores.food_contaminant_tests.get(foodItemId) || [];
         return { rows: arr };
       }
 
       // INSERT into food_freshness_assessments
       if (t.includes('insert into food_freshness_assessments')) {
-        const foodItemId = params[0];
-        const assessmentDate = params[1] || new Date().toISOString();
+        let foodItemId = params[0];
+        let assessmentDate = params[1] || new Date().toISOString();
         const freshnessScores = params[2] ? JSON.parse(params[2]) : {};
-        const overall = params[3] || 0;
+        let overall = params[3] || 0;
         const freshnessStatus = params[4] || 'fresh';
         const remainingDays = params[5] || 7;
         const storageRecs = params[6] ? JSON.parse(params[6]) : [];
-        const row = {
+        let row = {
           id: `ff-${Date.now()}`,
           food_item_id: foodItemId,
           assessment_date: assessmentDate,
@@ -922,7 +922,7 @@ function makeTestPool() {
           estimated_remaining_days: remainingDays,
           storage_recommendations: storageRecs
         };
-        const arr = testStores.food_freshness_assessments.get(foodItemId) || [];
+        let arr = testStores.food_freshness_assessments.get(foodItemId) || [];
         arr.push(row);
         testStores.food_freshness_assessments.set(foodItemId, arr);
         return { rows: [row] };
@@ -930,7 +930,7 @@ function makeTestPool() {
 
       // INSERT into food_recalls
       if (t.includes('insert into food_recalls')) {
-        const foodItemId = params[0];
+        let foodItemId = params[0];
         const recallNumber = params[1] || `REC-${Date.now()}`;
         const recallDate = params[2] || new Date().toISOString();
         const recallType = params[3] || null;
@@ -939,7 +939,7 @@ function makeTestPool() {
         const affectedBatches = params[6] ? JSON.parse(params[6]) : [];
         const affectedRegions = params[7] ? JSON.parse(params[7]) : [];
         const firm = params[8] || null;
-        const row = {
+        let row = {
           id: `rec-${Date.now()}`,
           food_item_id: foodItemId,
           recall_number: recallNumber,
@@ -958,15 +958,15 @@ function makeTestPool() {
 
       // SELECT active recalls
       if (t.includes('from food_recalls')) {
-        const all = Array.from(testStores.food_recalls.values());
-        const filtered = all.filter(r => r.recall_status === 'active');
+        let all = Array.from(testStores.food_recalls.values());
+        let filtered = all.filter(r => r.recall_status === 'active');
         return { rows: filtered };
       }
 
       // INSERT into food_intelligence_analytics
       if (t.includes('insert into food_intelligence_analytics')) {
-        const foodItemId = params[0];
-        const row = {
+        let foodItemId = params[0];
+        let row = {
           id: `fia-${Date.now()}`,
           food_item_id: foodItemId,
           date: new Date().toISOString().split('T')[0],
@@ -979,7 +979,7 @@ function makeTestPool() {
           demand_index: params[7] || 0,
           supply_index: params[8] || 0
         };
-        const arr = testStores.food_intelligence_analytics.get(foodItemId) || [];
+        let arr = testStores.food_intelligence_analytics.get(foodItemId) || [];
         arr.push(row);
         testStores.food_intelligence_analytics.set(foodItemId, arr);
         return { rows: [row] };
@@ -991,7 +991,7 @@ function makeTestPool() {
         // 1) (id, experience_name, description, type, target_entity_id, target_entity_type, thumbnail, experience_data_json, platform_requirements_json)
         // 2) (experience_name, experience_type, experience_category, description, target_entity_id, target_entity_type, thumbnail, experience_data_json, platform_requirements_json, created_by)
         const idCandidate = params[0];
-        const row = {};
+        let row = {};
         // detect style 2: first param looks like a human name (may contain space) and params length >= 9
         const looksLikeName = typeof params[0] === 'string' && params[0].length > 0 && (params[0].indexOf(' ') >= 0 || (params.length >= 9 && typeof params[1] === 'string'));
         if (looksLikeName) {
@@ -1029,13 +1029,13 @@ function makeTestPool() {
 
       if (t.includes('from arvr_experiences') || t.includes('from ar_vr_experiences')) {
         testStores.arvr_experiences = testStores.arvr_experiences || new Map();
-        const all = Array.from(testStores.arvr_experiences.values());
+        let all = Array.from(testStores.arvr_experiences.values());
         return { rows: all };
       }
 
       if (t.includes('insert into arvr_assets') || t.includes('insert into ar_vr_assets')) {
-        const id = `asset-${Date.now()}`;
-        const row = {
+        let id = `asset-${Date.now()}`;
+        let row = {
           id,
           asset_name: params[0] || '3d-asset',
           asset_type: params[1] || 'model',
@@ -1059,8 +1059,8 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into arvr_interaction_points') || t.includes('insert into ar_vr_interaction_points')) {
-        const id = `ip-${Date.now()}`;
-        const row = {
+        let id = `ip-${Date.now()}`;
+        let row = {
           id,
           experience_id: params[0],
           point_name: params[1] || 'Point',
@@ -1071,7 +1071,7 @@ function makeTestPool() {
           interaction_data: params[6] ? JSON.parse(params[6]) : {}
         };
         testStores.arvr_interaction_points = testStores.arvr_interaction_points || new Map();
-        const arr = testStores.arvr_interaction_points.get(row.experience_id) || [];
+        let arr = testStores.arvr_interaction_points.get(row.experience_id) || [];
         arr.push(row);
         testStores.arvr_interaction_points.set(row.experience_id, arr);
         return { rows: [row] };
@@ -1079,13 +1079,13 @@ function makeTestPool() {
 
       if (t.includes('from arvr_interaction_points')) {
         const expId = params[0];
-        const arr = (testStores.arvr_interaction_points && testStores.arvr_interaction_points.get(expId)) || [];
+        let arr = (testStores.arvr_interaction_points && testStores.arvr_interaction_points.get(expId)) || [];
         return { rows: arr };
       }
 
       if (t.includes('insert into arvr_sessions') || t.includes('insert into ar_vr_sessions')) {
-        const id = `sess-${Date.now()}`;
-        const row = {
+        let id = `sess-${Date.now()}`;
+        let row = {
           id,
           experience_id: params[0],
           user_id: params[1] || 'test-user',
@@ -1109,7 +1109,7 @@ function makeTestPool() {
       if (t.includes('update ar_vr_experiences') || t.includes('update arvr_experiences')) {
         testStores.arvr_experiences = testStores.arvr_experiences || new Map();
         // Expecting params[0] = id
-        const id = params && params.length > 0 ? params[0] : null;
+        let id = params && params.length > 0 ? params[0] : null;
         if (!id) return { rows: [] };
         // find row by id
         const existing = Array.from(testStores.arvr_experiences.values()).find(r => r.id === id || r.experience_id === id || r.experienceId === id);
@@ -1146,10 +1146,10 @@ function makeTestPool() {
         const sessionId = params && params.length > 1 ? params[1] : (params && params.length === 1 ? params[0] : null);
         const interactionCount = params && params.length > 0 ? Number(params[0]) || 0 : 0;
         if (!sessionId) return { rows: [] };
-        const existing = testStores.arvr_sessions.get(sessionId) || Array.from(testStores.arvr_sessions.values()).find(r => r.id === sessionId || r.session_id === sessionId);
+        let existing = testStores.arvr_sessions.get(sessionId) || Array.from(testStores.arvr_sessions.values()).find(r => r.id === sessionId || r.session_id === sessionId);
         if (!existing) {
           // create a minimal session record when not present so tests can end it
-          const created = {
+          let created = {
             id: sessionId,
             session_id: sessionId,
             experience_id: null,
@@ -1187,8 +1187,8 @@ function makeTestPool() {
         let device_distribution = {};
         try { most_viewed = params[4] ? JSON.parse(params[4]) : {}; } catch (e) { most_viewed = {}; }
         try { device_distribution = params[5] ? JSON.parse(params[5]) : {}; } catch (e) { device_distribution = {}; }
-        const key = new Date().toISOString().split('T')[0];
-        const row = {
+        let key = new Date().toISOString().split('T')[0];
+        let row = {
           id: `arva-${Date.now()}`,
           date: key,
           total_sessions,
@@ -1206,10 +1206,10 @@ function makeTestPool() {
 
       // Nutrition Intelligence: nutrients, food_profiles, product_nutrition and UDFs
       if (t.includes('insert into nutrients')) {
-        const id = params[0] || `nut-${Date.now()}`;
-        const name = params[1] || 'Protein';
-        const unit = params[2] || 'g';
-        const row = { id, symbol: (name || '').slice(0,3).toUpperCase(), name, unit, rda: params[3] || null };
+        let id = params[0] || `nut-${Date.now()}`;
+        let name = params[1] || 'Protein';
+        let unit = params[2] || 'g';
+        let row = { id, symbol: (name || '').slice(0,3).toUpperCase(), name, unit, rda: params[3] || null };
         testStores.nutrients = testStores.nutrients || new Map();
         testStores.nutrients.set(row.id, row);
         return { rows: [row] };
@@ -1221,7 +1221,7 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into food_profiles') || t.includes('insert into nutrition_food_profiles')) {
-        const id = `fp-${Date.now()}`;
+        let id = `fp-${Date.now()}`;
         // Accept either many positional params or a single JSON param
         let payload = {};
         if (params && params.length === 1 && typeof params[0] === 'string' && params[0].startsWith('{')) {
@@ -1236,7 +1236,7 @@ function makeTestPool() {
           payload.is_organic = params[6] || payload.is_organic;
           payload.nutrition_data = params[7] ? JSON.parse(params[7]) : payload.nutrition_data || {};
         }
-        const row = { id, food_name: payload.food_name || 'Test Food', scientific_name: payload.scientific_name || null, food_group: payload.food_group || null, botanical_family: payload.botanical_family || null, variety: payload.variety || null, origin_region: payload.origin_region || null, is_organic: !!payload.is_organic, nutrition_data: payload.nutrition_data || {} };
+        let row = { id, food_name: payload.food_name || 'Test Food', scientific_name: payload.scientific_name || null, food_group: payload.food_group || null, botanical_family: payload.botanical_family || null, variety: payload.variety || null, origin_region: payload.origin_region || null, is_organic: !!payload.is_organic, nutrition_data: payload.nutrition_data || {} };
         testStores.food_profiles = testStores.food_profiles || new Map();
         testStores.food_profiles.set(id, row);
         return { rows: [row] };
@@ -1249,7 +1249,7 @@ function makeTestPool() {
 
       // product nutrition entries
       if (t.includes('insert into product_nutrition')) {
-        const productId = params[0];
+        let productId = params[0];
         // Accept either JSON or positional fields
         let payload = {};
         if (params[1] && typeof params[1] === 'string' && params[1].startsWith('{')) {
@@ -1262,16 +1262,16 @@ function makeTestPool() {
           payload.verification_method = params[15] || params[5] || null;
           payload.confidence_score = params[16] || params[6] || null;
         }
-        const row = { id: `pn-${Date.now()}`, product_id: productId, nutrition_data: payload.nutrition_data || {}, calories_per_serving: payload.calories_per_serving || null, serving_size_g: payload.serving_size_g || null, servings_per_container: payload.servings_per_container || null, verification_method: payload.verification_method || null, confidence_score: payload.confidence_score || null };
+        let row = { id: `pn-${Date.now()}`, product_id: productId, nutrition_data: payload.nutrition_data || {}, calories_per_serving: payload.calories_per_serving || null, serving_size_g: payload.serving_size_g || null, servings_per_container: payload.servings_per_container || null, verification_method: payload.verification_method || null, confidence_score: payload.confidence_score || null };
         testStores.product_nutrition = testStores.product_nutrition || new Map();
         testStores.product_nutrition.set(productId, row);
         return { rows: [row] };
       }
 
       if (t.includes('from product_nutrition')) {
-        const productId = params[0];
+        let productId = params[0];
         testStores.product_nutrition = testStores.product_nutrition || new Map();
-        const row = testStores.product_nutrition.get(productId);
+        let row = testStores.product_nutrition.get(productId);
         return { rows: row ? [row] : [] };
       }
 
@@ -1279,7 +1279,7 @@ function makeTestPool() {
       if (t.includes('select calculate_nutrition_score') || t.includes('select calculate_nutrition_score(')) {
         const payload = params[0] ? JSON.parse(params[0]) : {};
         const nutrients = Object.values(payload).filter(v => typeof v === 'number');
-        const score = nutrients.length ? Math.round((nutrients.reduce((a,b)=>a+b,0)/nutrients.length)) : 0;
+        let score = nutrients.length ? Math.round((nutrients.reduce((a,b)=>a+b,0)/nutrients.length)) : 0;
         // assign grade
         let grade = 'D';
         if (score >= 85) grade = 'A';
@@ -1289,17 +1289,17 @@ function makeTestPool() {
       }
 
       if (t.includes('select calculate_nutrition_pricing') || t.includes('select calculate_nutrition_pricing(')) {
-        const productId = params[0] || 'prod-1';
+        let productId = params[0] || 'prod-1';
         const base = Number(params[1]) || 100;
         const premium = Number((base * 0.15).toFixed(2));
-        const finalPrice = Number((base + premium).toFixed(2));
+        let finalPrice = Number((base + premium).toFixed(2));
         return { rows: [{ base_price: base, final_price: finalPrice, price_premium_percentage: Math.round((premium/base)*100) }] };
       }
 
       // Conversational AI: domains, sessions, messages, context, simple intent detection
       if (t.includes('insert into conversation_domains') || t.includes('insert into conversational_domains')) {
-        const id = params[0] || `dom-${Date.now()}`;
-        const row = { id, name: params[1] || 'default', description: params[2] || null };
+        let id = params[0] || `dom-${Date.now()}`;
+        let row = { id, name: params[1] || 'default', description: params[2] || null };
         testStores.conversation_domains = testStores.conversation_domains || new Map();
         testStores.conversation_domains.set(row.id, row);
         return { rows: [row] };
@@ -1311,19 +1311,19 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into conversational_sessions') || t.includes('insert into conversation_sessions')) {
-        const id = `cs-${Date.now()}`;
-        const userId = params[0] || 'test-user';
+        let id = `cs-${Date.now()}`;
+        let userId = params[0] || 'test-user';
         // preserve the session_id passed in by the service when available (services often pass a generated session id)
         const providedSessionId = params[1] || null;
         const domainId = params[2] || null;
         const language = params[3] || 'en'; // language parameter, not JSON
-        const status = params[4] || 'active';
+        let status = params[4] || 'active';
         // attempt to resolve domain name if available
         testStores.conversation_domains = testStores.conversation_domains || new Map();
         const domainRow = domainId ? testStores.conversation_domains.get(domainId) : null;
         const domain_name = domainRow ? domainRow.name : (domainId || null);
         const sessionIdValue = providedSessionId || id;
-        const row = { id, session_id: sessionIdValue, user_id: userId, domain_id: domainId, domain_name, language, status, created_at: new Date().toISOString() };
+        let row = { id, session_id: sessionIdValue, user_id: userId, domain_id: domainId, domain_name, language, status, created_at: new Date().toISOString() };
         testStores.conversation_sessions = testStores.conversation_sessions || new Map();
         // store by session_id so lookups that query by session_id succeed
         testStores.conversation_sessions.set(sessionIdValue, row);
@@ -1338,7 +1338,7 @@ function makeTestPool() {
           const byKey = testStores.conversation_sessions.get(sessionIdParam);
           if (byKey) return { rows: [byKey] };
           // fallback: scan values for match in session_id or id
-          const all = Array.from(testStores.conversation_sessions.values());
+          let all = Array.from(testStores.conversation_sessions.values());
           const found = all.find(r => (r && (r.session_id === sessionIdParam || r.id === sessionIdParam)));
           return { rows: found ? [found] : [] };
         }
@@ -1346,7 +1346,7 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into conversational_messages') || t.includes('insert into conversation_messages')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         const role = params[1] || 'user';
         const content = params[2] || '';
         const contentType = params[3] || 'text';
@@ -1355,8 +1355,8 @@ function makeTestPool() {
         const confidenceScore = params[6] || null;
         const processingTime = params[7] || 0;
         
-        const id = `msg-${Date.now()}`;
-        const row = { 
+        let id = `msg-${Date.now()}`;
+        let row = { 
           id, 
           message_id: id, 
           session_id: sessionId, 
@@ -1370,21 +1370,21 @@ function makeTestPool() {
           created_at: new Date().toISOString() 
         };
         testStores.conversation_messages = testStores.conversation_messages || new Map();
-        const arr = testStores.conversation_messages.get(sessionId) || [];
+        let arr = testStores.conversation_messages.get(sessionId) || [];
         arr.push(row);
         testStores.conversation_messages.set(sessionId, arr);
         return { rows: [row] };
       }
 
       if (t.includes('from conversational_messages') || t.includes('from conversation_messages')) {
-        const sessionId = params[0];
-        const arr = (testStores.conversation_messages && testStores.conversation_messages.get(sessionId)) || [];
+        let sessionId = params[0];
+        let arr = (testStores.conversation_messages && testStores.conversation_messages.get(sessionId)) || [];
         return { rows: arr };
       }
 
       // update_session_activity UDF fallback
       if (t.includes('select update_session_activity')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         // Find the session and update its activity timestamp
         if (testStores.conversational_sessions && testStores.conversational_sessions.has(sessionId)) {
           const session = testStores.conversational_sessions.get(sessionId);
@@ -1396,7 +1396,7 @@ function makeTestPool() {
 
       // conversation context operations
       if (t.includes('insert into conversation_context')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         const contextKey = params[1];
         const contextValue = params[2] ? JSON.parse(params[2]) : {};
         
@@ -1409,13 +1409,13 @@ function makeTestPool() {
       }
 
       if (t.includes('select * from conversation_context where session_id')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         testStores.conversation_context = testStores.conversation_context || new Map();
-        const contextMap = testStores.conversation_context.get(sessionId) || new Map();
+        let contextMap = testStores.conversation_context.get(sessionId) || new Map();
         
         if (t.includes('and context_key')) {
-          const contextKey = params[1];
-          const value = contextMap.get(contextKey);
+          let contextKey = params[1];
+          let value = contextMap.get(contextKey);
           return { rows: value ? [{ session_id: sessionId, context_key: contextKey, context_value: value }] : [] };
         }
         
@@ -1430,11 +1430,11 @@ function makeTestPool() {
 
       // update conversation_sessions for ending sessions
       if (t.includes('update conversation_sessions set status')) {
-        const status = params[0];
-        const sessionId = params[1];
+        let status = params[0];
+        let sessionId = params[1];
         const store = testStores.conversation_sessions;
         if (store && store.has(sessionId)) {
-          const session = store.get(sessionId);
+          let session = store.get(sessionId);
           session.status = status;
           session.last_activity_at = new Date().toISOString();
           store.set(sessionId, session);
@@ -1448,16 +1448,16 @@ function makeTestPool() {
         const coverageAmount = Number(params[1]) || 100000;
         const baseRate = 0.05; // 5% base rate
         const cropFactor = cropType === 'wheat' ? 1.2 : cropType === 'rice' ? 1.5 : 1.0;
-        const premium = Math.round(coverageAmount * baseRate * cropFactor);
+        let premium = Math.round(coverageAmount * baseRate * cropFactor);
         return { rows: [{ premium, coverage_amount: coverageAmount, base_rate: baseRate, crop_factor: cropFactor }] };
       }
 
       if (t.includes('select calculate_transit_insurance_premium')) {
         const shipmentValue = Number(params[0]) || 50000;
         const distance = Number(params[1]) || 100;
-        const baseRate = 0.02; // 2% base rate
+        let baseRate = 0.02; // 2% base rate
         const distanceFactor = 1 + (distance / 1000) * 0.1; // 10% increase per 1000km
-        const premium = Math.round(shipmentValue * baseRate * distanceFactor);
+        let premium = Math.round(shipmentValue * baseRate * distanceFactor);
         return { rows: [{ premium, shipment_value: shipmentValue, distance, distance_factor: distanceFactor }] };
       }
 
@@ -1480,7 +1480,7 @@ function makeTestPool() {
       if (t.includes('select calculate_crop_recommendation')) {
         const soilType = params[0] || 'loam';
         const season = params[1] || 'kharif';
-        const recommendations = soilType === 'loam' && season === 'kharif' 
+        let recommendations = soilType === 'loam' && season === 'kharif' 
           ? ['rice', 'maize', 'cotton'] 
           : ['wheat', 'barley', 'mustard'];
         return { rows: [{ recommended_crops: recommendations, soil_type: soilType, season }] };
@@ -1496,10 +1496,10 @@ function makeTestPool() {
 
       // Voice AI handlers
       if (t.includes('insert into voice_sessions')) {
-        const userId = params[0];
-        const sessionId = params[1] || `VOICE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const language = params[2] || 'en';
-        const row = {
+        let userId = params[0];
+        let sessionId = params[1] || `VOICE-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        let language = params[2] || 'en';
+        let row = {
           id: `vs-${Date.now()}`,
           user_id: userId,
           session_id: sessionId,
@@ -1513,7 +1513,7 @@ function makeTestPool() {
       }
 
       if (t.includes('update voice_sessions set ended_at')) {
-        const sessionId = params[1];
+        let sessionId = params[1];
         // Try both session_id and id for lookup
         let session = null;
         if (testStores.voice_sessions && testStores.voice_sessions.has(sessionId)) {
@@ -1537,13 +1537,13 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into voice_commands')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         const commandType = params[1] || 'unknown';
         const transcript = params[2] || '';
         const intent = params[3] || null;
-        const confidenceScore = params[4] || 0;
+        let confidenceScore = params[4] || 0;
         const parameters = params[5] ? JSON.parse(params[5]) : {};
-        const row = {
+        let row = {
           id: `vc-${Date.now()}`,
           session_id: sessionId,
           command_type: commandType,
@@ -1555,28 +1555,28 @@ function makeTestPool() {
           created_at: new Date().toISOString()
         };
         testStores.voice_commands = testStores.voice_commands || new Map();
-        const arr = testStores.voice_commands.get(sessionId) || [];
+        let arr = testStores.voice_commands.get(sessionId) || [];
         arr.push(row);
         testStores.voice_commands.set(sessionId, arr);
         return { rows: [row] };
       }
 
       if (t.includes('select * from voice_commands where session_id')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         testStores.voice_commands = testStores.voice_commands || new Map();
-        const arr = testStores.voice_commands.get(sessionId) || [];
+        let arr = testStores.voice_commands.get(sessionId) || [];
         return { rows: arr };
       }
 
       if (t.includes('insert into speech_recognition_logs')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         const audioDuration = params[1] || 0;
-        const transcript = params[2] || '';
-        const confidenceScore = params[3] || 0;
+        let transcript = params[2] || '';
+        let confidenceScore = params[3] || 0;
         const languageDetected = params[4] || 'en';
         const recognitionProvider = params[5] || 'google';
-        const processingTime = params[6] || 0;
-        const row = {
+        let processingTime = params[6] || 0;
+        let row = {
           id: `srl-${Date.now()}`,
           session_id: sessionId,
           audio_duration_ms: audioDuration,
@@ -1588,20 +1588,20 @@ function makeTestPool() {
           created_at: new Date().toISOString()
         };
         testStores.speech_recognition_logs = testStores.speech_recognition_logs || new Map();
-        const arr = testStores.speech_recognition_logs.get(sessionId) || [];
+        let arr = testStores.speech_recognition_logs.get(sessionId) || [];
         arr.push(row);
         testStores.speech_recognition_logs.set(sessionId, arr);
         return { rows: [row] };
       }
 
       if (t.includes('insert into voice_responses')) {
-        const sessionId = params[0];
+        let sessionId = params[0];
         const commandId = params[1];
         const responseType = params[2] || 'text';
-        const content = params[3] || '';
+        let content = params[3] || '';
         const audioUrl = params[4] || null;
-        const language = params[5] || 'en';
-        const row = {
+        let language = params[5] || 'en';
+        let row = {
           id: `vr-${Date.now()}`,
           session_id: sessionId,
           command_id: commandId,
@@ -1612,15 +1612,15 @@ function makeTestPool() {
           created_at: new Date().toISOString()
         };
         testStores.voice_responses = testStores.voice_responses || new Map();
-        const arr = testStores.voice_responses.get(sessionId) || [];
+        let arr = testStores.voice_responses.get(sessionId) || [];
         arr.push(row);
         testStores.voice_responses.set(sessionId, arr);
         return { rows: [row] };
       }
 
       if (t.includes('insert into voice_preferences')) {
-        const userId = params[0];
-        const row = {
+        let userId = params[0];
+        let row = {
           id: `vp-${Date.now()}`,
           user_id: userId,
           preferred_language: params[1] || 'en',
@@ -1636,16 +1636,16 @@ function makeTestPool() {
       }
 
       if (t.includes('select * from voice_preferences where user_id')) {
-        const userId = params[0];
+        let userId = params[0];
         testStores.voice_preferences = testStores.voice_preferences || new Map();
-        const row = testStores.voice_preferences.get(userId);
+        let row = testStores.voice_preferences.get(userId);
         return { rows: row ? [row] : [] };
       }
 
       if (t.includes('insert into voice_analytics')) {
-        const userId = params[0];
+        let userId = params[0];
         const metrics = params[1] ? JSON.parse(params[1]) : {};
-        const row = {
+        let row = {
           id: `va-${Date.now()}`,
           user_id: userId,
           total_sessions: metrics.sessions || 0,
@@ -1658,22 +1658,22 @@ function makeTestPool() {
           date: new Date().toISOString().split('T')[0]
         };
         testStores.voice_analytics = testStores.voice_analytics || new Map();
-        const arr = testStores.voice_analytics.get(userId) || [];
+        let arr = testStores.voice_analytics.get(userId) || [];
         arr.push(row);
         testStores.voice_analytics.set(userId, arr);
         return { rows: [row] };
       }
 
       if (t.includes('select * from voice_analytics where user_id')) {
-        const userId = params[0];
+        let userId = params[0];
         testStores.voice_analytics = testStores.voice_analytics || new Map();
-        const arr = testStores.voice_analytics.get(userId) || [];
+        let arr = testStores.voice_analytics.get(userId) || [];
         return { rows: arr };
       }
 
       // Insurance handlers
       if (t.includes('insert into insurance_policies')) {
-        const row = {
+        let row = {
           id: `ip-${Date.now()}`,
           policy_number: params[0] || `POL-${Date.now()}`,
           user_id: params[1],
@@ -1689,16 +1689,16 @@ function makeTestPool() {
       }
 
       if (t.includes('select * from insurance_policies where user_id')) {
-        const userId = params[0];
+        let userId = params[0];
         testStores.insurance_policies = testStores.insurance_policies || new Map();
-        const all = Array.from(testStores.insurance_policies.values());
-        const filtered = all.filter(r => r.user_id === userId);
+        let all = Array.from(testStores.insurance_policies.values());
+        let filtered = all.filter(r => r.user_id === userId);
         return { rows: filtered };
       }
 
       // GST handlers
       if (t.includes('insert into gst_invoices')) {
-        const row = {
+        let row = {
           id: `gi-${Date.now()}`,
           invoice_number: params[0] || `INV-${Date.now()}`,
           order_id: params[1],
@@ -1714,7 +1714,7 @@ function makeTestPool() {
 
       // Product reviews handlers
       if (t.includes('insert into product_reviews')) {
-        const row = {
+        let row = {
           id: `pr-${Date.now()}`,
           product_id: params[0],
           user_id: params[1],
@@ -1724,22 +1724,22 @@ function makeTestPool() {
           created_at: new Date().toISOString()
         };
         testStores.product_reviews = testStores.product_reviews || new Map();
-        const arr = testStores.product_reviews.get(row.product_id) || [];
+        let arr = testStores.product_reviews.get(row.product_id) || [];
         arr.push(row);
         testStores.product_reviews.set(row.product_id, arr);
         return { rows: [row] };
       }
 
       if (t.includes('select * from product_reviews where product_id')) {
-        const productId = params[0];
+        let productId = params[0];
         testStores.product_reviews = testStores.product_reviews || new Map();
-        const arr = testStores.product_reviews.get(productId) || [];
+        let arr = testStores.product_reviews.get(productId) || [];
         return { rows: arr };
       }
 
       // Bulk orders handlers
       if (t.includes('insert into bulk_orders')) {
-        const row = {
+        let row = {
           id: `bo-${Date.now()}`,
           order_number: `BO-${Date.now()}`,
           buyer_id: params[0],
@@ -1755,7 +1755,7 @@ function makeTestPool() {
 
       // Land records handlers
       if (t.includes('insert into land_records')) {
-        const row = {
+        let row = {
           id: `lr-${Date.now()}`,
           farmer_id: params[0],
           land_area: Number(params[1]) || 0,
@@ -1765,7 +1765,7 @@ function makeTestPool() {
           created_at: new Date().toISOString()
         };
         testStores.land_records = testStores.land_records || new Map();
-        const arr = testStores.land_records.get(row.farmer_id) || [];
+        let arr = testStores.land_records.get(row.farmer_id) || [];
         arr.push(row);
         testStores.land_records.set(row.farmer_id, arr);
         return { rows: [row] };
@@ -1773,7 +1773,7 @@ function makeTestPool() {
 
       // Crop plans handlers
       if (t.includes('insert into crop_plans')) {
-        const row = {
+        let row = {
           id: `cp-${Date.now()}`,
           farmer_id: params[0],
           crop_type: params[1] || 'rice',
@@ -1783,7 +1783,7 @@ function makeTestPool() {
           created_at: new Date().toISOString()
         };
         testStores.crop_plans = testStores.crop_plans || new Map();
-        const arr = testStores.crop_plans.get(row.farmer_id) || [];
+        let arr = testStores.crop_plans.get(row.farmer_id) || [];
         arr.push(row);
         testStores.crop_plans.set(row.farmer_id, arr);
         return { rows: [row] };
@@ -1791,7 +1791,7 @@ function makeTestPool() {
 
       // Farmer wallet handlers
       if (t.includes('insert into farmer_wallets')) {
-        const row = {
+        let row = {
           id: `fw-${Date.now()}`,
           farmer_id: params[0],
           balance: Number(params[1]) || 0,
@@ -1806,13 +1806,13 @@ function makeTestPool() {
       if (t.includes('select * from farmer_wallets where farmer_id')) {
         const farmerId = params[0];
         testStores.farmer_wallets = testStores.farmer_wallets || new Map();
-        const row = testStores.farmer_wallets.get(farmerId);
+        let row = testStores.farmer_wallets.get(farmerId);
         return { rows: row ? [row] : [] };
       }
 
       // Nutrition Intelligence handlers
       if (t.includes('insert into food_nutrition_profiles')) {
-        const row = {
+        let row = {
           id: `fn-${Date.now()}`,
           food_name: params[0],
           scientific_name: params[1],
@@ -1836,7 +1836,7 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into product_nutrition')) {
-        const row = {
+        let row = {
           id: `pn-${Date.now()}`,
           product_id: params[0],
           nutrition_profile_id: params[1],
@@ -1858,9 +1858,9 @@ function makeTestPool() {
       }
 
       if (t.includes('select pn.*, fnp.food_name')) {
-        const productId = params[0];
+        let productId = params[0];
         testStores.product_nutrition = testStores.product_nutrition || new Map();
-        const row = testStores.product_nutrition.get(productId);
+        let row = testStores.product_nutrition.get(productId);
         if (row) {
           // Add food_name from food_nutrition_profiles if nutrition_profile_id exists
           if (row.nutrition_profile_id) {
@@ -1876,9 +1876,9 @@ function makeTestPool() {
       }
 
       if (t.includes('select * from product_nutrition where product_id')) {
-        const productId = params[0];
+        let productId = params[0];
         testStores.product_nutrition = testStores.product_nutrition || new Map();
-        const row = testStores.product_nutrition.get(productId);
+        let row = testStores.product_nutrition.get(productId);
         if (row) {
           // Return with calculated score if not present
           if (!row.overall_score && row.nutrition_data) {
@@ -1899,7 +1899,7 @@ function makeTestPool() {
 
       // Nutrition UDF fallbacks
       if (t.includes('select calculate_nutrition_score')) {
-        const nutritionData = params[0] ? JSON.parse(params[0]) : {};
+        let nutritionData = params[0] ? JSON.parse(params[0]) : {};
         const scoringModelId = params[1] || 1;
         
         // Simple scoring algorithm
@@ -1912,14 +1912,14 @@ function makeTestPool() {
         if (nutritionData.IRON > 1) score += 3;
         
         score = Math.min(100, Math.max(0, score));
-        const grade = score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F';
+        let grade = score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F';
         
         return { rows: [{ overall_score: score, grade, scoring_model_id: scoringModelId }] };
       }
 
       if (t.includes('select calculate_nutrition_score_from_data')) {
-        const nutritionData = params[0] ? JSON.parse(params[0]) : {};
-        const scoringModelId = params[1] || 1;
+        let nutritionData = params[0] ? JSON.parse(params[0]) : {};
+        let scoringModelId = params[1] || 1;
         
         // Calculate individual component scores
         const proteinScore = Math.min(100, (nutritionData.PRO || 0) * 10);
@@ -1930,7 +1930,7 @@ function makeTestPool() {
         
         // Overall score (weighted average)
         const overallScore = Math.round((proteinScore * 0.25 + fiberScore * 0.25 + sugarScore * 0.15 + sodiumScore * 0.15 + fatScore * 0.20));
-        const grade = overallScore >= 90 ? 'A' : overallScore >= 80 ? 'B' : overallScore >= 70 ? 'C' : overallScore >= 60 ? 'D' : 'F';
+        let grade = overallScore >= 90 ? 'A' : overallScore >= 80 ? 'B' : overallScore >= 70 ? 'C' : overallScore >= 60 ? 'D' : 'F';
         
         return { rows: [{ 
           overall_score: overallScore, 
@@ -1945,13 +1945,13 @@ function makeTestPool() {
       }
 
       if (t.includes('select calculate_nutrition_pricing')) {
-        const basePrice = Number(params[0]) || 100;
+        let basePrice = Number(params[0]) || 100;
         const nutritionScore = Number(params[1]) || 70;
         const pricingRuleId = params[2] || 1;
         
         // Premium pricing for higher nutrition scores
         const premiumMultiplier = 1 + ((nutritionScore - 70) / 100) * 0.3;
-        const finalPrice = Math.round(basePrice * premiumMultiplier);
+        let finalPrice = Math.round(basePrice * premiumMultiplier);
         
         return { rows: [{ base_price: basePrice, final_price: finalPrice, nutrition_score: nutritionScore, premium_multiplier: premiumMultiplier }] };
       }
@@ -1996,7 +1996,7 @@ function makeTestPool() {
 
       // Product nutrition scores handler
       if (t.includes('insert into product_nutrition_scores')) {
-        const row = {
+        let row = {
           id: `ns-${Date.now()}`,
           product_id: params[0],
           overall_score: parseFloat(params[1]) || 70,
@@ -2015,16 +2015,16 @@ function makeTestPool() {
       }
 
       if (t.includes('select * from product_nutrition_scores where product_id')) {
-        const productId = params[0];
+        let productId = params[0];
         testStores.nutrition_scores = testStores.nutrition_scores || new Map();
-        const row = testStores.nutrition_scores.get(productId);
+        let row = testStores.nutrition_scores.get(productId);
         return { rows: row ? [row] : [] };
       }
 
       // simple intent detection mock
       if (t.includes('select detect_intent') || t.includes('select detect_intent(')) {
         const text = params[0] || '';
-        const lower = String(text).toLowerCase();
+        let lower = String(text).toLowerCase();
         let intent = 'unknown';
         if (lower.includes('hello') || lower.includes('hi')) intent = 'greeting';
         else if (lower.includes('order') || lower.includes('buy')) intent = 'purchase_intent';
@@ -2048,8 +2048,8 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into test_categories')) {
-        const id = `tc-${Date.now()}`;
-        const row = { id, name: params[0] || 'Chemistry', description: params[1] || null };
+        let id = `tc-${Date.now()}`;
+        let row = { id, name: params[0] || 'Chemistry', description: params[1] || null };
         testStores.test_categories = testStores.test_categories || new Map();
         testStores.test_categories.set(row.id, row);
         return { rows: [row] };
@@ -2061,8 +2061,8 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into test_methods')) {
-        const id = `tm-${Date.now()}`;
-        const row = { id, name: params[0] || 'HPLC', category_id: params[1] || null, details: params[2] ? JSON.parse(params[2]) : {} };
+        let id = `tm-${Date.now()}`;
+        let row = { id, name: params[0] || 'HPLC', category_id: params[1] || null, details: params[2] ? JSON.parse(params[2]) : {} };
         testStores.test_methods = testStores.test_methods || new Map();
         testStores.test_methods.set(row.id, row);
         return { rows: [row] };
@@ -2074,9 +2074,9 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into samples')) {
-        const id = `samp-${Date.now()}`;
+        let id = `samp-${Date.now()}`;
         const sample_batch_number = params[2] || params[1] || `BATCH-${Date.now()}`;
-        const row = { id, product_id: params[0] || null, collected_by: params[1] || null, sample_batch_number, collected_at: new Date().toISOString(), status: 'registered' };
+        let row = { id, product_id: params[0] || null, collected_by: params[1] || null, sample_batch_number, collected_at: new Date().toISOString(), status: 'registered' };
         testStores.samples = testStores.samples || new Map();
         testStores.samples.set(row.id, row);
         return { rows: [row] };
@@ -2100,8 +2100,8 @@ function makeTestPool() {
       }
 
       if (t.includes('insert into test_results') || t.includes('insert into test_result')) {
-        const id = `tr-${Date.now()}`;
-        const row = { id, assignment_id: params[0], results: params[1] ? JSON.parse(params[1]) : {}, reported_at: new Date().toISOString() };
+        let id = `tr-${Date.now()}`;
+        let row = { id, assignment_id: params[0], results: params[1] ? JSON.parse(params[1]) : {}, reported_at: new Date().toISOString() };
         testStores.test_results = testStores.test_results || new Map();
         testStores.test_results.set(row.id, row);
         return { rows: [row] };
@@ -2127,9 +2127,9 @@ function makeTestPool() {
       }
 
       if (/^\s*update\s+/i.test(text || '')) {
-        const parsed = parseUpdateReturning(text, params);
+        let parsed = parseUpdateReturning(text, params);
         if (parsed) {
-          const store = storeFor(parsed.table);
+          let store = storeFor(parsed.table);
           let target = parsed.key ? store.get(parsed.key.value) : null;
 
           if (!target && parsed.key) {
@@ -2142,7 +2142,7 @@ function makeTestPool() {
           // straight off the result. Returning an empty set would throw a
           // TypeError that reads like a service bug rather than absent seed
           // data, which is the confusion this whole file exists to avoid.
-          const row = { ...(target || {}), ...parsed.patch };
+          let row = { ...(target || {}), ...parsed.patch };
           if (row.id === undefined && parsed.key) row[parsed.key.column] = parsed.key.value;
           if (row.id === undefined) row.id = parsed.key ? parsed.key.value : `${parsed.table}-${Date.now()}`;
           row.updated_at = new Date().toISOString();
@@ -2171,8 +2171,8 @@ function makeTestPool() {
       // consistent within a test.
       const from = (text || '').match(/\bfrom\s+"?([a-z_][a-z0-9_]*)"?/i);
       if (from && /^\s*select/i.test(text || '')) {
-        const table = from[1].toLowerCase();
-        const store = testStores[table];
+        let table = from[1].toLowerCase();
+        let store = testStores[table];
         if (store) {
           const rows = Array.from(store.values());
           return { rows: applyWhereFilter(rows, text, params) };
@@ -2238,7 +2238,7 @@ function setTestData(table, key, value, append = false) {
   if (!Object.prototype.hasOwnProperty.call(testStores, table)) return false;
 
   if (append) {
-    const arr = testStores[table].get(key) || [];
+    let arr = testStores[table].get(key) || [];
     arr.push(value);
     testStores[table].set(key, arr);
     return true;

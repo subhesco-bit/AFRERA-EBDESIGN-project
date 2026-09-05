@@ -160,8 +160,8 @@ async function getSoilRecommendations(farmerId, parcelId) {
       return { message: 'No soil samples found for this parcel' };
     }
 
-    const sample = latestSample.rows[0];
-    const report = await pool.query(
+    let sample = latestSample.rows[0];
+    let report = await pool.query(
       'SELECT * FROM soil_health_reports WHERE sample_id = $1',
       [sample.sample_id]
     );

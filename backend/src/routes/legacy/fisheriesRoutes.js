@@ -3,12 +3,14 @@
  * RESTful API endpoints for fisheries management (M025)
  */
 
-const express = require('express');
+const express = require('express.js');
+const { protectLivestockRouter } = require('../livestockRouteSupport.js');
 const router = express.Router();
-const fisheriesService = require('../../services/legacy/fisheriesService');
+protectLivestockRouter(router);
+const fisheriesService = require('../../services/legacy/fisheriesService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/fisheries - Get all fisheries
 router.get('/', authenticate, async (req, res) => {
@@ -38,7 +40,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/fisheries - Create fishery
 router.post('/', authenticate, async (req, res) => {
   try {
-    const fishery = await fisheriesService.createFishery(req.body);
+    let fishery = await fisheriesService.createFishery(req.body);
     res.status(201).json({ success: true, data: fishery });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

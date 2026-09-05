@@ -31,8 +31,8 @@
  * see the migration's comment on that column.
  */
 
-const { logger } = require('../../utils/logger');
-const { withTransaction } = require('../../core/withTransaction');
+const { logger } = require('../../utils\/logger');
+const { withTransaction } = require('../../core\/withTransaction');
 
 /** Round to 2 decimal places — matches this schema's DECIMAL(12,2)/(4,2) money columns. */
 const r2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
@@ -47,7 +47,7 @@ class GSTService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -154,7 +154,7 @@ class GSTService {
    * LEFT JOIN for a whole order.
    */
   async classifyProductGST(product = {}) {
-    const hsnCode = product.hsn_code || product.hsnCode || null;
+    let hsnCode = product.hsn_code || product.hsnCode || null;
     let hsnRow = null;
 
     if (hsnCode) {
@@ -283,10 +283,10 @@ class GSTService {
    * code is present, falling back to the category map otherwise.
    */
   async calculateProductGST(product) {
-    const classification = await this.classifyProductGST(product);
-    const gstRate = classification.rate;
+    let classification = await this.classifyProductGST(product);
+    let gstRate = classification.rate;
     const price = Number(product.price);
-    const gstAmount = r2((price * gstRate) / 100);
+    let gstAmount = r2((price * gstRate) / 100);
 
     return {
       productId: product.id,
@@ -312,7 +312,7 @@ class GSTService {
    */
   async getGSTSummary(startDate, endDate) {
     try {
-      const query = `
+      let query = `
         SELECT
           DATE_TRUNC('month', o.created_at) as month,
           COUNT(DISTINCT o.id) as total_orders,
@@ -331,7 +331,7 @@ class GSTService {
         ORDER BY month DESC, category_sales DESC
       `;
 
-      const result = await this.pool.query(query, [startDate, endDate]);
+      let result = await this.pool.query(query, [startDate, endDate]);
 
       return {
         period: { startDate, endDate },
@@ -434,11 +434,11 @@ class GSTService {
       creditLines.push({ accountId: id, amount: r2(cgstAmount), label: 'CGST' });
     }
     if (Number(sgstAmount) > 0) {
-      const id = await this.findOrCreateAccount(client, companyId, 'GST-OUT-SGST', 'Output SGST Payable', 'liability', 'CR');
+      let id = await this.findOrCreateAccount(client, companyId, 'GST-OUT-SGST', 'Output SGST Payable', 'liability', 'CR');
       creditLines.push({ accountId: id, amount: r2(sgstAmount), label: 'SGST' });
     }
     if (Number(igstAmount) > 0) {
-      const id = await this.findOrCreateAccount(client, companyId, 'GST-OUT-IGST', 'Output IGST Payable', 'liability', 'CR');
+      let id = await this.findOrCreateAccount(client, companyId, 'GST-OUT-IGST', 'Output IGST Payable', 'liability', 'CR');
       creditLines.push({ accountId: id, amount: r2(igstAmount), label: 'IGST' });
     }
 
@@ -561,7 +561,7 @@ class GSTService {
         const invoice = invoiceInsert.rows[0];
 
         for (const item of gstCalculation.gstBreakdown) {
-          const itemGST = Number(item.gstAmount);
+          let itemGST = Number(item.gstAmount);
           let itemCgst = 0, itemSgst = 0, itemIgst = 0;
           if (isIntraState) {
             itemCgst = r2(itemGST / 2);
@@ -626,7 +626,7 @@ class GSTService {
    */
   async updateOrderGST(orderId, gstDetails) {
     try {
-      const query = `
+      let query = `
         UPDATE orders
         SET
           gst_amount = $1,
@@ -637,7 +637,7 @@ class GSTService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         gstDetails.totalGST,
         JSON.stringify(gstDetails.gstBreakdown),
         gstDetails.invoiceNumber,
@@ -653,3 +653,6 @@ class GSTService {
 }
 
 module.exports = new GSTService();
+
+
+

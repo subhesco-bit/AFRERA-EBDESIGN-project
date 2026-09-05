@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Monitoring and Error Reporting
- * 
+ *
  * Production-ready monitoring with:
  * - Sentry integration
  * - Performance monitoring
@@ -12,27 +12,27 @@
  * - User context
  */
 
-import * as Sentry from '@sentry/react'
+import * as Sentry from '@sentry/react';
 
-import config from '../config/env'
+import config from '../config/env';
 
 /**
  * Initialize Sentry for error monitoring and performance tracking
  */
 function initSentry() {
   if (!config.SENTRY_DSN) {
-    
-    return
+
+    return;
   }
 
   Sentry.init({
     dsn: config.SENTRY_DSN,
     environment: config.SENTRY_ENVIRONMENT,
     release: import.meta.env.VITE_APP_VERSION || '1.0.0',
-    
+
     // Performance monitoring
     integrations: [
-      Sentry.browserTracingIntegration()
+      Sentry.browserTracingIntegration(),
     ],
 
     // Which request URLs get trace headers attached (replaces the old
@@ -41,68 +41,68 @@ function initSentry() {
       'localhost',
       config.API_URL,
       /^\//,
-      import.meta.env.VITE_API_URL
+      import.meta.env.VITE_API_URL,
     ],
 
     // Performance sampling
     tracesSampleRate: config.IS_PRODUCTION ? 0.1 : 1.0,
-    
+
     // Error sampling
     sampleRate: config.IS_PRODUCTION ? 0.1 : 1.0,
-    
+
     // Before send hook for error filtering
     beforeSend(event, hint) {
       // Filter out certain errors
       if (event.exception) {
-        const error = hint.originalException
-        
+        const error = hint.originalException;
+
         // Ignore network errors in development
         if (config.IS_DEVELOPMENT && error.message?.includes('NetworkError')) {
-          return null
+          return null;
         }
-        
+
         // Ignore cancelled requests
         if (error.message?.includes('cancelled')) {
-          return null
+          return null;
         }
       }
-      
+
       // Add custom context
       event.contexts = {
         ...event.contexts,
         app: {
           name: 'EBDESIGN Frontend',
-          version: import.meta.env.VITE_APP_VERSION || '1.0.0'
-        }
-      }
-      
-      return event
+          version: import.meta.env.VITE_APP_VERSION || '1.0.0',
+        },
+      };
+
+      return event;
     },
-    
+
     // Before breadcrumb hook
     beforeBreadcrumb(breadcrumb, hint) {
       // Filter out sensitive breadcrumbs
       if (breadcrumb.category === 'xhr') {
-        const url = breadcrumb.data?.url
+        const url = breadcrumb.data?.url;
         if (url?.includes('/auth/') || url?.includes('/login') || url?.includes('/register')) {
           breadcrumb.data = {
             ...breadcrumb.data,
-            url: '[REDACTED]'
-          }
+            url: '[REDACTED]',
+          };
         }
       }
-      
-      return breadcrumb
+
+      return breadcrumb;
     },
-    
+
     // Initial scope
     initialScope: {
       tags: {
         platform: 'web',
-        framework: 'react'
-      }
-    }
-  })
+        framework: 'react',
+      },
+    },
+  });
 }
 
 /**
@@ -110,8 +110,8 @@ function initSentry() {
  */
 function setUser(user) {
   if (!user) {
-    Sentry.setUser(null)
-    return
+    Sentry.setUser(null);
+    return;
   }
 
   Sentry.setUser({
@@ -120,21 +120,21 @@ function setUser(user) {
     username: user.username,
     role: user.role,
     // Add any other user properties you want to track
-  })
+  });
 }
 
 /**
  * Set custom tags for better error categorization
  */
 function setTags(tags) {
-  Sentry.setTags(tags)
+  Sentry.setTags(tags);
 }
 
 /**
  * Set custom context for additional information
  */
 function setContext(key, context) {
-  Sentry.setContext(key, context)
+  Sentry.setContext(key, context);
 }
 
 /**
@@ -146,8 +146,8 @@ function addBreadcrumb(category, message, level = 'info', data = {}) {
     message,
     level,
     data,
-    timestamp: Date.now() / 1000
-  })
+    timestamp: Date.now() / 1000,
+  });
 }
 
 /**
@@ -156,20 +156,20 @@ function addBreadcrumb(category, message, level = 'info', data = {}) {
 function captureException(error, context = {}) {
   Sentry.withScope((scope) => {
     if (context.tags) {
-      scope.setTags(context.tags)
+      scope.setTags(context.tags);
     }
     if (context.extra) {
-      scope.setExtras(context.extra)
+      scope.setExtras(context.extra);
     }
     if (context.fingerprint) {
-      scope.setFingerprint(context.fingerprint)
+      scope.setFingerprint(context.fingerprint);
     }
     if (context.level) {
-      scope.setLevel(context.level)
+      scope.setLevel(context.level);
     }
-    
-    Sentry.captureException(error)
-  })
+
+    Sentry.captureException(error);
+  });
 }
 
 /**
@@ -178,22 +178,22 @@ function captureException(error, context = {}) {
 function captureMessage(message, level = 'info', context = {}) {
   Sentry.withScope((scope) => {
     if (context.tags) {
-      scope.setTags(context.tags)
+      scope.setTags(context.tags);
     }
     if (context.extra) {
-      scope.setExtras(context.extra)
+      scope.setExtras(context.extra);
     }
-    
-    scope.setLevel(level)
-    Sentry.captureMessage(message)
-  })
+
+    scope.setLevel(level);
+    Sentry.captureMessage(message);
+  });
 }
 
 /**
  * Track user action for analytics
  */
 function trackAction(actionName, properties = {}) {
-  addBreadcrumb('user-action', actionName, 'info', properties)
+  addBreadcrumb('user-action', actionName, 'info', properties);
 }
 
 /**
@@ -202,8 +202,8 @@ function trackAction(actionName, properties = {}) {
 function trackPageView(pageName, properties = {}) {
   addBreadcrumb('navigation', `Viewed ${pageName}`, 'info', {
     page: pageName,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
 /**
@@ -214,8 +214,8 @@ function trackAPICall(endpoint, method, status, duration) {
     endpoint,
     method,
     status,
-    duration
-  })
+    duration,
+  });
 }
 
 /**
@@ -226,8 +226,8 @@ function trackFormSubmission(formName, success, errors = []) {
     form: formName,
     success,
     errorCount: errors.length,
-    errors: errors.slice(0, 5) // Only include first 5 errors
-  })
+    errors: errors.slice(0, 5), // Only include first 5 errors
+  });
 }
 
 /**
@@ -240,8 +240,8 @@ function trackPerformance(metricName, value, properties = {}) {
   addBreadcrumb('performance', `${metricName}: ${value}ms`, 'info', {
     metric: metricName,
     value,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
 /**
@@ -250,8 +250,8 @@ function trackPerformance(metricName, value, properties = {}) {
 function trackFeatureUsage(featureName, properties = {}) {
   addBreadcrumb('feature', `Used ${featureName}`, 'info', {
     feature: featureName,
-    ...properties
-  })
+    ...properties,
+  });
 }
 
 /**
@@ -264,37 +264,37 @@ const performance = {
   startTransaction(name, op = 'custom') {
     return Sentry.startInactiveSpan({
       name,
-      op
-    })
+      op,
+    });
   },
 
   /**
    * Measure page load time
    */
   measurePageLoad() {
-    if (typeof window === 'undefined' || !window.performance) return null
+    if (typeof window === 'undefined' || !window.performance) return null;
 
-    const perfData = window.performance.timing
-    const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart
-    const domReadyTime = perfData.domContentLoadedEventEnd - perfData.navigationStart
-    
+    const perfData = window.performance.timing;
+    const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+    const domReadyTime = perfData.domContentLoadedEventEnd - perfData.navigationStart;
+
     return {
       pageLoadTime,
       domReadyTime,
       firstPaint: perfData.responseStart - perfData.navigationStart,
-      domInteractive: perfData.domInteractive - perfData.navigationStart
-    }
+      domInteractive: perfData.domInteractive - perfData.navigationStart,
+    };
   },
 
   /**
    * Measure API request time
    */
   measureAPIRequest(endpoint, startTime) {
-    const duration = Date.now() - startTime
-    trackAPICall(endpoint, 'API', 200, duration)
-    return duration
-  }
-}
+    const duration = Date.now() - startTime;
+    trackAPICall(endpoint, 'API', 200, duration);
+    return duration;
+  },
+};
 
 /**
  * Error categorization helpers
@@ -306,80 +306,80 @@ const errorCategories = {
   AUTHORIZATION: 'authorization',
   BUSINESS_LOGIC: 'business_logic',
   UI: 'ui',
-  UNKNOWN: 'unknown'
-}
+  UNKNOWN: 'unknown',
+};
 
 /**
  * Categorize error based on type and message
  */
 function categorizeError(error) {
-  if (!error) return errorCategories.UNKNOWN
+  if (!error) return errorCategories.UNKNOWN;
 
-  const message = error.message?.toLowerCase() || ''
-  const name = error.name?.toLowerCase() || ''
+  const message = error.message?.toLowerCase() || '';
+  const name = error.name?.toLowerCase() || '';
 
   // Network errors
   if (name.includes('network') || message.includes('network') || message.includes('fetch')) {
-    return errorCategories.NETWORK
+    return errorCategories.NETWORK;
   }
 
   // Authentication errors
   if (message.includes('unauthorized') || message.includes('401') || message.includes('token')) {
-    return errorCategories.AUTHENTICATION
+    return errorCategories.AUTHENTICATION;
   }
 
   // Authorization errors
   if (message.includes('forbidden') || message.includes('403') || message.includes('permission')) {
-    return errorCategories.AUTHORIZATION
+    return errorCategories.AUTHORIZATION;
   }
 
   // Validation errors
   if (message.includes('validation') || message.includes('invalid') || message.includes('required')) {
-    return errorCategories.VALIDATION
+    return errorCategories.VALIDATION;
   }
 
   // UI errors
   if (name.includes('react') || message.includes('render') || message.includes('component')) {
-    return errorCategories.UI
+    return errorCategories.UI;
   }
 
-  return errorCategories.UNKNOWN
+  return errorCategories.UNKNOWN;
 }
 
 /**
  * Create error fingerprint for grouping
  */
 function createErrorFingerprint(error, category) {
-  const message = error.message || 'unknown'
-  const name = error.name || 'Error'
-  
+  let message = error.message || 'unknown';
+  let name = error.name || 'Error';
+
   // Create a fingerprint based on error type and key parts of the message
   const keyParts = message
     .replace(/[0-9]/g, 'N') // Replace numbers with N
     .replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, 'UUID') // Replace UUIDs
     .split(' ')
     .slice(0, 3) // Take first 3 words
-    .join('-')
-  
-  return `${category}-${name}-${keyParts}`
+    .join('-');
+
+  return `${category}-${name}-${keyParts}`;
 }
 
 /**
  * Enhanced error capture with categorization
  */
 function captureCategorizedError(error, context = {}) {
-  const category = categorizeError(error)
-  const fingerprint = createErrorFingerprint(error, category)
-  
+  const category = categorizeError(error);
+  const fingerprint = createErrorFingerprint(error, category);
+
   captureException(error, {
     ...context,
     tags: {
       ...context.tags,
       category,
-      errorType: error.name
+      errorType: error.name,
     },
-    fingerprint: [fingerprint]
-  })
+    fingerprint: [fingerprint],
+  });
 }
 
 /**
@@ -388,7 +388,7 @@ function captureCategorizedError(error, context = {}) {
 function enableSessionReplay() {
   // This would require @sentry/replay package
   // Implementation depends on your Sentry plan
-  
+
 }
 
 /**
@@ -396,11 +396,11 @@ function enableSessionReplay() {
  */
 function healthCheck() {
   return {
-    sentry: !!Sentry.getClient(),
-    dsn: !!config.SENTRY_DSN,
+    sentry: Boolean(Sentry.getClient()),
+    dsn: Boolean(config.SENTRY_DSN),
     environment: config.SENTRY_ENVIRONMENT,
-    enabled: config.ENABLE_ERROR_REPORTING
-  }
+    enabled: config.ENABLE_ERROR_REPORTING,
+  };
 }
 
 /**
@@ -426,7 +426,7 @@ const monitoring = {
   createErrorFingerprint,
   captureCategorizedError,
   enableSessionReplay,
-  healthCheck
-}
+  healthCheck,
+};
 
-export default monitoring
+export default monitoring;

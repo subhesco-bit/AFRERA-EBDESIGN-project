@@ -15,7 +15,7 @@ const express = require('express');
 const router = express.Router();
 const ecommerceAIController = require('../controllers/ecommerceAIController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // ============================================================================
 // CUSTOMER SEGMENTATION ROUTES
@@ -26,14 +26,14 @@ const { authRateLimit } = require('../middleware/rateLimiter');
  * @desc    Segment all customers using RFM analysis
  * @access  Private (Admin)
  */
-router.post('/segment-customers-rfm', authRateLimit, authMiddleware, ecommerceAIController.segmentCustomersRFM);
+router.post('/segment-customers-rfm', authLimiter, authMiddleware, ecommerceAIController.segmentCustomersRFM);
 
 /**
  * @route   POST /api/ecommerce-ai/segment-customers-behavioral
  * @desc    Segment all customers using behavioral analysis
  * @access  Private (Admin)
  */
-router.post('/segment-customers-behavioral', authRateLimit, authMiddleware, ecommerceAIController.segmentCustomersBehavioral);
+router.post('/segment-customers-behavioral', authLimiter, authMiddleware, ecommerceAIController.segmentCustomersBehavioral);
 
 // ============================================================================
 // DEMAND FORECASTING ROUTES
@@ -44,7 +44,7 @@ router.post('/segment-customers-behavioral', authRateLimit, authMiddleware, ecom
  * @desc    Forecast demand for a specific product
  * @access  Private (Admin/Seller)
  */
-router.post('/forecast-demand/:productId', authRateLimit, authMiddleware, ecommerceAIController.forecastProductDemand);
+router.post('/forecast-demand/:productId', authLimiter, authMiddleware, ecommerceAIController.forecastProductDemand);
 
 // ============================================================================
 // INVENTORY OPTIMIZATION ROUTES
@@ -55,7 +55,7 @@ router.post('/forecast-demand/:productId', authRateLimit, authMiddleware, ecomme
  * @desc    Optimize inventory levels for a product
  * @access  Private (Admin/Seller)
  */
-router.post('/optimize-inventory/:productId', authRateLimit, authMiddleware, ecommerceAIController.optimizeInventory);
+router.post('/optimize-inventory/:productId', authLimiter, authMiddleware, ecommerceAIController.optimizeInventory);
 
 // ============================================================================
 // PRODUCT RECOMMENDATIONS ROUTES
@@ -77,7 +77,7 @@ router.get('/recommendations/:userId', authMiddleware, ecommerceAIController.get
  * @desc    Predict sales for category or overall
  * @access  Private (Admin)
  */
-router.post('/predict-sales', authRateLimit, authMiddleware, ecommerceAIController.predictSales);
+router.post('/predict-sales', authLimiter, authMiddleware, ecommerceAIController.predictSales);
 
 // ============================================================================
 // CUSTOMER LIFETIME VALUE ROUTES
@@ -106,3 +106,4 @@ router.get('/market-basket', authMiddleware, ecommerceAIController.analyzeMarket
 // ============================================================================
 
 module.exports = router;
+

@@ -6,14 +6,14 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // COPILOT FRAMEWORK (CAP-230)
@@ -127,7 +127,7 @@ async function generateCopilotResponse(copilotType, message, context, session) {
  */
 router.get('/session/:id/history', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM copilot_messages 
        WHERE session_id = $1 
        ORDER BY created_at ASC`,
@@ -146,7 +146,7 @@ router.get('/session/:id/history', authMiddleware, async (req, res) => {
  */
 router.put('/session/:id/close', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE copilot_sessions 
        SET status = 'closed', ended_at = NOW(), updated_at = NOW()
        WHERE id = $1 AND user_id = $2
@@ -176,7 +176,7 @@ async function generateFinanceCopilotResponse(message, context, session) {
 
   if (lowerMessage.includes('cash flow') && userId) {
     try {
-      const result = await pool.query(
+      let result = await pool.query(
         `SELECT SUM(amount) AS total, AVG(amount) AS avg_amount, COUNT(*) AS txn_count
            FROM financial_transactions
           WHERE user_id = $1 AND transaction_date > NOW() - INTERVAL '90 days'`,
@@ -232,11 +232,11 @@ router.get('/finance/analytics', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateLogisticsCopilotResponse(message, context, session) {
-  const lowerMessage = (message || '').toLowerCase();
+  let lowerMessage = (message || '').toLowerCase();
 
   if (lowerMessage.includes('route') || lowerMessage.includes('shipment') || lowerMessage.includes('freight')) {
     try {
-      const result = await pool.query(
+      let result = await pool.query(
         `SELECT origin_address, destination_address, weight_kg, estimated_cost, actual_cost, status
            FROM shipments
           ORDER BY created_at DESC
@@ -293,12 +293,12 @@ router.get('/logistics/routes', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateWarehouseCopilotResponse(message, context, session) {
-  const lowerMessage = (message || '').toLowerCase();
+  let lowerMessage = (message || '').toLowerCase();
   const warehouseId = context?.warehouse_id;
 
   if ((lowerMessage.includes('inventory') || lowerMessage.includes('stock')) && warehouseId) {
     try {
-      const result = await pool.query(
+      let result = await pool.query(
         `SELECT p.name, wi.quantity, wi.zone, wi.expiry_date
            FROM warehouse_inventory wi
            JOIN products p ON p.id = wi.product_id
@@ -363,13 +363,13 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
 // ============================================================================
 
 async function generateInsuranceCopilotResponse(message, context, session) {
-  const lowerMessage = (message || '').toLowerCase();
-  const userId = session?.user_id;
+  let lowerMessage = (message || '').toLowerCase();
+  let userId = session?.user_id;
 
   if (lowerMessage.includes('claim') || lowerMessage.includes('policy') || lowerMessage.includes('coverage')) {
     if (userId) {
       try {
-        const result = await pool.query(
+        let result = await pool.query(
           `SELECT policy_number, coverage_amount, premium_amount, policy_end_date, status
              FROM policies
             WHERE user_id = $1
@@ -378,7 +378,7 @@ async function generateInsuranceCopilotResponse(message, context, session) {
           [userId]
         );
         if (result.rows.length > 0) {
-          const lines = result.rows.map((p) => `${p.policy_number}: ${p.status}, coverage ₹${p.coverage_amount}, expires ${new Date(p.policy_end_date).toLocaleDateString('en-IN')}`).join('\n');
+          let lines = result.rows.map((p) => `${p.policy_number}: ${p.status}, coverage ₹${p.coverage_amount}, expires ${new Date(p.policy_end_date).toLocaleDateString('en-IN')}`).join('\n');
           return {
             content: `Your recorded policies:\n${lines}`,
             metadata: { capabilities: ['policy_analysis'], source: 'policies', matched_on_real_data: true },
@@ -439,7 +439,7 @@ router.get('/insurance/policies', authMiddleware, async (req, res) => {
  */
 async function generateNutritionCopilotResponse(message, context, session) {
   const nutritionIntelligenceService = require('./nutritionIntelligenceService');
-  const lowerMessage = (message || '').toLowerCase();
+  let lowerMessage = (message || '').toLowerCase();
   const words = lowerMessage.split(/[^a-z0-9]+/).filter((w) => w.length > 3);
 
   // 1. Natural-therapy / traditional-remedy match (real DB, real evidence labels)
@@ -559,12 +559,12 @@ function generateNutritionRecommendations(foods) {
 // ============================================================================
 
 async function generateMarketplaceCopilotResponse(message, context, session) {
-  const lowerMessage = (message || '').toLowerCase();
+  let lowerMessage = (message || '').toLowerCase();
   const categoryId = context?.category_id;
 
   if ((lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('market')) && categoryId) {
     try {
-      const result = await pool.query(
+      let result = await pool.query(
         `SELECT avg_price, min_price, max_price, listing_count, record_date
            FROM market_price_history
           WHERE category_id = $1
@@ -639,7 +639,7 @@ async function generateGenericCopilotResponse(message, context, session) {
  */
 router.get('/analytics', authMiddleware, async (req, res) => {
   try {
-    const analytics = await pool.query(`
+    let analytics = await pool.query(`
       SELECT 
         copilot_type,
         COUNT(*) as session_count,
@@ -672,3 +672,6 @@ module.exports = {
   // farmer queries instead of duplicating it.
   generateCopilotResponse
 };
+
+
+

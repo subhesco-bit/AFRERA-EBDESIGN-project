@@ -8,9 +8,9 @@
  * Compliance: IFRS, GAAP, GST, VAT, local regulations
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 const aiBackbone = require('./aiBackboneService');
 
 // ============================================================================
@@ -52,7 +52,7 @@ const generalLedger = {
    * Create general ledger account
    */
   createGLAccount: async (accountData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -79,7 +79,7 @@ const generalLedger = {
    * Post journal entry
    */
   postJournalEntry: async (journalData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -120,7 +120,7 @@ const generalLedger = {
    * Generate trial balance
    */
   generateTrialBalance: async (fromDate, toDate, chartId) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -157,7 +157,7 @@ const generalLedger = {
    * Generate balance sheet
    */
   generateBalanceSheet: async (asOfDate, chartId) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -198,7 +198,7 @@ const generalLedger = {
    * Generate profit and loss statement
    */
   generateProfitLoss: async (fromDate, toDate, chartId) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -287,7 +287,7 @@ const controlling = {
    * Create cost center
    */
   createCostCenter: async (costCenterData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -314,7 +314,7 @@ const controlling = {
    * Create profit center
    */
   createProfitCenter: async (profitCenterData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -341,7 +341,7 @@ const controlling = {
    * Post cost allocation
    */
   postCostAllocation: async (allocationData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -368,7 +368,7 @@ const controlling = {
    * Generate cost center report
    */
   generateCostCenterReport: async (costCenterCode, fromDate, toDate) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -401,7 +401,7 @@ const controlling = {
    * Generate profit center report
    */
   generateProfitCenterReport: async (profitCenterCode, fromDate, toDate) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -444,7 +444,7 @@ const materialsManagement = {
    * Create material master
    */
   createMaterialMaster: async (materialData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -471,7 +471,7 @@ const materialsManagement = {
    * Create purchase order
    */
   createPurchaseOrder: async (poData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -485,7 +485,7 @@ const materialsManagement = {
         [po_number, vendor_code, purchase_org, purchase_group, currency, document_date]
       );
       
-      const header = headerRows[0];
+      let header = headerRows[0];
       
       // Create PO items
       for (const item of po_items) {
@@ -510,7 +510,7 @@ const materialsManagement = {
    * Create goods receipt
    */
   createGoodsReceipt: async (grData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -524,7 +524,7 @@ const materialsManagement = {
         [gr_number, po_number, movement_type, posting_date]
       );
       
-      const header = headerRows[0];
+      let header = headerRows[0];
       
       // Create GR items and update inventory
       for (const item of gr_items) {
@@ -558,7 +558,7 @@ const materialsManagement = {
    * Get inventory overview
    */
   getInventoryOverview: async (materialCode, storageLocation) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -593,7 +593,7 @@ const materialsManagement = {
       const inventory = await materialsManagement.getInventoryOverview(materialCode, storageLocation);
       
       // Get purchase orders
-      const pg = getPostgreSQL();
+      let pg = getPostgreSQL();
       const { rows: poRows } = await pg.query(
         `SELECT po.po_number, po.vendor_code, po.document_date, poi.material_code, poi.quantity, poi.price, poi.delivery_date
          FROM erp_purchase_orders po
@@ -641,7 +641,7 @@ const salesDistribution = {
    * Create customer master
    */
   createCustomerMaster: async (customerData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -668,7 +668,7 @@ const salesDistribution = {
    * Create sales order
    */
   createSalesOrder: async (soData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -682,7 +682,7 @@ const salesDistribution = {
         [so_number, customer_code, sales_org, distribution_channel, division, currency, document_date]
       );
       
-      const header = headerRows[0];
+      let header = headerRows[0];
       
       // Create SO items
       for (const item of so_items) {
@@ -707,7 +707,7 @@ const salesDistribution = {
    * Create delivery
    */
   createDelivery: async (deliveryData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -721,7 +721,7 @@ const salesDistribution = {
         [delivery_number, so_number, shipping_point, loading_date]
       );
       
-      const header = headerRows[0];
+      let header = headerRows[0];
       
       // Create delivery items
       for (const item of delivery_items) {
@@ -746,7 +746,7 @@ const salesDistribution = {
    * Create invoice
    */
   createInvoice: async (invoiceData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -760,7 +760,7 @@ const salesDistribution = {
         [invoice_number, so_number, delivery_number, customer_code, currency, document_date, due_date]
       );
       
-      const header = headerRows[0];
+      let header = headerRows[0];
       
       // Create invoice items
       let totalAmount = 0;
@@ -801,7 +801,7 @@ const productionPlanning = {
    * Create production order
    */
   createProductionOrder: async (poData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -828,7 +828,7 @@ const productionPlanning = {
    * Release production order
    */
   releaseProductionOrder: async (productionOrder) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -851,7 +851,7 @@ const productionPlanning = {
    * Confirm production order
    */
   confirmProductionOrder: async (productionOrder, confirmationData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -885,7 +885,7 @@ const productionPlanning = {
   optimizeProductionAI: async (productionPlant, fromDate, toDate) => {
     try {
       // Get production data
-      const pg = getPostgreSQL();
+      let pg = getPostgreSQL();
       const { rows: poRows } = await pg.query(
         `SELECT po.production_order, po.material_code, po.production_quantity, po.actual_quantity, 
            po.planned_start_date, po.planned_finish_date, po.actual_start_date, po.actual_finish_date,
@@ -922,7 +922,7 @@ const productionPlanning = {
       };
       
       // Call AI for optimization
-      const aiOptimization = await aiBackbone.optimizeProduction(productionData);
+      let aiOptimization = await aiBackbone.optimizeProduction(productionData);
       
       await signalBus.emit('erp.pp.ai.optimization.completed', { 
         production_plant: productionPlant, 
@@ -950,7 +950,7 @@ const qualityManagement = {
    * Create inspection lot
    */
   createInspectionLot: async (lotData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -977,7 +977,7 @@ const qualityManagement = {
    * Record inspection result
    */
   recordInspectionResult: async (resultData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1004,7 +1004,7 @@ const qualityManagement = {
    * Make usage decision
    */
   makeUsageDecision: async (decisionData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1042,7 +1042,7 @@ const plantMaintenance = {
    * Create equipment master
    */
   createEquipmentMaster: async (equipmentData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1069,7 +1069,7 @@ const plantMaintenance = {
    * Create maintenance order
    */
   createMaintenanceOrder: async (moData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1096,7 +1096,7 @@ const plantMaintenance = {
    * Confirm maintenance order
    */
   confirmMaintenanceOrder: async (maintenanceOrder, confirmationData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1134,7 +1134,7 @@ const humanResources = {
    * Create employee master
    */
   createEmployeeMaster: async (employeeData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1161,7 +1161,7 @@ const humanResources = {
    * Create organizational unit
    */
   createOrganizationalUnit: async (orgData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1188,7 +1188,7 @@ const humanResources = {
    * Process payroll
    */
   processPayroll: async (payrollData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1202,7 +1202,7 @@ const humanResources = {
         [payroll_run, period, year, processing_date]
       );
       
-      const header = headerRows[0];
+      let header = headerRows[0];
       
       // Create payroll items
       for (const item of payroll_items) {
@@ -1229,7 +1229,7 @@ const humanResources = {
   analyzeHRAI: async (period, year) => {
     try {
       // Get HR data
-      const pg = getPostgreSQL();
+      let pg = getPostgreSQL();
       
       // Employee count
       const { rows: employeeRows } = await pg.query(
@@ -1257,7 +1257,7 @@ const humanResources = {
       };
       
       // Call AI for analysis
-      const aiAnalysis = await aiBackbone.analyzeHR(hrData);
+      let aiAnalysis = await aiBackbone.analyzeHR(hrData);
       
       await signalBus.emit('erp.hr.ai.analysis.completed', { 
         period, 
@@ -1286,7 +1286,7 @@ const projectSystem = {
    * Create project definition
    */
   createProjectDefinition: async (projectData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1313,7 +1313,7 @@ const projectSystem = {
    * Create work breakdown structure (WBS)
    */
   createWBS: async (wbsData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1340,7 +1340,7 @@ const projectSystem = {
    * Update project status
    */
   updateProjectStatus: async (projectCode, statusData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1373,7 +1373,7 @@ const projectSystem = {
   analyzeProjectAI: async (projectCode) => {
     try {
       // Get project data
-      const pg = getPostgreSQL();
+      let pg = getPostgreSQL();
       const { rows: projectRows } = await pg.query(
         `SELECT * FROM erp_projects WHERE project_code = $1`,
         [projectCode]
@@ -1404,7 +1404,7 @@ const projectSystem = {
       };
       
       // Call AI for analysis
-      const aiAnalysis = await aiBackbone.analyzeProject(projectData);
+      let aiAnalysis = await aiBackbone.analyzeProject(projectData);
       
       await signalBus.emit('erp.ps.ai.analysis.completed', { 
         project_code: projectCode, 
@@ -1432,7 +1432,7 @@ const treasury = {
    * Create bank account
    */
   createBankAccount: async (bankData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1459,7 +1459,7 @@ const treasury = {
    * Record cash flow
    */
   recordCashFlow: async (cashFlowData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1486,7 +1486,7 @@ const treasury = {
    * Get cash position
    */
   getCashPosition: async (asOfDate, currency) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1522,7 +1522,7 @@ const assetManagement = {
    * Create fixed asset
    */
   createFixedAsset: async (assetData) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1549,7 +1549,7 @@ const assetManagement = {
    * Calculate depreciation
    */
   calculateDepreciation: async (assetCode, fromDate, toDate) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1610,7 +1610,7 @@ const businessIntelligence = {
    * Generate executive dashboard
    */
   generateExecutiveDashboard: async (fromDate, toDate) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1670,7 +1670,7 @@ const businessIntelligence = {
    * Generate profitability analysis
    */
   generateProfitabilityAnalysis: async (fromDate, toDate, profitCenterCode) => {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) throw new Error('Database not initialized');
     
     try {
@@ -1748,3 +1748,6 @@ module.exports = {
   // Business Intelligence (BI)
   businessIntelligence
 };
+
+
+

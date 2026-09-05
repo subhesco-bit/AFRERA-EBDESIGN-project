@@ -15,7 +15,7 @@ async function registerFarmer(req, res) {
 
 async function getFarmer(req, res) {
   try {
-    const farmer = await service.getFarmer(req.params.farmerId);
+    let farmer = await service.getFarmer(req.params.farmerId);
     if (!farmer) return res.status(404).json({ success: false, error: 'Farmer not found' });
     res.json({ success: true, data: farmer });
   } catch (error) {
@@ -37,7 +37,7 @@ async function listFarmers(req, res) {
 
 async function updateFarmer(req, res) {
   try {
-    const farmer = await service.updateFarmer(req.params.farmerId, req.body);
+    let farmer = await service.updateFarmer(req.params.farmerId, req.body);
     if (!farmer) return res.status(404).json({ success: false, error: 'Farmer not found' });
     res.json({ success: true, data: farmer });
   } catch (error) {
@@ -60,7 +60,7 @@ async function analyzeFarmerProfile(req, res) {
 // Verification
 async function verifyFarmer(req, res) {
   try {
-    const result = await service.verifyFarmer(req.params.farmerId, req.body);
+    let result = await service.verifyFarmer(req.params.farmerId, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('verifyFarmer error', { error: error.message });
@@ -71,7 +71,7 @@ async function verifyFarmer(req, res) {
 async function approveFarmerVerification(req, res) {
   try {
     const { approved, approvedBy, notes } = req.body;
-    const result = await service.approveFarmerVerification(req.params.farmerId, approved, approvedBy, notes);
+    let result = await service.approveFarmerVerification(req.params.farmerId, approved, approvedBy, notes);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('approveFarmerVerification error', { error: error.message });
@@ -82,7 +82,7 @@ async function approveFarmerVerification(req, res) {
 // Onboarding
 async function initiateOnboarding(req, res) {
   try {
-    const result = await service.initiateOnboarding(req.params.farmerId);
+    let result = await service.initiateOnboarding(req.params.farmerId);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('initiateOnboarding error', { error: error.message });
@@ -93,7 +93,7 @@ async function initiateOnboarding(req, res) {
 async function updateOnboardingProgress(req, res) {
   try {
     const { stepIndex, stepData } = req.body;
-    const result = await service.updateOnboardingProgress(req.params.farmerId, stepIndex, stepData);
+    let result = await service.updateOnboardingProgress(req.params.farmerId, stepIndex, stepData);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('updateOnboardingProgress error', { error: error.message });

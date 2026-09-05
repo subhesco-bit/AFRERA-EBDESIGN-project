@@ -6,7 +6,7 @@
 -- Consents Table
 CREATE TABLE IF NOT EXISTS consents (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   consent_type VARCHAR(100) NOT NULL, -- 'data_processing', 'marketing', 'analytics', etc.
   consent_category VARCHAR(100) NOT NULL,
   consent_text TEXT,

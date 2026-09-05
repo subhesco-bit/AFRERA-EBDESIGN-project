@@ -33,7 +33,7 @@ class HRController {
   async predictAttrition(req, res) {
     try {
       const { employeeId } = req.params;
-      const result = await hrService.predictEmployeeAttrition(employeeId);
+      let result = await hrService.predictEmployeeAttrition(employeeId);
       res.json({
         success: true,
         data: result
@@ -53,7 +53,7 @@ class HRController {
     try {
       const { employeeId } = req.params;
       const timeframe = req.query.timeframe || '30 days';
-      const result = await hrService.analyzeEmployeeSentiment(employeeId, timeframe);
+      let result = await hrService.analyzeEmployeeSentiment(employeeId, timeframe);
       res.json({
         success: true,
         data: result
@@ -72,7 +72,7 @@ class HRController {
   async getTrainingRecommendations(req, res) {
     try {
       const { employeeId } = req.params;
-      const result = await hrService.recommendTraining(employeeId);
+      let result = await hrService.recommendTraining(employeeId);
       res.json({
         success: true,
         data: result
@@ -91,7 +91,7 @@ class HRController {
   async optimizeShiftSchedule(req, res) {
     try {
       const { departmentId, startDate, endDate } = req.body;
-      const result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
+      let result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
       res.json({
         success: true,
         message: 'Shift schedule optimized successfully',
@@ -110,7 +110,7 @@ class HRController {
    */
   async detectTimesheetAnomalies(req, res) {
     try {
-      const result = await hrService.detectTimesheetAnomalies(req.body);
+      let result = await hrService.detectTimesheetAnomalies(req.body);
       res.json({
         success: true,
         data: result
