@@ -128,7 +128,7 @@ class ETLService {
       const rawData = await this.extract(source);
 
       // Transform
-      const transformedData = await this.transform(rawData, transform);
+      let transformedData = await this.transform(rawData, transform);
 
       // Load
       const loadResult = await this.load(transformedData, destination);
@@ -214,8 +214,8 @@ class ETLService {
    */
   async extractFromCSV(config) {
     const { filePath } = config;
-    const fullPath = path.join(this.dataDir, filePath);
-    const content = await fs.readFile(fullPath, 'utf8');
+    let fullPath = path.join(this.dataDir, filePath);
+    let content = await fs.readFile(fullPath, 'utf8');
     
     // Simple CSV parsing (in production, use a proper CSV library)
     const lines = content.split('\n');
@@ -353,7 +353,7 @@ class ETLService {
 
     for (const record of data) {
       try {
-        const values = columns.map(col => record[col]);
+        let values = columns.map(col => record[col]);
         await this.db.query(query, values);
         inserted++;
       } catch (error) {
@@ -371,7 +371,7 @@ class ETLService {
    */
   async loadToFile(data, config) {
     const { filePath, format = 'json' } = config;
-    const fullPath = path.join(this.dataDir, filePath);
+    let fullPath = path.join(this.dataDir, filePath);
 
     let content;
     switch (format) {
@@ -382,7 +382,7 @@ class ETLService {
         if (data.length === 0) {
           content = '';
         } else {
-          const headers = Object.keys(data[0]).join(',');
+          let headers = Object.keys(data[0]).join(',');
           const rows = data.map(row => Object.values(row).join(','));
           content = [headers, ...rows].join('\n');
         }
@@ -405,7 +405,7 @@ class ETLService {
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
       
-      const response = await fetch(url, {
+      let response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -452,13 +452,13 @@ class ETLService {
    */
   async getPipelineHistory(pipelineName, limit = 10) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM etl_pipeline_executions
         WHERE name = $1
         ORDER BY created_at DESC
         LIMIT $2
       `;
-      const result = await this.db.query(query, [pipelineName, limit]);
+      let result = await this.db.query(query, [pipelineName, limit]);
       return result.rows;
     } catch (error) {
       logger.error('Get pipeline history failed', error);

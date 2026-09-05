@@ -61,7 +61,7 @@ router.post('/devices/:deviceId/data',
         return apiResponseHandler.sendError(res, 'Invalid sensor data format', 400, 'INVALID_DATA');
       }
 
-      const result = await iotService.receiveDeviceData(deviceId, sensorData);
+      let result = await iotService.receiveDeviceData(deviceId, sensorData);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Device data received successfully');
@@ -84,7 +84,7 @@ router.get('/devices/:deviceId/status',
     try {
       const { deviceId } = req.params;
 
-      const result = await iotService.getDeviceStatus(deviceId);
+      let result = await iotService.getDeviceStatus(deviceId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Device status retrieved');
@@ -112,7 +112,7 @@ router.get('/farmers/:farmerId/devices',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      const result = await iotService.getFarmerDevices(farmerId);
+      let result = await iotService.getFarmerDevices(farmerId);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Farmer devices retrieved');
@@ -136,7 +136,7 @@ router.put('/devices/:deviceId/configure',
       const { deviceId } = req.params;
       const configuration = req.body;
 
-      const result = await iotService.configureDevice(deviceId, configuration);
+      let result = await iotService.configureDevice(deviceId, configuration);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Device configured successfully');
@@ -168,7 +168,7 @@ router.get('/data/aggregated',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      const result = await iotService.getAggregatedData(farmerId, sensorType, timeRange);
+      let result = await iotService.getAggregatedData(farmerId, sensorType, timeRange);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Aggregated data retrieved');
@@ -189,7 +189,7 @@ router.post('/buffer/process',
   authorize(['admin']),
   async (req, res) => {
     try {
-      const result = await iotService.forceProcessBuffer();
+      let result = await iotService.forceProcessBuffer();
       return apiResponseHandler.sendSuccess(res, null, result.message);
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to process buffer', 500, 'SERVER_ERROR', error.message);

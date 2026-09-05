@@ -83,7 +83,7 @@ async function createEnvironment(envData) {
  */
 async function getEnvironment(envId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM environments WHERE env_id = $1',
       [envId]
     );
@@ -104,7 +104,7 @@ async function getEnvironment(envId) {
  */
 async function updateEnvironment(envId, updates) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE environments 
        SET infrastructure_config = COALESCE($1, infrastructure_config),
            database_config = COALESCE($2, database_config),
@@ -168,7 +168,7 @@ async function listEnvironments(filters) {
       params.push(offset);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
 
     return {
       total: result.rows.length,

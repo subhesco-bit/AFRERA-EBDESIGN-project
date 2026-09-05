@@ -26,7 +26,7 @@ const getImplement = async (req, res) => {
 
 const registerImplement = async (req, res) => {
   try {
-    const implement = await implementService.registerImplement(req.body);
+    let implement = await implementService.registerImplement(req.body);
     res.status(201).json({ success: true, data: implement });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

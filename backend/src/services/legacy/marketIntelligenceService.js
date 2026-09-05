@@ -165,7 +165,7 @@ function setupRoutes(app) {
 
   router.get('/intelligence/crop/:cropId', async (req, res) => {
     try {
-      const intelligenceRecords = await getMarketIntelligenceByCrop(req.params.cropId);
+      let intelligenceRecords = await getMarketIntelligenceByCrop(req.params.cropId);
       res.json({ success: true, data: intelligenceRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -174,7 +174,7 @@ function setupRoutes(app) {
 
   router.get('/intelligence/village/:villageId/latest', async (req, res) => {
     try {
-      const intelligence = await getLatestMarketIntelligence(req.params.villageId);
+      let intelligence = await getLatestMarketIntelligence(req.params.villageId);
       res.json({ success: true, data: intelligence });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -183,7 +183,7 @@ function setupRoutes(app) {
 
   router.post('/intelligence', async (req, res) => {
     try {
-      const intelligence = await createMarketIntelligence(req.body);
+      let intelligence = await createMarketIntelligence(req.body);
       res.status(201).json({ success: true, data: intelligence });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });

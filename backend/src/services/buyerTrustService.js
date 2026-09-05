@@ -133,7 +133,7 @@ class BuyerTrustService {
    */
   async getBuyerPaymentHistory(buyerId) {
     try {
-      const payments = await db('order_payments')
+      let payments = await db('order_payments')
         .where('buyer_id', buyerId)
         .orderBy('created_at', 'desc')
         .limit(100);

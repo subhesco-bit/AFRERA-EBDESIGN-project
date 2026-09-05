@@ -157,7 +157,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.created = (data, message, metadata = {}) => {
-    const response = successResponse(data, message || 'Resource created', 201, {
+    let response = successResponse(data, message || 'Resource created', 201, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -172,7 +172,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.accepted = (data, message, metadata = {}) => {
-    const response = successResponse(data, message || 'Request accepted', 202, {
+    let response = successResponse(data, message || 'Request accepted', 202, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -186,7 +186,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.badRequest = (message, details, metadata = {}) => {
-    const response = errorResponse(message, 400, details, {
+    let response = errorResponse(message, 400, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -196,7 +196,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.unauthorized = (message, metadata = {}) => {
-    const response = errorResponse(message || 'Unauthorized', 401, null, {
+    let response = errorResponse(message || 'Unauthorized', 401, null, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -206,7 +206,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.forbidden = (message, metadata = {}) => {
-    const response = errorResponse(message || 'Forbidden', 403, null, {
+    let response = errorResponse(message || 'Forbidden', 403, null, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -216,7 +216,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.notFound = (message, metadata = {}) => {
-    const response = errorResponse(message || 'Resource not found', 404, null, {
+    let response = errorResponse(message || 'Resource not found', 404, null, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -226,7 +226,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.conflict = (message, details, metadata = {}) => {
-    const response = errorResponse(message || 'Resource conflict', 409, details, {
+    let response = errorResponse(message || 'Resource conflict', 409, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -236,7 +236,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.unprocessableEntity = (message, details, metadata = {}) => {
-    const response = errorResponse(message || 'Unprocessable entity', 422, details, {
+    let response = errorResponse(message || 'Unprocessable entity', 422, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -246,7 +246,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.tooManyRequests = (message, retryAfter, metadata = {}) => {
-    const response = errorResponse(message || 'Too many requests', 429, { retryAfter }, {
+    let response = errorResponse(message || 'Too many requests', 429, { retryAfter }, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -259,7 +259,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.serverError = (message, details, metadata = {}) => {
-    const response = errorResponse(message || 'Internal server error', 500, details, {
+    let response = errorResponse(message || 'Internal server error', 500, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -269,7 +269,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.serviceUnavailable = (message, retryAfter, metadata = {}) => {
-    const response = errorResponse(message || 'Service unavailable', 503, { retryAfter }, {
+    let response = errorResponse(message || 'Service unavailable', 503, { retryAfter }, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -282,7 +282,7 @@ function responseFormatter(req, res, next) {
   };
 
   res.paginated = (data, pagination, message, metadata = {}) => {
-    const response = paginatedResponse(data, pagination, message, {
+    let response = paginatedResponse(data, pagination, message, {
       requestId: req.id,
       duration: Date.now() - startTime,
       ...metadata
@@ -337,7 +337,7 @@ function fieldSelector(req, res, next) {
 
   const fieldList = fields.split(',').map(f => f.trim());
   
-  const originalJson = res.json;
+  let originalJson = res.json;
   res.json = function(data) {
     if (data && data.data && typeof data.data === 'object') {
       const selected = {};

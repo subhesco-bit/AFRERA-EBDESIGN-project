@@ -48,7 +48,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const dpr = await dprGenerationService.getById(req.params.id, { userId: req.user.id, isAdmin: req.user.role === 'admin' });
+    let dpr = await dprGenerationService.getById(req.params.id, { userId: req.user.id, isAdmin: req.user.role === 'admin' });
     res.json({ success: true, data: dpr });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });

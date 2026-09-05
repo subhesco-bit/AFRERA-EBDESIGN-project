@@ -56,7 +56,7 @@ router.post('/root-cause', async (req, res) => {
       });
     }
     
-    const result = await aiSelfHealingService.performRootCauseAnalysis(error, context || {});
+    let result = await aiSelfHealingService.performRootCauseAnalysis(error, context || {});
     
     res.json(result);
   } catch (error) {
@@ -83,7 +83,7 @@ router.post('/recover', async (req, res) => {
       });
     }
     
-    const result = await aiSelfHealingService.executeRecoveryStrategy(error_type, context || {});
+    let result = await aiSelfHealingService.executeRecoveryStrategy(error_type, context || {});
     
     res.json(result);
   } catch (error) {
@@ -149,7 +149,7 @@ router.post('/heal', async (req, res) => {
  */
 router.get('/predict', async (req, res) => {
   try {
-    const result = await aiSelfHealingService.predictiveFailurePrevention();
+    let result = await aiSelfHealingService.predictiveFailurePrevention();
     
     res.json(result);
   } catch (error) {

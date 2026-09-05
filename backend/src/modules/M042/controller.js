@@ -24,7 +24,7 @@ const recordEquipmentUsage = async (req, res) => {
 
 const getEquipmentByOwner = async (req, res) => {
   try {
-    const equipment = await equipmentInventoryService.getEquipmentByOwner(req.params.ownerId);
+    let equipment = await equipmentInventoryService.getEquipmentByOwner(req.params.ownerId);
     res.status(200).json({ success: true, data: equipment });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

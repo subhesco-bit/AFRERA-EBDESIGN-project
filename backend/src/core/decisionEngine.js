@@ -236,10 +236,10 @@ class DecisionEngine {
         const probability = Number(signal.payload?.probability) || 0;
         if (probability < 0.6) return null;
 
-        const related = signal.entityId ? ctx.forEntity(signal.entityId) : [];
+        let related = signal.entityId ? ctx.forEntity(signal.entityId) : [];
         const payments = related.filter((s) => s.type === SIGNAL.PAYMENT_RECEIVED);
 
-        const actions = [ACTION.BLOCK_TRANSACTION];
+        let actions = [ACTION.BLOCK_TRANSACTION];
         if (payments.length) actions.push(ACTION.FREEZE_PAYOUT);
         if (probability >= 0.8) actions.push(ACTION.ESCALATE_HUMAN);
 
@@ -265,7 +265,7 @@ class DecisionEngine {
       description: 'Quality test failure on a batch that has already shipped.',
       triggers: [SIGNAL.QUALITY_FAILED],
       evaluate: (signal, ctx) => {
-        const related = signal.entityId ? ctx.forEntity(signal.entityId) : [];
+        let related = signal.entityId ? ctx.forEntity(signal.entityId) : [];
         const shipped = related.some(
           (s) => s.type === SIGNAL.ORDER_PLACED || s.type === SIGNAL.SHIPMENT_DELAYED
         );

@@ -143,7 +143,7 @@ class DynamicServiceLoader {
     }
 
     try {
-      const startTime = Date.now();
+      let startTime = Date.now();
 
       const ServiceClass = require(entry.path);
       const exported = ServiceClass.default || ServiceClass;
@@ -199,7 +199,7 @@ class DynamicServiceLoader {
    * Load all services in a subfolder
    */
   async loadSubfolder(subfolder) {
-    const services = this.bySubfolder.get(subfolder) || [];
+    let services = this.bySubfolder.get(subfolder) || [];
     logger.info(`Loading ${services.length} services from subfolder: ${subfolder}`);
     return this.loadMultiple(...services);
   }
@@ -221,7 +221,7 @@ class DynamicServiceLoader {
       ];
     }
 
-    const startTime = Date.now();
+    let startTime = Date.now();
     const loaded = [];
     const failed = [];
 
@@ -234,7 +234,7 @@ class DynamicServiceLoader {
       }
     }
 
-    const elapsed = Date.now() - startTime;
+    let elapsed = Date.now() - startTime;
     logger.info(`Critical services loaded`, {
       loaded: loaded.length,
       failed: failed.length,
@@ -270,7 +270,7 @@ class DynamicServiceLoader {
    * Get service metadata without loading
    */
   getMetadata(serviceName) {
-    const entry = this.services.get(serviceName);
+    let entry = this.services.get(serviceName);
     if (!entry) return null;
 
     return {
@@ -362,7 +362,7 @@ class DynamicServiceLoader {
    * Unload a service (free memory)
    */
   unloadService(serviceName) {
-    const entry = this.services.get(serviceName);
+    let entry = this.services.get(serviceName);
     if (entry && entry.loaded) {
       entry.instance = null;
       entry.loaded = false;
@@ -503,7 +503,7 @@ class DynamicServiceLoader {
    */
   async reload() {
     this.loadedCount = 0;
-    const services = Array.from(this.services.values());
+    let services = Array.from(this.services.values());
 
     for (const service of services) {
       service.loaded = false;

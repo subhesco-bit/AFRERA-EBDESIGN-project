@@ -99,7 +99,7 @@ async function createCampaign(userId, campaignData) {
  * Launch campaign
  */
 async function launchCampaign(campaignId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Update campaign status
@@ -110,7 +110,7 @@ async function launchCampaign(campaignId) {
     `, [campaignId]);
     
     // Create ad placements
-    const campaign = await pg.query(`
+    let campaign = await pg.query(`
       SELECT platforms, ad_creatives
       FROM marketing_campaigns
       WHERE id = $1
@@ -159,7 +159,7 @@ async function launchCampaign(campaignId) {
  * Update campaign performance metrics
  */
 async function updateCampaignMetrics(campaignId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get campaign ad placements
@@ -225,7 +225,7 @@ async function updateCampaignMetrics(campaignId) {
  * Create sponsored product listing
  */
 async function createSponsoredProduct(sellerId, productData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -291,7 +291,7 @@ async function createSponsoredProduct(sellerId, productData) {
  * Get sponsored products for display
  */
 async function getSponsoredProducts(filters = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const { category_id, tier, limit = 10 } = filters;
@@ -360,7 +360,7 @@ async function getSponsoredProducts(filters = {}) {
  * Create promotion/discount offer
  */
 async function createPromotion(creatorId, promotionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -437,11 +437,11 @@ async function createPromotion(creatorId, promotionData) {
  * Apply promotion to order
  */
 async function applyPromotion(promoCode, orderId, userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get promotion details
-    const promotion = await pg.query(`
+    let promotion = await pg.query(`
       SELECT * FROM promotions
       WHERE id = $1
         AND status = 'active'
@@ -552,7 +552,7 @@ async function applyPromotion(promoCode, orderId, userId) {
  * Create cart abandonment retargeting campaign
  */
 async function createCartRetargeting(userId, cartItems) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Check if user already has active retargeting
@@ -573,11 +573,11 @@ async function createCartRetargeting(userId, cartItems) {
     }
     
     // Create retargeting campaign
-    const campaignId = `RET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    let campaignId = `RET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     const cartValue = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    const campaign = {
+    let campaign = {
       id: campaignId,
       user_id: userId,
       campaign_type: 'cart_abandonment',
@@ -609,11 +609,11 @@ async function createCartRetargeting(userId, cartItems) {
  * Create product view retargeting
  */
 async function createProductViewRetargeting(userId, productId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Check if user already has recent retargeting for this product
-    const existing = await pg.query(`
+    let existing = await pg.query(`
       SELECT id FROM retargeting_campaigns
       WHERE user_id = $1
         AND campaign_type = 'product_view'
@@ -631,9 +631,9 @@ async function createProductViewRetargeting(userId, productId) {
     }
     
     // Create retargeting campaign
-    const campaignId = `RET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    let campaignId = `RET-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
-    const campaign = {
+    let campaign = {
       id: campaignId,
       user_id: userId,
       campaign_type: 'product_view',
@@ -668,7 +668,7 @@ async function createProductViewRetargeting(userId, productId) {
  * Get marketing performance analytics
  */
 async function getMarketingAnalytics(filters = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const { start_date, end_date, campaign_id } = filters;
@@ -690,7 +690,7 @@ async function getMarketingAnalytics(filters = {}) {
       WHERE 1=1
     `;
     
-    const params = [];
+    let params = [];
     let paramCount = 0;
     
     if (start_date) {
@@ -711,7 +711,7 @@ async function getMarketingAnalytics(filters = {}) {
       params.push(campaign_id);
     }
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     // Calculate aggregate metrics
     const aggregates = result.rows.reduce((acc, row) => {

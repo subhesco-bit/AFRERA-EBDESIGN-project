@@ -156,7 +156,7 @@ class PaymentGatewayService {
    */
   async createPaymentRecord(paymentData) {
     try {
-      const query = `
+      let query = `
         INSERT INTO payments (
           user_id, amount, currency, gateway, payment_method, 
           description, status, metadata, created_at
@@ -174,7 +174,7 @@ class PaymentGatewayService {
         JSON.stringify(paymentData.metadata)
       ];
       
-      const result = await this.db.query(query, values);
+      let result = await this.db.query(query, values);
       return result.rows[0].payment_id;
     } catch (error) {
       logger.error('Create payment record failed', error);
@@ -187,7 +187,7 @@ class PaymentGatewayService {
    */
   async updatePaymentStatus(paymentId, status, gatewayResponse) {
     try {
-      const query = `
+      let query = `
         UPDATE payments 
         SET status = $1, 
             gateway_transaction_id = $2,
@@ -241,7 +241,7 @@ class PaymentGatewayService {
    */
   async createRefundRecord(refundData) {
     try {
-      const query = `
+      let query = `
         INSERT INTO refunds (
           payment_id, amount, reason, gateway_refund_id, 
           status, created_at

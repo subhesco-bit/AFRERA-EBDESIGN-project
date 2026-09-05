@@ -97,7 +97,7 @@ export const MultilingualProvider = ({ children }) => {
 
   const translate = async (text, targetLanguage = currentLanguage) => {
     try {
-      const response = await multilingualAPI.translate({
+      let response = await multilingualAPI.translate({
         text,
         source_language: 'en', // Assuming source is English
         target_language: targetLanguage,
@@ -112,7 +112,7 @@ export const MultilingualProvider = ({ children }) => {
 
   const detectLanguage = async (text) => {
     try {
-      const response = await multilingualAPI.detect(text);
+      let response = await multilingualAPI.detect(text);
       return response.data;
     } catch (error) {
       console.error('Language detection failed:', error);

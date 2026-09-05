@@ -102,7 +102,7 @@ async function transferLandOwnership(parcelId, fromFarmerId, toFarmerId, transfe
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO land_transfers 
        (transfer_id, parcel_id, from_farmer_id, to_farmer_id, transfer_date, transfer_type, 
         transfer_amount, transfer_details, documents, approval_status, created_at)
@@ -126,7 +126,7 @@ async function transferLandOwnership(parcelId, fromFarmerId, toFarmerId, transfe
 
 async function getLandByFarmer(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM land_parcels WHERE farmer_id = $1 ORDER BY created_at DESC',
       [farmerId]
     );
@@ -214,7 +214,7 @@ async function getTotalParcels(district, landType) {
       params.push(landType);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.count || 0;
   } catch (error) {
     return 0;
@@ -224,7 +224,7 @@ async function getTotalParcels(district, landType) {
 async function getTotalArea(district, landType) {
   try {
     let query = 'SELECT SUM(area) as total FROM land_parcels WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -236,7 +236,7 @@ async function getTotalArea(district, landType) {
       params.push(landType);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.total || 0;
   } catch (error) {
     return 0;
@@ -246,7 +246,7 @@ async function getTotalArea(district, landType) {
 async function getAverageValue(district, landType) {
   try {
     let query = 'SELECT AVG(market_value) as avg FROM land_parcels WHERE market_value IS NOT NULL';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -258,7 +258,7 @@ async function getAverageValue(district, landType) {
       params.push(landType);
     }
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows[0]?.avg || 0;
   } catch (error) {
     return 0;
@@ -268,7 +268,7 @@ async function getAverageValue(district, landType) {
 async function getLandTypeDistribution(district) {
   try {
     let query = 'SELECT land_type, COUNT(*) as count FROM land_parcels WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -278,7 +278,7 @@ async function getLandTypeDistribution(district) {
 
     query += ' GROUP BY land_type';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     return [];
@@ -288,7 +288,7 @@ async function getLandTypeDistribution(district) {
 async function getOwnershipDistribution(district) {
   try {
     let query = 'SELECT ownership_type, COUNT(*) as count FROM land_parcels WHERE 1=1';
-    const params = [];
+    let params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -298,7 +298,7 @@ async function getOwnershipDistribution(district) {
 
     query += ' GROUP BY ownership_type';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     return [];
@@ -306,7 +306,7 @@ async function getOwnershipDistribution(district) {
 }
 
 async function generateLandInsights(district, landType) {
-  const aiRequest = {
+  let aiRequest = {
     task: 'land_analytics_insights',
     parameters: {
       district,
@@ -316,7 +316,7 @@ async function generateLandInsights(district, landType) {
     }
   };
 
-  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+  let aiResponse = await aiAPI.generateRecommendation(aiRequest);
   return aiResponse;
 }
 

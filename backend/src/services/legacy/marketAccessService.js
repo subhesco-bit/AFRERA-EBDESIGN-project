@@ -193,7 +193,7 @@ function setupRoutes(app) {
 
   router.get('/access/type/:marketType', async (req, res) => {
     try {
-      const accessRecords = await getMarketAccessByType(req.params.marketType);
+      let accessRecords = await getMarketAccessByType(req.params.marketType);
       res.json({ success: true, data: accessRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -211,7 +211,7 @@ function setupRoutes(app) {
 
   router.post('/access', async (req, res) => {
     try {
-      const access = await upsertMarketAccess(req.body);
+      let access = await upsertMarketAccess(req.body);
       res.status(201).json({ success: true, data: access });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });

@@ -31,7 +31,7 @@ class ProductionService {
       return result;
     } catch (error) {
       this.errorCount++;
-      const duration = Date.now() - startTime;
+      let duration = Date.now() - startTime;
 
       this.logger.error(`${this.name}.${methodName} failed`, {
         error: error.message,
@@ -52,7 +52,7 @@ class ProductionService {
 
       const results = [];
       for (const operation of operations) {
-        const result = await client.query(...operation);
+        let result = await client.query(...operation);
         results.push(result);
       }
 
@@ -76,7 +76,7 @@ class ProductionService {
     }
 
     // Execute query
-    const result = await this.db.query(query, params);
+    let result = await this.db.query(query, params);
 
     // Cache result
     await this.cache.set(cacheKey, result.rows, ttl);
@@ -90,7 +90,7 @@ class ProductionService {
       throw new ValidationError('Records must be a non-empty array');
     }
 
-    const results = [];
+    let results = [];
 
     for (let i = 0; i < records.length; i += batchSize) {
       const batch = records.slice(i, i + batchSize);
@@ -104,7 +104,7 @@ class ProductionService {
 
       const query = `INSERT INTO ${table} (${columns.join(',')}) VALUES ${placeholders} RETURNING *`;
 
-      const result = await this.db.query(query, values);
+      let result = await this.db.query(query, values);
       results.push(...result.rows);
     }
 
@@ -120,7 +120,7 @@ class ProductionService {
       .join(' AND ');
 
     const whereClause = where ? `WHERE ${where}` : '';
-    const values = Object.values(filter);
+    let values = Object.values(filter);
 
     const [countResult, dataResult] = await Promise.all([
       this.db.query(`SELECT COUNT(*) FROM ${table} ${whereClause}`, values),
@@ -141,7 +141,7 @@ class ProductionService {
   // Circuit breaker pattern for external calls
   async callExternalService(serviceName, fn, fallback = null) {
     try {
-      const result = await Promise.race([
+      let result = await Promise.race([
         fn(),
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 5000)

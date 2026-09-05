@@ -37,7 +37,7 @@ function crudRouter(service, validateCreate) {
   });
   router.put('/:id', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, validateBody(), bodyValidator((body) => validateOperationsBody(body)), async (req, res) => {
     try {
-      const item = await service.update(req.params.id, req.body);
+      let item = await service.update(req.params.id, req.body);
       if (!item) return res.status(404).json({ success: false, error: 'Not found' });
       emitMutation(req, 'update', item, SIGNAL.OPERATIONS_RECORD_CHANGED, 'operations_management_routes'); res.json({ success: true, data: item });
     } catch (e) { return fail(req, res, e, 'operations.update', e.status || 500); }

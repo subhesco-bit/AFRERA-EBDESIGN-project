@@ -293,7 +293,7 @@ class AIAgentService {
       } else if (agent.model === 'gemini') {
         if (!this.gemini) throw new Error('GEMINI_API_KEY not configured — gemini agent unavailable');
         const model = this.gemini.getGenerativeModel({ model: 'gemini-pro' });
-        const result = await model.generateContent(messages.map(m => m.content).join('\n'));
+        let result = await model.generateContent(messages.map(m => m.content).join('\n'));
         response = { choices: [{ message: { content: result.response.text() } }] };
       } else if (agent.model === 'claude') {
         if (!this.anthropic) throw new Error('ANTHROPIC_API_KEY not configured — claude agent unavailable');
@@ -362,7 +362,7 @@ class AIAgentService {
       if (tool) {
         try {
           const args = JSON.parse(toolCall.function.arguments);
-          const result = await tool.handler(args);
+          let result = await tool.handler(args);
           results.push({
             tool_call_id: toolCall.id,
             result: result
@@ -397,7 +397,7 @@ class AIAgentService {
    * Coordinate multiple agents for complex tasks
    */
   async coordinateAgents(agentNames, task, context = {}) {
-    const results = {};
+    let results = {};
     
     for (const agentName of agentNames) {
       results[agentName] = await this.executeAgentTask(agentName, task, context);
@@ -429,7 +429,7 @@ class AIAgentService {
    * Get agent status
    */
   getAgentStatus(agentName) {
-    const agent = this.agents.get(agentName);
+    let agent = this.agents.get(agentName);
     if (!agent) {
       return null;
     }
@@ -456,7 +456,7 @@ class AIAgentService {
    * Update agent configuration
    */
   updateAgent(agentName, updates) {
-    const agent = this.agents.get(agentName);
+    let agent = this.agents.get(agentName);
     if (!agent) {
       throw new Error(`Agent ${agentName} not found`);
     }

@@ -83,7 +83,7 @@ async function checkIpAccess(req, res) {
 async function checkRateLimit(req, res) {
   try {
     const { identifier, limit, windowMinutes } = req.body;
-    const result = await service.checkRateLimit(identifier, limit, windowMinutes);
+    let result = await service.checkRateLimit(identifier, limit, windowMinutes);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('checkRateLimit error', { error: error.message });
@@ -127,7 +127,7 @@ async function createAccessPolicy(req, res) {
 async function evaluateAccessPolicy(req, res) {
   try {
     const { userId, resource, action } = req.body;
-    const result = await service.evaluateAccessPolicy(userId, resource, action);
+    let result = await service.evaluateAccessPolicy(userId, resource, action);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('evaluateAccessPolicy error', { error: error.message });

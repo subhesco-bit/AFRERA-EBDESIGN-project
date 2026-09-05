@@ -212,7 +212,7 @@ async function advancedPredictDemand(productId, timeHorizon = 30, includeExplana
  */
 async function advancedOptimizePrice(productId, currentPrice, context = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get comprehensive market data
     const marketQuery = `
@@ -375,7 +375,7 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
  */
 async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get comprehensive farmer data
     const farmerQuery = `
@@ -444,7 +444,7 @@ async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
     const models = await loadEnsembleModels('credit_scoring');
     
     // Get predictions from each model
-    const predictions = {};
+    let predictions = {};
     for (const [modelName, model] of Object.entries(models)) {
       predictions[modelName] = await model.predict(farmerData, externalRiskFactors);
     }
@@ -527,7 +527,7 @@ async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
  */
 async function advancedDetectFraud(transactionData, userId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get user behavior patterns
     const behaviorPatterns = await getUserBehaviorPatterns(userId);
@@ -536,7 +536,7 @@ async function advancedDetectFraud(transactionData, userId) {
     const transactionContext = await getTransactionContext(transactionData);
     
     // Load fraud detection models
-    const models = await loadFraudDetectionModels();
+    let models = await loadFraudDetectionModels();
     
     // Run anomaly detection
     const anomalyScores = {};
@@ -600,7 +600,7 @@ async function advancedDetectFraud(transactionData, userId) {
  */
 async function advancedGenerateRecommendations(userId, context = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get user profile and preferences
     const userProfile = await getUserProfile(userId);
@@ -612,7 +612,7 @@ async function advancedGenerateRecommendations(userId, context = {}) {
     const realTimeContext = await getRealTimeContext(userId, context);
     
     // Load recommendation models
-    const models = await loadRecommendationModels();
+    let models = await loadRecommendationModels();
     
     // Generate recommendations from each approach
     const collaborativeRecommendations = await models.collaborative_filtering.generate(userHistory);
@@ -686,7 +686,7 @@ async function detectCropDisease(imageData, additionalData = {}) {
     const treatmentRecommendations = await generateTreatmentRecommendations(detectionResults, diseaseInfo);
     
     // Calculate confidence intervals
-    const confidenceIntervals = calculateDetectionConfidence(detectionResults);
+    let confidenceIntervals = calculateDetectionConfidence(detectionResults);
     
     logger.info(`Crop disease detection completed: ${detectionResults.primary_disease}`);
     
@@ -786,8 +786,8 @@ async function loadRLModel(modelName) {
     modelType: 'elasticity_optimiser',
     getAction: async (state = {}) => {
       const currentPrice = Number(state.current_price) || 0;
-      const priceHistory = Array.isArray(state.price_history) ? state.price_history : [];
-      const demandHistory = Array.isArray(state.demand_history) ? state.demand_history : [];
+      let priceHistory = Array.isArray(state.price_history) ? state.price_history : [];
+      let demandHistory = Array.isArray(state.demand_history) ? state.demand_history : [];
 
       const minPrice = Number.isFinite(state.min_price) ? state.min_price : currentPrice * 0.7;
       const maxPrice = Number.isFinite(state.max_price) ? state.max_price : currentPrice * 1.3;
@@ -803,7 +803,7 @@ async function loadRLModel(modelName) {
       }
 
       // Negative correlation = demand falls as price rises (normal good).
-      const elasticity = stats.correlation(priceHistory, demandHistory);
+      let elasticity = stats.correlation(priceHistory, demandHistory);
       const demandTrend = stats.linearRegression(demandHistory);
 
       // Move price against demand pressure, scaled by how strong the
@@ -974,7 +974,7 @@ function prepareTimeSeriesData(rows, externalFactors = {}) {
 
 /** 95% intervals around each forecast point, widening with horizon. */
 function calculateConfidenceIntervals(predictions, rows) {
-  const values = Array.isArray(predictions?.values) ? predictions.values
+  let values = Array.isArray(predictions?.values) ? predictions.values
     : (Array.isArray(predictions) ? predictions : []);
   const history = column(rows, 'demand');
   const sd = predictions?.residualStdDev ?? stats.stdDev(history);
@@ -987,7 +987,7 @@ function calculateConfidenceIntervals(predictions, rows) {
 }
 
 function calculateTrend(rows) {
-  const series = column(rows, 'demand');
+  let series = column(rows, 'demand');
   const { slope, r2 } = stats.linearRegression(series);
   const avg = stats.mean(series);
   return {
@@ -999,8 +999,8 @@ function calculateTrend(rows) {
 }
 
 function calculateAdvancedSeasonality(rows, period = 7) {
-  const series = column(rows, 'demand');
-  const indices = stats.seasonalIndices(series, period);
+  let series = column(rows, 'demand');
+  let indices = stats.seasonalIndices(series, period);
   const strength = stats.stdDev(indices);
   return {
     period,
@@ -1013,7 +1013,7 @@ function calculateAdvancedSeasonality(rows, period = 7) {
 }
 
 function calculateVolatility(rows) {
-  const series = column(rows, 'demand');
+  let series = column(rows, 'demand');
   const cv = stats.coefficientOfVariation(series);
   return {
     std_dev: stats.stdDev(series),
@@ -1062,11 +1062,11 @@ async function generateDemandExplanations(predictions, externalFactors, rows) {
 }
 
 function generateAdvancedDemandRecommendations(predictions, intervals, externalFactors) {
-  const values = predictions?.values || [];
+  let values = predictions?.values || [];
   const recs = [];
   if (values.length === 0) return recs;
 
-  const total = values.reduce((a, b) => a + b, 0);
+  let total = values.reduce((a, b) => a + b, 0);
   const peak = Math.max(...values);
   const upper = intervals?.length ? Math.max(...intervals.map((i) => i.upper)) : peak;
 
@@ -1098,7 +1098,7 @@ async function getRealTimePricingFactors(productId) {
 
 async function getInventoryLevel(productId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) return { available: false };
     const r = await pg.query(
       'SELECT COALESCE(SUM(quantity), 0) AS qty FROM inventory WHERE product_id = $1',
@@ -1148,7 +1148,7 @@ function generatePricingStrategy(action, outcome, risk) {
 }
 
 function generateAdvancedPricingRecommendations(action, outcome, risk) {
-  const recs = [{ action: 'set_price', detail: `Recommended price: ${action.price?.toFixed(2)}` }];
+  let recs = [{ action: 'set_price', detail: `Recommended price: ${action.price?.toFixed(2)}` }];
   if (action.constrainedBy) {
     recs.push({ action: 'review_bounds', detail: `Price clamped by ${action.constrainedBy}.` });
   }
@@ -1161,7 +1161,7 @@ function generateAdvancedPricingRecommendations(action, outcome, risk) {
 // --- credit helpers ----------------------------------------------------------
 
 function calculateAdvancedCreditScore(ensembleResult) {
-  const score = Math.round(ensembleResult?.score ?? 0);
+  let score = Math.round(ensembleResult?.score ?? 0);
   return {
     score,
     band: score >= 75 ? 'A' : score >= 60 ? 'B' : score >= 45 ? 'C' : 'D',
@@ -1211,7 +1211,7 @@ async function generateCreditExplanations(scoreObj, contributions) {
 }
 
 function generateLoanRecommendations(scoreObj, riskLevel) {
-  const recs = [];
+  let recs = [];
   if (riskLevel === 'low') {
     recs.push({ action: 'approve', detail: 'Strong profile; standard terms appropriate.' });
   } else if (riskLevel === 'moderate') {
@@ -1242,9 +1242,9 @@ async function loadFraudDetectionModels() {
 
 async function getUserBehaviorPatterns(userId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) return { available: false, amounts: [] };
-    const r = await pg.query(
+    let r = await pg.query(
       `SELECT total_amount FROM orders WHERE buyer_id = $1
        ORDER BY created_at DESC LIMIT 100`,
       [userId]
@@ -1322,7 +1322,7 @@ async function generateFraudReport(transactionData, details, probability, riskLe
 
 async function storeFraudDetectionResults(userId, report) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) return { stored: false, reason: 'no_database' };
     await pg.query(
       `INSERT INTO fraud_detection_results (user_id, risk_level, probability, details, created_at)
@@ -1345,9 +1345,9 @@ async function loadRecommendationModels() {
 
 async function getUserProfile(userId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) return { available: false };
-    const r = await pg.query('SELECT id, role FROM users WHERE id = $1', [userId]);
+    let r = await pg.query('SELECT id, role FROM users WHERE id = $1', [userId]);
     return { available: r.rows.length > 0, ...(r.rows[0] || {}) };
   } catch (error) {
     logger.warn('getUserProfile unavailable', { error: error.message });
@@ -1357,9 +1357,9 @@ async function getUserProfile(userId) {
 
 async function getUserHistory(userId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     if (!pg) return { available: false, product_ids: [] };
-    const r = await pg.query(
+    let r = await pg.query(
       `SELECT DISTINCT oi.product_id FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
        WHERE o.buyer_id = $1 LIMIT 200`,
@@ -1490,7 +1490,7 @@ router.post('/predict-demand', authMiddleware, async (req, res) => {
 router.post('/optimize-price', authMiddleware, async (req, res) => {
   try {
     const { product_id, current_price, context } = req.body;
-    const result = await advancedOptimizePrice(product_id, current_price, context);
+    let result = await advancedOptimizePrice(product_id, current_price, context);
     res.json(result);
   } catch (error) {
     logger.error('Advanced price optimization API error', { error: error.message, stack: error.stack });
@@ -1511,7 +1511,7 @@ router.post('/assess-credit-risk', authMiddleware, async (req, res) => {
   try {
     const { farmer_id } = req.body;
     const financialService = require('./financialService');
-    const result = await financialService.farmerCreditRiskScore(farmer_id);
+    let result = await financialService.farmerCreditRiskScore(farmer_id);
     res.json({ ...result, delegatedFrom: 'advancedAIService.advancedAssessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
   } catch (error) {
     logger.error('Advanced credit risk assessment API error', { error: error.message, stack: error.stack });
@@ -1526,7 +1526,7 @@ router.post('/assess-credit-risk', authMiddleware, async (req, res) => {
 router.post('/detect-fraud', authMiddleware, async (req, res) => {
   try {
     const { transaction_data, user_id } = req.body;
-    const result = await advancedDetectFraud(transaction_data, user_id);
+    let result = await advancedDetectFraud(transaction_data, user_id);
     res.json(result);
   } catch (error) {
     logger.error('Advanced fraud detection API error', { error: error.message, stack: error.stack });
@@ -1541,7 +1541,7 @@ router.post('/detect-fraud', authMiddleware, async (req, res) => {
 router.post('/recommendations', authMiddleware, async (req, res) => {
   try {
     const { user_id, context } = req.body;
-    const result = await advancedGenerateRecommendations(user_id, context);
+    let result = await advancedGenerateRecommendations(user_id, context);
     res.json(result);
   } catch (error) {
     logger.error('Advanced recommendations API error', { error: error.message, stack: error.stack });
@@ -1556,7 +1556,7 @@ router.post('/recommendations', authMiddleware, async (req, res) => {
 router.post('/detect-crop-disease', authMiddleware, async (req, res) => {
   try {
     const { image_data, additional_data } = req.body;
-    const result = await detectCropDisease(image_data, additional_data);
+    let result = await detectCropDisease(image_data, additional_data);
     res.json(result);
   } catch (error) {
     logger.error('Crop disease detection API error', { error: error.message, stack: error.stack });

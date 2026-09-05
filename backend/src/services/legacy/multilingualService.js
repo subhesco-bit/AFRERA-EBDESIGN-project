@@ -59,7 +59,7 @@ if (process.env.NODE_ENV === 'test') {
     const { content_key, language_code } = data;
     const id = `ct-${Date.now()}`;
     const record = Object.assign({ id, content_key, language_code, translated_text: data.translated_text || '' }, data);
-    const composite = `${content_key}::${language_code}`;
+    let composite = `${content_key}::${language_code}`;
     _translationStore.set(composite, record);
     return record;
   };
@@ -160,7 +160,7 @@ router.post('/detect', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
     
-    const result = await detectLanguage(text, {
+    let result = await detectLanguage(text, {
       userId: req.user.id,
       sessionId: req.sessionID
     });
@@ -181,7 +181,7 @@ router.post('/detect', authMiddleware, async (req, res) => {
  * Uses translation memory first, then external API
  */
 async function translateText(sourceText, sourceLang, targetLang, options = {}) {
-  const startTime = Date.now();
+  let startTime = Date.now();
   
   try {
     // Get language IDs
@@ -238,7 +238,7 @@ async function translateText(sourceText, sourceLang, targetLang, options = {}) {
       );
     }
     
-    const processingTime = Date.now() - startTime;
+    let processingTime = Date.now() - startTime;
     
     // Log translation request
     if (options.userId) {
@@ -304,7 +304,7 @@ router.post('/translate', authMiddleware, async (req, res) => {
       });
     }
     
-    const result = await translateText(text, source_language, target_language, {
+    let result = await translateText(text, source_language, target_language, {
       userId: req.user.id,
       domain,
       context
@@ -326,7 +326,7 @@ router.post('/translate', authMiddleware, async (req, res) => {
  */
 async function getContentTranslation(contentKey, languageCode, entityType = null, entityId = null) {
   try {
-    const langResult = await pool.query(
+    let langResult = await pool.query(
       'SELECT id FROM languages WHERE iso_code = $1',
       [languageCode]
     );
@@ -335,9 +335,9 @@ async function getContentTranslation(contentKey, languageCode, entityType = null
       throw new Error('Invalid language code');
     }
     
-    const languageId = langResult.rows[0].id;
+    let languageId = langResult.rows[0].id;
     
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM content_translations 
        WHERE content_key = $1 AND language_id = $2 
        AND ($3::text IS NULL OR entity_type = $3)
@@ -364,7 +364,7 @@ async function saveContentTranslation(data) {
   try {
     const { content_key, entity_type, entity_id, language_code, translated_text, context } = data;
     
-    const langResult = await pool.query(
+    let langResult = await pool.query(
       'SELECT id FROM languages WHERE iso_code = $1',
       [language_code]
     );
@@ -373,9 +373,9 @@ async function saveContentTranslation(data) {
       throw new Error('Invalid language code');
     }
     
-    const languageId = langResult.rows[0].id;
+    let languageId = langResult.rows[0].id;
     
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO content_translations 
        (content_key, entity_type, entity_id, language_id, translated_text, context, is_auto_translated, auto_translation_confidence)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -416,7 +416,7 @@ router.get('/content', authMiddleware, async (req, res) => {
       ORDER BY ct.content_key
     `;
 
-    const result = await pool.query(query, [language, entity_type || null, entity_id || null]);
+    let result = await pool.query(query, [language, entity_type || null, entity_id || null]);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get content translations API error', { error: error.message, stack: error.stack });
@@ -433,7 +433,7 @@ router.get('/content/:key', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'language parameter is required' });
     }
     
-    const result = await getContentTranslation(key, language, entity_type, entity_id);
+    let result = await getContentTranslation(key, language, entity_type, entity_id);
     
     if (!result) {
       return res.status(404).json({ error: 'Translation not found' });
@@ -451,7 +451,7 @@ router.get('/content/:key', authMiddleware, async (req, res) => {
  */
 router.post('/content', authMiddleware, async (req, res) => {
   try {
-    const result = await saveContentTranslation(req.body);
+    let result = await saveContentTranslation(req.body);
     res.json(result);
   } catch (error) {
     logger.error('Save content translation API error', { error: error.message, stack: error.stack });
@@ -468,7 +468,7 @@ router.post('/content', authMiddleware, async (req, res) => {
  */
 async function getUserLanguagePreferences(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT ulp.*, 
        l1.iso_code as primary_language_code, l1.name as primary_language_name,
        l2.iso_code as secondary_language_code, l2.name as secondary_language_name
@@ -508,7 +508,7 @@ async function updateUserLanguagePreferences(userId, preferences) {
     let secondaryLangId = null;
     
     if (primary_language) {
-      const langResult = await pool.query(
+      let langResult = await pool.query(
         'SELECT id FROM languages WHERE iso_code = $1',
         [primary_language]
       );
@@ -518,7 +518,7 @@ async function updateUserLanguagePreferences(userId, preferences) {
     }
     
     if (secondary_language) {
-      const langResult = await pool.query(
+      let langResult = await pool.query(
         'SELECT id FROM languages WHERE iso_code = $1',
         [secondary_language]
       );
@@ -527,7 +527,7 @@ async function updateUserLanguagePreferences(userId, preferences) {
       }
     }
     
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE user_language_preferences
        SET primary_language_id = COALESCE($1, primary_language_id),
            secondary_language_id = COALESCE($2, secondary_language_id),
@@ -552,7 +552,7 @@ async function updateUserLanguagePreferences(userId, preferences) {
  */
 router.get('/preferences', authMiddleware, async (req, res) => {
   try {
-    const result = await getUserLanguagePreferences(req.user.id);
+    let result = await getUserLanguagePreferences(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get preferences API error', { error: error.message, stack: error.stack });
@@ -565,7 +565,7 @@ router.get('/preferences', authMiddleware, async (req, res) => {
  */
 router.put('/preferences', authMiddleware, async (req, res) => {
   try {
-    const result = await updateUserLanguagePreferences(req.user.id, req.body);
+    let result = await updateUserLanguagePreferences(req.user.id, req.body);
     res.json(result);
   } catch (error) {
     logger.error('Update preferences API error', { error: error.message, stack: error.stack });
@@ -582,7 +582,7 @@ router.put('/preferences', authMiddleware, async (req, res) => {
  */
 async function getAvailableLanguages() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM languages WHERE is_active = true ORDER BY priority DESC, name'
     );
     return result.rows;
@@ -597,7 +597,7 @@ async function getAvailableLanguages() {
  */
 router.get('/languages', async (req, res) => {
   try {
-    const result = await getAvailableLanguages();
+    let result = await getAvailableLanguages();
     res.json(result);
   } catch (error) {
     logger.error('Get languages API error', { error: error.message, stack: error.stack });
@@ -615,7 +615,7 @@ router.get('/languages', async (req, res) => {
  */
 async function getPronunciation(term, languageCode, region = null) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM pronunciation_guides
        WHERE LOWER(term) = LOWER($1)
          AND language_code = $2
@@ -639,7 +639,7 @@ async function getPronunciation(term, languageCode, region = null) {
  */
 async function searchPronunciations(query, languageCode = null, limit = 20) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM pronunciation_guides
        WHERE LOWER(term) LIKE LOWER($1) || '%'
          AND ($2::varchar IS NULL OR language_code = $2)
@@ -678,7 +678,7 @@ async function savePronunciation(data) {
   }
 
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO pronunciation_guides
          (term, language_code, ipa, phonetic_spelling, syllables, audio_url,
           tts_hint, domain, region, is_verified, verified_by)
@@ -747,7 +747,7 @@ router.get('/pronunciation', async (req, res) => {
  */
 router.post('/pronunciation', authMiddleware, async (req, res) => {
   try {
-    const guide = await savePronunciation(req.body);
+    let guide = await savePronunciation(req.body);
     res.status(201).json(guide);
   } catch (error) {
     logger.error('Save pronunciation API error', { error: error.message, stack: error.stack });
@@ -765,7 +765,7 @@ router.post('/pronunciation', authMiddleware, async (req, res) => {
  */
 async function getTranslationMemoryStats() {
   try {
-    const result = await pool.query(`
+    let result = await pool.query(`
       SELECT 
         COUNT(*) as total_entries,
         COUNT(CASE WHEN is_verified = true THEN 1 END) as verified_entries,
@@ -787,7 +787,7 @@ async function getTranslationMemoryStats() {
  */
 router.get('/memory/stats', async (req, res) => {
   try {
-    const result = await getTranslationMemoryStats();
+    let result = await getTranslationMemoryStats();
     res.json(result);
   } catch (error) {
     logger.error('Get memory stats API error', { error: error.message, stack: error.stack });

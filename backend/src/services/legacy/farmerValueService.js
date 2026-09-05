@@ -417,7 +417,7 @@ router.get('/farmers/:farmerId/value-index', authMiddleware, async (req, res) =>
 
 router.post('/farmers/:farmerId/value-index/compute', authMiddleware, async (req, res) => {
   try {
-    const data = await computeFVI({
+    let data = await computeFVI({
       farmerId: req.params.farmerId,
       season: req.body.season,
       year: req.body.year,
@@ -435,14 +435,14 @@ router.get('/farmers/:farmerId/unclaimed-support', authMiddleware, async (req, r
 
 router.get('/farmers/:farmerId/cash-flow', authMiddleware, async (req, res) => {
   try {
-    const data = await getCashFlow(req.params.farmerId, req.query.from, req.query.to);
+    let data = await getCashFlow(req.params.farmerId, req.query.from, req.query.to);
     res.json({ success: true, data });
   } catch (e) { return fail(res, e, 'getCashFlow'); }
 });
 
 router.get('/farmers/:farmerId/ledger', authMiddleware, async (req, res) => {
   try {
-    const data = await getSeasonLedger(
+    let data = await getSeasonLedger(
       req.params.farmerId, req.query.season, req.query.year ? Number(req.query.year) : undefined
     );
     res.json({ success: true, data });

@@ -78,10 +78,10 @@ class BatchProcessingService extends EventEmitter {
    */
   async getJob(jobId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM batch_jobs WHERE job_id = $1
       `;
-      const result = await this.db.query(query, [jobId]);
+      let result = await this.db.query(query, [jobId]);
       
       if (result.rows.length === 0) {
         throw new Error('Job not found');
@@ -123,7 +123,7 @@ class BatchProcessingService extends EventEmitter {
       query += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Get user jobs failed', error);
@@ -136,7 +136,7 @@ class BatchProcessingService extends EventEmitter {
    */
   async cancelJob(jobId) {
     try {
-      const job = await this.getJob(jobId);
+      let job = await this.getJob(jobId);
       
       if (job.status !== 'pending' && job.status !== 'queued') {
         throw new Error('Cannot cancel job in current status');
@@ -145,13 +145,13 @@ class BatchProcessingService extends EventEmitter {
       // Remove from queue if present
       this.jobQueue = this.jobQueue.filter(j => j.job_id !== jobId);
 
-      const query = `
+      let query = `
         UPDATE batch_jobs 
         SET status = 'cancelled', updated_at = NOW()
         WHERE job_id = $1
         RETURNING *
       `;
-      const result = await this.db.query(query, [jobId]);
+      let result = await this.db.query(query, [jobId]);
 
       logger.info(`Job ${jobId} cancelled`);
       return result.rows[0];
@@ -187,7 +187,7 @@ class BatchProcessingService extends EventEmitter {
       return new Date(a.created_at) - new Date(b.created_at);
     });
 
-    const job = this.jobQueue.shift();
+    let job = this.jobQueue.shift();
     if (!job) {
       return;
     }
@@ -197,7 +197,7 @@ class BatchProcessingService extends EventEmitter {
     await this.updateJobStatus(job.job_id, 'processing');
 
     try {
-      const result = await this.executeJob(job);
+      let result = await this.executeJob(job);
       await this.updateJobStatus(job.job_id, 'completed', { result });
       this.emit('jobCompleted', job);
     } catch (error) {
@@ -242,7 +242,7 @@ class BatchProcessingService extends EventEmitter {
    * Execute data export job
    */
   async executeDataExportJob(config) {
-    const etlService = require('./etlService');
+    let etlService = require('./etlService');
     return await etlService.runPipeline(config);
   }
 
@@ -259,7 +259,7 @@ class BatchProcessingService extends EventEmitter {
    * Execute data sync job
    */
   async executeDataSyncJob(config) {
-    const etlService = require('./etlService');
+    let etlService = require('./etlService');
     return await etlService.runPipeline(config);
   }
 
@@ -271,7 +271,7 @@ class BatchProcessingService extends EventEmitter {
     
     let query = `UPDATE ${table} SET `;
     const setClauses = [];
-    const params = [];
+    let params = [];
     let paramCount = 0;
 
     for (const [field, value] of Object.entries(updates)) {
@@ -293,7 +293,7 @@ class BatchProcessingService extends EventEmitter {
       query += whereClauses.join(' AND ');
     }
 
-    const result = await this.db.query(query, params);
+    let result = await this.db.query(query, params);
     return { updated: result.rowCount };
   }
 
@@ -302,7 +302,7 @@ class BatchProcessingService extends EventEmitter {
    */
   async updateJobStatus(jobId, status, metadata = {}) {
     try {
-      const query = `
+      let query = `
         UPDATE batch_jobs 
         SET status = $1, 
             metadata = COALESCE($2, metadata),
@@ -335,7 +335,7 @@ class BatchProcessingService extends EventEmitter {
           SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
         FROM batch_jobs
       `;
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (userId) {
@@ -358,7 +358,7 @@ class BatchProcessingService extends EventEmitter {
         params.push(endDate);
       }
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get job statistics failed', error);
@@ -371,7 +371,7 @@ class BatchProcessingService extends EventEmitter {
    */
   async retryJob(jobId) {
     try {
-      const job = await this.getJob(jobId);
+      let job = await this.getJob(jobId);
       
       if (job.status !== 'failed') {
         throw new Error('Can only retry failed jobs');

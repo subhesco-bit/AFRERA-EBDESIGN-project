@@ -264,7 +264,7 @@ class AdvancedConnectionPool {
       return;
     }
 
-    const metrics = this.collectMetrics();
+    let metrics = this.collectMetrics();
     if (!metrics) {
       return;
     }
@@ -327,7 +327,7 @@ class AdvancedConnectionPool {
    * Execute query with retry logic
    */
   async query(text, params, options = {}) {
-    const startTime = Date.now();
+    let startTime = Date.now();
     let lastError = null;
     let attempt = 0;
 
@@ -335,7 +335,7 @@ class AdvancedConnectionPool {
       try {
         const result = await this.pool.query(text, params, options);
         
-        const duration = Date.now() - startTime;
+        let duration = Date.now() - startTime;
         this.metrics.totalQueries++;
         this.metrics.totalWaitTime += duration;
         
@@ -390,12 +390,12 @@ class AdvancedConnectionPool {
    * Execute transaction with automatic retry
    */
   async transaction(callback, options = {}) {
-    const client = await this.getClient();
+    let client = await this.getClient();
     
     try {
       await client.query('BEGIN');
       
-      const result = await callback(client);
+      let result = await callback(client);
       
       await client.query('COMMIT');
       

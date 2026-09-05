@@ -69,7 +69,7 @@ const InsurancePremiumCalculator = () => {
       const data = insuranceType === 'crop' ? cropData :
         insuranceType === 'transit' ? transitData : warehouseData;
 
-      const response = await insuranceAPI.generateQuote({
+      let response = await insuranceAPI.generateQuote({
         insuranceType,
         policyholderId: 1, // Would come from auth
         ...data,

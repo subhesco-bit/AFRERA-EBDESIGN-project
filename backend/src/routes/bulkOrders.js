@@ -11,7 +11,7 @@ router.post('/bulk-orders', auth, async (req, res) => {
 
 router.get('/bulk-orders/:orderId/quotations', async (req, res) => {
   try {
-    const result = await bulkOrderService.getQuotations(req.params.orderId);
+    let result = await bulkOrderService.getQuotations(req.params.orderId);
     res.json(result);
   } catch (error) { res.status(500).json({ error: error.message }); }
 });

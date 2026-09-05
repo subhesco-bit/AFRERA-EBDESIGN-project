@@ -74,9 +74,9 @@ export const useIsBreakpointUp = (breakpoint) => {
 // Hook to check if current breakpoint matches or is below
 export const useIsBreakpointDown = (breakpoint) => {
   const { breakpoint: currentBreakpoint } = useBreakpoint();
-  const breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-  const currentIndex = breakpointOrder.indexOf(currentBreakpoint);
-  const targetIndex = breakpointOrder.indexOf(breakpoint);
+  let breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
+  let currentIndex = breakpointOrder.indexOf(currentBreakpoint);
+  let targetIndex = breakpointOrder.indexOf(breakpoint);
 
   return currentIndex <= targetIndex;
 };
@@ -94,7 +94,7 @@ export const useDeviceType = () => {
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const width = window.innerWidth;
+    let width = window.innerWidth;
 
     let type = 'desktop';
 
@@ -135,8 +135,8 @@ export const useOrientation = () => {
 export const useResponsiveValue = (values) => {
   const { breakpoint } = useBreakpoint();
 
-  const breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-  const currentIndex = breakpointOrder.indexOf(breakpoint);
+  let breakpointOrder = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
+  let currentIndex = breakpointOrder.indexOf(breakpoint);
 
   // Find the largest breakpoint that has a defined value
   for (let i = currentIndex; i >= 0; i--) {
@@ -244,7 +244,7 @@ export const useViewport = () => {
   });
 
   useEffect(() => {
-    const handleResize = () => {
+    let handleResize = () => {
       setViewport({
         width: window.innerWidth,
         height: window.innerHeight,
@@ -299,10 +299,10 @@ export const useMediaQuery = (query) => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
+    let mediaQuery = window.matchMedia(query);
     setMatches(mediaQuery.matches);
 
-    const handler = (e) => setMatches(e.matches);
+    let handler = (e) => setMatches(e.matches);
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);

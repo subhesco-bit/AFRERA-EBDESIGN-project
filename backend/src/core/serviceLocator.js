@@ -55,7 +55,7 @@ class ServiceLocator {
    * Get service or throw user-friendly error
    */
   async getOrThrow(serviceName) {
-    const service = await this.get(serviceName);
+    let service = await this.get(serviceName);
     if (!service) {
       throw new Error(`Service '${serviceName}' could not be loaded`);
     }
@@ -103,7 +103,7 @@ class ServiceLocator {
    * Get all services in a subfolder
    */
   async getSubfolder(subfolder) {
-    const serviceNames = this.serviceLoader.getServicesInSubfolder(subfolder);
+    let serviceNames = this.serviceLoader.getServicesInSubfolder(subfolder);
     return this.getMultiple(...serviceNames);
   }
 
@@ -236,7 +236,7 @@ class ServiceLocator {
    * Get access patterns (for optimization)
    */
   getAccessPatterns() {
-    const patterns = {};
+    let patterns = {};
 
     for (const access of this.accessLog) {
       patterns[access.service] = (patterns[access.service] || 0) + 1;

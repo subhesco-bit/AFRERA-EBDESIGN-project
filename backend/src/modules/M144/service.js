@@ -60,8 +60,8 @@ class GreenhouseManagementService {
   }
 
   async getGreenhouse(id) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-    const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
     
     if (res.rows.length === 0) return null;
     
@@ -70,10 +70,10 @@ class GreenhouseManagementService {
   }
 
   async createGreenhouse(payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { farmerId, name, location, area, greenhouseType, constructionDate, temperatureControl, humidityControl, irrigationSystem, lightingSystem, currentUsage, automationConfig, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `INSERT INTO ${tableName} (farmer_id, name, location, area, greenhouse_type, construction_date, temperature_control, humidity_control, irrigation_system, lighting_system, current_usage, automation_config, metadata, created_at) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW()) RETURNING *`,
       [farmerId, name, location, area, greenhouseType, constructionDate, temperatureControl, humidityControl, irrigationSystem, lightingSystem, currentUsage, JSON.stringify(automationConfig || {}), JSON.stringify(metadata || {})]
@@ -93,10 +93,10 @@ class GreenhouseManagementService {
   }
 
   async updateGreenhouse(id, payload) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     const { name, location, area, greenhouseType, temperatureControl, humidityControl, irrigationSystem, lightingSystem, currentUsage, automationConfig, status, metadata } = payload;
     
-    const res = await pg.query(
+    let res = await pg.query(
       `UPDATE ${tableName} 
        SET name = $1, location = $2, area = $3, greenhouse_type = $4, construction_date = $5, temperature_control = $6, humidity_control = $7, irrigation_system = $8, lighting_system = $9, current_usage = $10, automation_config = $11, status = $12, metadata = $13, updated_at = NOW() 
        WHERE id = $14 RETURNING *`,
@@ -119,8 +119,8 @@ class GreenhouseManagementService {
   }
 
   async deleteGreenhouse(id) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-    const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
     return !!res.rows[0];
   }
 
@@ -145,7 +145,7 @@ class GreenhouseManagementService {
     
     const sensorId = `GH-SENSOR-${greenhouseId}-${sensorType}-${Date.now()}`;
     
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     await pg.query(
       `INSERT INTO greenhouse_sensors (greenhouse_id, sensor_type, device_id, sensor_id, location, calibration, status, created_at) 
        VALUES ($1, $2, $3, $4, $5, $6, 'ACTIVE', NOW())`,
@@ -161,7 +161,7 @@ class GreenhouseManagementService {
   }
 
   async getGreenhouseSensorData(greenhouseId, { startTime, endTime, sensorTypes } = {}) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error(' Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error(' Database not initialized');
     
     const sensorsRes = await pg.query(
       `SELECT * FROM greenhouse_sensors WHERE greenhouse_id = $1 AND status = 'ACTIVE'`,
@@ -197,14 +197,14 @@ class GreenhouseManagementService {
    * reason otherwise, rather than fabricating one.
    */
   async fetchGreenhouseSensorData(deviceId, startTime, endTime) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     try {
       const params = [deviceId];
       let query = `SELECT * FROM greenhouse_sensor_readings WHERE device_id = $1`;
       if (startTime) { params.push(startTime); query += ` AND recorded_at >= $${params.length}`; }
       if (endTime) { params.push(endTime); query += ` AND recorded_at <= $${params.length}`; }
       query += ' ORDER BY recorded_at DESC LIMIT 100';
-      const res = await pg.query(query, params);
+      let res = await pg.query(query, params);
       return { deviceId, readings: res.rows, configured: true };
     } catch (error) {
       // greenhouse_sensor_readings has no migration in this codebase yet -
@@ -380,7 +380,7 @@ class GreenhouseManagementService {
   async setupAutomationRules(greenhouseId, rules) {
     logger.info(`Setting up automation rules for greenhouse ${greenhouseId}`);
     
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     for (const rule of rules) {
       await pg.query(
@@ -394,7 +394,7 @@ class GreenhouseManagementService {
   }
 
   async updateAutomationRules(greenhouseId, rules) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Delete existing rules
     await pg.query(`DELETE FROM greenhouse_automation_rules WHERE greenhouse_id = $1`, [greenhouseId]);
@@ -404,7 +404,7 @@ class GreenhouseManagementService {
   }
 
   async executeAutomation(greenhouseId) {
-    const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+    let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
     
     // Get active automation rules
     const rulesRes = await pg.query(
@@ -448,7 +448,7 @@ class GreenhouseManagementService {
       logger.warn(`Trigger condition missing required fields: ${JSON.stringify(triggerCondition)}`);
       return false;
     }
-    const sensorData = await this.getGreenhouseSensorData(greenhouseId);
+    let sensorData = await this.getGreenhouseSensorData(greenhouseId);
     const latest = sensorData.data?.[0]?.readings?.[0];
     if (!latest || latest[field] === undefined) return false;
 
@@ -479,7 +479,7 @@ class GreenhouseManagementService {
   }
 
   async getGreenhouseAIInsights(greenhouseId) {
-    const sensorData = await this.getGreenhouseSensorData(greenhouseId);
+    let sensorData = await this.getGreenhouseSensorData(greenhouseId);
     
     const insights = {
       cropOptimization: await this.optimizeCropSelection(sensorData),
@@ -543,9 +543,9 @@ class GreenhouseManagementService {
   }
 
   async optimizeEnergyUsage(sensorData) {
-    const summary = sensorData.summary;
+    let summary = sensorData.summary;
     
-    const optimizations = [];
+    let optimizations = [];
     
     if (summary.averageTemperature > 28) {
       optimizations.push({
@@ -581,7 +581,7 @@ class GreenhouseManagementService {
   }
 
   async optimizeResources(sensorData) {
-    const summary = sensorData.summary;
+    let summary = sensorData.summary;
     
     return {
       irrigation: {

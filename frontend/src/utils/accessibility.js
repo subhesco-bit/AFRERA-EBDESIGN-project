@@ -93,7 +93,7 @@ const focusManager = {
    * Focus last focusable element in container
    */
   focusLast(container) {
-    const focusableElements = this.getFocusableElements(container);
+    let focusableElements = this.getFocusableElements(container);
     if (focusableElements.length > 0) {
       focusableElements[focusableElements.length - 1].focus();
       return true;
@@ -124,7 +124,7 @@ const focusManager = {
    * Trap focus within container (for modals, dialogs)
    */
   trapFocus(container) {
-    const focusableElements = this.getFocusableElements(container);
+    let focusableElements = this.getFocusableElements(container);
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
@@ -263,7 +263,7 @@ const screenReader = {
    * Create visually hidden but screen reader accessible element
    */
   createHiddenElement(content) {
-    const element = document.createElement('span');
+    let element = document.createElement('span');
     element.className = 'sr-only';
     element.textContent = content;
     return element;
@@ -351,10 +351,10 @@ const accessibilityAudit = {
    */
   checkButtonLabels() {
     const buttons = document.querySelectorAll('button, [role="button"]');
-    const unlabeled = [];
+    let unlabeled = [];
 
     buttons.forEach((button) => {
-      const hasLabel =
+      let hasLabel =
         button.textContent.trim() ||
         button.getAttribute('aria-label') ||
         button.getAttribute('title') ||
@@ -375,7 +375,7 @@ const accessibilityAudit = {
    */
   checkLinkText() {
     const links = document.querySelectorAll('a[href]');
-    const issues = [];
+    let issues = [];
 
     links.forEach((link) => {
       const text = link.textContent.trim();

@@ -42,7 +42,7 @@ async function createAuditLog(logData) {
 }
 
 async function getAuditLogs({ page = 1, limit = 50, userId, action, entity, startDate, endDate } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -74,7 +74,7 @@ async function getAuditLogs({ page = 1, limit = 50, userId, action, entity, star
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM audit_logs`, 'SELECT COUNT(*) FROM audit_logs').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -82,22 +82,22 @@ async function getAuditLogs({ page = 1, limit = 50, userId, action, entity, star
 }
 
 async function getAuditLog(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM audit_logs WHERE id = $1', [id]);
+  let res = await pg.query('SELECT * FROM audit_logs WHERE id = $1', [id]);
   return res.rows[0] || null;
 }
 
 // Blockchain verification
 async function verifyAuditLogIntegrity(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const log = await getAuditLog(id);
   if (!log) return { valid: false, error: 'Log not found' };
   
   // Verify blockchain hash
-  const blockData = JSON.stringify({ 
+  let blockData = JSON.stringify({ 
     userId: log.user_id, 
     action: log.action, 
     entity: log.entity, 
@@ -118,20 +118,20 @@ async function verifyAuditLogIntegrity(id) {
 }
 
 async function getLatestBlockHash() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT block_hash FROM audit_logs ORDER BY id DESC LIMIT 1');
+  let res = await pg.query('SELECT block_hash FROM audit_logs ORDER BY id DESC LIMIT 1');
   return res.rows[0]?.block_hash || '0000000000000000000000000000000000000000000000000000000000000000';
 }
 
 // Compliance rules
 async function createComplianceRule(ruleData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, description, ruleType, conditions, actions, severity } = ruleData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO compliance_rules (name, description, rule_type, conditions, actions, severity, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
      RETURNING *`,
@@ -153,7 +153,7 @@ async function createComplianceRule(ruleData) {
 }
 
 async function listComplianceRules({ activeOnly = true } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM compliance_rules';
@@ -162,12 +162,12 @@ async function listComplianceRules({ activeOnly = true } = {}) {
   }
   query += ' ORDER BY severity DESC, name ASC';
   
-  const res = await pg.query(query);
+  let res = await pg.query(query);
   return res.rows;
 }
 
 async function evaluateComplianceRules(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const rules = await listComplianceRules({ activeOnly: true });
@@ -195,7 +195,7 @@ async function evaluateComplianceRules(userId) {
     }
     
     if (conditions.entityPattern) {
-      const matchingLogs = userLogs.items.filter(log => 
+      let matchingLogs = userLogs.items.filter(log => 
         log.entity && log.entity.includes(conditions.entityPattern)
       );
       
@@ -238,7 +238,7 @@ async function evaluateComplianceRules(userId) {
 
 // Regulatory reporting
 async function generateComplianceReport({ startDate, endDate, reportType = 'summary' }) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const logs = await getAuditLogs({ startDate, endDate, limit: 10000 });
@@ -298,7 +298,7 @@ async function verifyBatchIntegrity(logs) {
 
 // AI-powered anomaly detection
 async function detectAuditAnomalies({ timeframe = '24h' } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const timeCondition = timeframe === '24h' 

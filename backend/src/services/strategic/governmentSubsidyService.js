@@ -162,7 +162,7 @@ class GovernmentSubsidyService {
    */
   async calculateEligibility(farmerId, programId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get farmer details
@@ -181,7 +181,7 @@ class GovernmentSubsidyService {
         const farmer = farmerResult.rows[0];
         
         // Get program details
-        const programResult = await client.query(
+        let programResult = await client.query(
           `SELECT * FROM government_subsidy_programs WHERE id = $1`,
           [programId]
         );
@@ -405,7 +405,7 @@ class GovernmentSubsidyService {
    */
   async calculateInputBasedSubsidy(farmerId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT SUM(purchase_amount) as total_input_cost
          FROM farmer_input_purchases 
          WHERE farmer_id = $1 
@@ -429,7 +429,7 @@ class GovernmentSubsidyService {
    */
   async calculateOutputBasedSubsidy(farmerId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT SUM(sales_value) as total_output_value
          FROM farmer_sales 
          WHERE farmer_id = $1 
@@ -452,7 +452,7 @@ class GovernmentSubsidyService {
    * @returns {Object} Application result
    */
   async submitSubsidyApplication(applicationData) {
-    const client = await this.pool.connect();
+    let client = await this.pool.connect();
     
     try {
       await client.query('BEGIN');
@@ -585,13 +585,13 @@ class GovernmentSubsidyService {
    * @returns {Object} Disbursement result
    */
   async disburseSubsidy(applicationId, disbursementData) {
-    const client = await this.pool.connect();
+    let client = await this.pool.connect();
     
     try {
       await client.query('BEGIN');
       
       // Get application details
-      const applicationResult = await client.query(
+      let applicationResult = await client.query(
         `SELECT sa.*, sp.subsidy_amount, sp.subsidy_percentage, sp.subsidy_type
          FROM government_subsidy_applications sa
          JOIN government_subsidy_programs sp ON sa.program_id = sp.id
@@ -672,11 +672,11 @@ class GovernmentSubsidyService {
    */
   async trackSubsidyImpact(programId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get program details
-        const programResult = await client.query(
+        let programResult = await client.query(
           `SELECT * FROM government_subsidy_programs WHERE id = $1`,
           [programId]
         );
@@ -685,7 +685,7 @@ class GovernmentSubsidyService {
           throw new Error('Program not found');
         }
         
-        const program = programResult.rows[0];
+        let program = programResult.rows[0];
         
         // Get utilization metrics
         const utilizationResult = await client.query(
@@ -770,7 +770,7 @@ class GovernmentSubsidyService {
   async detectLeakage(client, programId) {
     try {
       // Check for duplicate applications
-      const duplicateResult = await client.query(
+      let duplicateResult = await client.query(
         `SELECT farmer_id, COUNT(*) as application_count
          FROM government_subsidy_applications 
          WHERE program_id = $1 AND status IN ('approved', 'disbursed')
@@ -878,7 +878,7 @@ class GovernmentSubsidyService {
    */
   async getGovernmentDashboard(ministry, fiscalYear) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Build query conditions
@@ -972,7 +972,7 @@ class GovernmentSubsidyService {
    */
   async getFarmerSubsidyDashboard(farmerId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get eligible programs

@@ -16,7 +16,7 @@ const createConfiguration = async (req, res) => {
 
 const getConfiguration = async (req, res) => {
   try {
-    const config = await platformConfigService.getConfiguration(req.params.key, req.query.environment);
+    let config = await platformConfigService.getConfiguration(req.params.key, req.query.environment);
     res.status(200).json({ success: true, data: config });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -25,7 +25,7 @@ const getConfiguration = async (req, res) => {
 
 const updateConfiguration = async (req, res) => {
   try {
-    const config = await platformConfigService.updateConfiguration(req.params.id, req.body);
+    let config = await platformConfigService.updateConfiguration(req.params.id, req.body);
     res.status(200).json({ success: true, data: config });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

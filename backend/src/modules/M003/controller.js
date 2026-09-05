@@ -16,7 +16,7 @@ const createTenant = async (req, res) => {
 
 const getTenant = async (req, res) => {
   try {
-    const tenant = await tenantService.getTenant(req.params.id);
+    let tenant = await tenantService.getTenant(req.params.id);
     res.status(200).json({ success: true, data: tenant });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -25,7 +25,7 @@ const getTenant = async (req, res) => {
 
 const updateTenant = async (req, res) => {
   try {
-    const tenant = await tenantService.updateTenant(req.params.id, req.body);
+    let tenant = await tenantService.updateTenant(req.params.id, req.body);
     res.status(200).json({ success: true, data: tenant });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

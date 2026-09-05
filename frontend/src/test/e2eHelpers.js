@@ -180,7 +180,7 @@ export async function testApiIntegration(endpoint, expectedResponse = {}) {
  * Test helper: Check accessibility
  */
 export async function testAccessibility(container) {
-  const issues = [];
+  let issues = [];
 
   // Check for alt text on images
   const images = container.querySelectorAll('img');

@@ -23,7 +23,7 @@ router.post('/stripe/intent', async (req, res, next) => {
 router.post('/razorpay/verify', async (req, res, next) => {
   try {
     const { amount, orderId } = req.body;
-    const result = await paymentService.processRazorpayPayment(req.user.id, amount, orderId);
+    let result = await paymentService.processRazorpayPayment(req.user.id, amount, orderId);
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);

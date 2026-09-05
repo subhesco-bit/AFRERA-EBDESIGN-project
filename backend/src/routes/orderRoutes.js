@@ -103,7 +103,7 @@ router.post('/', verifyToken, async (req, res) => {
 // PUT /orders/:id
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const order = orders.find(
+    let order = orders.find(
       (o) => o.id === req.params.id && o.userId === req.userId
     );
 

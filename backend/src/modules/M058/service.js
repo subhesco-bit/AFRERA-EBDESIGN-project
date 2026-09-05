@@ -52,7 +52,7 @@ async function getReturn(returnId) {
 
 async function updateReturnStatus(returnId, status, notes = null) {
   try {
-    const res = await pool.query(
+    let res = await pool.query(
       'UPDATE returns SET status = $1, notes = COALESCE($2, notes), updated_at = NOW() WHERE return_id = $3 RETURNING *',
       [status, notes, returnId]
     );

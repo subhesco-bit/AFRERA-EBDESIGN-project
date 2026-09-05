@@ -177,7 +177,7 @@ async function monitorWaterQuality(locationId) {
  */
 async function generateTreatmentRecommendations(locationId, qualityIssues) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'water_treatment_recommendations',
       parameters: {
         location_id: locationId,
@@ -190,7 +190,7 @@ async function generateTreatmentRecommendations(locationId, qualityIssues) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       recommendation_id: generateId(),
@@ -243,7 +243,7 @@ async function getWaterStandards(sourceType) {
 
 async function getHistoricalQualityData(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM water_quality_measurements WHERE location_id = $1 ORDER BY sample_date DESC LIMIT 30',
       [locationId]
     );
@@ -263,7 +263,7 @@ async function getSeasonalPatterns(state, district) {
 
 async function getUsageContext(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT primary_use, secondary_use FROM water_usage_context WHERE location_id = $1',
       [locationId]
     );
@@ -275,7 +275,7 @@ async function getUsageContext(locationId) {
 
 async function getMeasurements(locationId, period) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM water_quality_measurements 
        WHERE location_id = $1 AND sample_date >= $2 
        ORDER BY sample_date DESC`,
@@ -296,7 +296,7 @@ async function calculateComplianceScore(locationId, period) {
 }
 
 async function identifyViolations(locationId, period) {
-  const measurements = await getMeasurements(locationId, period);
+  let measurements = await getMeasurements(locationId, period);
   const violations = measurements.filter(m => m.compliance_status !== 'compliant');
   
   return violations.map(v => ({
@@ -317,7 +317,7 @@ async function analyzeQualityTrends(locationId, period) {
 }
 
 async function generateComplianceRecommendations(locationId, period) {
-  const violations = await identifyViolations(locationId, period);
+  let violations = await identifyViolations(locationId, period);
   
   if (violations.length > 0) {
     return [
@@ -333,7 +333,7 @@ async function generateComplianceRecommendations(locationId, period) {
 
 async function getCurrentReadings(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM water_quality_measurements WHERE location_id = $1 ORDER BY sample_date DESC LIMIT 1',
       [locationId]
     );
@@ -363,7 +363,7 @@ async function determineHealthStatus(locationId) {
 }
 
 async function generateQualityAlerts(locationId) {
-  const readings = await getCurrentReadings(locationId);
+  let readings = await getCurrentReadings(locationId);
   const alerts = [];
   
   if (readings.ph_level < 6.0 || readings.ph_level > 8.5) {
@@ -390,7 +390,7 @@ async function predictQualityChanges(locationId) {
 
 async function getSourceType(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT source_type FROM water_sources WHERE location_id = $1',
       [locationId]
     );

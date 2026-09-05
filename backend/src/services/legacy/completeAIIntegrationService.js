@@ -148,7 +148,7 @@ async function recommendCropPlanning(farmerId, farmData) {
  * AI-powered harvest timing prediction
  */
 async function predictHarvestTiming(farmerId, cropData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get historical harvest data
@@ -223,7 +223,7 @@ async function predictHarvestTiming(farmerId, cropData) {
  * AI-powered resource optimization for farmer
  */
 async function optimizeFarmerResources(farmerId, resourceData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get current resource usage
@@ -262,7 +262,7 @@ async function optimizeFarmerResources(farmerId, resourceData) {
     
     // Calculate resource optimization recommendations
     for (const resource of currentResources.rows) {
-      const recommendation = {
+      let recommendation = {
         resource_type: resource.resource_type,
         current_usage: resource.current_usage,
         recommended_usage: resource.current_usage,
@@ -350,7 +350,7 @@ function calculateSymptomMatch(reportedSymptoms, knownSymptoms) {
  * AI-powered disease detection for crops
  */
 async function detectCropDisease(cropId, diseaseData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get crop health data
@@ -446,7 +446,7 @@ async function detectCropDisease(cropId, diseaseData) {
  * AI-powered yield prediction for crops
  */
 async function predictCropYield(cropId, yieldData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get historical yield data
@@ -478,10 +478,10 @@ async function predictCropYield(cropId, yieldData) {
     `, [cropId]);
     
     // Get weather forecast
-    const weatherForecast = await getWeatherForecast(yieldData.location);
+    let weatherForecast = await getWeatherForecast(yieldData.location);
     
     // AI yield prediction algorithm
-    const prediction = {
+    let prediction = {
       crop_id: cropId,
       predicted_yield: 0,
       confidence_score: 0,
@@ -560,7 +560,7 @@ async function predictCropYield(cropId, yieldData) {
  * AI-powered livestock health monitoring
  */
 async function monitorLivestockHealth(livestockId, healthData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get livestock health history
@@ -663,11 +663,11 @@ async function monitorLivestockHealth(livestockId, healthData) {
  * AI-powered breeding recommendation for livestock
  */
 async function recommendLivestockBreeding(livestockId, breedingData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get livestock inventory
-    const livestock = await pg.query(`
+    let livestock = await pg.query(`
       SELECT 
         livestock_id,
         breed,
@@ -696,7 +696,7 @@ async function recommendLivestockBreeding(livestockId, breedingData) {
     `, [livestockId]);
     
     // AI breeding recommendation algorithm
-    const recommendation = {
+    let recommendation = {
       livestock_id: livestockId,
       recommended_action: 'breed',
       confidence_score: 0,
@@ -751,7 +751,7 @@ async function recommendLivestockBreeding(livestockId, breedingData) {
  * AI-powered dairy production optimization
  */
 async function optimizeDairyProduction(dairyId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get dairy production data
@@ -770,7 +770,7 @@ async function optimizeDairyProduction(dairyId, productionData) {
     `, [dairyId]);
     
     // AI optimization algorithm
-    const optimization = {
+    let optimization = {
       dairy_id: dairyId,
       current_efficiency: 0,
       optimized_feed_mix: {},
@@ -824,7 +824,7 @@ async function optimizeDairyProduction(dairyId, productionData) {
  * AI-powered poultry health monitoring
  */
 async function monitorPoultryHealth(poultryId, healthData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get poultry health data
@@ -841,7 +841,7 @@ async function monitorPoultryHealth(poultryId, healthData) {
     `, [poultryId]);
     
     // AI health monitoring algorithm
-    const monitoring = {
+    let monitoring = {
       poultry_id: poultryId,
       current_health_status: 'healthy',
       health_trend: 'stable',
@@ -852,7 +852,7 @@ async function monitorPoultryHealth(poultryId, healthData) {
     
     // Analyze health status
     if (health.rows.length > 0) {
-      const currentHealth = health.rows[0];
+      let currentHealth = health.rows[0];
       monitoring.current_health_status = currentHealth.health_status;
       
       if (currentHealth.mortality_rate > 0.05) {
@@ -894,11 +894,11 @@ async function monitorPoultryHealth(poultryId, healthData) {
  * AI-powered goat production optimization
  */
 async function optimizeGoatProduction(goatId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get goat production data
-    const production = await pg.query(`
+    let production = await pg.query(`
       SELECT 
         goat_id,
         milk_production,
@@ -913,7 +913,7 @@ async function optimizeGoatProduction(goatId, productionData) {
     `, [goatId]);
     
     // AI optimization algorithm
-    const optimization = {
+    let optimization = {
       goat_id: goatId,
       optimized_production_mix: {},
       expected_increase: 0,
@@ -949,11 +949,11 @@ async function optimizeGoatProduction(goatId, productionData) {
  * AI-powered sheep production optimization
  */
 async function optimizeSheepProduction(sheepId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get sheep production data
-    const production = await pg.query(`
+    let production = await pg.query(`
       SELECT 
         sheep_id,
         wool_production,
@@ -968,7 +968,7 @@ async function optimizeSheepProduction(sheepId, productionData) {
     `, [sheepId]);
     
     // AI optimization algorithm
-    const optimization = {
+    let optimization = {
       sheep_id: sheepId,
       optimized_production_mix: {},
       expected_wool_increase: 0,
@@ -1004,11 +1004,11 @@ async function optimizeSheepProduction(sheepId, productionData) {
  * AI-powered pig production optimization
  */
 async function optimizePigProduction(pigId, productionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get pig production data
-    const production = await pg.query(`
+    let production = await pg.query(`
       SELECT 
         pig_id,
         meat_production,
@@ -1165,7 +1165,7 @@ function calculateOptimalHarvestDate(historicalHarvests, weatherForecast, growth
 function calculateExpectedYield(cropData, growthStage, weatherForecast) {
   const baseYield = cropData.expected_yield_per_hectare || 2.5;
   const growthMultiplier = growthStage === 'flowering' ? 1.2 : growthStage === 'fruiting' ? 1.3 : 1.0;
-  const weatherMultiplier = weatherForecast.forecast === 'favorable' ? 1.1 : 0.9;
+  let weatherMultiplier = weatherForecast.forecast === 'favorable' ? 1.1 : 0.9;
   
   return baseYield * growthMultiplier * weatherMultiplier;
 }
@@ -1187,7 +1187,7 @@ function calculateWeatherMultiplier(weatherForecast) {
 /** Quality grade from current plant health plus forecast — a stricter sibling of
  *  calculateExpectedQuality, which only has forecast to go on. */
 function predictQualityGrade(currentCondition, weatherForecast) {
-  const health = currentCondition?.plant_health;
+  let health = currentCondition?.plant_health;
   if (health === 'excellent' && weatherForecast?.forecast === 'favorable') return 'grade_a';
   if (health === 'poor' || weatherForecast?.forecast === 'adverse') return 'grade_c';
   return 'grade_b';
@@ -1197,7 +1197,7 @@ function predictQualityGrade(currentCondition, weatherForecast) {
  *  Returns null rather than a fabricated number when there is no priced data for
  *  this crop — an absent price must never be silently rendered as a real one. */
 async function predictMarketPriceAtDate(cropType, targetDate) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   const result = await pg.query(
     `SELECT market_price, demand_trend, seasonality FROM market_intelligence WHERE crop_type = $1 AND active = true LIMIT 1`,
     [cropType]
@@ -1272,7 +1272,7 @@ function determineBreedingTimeline(age, sex) {
 }
 
 function identifyBreedingRisks(livestockData, breedingHistory) {
-  const risks = [];
+  let risks = [];
   
   if (livestockData.age > 8) risks.push('advanced age risk');
   if (livestockData.health_status !== 'healthy') risks.push('health risk');

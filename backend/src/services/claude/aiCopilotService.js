@@ -168,7 +168,7 @@ class ClaudeAIEnhancedCopilotService {
     if (!aiContent) return [];
     
     const questions = [];
-    const lines = aiContent.split('\n');
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('?') && (line.includes('Would') || line.includes('Can you') || line.includes('Have you'))) {

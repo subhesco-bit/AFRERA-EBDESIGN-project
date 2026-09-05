@@ -118,7 +118,7 @@ class HealthChecker {
 // Metrics middleware
 const metricsMiddleware = (metrics) => {
   return (req, res, next) => {
-    const start = Date.now();
+    let start = Date.now();
 
     const originalJson = res.json;
     res.json = function (data) {

@@ -71,7 +71,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/projects', (req, res) => {
   try {
-    const project = researchAndDevelopmentService.createRDProject(req.body);
+    let project = researchAndDevelopmentService.createRDProject(req.body);
     res.status(201).json({
       success: true,
       message: 'R&D project created successfully',
@@ -90,7 +90,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/projects/:projectId', (req, res) => {
   try {
-    const project = researchAndDevelopmentService.updateRDProject(req.params.projectId, req.body);
+    let project = researchAndDevelopmentService.updateRDProject(req.params.projectId, req.body);
     res.json({
       success: true,
       message: 'R&D project updated successfully',
@@ -150,7 +150,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/projects/:projectId/milestones/:milestoneId', (req, res) => {
   try {
-    const milestone = researchAndDevelopmentService.updateMilestone(req.params.projectId, req.params.milestoneId, req.body);
+    let milestone = researchAndDevelopmentService.updateMilestone(req.params.projectId, req.params.milestoneId, req.body);
     res.json({
       success: true,
       message: 'Milestone updated successfully',
@@ -173,7 +173,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/collaborations', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       type: req.query.type,
       projectId: req.query.projectId
@@ -221,7 +221,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/innovations', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       category: req.query.category,
       projectId: req.query.projectId,
@@ -270,7 +270,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/patents', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       jurisdiction: req.query.jurisdiction,
       innovationId: req.query.innovationId
@@ -318,7 +318,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/funding', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       category: req.query.category,
       provider: req.query.provider
@@ -385,7 +385,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/publications', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       type: req.query.type,
       projectId: req.query.projectId
@@ -464,7 +464,7 @@ router.get
     logger.debug('router.get request');('/knowledge', (req, res) => {
   try {
     const query = req.query.q;
-    const filters = {
+    let filters = {
       category: req.query.category,
       verified: req.query.verified
     };
@@ -488,7 +488,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/knowledge', (req, res) => {
   try {
-    const knowledge = researchAndDevelopmentService.addKnowledge(req.body);
+    let knowledge = researchAndDevelopmentService.addKnowledge(req.body);
     res.status(201).json({
       success: true,
       message: 'Knowledge added successfully',

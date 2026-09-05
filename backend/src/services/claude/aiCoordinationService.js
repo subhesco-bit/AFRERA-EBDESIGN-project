@@ -147,7 +147,7 @@ class ClaudeAIEnhancedCoordinationService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'routeIntent',
         intent: intent,
@@ -155,7 +155,7 @@ class ClaudeAIEnhancedCoordinationService {
         context: context
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: this.buildIntentRoutingQuery(intent, domain, context, options),
         context: { 
@@ -169,9 +169,9 @@ class ClaudeAIEnhancedCoordinationService {
         agentPreference: 'operations-manager'
       });
 
-      const originalResult = await this.originalService.listUnservedIntents();
+      let originalResult = await this.originalService.listUnservedIntents();
       
-      const enhancedResult = {
+      let enhancedResult = {
         intents: originalResult,
         ai_enhanced: true,
         ai_routing_strategy: aiEnhancement.content || null,
@@ -239,7 +239,7 @@ class ClaudeAIEnhancedCoordinationService {
     if (!aiContent) return null;
     
     const insights = [];
-    const lines = aiContent.split('\n');
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('optimize') || line.includes('improve') || line.includes('enhance')) {

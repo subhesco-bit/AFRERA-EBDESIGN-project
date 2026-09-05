@@ -159,7 +159,7 @@ async function listFPOs({ page = 1, limit = 20, status = null, districtId = null
  */
 async function getFPO(fpoId) {
   try {
-    const res = await pool.query('SELECT * FROM fpos WHERE fpo_id = $1', [fpoId]);
+    let res = await pool.query('SELECT * FROM fpos WHERE fpo_id = $1', [fpoId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error getting FPO', { error: error.message });
@@ -191,7 +191,7 @@ async function updateFPO(fpoId, updates) {
       metadata
     } = updates;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE fpos 
        SET name = COALESCE($1, name),
            registration_number = COALESCE($2, registration_number),
@@ -234,7 +234,7 @@ async function updateFPO(fpoId, updates) {
  */
 async function deleteFPO(fpoId) {
   try {
-    const res = await pool.query('DELETE FROM fpos WHERE fpo_id = $1 RETURNING fpo_id', [fpoId]);
+    let res = await pool.query('DELETE FROM fpos WHERE fpo_id = $1 RETURNING fpo_id', [fpoId]);
     return !!res.rows[0];
   } catch (error) {
     logger.error('Error deleting FPO', { error: error.message });
@@ -247,7 +247,7 @@ async function deleteFPO(fpoId) {
  */
 async function addFPOMember(fpoId, farmerId, memberDetails) {
   try {
-    const res = await pool.query(
+    let res = await pool.query(
       `INSERT INTO fpo_memberships (membership_id, fpo_id, farmer_id, membership_date, shareholding, role, metadata) 
        VALUES ($1, $2, $3, NOW(), $4, $5, $6) RETURNING *`,
       [generateId(), fpoId, farmerId, memberDetails.shareholding || 0, memberDetails.role || 'MEMBER', JSON.stringify(memberDetails.metadata || {})]
@@ -268,7 +268,7 @@ async function addFPOMember(fpoId, farmerId, memberDetails) {
  */
 async function getFPOMembers(fpoId) {
   try {
-    const res = await pool.query(
+    let res = await pool.query(
       `SELECT fm.*, f.name as farmer_name, f.contact_number 
        FROM fpo_memberships fm 
        JOIN farmers f ON fm.farmer_id = f.id 
@@ -293,7 +293,7 @@ async function getFPOMembers(fpoId) {
  */
 async function getFPOFinancialSummary(fpoId) {
   try {
-    const res = await pool.query(
+    let res = await pool.query(
       `SELECT 
         fpo_id,
         SUM(CASE WHEN transaction_type = 'CREDIT' THEN amount ELSE 0 END) as total_credits,
@@ -325,7 +325,7 @@ async function recordFPOTransaction(fpoId, transactionDetails) {
   try {
     const { transactionType, amount, description, category, referenceId, metadata } = transactionDetails;
     
-    const res = await pool.query(
+    let res = await pool.query(
       `INSERT INTO fpo_financial_transactions (transaction_id, fpo_id, transaction_type, amount, description, category, reference_id, metadata, transaction_date) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) RETURNING *`,
       [generateId(), fpoId, transactionType, amount, description, category, referenceId, JSON.stringify(metadata || {})]
@@ -343,11 +343,11 @@ async function recordFPOTransaction(fpoId, transactionDetails) {
  */
 async function generateFPOPerformanceReport(fpoId) {
   try {
-    const fpo = await getFPO(fpoId);
+    let fpo = await getFPO(fpoId);
     const financialSummary = await getFPOFinancialSummary(fpoId);
     const members = await getFPOMembers(fpoId);
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'fpo_performance_analysis',
       parameters: {
         fpo_data: fpo,
@@ -358,7 +358,7 @@ async function generateFPOPerformanceReport(fpoId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const report = {
       report_id: generateId(),

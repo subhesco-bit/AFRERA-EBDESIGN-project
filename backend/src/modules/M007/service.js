@@ -16,17 +16,17 @@ async function listRoles({ page = 1, limit = 20 } = {}) {
 }
 
 async function getRole(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM roles WHERE id = $1', [id]);
+  let res = await pg.query('SELECT * FROM roles WHERE id = $1', [id]);
   return res.rows[0] || null;
 }
 
 async function createRole(roleData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { name, description, permissions = [], parentRoleId = null } = roleData;
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO roles (name, description, permissions, parent_role_id, created_at, updated_at)
      VALUES ($1, $2, $3, $4, NOW(), NOW())
      RETURNING *`,
@@ -48,10 +48,10 @@ async function createRole(roleData) {
 }
 
 async function updateRole(id, roleData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { name, description, permissions, parentRoleId } = roleData;
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE roles 
      SET name = COALESCE($1, name),
          description = COALESCE($2, description),
@@ -78,25 +78,25 @@ async function updateRole(id, roleData) {
 }
 
 async function deleteRole(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('DELETE FROM roles WHERE id = $1 RETURNING id', [id]);
+  let res = await pg.query('DELETE FROM roles WHERE id = $1 RETURNING id', [id]);
   return !!res.rows[0];
 }
 
 // Permission management
 async function listPermissions() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM permissions ORDER BY resource, action ASC');
+  let res = await pg.query('SELECT * FROM permissions ORDER BY resource, action ASC');
   return res.rows;
 }
 
 async function createPermission(permissionData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { resource, action, description } = permissionData;
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO permissions (resource, action, description, created_at)
      VALUES ($1, $2, $3, NOW())
      RETURNING *`,
@@ -107,9 +107,9 @@ async function createPermission(permissionData) {
 
 // User role assignment
 async function assignRoleToUser(userId, roleId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO user_roles (user_id, role_id, assigned_at)
      VALUES ($1, $2, NOW())
      ON CONFLICT (user_id, role_id) DO NOTHING
@@ -133,9 +133,9 @@ async function assignRoleToUser(userId, roleId) {
 }
 
 async function removeRoleFromUser(userId, roleId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     'DELETE FROM user_roles WHERE user_id = $1 AND role_id = $2 RETURNING *',
     [userId, roleId]
   );
@@ -156,9 +156,9 @@ async function removeRoleFromUser(userId, roleId) {
 }
 
 async function getUserRoles(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT r.* FROM roles r
      JOIN user_roles ur ON r.id = ur.role_id
      WHERE ur.user_id = $1`,
@@ -168,9 +168,9 @@ async function getUserRoles(userId) {
 }
 
 async function getUserPermissions(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT DISTINCT p.* FROM permissions p
      JOIN roles r ON p.id = ANY(r.permissions)
      JOIN user_roles ur ON r.id = ur.role_id
@@ -182,7 +182,7 @@ async function getUserPermissions(userId) {
 
 // AI-powered role recommendation
 async function recommendRoleForUser(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get user's current roles
@@ -229,11 +229,11 @@ async function recommendRoleForUser(userId) {
 
 // Permission matrix for UI
 async function getPermissionMatrix() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const roles = await pg.query('SELECT * FROM roles ORDER BY name');
-  const permissions = await pg.query('SELECT * FROM permissions ORDER BY resource, action');
+  let permissions = await pg.query('SELECT * FROM permissions ORDER BY resource, action');
   
   const matrix = roles.rows.map(role => {
     const rolePermissions = role.permissions || [];
@@ -255,10 +255,10 @@ async function getPermissionMatrix() {
 
 // Role hierarchy
 async function getRoleHierarchy() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const roles = await pg.query('SELECT * FROM roles ORDER BY name');
+  let roles = await pg.query('SELECT * FROM roles ORDER BY name');
   
   // Build hierarchy tree
   const roleMap = new Map();

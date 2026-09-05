@@ -96,7 +96,7 @@ async function calculateDynamicPrice(productId, context = {}) {
     }
 
     // AI-powered price optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'dynamic_pricing',
       parameters: {
         product_id: productId,
@@ -108,7 +108,7 @@ async function calculateDynamicPrice(productId, context = {}) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     return {
       product_id: productId,
@@ -177,7 +177,7 @@ async function updatePricingRule(ruleId, updates) {
   try {
     const { rule_name, rule_type, base_price, conditions, adjustments, status, metadata } = updates;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE pricing_rules 
        SET rule_name = COALESCE($1, rule_name),
            rule_type = COALESCE($2, rule_type),
@@ -210,7 +210,7 @@ async function updatePricingRule(ruleId, updates) {
  */
 async function deletePricingRule(ruleId) {
   try {
-    const res = await pool.query('DELETE FROM pricing_rules WHERE rule_id = $1 RETURNING rule_id', [ruleId]);
+    let res = await pool.query('DELETE FROM pricing_rules WHERE rule_id = $1 RETURNING rule_id', [ruleId]);
     return !!res.rows[0];
   } catch (error) {
     logger.error('Error deleting pricing rule', { error: error.message });
@@ -256,12 +256,12 @@ async function analyzePriceElasticity(productId) {
 }
 
 async function getBasePrice(productId) {
-  const res = await pool.query('SELECT price FROM products WHERE product_id = $1', [productId]);
+  let res = await pool.query('SELECT price FROM products WHERE product_id = $1', [productId]);
   return res.rows[0]?.price || 0;
 }
 
 async function getApplicableRules(productId, context) {
-  const res = await pool.query(
+  let res = await pool.query(
     'SELECT * FROM pricing_rules WHERE product_id = $1 AND status = $2',
     [productId, 'active']
   );
@@ -282,7 +282,7 @@ async function getCurrentDemand(productId) {
 }
 
 async function getInventoryLevel(productId) {
-  const res = await pool.query('SELECT quantity FROM products WHERE product_id = $1', [productId]);
+  let res = await pool.query('SELECT quantity FROM products WHERE product_id = $1', [productId]);
   return res.rows[0]?.quantity || 0;
 }
 

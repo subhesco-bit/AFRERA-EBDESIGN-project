@@ -106,7 +106,7 @@ function requireResourceOwner({ table, idParam, ownerColumn, idColumn = 'id', ow
 
 /** Resolves the farmers.id owned by the calling user, or null. */
 async function farmerIdOf(req) {
-  const result = await pool.query('SELECT id FROM farmers WHERE user_id = $1', [req.user.id]);
+  let result = await pool.query('SELECT id FROM farmers WHERE user_id = $1', [req.user.id]);
   return result.rows.length ? result.rows[0].id : null;
 }
 

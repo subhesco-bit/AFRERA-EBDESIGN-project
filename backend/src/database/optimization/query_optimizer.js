@@ -140,7 +140,7 @@ class QueryOptimizer {
   analyzeQuery(query) {
     const normalizedQuery = query.toLowerCase().replace(/\s+/g, ' ');
     
-    const analysis = {
+    let analysis = {
       hasSelect: normalizedQuery.includes('select'),
       hasJoin: normalizedQuery.includes('join'),
       hasWhere: normalizedQuery.includes('where'),
@@ -265,7 +265,7 @@ class QueryOptimizer {
       const duration = Date.now() - startTime;
 
       const plan = planResult.rows[0]['QUERY PLAN'];
-      const analysis = this.parseExecutionPlan(plan);
+      let analysis = this.parseExecutionPlan(plan);
 
       return {
         duration,
@@ -283,7 +283,7 @@ class QueryOptimizer {
    * Parse execution plan
    */
   parseExecutionPlan(plan) {
-    const analysis = {
+    let analysis = {
       totalCost: 0,
       actualTime: 0,
       rows: 0,
@@ -348,7 +348,7 @@ class QueryOptimizer {
    * Get optimization suggestions based on execution plan
    */
   getOptimizationSuggestions(analysis) {
-    const suggestions = [];
+    let suggestions = [];
 
     // Check for sequential scans on large tables
     if (analysis.sequentialScans.length > 0) {

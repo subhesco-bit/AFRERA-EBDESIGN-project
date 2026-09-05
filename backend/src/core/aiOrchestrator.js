@@ -124,7 +124,7 @@ const SPEECH_PROVIDER_ENV = {
 
 /** Configuration state only. Never logs or returns the key value itself. */
 function speechProviderStatus(providerKey) {
-  const env = SPEECH_PROVIDER_ENV[providerKey];
+  let env = SPEECH_PROVIDER_ENV[providerKey];
   if (!env) return { provider: providerKey, known: false, configured: false };
   return {
     provider: providerKey,
@@ -192,7 +192,7 @@ async function callSpeechProvider(providerKey, action, _input, _opts = {}) {
  * data-residency question.
  */
 async function callProvider(providerKey, _prompt, _opts = {}) {
-  const status = providerStatus(providerKey);
+  let status = providerStatus(providerKey);
   if (!status.known) {
     return { ok: false, status: 'unknown_provider', provider: providerKey, knownProviders: Object.keys(PROVIDER_ENV) };
   }
@@ -455,7 +455,7 @@ const ENGINES = {
     invoke: async (payload = {}) => {
       const ocr = require('../services/legacy/ocrService');
       const { buffer, imageBase64, language = 'eng', reportNumber } = payload;
-      const imgBuffer = buffer || (imageBase64 ? Buffer.from(imageBase64, 'base64') : null);
+      let imgBuffer = buffer || (imageBase64 ? Buffer.from(imageBase64, 'base64') : null);
       if (!imgBuffer) throw new Error('ocr_engine requires payload.buffer (Buffer) or payload.imageBase64');
       if (reportNumber) return ocr.extractAndStoreCertificateText(reportNumber, imgBuffer, { language });
       return ocr.extractTextFromImage(imgBuffer, { language });
@@ -667,7 +667,7 @@ const ENGINES = {
         const copilot = require('../services/legacy/aiCopilotService');
         const { copilotType = 'generic', message, context = {}, session = {} } = payload;
         if (!message) throw new Error('llm template fallback requires payload.message');
-        const result = await copilot.generateCopilotResponse(copilotType, message, context, session);
+        let result = await copilot.generateCopilotResponse(copilotType, message, context, session);
         return { usedTemplateFallbackNotLLM: true, result };
       }
       return {
@@ -749,7 +749,7 @@ async function route(taskType, payload = {}, opts = {}) {
   }
 
   try {
-    const result = await entry.invoke(payload, opts);
+    let result = await entry.invoke(payload, opts);
     await logInvocation({ agentKey, intent: taskType, outcome: 'success', latencyMs: Date.now() - startedAt });
     return { ok: true, status: entry.status, engine: entry.label, citation: entry.citation, result };
   } catch (err) {

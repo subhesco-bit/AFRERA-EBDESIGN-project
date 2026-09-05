@@ -66,7 +66,7 @@ router.get('/articles/:articleId', (req, res) => {
 // Create a new article
 router.post('/articles', (req, res) => {
   try {
-    const article = knowledgeService.createArticle(req.body);
+    let article = knowledgeService.createArticle(req.body);
     res.status(201).json({
       success: true,
       message: 'Article created successfully',
@@ -83,7 +83,7 @@ router.post('/articles', (req, res) => {
 // Update an article
 router.put('/articles/:articleId', (req, res) => {
   try {
-    const article = knowledgeService.updateArticle(req.params.articleId, req.body);
+    let article = knowledgeService.updateArticle(req.params.articleId, req.body);
     res.json({
       success: true,
       message: 'Article updated successfully',
@@ -120,7 +120,7 @@ router.delete('/articles/:articleId', (req, res) => {
 // Get all wiki pages
 router.get('/wiki', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       status: req.query.status,
       parentId: req.query.parentId,
       authorId: req.query.authorId
@@ -165,7 +165,7 @@ router.get('/wiki/slug/:slug', (req, res) => {
 // Create a new wiki page
 router.post('/wiki', (req, res) => {
   try {
-    const page = knowledgeService.createWikiPage(req.body);
+    let page = knowledgeService.createWikiPage(req.body);
     res.status(201).json({
       success: true,
       message: 'Wiki page created successfully',
@@ -182,7 +182,7 @@ router.post('/wiki', (req, res) => {
 // Update a wiki page
 router.put('/wiki/:wikiId', (req, res) => {
   try {
-    const page = knowledgeService.updateWikiPage(req.params.wikiId, req.body);
+    let page = knowledgeService.updateWikiPage(req.params.wikiId, req.body);
     res.json({
       success: true,
       message: 'Wiki page updated successfully',
@@ -203,7 +203,7 @@ router.put('/wiki/:wikiId', (req, res) => {
 // Get all taxonomies
 router.get('/taxonomies', (req, res) => {
   try {
-    const filters = {
+    let filters = {
       parentId: req.query.parentId,
       level: req.query.level
     };
@@ -264,7 +264,7 @@ router.post('/taxonomies', (req, res) => {
 router.get('/search', (req, res) => {
   try {
     const query = req.query.q;
-    const filters = {
+    let filters = {
       type: req.query.type
     };
     
@@ -392,7 +392,7 @@ router.post('/feedback', (req, res) => {
 // Get feedback for a resource
 router.get('/feedback/:resourceId', (req, res) => {
   try {
-    const feedback = knowledgeService.getFeedback(req.params.resourceId);
+    let feedback = knowledgeService.getFeedback(req.params.resourceId);
     res.json({
       success: true,
       count: feedback.length,

@@ -27,7 +27,7 @@ router.get('/proposals', async (req, res) => {
 
 router.post('/proposals/:id/decision', async (req, res) => {
   try {
-    const proposal = await service.decideProposal({ proposalId: req.params.id, user: req.user, ...req.body });
+    let proposal = await service.decideProposal({ proposalId: req.params.id, user: req.user, ...req.body });
     res.json({ success: true, data: proposal });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -36,7 +36,7 @@ router.post('/proposals/:id/decision', async (req, res) => {
 
 router.post('/proposals/:id/execute', async (req, res) => {
   try {
-    const proposal = await service.executeProposal({ proposalId: req.params.id, user: req.user });
+    let proposal = await service.executeProposal({ proposalId: req.params.id, user: req.user });
     res.json({ success: true, data: proposal });
   } catch (error) {
     res.status(403).json({ success: false, error: error.message });

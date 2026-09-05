@@ -82,7 +82,7 @@ router.post('/self-healing', ...writeAdmin, validateBody(), body, (req, res, nex
   next();
 }, async (req, res) => {
   try {
-    const result = await systemAdministrationService.triggerSelfHealing(req.body);
+    let result = await systemAdministrationService.triggerSelfHealing(req.body);
     
     // Emit signal for self-healing action
     signalBus.emitSignal(SIGNAL.SYSTEM_HEALTH_CHANGED, {
@@ -167,7 +167,7 @@ router.get('/dashboard/health', ...admin, async (req, res) => {
 // Perform automated maintenance
 router.post('/maintenance/automated', ...writeAdmin, async (req, res) => {
   try {
-    const result = await systemAdministrationService.performAutomatedMaintenance();
+    let result = await systemAdministrationService.performAutomatedMaintenance();
     res.json(result);
   } catch (error) {
     logger.error('systemAdministrationRoutes:performAutomatedMaintenance', { error: error.message });

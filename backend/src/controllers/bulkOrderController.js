@@ -45,7 +45,7 @@ exports.getBulkOrder = async (req, res) => {
     // so there's no real user scoping to enforce here yet - pass
     // isAdmin=true to make the existing intended lookup-by-id actually
     // work, same openness the route already has.
-    const result = await bulkOrderService.getBulkOrder(orderId, req.user?.id, true);
+    let result = await bulkOrderService.getBulkOrder(orderId, req.user?.id, true);
     
     res.status(200).json({
       success: true,
@@ -65,10 +65,10 @@ exports.getBulkOrder = async (req, res) => {
  */
 exports.getUserBulkOrders = async (req, res) => {
   try {
-    const userId = req.user?.id || req.query.userId;
+    let userId = req.user?.id || req.query.userId;
     const { status, limit, offset } = req.query;
     
-    const result = await bulkOrderService.getUserBulkOrders(userId, { status, limit, offset });
+    let result = await bulkOrderService.getUserBulkOrders(userId, { status, limit, offset });
     
     res.status(200).json({
       success: true,
@@ -92,7 +92,7 @@ exports.updateBulkOrderStatus = async (req, res) => {
     const { status, notes } = req.body;
     const adminId = req.user?.id || req.body.adminId;
     
-    const result = await bulkOrderService.updateBulkOrderStatus(orderId, status, adminId, notes);
+    let result = await bulkOrderService.updateBulkOrderStatus(orderId, status, adminId, notes);
     
     res.status(200).json({
       success: true,
@@ -115,7 +115,7 @@ exports.getBulkOrderQuotations = async (req, res) => {
   try {
     const { orderId } = req.params;
 
-    const result = await bulkOrderService.getQuotationsForOrder(orderId);
+    let result = await bulkOrderService.getQuotationsForOrder(orderId);
 
     res.status(200).json({
       success: true,
@@ -139,7 +139,7 @@ exports.submitQuotation = async (req, res) => {
     const quotationData = req.body;
     const supplierId = req.user?.id || req.body.supplierId;
     
-    const result = await bulkOrderService.createQuotation(orderId, quotationData);
+    let result = await bulkOrderService.createQuotation(orderId, quotationData);
     
     res.status(201).json({
       success: true,
@@ -161,9 +161,9 @@ exports.submitQuotation = async (req, res) => {
 exports.acceptQuotation = async (req, res) => {
   try {
     const { quotationId } = req.params;
-    const userId = req.user?.id || req.body.userId;
+    let userId = req.user?.id || req.body.userId;
     
-    const result = await bulkOrderService.acceptQuotation(quotationId, userId);
+    let result = await bulkOrderService.acceptQuotation(quotationId, userId);
     
     res.status(200).json({
       success: true,
@@ -191,7 +191,7 @@ exports.getBulkOrderAnalytics = async (req, res) => {
     // function" on every call. Fixed to call the real method with the
     // filters it actually supports.
     const { startDate, endDate, productId } = req.query;
-    const result = await bulkOrderService.getBulkOrderStats({ startDate, endDate, productId });
+    let result = await bulkOrderService.getBulkOrderStats({ startDate, endDate, productId });
     
     res.status(200).json({
       success: true,
@@ -214,7 +214,7 @@ exports.cancelBulkOrder = async (req, res) => {
     const { orderId } = req.params;
     const { reason } = req.body;
     
-    const result = await bulkOrderService.cancelBulkOrder(orderId, reason);
+    let result = await bulkOrderService.cancelBulkOrder(orderId, reason);
     
     res.status(200).json({
       success: true,

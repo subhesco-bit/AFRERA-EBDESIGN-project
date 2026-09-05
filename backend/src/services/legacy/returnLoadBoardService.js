@@ -33,7 +33,7 @@ class ReturnLoadBoardService {
     if (destinationAddress) { params.push(`%${destinationAddress}%`); conditions.push(`destination_address ILIKE $${params.length}`); }
     if (minCapacityKg) { params.push(minCapacityKg); conditions.push(`available_capacity_kg >= $${params.length}`); }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM return_load_postings WHERE ${conditions.join(' AND ')} ORDER BY available_from ASC`,
       params
     );
@@ -41,7 +41,7 @@ class ReturnLoadBoardService {
   }
 
   async bookPosting(postingId, shipmentId) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE return_load_postings SET status = 'booked', booked_shipment_id = $1, updated_at = NOW()
        WHERE id = $2 AND status = 'open' RETURNING *`,
       [shipmentId, postingId]
@@ -51,7 +51,7 @@ class ReturnLoadBoardService {
   }
 
   async cancelPosting(postingId, postedBy) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE return_load_postings SET status = 'cancelled', updated_at = NOW()
        WHERE id = $1 AND posted_by = $2 AND status = 'open' RETURNING *`,
       [postingId, postedBy]

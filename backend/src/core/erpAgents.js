@@ -434,7 +434,7 @@ const AGENTS = [
       // An overdue calibration on a cold-chain sensor is not a maintenance
       // backlog item — it invalidates every consignment that sensor certifies.
       const blocking = due.filter((a) => a.blocksColdDispatch);
-      const overdue = due.filter((a) => Number(a.daysUntilDue) < 0);
+      let overdue = due.filter((a) => Number(a.daysUntilDue) < 0);
 
       return proposal({
         domain: DOMAIN.MAINTENANCE,
@@ -504,7 +504,7 @@ const AGENTS = [
       const breached = pending.filter((p) => p.slaStatus === 'breached');
       if (breached.length === 0) return null;
 
-      const worst = [...breached].sort((a, b) => b.hoursOpen - a.hoursOpen)[0];
+      let worst = [...breached].sort((a, b) => b.hoursOpen - a.hoursOpen)[0];
 
       return proposal({
         domain: DOMAIN.WORKFLOW,
@@ -539,7 +539,7 @@ const AGENTS = [
       const lead = ctx.lead;
       if (!lead) return null;
 
-      const criteria = [
+      let criteria = [
         {
           name: 'Segment fit',
           weight: 0.35,
@@ -604,11 +604,11 @@ const AGENTS = [
     description: 'Warns before a legal or contractual obligation falls due.',
     evaluate(ctx = {}) {
       const obligations = ctx.obligations || [];
-      const horizon = ctx.warnDays ?? 30;
-      const due = obligations.filter((o) => Number(o.daysUntilDue) <= horizon);
+      let horizon = ctx.warnDays ?? 30;
+      let due = obligations.filter((o) => Number(o.daysUntilDue) <= horizon);
       if (due.length === 0) return null;
 
-      const overdue = due.filter((o) => Number(o.daysUntilDue) < 0);
+      let overdue = due.filter((o) => Number(o.daysUntilDue) < 0);
       const withConsequence = due.filter((o) => o.breachConsequence);
 
       return proposal({
@@ -693,12 +693,12 @@ const AGENTS = [
 
       const unacknowledged = live.filter((i) => i.acknowledgementOverdue);
       const lifeSafety = live.filter((i) => i.peopleAtRisk);
-      const critical = live.filter((i) => i.severity === 'critical');
+      let critical = live.filter((i) => i.severity === 'critical');
 
       // Nothing overdue and nothing critical means the response is working.
       if (unacknowledged.length === 0 && critical.length === 0 && lifeSafety.length === 0) return null;
 
-      const worst = lifeSafety[0] || critical[0] || unacknowledged[0];
+      let worst = lifeSafety[0] || critical[0] || unacknowledged[0];
 
       return proposal({
         domain: DOMAIN.EMERGENCY,
@@ -738,7 +738,7 @@ const AGENTS = [
       const violations = ctx.violations || [];
       if (violations.length === 0) return null;
 
-      const critical = violations.filter((v) => v.severity === 'critical' || v.severity === 'high');
+      let critical = violations.filter((v) => v.severity === 'critical' || v.severity === 'high');
 
       return proposal({
         domain: DOMAIN.COMPLIANCE,
@@ -804,7 +804,7 @@ const AGENTS = [
     domain: DOMAIN.ASSETS,
     description: 'Flags fully depreciated assets still carried as active, and assets sitting idle.',
     evaluate(ctx = {}) {
-      const assets = ctx.assets || [];
+      let assets = ctx.assets || [];
       if (assets.length === 0) return null;
 
       const fullyDepreciatedActive = assets.filter((a) => a.fullyDepreciated && a.status === 'active');
@@ -850,7 +850,7 @@ const AGENTS = [
       );
       if (atRisk.length === 0) return null;
 
-      const worst = [...atRisk].sort((a, b) =>
+      let worst = [...atRisk].sort((a, b) =>
         (b.etaHoursRemaining - b.committedHoursRemaining) - (a.etaHoursRemaining - a.committedHoursRemaining)
       )[0];
       const worstOverrun = Math.round(worst.etaHoursRemaining - worst.committedHoursRemaining);
@@ -931,7 +931,7 @@ const AGENTS = [
     evaluate(ctx = {}) {
       const employees = ctx.employees || [];
       const cap = Number(ctx.capDays) || 45;
-      const over = employees.filter((e) => Number(e.leaveBalanceDays) > cap);
+      let over = employees.filter((e) => Number(e.leaveBalanceDays) > cap);
       if (over.length === 0) return null;
 
       const liabilityDays = over.reduce((s, e) => s + (Number(e.leaveBalanceDays) - cap), 0);

@@ -111,7 +111,7 @@ router.get('/detailed', async (req, res) => {
     // Check disk space (if available)
     try {
       const fs = require('fs');
-      const stats = fs.statSync('.');
+      let stats = fs.statSync('.');
       health.checks.disk = {
         status: 'healthy',
         message: 'Disk space check not implemented'
@@ -138,7 +138,7 @@ router.get('/detailed', async (req, res) => {
 router.get('/ready', async (req, res) => {
   try {
     // Check if all critical services are ready
-    const db = getPostgreSQL();
+    let db = getPostgreSQL();
     await db.query('SELECT 1');
 
     res.status(200).json({

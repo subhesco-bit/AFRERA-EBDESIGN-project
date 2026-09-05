@@ -15,7 +15,7 @@ async function registerDairyHerd(req, res) {
 
 async function getDairyHerd(req, res) {
   try {
-    const herd = await service.getDairyHerd(req.params.herdId);
+    let herd = await service.getDairyHerd(req.params.herdId);
     if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
     res.json({ success: true, data: herd });
   } catch (error) {
@@ -37,7 +37,7 @@ async function listDairyHerds(req, res) {
 
 async function updateDairyHerd(req, res) {
   try {
-    const herd = await service.updateDairyHerd(req.params.herdId, req.body);
+    let herd = await service.updateDairyHerd(req.params.herdId, req.body);
     if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
     res.json({ success: true, data: herd });
   } catch (error) {

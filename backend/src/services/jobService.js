@@ -220,12 +220,12 @@ class JobService {
   // Get job status
   async getJobStatus(jobType, jobId) {
     try {
-      const queue = this.queues[jobType];
+      let queue = this.queues[jobType];
       if (!queue) {
         throw new Error(`Unknown job type: ${jobType}`);
       }
 
-      const job = await queue.getJob(jobId);
+      let job = await queue.getJob(jobId);
       if (!job) {
         return null;
       }
@@ -250,12 +250,12 @@ class JobService {
   // Retry a failed job
   async retryJob(jobType, jobId) {
     try {
-      const queue = this.queues[jobType];
+      let queue = this.queues[jobType];
       if (!queue) {
         throw new Error(`Unknown job type: ${jobType}`);
       }
 
-      const job = await queue.getJob(jobId);
+      let job = await queue.getJob(jobId);
       if (!job) {
         throw new Error(`Job not found: ${jobId}`);
       }
@@ -272,7 +272,7 @@ class JobService {
   // Get queue stats
   async getQueueStats(jobType) {
     try {
-      const queue = this.queues[jobType];
+      let queue = this.queues[jobType];
       if (!queue) {
         throw new Error(`Unknown job type: ${jobType}`);
       }
@@ -304,7 +304,7 @@ class JobService {
   // Clean up completed jobs
   async cleanupCompletedJobs(jobType, count = 1000) {
     try {
-      const queue = this.queues[jobType];
+      let queue = this.queues[jobType];
       if (!queue) {
         throw new Error(`Unknown job type: ${jobType}`);
       }

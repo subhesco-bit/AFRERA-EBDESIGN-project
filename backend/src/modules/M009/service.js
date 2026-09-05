@@ -36,7 +36,7 @@ async function createSecurityEvent(eventData) {
 }
 
 async function getSecurityEvents({ page = 1, limit = 50, userId, eventType, severity, startDate, endDate } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -68,7 +68,7 @@ async function getSecurityEvents({ page = 1, limit = 50, userId, eventType, seve
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM security_events`, 'SELECT COUNT(*) FROM security_events').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -77,10 +77,10 @@ async function getSecurityEvents({ page = 1, limit = 50, userId, eventType, seve
 
 // IP whitelist/blacklist management
 async function addToIpList(listType, ipAddress, description, userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO ip_lists (list_type, ip_address, description, added_by, created_at)
      VALUES ($1, $2, $3, $4, NOW())
      ON CONFLICT (list_type, ip_address) DO UPDATE SET
@@ -105,10 +105,10 @@ async function addToIpList(listType, ipAddress, description, userId) {
 }
 
 async function removeFromIpList(listType, ipAddress) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'DELETE FROM ip_lists WHERE list_type = $1 AND ip_address = $2 RETURNING *',
     [listType, ipAddress]
   );
@@ -117,10 +117,10 @@ async function removeFromIpList(listType, ipAddress) {
 }
 
 async function getIpLists(listType) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM ip_lists WHERE list_type = $1 ORDER BY created_at DESC',
     [listType]
   );
@@ -129,7 +129,7 @@ async function getIpLists(listType) {
 }
 
 async function checkIpAccess(ipAddress) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Check blacklist first
@@ -160,7 +160,7 @@ async function checkIpAccess(ipAddress) {
 
 // Rate limiting
 async function checkRateLimit(identifier, limit, windowMinutes = 15) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000);
@@ -204,7 +204,7 @@ async function checkRateLimit(identifier, limit, windowMinutes = 15) {
 
 // AI-powered threat detection
 async function detectThreats() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const threats = [];
@@ -286,7 +286,7 @@ async function detectThreats() {
 
 // Security score calculation
 async function calculateSecurityScore(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let score = 100;
@@ -320,7 +320,7 @@ async function calculateSecurityScore(userId) {
   );
   
   if (parseInt(blacklistHits.rows[0].count) > 0) {
-    const deduction = blacklistHits.rows[0].count * 15;
+    let deduction = blacklistHits.rows[0].count * 15;
     score -= deduction;
     factors.push({
       type: 'blacklist_hits',
@@ -343,12 +343,12 @@ async function calculateSecurityScore(userId) {
 
 // Access control policies
 async function createAccessPolicy(policyData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, description, resource, conditions, actions, priority } = policyData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO access_policies (name, description, resource, conditions, actions, priority, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
      RETURNING *`,
@@ -370,7 +370,7 @@ async function createAccessPolicy(policyData) {
 }
 
 async function evaluateAccessPolicy(userId, resource, action) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const policies = await pg.query(

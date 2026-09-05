@@ -216,7 +216,7 @@ class SystemAdministrationService {
    */
   async detectSecurityThreats() {
     try {
-      const systemLogs = await this.getRecentSystemLogs();
+      let systemLogs = await this.getRecentSystemLogs();
       const networkTraffic = await this.getNetworkTraffic();
       const userBehavior = await this.getUserBehavior();
       const knownThreats = await this.getKnownThreats();
@@ -320,7 +320,7 @@ class SystemAdministrationService {
 
       for (const task of maintenanceTasks.tasks || []) {
         try {
-          const result = await this.executeMaintenanceTask(task);
+          let result = await this.executeMaintenanceTask(task);
           results.push({ task: task.name, status: 'success', result });
         } catch (error) {
           logger.error(`Maintenance task ${task.name} failed:`, error);

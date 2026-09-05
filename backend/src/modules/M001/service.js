@@ -35,13 +35,13 @@ async function unwrap(operation, parameters) {
 
 async function initializePlatform(configData) {
   if (!configData || typeof configData !== 'object' || Array.isArray(configData)) {
-    const error = new Error('Configuration payload is required');
+    let error = new Error('Configuration payload is required');
     error.code = 'VALIDATION_ERROR';
     throw error;
   }
   const requiredIdentifiers = ['platform_name', 'version', 'environment', 'deployment_type'];
   if (requiredIdentifiers.some(identifier => typeof configData[identifier] !== 'string' || configData[identifier].trim().length === 0)) {
-    const error = new Error('platform_name, version, environment, and deployment_type are required');
+    let error = new Error('platform_name, version, environment, and deployment_type are required');
     error.code = 'VALIDATION_ERROR';
     throw error;
   }
@@ -59,7 +59,7 @@ async function getPlatformMetrics(params) {
 async function updatePlatformConfiguration(configId, updates) {
   if (typeof configId !== 'string' || configId.trim().length === 0 ||
       !updates || typeof updates !== 'object' || Array.isArray(updates)) {
-    const error = new Error('configId and a configuration update object are required');
+    let error = new Error('configId and a configuration update object are required');
     error.code = 'VALIDATION_ERROR';
     throw error;
   }

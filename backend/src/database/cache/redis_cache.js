@@ -166,7 +166,7 @@ class RedisCache {
       return false;
     }
 
-    const key = this.generateCacheKey(query, params);
+    let key = this.generateCacheKey(query, params);
     const serializedValue = this.serialize(value);
     const cacheTTL = ttl || this.config.defaultTTL;
 
@@ -189,7 +189,7 @@ class RedisCache {
       return false;
     }
 
-    const key = this.generateCacheKey(query, params);
+    let key = this.generateCacheKey(query, params);
 
     try {
       await this.client.del(key);
@@ -252,7 +252,7 @@ class RedisCache {
     }
 
     // Execute callback to get value
-    const value = await callback();
+    let value = await callback();
 
     // Set in cache
     await this.set(query, params, value, ttl);
@@ -268,7 +268,7 @@ class RedisCache {
       return queries.map(() => null);
     }
 
-    const keys = queries.map(q => this.generateCacheKey(q.query, q.params));
+    let keys = queries.map(q => this.generateCacheKey(q.query, q.params));
 
     try {
       const values = await this.client.mget(...keys);
@@ -296,14 +296,14 @@ class RedisCache {
       return false;
     }
 
-    const cacheTTL = ttl || this.config.defaultTTL;
+    let cacheTTL = ttl || this.config.defaultTTL;
 
     try {
       const pipeline = this.client.pipeline();
 
       for (const item of items) {
-        const key = this.generateCacheKey(item.query, item.params);
-        const serializedValue = this.serialize(item.value);
+        let key = this.generateCacheKey(item.query, item.params);
+        let serializedValue = this.serialize(item.value);
         pipeline.setex(key, cacheTTL, serializedValue);
       }
 
@@ -333,7 +333,7 @@ class RedisCache {
 
     for (const warmupQuery of warmupQueries) {
       try {
-        const value = await warmupQuery.callback();
+        let value = await warmupQuery.callback();
         await this.set(warmupQuery.query, warmupQuery.params, value, warmupQuery.ttl);
         warmed++;
       } catch (error) {
@@ -420,7 +420,7 @@ class RedisCache {
     }
 
     try {
-      const info = await this.client.info();
+      let info = await this.client.info();
       return info;
     } catch (error) {
       logger.error('Failed to get cache info', { error: error.message });

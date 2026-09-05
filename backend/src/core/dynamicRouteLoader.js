@@ -155,7 +155,7 @@ class DynamicRouteLoader {
     }
 
     try {
-      const startTime = Date.now();
+      let startTime = Date.now();
 
       // Load router
       const routeModule = require(entry.path);
@@ -233,7 +233,7 @@ class DynamicRouteLoader {
     parts.push(this._toMountSegment(entry.name));
 
     // Build final path
-    const relativePath = '/' + parts.join('/');
+    let relativePath = '/' + parts.join('/');
     return `${apiVersion}${relativePath}`;
   }
 
@@ -250,7 +250,7 @@ class DynamicRouteLoader {
       ];
     }
 
-    const startTime = Date.now();
+    let startTime = Date.now();
     const mounted = [];
     const failed = [];
 
@@ -263,7 +263,7 @@ class DynamicRouteLoader {
       }
     }
 
-    const elapsed = Date.now() - startTime;
+    let elapsed = Date.now() - startTime;
 
     logger.info(`Critical routes mounted`, {
       mounted: mounted.length,
@@ -279,7 +279,7 @@ class DynamicRouteLoader {
    * Reduces startup time for 200K+ routes
    */
   async mountRouteOnDemand(routeName, apiVersion = '/api/v1') {
-    const entry = this.routes.get(routeName);
+    let entry = this.routes.get(routeName);
 
     if (!entry) {
       throw new Error(`Route not found: ${routeName}`);
@@ -300,8 +300,8 @@ class DynamicRouteLoader {
     const routes = this.byVersion.get(version) || [];
     logger.info(`Mounting ${routes.length} routes from version: ${version}`);
 
-    const mounted = [];
-    const failed = [];
+    let mounted = [];
+    let failed = [];
 
     for (const routeName of routes) {
       try {
@@ -319,11 +319,11 @@ class DynamicRouteLoader {
    * Mount all routes in a subfolder
    */
   async mountSubfolder(subfolder, apiVersion = '/api/v1') {
-    const routes = this.bySubfolder.get(subfolder) || [];
+    let routes = this.bySubfolder.get(subfolder) || [];
     logger.info(`Mounting ${routes.length} routes from subfolder: ${subfolder}`);
 
-    const mounted = [];
-    const failed = [];
+    let mounted = [];
+    let failed = [];
 
     for (const routeName of routes) {
       try {
@@ -341,7 +341,7 @@ class DynamicRouteLoader {
    * Mount Express routers that live under services/ (misplaced *Routes.js).
    */
   async discoverServiceEmbeddedRoutes(servicesDir, apiVersion = '/api/v1') {
-    const files = [];
+    let files = [];
     this._walkDirectory(servicesDir, files);
     for (const filePath of files) {
       if (/Routes\.js$/i.test(filePath) && this._isMountableRouteFile(filePath)) {
@@ -363,7 +363,7 @@ class DynamicRouteLoader {
    * Get route metadata
    */
   getMetadata(routeName) {
-    const entry = this.routes.get(routeName);
+    let entry = this.routes.get(routeName);
     if (!entry) return null;
 
     return {
@@ -449,7 +449,7 @@ class DynamicRouteLoader {
    * Unmount a route
    */
   unmountRoute(routeName) {
-    const entry = this.routes.get(routeName);
+    let entry = this.routes.get(routeName);
     if (entry && entry.mounted) {
       entry.mounted = false;
       entry.router = null;
@@ -502,7 +502,7 @@ class DynamicRouteLoader {
    * routes/users.js → root
    */
   _extractVersion(relativePath) {
-    const parts = relativePath.split(path.sep);
+    let parts = relativePath.split(path.sep);
     if (parts[0].match(/^v\d+$/)) {
       return parts[0];
     }
@@ -523,7 +523,7 @@ class DynamicRouteLoader {
 
     // Remove version prefix if present
     let subdir = dir;
-    const parts = dir.split(path.sep);
+    let parts = dir.split(path.sep);
     if (parts[0].match(/^v\d+$/)) {
       subdir = parts.slice(1).join(path.sep);
     }
@@ -583,7 +583,7 @@ class DynamicRouteLoader {
    */
   async reload() {
     this.mountedCount = 0;
-    const routes = Array.from(this.routes.values());
+    let routes = Array.from(this.routes.values());
 
     for (const route of routes) {
       route.mounted = false;

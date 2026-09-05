@@ -88,7 +88,7 @@ async function getValueFactors() {
  */
 router.get('/value-factors', async (req, res) => {
   try {
-    const result = await getValueFactors();
+    let result = await getValueFactors();
     res.json(result);
   } catch (error) {
     logger.error('Get value factors API error', { error: error.message, stack: error.stack });
@@ -128,7 +128,7 @@ async function calculateProductValueScore(data) {
     const validUntil = new Date();
     validUntil.setDate(validUntil.getDate() + 30); // Valid for 30 days
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO product_value_scores 
        (product_id, nutrition_score, organic_score, gi_score, freshness_score, 
         sustainability_score, quality_score, overall_value_score, value_grade, valid_until)
@@ -160,7 +160,7 @@ async function calculateProductValueScore(data) {
  */
 router.post('/product-value-scores', authMiddleware, async (req, res) => {
   try {
-    const result = await calculateProductValueScore(req.body);
+    let result = await calculateProductValueScore(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Calculate product value score API error', { error: error.message, stack: error.stack });
@@ -173,7 +173,7 @@ router.post('/product-value-scores', authMiddleware, async (req, res) => {
  */
 async function getProductValueScore(productId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT * FROM product_value_scores 
        WHERE product_id = $1 
        AND (valid_until IS NULL OR valid_until > CURRENT_TIMESTAMP)
@@ -198,7 +198,7 @@ async function getProductValueScore(productId) {
  */
 router.get('/product-value-scores/:productId', async (req, res) => {
   try {
-    const result = await getProductValueScore(req.params.productId);
+    let result = await getProductValueScore(req.params.productId);
     res.json(result);
   } catch (error) {
     logger.error('Get product value score API error', { error: error.message, stack: error.stack });
@@ -253,7 +253,7 @@ async function calculateValueBasedPrice(productId, basePrice) {
 router.post('/value-pricing', authMiddleware, async (req, res) => {
   try {
     const { product_id, base_price } = req.body;
-    const result = await calculateValueBasedPrice(product_id, base_price);
+    let result = await calculateValueBasedPrice(product_id, base_price);
     res.json(result);
   } catch (error) {
     logger.error('Calculate value-based price API error', { error: error.message, stack: error.stack });
@@ -270,7 +270,7 @@ router.post('/value-pricing', authMiddleware, async (req, res) => {
  */
 async function setConsumerValuePreferences(userId, preferences) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO consumer_value_preferences 
        (user_id, nutrition_importance, organic_importance, gi_importance, 
         freshness_importance, sustainability_importance, quality_importance, 
@@ -313,7 +313,7 @@ async function setConsumerValuePreferences(userId, preferences) {
  */
 router.post('/consumer-preferences', authMiddleware, async (req, res) => {
   try {
-    const result = await setConsumerValuePreferences(req.user.id, req.body);
+    let result = await setConsumerValuePreferences(req.user.id, req.body);
     res.json(result);
   } catch (error) {
     logger.error('Set consumer preferences API error', { error: error.message, stack: error.stack });
@@ -326,7 +326,7 @@ router.post('/consumer-preferences', authMiddleware, async (req, res) => {
  */
 async function getConsumerValuePreferences(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM consumer_value_preferences WHERE user_id = $1',
       [userId]
     );
@@ -355,7 +355,7 @@ async function getConsumerValuePreferences(userId) {
  */
 router.get('/consumer-preferences', authMiddleware, async (req, res) => {
   try {
-    const result = await getConsumerValuePreferences(req.user.id);
+    let result = await getConsumerValuePreferences(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get consumer preferences API error', { error: error.message, stack: error.stack });
@@ -375,7 +375,7 @@ async function generateValueRecommendations(userId, limit = 10) {
     const preferences = await getConsumerValuePreferences(userId);
 
     // Get products with value scores that match preferences
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT pvs.*, p.name, p.base_price, pvp.final_price, pvp.premium_percentage
        FROM product_value_scores pvs
        LEFT JOIN products p ON pvs.product_id = p.id
@@ -448,7 +448,7 @@ async function generateValueRecommendations(userId, limit = 10) {
 router.get('/recommendations', authMiddleware, async (req, res) => {
   try {
     const { limit } = req.query;
-    const result = await generateValueRecommendations(req.user.id, parseInt(limit) || 10);
+    let result = await generateValueRecommendations(req.user.id, parseInt(limit) || 10);
     res.json(result);
   } catch (error) {
     logger.error('Generate recommendations API error', { error: error.message, stack: error.stack });
@@ -465,7 +465,7 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
  */
 async function getValueTiers() {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM value_tiers WHERE is_active = true ORDER BY min_score DESC'
     );
     return result.rows;
@@ -480,7 +480,7 @@ async function getValueTiers() {
  */
 router.get('/value-tiers', async (req, res) => {
   try {
-    const result = await getValueTiers();
+    let result = await getValueTiers();
     res.json(result);
   } catch (error) {
     logger.error('Get value tiers API error', { error: error.message, stack: error.stack });

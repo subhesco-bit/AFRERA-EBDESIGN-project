@@ -68,7 +68,7 @@ router.get('/ai-capability', (req, res) => {
 router.post('/generate-strategy', async (req, res) => {
   try {
     const { objectives, currentState, options } = req.body;
-    const result = await originalService.generateStrategy(objectives, currentState, options);
+    let result = await originalService.generateStrategy(objectives, currentState, options);
     
     res.json({
       success: true,

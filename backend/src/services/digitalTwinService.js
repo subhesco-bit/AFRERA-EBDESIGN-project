@@ -117,7 +117,7 @@ class DigitalTwinService {
         };
       }
 
-      const query = `
+      let query = `
         INSERT INTO digital_twins (
           twin_id, entity_type, entity_id, owner_id,
           name, location, specifications, status,
@@ -126,8 +126,8 @@ class DigitalTwinService {
         RETURNING twin_id, entity_id, status
       `;
 
-      const twinId = this.generateTwinId();
-      const specifications = {
+      let twinId = this.generateTwinId();
+      let specifications = {
         cropType,
         variety,
         plantingDate,
@@ -137,13 +137,13 @@ class DigitalTwinService {
         modelVersion: '1.0'
       };
 
-      const result = await db.query(query, [
+      let result = await db.query(query, [
         twinId, 'crop', cropId, farmerId,
         `${cropType} - ${variety}`, location,
         JSON.stringify(specifications)
       ]);
 
-      const twinState = this.initializeTwinState('crop', specifications);
+      let twinState = this.initializeTwinState('crop', specifications);
       this.activeTwins.set(twinId, twinState);
 
       return {
@@ -222,7 +222,7 @@ class DigitalTwinService {
    */
   async runSimulation(twinId, simulationConfig) {
     try {
-      const twin = await this.getTwinById(twinId);
+      let twin = await this.getTwinById(twinId);
       if (!twin) {
         return {
           success: false,
@@ -267,7 +267,7 @@ class DigitalTwinService {
    * Get twin by ID
    */
   async getTwinById(twinId) {
-    const query = `
+    let query = `
       SELECT twin_id, entity_type, entity_id, owner_id,
              name, location, specifications, status,
              created_at, last_synced
@@ -275,7 +275,7 @@ class DigitalTwinService {
       WHERE twin_id = $1
     `;
 
-    const result = await db.query(query, [twinId]);
+    let result = await db.query(query, [twinId]);
     return result.rows[0];
   }
 
@@ -309,7 +309,7 @@ class DigitalTwinService {
    * Get farm real-time data
    */
   async getFarmRealTimeData(farmId) {
-    const query = `
+    let query = `
       SELECT
         f.area,
         f.soil_type,
@@ -322,7 +322,7 @@ class DigitalTwinService {
       GROUP BY f.id
     `;
 
-    const result = await db.query(query, [farmId]);
+    let result = await db.query(query, [farmId]);
     return result.rows[0] || {};
   }
 
@@ -332,7 +332,7 @@ class DigitalTwinService {
    * crops.id itself (see schema-decisions.json's digital_twins entry).
    */
   async getCropRealTimeData(cropPlantingId) {
-    const query = `
+    let query = `
       SELECT
         cat.common_name as crop_type,
         cp.growth_stage,
@@ -345,7 +345,7 @@ class DigitalTwinService {
       WHERE cp.id = $1
     `;
 
-    const result = await db.query(query, [cropPlantingId]);
+    let result = await db.query(query, [cropPlantingId]);
     return result.rows[0] || {};
   }
 
@@ -359,13 +359,13 @@ class DigitalTwinService {
       // iot_devices links to its owner via farmer_id (see the note in
       // getRealWorldData above) - not a generic entity_id, which does not
       // exist on this table.
-      const query = `
+      let query = `
         SELECT device_id, device_type, last_active
         FROM iot_devices
         WHERE farmer_id = $1 AND status = 'active'
       `;
 
-      const result = await db.query(query, [farmerId]);
+      let result = await db.query(query, [farmerId]);
       
       if (result.rows.length === 0) return null;
       
@@ -432,7 +432,7 @@ class DigitalTwinService {
    * Update twin state
    */
   updateTwinState(twin, realWorldData) {
-    const currentState = this.activeTwins.get(twin.twin_id) || {};
+    let currentState = this.activeTwins.get(twin.twin_id) || {};
     const newState = { ...currentState };
 
     // Update based on entity type
@@ -524,7 +524,7 @@ class DigitalTwinService {
    * Simulate resource optimization
    */
   simulateResourceOptimization(state, config) {
-    const scenarios = [];
+    let scenarios = [];
     const currentResources = state.resourceLevels || { water: 100, nutrients: 100, energy: 100 };
 
     scenarios.push({
@@ -557,7 +557,7 @@ class DigitalTwinService {
    * Simulate climate impact
    */
   simulateClimateImpact(state, config) {
-    const scenarios = [];
+    let scenarios = [];
     const climateScenarios = [
       { name: 'Normal Rainfall', rainfall: 'normal', impact: 0 },
       { name: 'Drought Conditions', rainfall: 'low', impact: -0.25 },

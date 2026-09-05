@@ -230,7 +230,7 @@ class FileConnectivityAudit {
       const indexPath = path.join(rootDir, 'src', 'core', 'index.js');
       if (fs.existsSync(indexPath)) {
         const indexContent = fs.readFileSync(indexPath, 'utf8');
-        const fileName = path.basename(filePath, path.extname(filePath));
+        let fileName = path.basename(filePath, path.extname(filePath));
         return indexContent.includes(fileName);
       }
       return false;

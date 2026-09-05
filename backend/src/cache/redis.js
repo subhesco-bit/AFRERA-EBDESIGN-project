@@ -73,7 +73,7 @@ async function set(key, value, ttl = 3600) {
  */
 async function get(key) {
   try {
-    const client = getClient();
+    let client = getClient();
     const value = await client.get(key);
     
     if (value === null) {
@@ -92,7 +92,7 @@ async function get(key) {
  */
 async function del(key) {
   try {
-    const client = getClient();
+    let client = getClient();
     await client.del(key);
     logger.debug(`Deleted cache key: ${key}`);
   } catch (error) {
@@ -106,7 +106,7 @@ async function del(key) {
  */
 async function delPattern(pattern) {
   try {
-    const client = getClient();
+    let client = getClient();
     const keys = await client.keys(pattern);
     
     if (keys.length > 0) {
@@ -126,7 +126,7 @@ async function delPattern(pattern) {
  */
 async function exists(key) {
   try {
-    const client = getClient();
+    let client = getClient();
     return await client.exists(key) === 1;
   } catch (error) {
     logger.error('Error checking cache existence', { error: error.message, stack: error.stack });
@@ -139,7 +139,7 @@ async function exists(key) {
  */
 async function expire(key, ttl) {
   try {
-    const client = getClient();
+    let client = getClient();
     await client.expire(key, ttl);
   } catch (error) {
     logger.error('Error setting TTL', { error: error.message, stack: error.stack });
@@ -152,7 +152,7 @@ async function expire(key, ttl) {
  */
 async function ttl(key) {
   try {
-    const client = getClient();
+    let client = getClient();
     return await client.ttl(key);
   } catch (error) {
     logger.error('Error getting TTL', { error: error.message, stack: error.stack });
@@ -165,7 +165,7 @@ async function ttl(key) {
  */
 async function incr(key) {
   try {
-    const client = getClient();
+    let client = getClient();
     return await client.incr(key);
   } catch (error) {
     logger.error('Error incrementing counter', { error: error.message, stack: error.stack });
@@ -178,7 +178,7 @@ async function incr(key) {
  */
 async function decr(key) {
   try {
-    const client = getClient();
+    let client = getClient();
     return await client.decr(key);
   } catch (error) {
     logger.error('Error decrementing counter', { error: error.message, stack: error.stack });

@@ -14,16 +14,16 @@ async function listSettings() {
 }
 
 async function getSetting(name) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT name, value, description, created_at, updated_at FROM admin_settings WHERE name = $1', [name]);
+  let res = await pg.query('SELECT name, value, description, created_at, updated_at FROM admin_settings WHERE name = $1', [name]);
   return res.rows[0] || null;
 }
 
 async function upsertSetting(name, value, description) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO admin_settings (name, value, description, created_at, updated_at)
      VALUES ($1, $2, $3, NOW(), NOW())
      ON CONFLICT (name) DO UPDATE SET
@@ -50,14 +50,14 @@ async function upsertSetting(name, value, description) {
 }
 
 async function ingestAuditLog(entry = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { userId = null, action, entity = null, entityId = null, details = null, ipAddress = null } = entry;
   if (!action) {
     logger.warn('ingestAuditLog called without an action', { entry });
     return { success: false, error: 'action is required' };
   }
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO audit_logs (user_id, action, entity, entity_id, details, ip_address, created_at)
      VALUES ($1, $2, $3, $4, $5, $6, NOW())
      RETURNING id, user_id, action, entity, entity_id, details, ip_address, created_at`,
@@ -82,7 +82,7 @@ async function ingestAuditLog(entry = {}) {
 
 // AI-powered analytics
 async function getSystemAnalytics() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get audit log statistics
@@ -114,7 +114,7 @@ async function getSystemAnalytics() {
 
 // Anomaly detection
 async function detectAnomalies() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Detect unusual activity patterns
@@ -154,7 +154,7 @@ async function detectAnomalies() {
 
 // Predictive maintenance
 async function getPredictiveMaintenance() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Analyze system performance patterns

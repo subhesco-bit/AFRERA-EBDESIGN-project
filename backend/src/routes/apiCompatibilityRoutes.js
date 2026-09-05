@@ -96,7 +96,7 @@ router.get('/enterprise/organizations/current/integrations', authMiddleware, req
     return res.status(400).json({ success: false, error: 'Authenticated organization context is required', code: 'ORGANIZATION_CONTEXT_REQUIRED' });
   }
   try {
-    const result = await enterpriseService.getOrganizationIntegrations(organizationId);
+    let result = await enterpriseService.getOrganizationIntegrations(organizationId);
     const integrations = result.data.integrations.map(({ api_key, ...safeIntegration }) => safeIntegration);
     return res.json({ success: true, data: { ...result.data, integrations } });
   } catch (error) { return next(error); }

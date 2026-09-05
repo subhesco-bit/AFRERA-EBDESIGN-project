@@ -73,7 +73,7 @@ const VoiceAssistant = ({ language = 'en' }) => {
 
   const fetchPreferences = async () => {
     try {
-      const response = await voiceAIAPI.getPreferences();
+      let response = await voiceAIAPI.getPreferences();
       setPreferences(response.data);
     } catch (err) {
       console.error('Failed to fetch voice preferences:', err);
@@ -100,7 +100,7 @@ const VoiceAssistant = ({ language = 'en' }) => {
   const processVoiceCommand = async (transcriptText) => {
     setIsProcessing(true);
     try {
-      const response = await voiceAIAPI.sendCommand({
+      let response = await voiceAIAPI.sendCommand({
         session_id: sessionId,
         transcript: transcriptText,
         command_type: 'general',

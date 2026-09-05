@@ -800,11 +800,11 @@ function scarcityMonths() {
  */
 function wellnessRecommendation({ concern, month } = {}) {
   const key = String(concern || '').toLowerCase().trim();
-  const items = WELLNESS_MAP[key];
+  let items = WELLNESS_MAP[key];
   if (!items) {
     throw new Error(`concern must be one of: ${Object.keys(WELLNESS_MAP).join(', ')}`);
   }
-  const idx = monthIndex(month);
+  let idx = monthIndex(month);
 
   return {
     concern: key,
@@ -838,7 +838,7 @@ function listConcerns() {
  * meaningfully consent. Explanations are preserved verbatim from the original.
  */
 function explainTerm({ term } = {}) {
-  const key = String(term || '').toLowerCase().replace(/[^a-z]/g, '');
+  let key = String(term || '').toLowerCase().replace(/[^a-z]/g, '');
   const text = JARGON[key];
   if (!text) {
     return {

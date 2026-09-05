@@ -40,7 +40,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/fisheries - Create fishery
 router.post('/', authenticate, async (req, res) => {
   try {
-    const fishery = await fisheriesService.createFishery(req.body);
+    let fishery = await fisheriesService.createFishery(req.body);
     res.status(201).json({ success: true, data: fishery });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

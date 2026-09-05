@@ -15,7 +15,7 @@ async function createVariety(req, res) {
 
 async function getVariety(req, res) {
   try {
-    const variety = await service.getVariety(req.params.varietyId);
+    let variety = await service.getVariety(req.params.varietyId);
     if (!variety) return res.status(404).json({ success: false, error: 'Crop variety not found' });
     res.json({ success: true, data: variety });
   } catch (error) {
@@ -37,7 +37,7 @@ async function listVarieties(req, res) {
 
 async function updateVariety(req, res) {
   try {
-    const variety = await service.updateVariety(req.params.varietyId, req.body);
+    let variety = await service.updateVariety(req.params.varietyId, req.body);
     if (!variety) return res.status(404).json({ success: false, error: 'Crop variety not found' });
     res.json({ success: true, data: variety });
   } catch (error) {
@@ -83,7 +83,7 @@ async function recordVarietyPerformance(req, res) {
 
 async function getVarietyPerformance(req, res) {
   try {
-    const performance = await service.getVarietyPerformance(req.params.varietyId);
+    let performance = await service.getVarietyPerformance(req.params.varietyId);
     res.json({ success: true, data: performance });
   } catch (error) {
     logger.error('getVarietyPerformance error', { error: error.message });

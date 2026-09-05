@@ -121,7 +121,7 @@ router.post('/product-nutrition/:productId/score', async (req, res) => {
 router.get('/product-nutrition/:productId/score', async (req, res) => {
   try {
     const { productId } = req.params;
-    const score = await nutritionIntelligenceService.getProductNutritionScore(productId);
+    let score = await nutritionIntelligenceService.getProductNutritionScore(productId);
     res.json({ success: true, data: score });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -221,7 +221,7 @@ router.get('/recommendations', async (req, res) => {
 router.post('/recommendations', async (req, res) => {
   try {
     const { dietary_profile_id, target_calories, limit } = req.body;
-    const recommendations = await nutritionIntelligenceService.generateRecommendations(
+    let recommendations = await nutritionIntelligenceService.generateRecommendations(
       dietary_profile_id, 
       target_calories, 
       limit

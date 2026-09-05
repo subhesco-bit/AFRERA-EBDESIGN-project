@@ -32,16 +32,16 @@ async function listOrchards({ page = 1, limit = 20, farmerId = null } = {}) {
 }
 
 async function getOrchard(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
   return res.rows[0] || null;
 }
 
 async function createOrchard(payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   const { farmerId, name, location, area, orchardType, treeCount, plantingDate, varieties, soilType, irrigationSystem, metadata } = payload;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO ${tableName} (farmer_id, name, location, area, orchard_type, tree_count, planting_date, varieties, soil_type, irrigation_system, metadata, created_at) 
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW()) RETURNING *`,
     [farmerId, name, location, area, orchardType, treeCount, plantingDate, JSON.stringify(varieties || []), soilType, irrigationSystem, JSON.stringify(metadata || {})]
@@ -50,10 +50,10 @@ async function createOrchard(payload) {
 }
 
 async function updateOrchard(id, payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   const { name, location, area, orchardType, treeCount, plantingDate, varieties, soilType, irrigationSystem, metadata } = payload;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE ${tableName} 
      SET name = $1, location = $2, area = $3, orchard_type = $4, tree_count = $5, planting_date = $6, varieties = $7, soil_type = $8, irrigation_system = $9, metadata = $10, updated_at = NOW() 
      WHERE id = $11 RETURNING *`,
@@ -63,15 +63,15 @@ async function updateOrchard(id, payload) {
 }
 
 async function deleteOrchard(id) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
-  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
   return !!res.rows[0];
 }
 
 async function getOrchardProduction(orchardId, year) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM orchard_production WHERE orchard_id = $1 AND production_year = $2`,
     [orchardId, year]
   );
@@ -80,10 +80,10 @@ async function getOrchardProduction(orchardId, year) {
 }
 
 async function recordOrchardProduction(payload) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   const { orchardId, productionYear, variety, quantity, qualityGrade, harvestDate, revenue, metadata } = payload;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO orchard_production (orchard_id, production_year, variety, quantity, quality_grade, harvest_date, revenue, metadata, created_at) 
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) 
      ON CONFLICT (orchard_id, production_year, variety) 
@@ -95,9 +95,9 @@ async function recordOrchardProduction(payload) {
 }
 
 async function getOrchardAnalytics(orchardId) {
-  const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
+  let pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT 
       production_year,
       variety,

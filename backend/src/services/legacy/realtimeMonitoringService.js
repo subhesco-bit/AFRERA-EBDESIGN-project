@@ -129,7 +129,7 @@ class RealtimeMonitoringService {
    */
   async stopMonitoring(monitorId) {
     try {
-      const monitor = this.activeMonitors.get(monitorId);
+      let monitor = this.activeMonitors.get(monitorId);
       if (!monitor) {
         throw new Error(`Monitor ${monitorId} not found`);
       }
@@ -161,7 +161,7 @@ class RealtimeMonitoringService {
     
     const loop = setInterval(async () => {
       try {
-        const monitor = this.activeMonitors.get(monitorId);
+        let monitor = this.activeMonitors.get(monitorId);
         if (!monitor || monitor.status !== 'active') {
           clearInterval(loop);
           return;
@@ -197,7 +197,7 @@ class RealtimeMonitoringService {
    */
   async collectMetrics(resourceId, config) {
     try {
-      const metrics = {};
+      let metrics = {};
       
       for (const metric of config.metrics || []) {
         metrics[metric.name] = await this.collectMetric(resourceId, metric);
@@ -232,7 +232,7 @@ class RealtimeMonitoringService {
    * Check for alerts based on metrics
    */
   async checkAlerts(monitorId, metrics, config) {
-    const alerts = [];
+    let alerts = [];
     
     for (const alertConfig of config.alerts || []) {
       const rule = this.alertRules.get(alertConfig.type);
@@ -285,7 +285,7 @@ class RealtimeMonitoringService {
    * Check anomaly alert
    */
   async checkAnomalyAlert(metrics, config) {
-    const value = metrics[config.metric];
+    let value = metrics[config.metric];
     const mean = config.mean || 50;
     const stdDev = config.stdDev || 10;
     
@@ -378,7 +378,7 @@ class RealtimeMonitoringService {
    * Check scaling trigger
    */
   async checkScalingTrigger(metrics, config) {
-    const value = metrics[config.metric];
+    let value = metrics[config.metric];
     return value > config.threshold;
   }
 
@@ -394,7 +394,7 @@ class RealtimeMonitoringService {
    * Check recovery trigger
    */
   async checkRecoveryTrigger(metrics, config) {
-    const value = metrics[config.metric];
+    let value = metrics[config.metric];
     return value < config.threshold;
   }
 
@@ -445,7 +445,7 @@ class RealtimeMonitoringService {
    * Add event to stream
    */
   async addEvent(streamType, event) {
-    const stream = this.eventStreams.get(streamType);
+    let stream = this.eventStreams.get(streamType);
     if (!stream) {
       throw new Error(`Stream ${streamType} not found`);
     }
@@ -473,7 +473,7 @@ class RealtimeMonitoringService {
    * Get monitoring status
    */
   async getMonitoringStatus(monitorId) {
-    const monitor = this.activeMonitors.get(monitorId);
+    let monitor = this.activeMonitors.get(monitorId);
     if (!monitor) {
       throw new Error(`Monitor ${monitorId} not found`);
     }

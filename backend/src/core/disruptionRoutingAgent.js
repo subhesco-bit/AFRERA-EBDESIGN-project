@@ -181,7 +181,7 @@ class DisruptionRoutingAgent {
   async activateEmergencyProcurement(disruptionId, affectedState) {
     try {
       // Activate alternative sourcing routes for affected region
-      const result = await pool.query(
+      let result = await pool.query(
         `INSERT INTO emergency_procurement_activations 
          (disruption_id, affected_state, activation_status, created_at)
          VALUES ($1, $2, 'active', NOW())
@@ -229,7 +229,7 @@ class DisruptionRoutingAgent {
       }
 
       // Mark related insurance claims for expedited processing
-      const result = await pool.query(
+      let result = await pool.query(
         `UPDATE insurance_claims 
          SET priority_level = 'expedited',
              expedited_reason = 'civil_disruption',
@@ -278,7 +278,7 @@ class DisruptionRoutingAgent {
    */
   async restoreNormalRouting(disruptionId) {
     try {
-      const result = await pool.query(
+      let result = await pool.query(
         `UPDATE shipments 
          SET rerouting_required = false,
              rerouting_reason = NULL,
@@ -346,7 +346,7 @@ class DisruptionRoutingAgent {
         return [];
       }
 
-      const result = await pool.query(
+      let result = await pool.query(
         `SELECT DISTINCT 
            s.farmer_id,
            s.logistics_partner_id,

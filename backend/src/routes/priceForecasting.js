@@ -13,7 +13,7 @@ router.get('/products/:id/price-forecast', async (req, res, next) => {
 
 router.get('/products/:id/price-history', async (req, res, next) => {
   try {
-    const result = await priceForecastingService.getHistoricalPrices(req.params.id);
+    let result = await priceForecastingService.getHistoricalPrices(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });

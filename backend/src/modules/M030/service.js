@@ -157,7 +157,7 @@ async function generateWeatherAdvisory(farmerData) {
 }
 
 async function generateMarketAdvisory(farmerData) {
-  const advisories = [
+  let advisories = [
     {
       type: 'market',
       message: 'Monitor market prices for primary crops before harvest',
@@ -255,7 +255,7 @@ async function generateGeneralAdvisory(farmerData) {
 
 // Advisory history and management
 async function getFarmerAdvisories(farmerId, { limit = 20, advisoryType } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM farmer_advisories WHERE farmer_id = $1';
@@ -270,26 +270,26 @@ async function getFarmerAdvisories(farmerId, { limit = 20, advisoryType } = {}) 
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 async function getAdvisory(advisoryId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM farmer_advisories WHERE id = $1', [advisoryId]);
+  let res = await pg.query('SELECT * FROM farmer_advisories WHERE id = $1', [advisoryId]);
   return res.rows[0] || null;
 }
 
 // IoT sensor integration
 async function registerIoTDevice(farmerId, deviceData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { deviceId, deviceType, location, capabilities } = deviceData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO iot_devices (farmer_id, device_id, device_type, location, capabilities, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, 'active', NOW(), NOW())
      ON CONFLICT (farmer_id, device_id) DO UPDATE SET
@@ -317,7 +317,7 @@ async function registerIoTDevice(farmerId, deviceData) {
 }
 
 async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const device = await pg.query(
@@ -346,12 +346,12 @@ async function getIoTDeviceData(farmerId, deviceId, { timeframe = '24h' } = {}) 
 
 // Real-time alerts
 async function createAlert(alertData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { farmerId, alertType, severity, message, actionRequired } = alertData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO farmer_alerts (farmer_id, alert_type, severity, message, action_required, is_read, created_at)
      VALUES ($1, $2, $3, $4, $5, false, NOW())
      RETURNING *`,
@@ -376,11 +376,11 @@ async function createAlert(alertData) {
 }
 
 async function getFarmerAlerts(farmerId, { unreadOnly = false, limit = 20 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT * FROM farmer_alerts WHERE farmer_id = $1';
-  const params = [farmerId];
+  let params = [farmerId];
   let paramIndex = 2;
   
   if (unreadOnly) {
@@ -390,12 +390,12 @@ async function getFarmerAlerts(farmerId, { unreadOnly = false, limit = 20 } = {}
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 async function markAlertAsRead(alertId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query('UPDATE farmer_alerts SET is_read = true, read_at = NOW() WHERE id = $1', [alertId]);
@@ -404,7 +404,7 @@ async function markAlertAsRead(alertId) {
 
 // Advisory analytics
 async function getAdvisoryAnalytics({ startDate, endDate, advisoryType } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -416,7 +416,7 @@ async function getAdvisoryAnalytics({ startDate, endDate, advisoryType } = {}) {
     FROM farmer_advisories
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -434,7 +434,7 @@ async function getAdvisoryAnalytics({ startDate, endDate, advisoryType } = {}) {
   
   query += ` GROUP BY advisory_type, priority, DATE(created_at) ORDER BY date DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     data: res.rows,
@@ -504,11 +504,11 @@ function normalizePerformanceSnapshot(payload = {}) {
 }
 
 async function createPerformanceSnapshot(payload) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const snapshot = normalizePerformanceSnapshot(payload);
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO farmer_m030_items (data, created_at, updated_at)
      VALUES ($1, NOW(), NOW())
      RETURNING *`,
@@ -519,11 +519,11 @@ async function createPerformanceSnapshot(payload) {
 }
 
 async function getFarmerPerformance(farmerId, { limit = 12 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 100);
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM farmer_m030_items
      WHERE data->>'farmerId' = $1
      ORDER BY created_at DESC
@@ -543,7 +543,7 @@ async function getFarmerPerformance(farmerId, { limit = 12 } = {}) {
 }
 
 async function healthCheck() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   await pg.query('SELECT 1');
   return {

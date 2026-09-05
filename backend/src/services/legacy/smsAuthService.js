@@ -124,7 +124,7 @@ async function sendVoiceOTP(phoneNumber, otp, language = 'en') {
       'or': `ଆପଣଙ୍କର AFRERA ଯାଞ୍ଚ କୋଡ୍ ${otp}। ପୁନରାବୃତ୍ତି। ${otp}। ଏହି କୋଡ୍ ୧୦ ମିନିଟ୍ରେ ମିୟଦ ସରିବ।`
     };
 
-    const message = voiceTemplate[language] || voiceTemplate['en'];
+    let message = voiceTemplate[language] || voiceTemplate['en'];
     const twimlLanguage = OTP_CONFIG.voiceLanguageMap[language] || 'en-US';
 
     if (twilioClient) {
@@ -236,10 +236,10 @@ async function initiateSMSLogin(phoneNumber, language = 'en', useVoice = false) 
  */
 async function verifySMSOTP(phoneNumber, otp) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     // Get latest valid OTP
-    const otpQuery = `
+    let otpQuery = `
       SELECT * FROM sms_otps
       WHERE phone_number = $1
         AND expires_at > NOW()
@@ -258,7 +258,7 @@ async function verifySMSOTP(phoneNumber, otp) {
     const otpRecord = otpResult.rows[0];
 
     // Verify OTP
-    const otpHash = hashOTP(otp);
+    let otpHash = hashOTP(otp);
     if (otpRecord.otp_hash !== otpHash) {
       // Increment attempt count
       await pg.query(
@@ -280,15 +280,15 @@ async function verifySMSOTP(phoneNumber, otp) {
     );
 
     // Get user
-    const userQuery = `
+    let userQuery = `
       SELECT u.*, up.first_name, up.last_name, up.preferred_language
       FROM users u
       LEFT JOIN user_profiles up ON u.id = up.user_id
       WHERE u.phone = $1
     `;
 
-    const userResult = await pg.query(userQuery, [phoneNumber]);
-    const user = userResult.rows[0];
+    let userResult = await pg.query(userQuery, [phoneNumber]);
+    let user = userResult.rows[0];
 
     // Reset failed login attempts
     await pg.query(
@@ -333,7 +333,7 @@ async function verifySMSOTP(phoneNumber, otp) {
  */
 async function registerWithPhone(phoneNumber, userData, language = 'en') {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     // Check if phone already exists
     const existingPhone = await pg.query(
@@ -346,9 +346,9 @@ async function registerWithPhone(phoneNumber, userData, language = 'en') {
     }
 
     // Generate OTP for verification
-    const otp = generateOTP();
-    const otpHash = hashOTP(otp);
-    const expiresAt = new Date(Date.now() + OTP_CONFIG.expiryMinutes * 60 * 1000);
+    let otp = generateOTP();
+    let otpHash = hashOTP(otp);
+    let expiresAt = new Date(Date.now() + OTP_CONFIG.expiryMinutes * 60 * 1000);
 
     // Store pending registration
     const registrationQuery = `
@@ -387,10 +387,10 @@ async function registerWithPhone(phoneNumber, userData, language = 'en') {
  */
 async function completePhoneRegistration(phoneNumber, otp) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     // Get pending registration
-    const registrationQuery = `
+    let registrationQuery = `
       SELECT * FROM pending_registrations
       WHERE phone_number = $1
         AND expires_at > NOW()
@@ -408,7 +408,7 @@ async function completePhoneRegistration(phoneNumber, otp) {
     const registration = registrationResult.rows[0];
 
     // Verify OTP
-    const otpHash = hashOTP(otp);
+    let otpHash = hashOTP(otp);
     if (registration.otp_hash !== otpHash) {
       throw new Error('Invalid OTP');
     }
@@ -421,9 +421,9 @@ async function completePhoneRegistration(phoneNumber, otp) {
 
     // Create user
     const userData = JSON.parse(registration.user_data);
-    const authService = require('../dual-use/authService');
+    let authService = require('../dual-use/authService');
 
-    const user = await authService.registerUser({
+    let user = await authService.registerUser({
       ...userData,
       phone: phoneNumber,
       status: 'active'
@@ -443,7 +443,7 @@ async function completePhoneRegistration(phoneNumber, otp) {
  */
 async function getUserLanguage(phoneNumber) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     const query = `
       SELECT up.preferred_language
@@ -497,7 +497,7 @@ router.post('/initiate', authRateLimit, async (req, res) => {
     // Was referencing `phoneNumber` (never defined; the body field is
     // `phone_number`) -> ReferenceError, so SMS login always failed.
     const userLanguage = language || await getUserLanguage(phone_number);
-    const result = await initiateSMSLogin(phone_number, userLanguage, use_voice);
+    let result = await initiateSMSLogin(phone_number, userLanguage, use_voice);
 
     res.json(result);
   } catch (error) {
@@ -518,7 +518,7 @@ router.post('/verify', authRateLimit, async (req, res) => {
       return res.status(400).json({ error: 'Phone number and OTP are required' });
     }
 
-    const result = await verifySMSOTP(phone_number, otp);
+    let result = await verifySMSOTP(phone_number, otp);
     res.json(result);
   } catch (error) {
     logger.error('SMS OTP verification API error', { error: error.message, stack: error.stack });
@@ -538,7 +538,7 @@ router.post('/register', authRateLimit, async (req, res) => {
       return res.status(400).json({ error: 'Phone number and user data are required' });
     }
 
-    const result = await registerWithPhone(phone_number, user_data, language);
+    let result = await registerWithPhone(phone_number, user_data, language);
     res.json(result);
   } catch (error) {
     logger.error('Phone registration API error', { error: error.message, stack: error.stack });
@@ -558,7 +558,7 @@ router.post('/complete-registration', authRateLimit, async (req, res) => {
       return res.status(400).json({ error: 'Phone number and OTP are required' });
     }
 
-    const result = await completePhoneRegistration(phone_number, otp);
+    let result = await completePhoneRegistration(phone_number, otp);
     res.json(result);
   } catch (error) {
     logger.error('Complete registration API error', { error: error.message, stack: error.stack });

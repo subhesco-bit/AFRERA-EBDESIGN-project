@@ -147,7 +147,7 @@ async function scheduleVaccination(vaccinationData) {
     };
 
     // AI-powered vaccination optimization
-    const aiRequest = {
+    let aiRequest = {
       task: 'vaccination_optimization',
       parameters: {
         vaccination_data: vaccinationData,
@@ -157,10 +157,10 @@ async function scheduleVaccination(vaccinationData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     vaccination.ai_optimization = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO vaccination_schedules 
        (vaccination_id, animal_id, animal_type, farmer_id, vaccine_type, 
         vaccine_name, scheduled_date, veterinarian_id, location, state, 
@@ -248,7 +248,7 @@ function generateId() {
 
 async function getDiseasePatterns(animalType, state, district) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM regional_disease_patterns WHERE animal_type = $1 AND state = $2 AND district = $3',
       [animalType, state, district]
     );
@@ -267,7 +267,7 @@ async function getTreatmentRecommendations(diagnosis, animalType) {
 
 async function getVaccinationStatus(animalId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM vaccination_records WHERE animal_id = $1 ORDER BY vaccination_date DESC LIMIT 5',
       [animalId]
     );
@@ -352,7 +352,7 @@ async function generateHerdHealthRecommendations(farmerId, animalType) {
 
 async function getTotalAnimals(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM animal_registry WHERE farmer_id = $1',
       [farmerId]
     );

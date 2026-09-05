@@ -35,23 +35,23 @@ async function registerFarmer(farmerData) {
 }
 
 async function getFarmer(farmerId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM farmers WHERE id = $1', [farmerId]);
+  let res = await pg.query('SELECT * FROM farmers WHERE id = $1', [farmerId]);
   return res.rows[0] || null;
 }
 
 async function getFarmerByEmail(email) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM farmers WHERE email = $1', [email]);
+  let res = await pg.query('SELECT * FROM farmers WHERE email = $1', [email]);
   return res.rows[0] || null;
 }
 
 async function listFarmers({ page = 1, limit = 20, status, primaryCrop } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -71,7 +71,7 @@ async function listFarmers({ page = 1, limit = 20, status, primaryCrop } = {}) {
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM farmers`, 'SELECT COUNT(*) FROM farmers').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -79,12 +79,12 @@ async function listFarmers({ page = 1, limit = 20, status, primaryCrop } = {}) {
 }
 
 async function updateFarmer(farmerId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, email, phone, address, landSize, primaryCrop, skills, education, farmingExperience, status } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE farmers 
      SET name = COALESCE($1, name),
          email = COALESCE($2, email),
@@ -118,7 +118,7 @@ async function updateFarmer(farmerId, updates) {
 
 // AI-powered farmer analysis
 async function analyzeFarmerProfile(farmerId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const farmer = await getFarmer(farmerId);
@@ -243,7 +243,7 @@ function estimateProductivityPotential(farmer) {
 
 // Farmer verification
 async function verifyFarmer(farmerId, verificationData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { documents, identityProof, landProof } = verificationData;
@@ -277,7 +277,7 @@ async function verifyFarmer(farmerId, verificationData) {
 }
 
 async function approveFarmerVerification(farmerId, approved, approvedBy, notes) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -309,10 +309,10 @@ async function approveFarmerVerification(farmerId, approved, approvedBy, notes) 
 
 // Farmer onboarding workflow
 async function initiateOnboarding(farmerId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const farmer = await getFarmer(farmerId);
+  let farmer = await getFarmer(farmerId);
   if (!farmer) {
     return { success: false, error: 'Farmer not found' };
   }
@@ -342,7 +342,7 @@ async function initiateOnboarding(farmerId) {
 }
 
 async function updateOnboardingProgress(farmerId, stepIndex, stepData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const onboardingRes = await pg.query('SELECT * FROM farmer_onboarding WHERE farmer_id = $1', [farmerId]);
@@ -352,7 +352,7 @@ async function updateOnboardingProgress(farmerId, stepIndex, stepData) {
   }
   
   const onboarding = onboardingRes.rows[0];
-  const checklist = onboarding.checklist || [];
+  let checklist = onboarding.checklist || [];
   
   // Update checklist item
   if (checklist[stepIndex]) {
@@ -377,7 +377,7 @@ async function updateOnboardingProgress(farmerId, stepIndex, stepData) {
 
 // Farmer analytics
 async function getFarmerAnalytics({ startDate, endDate, region } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -389,7 +389,7 @@ async function getFarmerAnalytics({ startDate, endDate, region } = {}) {
     FROM farmers
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -403,7 +403,7 @@ async function getFarmerAnalytics({ startDate, endDate, region } = {}) {
   
   query += ` GROUP BY primary_crop ORDER BY count DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     byCrop: res.rows,

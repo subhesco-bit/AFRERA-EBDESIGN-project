@@ -58,7 +58,7 @@ function requestGuard(req, res, next, { signal, advisory = false } = {}) {
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT) return fail(res, req, 400, 'limit is outside the allowed range', 'INVALID_PAGINATION');
 
   req.body = sanitizeObject(req.body || {});
-  const error = validateValue(req.body, 'body');
+  let error = validateValue(req.body, 'body');
   if (error) return fail(res, req, 400, error, 'INVALID_INPUT');
 
   const originalJson = res.json.bind(res);

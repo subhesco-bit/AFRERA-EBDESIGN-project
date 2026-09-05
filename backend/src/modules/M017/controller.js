@@ -27,7 +27,7 @@ async function getUserConsents(req, res) {
 
 async function getConsent(req, res) {
   try {
-    const consent = await service.getConsent(req.params.consentId);
+    let consent = await service.getConsent(req.params.consentId);
     if (!consent) return res.status(404).json({ success: false, error: 'Consent not found' });
     res.json({ success: true, data: consent });
   } catch (error) {
@@ -38,7 +38,7 @@ async function getConsent(req, res) {
 
 async function updateConsent(req, res) {
   try {
-    const consent = await service.updateConsent(req.params.consentId, req.body);
+    let consent = await service.updateConsent(req.params.consentId, req.body);
     if (!consent) return res.status(404).json({ success: false, error: 'Consent not found' });
     res.json({ success: true, data: consent });
   } catch (error) {
@@ -50,7 +50,7 @@ async function updateConsent(req, res) {
 async function revokeConsent(req, res) {
   try {
     const { reason } = req.body;
-    const consent = await service.revokeConsent(req.params.consentId, reason);
+    let consent = await service.revokeConsent(req.params.consentId, reason);
     if (!consent) return res.status(404).json({ success: false, error: 'Consent not found' });
     res.json({ success: true, data: consent });
   } catch (error) {
@@ -120,7 +120,7 @@ async function applyConsentTemplate(req, res) {
 // AI-powered analysis
 async function analyzeConsentCompliance(req, res) {
   try {
-    const userId = req.params.userId;
+    let userId = req.params.userId;
     const analysis = await service.analyzeConsentCompliance(userId);
     res.json({ success: true, data: analysis });
   } catch (error) {
@@ -143,7 +143,7 @@ async function getConsentHistory(req, res) {
 // Automated expiration
 async function checkExpiredConsents(req, res) {
   try {
-    const result = await service.checkExpiredConsents();
+    let result = await service.checkExpiredConsents();
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('checkExpiredConsents error', { error: error.message });
@@ -167,7 +167,7 @@ async function getConsentAnalytics(req, res) {
 async function bulkCreateConsents(req, res) {
   try {
     const { consents } = req.body;
-    const result = await service.bulkCreateConsents(consents);
+    let result = await service.bulkCreateConsents(consents);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('bulkCreateConsents error', { error: error.message });

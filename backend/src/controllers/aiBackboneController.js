@@ -42,7 +42,7 @@ const aiBackboneController = {
   switchProvider: async (req, res) => {
     try {
       const { provider } = req.body;
-      const result = aiBackboneService.switchProvider(provider);
+      let result = aiBackboneService.switchProvider(provider);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error switching AI provider', { error: error.message });
@@ -55,7 +55,7 @@ const aiBackboneController = {
    */
   resetAIStatistics: async (req, res) => {
     try {
-      const result = aiBackboneService.resetAIStatistics();
+      let result = aiBackboneService.resetAIStatistics();
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error resetting AI statistics', { error: error.message });
@@ -68,7 +68,7 @@ const aiBackboneController = {
    */
   supportAgriculturalDecision: async (req, res) => {
     try {
-      const result = await aiBackboneService.supportAgriculturalDecision(req.body);
+      let result = await aiBackboneService.supportAgriculturalDecision(req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in agricultural decision support', { error: error.message });
@@ -81,7 +81,7 @@ const aiBackboneController = {
    */
   optimizeLivestock: async (req, res) => {
     try {
-      const result = await aiBackboneService.optimizeLivestock(req.body);
+      let result = await aiBackboneService.optimizeLivestock(req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in livestock optimization', { error: error.message });

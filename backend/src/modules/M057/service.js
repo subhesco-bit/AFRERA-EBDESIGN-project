@@ -52,7 +52,7 @@ async function trackShipment(shipmentId) {
 
 async function updateShipmentStatus(shipmentId, status, location = null) {
   try {
-    const res = await pool.query(
+    let res = await pool.query(
       'UPDATE shipments SET status = $1, current_location = $2, updated_at = NOW() WHERE shipment_id = $3 RETURNING *',
       [status, location, shipmentId]
     );

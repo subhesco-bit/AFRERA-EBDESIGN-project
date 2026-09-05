@@ -153,7 +153,7 @@ router.post('/settlement/:instructionId/confirm', authMiddleware, async (req, re
     const { instructionId } = req.params;
     const confirmedBy = req.user.id;
     
-    const instruction = await custodyEventService.confirmSettlementExecution(
+    let instruction = await custodyEventService.confirmSettlementExecution(
       instructionId,
       confirmedBy
     );
@@ -179,7 +179,7 @@ router.get('/settlement/:instructionId', authMiddleware, async (req, res) => {
   try {
     const { instructionId } = req.params;
     
-    const instruction = await custodyEventService.getSettlementInstruction(instructionId);
+    let instruction = await custodyEventService.getSettlementInstruction(instructionId);
     
     res.json({
       success: true,

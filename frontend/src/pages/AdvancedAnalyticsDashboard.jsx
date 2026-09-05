@@ -29,7 +29,7 @@ const AdvancedAnalyticsDashboard = () => {
   const { data: marketData, isLoading: marketLoading } = useQuery({
     queryKey: ['marketTrends', 'rice', timeRange],
     queryFn: async () => {
-      const response = await analyticsAPI.getInsights({ cropType: 'rice', timeRange });
+      let response = await analyticsAPI.getInsights({ cropType: 'rice', timeRange });
       return response.data?.data || response.data;
     },
     enabled: Boolean(platformData),

@@ -64,7 +64,7 @@ async function initiatePasswordReset(email, method = 'email') {
 }
 
 async function verifyPasswordResetToken(token) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const res = await pg.query(
@@ -81,7 +81,7 @@ async function verifyPasswordResetToken(token) {
 }
 
 async function resetPassword(token, newPassword) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Verify token
@@ -126,7 +126,7 @@ async function resetPassword(token, newPassword) {
 
 // Security questions
 async function setupSecurityQuestions(userId, questions) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   for (const question of questions) {
@@ -147,7 +147,7 @@ async function setupSecurityQuestions(userId, questions) {
 }
 
 async function verifySecurityQuestions(userId, answers) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let verifiedCount = 0;
@@ -155,7 +155,7 @@ async function verifySecurityQuestions(userId, answers) {
   for (const answer of answers) {
     const { questionId, answer: userAnswer } = answer;
     
-    const res = await pg.query(
+    let res = await pg.query(
       'SELECT answer_hash FROM security_questions WHERE user_id = $1 AND question_id = $2',
       [userId, questionId]
     );
@@ -178,7 +178,7 @@ async function verifySecurityQuestions(userId, answers) {
 
 // Account lockout management
 async function lockAccount(userId, reason, duration = 15) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const lockUntil = new Date(Date.now() + duration * 60000); // duration in minutes
@@ -205,7 +205,7 @@ async function lockAccount(userId, reason, duration = 15) {
 }
 
 async function unlockAccount(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -228,16 +228,16 @@ async function unlockAccount(userId) {
 }
 
 async function checkAccountLockStatus(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT status, lock_reason, locked_until FROM users WHERE id = $1', [userId]);
+  let res = await pg.query('SELECT status, lock_reason, locked_until FROM users WHERE id = $1', [userId]);
   
   if (res.rows.length === 0) {
     return { success: false, error: 'User not found' };
   }
   
-  const user = res.rows[0];
+  let user = res.rows[0];
   
   // Check if lock has expired
   if (user.status === 'locked' && user.locked_until && new Date(user.locked_until) < new Date()) {
@@ -255,7 +255,7 @@ async function checkAccountLockStatus(userId) {
 
 // Recovery attempt tracking
 async function logRecoveryAttempt(userId, recoveryType, status, details = null) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -266,10 +266,10 @@ async function logRecoveryAttempt(userId, recoveryType, status, details = null) 
 }
 
 async function getRecoveryAttempts(userId, { limit = 20 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM recovery_attempts 
      WHERE user_id = $1 
      ORDER BY created_at DESC 
@@ -282,7 +282,7 @@ async function getRecoveryAttempts(userId, { limit = 20 } = {}) {
 
 // AI-powered fraud detection
 async function detectRecoveryFraud(userId, email) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Check for excessive recovery attempts
@@ -323,15 +323,15 @@ async function detectRecoveryFraud(userId, email) {
 
 // Temporary password generation
 async function generateTemporaryPassword(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Generate temporary password
   const tempPassword = crypto.randomBytes(12).toString('hex').substring(0, 16);
-  const passwordHash = await bcrypt.hash(tempPassword, 12);
+  let passwordHash = await bcrypt.hash(tempPassword, 12);
   
   // Set temporary password with expiration
-  const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+  let expiresAt = new Date(Date.now() + 3600000); // 1 hour
   
   await pg.query(
     `UPDATE users 
@@ -358,7 +358,7 @@ async function sendPasswordResetSMS(userId, token) {
 }
 
 async function invalidateAllUserSessions(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -369,7 +369,7 @@ async function invalidateAllUserSessions(userId) {
 
 // Account recovery analytics
 async function getRecoveryAnalytics({ startDate, endDate } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -395,7 +395,7 @@ async function getRecoveryAnalytics({ startDate, endDate } = {}) {
   
   query += ` GROUP BY recovery_type, status, DATE(created_at) ORDER BY date DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     data: res.rows,

@@ -34,7 +34,7 @@ router.get('/cost-centers', authMiddleware, async (req, res) => {
 
 router.get('/cost-centers/:costCenterId', authMiddleware, async (req, res) => {
   try {
-    const costCenter = await costControlService.getCostCenter(req.params.costCenterId);
+    let costCenter = await costControlService.getCostCenter(req.params.costCenterId);
     res.json({ success: true, data: costCenter });
   } catch (error) {
     res.status(error.message === 'Cost centre not found' ? 404 : 400).json({ success: false, error: error.message });
@@ -92,7 +92,7 @@ router.get('/budgets', authMiddleware, async (req, res) => {
 
 router.get('/budgets/:budgetId', authMiddleware, async (req, res) => {
   try {
-    const budget = await costControlService.getBudget(req.params.budgetId);
+    let budget = await costControlService.getBudget(req.params.budgetId);
     res.json({ success: true, data: budget });
   } catch (error) {
     res.status(error.message === 'Budget not found' ? 404 : 400).json({ success: false, error: error.message });
@@ -101,7 +101,7 @@ router.get('/budgets/:budgetId', authMiddleware, async (req, res) => {
 
 router.post('/budgets/:budgetId/submit', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const budget = await costControlService.submitBudget(req.params.budgetId);
+    let budget = await costControlService.submitBudget(req.params.budgetId);
     res.json({ success: true, data: budget });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -111,7 +111,7 @@ router.post('/budgets/:budgetId/submit', authMiddleware, adminMiddleware, async 
 router.post('/budgets/:budgetId/approve', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { approved = true } = req.body;
-    const budget = await costControlService.approveBudget(req.params.budgetId, req.user.id, approved);
+    let budget = await costControlService.approveBudget(req.params.budgetId, req.user.id, approved);
     res.json({ success: true, data: budget });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -147,7 +147,7 @@ router.get('/budgets/:budgetId/vs-actual', authMiddleware, async (req, res) => {
 
 router.get('/budgets/:budgetId/cost-reduction-recommendations', authMiddleware, async (req, res) => {
   try {
-    const report = await costControlService.getCostReductionRecommendations(req.params.budgetId);
+    let report = await costControlService.getCostReductionRecommendations(req.params.budgetId);
     res.json({ success: true, data: report });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

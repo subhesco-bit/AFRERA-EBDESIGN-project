@@ -32,7 +32,7 @@ router.post('/loans/apply',
 
 router.get('/loans/:id', authenticateToken, async (req, res, next) => {
   try {
-    const result = await loanManagementService.getLoanStatus(req.params.id);
+    let result = await loanManagementService.getLoanStatus(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error(`Get loan error: ${error.message}`);
@@ -46,7 +46,7 @@ router.post('/admin/loans/:id/approve',
   validateRequest({ body: { admin_notes: 'string' } }),
   async (req, res, next) => {
     try {
-      const result = await loanManagementService.approveLoan(req.params.id, req.body.admin_notes);
+      let result = await loanManagementService.approveLoan(req.params.id, req.body.admin_notes);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error(`Approve loan error: ${error.message}`);
@@ -57,7 +57,7 @@ router.post('/admin/loans/:id/approve',
 
 router.post('/loans/:id/disburse', authenticateToken, authorize(['admin']), async (req, res, next) => {
   try {
-    const result = await loanManagementService.disburseLoan(req.params.id);
+    let result = await loanManagementService.disburseLoan(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error(`Disburse loan error: ${error.message}`);
@@ -67,7 +67,7 @@ router.post('/loans/:id/disburse', authenticateToken, authorize(['admin']), asyn
 
 router.get('/loans/:id/payments', authenticateToken, async (req, res, next) => {
   try {
-    const result = await loanManagementService.trackRepayment(req.params.id);
+    let result = await loanManagementService.trackRepayment(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error(`Track repayment error: ${error.message}`);

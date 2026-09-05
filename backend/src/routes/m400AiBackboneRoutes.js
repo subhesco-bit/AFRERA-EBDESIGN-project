@@ -77,7 +77,7 @@ router.post('/execute', authMiddleware, adminMiddleware, async (req, res) => {
 router.post('/coordinate', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
-    const result = await backbone.coordinateAIRequest(req.body || {});
+    let result = await backbone.coordinateAIRequest(req.body || {});
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -89,7 +89,7 @@ router.post('/decide', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
     const { parameters, context } = req.body || {};
-    const result = await backbone.makeEnterpriseDecision(parameters || {}, context || {});
+    let result = await backbone.makeEnterpriseDecision(parameters || {}, context || {});
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -101,7 +101,7 @@ router.post('/strategize', authMiddleware, adminMiddleware, async (req, res) => 
   try {
     await ensureInitialized();
     const { parameters, context } = req.body || {};
-    const result = await backbone.generateEnterpriseStrategy(parameters || {}, context || {});
+    let result = await backbone.generateEnterpriseStrategy(parameters || {}, context || {});
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -112,7 +112,7 @@ router.post('/strategize', authMiddleware, adminMiddleware, async (req, res) => 
 router.get('/intelligence', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
-    const result = await backbone.getCrossModuleIntelligence(req.query || {});
+    let result = await backbone.getCrossModuleIntelligence(req.query || {});
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -123,7 +123,7 @@ router.get('/intelligence', authMiddleware, adminMiddleware, async (req, res) =>
 router.post('/modules', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
-    const result = await backbone.registerModule(req.body || {});
+    let result = await backbone.registerModule(req.body || {});
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -134,7 +134,7 @@ router.post('/modules', authMiddleware, adminMiddleware, async (req, res) => {
 router.delete('/modules/:moduleId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
-    const result = await backbone.unregisterModule({ moduleId: req.params.moduleId });
+    let result = await backbone.unregisterModule({ moduleId: req.params.moduleId });
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

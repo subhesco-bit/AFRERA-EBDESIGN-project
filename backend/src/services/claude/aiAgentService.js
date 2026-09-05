@@ -123,7 +123,7 @@ class ClaudeAIEnhancedAgentService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'processAgentTask',
         agentType: agentType,
@@ -131,7 +131,7 @@ class ClaudeAIEnhancedAgentService {
         context: context
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'automation',
         query: this.buildAgentTaskQuery(agentType, task, context, options),
         context: { 

@@ -167,7 +167,7 @@ class TransactionManager {
       throw new Error('Savepoints are not enabled');
     }
 
-    const transaction = this.activeTransactions.get(transactionId);
+    let transaction = this.activeTransactions.get(transactionId);
     
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
@@ -195,7 +195,7 @@ class TransactionManager {
       throw new Error('Savepoints are not enabled');
     }
 
-    const transaction = this.activeTransactions.get(transactionId);
+    let transaction = this.activeTransactions.get(transactionId);
     
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
@@ -222,7 +222,7 @@ class TransactionManager {
    * Commit transaction
    */
   async commitTransaction(transactionId) {
-    const transaction = this.activeTransactions.get(transactionId);
+    let transaction = this.activeTransactions.get(transactionId);
     
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
@@ -261,7 +261,7 @@ class TransactionManager {
    * Rollback transaction
    */
   async rollbackTransaction(transactionId) {
-    const transaction = this.activeTransactions.get(transactionId);
+    let transaction = this.activeTransactions.get(transactionId);
     
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
@@ -270,7 +270,7 @@ class TransactionManager {
     try {
       await transaction.client.query('ROLLBACK');
       
-      const duration = Date.now() - transaction.startTime;
+      let duration = Date.now() - transaction.startTime;
       
       logger.info('Transaction rolled back', {
         transactionId,
@@ -303,10 +303,10 @@ class TransactionManager {
     const maxRetries = options.maxRetries || this.config.maxRetries;
 
     while (attempt <= maxRetries) {
-      const transaction = await this.beginTransaction(options);
+      let transaction = await this.beginTransaction(options);
 
       try {
-        const result = await callback(transaction);
+        let result = await callback(transaction);
         await transaction.commit();
         return result;
       } catch (error) {
@@ -363,7 +363,7 @@ class TransactionManager {
       const results = [];
 
       for (const operation of operations) {
-        const result = await transaction.execute(operation.query, operation.params);
+        let result = await transaction.execute(operation.query, operation.params);
         results.push({
           operation: operation.name || 'unnamed',
           result,
@@ -383,7 +383,7 @@ class TransactionManager {
       throw new Error('Distributed transactions are not enabled');
     }
 
-    const transactionId = this.generateTransactionId();
+    let transactionId = this.generateTransactionId();
     const startTime = Date.now();
 
     logger.info('Starting distributed transaction', { transactionId, participants: participants.length });
@@ -435,7 +435,7 @@ class TransactionManager {
         }
       }
 
-      const duration = Date.now() - startTime;
+      let duration = Date.now() - startTime;
       logger.info('Distributed transaction completed', {
         transactionId,
         duration: duration + 'ms',
@@ -449,7 +449,7 @@ class TransactionManager {
         participants: preparedParticipants.length
       };
     } catch (error) {
-      const duration = Date.now() - startTime;
+      let duration = Date.now() - startTime;
       logger.error('Distributed transaction failed', {
         transactionId,
         duration: duration + 'ms',
@@ -463,7 +463,7 @@ class TransactionManager {
    * Get active transaction info
    */
   getTransactionInfo(transactionId) {
-    const transaction = this.activeTransactions.get(transactionId);
+    let transaction = this.activeTransactions.get(transactionId);
     
     if (!transaction) {
       return null;
@@ -507,7 +507,7 @@ class TransactionManager {
     const staleTransactions = [];
 
     for (const [id, transaction] of this.activeTransactions.entries()) {
-      const duration = now - transaction.startTime;
+      let duration = now - transaction.startTime;
       
       if (duration > timeout) {
         staleTransactions.push({ id, transaction, duration });

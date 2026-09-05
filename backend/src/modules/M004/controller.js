@@ -16,7 +16,7 @@ const createOrganization = async (req, res) => {
 
 const getOrganization = async (req, res) => {
   try {
-    const org = await orgService.getOrganization(req.params.id);
+    let org = await orgService.getOrganization(req.params.id);
     res.status(200).json({ success: true, data: org });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -25,7 +25,7 @@ const getOrganization = async (req, res) => {
 
 const updateOrganization = async (req, res) => {
   try {
-    const org = await orgService.updateOrganization(req.params.id, req.body);
+    let org = await orgService.updateOrganization(req.params.id, req.body);
     res.status(200).json({ success: true, data: org });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

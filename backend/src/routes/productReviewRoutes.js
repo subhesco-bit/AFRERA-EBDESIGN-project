@@ -31,7 +31,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/products/:productId', async (req, res) => {
   try {
-    const result = await productReviewService.getProductReviews(req.params.productId, req.query);
+    let result = await productReviewService.getProductReviews(req.params.productId, req.query);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -42,7 +42,7 @@ router.get
     // Log request
     logger.debug('router.get request');('/products/:productId/stats', async (req, res) => {
   try {
-    const result = await productReviewService.getProductReviewStats(req.params.productId);
+    let result = await productReviewService.getProductReviewStats(req.params.productId);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -54,7 +54,7 @@ router.get
     logger.debug('router.get request');('/me', authMiddleware, async (req, res) => {
   try {
     const { page, limit } = req.query;
-    const result = await productReviewService.getUserReviews(req.user.id, page, limit);
+    let result = await productReviewService.getUserReviews(req.user.id, page, limit);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -65,7 +65,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/:reviewId', authMiddleware, async (req, res) => {
   try {
-    const result = await productReviewService.updateReview(req.params.reviewId, req.user.id, req.body);
+    let result = await productReviewService.updateReview(req.params.reviewId, req.user.id, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -77,7 +77,7 @@ router.delete
     logger.debug('router.delete request');('/:reviewId', authMiddleware, async (req, res) => {
   try {
     const isAdmin = req.user.role === 'admin';
-    const result = await productReviewService.deleteReview(req.params.reviewId, req.user.id, isAdmin);
+    let result = await productReviewService.deleteReview(req.params.reviewId, req.user.id, isAdmin);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -88,7 +88,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/:reviewId/helpful', authMiddleware, async (req, res) => {
   try {
-    const result = await productReviewService.markReviewHelpful(req.params.reviewId, req.user.id);
+    let result = await productReviewService.markReviewHelpful(req.params.reviewId, req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -99,7 +99,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/:reviewId/report', authMiddleware, async (req, res) => {
   try {
-    const result = await productReviewService.reportReview(req.params.reviewId, req.user.id, req.body.reason);
+    let result = await productReviewService.reportReview(req.params.reviewId, req.user.id, req.body.reason);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -110,7 +110,7 @@ router.patch
     // Log request
     logger.debug('router.patch request');('/:reviewId/moderate', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const result = await productReviewService.moderateReview(req.params.reviewId, req.body.status, req.user.id);
+    let result = await productReviewService.moderateReview(req.params.reviewId, req.body.status, req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

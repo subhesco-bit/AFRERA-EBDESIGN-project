@@ -30,7 +30,7 @@ function mean(series) {
 }
 
 function median(series) {
-  const s = clean(series).sort((a, b) => a - b);
+  let s = clean(series).sort((a, b) => a - b);
   if (s.length === 0) return 0;
   const mid = Math.floor(s.length / 2);
   return s.length % 2 !== 0 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
@@ -38,7 +38,7 @@ function median(series) {
 
 /** Sample standard deviation (n-1). Returns 0 for series shorter than 2. */
 function stdDev(series) {
-  const s = clean(series);
+  let s = clean(series);
   if (s.length < 2) return 0;
   const m = mean(s);
   const variance = s.reduce((acc, v) => acc + (v - m) ** 2, 0) / (s.length - 1);
@@ -51,7 +51,7 @@ function variance(series) {
 
 /** Linear interpolation percentile. p in [0,1]. */
 function percentile(series, p) {
-  const s = clean(series).sort((a, b) => a - b);
+  let s = clean(series).sort((a, b) => a - b);
   if (s.length === 0) return 0;
   if (s.length === 1) return s[0];
   const idx = p * (s.length - 1);
@@ -63,7 +63,7 @@ function percentile(series, p) {
 
 /** Coefficient of variation — unitless volatility measure. */
 function coefficientOfVariation(series) {
-  const m = mean(series);
+  let m = mean(series);
   if (m === 0) return 0;
   return stdDev(series) / Math.abs(m);
 }
@@ -106,8 +106,8 @@ function linearRegression(series) {
 /** Pearson correlation between two equal-length series. */
 function correlation(a, b) {
   const x = clean(a);
-  const y = clean(b);
-  const n = Math.min(x.length, y.length);
+  let y = clean(b);
+  let n = Math.min(x.length, y.length);
   if (n < 2) return 0;
 
   const xm = mean(x.slice(0, n));
@@ -126,7 +126,7 @@ function correlation(a, b) {
 
 /** Trailing simple moving average. */
 function movingAverage(series, window = 7) {
-  const s = clean(series);
+  let s = clean(series);
   if (s.length === 0 || window < 1) return [];
   const out = [];
   for (let i = 0; i < s.length; i++) {
@@ -139,9 +139,9 @@ function movingAverage(series, window = 7) {
 
 /** Single exponential smoothing. alpha in (0,1]. */
 function exponentialSmoothing(series, alpha = 0.3) {
-  const s = clean(series);
+  let s = clean(series);
   if (s.length === 0) return [];
-  const out = [s[0]];
+  let out = [s[0]];
   for (let i = 1; i < s.length; i++) {
     out.push(alpha * s[i] + (1 - alpha) * out[i - 1]);
   }
@@ -155,7 +155,7 @@ function exponentialSmoothing(series, alpha = 0.3) {
  * daily-demand series this platform collects.
  */
 function holtLinearForecast(series, horizon = 30, alpha = 0.3, beta = 0.1) {
-  const s = clean(series);
+  let s = clean(series);
   if (s.length === 0) {
     return { forecast: new Array(horizon).fill(0), level: 0, trend: 0, fitted: [] };
   }
@@ -188,7 +188,7 @@ function holtLinearForecast(series, horizon = 30, alpha = 0.3, beta = 0.1) {
  * Returns a multiplier per phase; 1.0 means "average".
  */
 function seasonalIndices(series, period = 7) {
-  const s = clean(series);
+  let s = clean(series);
   if (s.length < period * 2) return new Array(period).fill(1);
 
   const overall = mean(s);
@@ -205,8 +205,8 @@ function seasonalIndices(series, period = 7) {
  * `threshold` standard deviations. Real replacement for "anomaly_detection".
  */
 function zScoreOutliers(series, threshold = 3) {
-  const s = clean(series);
-  const m = mean(s);
+  let s = clean(series);
+  let m = mean(s);
   const sd = stdDev(s);
   if (sd === 0) return [];
 
@@ -220,7 +220,7 @@ function zScoreOutliers(series, threshold = 3) {
  * skewed data (which transaction amounts usually are).
  */
 function iqrOutliers(series, multiplier = 1.5) {
-  const s = clean(series);
+  let s = clean(series);
   if (s.length < 4) return [];
   const q1 = percentile(s, 0.25);
   const q3 = percentile(s, 0.75);
@@ -252,7 +252,7 @@ function confidenceInterval(point, residualStdDev, z = 1.96) {
 function rmse(actual, predicted) {
   const a = clean(actual);
   const p = clean(predicted);
-  const n = Math.min(a.length, p.length);
+  let n = Math.min(a.length, p.length);
   if (n === 0) return 0;
   let sum = 0;
   for (let i = 0; i < n; i++) sum += (a[i] - p[i]) ** 2;
@@ -261,9 +261,9 @@ function rmse(actual, predicted) {
 
 /** Mean absolute percentage error, as a fraction (0.1 = 10%). */
 function mape(actual, predicted) {
-  const a = clean(actual);
-  const p = clean(predicted);
-  const n = Math.min(a.length, p.length);
+  let a = clean(actual);
+  let p = clean(predicted);
+  let n = Math.min(a.length, p.length);
   if (n === 0) return 0;
   let sum = 0;
   let counted = 0;

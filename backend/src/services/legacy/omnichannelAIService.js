@@ -727,7 +727,7 @@ router.get('/analytics', authMiddleware, async (req, res) => {
  */
 router.get('/config/:channel_type', authMiddleware, async (req, res) => {
   try {
-    const config = await pool.query(
+    let config = await pool.query(
       'SELECT * FROM omnichannel_config WHERE channel_type = $1',
       [req.params.channel_type]
     );
@@ -750,7 +750,7 @@ router.put('/config/:channel_type', authMiddleware, requireRole(...PLATFORM_STAF
   try {
     const { capabilities, settings, enabled } = req.body;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE omnichannel_config 
        SET capabilities = COALESCE($1, capabilities),
            settings = COALESCE($2, settings),

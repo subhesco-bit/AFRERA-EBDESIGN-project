@@ -34,7 +34,7 @@ router.get('/buyers/:id/trust', authenticateToken, async (req, res, next) => {
  */
 router.get('/buyers/:id/reputation', async (req, res, next) => {
   try {
-    const result = await buyerTrustService.getBuyerReputation(req.params.id);
+    let result = await buyerTrustService.getBuyerReputation(req.params.id);
 
     res.json({
       success: true,
@@ -52,7 +52,7 @@ router.get('/buyers/:id/reputation', async (req, res, next) => {
  */
 router.get('/buyers/:id/payment-history', authenticateToken, async (req, res, next) => {
   try {
-    const result = await buyerTrustService.getBuyerPaymentHistory(req.params.id);
+    let result = await buyerTrustService.getBuyerPaymentHistory(req.params.id);
 
     res.json({
       success: true,
@@ -77,7 +77,7 @@ router.post('/buyers/:id/fraud-report',
   }),
   async (req, res, next) => {
     try {
-      const result = await buyerTrustService.reportFraudSuspicion(
+      let result = await buyerTrustService.reportFraudSuspicion(
         req.params.id,
         req.body.reason
       );

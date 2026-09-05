@@ -63,7 +63,7 @@ async function getReview(reviewId) {
 async function getProductReviews(productId, { page = 1, limit = 20 } = {}) {
   try {
     const offset = (page - 1) * limit;
-    const res = await pool.query(
+    let res = await pool.query(
       'SELECT * FROM reviews WHERE product_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
       [productId, 'approved', limit, offset]
     );
@@ -76,7 +76,7 @@ async function getProductReviews(productId, { page = 1, limit = 20 } = {}) {
 
 async function updateReviewStatus(reviewId, status) {
   try {
-    const res = await pool.query('UPDATE reviews SET status = $1, updated_at = NOW() WHERE review_id = $2 RETURNING *', [status, reviewId]);
+    let res = await pool.query('UPDATE reviews SET status = $1, updated_at = NOW() WHERE review_id = $2 RETURNING *', [status, reviewId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error updating review status', { error: error.message });
@@ -97,7 +97,7 @@ function generateId() {
  */
 async function getProductContext(productId) {
   try {
-    const res = await pool.query(
+    let res = await pool.query(
       `SELECT c.name AS category, COALESCE(p.average_rating, 0) AS average_rating
        FROM products p LEFT JOIN categories c ON c.id = p.category_id
        WHERE p.id = $1`,

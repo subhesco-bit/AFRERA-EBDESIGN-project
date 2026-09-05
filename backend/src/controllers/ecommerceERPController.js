@@ -41,7 +41,7 @@ async function generateGSTInvoice(req, res) {
   try {
     const { orderId } = req.params;
     
-    const result = await ecommerceERPService.generateGSTInvoice(orderId);
+    let result = await ecommerceERPService.generateGSTInvoice(orderId);
     
     res.json(result);
   } catch (error) {
@@ -65,7 +65,7 @@ async function syncInventoryWithERP(req, res) {
   try {
     const { productId } = req.params;
     
-    const result = await ecommerceERPService.syncInventoryWithERP(productId);
+    let result = await ecommerceERPService.syncInventoryWithERP(productId);
     
     res.json(result);
   } catch (error) {
@@ -85,7 +85,7 @@ async function createPurchaseOrder(req, res) {
   try {
     const { listingId, quantity } = req.body;
     
-    const result = await ecommerceERPService.createPurchaseOrder(listingId, quantity);
+    let result = await ecommerceERPService.createPurchaseOrder(listingId, quantity);
     
     res.json(result);
   } catch (error) {
@@ -109,7 +109,7 @@ async function syncCustomerWithCRM(req, res) {
   try {
     const { userId } = req.params;
     
-    const result = await ecommerceERPService.syncCustomerWithCRM(userId);
+    let result = await ecommerceERPService.syncCustomerWithCRM(userId);
     
     res.json(result);
   } catch (error) {
@@ -133,7 +133,7 @@ async function createProductionOrder(req, res) {
   try {
     const { productId, demandQuantity } = req.body;
     
-    const result = await ecommerceERPService.createProductionOrder(productId, demandQuantity);
+    let result = await ecommerceERPService.createProductionOrder(productId, demandQuantity);
     
     res.json(result);
   } catch (error) {

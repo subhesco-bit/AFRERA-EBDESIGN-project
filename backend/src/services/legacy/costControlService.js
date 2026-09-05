@@ -83,7 +83,7 @@ class CostControlService {
       }
 
       query += ' ORDER BY code ASC';
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting cost centres', { error: error.message, stack: error.stack });
@@ -93,7 +93,7 @@ class CostControlService {
 
   async getCostCenter(costCenterId) {
     try {
-      const result = await this.pool.query('SELECT * FROM cost_centers WHERE id = $1', [costCenterId]);
+      let result = await this.pool.query('SELECT * FROM cost_centers WHERE id = $1', [costCenterId]);
       if (result.rows.length === 0) throw new Error('Cost centre not found');
       return result.rows[0];
     } catch (error) {
@@ -118,7 +118,7 @@ class CostControlService {
         JOIN chart_of_accounts coa ON coa.id = jl.account_id
         WHERE jl.cost_center_id = $1 AND je.status = 'posted'
       `;
-      const params = [costCenterId];
+      let params = [costCenterId];
       let paramCount = 1;
 
       if (filters.fiscalPeriodId) {
@@ -128,7 +128,7 @@ class CostControlService {
       }
 
       query += ' GROUP BY coa.account_type ORDER BY coa.account_type';
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting cost centre actuals', { error: error.message, stack: error.stack });
@@ -147,7 +147,7 @@ class CostControlService {
       if (!code) throw new Error('code is required');
       if (!name) throw new Error('name is required');
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO profit_centers
            (company_id, code, name, parent_profit_center_id, business_unit_id, responsible_user_id)
          VALUES ($1, $2, $3, $4, $5, $6)
@@ -167,7 +167,7 @@ class CostControlService {
     try {
       if (!companyId) throw new Error('companyId is required');
       let query = 'SELECT * FROM profit_centers WHERE company_id = $1';
-      const params = [companyId];
+      let params = [companyId];
 
       if (filters.isActive !== undefined) {
         query += ' AND is_active = $2';
@@ -175,7 +175,7 @@ class CostControlService {
       }
 
       query += ' ORDER BY code ASC';
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting profit centres', { error: error.message, stack: error.stack });
@@ -195,7 +195,7 @@ class CostControlService {
       if (!code) throw new Error('code is required');
       if (!name) throw new Error('name is required');
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO budgets (company_id, fiscal_year_id, code, name, budget_type)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
@@ -214,7 +214,7 @@ class CostControlService {
     try {
       if (!companyId) throw new Error('companyId is required');
       let query = 'SELECT * FROM budgets WHERE company_id = $1';
-      const params = [companyId];
+      let params = [companyId];
       let paramCount = 1;
 
       if (filters.status) {
@@ -229,7 +229,7 @@ class CostControlService {
       }
 
       query += ' ORDER BY code ASC';
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting budgets', { error: error.message, stack: error.stack });
@@ -239,7 +239,7 @@ class CostControlService {
 
   async getBudget(budgetId) {
     try {
-      const result = await this.pool.query('SELECT * FROM budgets WHERE id = $1', [budgetId]);
+      let result = await this.pool.query('SELECT * FROM budgets WHERE id = $1', [budgetId]);
       if (result.rows.length === 0) throw new Error('Budget not found');
       return result.rows[0];
     } catch (error) {
@@ -251,7 +251,7 @@ class CostControlService {
   /** Draft -> submitted -> approved/rejected, matching the budgets.status CHECK constraint. */
   async submitBudget(budgetId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE budgets SET status = 'submitted' WHERE id = $1 AND status = 'draft' RETURNING *`,
         [budgetId]
       );
@@ -267,7 +267,7 @@ class CostControlService {
 
   async approveBudget(budgetId, approverId, approved = true) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE budgets
          SET status = $1, approved_by = $2, approved_at = NOW()
          WHERE id = $3 AND status = 'submitted'
@@ -294,7 +294,7 @@ class CostControlService {
       // Belt-and-braces: the budget must exist before a line can reference it.
       await this.getBudget(budgetId);
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO budget_lines
            (budget_id, account_id, cost_center_id, profit_center_id, fiscal_period_id, budgeted_amount, notes)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -311,7 +311,7 @@ class CostControlService {
 
   async getBudgetLines(budgetId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT bl.*, coa.account_code, coa.account_name
          FROM budget_lines bl
          JOIN chart_of_accounts coa ON coa.id = bl.account_id
@@ -370,7 +370,7 @@ class CostControlService {
         ORDER BY coa.account_code
       `;
 
-      const result = await this.pool.query(query, [budgetId]);
+      let result = await this.pool.query(query, [budgetId]);
       const totalBudgeted = result.rows.reduce((s, r) => s + Number(r.budgeted_amount), 0);
       const totalActual = result.rows.reduce((s, r) => s + Number(r.actual_amount), 0);
 

@@ -48,27 +48,27 @@ async function createUser({ name, email, password, role = 'farmer', status = 'ac
 }
 
 async function getUserById(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT id, name, email, role, status, created_at, updated_at FROM users WHERE id = $1', [id]);
+  let res = await pg.query('SELECT id, name, email, role, status, created_at, updated_at FROM users WHERE id = $1', [id]);
   return res.rows[0] || null;
 }
 
 async function getUserByEmail(email) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1', [email]);
+  let res = await pg.query('SELECT * FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1', [email]);
   return res.rows[0] || null;
 }
 
 async function listUsers({ page = 1, limit = 20 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const offset = (page - 1) * limit;
   const totalRes = await pg.query('SELECT COUNT(*) FROM users');
   const total = parseInt(totalRes.rows[0].count || '0');
-  const res = await pg.query('SELECT id, name, email, role, status, created_at FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2', [limit, offset]);
+  let res = await pg.query('SELECT id, name, email, role, status, created_at FROM users ORDER BY created_at DESC LIMIT $1 OFFSET $2', [limit, offset]);
 
   return {
     users: res.rows,
@@ -77,9 +77,9 @@ async function listUsers({ page = 1, limit = 20 } = {}) {
 }
 
 async function updateUser(id, { name, email, role, status }) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE users SET name = COALESCE($1, name), email = COALESCE($2, email), role = COALESCE($3, role), status = COALESCE($4, status), updated_at = NOW() WHERE id = $5 RETURNING id, name, email, role, status, updated_at`,
     [name, email, role, status, id]
   );
@@ -87,24 +87,24 @@ async function updateUser(id, { name, email, role, status }) {
 }
 
 async function deleteUser(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   // Soft-delete by setting status to 'deleted'
-  const res = await pg.query('UPDATE users SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id', ['deleted', id]);
+  let res = await pg.query('UPDATE users SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING id', ['deleted', id]);
   return !!res.rows[0];
 }
 
 async function changePassword(id, newPassword) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const hashed = await bcrypt.hash(newPassword, 12);
+  let hashed = await bcrypt.hash(newPassword, 12);
   await pg.query('UPDATE users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [hashed, id]);
   return true;
 }
 
 // AI-powered user analytics
 async function getUserAnalytics(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get user activity patterns
@@ -147,10 +147,10 @@ async function getUserAnalytics(userId) {
 }
 
 async function getUserActivity(userId, { limit = 50 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM audit_logs
      WHERE user_id = $1
      ORDER BY created_at DESC
@@ -162,7 +162,7 @@ async function getUserActivity(userId, { limit = 50 } = {}) {
 }
 
 async function getUserEngagementScore(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Calculate engagement score based on activity frequency and recency
@@ -201,7 +201,7 @@ async function getUserEngagementScore(userId) {
 }
 
 async function getUserBehaviorProfile(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Analyze user behavior patterns
@@ -256,7 +256,7 @@ function generateUserRecommendations(activityPattern, failedLogins) {
 }
 
 function generateBehaviorRecommendations(timePattern, dayPattern) {
-  const recommendations = [];
+  let recommendations = [];
   
   if (timePattern.length > 0) {
     const peakHour = timePattern[0].hour;
@@ -281,7 +281,7 @@ function generateBehaviorRecommendations(timePattern, dayPattern) {
 }
 
 async function bulkCreateUsers(users) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const results = [];

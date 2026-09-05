@@ -93,7 +93,7 @@ async function createComparisonConfig(configData) {
       baseline_entity_id
     } = configData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO comparison_configs 
        (config_id, group_id, config_name, metrics_to_compare, dimensions_to_compare, 
         weightings, normalization_method, aggregation_method, baseline_entity_id, status, created_at)
@@ -128,7 +128,7 @@ async function createComparisonConfig(configData) {
 async function runComparison(configId, comparisonDate, periodStart, periodEnd) {
   try {
     const config = await getComparisonConfig(configId);
-    const group = await getComparisonGroup(config.group_id);
+    let group = await getComparisonGroup(config.group_id);
 
     const entityScores = {};
     const metricComparisons = {};
@@ -150,7 +150,7 @@ async function runComparison(configId, comparisonDate, periodStart, periodEnd) {
     const gaps = calculateGaps(entityScores, config.baseline_entity_id);
 
     // AI-powered insights
-    const aiRequest = {
+    let aiRequest = {
       task: 'comparison_insights',
       parameters: {
         entity_scores: entityScores,
@@ -161,9 +161,9 @@ async function runComparison(configId, comparisonDate, periodStart, periodEnd) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO comparison_results 
        (result_id, config_id, comparison_date, period_start, period_end, 
         entity_scores, metric_comparisons, rankings, gaps, insights, recommendations, generated_at)
@@ -209,7 +209,7 @@ async function addBenchmark(benchmarkData) {
       period
     } = benchmarkData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO comparison_benchmarks 
        (benchmark_id, group_id, benchmark_name, benchmark_type, benchmark_values, 
         source, industry, region, period, status, created_at)
@@ -243,7 +243,7 @@ async function addBenchmark(benchmarkData) {
  */
 async function getBenchmarks(groupId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM comparison_benchmarks WHERE group_id = $1 AND status = $2',
       [groupId, 'active']
     );
@@ -270,7 +270,7 @@ async function createComparisonAlert(alertData) {
       message
     } = alertData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO comparison_alerts 
        (alert_id, config_id, entity_id, alert_type, alert_condition, 
         threshold_value, current_value, severity, message, triggered_at)
@@ -316,7 +316,7 @@ async function getComparisonAlerts(configId, filters = {}) {
 
     query += ' ORDER BY triggered_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting comparison alerts', { error: error.message });
@@ -331,7 +331,7 @@ async function createSnapshot(configId, snapshotName, comparisonDate, createdBy)
   try {
     const latestResult = await getLatestComparisonResult(configId);
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO comparison_snapshots 
        (snapshot_id, config_id, snapshot_name, snapshot_data, comparison_date, created_by, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -370,7 +370,7 @@ async function getComparisonBestPractices(groupType) {
 
 async function getSimilarGroups(groupType) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM comparison_groups WHERE group_type = $1 LIMIT 5',
       [groupType]
     );
@@ -382,7 +382,7 @@ async function getSimilarGroups(groupType) {
 
 async function getComparisonConfig(configId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM comparison_configs WHERE config_id = $1',
       [configId]
     );
@@ -394,7 +394,7 @@ async function getComparisonConfig(configId) {
 
 async function getComparisonGroup(groupId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM comparison_groups WHERE group_id = $1',
       [groupId]
     );
@@ -434,7 +434,7 @@ async function getGroupContext(groupId) {
 
 async function getLatestComparisonResult(configId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM comparison_results WHERE config_id = $1 ORDER BY generated_at DESC LIMIT 1',
       [configId]
     );

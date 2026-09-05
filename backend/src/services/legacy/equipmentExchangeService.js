@@ -37,7 +37,7 @@ class EquipmentExchangeService {
     if (stateId) { if (!Number.isInteger(stateId) || stateId < 1 || stateId > 100000) throw new Error('stateId is outside the allowed range'); params.push(stateId); conditions.push(`state_id = $${params.length}`); }
     if (pricingType) { if (!['free', 'priced'].includes(pricingType)) throw new Error('pricingType must be free or priced'); params.push(pricingType); conditions.push(`pricing_type = $${params.length}`); }
 
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT eel.*, u.name AS listed_by_name
          FROM equipment_exchange_listings eel
          JOIN users u ON u.id = eel.listed_by
@@ -49,7 +49,7 @@ class EquipmentExchangeService {
   }
 
   async getListing(listingId) {
-    const result = await pool.query(
+    let result = await pool.query(
       `SELECT eel.*, u.name AS listed_by_name
          FROM equipment_exchange_listings eel
          JOIN users u ON u.id = eel.listed_by
@@ -61,7 +61,7 @@ class EquipmentExchangeService {
   }
 
   async reserveListing(listingId, reservedBy) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE equipment_exchange_listings SET status = 'reserved', reserved_by = $1, updated_at = NOW()
        WHERE id = $2 AND status = 'available' RETURNING *`,
       [reservedBy, listingId]
@@ -71,7 +71,7 @@ class EquipmentExchangeService {
   }
 
   async completeExchange(listingId, listedBy) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE equipment_exchange_listings SET status = 'exchanged', updated_at = NOW()
        WHERE id = $1 AND listed_by = $2 AND status = 'reserved' RETURNING *`,
       [listingId, listedBy]
@@ -81,7 +81,7 @@ class EquipmentExchangeService {
   }
 
   async withdrawListing(listingId, listedBy) {
-    const result = await pool.query(
+    let result = await pool.query(
       `UPDATE equipment_exchange_listings SET status = 'withdrawn', updated_at = NOW()
        WHERE id = $1 AND listed_by = $2 AND status IN ('available', 'reserved') RETURNING *`,
       [listingId, listedBy]

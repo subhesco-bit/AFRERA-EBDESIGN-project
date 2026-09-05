@@ -143,7 +143,7 @@ class ConfigRegistry {
    */
   async _createDefaultConfig(serviceName, metadata = {}) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `INSERT INTO service_configs
          (service_name, category, enabled, config, metadata)
          VALUES ($1, $2, $3, $4, $5)
@@ -158,7 +158,7 @@ class ConfigRegistry {
         ]
       );
 
-      const config = result.rows[0];
+      let config = result.rows[0];
       this.cache.set(serviceName, config);
       return config;
     } catch (error) {
@@ -172,7 +172,7 @@ class ConfigRegistry {
    */
   async updateServiceConfig(serviceName, updates) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `UPDATE service_configs
          SET config = jsonb_set(config, '{}', $2),
              updated_at = NOW()
@@ -198,7 +198,7 @@ class ConfigRegistry {
    */
   async setServiceEnabled(serviceName, enabled) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `UPDATE service_configs
          SET enabled = $2, updated_at = NOW()
          WHERE service_name = $1
@@ -222,7 +222,7 @@ class ConfigRegistry {
    * Check if service is enabled
    */
   async isServiceEnabled(serviceName) {
-    const config = await this.getServiceConfig(serviceName);
+    let config = await this.getServiceConfig(serviceName);
     return config?.enabled ?? true;
   }
 
@@ -232,7 +232,7 @@ class ConfigRegistry {
    */
   async loadAllConfigs() {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         'SELECT * FROM service_configs ORDER BY priority DESC'
       );
 
@@ -259,7 +259,7 @@ class ConfigRegistry {
     }
 
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         'SELECT * FROM feature_flags WHERE feature_name = $1',
         [featureName]
       );
@@ -281,7 +281,7 @@ class ConfigRegistry {
    * Check if feature is enabled
    */
   async isFeatureEnabled(featureName) {
-    const flag = await this.getFeatureFlag(featureName);
+    let flag = await this.getFeatureFlag(featureName);
     return flag?.enabled ?? false;
   }
 
@@ -290,7 +290,7 @@ class ConfigRegistry {
    */
   async setFeatureFlag(featureName, enabled, config = {}) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `INSERT INTO feature_flags (feature_name, enabled, config)
          VALUES ($1, $2, $3)
          ON CONFLICT (feature_name)
@@ -316,7 +316,7 @@ class ConfigRegistry {
    */
   async loadAllFeatureFlags() {
     try {
-      const result = await this.db.query('SELECT * FROM feature_flags');
+      let result = await this.db.query('SELECT * FROM feature_flags');
 
       for (const flag of result.rows) {
         this.featureFlags.set(flag.feature_name, flag);
@@ -335,7 +335,7 @@ class ConfigRegistry {
    */
   async getVersionRouting(serviceName) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `SELECT * FROM version_routing
          WHERE service_name = $1 AND enabled = true
          ORDER BY percentage DESC`,
@@ -354,7 +354,7 @@ class ConfigRegistry {
    */
   async setVersionRouting(serviceName, version, percentage, config = {}) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `INSERT INTO version_routing (service_name, version, percentage, config)
          VALUES ($1, $2, $3, $4)
          ON CONFLICT (service_name, version)
@@ -385,7 +385,7 @@ class ConfigRegistry {
     }
 
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `SELECT * FROM tenant_config_overrides
          WHERE tenant_id = $1 AND service_name = $2`,
         [tenantId, serviceName]
@@ -411,7 +411,7 @@ class ConfigRegistry {
    */
   async setTenantConfigOverride(tenantId, serviceName, config) {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         `INSERT INTO tenant_config_overrides (tenant_id, service_name, config)
          VALUES ($1, $2, $3)
          ON CONFLICT (tenant_id, service_name)
@@ -420,7 +420,7 @@ class ConfigRegistry {
         [tenantId, serviceName, JSON.stringify(config)]
       );
 
-      const key = `${tenantId}:${serviceName}`;
+      let key = `${tenantId}:${serviceName}`;
       this.tenantOverrides.set(key, result.rows[0]);
 
       logger.info(`Tenant override set: ${tenantId}/${serviceName}`);
@@ -483,7 +483,7 @@ class ConfigRegistry {
    */
   async getDisabledServices() {
     try {
-      const result = await this.db.query(
+      let result = await this.db.query(
         'SELECT service_name FROM service_configs WHERE enabled = false'
       );
 

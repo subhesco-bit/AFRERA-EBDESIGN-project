@@ -42,7 +42,7 @@ async function segmentCustomersRFM(req, res) {
  */
 async function segmentCustomersBehavioral(req, res) {
   try {
-    const result = await ecommerceAIService.segmentCustomersBehavioral();
+    let result = await ecommerceAIService.segmentCustomersBehavioral();
     
     res.json(result);
   } catch (error) {
@@ -67,7 +67,7 @@ async function forecastProductDemand(req, res) {
     const { productId } = req.params;
     const { horizonDays } = req.body;
     
-    const result = await ecommerceAIService.forecastProductDemand(productId, horizonDays || 30);
+    let result = await ecommerceAIService.forecastProductDemand(productId, horizonDays || 30);
     
     res.json(result);
   } catch (error) {
@@ -91,7 +91,7 @@ async function optimizeInventory(req, res) {
   try {
     const { productId } = req.params;
     
-    const result = await ecommerceAIService.optimizeInventory(productId);
+    let result = await ecommerceAIService.optimizeInventory(productId);
     
     res.json(result);
   } catch (error) {
@@ -116,7 +116,7 @@ async function getPersonalizedRecommendations(req, res) {
     const { userId } = req.params;
     const { limit } = req.query;
     
-    const result = await ecommerceAIService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
+    let result = await ecommerceAIService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
     
     res.json(result);
   } catch (error) {
@@ -140,7 +140,7 @@ async function predictSales(req, res) {
   try {
     const { categoryId, periodDays } = req.body;
     
-    const result = await ecommerceAIService.predictSales(categoryId, periodDays || 30);
+    let result = await ecommerceAIService.predictSales(categoryId, periodDays || 30);
     
     res.json(result);
   } catch (error) {
@@ -164,7 +164,7 @@ async function calculateCustomerLifetimeValue(req, res) {
   try {
     const { userId } = req.params;
     
-    const result = await ecommerceAIService.calculateCustomerLifetimeValue(userId);
+    let result = await ecommerceAIService.calculateCustomerLifetimeValue(userId);
     
     res.json(result);
   } catch (error) {
@@ -188,7 +188,7 @@ async function analyzeMarketBasket(req, res) {
   try {
     const { categoryId } = req.query;
     
-    const result = await ecommerceAIService.analyzeMarketBasket(categoryId);
+    let result = await ecommerceAIService.analyzeMarketBasket(categoryId);
     
     res.json(result);
   } catch (error) {

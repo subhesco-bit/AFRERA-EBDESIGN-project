@@ -64,7 +64,7 @@ export default function AIChat() {
     setLoading(true);
 
     try {
-      const response = await api.post('/ai/unified', {
+      let response = await api.post('/ai/unified', {
         requestType: 'conversational',
         query: userMessage.content,
         agentPreference: selectedAgent,

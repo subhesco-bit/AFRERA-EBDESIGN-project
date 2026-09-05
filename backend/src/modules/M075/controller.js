@@ -14,7 +14,7 @@ async function registerPigHerd(req, res) {
 
 async function getPigHerd(req, res) {
   try {
-    const herd = await service.getPigHerd(req.params.herdId);
+    let herd = await service.getPigHerd(req.params.herdId);
     if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
     res.json({ success: true, data: herd });
   } catch (error) {
@@ -36,7 +36,7 @@ async function listPigHerds(req, res) {
 
 async function updatePigHerd(req, res) {
   try {
-    const herd = await service.updatePigHerd(req.params.herdId, req.body);
+    let herd = await service.updatePigHerd(req.params.herdId, req.body);
     if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
     res.json({ success: true, data: herd });
   } catch (error) {

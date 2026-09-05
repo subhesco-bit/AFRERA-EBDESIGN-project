@@ -263,7 +263,7 @@ class UnifiedConfigService {
    * Set configuration value
    */
   set(path, value) {
-    const keys = path.split('.');
+    let keys = path.split('.');
     let config = this.config;
     
     for (let i = 0; i < keys.length - 1; i++) {

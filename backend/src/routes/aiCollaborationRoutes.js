@@ -20,7 +20,7 @@ router.get('/context', async (req, res) => {
 
 router.put('/context', async (req, res) => {
   try {
-    const context = await aiCollaborationService.updateSharedContext(req.body || {});
+    let context = await aiCollaborationService.updateSharedContext(req.body || {});
     res.json({ success: true, data: context });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -80,7 +80,7 @@ router.post('/handoff/:handoffId/accept', async (req, res) => {
     if (!acceptingAI) {
       return res.status(400).json({ success: false, error: 'accepting_ai is required' });
     }
-    const handoff = await aiCollaborationService.acceptHandoff(req.params.handoffId, acceptingAI);
+    let handoff = await aiCollaborationService.acceptHandoff(req.params.handoffId, acceptingAI);
     res.json({ success: true, data: handoff });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

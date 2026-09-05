@@ -26,7 +26,7 @@ const getSparePart = async (req, res) => {
 
 const registerSparePart = async (req, res) => {
   try {
-    const part = await partsService.registerSparePart(req.body);
+    let part = await partsService.registerSparePart(req.body);
     res.status(201).json({ success: true, data: part });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

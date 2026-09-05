@@ -117,7 +117,7 @@ async function addGroupMember(groupId, farmerId, membershipData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO group_memberships 
        (membership_id, group_id, farmer_id, membership_type, role, join_date, 
         contribution_amount, share_percentage, voting_rights, status, created_at)
@@ -167,7 +167,7 @@ async function recordGroupMeeting(groupId, meetingData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO group_meetings 
        (meeting_id, group_id, meeting_type, meeting_date, meeting_time, location, 
         agenda, attendees, minutes, decisions, action_items, created_at)
@@ -209,7 +209,7 @@ async function recordGroupTransaction(groupId, transactionData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO group_finances 
        (finance_id, group_id, transaction_type, amount, description, category, 
         transaction_date, reference_number, created_by, created_at)
@@ -236,7 +236,7 @@ async function recordGroupTransaction(groupId, transactionData) {
  */
 async function getGroupAnalytics(groupId) {
   try {
-    const group = await pool.query('SELECT * FROM farmer_groups WHERE group_id = $1', [groupId]);
+    let group = await pool.query('SELECT * FROM farmer_groups WHERE group_id = $1', [groupId]);
     if (group.rows.length === 0) {
       throw new Error('Group not found');
     }
@@ -276,7 +276,7 @@ function generateId() {
 
 async function getRegionalGroups(state, district) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM farmer_groups WHERE state = $1 AND district = $2',
       [state, district]
     );
@@ -304,7 +304,7 @@ async function getSuccessFactors(groupType) {
 }
 
 async function generateGroupInsights(groupId, members, finances) {
-  const aiRequest = {
+  let aiRequest = {
     task: 'group_analytics_insights',
     parameters: {
       group_id: groupId,
@@ -313,7 +313,7 @@ async function generateGroupInsights(groupId, members, finances) {
     }
   };
 
-  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+  let aiResponse = await aiAPI.generateRecommendation(aiRequest);
   return aiResponse;
 }
 

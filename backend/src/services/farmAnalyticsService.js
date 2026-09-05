@@ -21,7 +21,7 @@ class FarmAnalyticsService {
 
   async getDashboard(farmId) {
     try {
-      const report = await db('farm_analytics_reports').where('farm_id', farmId).orderBy('created_at', 'desc').first();
+      let report = await db('farm_analytics_reports').where('farm_id', farmId).orderBy('created_at', 'desc').first();
       return { farm_id: farmId, dashboard: report ? JSON.parse(report.report_data) : {} };
     } catch (error) { logger.error(`Get dashboard failed: ${error.message}`); throw error; }
   }

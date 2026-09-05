@@ -26,10 +26,10 @@ async function getSetting(req, res) {
 
 async function upsertSetting(req, res) {
   try {
-    const name = req.params.name;
+    let name = req.params.name;
     const value = req.body.value;
     const description = req.body.description;
-    const row = await service.upsertSetting(name, value, description);
+    let row = await service.upsertSetting(name, value, description);
     res.json({ success: true, data: row });
   } catch (error) {
     logger.error('upsertSetting error', { error: error.message });

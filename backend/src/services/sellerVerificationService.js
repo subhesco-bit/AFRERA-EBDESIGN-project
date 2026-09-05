@@ -67,7 +67,7 @@ class SellerVerificationService {
    */
   async getVerificationStatus(sellerId) {
     try {
-      const verification = await db('seller_verifications')
+      let verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .orderBy('submission_date', 'desc')
         .first();
@@ -101,7 +101,7 @@ class SellerVerificationService {
    */
   async verifySellerAccount(sellerId, adminNotes = '') {
     try {
-      const verification = await db('seller_verifications')
+      let verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .orderBy('submission_date', 'desc')
         .first();
@@ -154,7 +154,7 @@ class SellerVerificationService {
    */
   async rejectVerification(sellerId, reason) {
     try {
-      const verification = await db('seller_verifications')
+      let verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .orderBy('submission_date', 'desc')
         .first();
@@ -210,7 +210,7 @@ class SellerVerificationService {
    */
   async calculateTrustScore(sellerId) {
     try {
-      const verification = await db('seller_verifications')
+      let verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .where('status', 'verified')
         .first();

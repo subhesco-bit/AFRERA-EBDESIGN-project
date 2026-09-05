@@ -245,7 +245,7 @@ async function handleShipmentQuery(messageText) {
     );
     const latest = trackingRows[0];
 
-    const lines = [
+    let lines = [
       `Shipment ${shipment.shipment_number}: status ${shipment.status}`,
       `From ${shipment.origin_address} to ${shipment.destination_address}`
     ];

@@ -71,7 +71,7 @@ router.get('/distributions', authMiddleware, async (req, res) => {
 
 router.get('/distributions/:id', authMiddleware, async (req, res) => {
   try {
-    const distribution = await cooperativeShareService.getDistribution(req.params.id);
+    let distribution = await cooperativeShareService.getDistribution(req.params.id);
     res.json({ success: true, data: distribution });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });

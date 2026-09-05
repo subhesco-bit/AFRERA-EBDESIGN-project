@@ -178,7 +178,7 @@ class RedisCacheService {
       }
 
       const values = await this.redis.mget(...keys);
-      const result = {};
+      let result = {};
       
       keys.forEach((key, index) => {
         if (values[index] !== null) {
@@ -298,7 +298,7 @@ class RedisCacheService {
    * Get value with complex key
    */
   async getWithPrefix(prefix, key) {
-    const fullKey = `${prefix}:${key}`;
+    let fullKey = `${prefix}:${key}`;
     return await this.get(fullKey);
   }
 

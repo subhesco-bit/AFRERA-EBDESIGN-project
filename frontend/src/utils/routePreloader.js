@@ -215,7 +215,7 @@ export function usePredictivePreloader() {
     if (history.length < 2) return;
 
     // Simple prediction: preload routes that were visited after current route
-    const currentPath = history[history.length - 1].path;
+    let currentPath = history[history.length - 1].path;
 
     // Find patterns in navigation history
     const patterns = findNavigationPatterns(history);
@@ -235,7 +235,7 @@ export function usePredictivePreloader() {
  * Find navigation patterns in history
  */
 function findNavigationPatterns(history) {
-  const patterns = [];
+  let patterns = [];
   const patternMap = new Map();
 
   for (let i = 0; i < history.length - 1; i++) {

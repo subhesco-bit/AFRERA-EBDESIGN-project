@@ -121,7 +121,7 @@ class ProductReviewService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       // Get total count
       const countQuery = `
@@ -152,7 +152,7 @@ class ProductReviewService {
    */
   async getProductReviewStats(productId) {
     try {
-      const query = `
+      let query = `
         SELECT 
           COUNT(*) as total_reviews,
           AVG(rating) as average_rating,
@@ -166,7 +166,7 @@ class ProductReviewService {
         WHERE product_id = $1 AND status = 'approved'
       `;
 
-      const result = await this.pool.query(query, [productId]);
+      let result = await this.pool.query(query, [productId]);
       const stats = result.rows[0];
 
       return {
@@ -193,7 +193,7 @@ class ProductReviewService {
    */
   async updateProductRating(productId) {
     try {
-      const query = `
+      let query = `
         UPDATE products
         SET 
           average_rating = (
@@ -211,7 +211,7 @@ class ProductReviewService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [productId]);
+      let result = await this.pool.query(query, [productId]);
       return result.rows[0];
     } catch (error) {
       logger.error('Error updating product rating', { error: error.message, stack: error.stack });
@@ -277,7 +277,7 @@ class ProductReviewService {
     const { rating, title, comment, images } = updateData;
 
     try {
-      const query = `
+      let query = `
         UPDATE product_reviews
         SET 
           rating = COALESCE($1, rating),
@@ -289,7 +289,7 @@ class ProductReviewService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         rating,
         title,
         comment,
@@ -318,14 +318,14 @@ class ProductReviewService {
   async deleteReview(reviewId, userId, isAdmin = false) {
     try {
       let query = 'DELETE FROM product_reviews WHERE id = $1';
-      const params = [reviewId];
+      let params = [reviewId];
 
       if (!isAdmin) {
         query += ' AND user_id = $2';
         params.push(userId);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       if (result.rowCount === 0) {
         throw new Error('Review not found or unauthorized');
@@ -344,7 +344,7 @@ class ProductReviewService {
    */
   async moderateReview(reviewId, status, moderatorId) {
     try {
-      const query = `
+      let query = `
         UPDATE product_reviews
         SET 
           status = $1,
@@ -354,7 +354,7 @@ class ProductReviewService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [status, moderatorId, reviewId]);
+      let result = await this.pool.query(query, [status, moderatorId, reviewId]);
 
       // Update product rating if approved
       if (status === 'approved') {
@@ -373,9 +373,9 @@ class ProductReviewService {
    */
   async getUserReviews(userId, page = 1, limit = 20) {
     try {
-      const offset = (page - 1) * limit;
+      let offset = (page - 1) * limit;
 
-      const query = `
+      let query = `
         SELECT 
           pr.*,
           p.name as product_name,
@@ -388,7 +388,7 @@ class ProductReviewService {
         LIMIT $2 OFFSET $3
       `;
 
-      const result = await this.pool.query(query, [userId, limit, offset]);
+      let result = await this.pool.query(query, [userId, limit, offset]);
 
       return {
         reviews: result.rows,
@@ -405,13 +405,13 @@ class ProductReviewService {
    */
   async reportReview(reviewId, userId, reason) {
     try {
-      const query = `
+      let query = `
         INSERT INTO review_reports (review_id, reporter_id, reason, status)
         VALUES ($1, $2, $3, 'pending')
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [reviewId, userId, reason]);
+      let result = await this.pool.query(query, [reviewId, userId, reason]);
 
       logger.info(`Review ${reviewId} reported by user ${userId}`);
       return result.rows[0];

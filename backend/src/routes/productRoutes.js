@@ -150,7 +150,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/:id', verifyToken, async (req, res) => {
   try {
-    const product = products.find((p) => p.id === req.params.id);
+    let product = products.find((p) => p.id === req.params.id);
 
     if (!product) {
       return res.status(404).json({

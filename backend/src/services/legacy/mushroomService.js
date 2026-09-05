@@ -58,7 +58,7 @@ class MushroomService {
   async getMushroomById(mushroomId) {
     try {
       const query = 'SELECT * FROM mushroom_cultivation WHERE id = $1';
-      const result = await this.pool.query(query, [mushroomId]);
+      let result = await this.pool.query(query, [mushroomId]);
       
       if (result.rows.length === 0) {
         throw new Error('Mushroom cultivation not found');
@@ -87,13 +87,13 @@ class MushroomService {
         expected_yield_kg
       } = mushroomData;
 
-      const query = `
+      let query = `
         INSERT INTO mushroom_cultivation (farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg
       ]);
 
@@ -109,13 +109,13 @@ class MushroomService {
    */
   async getSpawnManagement(mushroomId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM spawn_management
         WHERE mushroom_id = $1
         ORDER BY spawn_date DESC
       `;
 
-      const result = await this.pool.query(query, [mushroomId]);
+      let result = await this.pool.query(query, [mushroomId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting spawn management:', error);
@@ -128,13 +128,13 @@ class MushroomService {
    */
   async getSubstrateManagement(mushroomId) {
     try {
-      const query = `
+      let query = `
         SELECT * FROM substrate_management
         WHERE mushroom_id = $1
         ORDER BY preparation_date DESC
       `;
 
-      const result = await this.pool.query(query, [mushroomId]);
+      let result = await this.pool.query(query, [mushroomId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting substrate management:', error);

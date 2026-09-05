@@ -169,7 +169,7 @@ function validateField(field, value, rules, data, path = '') {
       });
     }
     if (rules.pattern) {
-      const regex = getPattern(rules.pattern);
+      let regex = getPattern(rules.pattern);
       if (!regex.test(value)) {
         errors.push({
           field: fieldPath,
@@ -440,7 +440,7 @@ function validateType(field, value, type) {
  * Validate data against schema
  */
 function validate(data, schema, path = '') {
-  const errors = [];
+  let errors = [];
   
   for (const [field, rules] of Object.entries(schema)) {
     const value = data[field];
@@ -495,7 +495,7 @@ function validateBody(schema, options = {}) {
         req.body = sanitize(req.body, schema);
       }
       
-      const errors = validate(req.body, schema);
+      let errors = validate(req.body, schema);
       
       if (errors.length > 0) {
         logger.warn('Validation failed', {
@@ -535,7 +535,7 @@ function validateQuery(schema, options = {}) {
         req.query = sanitize(req.query, schema);
       }
       
-      const errors = validate(req.query, schema);
+      let errors = validate(req.query, schema);
       
       if (errors.length > 0) {
         logger.warn('Query validation failed', {
@@ -575,7 +575,7 @@ function validateParams(schema, options = {}) {
         req.params = sanitize(req.params, schema);
       }
       
-      const errors = validate(req.params, schema);
+      let errors = validate(req.params, schema);
       
       if (errors.length > 0) {
         logger.warn('Params validation failed', {
@@ -609,15 +609,15 @@ function validateParams(schema, options = {}) {
  * Async validation support
  */
 async function validateAsync(data, schema, path = '') {
-  const errors = [];
+  let errors = [];
   
   for (const [field, rules] of Object.entries(schema)) {
-    const value = data[field];
+    let value = data[field];
     
     // Handle async custom validators
     if (rules.customAsync && typeof rules.customAsync === 'function') {
       try {
-        const customError = await rules.customAsync(value, data, path ? `${path}.${field}` : field);
+        let customError = await rules.customAsync(value, data, path ? `${path}.${field}` : field);
         if (customError) {
           errors.push({
             field: path ? `${path}.${field}` : field,
@@ -636,7 +636,7 @@ async function validateAsync(data, schema, path = '') {
       }
     }
     
-    const fieldErrors = validateField(field, value, rules, data, path);
+    let fieldErrors = validateField(field, value, rules, data, path);
     errors.push(...fieldErrors);
   }
   
@@ -653,7 +653,7 @@ function validateBodyAsync(schema, options = {}) {
         req.body = sanitize(req.body, schema);
       }
       
-      const errors = await validateAsync(req.body, schema);
+      let errors = await validateAsync(req.body, schema);
       
       if (errors.length > 0) {
         logger.warn('Async validation failed', {

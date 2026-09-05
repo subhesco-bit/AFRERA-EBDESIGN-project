@@ -60,7 +60,7 @@ router.post('/perception', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.perceptionProcess(input, context || {});
+    let result = await aiBrainService.perceptionProcess(input, context || {});
     
     res.json(result);
   } catch (error) {
@@ -87,7 +87,7 @@ router.post('/attention', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.attentionProcess(perception, goals || []);
+    let result = await aiBrainService.attentionProcess(perception, goals || []);
     
     res.json(result);
   } catch (error) {
@@ -114,7 +114,7 @@ router.post('/reasoning', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.reasoningProcess(attention, knowledge || {});
+    let result = await aiBrainService.reasoningProcess(attention, knowledge || {});
     
     res.json(result);
   } catch (error) {
@@ -141,7 +141,7 @@ router.post('/learning', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.learningProcess(experience, outcome);
+    let result = await aiBrainService.learningProcess(experience, outcome);
     
     res.json(result);
   } catch (error) {
@@ -168,7 +168,7 @@ router.post('/decision', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.decisionProcess(
+    let result = await aiBrainService.decisionProcess(
       reasoning,
       context || {},
       constraints || {}
@@ -199,7 +199,7 @@ router.post('/planning', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.planningProcess(
+    let result = await aiBrainService.planningProcess(
       decision,
       current_state || {},
       target_state || {}
@@ -282,7 +282,7 @@ router.get('/knowledge/:domain', (req, res) => {
  */
 router.get('/knowledge', (req, res) => {
   try {
-    const knowledge = Array.from(aiBrainService.knowledgeGraph.entries()).map(([domain, data]) => ({
+    let knowledge = Array.from(aiBrainService.knowledgeGraph.entries()).map(([domain, data]) => ({
       domain,
       timestamp: data.timestamp,
       confidence: data.confidence
@@ -351,7 +351,7 @@ router.put('/context', (req, res) => {
  */
 router.delete('/working-memory', (req, res) => {
   try {
-    const result = aiBrainService.clearWorkingMemory();
+    let result = aiBrainService.clearWorkingMemory();
     
     res.json(result);
   } catch (error) {

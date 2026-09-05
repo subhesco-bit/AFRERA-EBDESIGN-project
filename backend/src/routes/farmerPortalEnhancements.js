@@ -70,7 +70,7 @@ router.get('/land-records', authMiddleware, resolveFarmerId, async (req, res) =>
 router.get('/land-records/:recordId', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { recordId } = req.params;
-    const landRecord = await landRecordsService.getLandRecord(recordId, req.farmerId, req.user.role === 'admin');
+    let landRecord = await landRecordsService.getLandRecord(recordId, req.farmerId, req.user.role === 'admin');
     res.json({ success: true, data: landRecord });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -80,7 +80,7 @@ router.get('/land-records/:recordId', authMiddleware, resolveFarmerId, async (re
 router.put('/land-records/:recordId', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { recordId } = req.params;
-    const landRecord = await landRecordsService.updateLandRecord(recordId, req.farmerId, req.body);
+    let landRecord = await landRecordsService.updateLandRecord(recordId, req.farmerId, req.body);
     res.json({ success: true, data: landRecord });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -98,7 +98,7 @@ router.put('/land-records/:recordId', authRateLimit, authMiddleware, resolveFarm
 router.put('/land-records/:recordId/verify', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { recordId } = req.params;
-    const landRecord = await landRecordsService.verifyLandRecord(recordId, req.user.id, req.body);
+    let landRecord = await landRecordsService.verifyLandRecord(recordId, req.user.id, req.body);
     res.json({ success: true, data: landRecord });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -126,7 +126,7 @@ router.get('/land-records/statistics/region', authMiddleware, adminMiddleware, a
 router.delete('/land-records/:recordId', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { recordId } = req.params;
-    const result = await landRecordsService.deleteLandRecord(recordId, req.farmerId);
+    let result = await landRecordsService.deleteLandRecord(recordId, req.farmerId);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -166,7 +166,7 @@ router.put('/crop-plans/:planId/status', authRateLimit, authMiddleware, resolveF
   try {
     const { planId } = req.params;
     const { status, ...updateData } = req.body;
-    const cropPlan = await cropPlanningService.updateCropPlanStatus(planId, req.farmerId, status, updateData);
+    let cropPlan = await cropPlanningService.updateCropPlanStatus(planId, req.farmerId, status, updateData);
     res.json({ success: true, data: cropPlan });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -214,7 +214,7 @@ router.post('/wallet/deposit', authRateLimit, authMiddleware, resolveFarmerId, a
 router.post('/wallet/withdraw', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { amount, bankAccount, reference } = req.body;
-    const transaction = await withdrawFromWallet(req.farmerId, amount, bankAccount, reference);
+    let transaction = await withdrawFromWallet(req.farmerId, amount, bankAccount, reference);
     res.json({ success: true, data: transaction });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -224,7 +224,7 @@ router.post('/wallet/withdraw', authRateLimit, authMiddleware, resolveFarmerId, 
 router.post('/wallet/transfer', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { recipientId, amount, description } = req.body;
-    const transaction = await transferFromWallet(req.farmerId, recipientId, amount, description);
+    let transaction = await transferFromWallet(req.farmerId, recipientId, amount, description);
     res.json({ success: true, data: transaction });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -243,7 +243,7 @@ router.get('/wallet/balance', authMiddleware, resolveFarmerId, async (req, res) 
 router.post('/wallet/link-bank', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { bankName, accountNumber, ifscCode, accountHolder } = req.body;
-    const result = await linkBankAccount(req.farmerId, bankName, accountNumber, ifscCode, accountHolder);
+    let result = await linkBankAccount(req.farmerId, bankName, accountNumber, ifscCode, accountHolder);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

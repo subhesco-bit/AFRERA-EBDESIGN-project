@@ -306,7 +306,7 @@ function pluralize(key, count, options = {}) {
   const { namespace = 'common' } = options;
 
   // Get translations
-  const translations = translationCache.get(currentLanguage) || DEFAULT_TRANSLATIONS;
+  let translations = translationCache.get(currentLanguage) || DEFAULT_TRANSLATIONS;
   const namespaceTranslations = translations[namespace] || {};
 
   // Try to get pluralized form
@@ -348,10 +348,10 @@ function formatDate(date, options = {}) {
  * Format time according to locale
  */
 function formatTime(date, options = {}) {
-  const language = currentLanguage;
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+  let language = currentLanguage;
+  let locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
 
-  const defaultOptions = {
+  let defaultOptions = {
     hour: '2-digit',
     minute: '2-digit',
   };
@@ -363,10 +363,10 @@ function formatTime(date, options = {}) {
  * Format date and time according to locale
  */
 function formatDateTime(date, options = {}) {
-  const language = currentLanguage;
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+  let language = currentLanguage;
+  let locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
 
-  const defaultOptions = {
+  let defaultOptions = {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -381,8 +381,8 @@ function formatDateTime(date, options = {}) {
  * Format number according to locale
  */
 function formatNumber(number, options = {}) {
-  const language = currentLanguage;
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+  let language = currentLanguage;
+  let locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
 
   return new Intl.NumberFormat(locale, options).format(number);
 }
@@ -391,10 +391,10 @@ function formatNumber(number, options = {}) {
  * Format currency according to locale
  */
 function formatCurrency(amount, currency = 'INR', options = {}) {
-  const language = currentLanguage;
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+  let language = currentLanguage;
+  let locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
 
-  const defaultOptions = {
+  let defaultOptions = {
     style: 'currency',
     currency,
   };
@@ -406,10 +406,10 @@ function formatCurrency(amount, currency = 'INR', options = {}) {
  * Format percentage according to locale
  */
 function formatPercent(value, options = {}) {
-  const language = currentLanguage;
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+  let language = currentLanguage;
+  let locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
 
-  const defaultOptions = {
+  let defaultOptions = {
     style: 'percent',
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -422,8 +422,8 @@ function formatPercent(value, options = {}) {
  * Format relative time (e.g., "2 hours ago")
  */
 function formatRelativeTime(date) {
-  const language = currentLanguage;
-  const locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
+  let language = currentLanguage;
+  let locale = SUPPORTED_LANGUAGES[language]?.locale || 'en-US';
 
   const now = new Date();
   const diff = now - date;
@@ -468,7 +468,7 @@ async function loadTranslations(languageCode) {
 
   try {
     // Try to load from file
-    const translations = await import(`../locales/${languageCode}.json`);
+    let translations = await import(`../locales/${languageCode}.json`);
     translationCache.set(languageCode, translations.default || translations);
     return translations.default || translations;
   } catch (error) {

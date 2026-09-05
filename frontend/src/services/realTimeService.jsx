@@ -368,7 +368,7 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = notificationSystem.subscribe(setNotifications);
+    let unsubscribe = notificationSystem.subscribe(setNotifications);
     setNotifications(notificationSystem.getNotifications());
     return unsubscribe;
   }, []);
@@ -442,7 +442,7 @@ export const useRealTimeSync = (resource, initialData, syncInterval = 30000) => 
     const interval = setInterval(syncData, syncInterval);
 
     // Listen for real-time updates
-    const unsubscribe = realTimeService.on(`${resource}:update`, (newData) => {
+    let unsubscribe = realTimeService.on(`${resource}:update`, (newData) => {
       setData(newData);
       setLastSync(new Date());
     });

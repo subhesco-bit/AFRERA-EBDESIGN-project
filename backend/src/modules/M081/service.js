@@ -83,7 +83,7 @@ async function createDashboard(dashboardData) {
  */
 async function getDashboard(dashboardId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM dashboards WHERE dashboard_id = $1',
       [dashboardId]
     );
@@ -118,7 +118,7 @@ async function listDashboards(userId, filters = {}) {
 
     query += ' ORDER BY created_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error listing dashboards', { error: error.message });
@@ -154,7 +154,7 @@ async function updateDashboard(dashboardId, updateData) {
     values.push(dashboardId);
 
     const query = `UPDATE dashboards SET ${fields.join(', ')} WHERE dashboard_id = $${paramCount} RETURNING *`;
-    const result = await pool.query(query, values);
+    let result = await pool.query(query, values);
 
     logger.info(`Dashboard updated: ${dashboardId}`);
     return result.rows[0];
@@ -169,7 +169,7 @@ async function updateDashboard(dashboardId, updateData) {
  */
 async function deleteDashboard(dashboardId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'DELETE FROM dashboards WHERE dashboard_id = $1 RETURNING dashboard_id',
       [dashboardId]
     );
@@ -218,7 +218,7 @@ async function addWidget(dashboardId, widgetData) {
     };
 
     // AI-powered widget configuration
-    const aiRequest = {
+    let aiRequest = {
       task: 'widget_configuration_optimization',
       parameters: {
         widget_type: widget_type,
@@ -228,10 +228,10 @@ async function addWidget(dashboardId, widgetData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     widget.ai_recommendations = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dashboard_widgets 
        (widget_id, dashboard_id, widget_type, widget_name, position_x, position_y, 
         width, height, data_source, query_config, visualization_config, 
@@ -269,7 +269,7 @@ async function addWidget(dashboardId, widgetData) {
  */
 async function getDashboardWidgets(dashboardId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM dashboard_widgets WHERE dashboard_id = $1 AND status = $2 ORDER BY position_y, position_x',
       [dashboardId, 'active']
     );
@@ -285,8 +285,8 @@ async function getDashboardWidgets(dashboardId) {
  */
 async function updateWidget(widgetId, updateData) {
   try {
-    const fields = [];
-    const values = [];
+    let fields = [];
+    let values = [];
     let paramCount = 1;
 
     Object.keys(updateData).forEach(key => {
@@ -307,8 +307,8 @@ async function updateWidget(widgetId, updateData) {
 
     values.push(widgetId);
 
-    const query = `UPDATE dashboard_widgets SET ${fields.join(', ')} WHERE widget_id = $${paramCount} RETURNING *`;
-    const result = await pool.query(query, values);
+    let query = `UPDATE dashboard_widgets SET ${fields.join(', ')} WHERE widget_id = $${paramCount} RETURNING *`;
+    let result = await pool.query(query, values);
 
     logger.info(`Widget updated: ${widgetId}`);
     return result.rows[0];
@@ -323,7 +323,7 @@ async function updateWidget(widgetId, updateData) {
  */
 async function deleteWidget(widgetId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'DELETE FROM dashboard_widgets WHERE widget_id = $1 RETURNING widget_id',
       [widgetId]
     );
@@ -349,7 +349,7 @@ async function addDataSource(dashboardId, sourceData) {
       refresh_schedule
     } = sourceData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dashboard_data_sources 
        (source_id, dashboard_id, source_name, source_type, connection_config, 
         query_template, refresh_schedule, status, created_at)
@@ -381,7 +381,7 @@ async function addDataSource(dashboardId, sourceData) {
  */
 async function getDataSources(dashboardId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM dashboard_data_sources WHERE dashboard_id = $1 AND status = $2',
       [dashboardId, 'active']
     );
@@ -406,7 +406,7 @@ async function addFilter(dashboardId, filterData) {
       applies_to_widgets
     } = filterData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dashboard_filters 
        (filter_id, dashboard_id, filter_name, filter_type, field_name, 
         default_value, filter_config, applies_to_widgets, status, created_at)
@@ -439,7 +439,7 @@ async function addFilter(dashboardId, filterData) {
  */
 async function getDashboardFilters(dashboardId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM dashboard_filters WHERE dashboard_id = $1 AND status = $2',
       [dashboardId, 'active']
     );
@@ -457,7 +457,7 @@ async function createSnapshot(dashboardId, snapshotData) {
   try {
     const { snapshot_name, filters_applied, created_by } = snapshotData;
 
-    const dashboard = await getDashboard(dashboardId);
+    let dashboard = await getDashboard(dashboardId);
     const widgets = await getDashboardWidgets(dashboardId);
 
     const snapshot = {
@@ -473,7 +473,7 @@ async function createSnapshot(dashboardId, snapshotData) {
       created_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dashboard_snapshots 
        (snapshot_id, dashboard_id, snapshot_name, snapshot_data, filters_applied, created_by, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -504,7 +504,7 @@ async function shareDashboard(dashboardId, shareData) {
   try {
     const { shared_with, shared_by, permission_level, expires_at } = shareData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO dashboard_shares 
        (share_id, dashboard_id, shared_with, shared_by, permission_level, expires_at, status, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -587,7 +587,7 @@ function generateId() {
 
 async function getUserPreferences(userId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT preferences FROM user_preferences WHERE user_id = $1',
       [userId]
     );
@@ -599,7 +599,7 @@ async function getUserPreferences(userId) {
 
 async function getSimilarDashboards(dashboardType) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM dashboards WHERE dashboard_type = $1 AND status = $2 LIMIT 5',
       [dashboardType, 'active']
     );
@@ -639,7 +639,7 @@ async function analyzeDataCharacteristics(dataSource) {
 
 async function getWidget(widgetId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM dashboard_widgets WHERE widget_id = $1',
       [widgetId]
     );

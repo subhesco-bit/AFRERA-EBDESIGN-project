@@ -41,7 +41,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // Get specific escrow transaction
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const escrow = await escrowService.getEscrowTransaction(req.params.id);
+    let escrow = await escrowService.getEscrowTransaction(req.params.id);
     const canView = ['admin', 'superadmin'].includes(req.user.role)
       || escrow.buyer_id === req.user.id
       || escrow.farmer_id === req.user.id;
@@ -57,7 +57,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // Release escrow funds to farmer
 router.post('/:id/release', authMiddleware, async (req, res) => {
   try {
-    const escrow = await escrowService.getEscrowTransaction(req.params.id);
+    let escrow = await escrowService.getEscrowTransaction(req.params.id);
     if (!['admin', 'superadmin'].includes(req.user.role) && escrow.farmer_id !== req.user.id) {
       return res.status(403).json({ error: 'Only the receiving farmer or an administrator can release escrow' });
     }
@@ -71,11 +71,11 @@ router.post('/:id/release', authMiddleware, async (req, res) => {
 // Refund escrow to buyer
 router.post('/:id/refund', authMiddleware, async (req, res) => {
   try {
-    const escrow = await escrowService.getEscrowTransaction(req.params.id);
+    let escrow = await escrowService.getEscrowTransaction(req.params.id);
     if (!['admin', 'superadmin'].includes(req.user.role) && escrow.buyer_id !== req.user.id) {
       return res.status(403).json({ error: 'Only the paying buyer or an administrator can request a refund' });
     }
-    const result = await escrowService.refundEscrowFunds(req.params.id, req.body.reason || 'Buyer refund request');
+    let result = await escrowService.refundEscrowFunds(req.params.id, req.body.reason || 'Buyer refund request');
     apiResponseHandler.sendSuccess(res, result, 'Escrow refunded successfully');
   } catch (error) {
     apiResponseHandler.sendError(res, error.message);
@@ -85,8 +85,8 @@ router.post('/:id/refund', authMiddleware, async (req, res) => {
 // Get escrow status
 router.get('/:id/status', authMiddleware, async (req, res) => {
   try {
-    const escrow = await escrowService.getEscrowTransaction(req.params.id);
-    const canView = ['admin', 'superadmin'].includes(req.user.role)
+    let escrow = await escrowService.getEscrowTransaction(req.params.id);
+    let canView = ['admin', 'superadmin'].includes(req.user.role)
       || escrow.buyer_id === req.user.id
       || escrow.farmer_id === req.user.id;
     if (!canView) {

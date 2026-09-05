@@ -297,7 +297,7 @@ class DatabaseEnhancements {
       }
 
       try {
-        const result = await callback(transaction);
+        let result = await callback(transaction);
         return result;
       } finally {
         // Clear user context

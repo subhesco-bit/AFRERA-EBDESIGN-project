@@ -37,7 +37,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // FPO directory
 router.get('/fpos/list', authMiddleware, async (req, res) => {
   try {
-    const result = await getFPOs(req.query);
+    let result = await getFPOs(req.query);
     return apiResponseHandler.sendSuccess(res, result, 'FPOs retrieved successfully');
   } catch (error) {
     return apiResponseHandler.sendError(res, 'Failed to retrieve FPOs', 500, 'SERVER_ERROR', error.message);
@@ -65,16 +65,16 @@ router.get('/:farmerId', authMiddleware, async (req, res) => {
   try {
     let farmerId = req.params.farmerId;
     if (farmerId === 'me' || farmerId === 'current-farmer-id') {
-      const result = await pool.query('SELECT id FROM farmers WHERE user_id = $1', [req.user.id]);
+      let result = await pool.query('SELECT id FROM farmers WHERE user_id = $1', [req.user.id]);
       if (result.rows.length === 0) {
         return res.status(404).json({ success: false, error: 'No farmer profile is associated with this account' });
       }
       farmerId = result.rows[0].id;
     }
-    const farmer = await getFarmerById(farmerId);
+    let farmer = await getFarmerById(farmerId);
     res.json({ success: true, data: farmer });
   } catch (error) {
-    const status = error.message === 'Farmer not found' ? 404 : 500;
+    let status = error.message === 'Farmer not found' ? 404 : 500;
     res.status(status).json({ success: false, error: error.message });
   }
 });

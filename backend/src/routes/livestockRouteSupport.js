@@ -57,7 +57,7 @@ function requestGuard(req, res, next, mutationSignal = SIGNAL.LIVESTOCK_RECORD_C
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT) return fail(res, 400, 'limit is outside the allowed range', req);
   if (req.body && typeof req.body === 'object') {
     req.body = sanitizeObject(req.body);
-    const error = validatePayload(req.body);
+    let error = validatePayload(req.body);
     if (error) return fail(res, 400, error, req);
   }
 

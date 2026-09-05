@@ -45,7 +45,7 @@ function WelfareProgramsSection() {
     if (!farmerId || !programId) { setEnrollError('Farmer ID and Program ID are both required'); return; }
     setLoading(true);
     try {
-      const res = await farmerWelfareAPI.enroll(farmerId, programId);
+      let res = await farmerWelfareAPI.enroll(farmerId, programId);
       setEnrollResult(res.data?.data);
     } catch (e) {
       setEnrollError(e?.response?.data?.error || e.message || 'Enrollment failed');

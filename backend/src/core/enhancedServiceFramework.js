@@ -113,7 +113,7 @@ class EnhancedServiceFramework extends ProductionService {
       let batchSize = initialBatchSize;
       let totalProcessed = 0;
       let totalFailed = 0;
-      const results = [];
+      let results = [];
 
       for (let i = 0; i < items.length; i += batchSize) {
         const batch = items.slice(i, i + batchSize);
@@ -217,7 +217,7 @@ class EnhancedServiceFramework extends ProductionService {
       let hasMore = true;
 
       while (hasMore) {
-        const results = await this.smartRetry(async () => {
+        let results = await this.smartRetry(async () => {
           const q = `${query} LIMIT $1 OFFSET $2`;
           return this.db.query(q, [batchSize, offset]);
         });
@@ -265,7 +265,7 @@ class EnhancedServiceFramework extends ProductionService {
   }
 
   calculatePercentile(percentile) {
-    const times = Object.values(this.performanceProfiles).sort((a, b) => a - b);
+    let times = Object.values(this.performanceProfiles).sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * times.length) - 1;
     return times[Math.max(0, index)] || 0;
   }

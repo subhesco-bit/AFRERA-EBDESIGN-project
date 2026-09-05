@@ -30,7 +30,7 @@ router.get('/active', async (req, res) => {
 
 router.post('/:id/verify', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const event = await civilDisruptionService.verify(req.params.id, req.user?.id);
+    let event = await civilDisruptionService.verify(req.params.id, req.user?.id);
     res.json({ success: true, data: event });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -39,7 +39,7 @@ router.post('/:id/verify', authMiddleware, adminMiddleware, async (req, res) => 
 
 router.post('/:id/resolve', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const event = await civilDisruptionService.resolve(req.params.id, req.body?.endDate);
+    let event = await civilDisruptionService.resolve(req.params.id, req.body?.endDate);
     res.json({ success: true, data: event });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

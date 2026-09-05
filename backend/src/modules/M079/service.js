@@ -174,7 +174,7 @@ async function implementConservationMeasures(watershedId, measuresData) {
     };
 
     // AI-powered conservation planning
-    const aiRequest = {
+    let aiRequest = {
       task: 'conservation_implementation_planning',
       parameters: {
         watershed_id: watershedId,
@@ -188,11 +188,11 @@ async function implementConservationMeasures(watershedId, measuresData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     implementation.ai_planning = aiResponse;
 
     // Insert into database
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO conservation_implementations 
        (implementation_id, watershed_id, measure_type, location, area_hectares, 
         budget_allocation, implementation_date, expected_outcomes, monitoring_schedule, 
@@ -255,7 +255,7 @@ function generateId() {
 
 async function getEcologicalAssessment(watershedId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM ecological_assessments WHERE watershed_id = $1 ORDER BY assessment_date DESC LIMIT 1',
       [watershedId]
     );
@@ -267,7 +267,7 @@ async function getEcologicalAssessment(watershedId) {
 
 async function getHydrologicalData(watershedId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM hydrological_data WHERE watershed_id = $1 ORDER BY record_date DESC LIMIT 12',
       [watershedId]
     );
@@ -279,7 +279,7 @@ async function getHydrologicalData(watershedId) {
 
 async function getLandUsePatterns(watershedId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM land_use_patterns WHERE watershed_id = $1',
       [watershedId]
     );
@@ -291,7 +291,7 @@ async function getLandUsePatterns(watershedId) {
 
 async function getBiodiversityInventory(watershedId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM biodiversity_inventory WHERE watershed_id = $1',
       [watershedId]
     );
@@ -375,7 +375,7 @@ async function assessSoilHealth(watershedId) {
 
 async function getConservationStatus(watershedId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as active_measures FROM conservation_implementations WHERE watershed_id = $1 AND status = $2',
       [watershedId, 'active']
     );
@@ -444,7 +444,7 @@ async function assessImplementationRisks(watershedId, measureType) {
 
 async function getWatershedOverview(watershedId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM watershed_plans WHERE watershed_id = $1',
       [watershedId]
     );

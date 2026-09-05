@@ -164,7 +164,7 @@ router.post('/handoff/:handoffId/accept', async (req, res) => {
       });
     }
 
-    const handoff = await aiCollaborationService.acceptHandoff(handoffId, accepting_ai);
+    let handoff = await aiCollaborationService.acceptHandoff(handoffId, accepting_ai);
     
     res.json({
       success: true,

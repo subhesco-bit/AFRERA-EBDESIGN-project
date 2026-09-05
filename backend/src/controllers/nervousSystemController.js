@@ -294,7 +294,7 @@ async function triggerReflex(req, res) {
   try {
     const { triggerEvent, context } = req.body;
     
-    const result = await nervousSystem.triggerReflex(triggerEvent, context);
+    let result = await nervousSystem.triggerReflex(triggerEvent, context);
     
     res.json(result);
   } catch (error) {
@@ -342,7 +342,7 @@ async function getSensorData(req, res) {
   try {
     const { sensorId } = req.params;
     
-    const result = await sensorNetwork.collectSensorData(sensorId);
+    let result = await sensorNetwork.collectSensorData(sensorId);
     
     res.json(result);
   } catch (error) {
@@ -394,7 +394,7 @@ async function executeMotorFunction(req, res) {
   try {
     const { functionName, parameters } = req.body;
     
-    const result = await motorFunctions.executeFunction(functionName, parameters);
+    let result = await motorFunctions.executeFunction(functionName, parameters);
     
     res.json(result);
   } catch (error) {
@@ -467,7 +467,7 @@ async function routeRequest(req, res) {
   try {
     const { routeConfig, request } = req.body;
     
-    const result = await enterpriseRouteControl.routeRequest(routeConfig, request);
+    let result = await enterpriseRouteControl.routeRequest(routeConfig, request);
     
     res.json(result);
   } catch (error) {

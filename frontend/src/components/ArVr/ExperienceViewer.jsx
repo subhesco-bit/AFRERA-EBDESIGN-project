@@ -40,7 +40,7 @@ const ExperienceViewer = ({ productId, experiences: experiencesProp }) => {
   const selectExperience = async (experience) => {
     setSelectedExperience(experience);
     try {
-      const response = await arVrAPI.getInteractionPoints(experience.id);
+      let response = await arVrAPI.getInteractionPoints(experience.id);
       setInteractionPoints(response.data);
     } catch (err) {
       console.error('Failed to fetch interaction points:', err);

@@ -71,10 +71,10 @@ async function createFederatedIdentity(identityData) {
 
 async function getFederatedIdentities(userId) {
   if (typeof userId !== 'string' || !UUID_RE.test(userId)) throw validationError('userId must be a valid UUID');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM federated_identities WHERE user_id = $1 ORDER BY created_at DESC',
     [userId]
   );
@@ -84,10 +84,10 @@ async function getFederatedIdentities(userId) {
 
 async function getFederatedIdentity(identityId) {
   identityId = requireIdentityId(identityId);
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM federated_identities WHERE id = $1',
     [identityId]
   );
@@ -98,14 +98,14 @@ async function getFederatedIdentity(identityId) {
 async function updateFederatedIdentity(identityId, updates) {
   identityId = requireIdentityId(identityId);
   requireObject(updates, 'update payload');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { attributes, trustLevel } = updates;
   if (attributes !== undefined) requireObject(attributes, 'attributes');
   if (trustLevel !== undefined && !TRUST_LEVELS.has(trustLevel)) throw validationError('trustLevel is invalid');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE federated_identities 
      SET attributes = COALESCE($1, attributes),
          trust_level = COALESCE($2, trust_level),
@@ -120,10 +120,10 @@ async function updateFederatedIdentity(identityId, updates) {
 
 async function revokeFederatedIdentity(identityId) {
   identityId = requireIdentityId(identityId);
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'UPDATE federated_identities SET trust_level = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
     ['revoked', identityId]
   );
@@ -145,7 +145,7 @@ async function revokeFederatedIdentity(identityId) {
 // Identity attribute mapping
 async function createAttributeMapping(mappingData) {
   requireObject(mappingData, 'mapping payload');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { provider, sourceAttribute, targetAttribute, transformation, isRequired } = mappingData;
@@ -154,7 +154,7 @@ async function createAttributeMapping(mappingData) {
   if (transformation !== undefined) requireObject(transformation, 'transformation');
   if (isRequired !== undefined && typeof isRequired !== 'boolean') throw validationError('isRequired must be boolean');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO identity_attribute_mappings (provider, source_attribute, target_attribute, transformation, is_required, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
      ON CONFLICT (provider, source_attribute) DO UPDATE SET
@@ -171,10 +171,10 @@ async function createAttributeMapping(mappingData) {
 
 async function getAttributeMappings(provider) {
   requireProvider(provider);
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM identity_attribute_mappings WHERE provider = $1 ORDER BY source_attribute',
     [provider]
   );
@@ -185,7 +185,7 @@ async function getAttributeMappings(provider) {
 async function applyAttributeMapping(provider, sourceAttributes) {
   requireProvider(provider);
   requireObject(sourceAttributes, 'sourceAttributes');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const mappings = await getAttributeMappings(provider);
@@ -236,7 +236,7 @@ function applyTransformation(value, transformation) {
 // Federation trust management
 async function createTrustRelationship(trustData) {
   requireObject(trustData, 'trust payload');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { provider, trustLevel, trustScore, metadata } = trustData;
@@ -245,7 +245,7 @@ async function createTrustRelationship(trustData) {
   if (trustScore !== undefined && (!Number.isInteger(trustScore) || trustScore < 0 || trustScore > 100)) throw validationError('trustScore must be an integer between 0 and 100');
   if (metadata !== undefined) requireObject(metadata, 'metadata');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO federation_trust (provider, trust_level, trust_score, metadata, created_at, updated_at)
      VALUES ($1, $2, $3, $4, NOW(), NOW())
      ON CONFLICT (provider) DO UPDATE SET
@@ -271,10 +271,10 @@ async function createTrustRelationship(trustData) {
 }
 
 async function getTrustRelationships() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM federation_trust ORDER BY trust_score DESC');
+  let res = await pg.query('SELECT * FROM federation_trust ORDER BY trust_score DESC');
   return res.rows;
 }
 
@@ -282,10 +282,10 @@ async function updateTrustScore(provider, delta, reason) {
   requireProvider(provider);
   if (!Number.isInteger(delta) || delta < -100 || delta > 100) throw validationError('delta must be an integer between -100 and 100');
   if (reason !== undefined && (typeof reason !== 'string' || reason.length > 1000)) throw validationError('reason must be at most 1000 characters');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE federation_trust 
      SET trust_score = GREATEST(0, LEAST(100, trust_score + $1)),
          updated_at = NOW()
@@ -321,7 +321,7 @@ async function updateTrustScore(provider, delta, reason) {
 // Centralized identity directory
 async function searchIdentities(searchCriteria) {
   requireObject(searchCriteria, 'search criteria');
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { provider, userId, email, name, limit = 20 } = searchCriteria;
@@ -358,13 +358,13 @@ async function searchIdentities(searchCriteria) {
   query += ` ORDER BY fi.created_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   return res.rows;
 }
 
 // AI-powered identity pattern analysis
 async function analyzeIdentityPatterns() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Analyze provider distribution
@@ -444,7 +444,7 @@ function generateIdentityRecommendations(providerDistribution, attributeUsage) {
 
 // Federation health monitoring
 async function getFederationHealth() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get overall statistics

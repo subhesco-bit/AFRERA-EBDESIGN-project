@@ -33,7 +33,7 @@ async function getNotifications(req, res) {
 
 async function getNotification(req, res) {
   try {
-    const notification = await service.getNotification(req.params.id);
+    let notification = await service.getNotification(req.params.id);
     if (!notification) return res.status(404).json({ success: false, error: 'Notification not found' });
     res.json({ success: true, data: notification });
   } catch (error) {
@@ -45,7 +45,7 @@ async function getNotification(req, res) {
 async function markAsRead(req, res) {
   try {
     const userId = req.user?.id;
-    const notification = await service.markAsRead(req.params.id, userId);
+    let notification = await service.markAsRead(req.params.id, userId);
     if (!notification) return res.status(404).json({ success: false, error: 'Notification not found' });
     res.json({ success: true, data: notification });
   } catch (error) {
@@ -56,7 +56,7 @@ async function markAsRead(req, res) {
 
 async function markAllAsRead(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const notifications = await service.markAllAsRead(userId);
     res.json({ success: true, data: notifications });
   } catch (error) {
@@ -68,7 +68,7 @@ async function markAllAsRead(req, res) {
 // Notification delivery
 async function deliverNotification(req, res) {
   try {
-    const result = await service.deliverNotification(req.params.id);
+    let result = await service.deliverNotification(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('deliverNotification error', { error: error.message });
@@ -79,7 +79,7 @@ async function deliverNotification(req, res) {
 // User preferences
 async function getUserPreferences(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
+    let userId = req.params.userId || req.user?.id;
     const preferences = await service.getUserPreferences(userId);
     res.json({ success: true, data: preferences });
   } catch (error) {
@@ -90,8 +90,8 @@ async function getUserPreferences(req, res) {
 
 async function updateUserPreferences(req, res) {
   try {
-    const userId = req.params.userId || req.user?.id;
-    const preferences = await service.updateUserPreferences(userId, req.body);
+    let userId = req.params.userId || req.user?.id;
+    let preferences = await service.updateUserPreferences(userId, req.body);
     res.json({ success: true, data: preferences });
   } catch (error) {
     logger.error('updateUserPreferences error', { error: error.message });
@@ -113,7 +113,7 @@ async function createTemplate(req, res) {
 async function getTemplate(req, res) {
   try {
     const { type, language } = req.query;
-    const template = await service.getTemplate(type, language);
+    let template = await service.getTemplate(type, language);
     if (!template) return res.status(404).json({ success: false, error: 'Template not found' });
     res.json({ success: true, data: template });
   } catch (error) {

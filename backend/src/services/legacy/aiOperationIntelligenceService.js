@@ -241,7 +241,7 @@ class AIOperationIntelligenceService {
         response_format: { type: 'json_object' }
       });
       
-      const analysis = JSON.parse(response.choices[0].message.content);
+      let analysis = JSON.parse(response.choices[0].message.content);
       
       return {
         success: true,
@@ -261,7 +261,7 @@ class AIOperationIntelligenceService {
    */
   async generateOptimizationRecommendations(analysis) {
     try {
-      const prompt = `
+      let prompt = `
         Based on the performance analysis, generate optimization recommendations:
         
         Analysis: ${JSON.stringify(analysis)}
@@ -277,13 +277,13 @@ class AIOperationIntelligenceService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
       });
       
-      const recommendations = JSON.parse(response.choices[0].message.content);
+      let recommendations = JSON.parse(response.choices[0].message.content);
       
       return {
         success: true,
@@ -474,10 +474,10 @@ class AIOperationIntelligenceService {
    */
   async predictiveOptimization(horizon = 24) {
     try {
-      const currentMetrics = this.performanceMetrics.get('current');
-      const history = this.operationHistory.slice(-100);
+      let currentMetrics = this.performanceMetrics.get('current');
+      let history = this.operationHistory.slice(-100);
       
-      const prompt = `
+      let prompt = `
         Perform predictive optimization analysis for the next ${horizon} hours:
         
         Current Metrics: ${JSON.stringify(currentMetrics)}
@@ -492,7 +492,7 @@ class AIOperationIntelligenceService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -518,10 +518,10 @@ class AIOperationIntelligenceService {
    */
   async detectAnomalies() {
     try {
-      const currentMetrics = this.performanceMetrics.get('current');
-      const history = Array.from(this.performanceMetrics.entries()).slice(-50);
+      let currentMetrics = this.performanceMetrics.get('current');
+      let history = Array.from(this.performanceMetrics.entries()).slice(-50);
       
-      const prompt = `
+      let prompt = `
         Detect anomalies in the current performance metrics compared to historical data:
         
         Current Metrics: ${JSON.stringify(currentMetrics)}
@@ -536,7 +536,7 @@ class AIOperationIntelligenceService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }
@@ -562,9 +562,9 @@ class AIOperationIntelligenceService {
    */
   async continuousImprovement() {
     try {
-      const history = this.operationHistory.slice(-200);
+      let history = this.operationHistory.slice(-200);
       
-      const prompt = `
+      let prompt = `
         Analyze operation history and identify continuous improvement opportunities:
         
         Operation History: ${JSON.stringify(history)}
@@ -578,7 +578,7 @@ class AIOperationIntelligenceService {
       `;
       
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      const response = await this.openai.chat.completions.create({
+      let response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' }

@@ -72,7 +72,7 @@ async function getMaskingRules(req, res) {
 // Privacy policy management
 async function createPrivacyPolicy(req, res) {
   try {
-    const policy = await service.createPrivacyPolicy(req.body);
+    let policy = await service.createPrivacyPolicy(req.body);
     res.status(201).json({ success: true, data: policy });
   } catch (error) {
     logger.error('createPrivacyPolicy error', { error: error.message });
@@ -83,7 +83,7 @@ async function createPrivacyPolicy(req, res) {
 async function getPrivacyPolicies(req, res) {
   try {
     const { activeOnly } = req.query;
-    const policies = await service.getPrivacyPolicies({ activeOnly: activeOnly === 'true' });
+    let policies = await service.getPrivacyPolicies({ activeOnly: activeOnly === 'true' });
     res.json({ success: true, data: policies });
   } catch (error) {
     logger.error('getPrivacyPolicies error', { error: error.message });
@@ -93,7 +93,7 @@ async function getPrivacyPolicies(req, res) {
 
 async function acceptPrivacyPolicy(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const { policyId } = req.body;
     const acceptance = await service.acceptPrivacyPolicy(userId, policyId);
     res.json({ success: true, data: acceptance });
@@ -106,7 +106,7 @@ async function acceptPrivacyPolicy(req, res) {
 // AI-powered risk assessment
 async function assessPrivacyRisk(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const riskAssessment = await service.assessPrivacyRisk(userId, req.body);
     res.json({ success: true, data: riskAssessment });
   } catch (error) {
@@ -118,7 +118,7 @@ async function assessPrivacyRisk(req, res) {
 // Privacy impact analysis
 async function performPrivacyImpactAnalysis(req, res) {
   try {
-    const userId = req.user?.id;
+    let userId = req.user?.id;
     const analysis = await service.performPrivacyImpactAnalysis(userId, req.body);
     res.json({ success: true, data: analysis });
   } catch (error) {
@@ -141,7 +141,7 @@ async function getPrivacyComplianceStatus(req, res) {
 // Data retention
 async function enforceDataRetention(req, res) {
   try {
-    const result = await service.enforceDataRetention();
+    let result = await service.enforceDataRetention();
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('enforceDataRetention error', { error: error.message });

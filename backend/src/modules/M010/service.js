@@ -43,7 +43,7 @@ async function createNotification(notificationData) {
 }
 
 async function getNotifications({ page = 1, limit = 20, userId, type, status, priority } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -71,7 +71,7 @@ async function getNotifications({ page = 1, limit = 20, userId, type, status, pr
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM notifications`, 'SELECT COUNT(*) FROM notifications').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -79,16 +79,16 @@ async function getNotifications({ page = 1, limit = 20, userId, type, status, pr
 }
 
 async function getNotification(id) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM notifications WHERE id = $1', [id]);
+  let res = await pg.query('SELECT * FROM notifications WHERE id = $1', [id]);
   return res.rows[0] || null;
 }
 
 async function markAsRead(id, userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE notifications 
      SET read = true, read_at = NOW(), updated_at = NOW()
      WHERE id = $1 AND user_id = $2
@@ -99,9 +99,9 @@ async function markAsRead(id, userId) {
 }
 
 async function markAllAsRead(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE notifications 
      SET read = true, read_at = NOW(), updated_at = NOW()
      WHERE user_id = $1 AND read = false
@@ -113,7 +113,7 @@ async function markAllAsRead(userId) {
 
 // Notification delivery
 async function deliverNotification(notificationId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const notification = await getNotification(notificationId);
@@ -207,10 +207,10 @@ async function deliverPush(notification) {
 
 // Notification preferences
 async function getUserPreferences(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM notification_preferences WHERE user_id = $1',
     [userId]
   );
@@ -219,12 +219,12 @@ async function getUserPreferences(userId) {
 }
 
 async function updateUserPreferences(userId, preferences) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { channels, types, quietHours, digestFrequency } = preferences;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO notification_preferences (user_id, channels, types, quiet_hours, digest_frequency, updated_at)
      VALUES ($1, $2, $3, $4, $5, NOW())
      ON CONFLICT (user_id) DO UPDATE SET
@@ -251,12 +251,12 @@ function getDefaultPreferences() {
 
 // Notification templates
 async function createTemplate(templateData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { name, type, subject, bodyTemplate, variables, language } = templateData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO notification_templates (name, type, subject, body_template, variables, language, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
      RETURNING *`,
@@ -267,10 +267,10 @@ async function createTemplate(templateData) {
 }
 
 async function getTemplate(type, language = 'en') {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM notification_templates WHERE type = $1 AND language = $2 AND is_active = true',
     [type, language]
   );
@@ -279,7 +279,7 @@ async function getTemplate(type, language = 'en') {
 }
 
 async function renderTemplate(templateId, variables) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const template = await pg.query(
@@ -330,7 +330,7 @@ async function calculateNotificationPriority(type, data) {
 
 // Notification batching and throttling
 async function batchNotifications(notificationIds) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const notifications = await Promise.all(
@@ -365,7 +365,7 @@ async function batchNotifications(notificationIds) {
 }
 
 async function createDigestNotification(notifications) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const first = notifications[0];
@@ -384,11 +384,11 @@ async function createDigestNotification(notifications) {
 
 // Notification analytics
 async function getNotificationAnalytics({ userId, startDate, endDate } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = 'SELECT type, status, COUNT(*) as count FROM notifications WHERE 1=1';
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (userId) {
@@ -406,7 +406,7 @@ async function getNotificationAnalytics({ userId, startDate, endDate } = {}) {
   
   query += ' GROUP BY type, status';
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     summary: res.rows,

@@ -35,14 +35,14 @@ class PlatformCoreService {
    */
   async updatePlatformConfig(key, value, updatedBy) {
     try {
-      const query = `
+      let query = `
         UPDATE platform_config
         SET value = $1, updated_by = $2, updated_at = CURRENT_TIMESTAMP
         WHERE key = $3
         RETURNING *
       `;
       
-      const result = await this.pool.query(query, [value, updatedBy, key]);
+      let result = await this.pool.query(query, [value, updatedBy, key]);
       return result.rows[0];
     } catch (error) {
       console.error('Error updating platform config:', error);

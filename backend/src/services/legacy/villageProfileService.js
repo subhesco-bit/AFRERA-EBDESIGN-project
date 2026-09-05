@@ -299,7 +299,7 @@ function setupRoutes(app) {
 
   router.get('/villages/block/:block', async (req, res) => {
     try {
-      const villages = await getVillagesByBlock(req.params.block);
+      let villages = await getVillagesByBlock(req.params.block);
       res.json({ success: true, data: villages });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -308,7 +308,7 @@ function setupRoutes(app) {
 
   router.get('/districts/:district/economic-summary', async (req, res) => {
     try {
-      const summary = await getDistrictEconomicSummary(req.params.district);
+      let summary = await getDistrictEconomicSummary(req.params.district);
       res.json({ success: true, data: summary });
     } catch (error) {
       res.status(404).json({ success: false, error: error.message });
@@ -317,7 +317,7 @@ function setupRoutes(app) {
 
   router.post('/villages', async (req, res) => {
     try {
-      const profile = await upsertVillageProfile(req.body);
+      let profile = await upsertVillageProfile(req.body);
       res.status(201).json({ success: true, data: profile });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -326,7 +326,7 @@ function setupRoutes(app) {
 
   router.get('/villages/search', async (req, res) => {
     try {
-      const villages = await searchVillages(req.query);
+      let villages = await searchVillages(req.query);
       res.json({ success: true, data: villages });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

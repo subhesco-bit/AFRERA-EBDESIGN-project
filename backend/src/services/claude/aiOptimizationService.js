@@ -122,7 +122,7 @@ class ClaudeAIEnhancedOptimizationService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'allocateResources',
         resources: resources,
@@ -130,7 +130,7 @@ class ClaudeAIEnhancedOptimizationService {
         constraints: constraints
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'decision',
         query: this.buildResourceAllocationQuery(resources, tasks, constraints, options),
         context: { 
@@ -143,9 +143,9 @@ class ClaudeAIEnhancedOptimizationService {
         agentPreference: 'operations-manager'
       });
 
-      const originalResult = await this.originalService.allocateResources(resources, tasks, constraints);
+      let originalResult = await this.originalService.allocateResources(resources, tasks, constraints);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_allocation_strategy: aiEnhancement.content || null,
@@ -225,8 +225,8 @@ class ClaudeAIEnhancedOptimizationService {
   extractResourceRecommendations(aiContent) {
     if (!aiContent) return [];
     
-    const recommendations = [];
-    const lines = aiContent.split('\n');
+    let recommendations = [];
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('allocate') || line.includes('assign') || line.includes('distribute')) {

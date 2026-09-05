@@ -44,7 +44,7 @@ exports.predictHarvestTiming = async (req, res) => {
     const { farmerId } = req.params;
     const cropData = req.body;
     
-    const result = await completeAIIntegrationService.predictHarvestTiming(farmerId, cropData);
+    let result = await completeAIIntegrationService.predictHarvestTiming(farmerId, cropData);
     
     res.status(200).json({
       success: true,
@@ -68,7 +68,7 @@ exports.optimizeFarmerResources = async (req, res) => {
     const { farmerId } = req.params;
     const resourceData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeFarmerResources(farmerId, resourceData);
+    let result = await completeAIIntegrationService.optimizeFarmerResources(farmerId, resourceData);
     
     res.status(200).json({
       success: true,
@@ -96,7 +96,7 @@ exports.detectCropDisease = async (req, res) => {
     const { cropId } = req.params;
     const diseaseData = req.body;
     
-    const result = await completeAIIntegrationService.detectCropDisease(cropId, diseaseData);
+    let result = await completeAIIntegrationService.detectCropDisease(cropId, diseaseData);
     
     res.status(200).json({
       success: true,
@@ -120,7 +120,7 @@ exports.predictCropYield = async (req, res) => {
     const { cropId } = req.params;
     const yieldData = req.body;
     
-    const result = await completeAIIntegrationService.predictCropYield(cropId, yieldData);
+    let result = await completeAIIntegrationService.predictCropYield(cropId, yieldData);
     
     res.status(200).json({
       success: true,
@@ -148,7 +148,7 @@ exports.monitorLivestockHealth = async (req, res) => {
     const { livestockId } = req.params;
     const healthData = req.body;
     
-    const result = await completeAIIntegrationService.monitorLivestockHealth(livestockId, healthData);
+    let result = await completeAIIntegrationService.monitorLivestockHealth(livestockId, healthData);
     
     res.status(200).json({
       success: true,
@@ -172,7 +172,7 @@ exports.recommendLivestockBreeding = async (req, res) => {
     const { livestockId } = req.params;
     const breedingData = req.body;
     
-    const result = await completeAIIntegrationService.recommendLivestockBreeding(livestockId, breedingData);
+    let result = await completeAIIntegrationService.recommendLivestockBreeding(livestockId, breedingData);
     
     res.status(200).json({
       success: true,
@@ -200,7 +200,7 @@ exports.optimizeDairyProduction = async (req, res) => {
     const { dairyId } = req.params;
     const productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeDairyProduction(dairyId, productionData);
+    let result = await completeAIIntegrationService.optimizeDairyProduction(dairyId, productionData);
     
     res.status(200).json({
       success: true,
@@ -222,9 +222,9 @@ exports.optimizeDairyProduction = async (req, res) => {
 exports.monitorPoultryHealth = async (req, res) => {
   try {
     const { poultryId } = req.params;
-    const healthData = req.body;
+    let healthData = req.body;
     
-    const result = await completeAIIntegrationService.monitorPoultryHealth(poultryId, healthData);
+    let result = await completeAIIntegrationService.monitorPoultryHealth(poultryId, healthData);
     
     res.status(200).json({
       success: true,
@@ -246,9 +246,9 @@ exports.monitorPoultryHealth = async (req, res) => {
 exports.optimizeGoatProduction = async (req, res) => {
   try {
     const { goatId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeGoatProduction(goatId, productionData);
+    let result = await completeAIIntegrationService.optimizeGoatProduction(goatId, productionData);
     
     res.status(200).json({
       success: true,
@@ -270,9 +270,9 @@ exports.optimizeGoatProduction = async (req, res) => {
 exports.optimizeSheepProduction = async (req, res) => {
   try {
     const { sheepId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeSheepProduction(sheepId, productionData);
+    let result = await completeAIIntegrationService.optimizeSheepProduction(sheepId, productionData);
     
     res.status(200).json({
       success: true,
@@ -294,9 +294,9 @@ exports.optimizeSheepProduction = async (req, res) => {
 exports.optimizePigProduction = async (req, res) => {
   try {
     const { pigId } = req.params;
-    const productionData = req.body;
+    let productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizePigProduction(pigId, productionData);
+    let result = await completeAIIntegrationService.optimizePigProduction(pigId, productionData);
     
     res.status(200).json({
       success: true,

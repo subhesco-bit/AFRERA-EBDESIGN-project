@@ -135,8 +135,8 @@ function setItem(key, value, options = {}) {
 function getItem(key, storage = StorageType.LOCAL) {
   if (!CACHE_CONFIG.ENABLED) return null;
 
-  const cacheKey = getCacheKey(key);
-  const storageObj = getStorage(storage);
+  let cacheKey = getCacheKey(key);
+  let storageObj = getStorage(storage);
 
   try {
     let entry;
@@ -173,8 +173,8 @@ function getItem(key, storage = StorageType.LOCAL) {
  * Remove item from cache
  */
 function removeItem(key, storage = StorageType.LOCAL) {
-  const cacheKey = getCacheKey(key);
-  const storageObj = getStorage(storage);
+  let cacheKey = getCacheKey(key);
+  let storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
@@ -193,7 +193,7 @@ function removeItem(key, storage = StorageType.LOCAL) {
  * Clear all cache
  */
 function clearCache(storage = StorageType.LOCAL) {
-  const storageObj = getStorage(storage);
+  let storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
@@ -217,7 +217,7 @@ function clearCache(storage = StorageType.LOCAL) {
  * Clear cache by tag
  */
 function clearByTag(tag, storage = StorageType.LOCAL) {
-  const storageObj = getStorage(storage);
+  let storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
@@ -227,11 +227,11 @@ function clearByTag(tag, storage = StorageType.LOCAL) {
         }
       }
     } else {
-      const keys = Object.keys(storageObj);
+      let keys = Object.keys(storageObj);
       keys.forEach((key) => {
         if (key.startsWith(CACHE_CONFIG.PREFIX)) {
-          const value = storageObj.getItem(key);
-          const entry = parseCacheEntry(value);
+          let value = storageObj.getItem(key);
+          let entry = parseCacheEntry(value);
           if (entry && entry.tags && entry.tags.includes(tag)) {
             storageObj.removeItem(key);
           }
@@ -249,7 +249,7 @@ function clearByTag(tag, storage = StorageType.LOCAL) {
  * Get cache size
  */
 function getCacheSize(storage = StorageType.LOCAL) {
-  const storageObj = getStorage(storage);
+  let storageObj = getStorage(storage);
 
   try {
     if (storage === StorageType.MEMORY) {
@@ -257,7 +257,7 @@ function getCacheSize(storage = StorageType.LOCAL) {
     }
 
     let size = 0;
-    const keys = Object.keys(storageObj);
+    let keys = Object.keys(storageObj);
     keys.forEach((key) => {
       if (key.startsWith(CACHE_CONFIG.PREFIX)) {
         size++;
@@ -319,7 +319,7 @@ const apiCache = {
    * Cache GET request
    */
   async get(url, fetchFn, options = {}) {
-    const cacheKey = `api_${url}`;
+    let cacheKey = `api_${url}`;
     return staleWhileRevalidate(cacheKey, fetchFn, {
       ttl: options.ttl || CACHE_CONFIG.DEFAULT_TTL,
       storage: options.storage || StorageType.LOCAL,
@@ -331,7 +331,7 @@ const apiCache = {
    * Invalidate cache by URL pattern
    */
   invalidatePattern(pattern, storage = StorageType.LOCAL) {
-    const storageObj = getStorage(storage);
+    let storageObj = getStorage(storage);
 
     try {
       if (storage === StorageType.MEMORY) {
@@ -341,7 +341,7 @@ const apiCache = {
           }
         }
       } else {
-        const keys = Object.keys(storageObj);
+        let keys = Object.keys(storageObj);
         keys.forEach((key) => {
           if (key.startsWith(CACHE_CONFIG.PREFIX) && key.includes(pattern)) {
             storageObj.removeItem(key);
@@ -543,7 +543,7 @@ const indexedDBCache = {
       const transaction = this.db.transaction('cache', 'readwrite');
       const store = transaction.objectStore('cache');
 
-      const entry = {
+      let entry = {
         key,
         value,
         timestamp: Date.now(),
@@ -551,7 +551,7 @@ const indexedDBCache = {
         tags: options.tags || [],
       };
 
-      const request = store.put(entry);
+      let request = store.put(entry);
       request.onsuccess = () => resolve(true);
       request.onerror = () => reject(request.error);
     });
@@ -564,12 +564,12 @@ const indexedDBCache = {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readonly');
-      const store = transaction.objectStore('cache');
-      const request = store.get(key);
+      let transaction = this.db.transaction('cache', 'readonly');
+      let store = transaction.objectStore('cache');
+      let request = store.get(key);
 
       request.onsuccess = () => {
-        const entry = request.result;
+        let entry = request.result;
         if (!entry) {
           resolve(null);
           return;
@@ -595,9 +595,9 @@ const indexedDBCache = {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readwrite');
-      const store = transaction.objectStore('cache');
-      const request = store.delete(key);
+      let transaction = this.db.transaction('cache', 'readwrite');
+      let store = transaction.objectStore('cache');
+      let request = store.delete(key);
 
       request.onsuccess = () => resolve(true);
       request.onerror = () => reject(request.error);
@@ -611,9 +611,9 @@ const indexedDBCache = {
     if (!this.db) await this.init();
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db.transaction('cache', 'readwrite');
-      const store = transaction.objectStore('cache');
-      const request = store.clear();
+      let transaction = this.db.transaction('cache', 'readwrite');
+      let store = transaction.objectStore('cache');
+      let request = store.clear();
 
       request.onsuccess = () => resolve(true);
       request.onerror = () => reject(request.error);

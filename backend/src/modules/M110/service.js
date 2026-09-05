@@ -130,7 +130,7 @@ async function updateLifecycleStage(registryId, stageData) {
     };
 
     // AI-powered stage analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'lifecycle_stage_analysis',
       parameters: {
         stage_data: stageData,
@@ -141,7 +141,7 @@ async function updateLifecycleStage(registryId, stageData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     stage.ai_analysis = aiResponse;
 
     await pool.query(
@@ -151,7 +151,7 @@ async function updateLifecycleStage(registryId, stageData) {
       [lifecycle_stage, condition, registryId]
     );
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO asset_lifecycle_stages 
        (stage_id, registry_id, lifecycle_stage, condition, utilization_hours, 
         maintenance_cost, notes, ai_analysis, updated_at)
@@ -275,15 +275,15 @@ async function getDisposalOptions(assetType, year) {
 
 async function calculateCurrentDepreciation(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT purchase_date, purchase_cost, estimated_useful_life, residual_value FROM asset_lifecycle WHERE asset_registry_id = $1',
       [registryId]
     );
-    const asset = result.rows[0];
+    let asset = result.rows[0];
     if (!asset) return 0;
     
     const age = new Date().getFullYear() - new Date(asset.purchase_date).getFullYear();
-    const annualDepreciation = (asset.purchase_cost - asset.residual_value) / asset.estimated_useful_life;
+    let annualDepreciation = (asset.purchase_cost - asset.residual_value) / asset.estimated_useful_life;
     return annualDepreciation * age;
   } catch (error) {
     return 0;
@@ -292,14 +292,14 @@ async function calculateCurrentDepreciation(registryId) {
 
 async function getRemainingUsefulLife(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT purchase_date, estimated_useful_life FROM asset_lifecycle WHERE asset_registry_id = $1',
       [registryId]
     );
-    const asset = result.rows[0];
+    let asset = result.rows[0];
     if (!asset) return 0;
     
-    const age = new Date().getFullYear() - new Date(asset.purchase_date).getFullYear();
+    let age = new Date().getFullYear() - new Date(asset.purchase_date).getFullYear();
     return Math.max(0, asset.estimated_useful_life - age);
   } catch (error) {
     return 0;
@@ -307,7 +307,7 @@ async function getRemainingUsefulLife(registryId) {
 }
 
 async function getOptimalReplacementTime(registryId) {
-  const remainingLife = await getRemainingUsefulLife(registryId);
+  let remainingLife = await getRemainingUsefulLife(registryId);
   return {
     optimal_year: new Date().getFullYear() + remainingLife,
     reason: remainingLife < 2 ? 'end_of_life' : 'planned_replacement'
@@ -316,11 +316,11 @@ async function getOptimalReplacementTime(registryId) {
 
 async function estimateResaleValue(registryId, condition) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT purchase_cost, residual_value FROM asset_lifecycle WHERE asset_registry_id = $1',
       [registryId]
     );
-    const asset = result.rows[0];
+    let asset = result.rows[0];
     if (!asset) return 0;
     
     const conditionMultiplier = condition === 'excellent' ? 0.4 : condition === 'good' ? 0.3 : 0.2;
@@ -332,7 +332,7 @@ async function estimateResaleValue(registryId, condition) {
 
 async function getCurrentValue(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT purchase_cost FROM asset_lifecycle WHERE asset_registry_id = $1',
       [registryId]
     );
@@ -350,11 +350,11 @@ async function getAccumulatedDepreciation(registryId) {
 
 async function getDepreciationRate(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT purchase_cost, estimated_useful_life, residual_value FROM asset_lifecycle WHERE asset_registry_id = $1',
       [registryId]
     );
-    const asset = result.rows[0];
+    let asset = result.rows[0];
     if (!asset) return 0;
     
     return ((asset.purchase_cost - asset.residual_value) / asset.purchase_cost) / asset.estimated_useful_life;
@@ -377,7 +377,7 @@ async function generateDepreciationRecommendations(registryId, period) {
 
 async function getTotalAssets(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM asset_lifecycle WHERE farmer_id = $1',
       [farmerId]
     );
@@ -389,7 +389,7 @@ async function getTotalAssets(farmerId) {
 
 async function getTotalBookValue(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(purchase_cost - COALESCE(accumulated_depreciation, 0)) as total FROM asset_lifecycle WHERE farmer_id = $1',
       [farmerId]
     );
@@ -401,7 +401,7 @@ async function getTotalBookValue(farmerId) {
 
 async function getTotalDepreciation(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(accumulated_depreciation) as total FROM asset_lifecycle WHERE farmer_id = $1',
       [farmerId]
     );
@@ -413,7 +413,7 @@ async function getTotalDepreciation(farmerId) {
 
 async function getAssetDistribution(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT asset_type, COUNT(*) as count FROM asset_lifecycle WHERE farmer_id = $1 GROUP BY asset_type',
       [farmerId]
     );
@@ -461,7 +461,7 @@ async function listAssets({ page = 1, limit = 20, farmer_id = null, status = nul
 }
 
 async function getAsset(id) {
-  const res = await pool.query('SELECT * FROM asset_lifecycle WHERE asset_registry_id = $1', [id]);
+  let res = await pool.query('SELECT * FROM asset_lifecycle WHERE asset_registry_id = $1', [id]);
   return res.rows[0] || null;
 }
 

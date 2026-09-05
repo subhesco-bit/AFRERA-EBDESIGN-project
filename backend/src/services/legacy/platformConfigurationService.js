@@ -147,7 +147,7 @@ class PlatformConfigurationService {
     try {
       logger.info('Starting automated parameter tuning');
 
-      const currentConfig = await this.getConfiguration();
+      let currentConfig = await this.getConfiguration();
       const performanceHistory = await this.getPerformanceHistory();
       const workloadPatterns = await this.getWorkloadPatterns();
 
@@ -191,7 +191,7 @@ class PlatformConfigurationService {
     try {
       const currentPerformance = await this.getPerformanceMetrics();
       const performanceThresholds = await this.getPerformanceThresholds();
-      const currentConfig = await this.getConfiguration();
+      let currentConfig = await this.getConfiguration();
 
       // Check if performance thresholds are breached
       const adjustments = [];
@@ -257,7 +257,7 @@ class PlatformConfigurationService {
    */
   async performSecurityScan() {
     try {
-      const currentConfig = await this.getConfiguration();
+      let currentConfig = await this.getConfiguration();
       const knownVulnerabilities = await this.getKnownVulnerabilities();
       const securityBestPractices = await this.getSecurityBestPractices();
 
@@ -288,7 +288,7 @@ class PlatformConfigurationService {
    */
   async checkCompliance() {
     try {
-      const currentConfig = await this.getConfiguration();
+      let currentConfig = await this.getConfiguration();
       const complianceFrameworks = await this.getComplianceFrameworks();
       const industryStandards = await this.getIndustryStandards();
 
@@ -352,7 +352,7 @@ class PlatformConfigurationService {
       }
 
       // Apply the target configuration
-      const result = await this.db.query(`
+      let result = await this.db.query(`
         UPDATE platform_configurations 
         SET is_active = true 
         WHERE id = $1
@@ -424,7 +424,7 @@ class PlatformConfigurationService {
   }
 
   async createConfigurationSnapshot() {
-    const currentConfig = await this.getConfiguration();
+    let currentConfig = await this.getConfiguration();
     await this.db.query(`
       INSERT INTO configuration_snapshots 
       (config_data, created_at) 
@@ -487,7 +487,7 @@ class PlatformConfigurationService {
   }
 
   async getConfigurationById(id) {
-    const result = await this.db.query(
+    let result = await this.db.query(
       'SELECT * FROM platform_configurations WHERE id = $1',
       [id]
     );
@@ -495,7 +495,7 @@ class PlatformConfigurationService {
   }
 
   async getPreviousStableConfiguration() {
-    const result = await this.db.query(`
+    let result = await this.db.query(`
       SELECT * FROM platform_configurations 
       WHERE is_active = false 
       AND performance_score > 0.9

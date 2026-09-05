@@ -84,7 +84,7 @@ async function createTrendDefinition(trendData) {
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     trend.ai_recommendations = aiResponse;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_definitions 
        (trend_id, trend_name, trend_type, data_source, metric_name, 
         analysis_frequency, time_horizon, confidence_threshold, status, created_at)
@@ -119,7 +119,7 @@ async function addDataPoint(trendId, dataPointData) {
   try {
     const { timestamp, value, is_forecast, confidence_level, metadata } = dataPointData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_data_points 
        (data_point_id, trend_id, timestamp, value, is_forecast, confidence_level, metadata, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -151,7 +151,7 @@ async function getTrendDataPoints(trendId, filters = {}) {
   try {
     const { start_time, end_time, is_forecast } = filters;
     let query = 'SELECT * FROM trend_data_points WHERE trend_id = $1';
-    const params = [trendId];
+    let params = [trendId];
     let paramCount = 1;
 
     if (start_time) {
@@ -174,7 +174,7 @@ async function getTrendDataPoints(trendId, filters = {}) {
 
     query += ' ORDER BY timestamp ASC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting trend data points', { error: error.message });
@@ -198,7 +198,7 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
     }
 
     // AI-powered trend analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'trend_analysis',
       parameters: {
         data_points: dataPoints,
@@ -208,7 +208,7 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const analysis = {
       analysis_id: generateId(),
@@ -228,7 +228,7 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
       analyzed_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_analysis 
        (analysis_id, trend_id, analysis_type, trend_direction, trend_strength, 
         trend_slope, r_squared, seasonality_pattern, seasonality_strength, 
@@ -268,10 +268,10 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
  */
 async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
   try {
-    const dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
+    let dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
 
     // AI-powered forecasting
-    const aiRequest = {
+    let aiRequest = {
       task: 'trend_forecasting',
       parameters: {
         historical_data: dataPoints,
@@ -282,7 +282,7 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const forecast = {
       forecast_id: generateId(),
@@ -297,7 +297,7 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
       valid_until: new Date(Date.now() + forecastHorizon * 24 * 60 * 60 * 1000).toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_forecasts 
        (forecast_id, trend_id, forecast_type, forecast_horizon, forecast_data, 
         confidence_intervals, model_used, model_accuracy, generated_at, valid_until)
@@ -340,10 +340,10 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
  */
 async function detectSeasonality(trendId) {
   try {
-    const dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
+    let dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
 
     // AI-powered seasonality detection
-    const aiRequest = {
+    let aiRequest = {
       task: 'seasonality_detection',
       parameters: {
         data_points: dataPoints,
@@ -351,7 +351,7 @@ async function detectSeasonality(trendId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const seasonality = {
       seasonality_id: generateId(),
@@ -364,7 +364,7 @@ async function detectSeasonality(trendId) {
       detected_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_seasonality 
        (seasonality_id, trend_id, seasonality_type, period, amplitude, phase, 
         seasonal_indices, detected_at)
@@ -399,7 +399,7 @@ async function calculateCorrelation(trendId, correlatedMetric) {
     const correlatedData = await getCorrelatedData(correlatedMetric);
 
     // AI-powered correlation analysis
-    const aiRequest = {
+    let aiRequest = {
       task: 'correlation_analysis',
       parameters: {
         trend_data: trendData,
@@ -408,7 +408,7 @@ async function calculateCorrelation(trendId, correlatedMetric) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const correlation = {
       correlation_id: generateId(),
@@ -421,7 +421,7 @@ async function calculateCorrelation(trendId, correlatedMetric) {
       calculated_at: new Date().toISOString()
     };
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_correlations 
        (correlation_id, trend_id, correlated_metric, correlation_coefficient, 
         p_value, lead_lag_period, correlation_type, calculated_at)
@@ -452,10 +452,10 @@ async function calculateCorrelation(trendId, correlatedMetric) {
  */
 async function detectBreakpoints(trendId) {
   try {
-    const dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
+    let dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
 
     // AI-powered breakpoint detection
-    const aiRequest = {
+    let aiRequest = {
       task: 'breakpoint_detection',
       parameters: {
         data_points: dataPoints,
@@ -463,7 +463,7 @@ async function detectBreakpoints(trendId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const breakpoints = [];
     for (const bp of aiResponse.breakpoints) {
@@ -479,7 +479,7 @@ async function detectBreakpoints(trendId) {
         detected_at: new Date().toISOString()
       };
 
-      const result = await pool.query(
+      let result = await pool.query(
         `INSERT INTO trend_breakpoints 
          (breakpoint_id, trend_id, breakpoint_timestamp, breakpoint_type, 
           pre_trend_slope, post_trend_slope, significance_level, description, detected_at)
@@ -523,7 +523,7 @@ async function createTrendAlert(alertData) {
       message
     } = alertData;
 
-    const result = await pool.query(
+    let result = await pool.query(
       `INSERT INTO trend_alerts 
        (alert_id, trend_id, alert_type, alert_condition, threshold_value, severity, message, triggered_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -555,7 +555,7 @@ async function getTrendAlerts(trendId, filters = {}) {
   try {
     const { is_active } = filters;
     let query = 'SELECT * FROM trend_alerts WHERE trend_id = $1';
-    const params = [trendId];
+    let params = [trendId];
     let paramCount = 1;
 
     if (is_active !== undefined) {
@@ -566,7 +566,7 @@ async function getTrendAlerts(trendId, filters = {}) {
 
     query += ' ORDER BY triggered_at DESC';
 
-    const result = await pool.query(query, params);
+    let result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting trend alerts', { error: error.message });

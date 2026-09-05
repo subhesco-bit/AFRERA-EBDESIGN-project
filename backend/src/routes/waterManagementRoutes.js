@@ -41,7 +41,7 @@ function crudRouter(service, validateCreate) {
   });
   router.put('/:id', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, validateBody(), bodyValidator(validateUpdate), async (req, res) => {
     try {
-      const item = await service.update(req.params.id, req.body);
+      let item = await service.update(req.params.id, req.body);
       if (!item) return res.status(404).json({ success: false, error: 'Not found' });
       emitMutation(req, 'update', item);
       res.json({ success: true, data: item });

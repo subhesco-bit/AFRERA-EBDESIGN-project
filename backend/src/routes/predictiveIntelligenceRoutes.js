@@ -60,7 +60,7 @@ router.get
       const { cropType } = req.params;
       const { region, qualityGrade = 'standard' } = req.query;
 
-      const result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
+      let result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Pricing prediction generated');
@@ -96,7 +96,7 @@ router.post
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      const result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
+      let result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Yield prediction generated');
@@ -121,7 +121,7 @@ router.get
     try {
       const { region, season } = req.params;
 
-      const result = await predictiveService.getSeasonalRecommendations(region, season);
+      let result = await predictiveService.getSeasonalRecommendations(region, season);
       
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Seasonal recommendations retrieved');

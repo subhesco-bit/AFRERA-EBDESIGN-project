@@ -37,7 +37,7 @@ router.get('/fleet/vehicles', authMiddleware, async (req, res) => {
       type: req.query.type,
       status: req.query.status
     };
-    const result = await logisticsService.getFleet(filters);
+    let result = await logisticsService.getFleet(filters);
     res.json(result);
   } catch (error) {
     logger.error('Get fleet API error', { error: error.message, stack: error.stack });
@@ -50,7 +50,7 @@ router.get('/fleet/vehicles', authMiddleware, async (req, res) => {
  */
 router.get('/fleet/vehicles/:vehicleId', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.getVehicle(req.params.vehicleId);
+    let result = await logisticsService.getVehicle(req.params.vehicleId);
     res.json(result);
   } catch (error) {
     logger.error('Get vehicle API error', { error: error.message, stack: error.stack });
@@ -67,7 +67,7 @@ router.get('/fleet/vehicles/:vehicleId', authMiddleware, async (req, res) => {
  */
 router.put('/fleet/vehicles/:vehicleId', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
-    const result = await logisticsService.updateVehicle(req.params.vehicleId, req.body);
+    let result = await logisticsService.updateVehicle(req.params.vehicleId, req.body);
     res.json(result);
   } catch (error) {
     logger.error('Update vehicle API error', { error: error.message, stack: error.stack });
@@ -84,7 +84,7 @@ router.put('/fleet/vehicles/:vehicleId', authMiddleware, requireRole(...LOGISTIC
  */
 router.post('/fleet/vehicles/:vehicleId/maintenance', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.scheduleMaintenance(req.params.vehicleId, req.body);
+    let result = await logisticsService.scheduleMaintenance(req.params.vehicleId, req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Schedule maintenance API error', { error: error.message, stack: error.stack });
@@ -101,7 +101,7 @@ router.post('/fleet/vehicles/:vehicleId/maintenance', authMiddleware, async (req
  */
 router.post('/tracking/:shipmentId', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.updateTracking(req.params.shipmentId, req.body);
+    let result = await logisticsService.updateTracking(req.params.shipmentId, req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Update tracking API error', { error: error.message, stack: error.stack });
@@ -114,7 +114,7 @@ router.post('/tracking/:shipmentId', authMiddleware, async (req, res) => {
  */
 router.get('/tracking/:shipmentId', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.getTracking(req.params.shipmentId);
+    let result = await logisticsService.getTracking(req.params.shipmentId);
     res.json(result);
   } catch (error) {
     logger.error('Get tracking API error', { error: error.message, stack: error.stack });
@@ -127,7 +127,7 @@ router.get('/tracking/:shipmentId', authMiddleware, async (req, res) => {
  */
 router.get('/tracking/:shipmentId/live', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.getLiveTracking(req.params.shipmentId);
+    let result = await logisticsService.getLiveTracking(req.params.shipmentId);
     res.json(result);
   } catch (error) {
     logger.error('Get live tracking API error', { error: error.message, stack: error.stack });
@@ -144,7 +144,7 @@ router.get('/tracking/:shipmentId/live', authMiddleware, async (req, res) => {
  */
 router.post('/tracking/:shipmentId/geofence', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.setGeofence(req.params.shipmentId, req.body);
+    let result = await logisticsService.setGeofence(req.params.shipmentId, req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Set geofence API error', { error: error.message, stack: error.stack });
@@ -161,7 +161,7 @@ router.post('/tracking/:shipmentId/geofence', authMiddleware, async (req, res) =
  */
 router.post('/temperature/:shipmentId', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.recordTemperature(req.params.shipmentId, req.body);
+    let result = await logisticsService.recordTemperature(req.params.shipmentId, req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record temperature API error', { error: error.message, stack: error.stack });
@@ -174,12 +174,12 @@ router.post('/temperature/:shipmentId', authMiddleware, async (req, res) => {
  */
 router.get('/temperature/:shipmentId', authMiddleware, async (req, res) => {
   try {
-    const filters = {
+    let filters = {
       startDate: req.query.startDate,
       endDate: req.query.endDate,
       zone: req.query.zone
     };
-    const result = await logisticsService.getTemperatureData(req.params.shipmentId, filters);
+    let result = await logisticsService.getTemperatureData(req.params.shipmentId, filters);
     res.json(result);
   } catch (error) {
     logger.error('Get temperature data API error', { error: error.message, stack: error.stack });
@@ -192,7 +192,7 @@ router.get('/temperature/:shipmentId', authMiddleware, async (req, res) => {
  */
 router.get('/temperature/:shipmentId/alerts', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.getTemperatureAlerts(req.params.shipmentId);
+    let result = await logisticsService.getTemperatureAlerts(req.params.shipmentId);
     res.json(result);
   } catch (error) {
     logger.error('Get temperature alerts API error', { error: error.message, stack: error.stack });
@@ -209,7 +209,7 @@ router.get('/temperature/:shipmentId/alerts', authMiddleware, async (req, res) =
  */
 router.post('/warehouse/locations', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.createWarehouse(req.body);
+    let result = await logisticsService.createWarehouse(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add warehouse location API error', { error: error.message, stack: error.stack });
@@ -222,12 +222,12 @@ router.post('/warehouse/locations', authMiddleware, async (req, res) => {
  */
 router.get('/warehouse/locations', authMiddleware, async (req, res) => {
   try {
-    const filters = {
+    let filters = {
       warehouseId: req.query.warehouseId,
       zone: req.query.zone,
       status: req.query.status
     };
-    const result = await logisticsService.getWarehouses(filters);
+    let result = await logisticsService.getWarehouses(filters);
     res.json(result);
   } catch (error) {
     logger.error('Get warehouse locations API error', { error: error.message, stack: error.stack });
@@ -240,7 +240,7 @@ router.get('/warehouse/locations', authMiddleware, async (req, res) => {
  */
 router.post('/warehouse/inventory', authMiddleware, async (req, res) => {
   try {
-    const result = await logisticsService.addInventory(req.body.warehouseId, req.body);
+    let result = await logisticsService.addInventory(req.body.warehouseId, req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add inventory API error', { error: error.message, stack: error.stack });
@@ -259,7 +259,7 @@ router.get('/warehouse/inventory', authMiddleware, async (req, res) => {
     if (!req.query.warehouseId) {
       return res.status(400).json({ error: 'warehouseId is required' });
     }
-    const result = await logisticsService.getWarehouseInventory(req.query.warehouseId);
+    let result = await logisticsService.getWarehouseInventory(req.query.warehouseId);
     res.json(result);
   } catch (error) {
     logger.error('Get inventory API error', { error: error.message, stack: error.stack });
@@ -313,7 +313,7 @@ router.post('/drivers/location', authMiddleware, async (req, res) => {
 
 router.get('/drivers/active', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsService.getActiveDrivers(req.query);
+    let data = await logisticsService.getActiveDrivers(req.query);
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -322,7 +322,7 @@ router.get('/drivers/active', authMiddleware, async (req, res) => {
 
 router.get('/shipments/:id/trail', authMiddleware, async (req, res) => {
   try {
-    const data = await logisticsService.getShipmentTrail(req.params.id);
+    let data = await logisticsService.getShipmentTrail(req.params.id);
     res.json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

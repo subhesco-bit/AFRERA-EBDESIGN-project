@@ -32,7 +32,7 @@ router.get('/facilities', authMiddleware, async (req, res) => {
 
 router.get('/facilities/:facilityId', authMiddleware, async (req, res) => {
   try {
-    const facility = await coldStorageService.getFacility(req.params.facilityId);
+    let facility = await coldStorageService.getFacility(req.params.facilityId);
     res.json({ success: true, data: facility });
   } catch (error) {
     res.status(error.message === 'Cold storage facility not found' ? 404 : 400).json({ success: false, error: error.message });
@@ -41,7 +41,7 @@ router.get('/facilities/:facilityId', authMiddleware, async (req, res) => {
 
 router.put('/facilities/:facilityId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const facility = await coldStorageService.updateFacility(req.params.facilityId, req.body);
+    let facility = await coldStorageService.updateFacility(req.params.facilityId, req.body);
     res.json({ success: true, data: facility });
   } catch (error) {
     res.status(error.message === 'Cold storage facility not found' ? 404 : 400).json({ success: false, error: error.message });
@@ -80,7 +80,7 @@ router.get('/bookings', authMiddleware, async (req, res) => {
 
 router.put('/bookings/:bookingId/status', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
-    const booking = await coldStorageService.updateBookingStatus(req.params.bookingId, req.body.status);
+    let booking = await coldStorageService.updateBookingStatus(req.params.bookingId, req.body.status);
     res.json({ success: true, data: booking });
   } catch (error) {
     res.status(error.message === 'Booking not found' ? 404 : 400).json({ success: false, error: error.message });

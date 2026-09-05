@@ -52,7 +52,7 @@ router.get('/', rateLimiters.read, parsePageQuery, queryValidator(validateExchan
 
 router.get('/:listingId', rateLimiters.read, validateId, async (req, res) => {
   try {
-    const listing = await equipmentExchangeService.getListing(req.params.listingId);
+    let listing = await equipmentExchangeService.getListing(req.params.listingId);
     res.json({ success: true, data: listing });
   } catch (error) {
     return fail(req, res, error, 'exchange.get', 404);
@@ -61,7 +61,7 @@ router.get('/:listingId', rateLimiters.read, validateId, async (req, res) => {
 
 router.post('/:listingId/reserve', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, async (req, res) => {
   try {
-    const listing = await equipmentExchangeService.reserveListing(req.params.listingId, req.user.id);
+    let listing = await equipmentExchangeService.reserveListing(req.params.listingId, req.user.id);
     emitMutation(req, 'reserve', listing, SIGNAL.EQUIPMENT_EXCHANGE_CHANGED, 'equipment_exchange_routes');
     res.json({ success: true, data: listing });
   } catch (error) {
@@ -71,7 +71,7 @@ router.post('/:listingId/reserve', rateLimiters.write, authMiddleware, requireRo
 
 router.post('/:listingId/complete', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, async (req, res) => {
   try {
-    const listing = await equipmentExchangeService.completeExchange(req.params.listingId, req.user.id);
+    let listing = await equipmentExchangeService.completeExchange(req.params.listingId, req.user.id);
     emitMutation(req, 'complete', listing, SIGNAL.EQUIPMENT_EXCHANGE_CHANGED, 'equipment_exchange_routes');
     res.json({ success: true, data: listing });
   } catch (error) {
@@ -81,7 +81,7 @@ router.post('/:listingId/complete', rateLimiters.write, authMiddleware, requireR
 
 router.delete('/:listingId', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, async (req, res) => {
   try {
-    const listing = await equipmentExchangeService.withdrawListing(req.params.listingId, req.user.id);
+    let listing = await equipmentExchangeService.withdrawListing(req.params.listingId, req.user.id);
     emitMutation(req, 'withdraw', listing, SIGNAL.EQUIPMENT_EXCHANGE_CHANGED, 'equipment_exchange_routes');
     res.json({ success: true, data: listing });
   } catch (error) {

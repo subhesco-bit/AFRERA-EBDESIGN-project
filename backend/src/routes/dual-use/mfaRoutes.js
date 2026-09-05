@@ -123,7 +123,7 @@ router.post('/backup/sms', authMiddleware, async (req, res) => {
     const { userId } = req.user;
     
     // Get user phone number
-    const phoneNumber = req.user.phoneNumber;
+    let phoneNumber = req.user.phoneNumber;
     
     // Generate new backup code
     const backupCode = mfaService.generateBackupCode();

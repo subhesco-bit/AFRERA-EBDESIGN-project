@@ -175,7 +175,7 @@ class ResearchAndDevelopmentService {
    * Update R&D project
    */
   updateRDProject(projectId, updates) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -194,7 +194,7 @@ class ResearchAndDevelopmentService {
    * Delete R&D project
    */
   deleteRDProject(projectId) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -207,7 +207,7 @@ class ResearchAndDevelopmentService {
    * Add milestone to project
    */
   addMilestone(projectId, milestoneData) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -232,12 +232,12 @@ class ResearchAndDevelopmentService {
    * Update milestone status
    */
   updateMilestone(projectId, milestoneId, updates) {
-    const project = this.rdProjects.get(projectId);
+    let project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
 
-    const milestone = project.milestones.find(m => m.id === milestoneId);
+    let milestone = project.milestones.find(m => m.id === milestoneId);
     if (!milestone) {
       throw new Error(`Milestone ${milestoneId} not found`);
     }
@@ -454,7 +454,7 @@ class ResearchAndDevelopmentService {
    * Apply for funding
    */
   applyForFunding(fundingId, applicationData) {
-    const funding = this.fundingOpportunities.get(fundingId);
+    let funding = this.fundingOpportunities.get(fundingId);
     if (!funding) {
       throw new Error(`Funding opportunity ${fundingId} not found`);
     }

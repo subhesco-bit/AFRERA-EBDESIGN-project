@@ -195,7 +195,7 @@ function basis({ farmgatePerKg, ncrDeliveredPerKg, freightPerKg, expectedLossPct
  * the question is what the upside participation is actually worth on top.
  */
 function valueFloorParticipation(c, { floorPerKg, participationShare, spotPerKg, monthsAhead, qtyKg }) {
-  const sigma = c.volAnnual * Math.sqrt(monthsAhead / 12);
+  let sigma = c.volAnnual * Math.sqrt(monthsAhead / 12);
   const d = (spotPerKg - floorPerKg) / (spotPerKg * sigma || 1e-9);
   const nd = 0.5 * (1 + Math.tanh(0.8 * d));
   const callPerKg = Math.max(
@@ -303,11 +303,11 @@ async function districtConfidence(state, district, cropKey) {
 
 /** Compute an advance rate. Does not persist — see publish(). */
 async function computeAdvanceRate({ cropKey, monthsAhead, spotPerKg, weather, state, district }) {
-  const c = await cropParams(cropKey);
+  let c = await cropParams(cropKey);
   const w = weather || WEATHER_FALLBACK;
   const cal = await districtConfidence(state, district, cropKey);
-  const y = yieldIndex(c, w);
-  const fwd = forwardCurve(c, { spotPerKg, monthsAhead, yieldIdx: y.index });
+  let y = yieldIndex(c, w);
+  let fwd = forwardCurve(c, { spotPerKg, monthsAhead, yieldIdx: y.index });
   const deliveryMonth = new Date();
   deliveryMonth.setMonth(deliveryMonth.getMonth() + Math.round(monthsAhead));
 
@@ -351,8 +351,8 @@ async function publish(rate, publishedBy = null) {
 
 /** Full commitment advice for a farmer, persisted so it can be scored later. */
 async function adviseCommitment(input) {
-  const c = await cropParams(input.cropKey);
-  const cal = await districtConfidence(input.state, input.district, input.cropKey);
+  let c = await cropParams(input.cropKey);
+  let cal = await districtConfidence(input.state, input.district, input.cropKey);
   const result = commitAdvice(c, {
     ...input,
     weather: input.weather || WEATHER_FALLBACK,

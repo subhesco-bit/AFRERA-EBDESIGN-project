@@ -329,7 +329,7 @@ async function generateVoiceResponse(intent, entities, language, userId) {
  * Fetch Intent-Specific Data
  */
 async function fetchIntentData(intent, entities, userId) {
-  const data = {};
+  let data = {};
 
   try {
     switch (intent) {
@@ -455,13 +455,13 @@ async function getUserEligibleSubsidies(userId, crop) {
  * Get Order Status
  */
 async function getOrderStatus(orderId, userId) {
-  const query = `
+  let query = `
     SELECT status, estimated_delivery
     FROM orders
     WHERE id = $1 AND user_id = $2
   `;
 
-  const result = await pool.query(query, [orderId, userId]);
+  let result = await pool.query(query, [orderId, userId]);
 
   if (result.rows.length > 0) {
     return {
@@ -580,7 +580,7 @@ async function transcribeAudio(audioData, language) {
  * Get Conversation History
  */
 async function getConversationHistory(conversationId) {
-  const query = `
+  let query = `
     SELECT intent, transcript, response_text
     FROM voice_conversation_turns
     WHERE conversation_id = $1
@@ -588,7 +588,7 @@ async function getConversationHistory(conversationId) {
     LIMIT 10
   `;
 
-  const result = await pool.query(query, [conversationId]);
+  let result = await pool.query(query, [conversationId]);
   return result.rows;
 }
 
@@ -596,7 +596,7 @@ async function getConversationHistory(conversationId) {
  * Store Conversation Turn
  */
 async function storeConversationTurn(conversationId, userId, transcript, intentResult, response) {
-  const query = `
+  let query = `
     INSERT INTO voice_conversation_turns
     (conversation_id, user_id, transcript, intent, confidence, entities, response_text, response_data)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -620,14 +620,14 @@ async function storeConversationTurn(conversationId, userId, transcript, intentR
 async function createVoiceConversation(userId, language = 'en') {
   const conversationId = `CONV-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-  const query = `
+  let query = `
     INSERT INTO voice_conversations
     (conversation_id, user_id, language, status)
     VALUES ($1, $2, $3, 'active')
     RETURNING *
   `;
 
-  const result = await pool.query(query, [conversationId, userId, language]);
+  let result = await pool.query(query, [conversationId, userId, language]);
   return result.rows[0];
 }
 
@@ -662,7 +662,7 @@ router.post('/process', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Audio data and conversation ID are required' });
     }
 
-    const result = await processAdvancedVoiceCommand(
+    let result = await processAdvancedVoiceCommand(
       req.user.id,
       audio_data,
       language || 'en',
@@ -718,9 +718,9 @@ router.post('/text-query', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    const history = conversation_id ? await getConversationHistory(conversation_id) : [];
-    const intentResult = detectIntentWithContext(text, language || 'en', history);
-    const response = await generateVoiceResponse(
+    let history = conversation_id ? await getConversationHistory(conversation_id) : [];
+    let intentResult = detectIntentWithContext(text, language || 'en', history);
+    let response = await generateVoiceResponse(
       intentResult.intent,
       intentResult.entities,
       language || 'en',

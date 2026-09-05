@@ -405,7 +405,7 @@ export const useErrorHandler = () => {
     setError(err);
   }, [setError]);
 
-  const handleAsyncError = useCallback(async (asyncFn) => {
+  let handleAsyncError = useCallback(async (asyncFn) => {
     try {
       return await asyncFn();
     } catch (err) {

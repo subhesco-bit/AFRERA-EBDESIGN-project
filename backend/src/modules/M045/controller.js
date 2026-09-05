@@ -15,7 +15,7 @@ async function createSeedPlan(req, res) {
 
 async function getSeedPlan(req, res) {
   try {
-    const plan = await service.getSeedPlan(req.params.planId);
+    let plan = await service.getSeedPlan(req.params.planId);
     if (!plan) return res.status(404).json({ success: false, error: 'Seed plan not found' });
     res.json({ success: true, data: plan });
   } catch (error) {
@@ -37,7 +37,7 @@ async function listSeedPlans(req, res) {
 
 async function updateSeedPlan(req, res) {
   try {
-    const plan = await service.updateSeedPlan(req.params.planId, req.body);
+    let plan = await service.updateSeedPlan(req.params.planId, req.body);
     if (!plan) return res.status(404).json({ success: false, error: 'Seed plan not found' });
     res.json({ success: true, data: plan });
   } catch (error) {

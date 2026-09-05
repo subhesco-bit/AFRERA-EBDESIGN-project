@@ -137,7 +137,7 @@ class ClaudeAICoordinator {
     const systemPrompt = this.buildSystemPrompt(agent, agentConfig, context);
     const userMessage = this.buildUserMessage(query, sessionContext);
 
-    const response = await this.anthropic.messages.create({
+    let response = await this.anthropic.messages.create({
       model: this.model,
       max_tokens: this.maxTokens,
       temperature: this.temperature,
@@ -349,7 +349,7 @@ class ClaudeAICoordinator {
    */
   async trackAIUsage(userId, requestType, agent, response) {
     try {
-      const insertQuery = `
+      let insertQuery = `
         INSERT INTO ai_usage_tracking (user_id, request_type, agent, input_tokens, output_tokens, total_tokens, cost)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
       `;
@@ -397,7 +397,7 @@ class ClaudeAICoordinator {
    */
   async recordAIResponseFeedback(feedbackData) {
     try {
-      const result = await this.aiFeedback.recordFeedback(feedbackData);
+      let result = await this.aiFeedback.recordFeedback(feedbackData);
       
       // Log feedback with collaboration system
       await this.aiCollaboration.logWork('claude', {

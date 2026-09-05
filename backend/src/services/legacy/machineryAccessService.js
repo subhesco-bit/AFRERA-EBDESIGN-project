@@ -197,7 +197,7 @@ function setupRoutes(app) {
 
   router.get('/access/type/:machineryType', async (req, res) => {
     try {
-      const accessRecords = await getMachineryAccessByType(req.params.machineryType);
+      let accessRecords = await getMachineryAccessByType(req.params.machineryType);
       res.json({ success: true, data: accessRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -215,7 +215,7 @@ function setupRoutes(app) {
 
   router.post('/access', async (req, res) => {
     try {
-      const access = await upsertMachineryAccess(req.body);
+      let access = await upsertMachineryAccess(req.body);
       res.status(201).json({ success: true, data: access });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });

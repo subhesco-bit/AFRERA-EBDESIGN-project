@@ -130,7 +130,7 @@ router.post('/optimizer/recommend-stack', async (req, res) => {
       return res.status(400).json({ error: 'village_id and average_daily_demand_kwh are required' });
     }
 
-    const result = EnergyCostCalculator.optimizeEnergyStack({
+    let result = EnergyCostCalculator.optimizeEnergyStack({
       averageDailyDemandKwh: average_daily_demand_kwh,
       peakDemandKw: peak_demand_kw || (average_daily_demand_kwh * 1.5),
       gridAvailability: grid_availability || 0.6,
@@ -207,7 +207,7 @@ router.post('/productive/demand-forecast', async (req, res) => {
       return res.status(400).json({ error: 'village_id is required' });
     }
 
-    const result = EnergyCostCalculator.calculateProductiveEnergyDemand({
+    let result = EnergyCostCalculator.calculateProductiveEnergyDemand({
       farmerCount: farmer_count || 500,
       avgFarmSizeHectares: avg_farm_size_hectares || 2,
       irrigationArea: irrigation_area || 800,
@@ -241,7 +241,7 @@ router.post('/stack/compare', async (req, res) => {
       });
     }
 
-    const result = EnergyCostCalculator.compareStackConfigurations(stacks);
+    let result = EnergyCostCalculator.compareStackConfigurations(stacks);
 
     res.status(200).json({
       village_id,

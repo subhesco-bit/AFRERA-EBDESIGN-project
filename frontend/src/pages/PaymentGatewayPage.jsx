@@ -32,7 +32,7 @@ export default function PaymentGatewayPage() {
     setPaymentStatus(null);
 
     try {
-      const result = await paymentGatewayAPI.processPayment(paymentData);
+      let result = await paymentGatewayAPI.processPayment(paymentData);
       setPaymentStatus(result.data);
     } catch (error) {
       setPaymentStatus({
@@ -46,7 +46,7 @@ export default function PaymentGatewayPage() {
 
   const handleRefund = async (paymentId) => {
     try {
-      const result = await paymentGatewayAPI.refundPayment(paymentId, {
+      let result = await paymentGatewayAPI.refundPayment(paymentId, {
         amount: paymentData.amount,
         reason: 'Customer request'
       });
@@ -61,7 +61,7 @@ export default function PaymentGatewayPage() {
 
   const handleCheckStatus = async (paymentId) => {
     try {
-      const result = await paymentGatewayAPI.getPaymentStatus(paymentId);
+      let result = await paymentGatewayAPI.getPaymentStatus(paymentId);
       setPaymentStatus(result.data);
     } catch (error) {
       console.error('Status check failed:', error);

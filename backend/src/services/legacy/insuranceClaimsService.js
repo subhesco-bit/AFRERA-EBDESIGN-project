@@ -113,10 +113,10 @@ async function submitInsuranceClaim(claimData) {
  */
 async function processInsuranceClaim(claimId) {
   try {
-    const claim = await getClaimDetails(claimId);
+    let claim = await getClaimDetails(claimId);
     
     // AI-powered claim assessment
-    const aiRequest = {
+    let aiRequest = {
       task: 'insurance_claim_assessment',
       parameters: {
         claim_id: claimId,
@@ -130,7 +130,7 @@ async function processInsuranceClaim(claimId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const assessment = {
       claim_id: claimId,
@@ -189,7 +189,7 @@ async function processInsuranceClaim(claimId) {
  */
 async function followUpClaimSettlement(claimId) {
   try {
-    const claim = await getClaimDetails(claimId);
+    let claim = await getClaimDetails(claimId);
     
     const followUp = {
       follow_up_id: generateId(),
@@ -207,7 +207,7 @@ async function followUpClaimSettlement(claimId) {
     };
 
     // AI-powered follow-up recommendation
-    const aiRequest = {
+    let aiRequest = {
       task: 'settlement_follow_up_recommendation',
       parameters: {
         claim_data: claim,
@@ -217,7 +217,7 @@ async function followUpClaimSettlement(claimId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     followUp.ai_recommendations = aiResponse;
 
     // Execute automated follow-up actions
@@ -242,7 +242,7 @@ async function followUpClaimSettlement(claimId) {
  */
 async function getClaimStatus(claimId) {
   try {
-    const claim = await getClaimDetails(claimId);
+    let claim = await getClaimDetails(claimId);
     
     const status = {
       claim_id: claimId,
@@ -294,7 +294,7 @@ async function getClaimStatus(claimId) {
  */
 async function detectClaimFraud(claimData) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'fraud_detection',
       parameters: {
         claim_data: claimData,
@@ -307,7 +307,7 @@ async function detectClaimFraud(claimData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const fraudAnalysis = {
       claim_id: claimData.claim_id || generateId(),
@@ -333,9 +333,9 @@ async function detectClaimFraud(claimData) {
  */
 async function calculateClaimPayout(claimId) {
   try {
-    const claim = await getClaimDetails(claimId);
+    let claim = await getClaimDetails(claimId);
     
-    const aiRequest = {
+    let aiRequest = {
       task: 'payout_calculation',
       parameters: {
         claim_data: claim,
@@ -348,7 +348,7 @@ async function calculateClaimPayout(claimId) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const payout = {
       claim_id: claimId,
@@ -542,7 +542,7 @@ async function getCoverageLimits(policyId) {
 function setupRoutes(app) {
   app.post('/api/v1/insurance/claims/submit', authMiddleware, async (req, res) => {
     try {
-      const claim = await submitInsuranceClaim(req.body);
+      let claim = await submitInsuranceClaim(req.body);
       res.json({ success: true, data: claim });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -551,7 +551,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/insurance/claims/:id/process', authMiddleware, async (req, res) => {
     try {
-      const assessment = await processInsuranceClaim(req.params.id);
+      let assessment = await processInsuranceClaim(req.params.id);
       res.json({ success: true, data: assessment });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -560,7 +560,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/insurance/claims/:id/followup', authMiddleware, async (req, res) => {
     try {
-      const followUp = await followUpClaimSettlement(req.params.id);
+      let followUp = await followUpClaimSettlement(req.params.id);
       res.json({ success: true, data: followUp });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -569,7 +569,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/insurance/claims/:id/status', async (req, res) => {
     try {
-      const status = await getClaimStatus(req.params.id);
+      let status = await getClaimStatus(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -578,7 +578,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/insurance/claims/fraud-detect', authMiddleware, async (req, res) => {
     try {
-      const fraudAnalysis = await detectClaimFraud(req.body);
+      let fraudAnalysis = await detectClaimFraud(req.body);
       res.json({ success: true, data: fraudAnalysis });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -587,7 +587,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/insurance/claims/:id/payout', async (req, res) => {
     try {
-      const payout = await calculateClaimPayout(req.params.id);
+      let payout = await calculateClaimPayout(req.params.id);
       res.json({ success: true, data: payout });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

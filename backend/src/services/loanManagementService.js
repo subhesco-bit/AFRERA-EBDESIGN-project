@@ -55,7 +55,7 @@ class LoanManagementService {
    */
   async getLoanStatus(loanId) {
     try {
-      const loan = await db('loans').where('id', loanId).first();
+      let loan = await db('loans').where('id', loanId).first();
       if (!loan) throw new NotFoundError('Loan not found');
 
       const payments = await db('loan_payments').where('loan_id', loanId);
@@ -106,7 +106,7 @@ class LoanManagementService {
    */
   async disburseLoan(loanId) {
     try {
-      const loan = await db('loans').where('id', loanId).first();
+      let loan = await db('loans').where('id', loanId).first();
       if (!loan) throw new NotFoundError('Loan not found');
 
       await db('loans')
@@ -135,10 +135,10 @@ class LoanManagementService {
    */
   async trackRepayment(loanId) {
     try {
-      const loan = await db('loans').where('id', loanId).first();
+      let loan = await db('loans').where('id', loanId).first();
       if (!loan) throw new NotFoundError('Loan not found');
 
-      const payments = await db('loan_payments')
+      let payments = await db('loan_payments')
         .where('loan_id', loanId)
         .orderBy('due_date');
 

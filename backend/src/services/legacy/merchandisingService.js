@@ -328,7 +328,7 @@ function listRituals({ mood } = {}) {
  * is more useful than a silently shortened one.
  */
 function ritualBundle({ name } = {}) {
-  const q = String(name || '').toLowerCase().trim();
+  let q = String(name || '').toLowerCase().trim();
   if (!q) throw new Error('name is required');
   const r = RITUALS.find((x) => x.name.toLowerCase() === q)
          || RITUALS.find((x) => x.name.toLowerCase().includes(q));
@@ -351,7 +351,7 @@ function ritualBundle({ name } = {}) {
  * advice about the same product.
  */
 function tipsFor({ audience } = {}) {
-  const key = String(audience || 'consumer').toLowerCase().trim();
+  let key = String(audience || 'consumer').toLowerCase().trim();
   const tips = SEASONAL_TIPS[key];
   if (!tips) {
     throw new Error(`audience must be one of: ${Object.keys(SEASONAL_TIPS).join(', ')}`);
@@ -368,7 +368,7 @@ function listAudiences() {
 // ---------------------------------------------------------------------------
 
 function portalDefinition({ role } = {}) {
-  const key = String(role || '').toLowerCase().trim();
+  let key = String(role || '').toLowerCase().trim();
   const p = PORTALS[key];
   if (!p) {
     throw new Error(`role must be one of: ${Object.keys(PORTALS).join(', ')}`);

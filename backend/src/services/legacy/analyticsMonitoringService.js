@@ -121,7 +121,7 @@ class AnalyticsMonitoringService {
       }
 
       // Store in database
-      const query = `
+      let query = `
         INSERT INTO performance_metrics (endpoint, response_time, status_code, user_id)
         VALUES ($1, $2, $3, $4)
       `;
@@ -329,7 +329,7 @@ class AnalyticsMonitoringService {
         const isHealthy = await this.checkServiceHealth(service);
         const responseTime = Date.now() - startTime;
 
-        const query = `
+        let query = `
           INSERT INTO system_health (service_name, status, response_time)
           VALUES ($1, $2, $3)
         `;

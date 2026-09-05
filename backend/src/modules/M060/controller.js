@@ -23,7 +23,7 @@ const list = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    const review = await reviewService.getReview(req.params.id);
+    let review = await reviewService.getReview(req.params.id);
     if (!review) return res.status(404).json({ success: false, error: 'Review not found' });
     res.status(200).json({ success: true, data: review });
   } catch (error) {
@@ -33,7 +33,7 @@ const get = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    const review = await reviewService.updateReviewStatus(req.params.id, req.body.status);
+    let review = await reviewService.updateReviewStatus(req.params.id, req.body.status);
     if (!review) return res.status(404).json({ success: false, error: 'Review not found' });
     res.status(200).json({ success: true, data: review });
   } catch (error) {

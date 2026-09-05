@@ -61,8 +61,8 @@ const LandRecords = ({ farmerId }) => {
   const addLandRecord = async () => {
     setLoading(true);
     try {
-      const response = await farmerPortalAPI.addLandRecord(newRecord);
-      const data = response.data;
+      let response = await farmerPortalAPI.addLandRecord(newRecord);
+      let data = response.data;
       if (data.success) {
         setDialogOpen(false);
         setNewRecord({
@@ -89,8 +89,8 @@ const LandRecords = ({ farmerId }) => {
   const syncWithGovernment = async () => {
     setLoading(true);
     try {
-      const response = await farmerPortalAPI.syncGovernmentLandRecords();
-      const data = response.data;
+      let response = await farmerPortalAPI.syncGovernmentLandRecords();
+      let data = response.data;
       alert(`Synced ${data.data.syncedCount} records from government`);
       loadLandRecords();
     } catch (error) {

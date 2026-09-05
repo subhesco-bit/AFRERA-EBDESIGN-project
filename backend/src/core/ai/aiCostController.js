@@ -153,7 +153,7 @@ function getCostRate(provider) {
  * Estimate cost before operation
  */
 function estimateCost(provider, estimatedTokens) {
-  const rate = getCostRate(provider);
+  let rate = getCostRate(provider);
   return (estimatedTokens / 1000) * rate;
 }
 

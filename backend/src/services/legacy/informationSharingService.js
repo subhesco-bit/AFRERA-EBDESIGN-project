@@ -165,7 +165,7 @@ class InformationSharingService {
    * Get a specific document
    */
   getDocument(documentId) {
-    const document = this.documents.get(documentId);
+    let document = this.documents.get(documentId);
     if (document) {
       document.accessCount = (document.accessCount || 0) + 1;
       this.documents.set(documentId, document);
@@ -177,7 +177,7 @@ class InformationSharingService {
    * Update document
    */
   updateDocument(documentId, updates) {
-    const document = this.documents.get(documentId);
+    let document = this.documents.get(documentId);
     if (!document) {
       throw new Error(`Document ${documentId} not found`);
     }
@@ -198,7 +198,7 @@ class InformationSharingService {
    * Delete document
    */
   deleteDocument(documentId) {
-    const document = this.documents.get(documentId);
+    let document = this.documents.get(documentId);
     if (!document) {
       throw new Error(`Document ${documentId} not found`);
     }
@@ -343,7 +343,7 @@ class InformationSharingService {
    * Get sharing link by token
    */
   getSharingLinkByToken(token) {
-    const link = Array.from(this.sharingLinks.values()).find(l => l.token === token);
+    let link = Array.from(this.sharingLinks.values()).find(l => l.token === token);
     
     if (link) {
       // Check if expired
@@ -416,7 +416,7 @@ class InformationSharingService {
    * Join collaboration session
    */
   joinCollaborationSession(sessionId, userId) {
-    const session = this.collaborationSessions.get(sessionId);
+    let session = this.collaborationSessions.get(sessionId);
     if (!session) {
       throw new Error(`Collaboration session ${sessionId} not found`);
     }
@@ -433,7 +433,7 @@ class InformationSharingService {
    * End collaboration session
    */
   endCollaborationSession(sessionId) {
-    const session = this.collaborationSessions.get(sessionId);
+    let session = this.collaborationSessions.get(sessionId);
     if (!session) {
       throw new Error(`Collaboration session ${sessionId} not found`);
     }
@@ -525,8 +525,8 @@ class InformationSharingService {
    * Get sharing analytics
    */
   getAnalytics() {
-    const documents = Array.from(this.documents.values());
-    const folders = Array.from(this.folders.values());
+    let documents = Array.from(this.documents.values());
+    let folders = Array.from(this.folders.values());
     const links = Array.from(this.sharingLinks.values());
     const sessions = Array.from(this.collaborationSessions.values());
 
@@ -572,7 +572,7 @@ class InformationSharingService {
    * Group documents by category
    */
   groupByCategory(documents) {
-    const grouped = {};
+    let grouped = {};
     documents.forEach(doc => {
       const category = doc.category || 'other';
       grouped[category] = (grouped[category] || 0) + 1;

@@ -43,7 +43,7 @@ const OrganicFarmRegistration = ({ onSuccess }) => {
     setError(null);
 
     try {
-      const response = await organicTraceabilityAPI.registerFarm({
+      let response = await organicTraceabilityAPI.registerFarm({
         ...formData,
         total_area_hectares: parseFloat(formData.total_area_hectares),
         organic_area_hectares: parseFloat(formData.organic_area_hectares),

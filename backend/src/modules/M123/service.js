@@ -141,7 +141,7 @@ async function updateFlockHealth(registryId, healthData) {
       recorded_at: new Date().toISOString()
     };
 
-    const aiRequest = {
+    let aiRequest = {
       task: 'poultry_health_analysis',
       parameters: {
         registry_id: registryId,
@@ -152,7 +152,7 @@ async function updateFlockHealth(registryId, healthData) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
     healthRecord.ai_analysis = aiResponse;
 
     await pool.query(
@@ -281,7 +281,7 @@ async function getNutritionalRequirements(breed, purpose) {
 
 async function getFlockHealthHistory(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM poultry_health_records WHERE registry_id = $1 ORDER BY recorded_at DESC LIMIT 10',
       [registryId]
     );
@@ -309,7 +309,7 @@ async function getEnvironmentalFactors(location) {
 
 async function getFlockBreed(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT breed FROM poultry_registry WHERE flock_registry_id = $1',
       [registryId]
     );
@@ -321,7 +321,7 @@ async function getFlockBreed(registryId) {
 
 async function getFlockLocation(registryId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT location, state, district FROM poultry_registry WHERE flock_registry_id = $1',
       [registryId]
     );
@@ -382,7 +382,7 @@ async function generatePerformanceRecommendations(registryId, period) {
 
 async function getFlockCount(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT COUNT(*) as count FROM poultry_registry WHERE farmer_id = $1',
       [farmerId]
     );
@@ -394,7 +394,7 @@ async function getFlockCount(farmerId) {
 
 async function getBreedDistribution(farmerId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT breed, COUNT(*) as count FROM poultry_registry WHERE farmer_id = $1 GROUP BY breed',
       [farmerId]
     );

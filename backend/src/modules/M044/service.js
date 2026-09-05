@@ -34,15 +34,15 @@ async function createVariety(varietyData) {
 }
 
 async function getVariety(varietyId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query('SELECT * FROM crop_varieties WHERE id = $1', [varietyId]);
+  let res = await pg.query('SELECT * FROM crop_varieties WHERE id = $1', [varietyId]);
   return res.rows[0] || null;
 }
 
 async function listVarieties({ page = 1, limit = 20, cropName, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const offset = (page - 1) * limit;
@@ -62,7 +62,7 @@ async function listVarieties({ page = 1, limit = 20, cropName, status } = {}) {
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
 
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM crop_varieties`, 'SELECT COUNT(*) FROM crop_varieties').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
 
@@ -70,12 +70,12 @@ async function listVarieties({ page = 1, limit = 20, cropName, status } = {}) {
 }
 
 async function updateVariety(varietyId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { varietyName, characteristics, seedSource, maturityDays, yieldPotential, diseaseResistance, droughtTolerance, notes, status } = updates;
 
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE crop_varieties
      SET variety_name = COALESCE($1, variety_name),
          characteristics = COALESCE($2, characteristics),
@@ -107,10 +107,10 @@ async function updateVariety(varietyId, updates) {
 }
 
 async function deleteVariety(varietyId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query('DELETE FROM crop_varieties WHERE id = $1 RETURNING id', [varietyId]);
+  let res = await pg.query('DELETE FROM crop_varieties WHERE id = $1 RETURNING id', [varietyId]);
 
   if (res.rows[0]) {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
@@ -128,7 +128,7 @@ async function deleteVariety(varietyId) {
 
 // AI-powered variety recommendation
 async function recommendVarieties(cropName, conditions = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { soilType, climate, irrigation, season } = conditions;
@@ -212,12 +212,12 @@ function generateVarietyComparison(varieties) {
 
 // Variety performance tracking
 async function recordVarietyPerformance(performanceData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { varietyId, farmerId, actualYield, plantingDate, harvestDate, conditions, notes } = performanceData;
 
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO variety_performance (variety_id, farmer_id, actual_yield, planting_date, harvest_date, conditions, notes, created_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
      RETURNING *`,
@@ -240,10 +240,10 @@ async function recordVarietyPerformance(performanceData) {
 }
 
 async function getVarietyPerformance(varietyId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM variety_performance WHERE variety_id = $1 ORDER BY harvest_date DESC',
     [varietyId]
   );
@@ -252,7 +252,7 @@ async function getVarietyPerformance(varietyId) {
 }
 
 async function analyzeVarietyPerformance(varietyId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const performance = await getVarietyPerformance(varietyId);
@@ -304,7 +304,7 @@ function generatePerformanceRecommendation(performance) {
 
 // Variety analytics
 async function getVarietyAnalytics({ cropName, startDate, endDate } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   let query = `
@@ -316,7 +316,7 @@ async function getVarietyAnalytics({ cropName, startDate, endDate } = {}) {
     FROM crop_varieties
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
 
   if (cropName) {
@@ -326,7 +326,7 @@ async function getVarietyAnalytics({ cropName, startDate, endDate } = {}) {
 
   query += ` GROUP BY crop_name ORDER BY count DESC`;
 
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
 
   return {
     byCrop: res.rows,

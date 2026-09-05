@@ -54,7 +54,7 @@ router.get
     const decisionSupportService = require('../services/legacy/decisionSupportService');
     
     // Get buyer profile to determine credit eligibility
-    const profile = {
+    let profile = {
       turnover_cr: 4,
       vintage_years: 3
     };
@@ -145,7 +145,7 @@ router.get
     logger.debug('router.get request');('/logistics/:providerId/profile', authMiddleware, async (req, res) => {
   try {
     const { providerId } = req.params;
-    const profile = {
+    let profile = {
       id: providerId,
       name: 'NE ColdChain Logistics',
       revenue: 12500000,
@@ -287,7 +287,7 @@ router.get
     logger.debug('router.get request');('/processor/:processorId/profile', authMiddleware, async (req, res) => {
   try {
     const { processorId } = req.params;
-    const profile = {
+    let profile = {
       id: processorId,
       name: 'NE Food Processing Ltd',
       capacity: 500,
@@ -309,7 +309,7 @@ router.get
     logger.debug('router.get request');('/retailer/:retailerId/profile', authMiddleware, async (req, res) => {
   try {
     const { retailerId } = req.params;
-    const profile = {
+    let profile = {
       id: retailerId,
       name: 'NE Flagship Store',
       locations: 8,

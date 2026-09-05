@@ -129,10 +129,10 @@ async function calculateNutrientValuePrice(productId, nutrientContent) {
  * Get nutrient benchmarks for category
  */
 async function getNutrientBenchmarks(categoryId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
-    const benchmarks = await pg.query(`
+    let benchmarks = await pg.query(`
       SELECT 
         protein,
         iron,
@@ -191,7 +191,7 @@ function calculateNutrientScore(actualValue, benchmark, weight) {
  * Submit nutrient content for lab verification
  */
 async function submitNutrientContent(productId, contentData, verificationData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -272,11 +272,11 @@ async function submitNutrientContent(productId, contentData, verificationData) {
  * Approve nutrient content verification
  */
 async function approveNutrientVerification(verificationId, approvedBy, notes) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get verification details
-    const verification = await pg.query(`
+    let verification = await pg.query(`
       SELECT * FROM nutrient_content_verification
       WHERE id = $1
     `, [verificationId]);
@@ -340,7 +340,7 @@ async function approveNutrientVerification(verificationId, approvedBy, notes) {
  * Create nutrient-value-based product listing
  */
 async function createNutrientValueListing(sellerId, listingData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -359,7 +359,7 @@ async function createNutrientValueListing(sellerId, listingData) {
     const listingId = `NVL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
     // Calculate nutrient value price
-    const pricing = await calculateNutrientValuePrice(listingId, nutrient_content);
+    let pricing = await calculateNutrientValuePrice(listingId, nutrient_content);
     
     const listing = {
       id: listingId,
@@ -421,7 +421,7 @@ async function createNutrientValueListing(sellerId, listingData) {
  * Assign nutrient quality tier to product
  */
 async function assignNutrientTier(productId, manualOverride = null) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     let nutrientDensityScore;
@@ -430,7 +430,7 @@ async function assignNutrientTier(productId, manualOverride = null) {
       nutrientDensityScore = manualOverride;
     } else {
       // Get current nutrient density score
-      const product = await pg.query(`
+      let product = await pg.query(`
         SELECT nutrient_density_score
         FROM product_listings
         WHERE id = $1
@@ -515,7 +515,7 @@ async function assignNutrientTier(productId, manualOverride = null) {
  * Compare products by nutrient value
  */
 async function compareProductsByNutrient(productIds) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const products = await pg.query(`
@@ -545,9 +545,9 @@ async function compareProductsByNutrient(productIds) {
     
     // Calculate comparison metrics
     const comparison = products.rows.map(product => {
-      const nutrientContent = JSON.parse(product.verified_nutrient_content);
-      const basePrice = parseFloat(product.base_price);
-      const nutrientValuePrice = parseFloat(product.nutrient_value_price);
+      let nutrientContent = JSON.parse(product.verified_nutrient_content);
+      let basePrice = parseFloat(product.base_price);
+      let nutrientValuePrice = parseFloat(product.nutrient_value_price);
       
       return {
         id: product.id,
@@ -605,7 +605,7 @@ async function compareProductsByNutrient(productIds) {
  * Issue nutrient quality certificate
  */
 async function issueNutrientCertificate(productId, certificationData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -680,7 +680,7 @@ async function issueNutrientCertificate(productId, certificationData) {
  * Calculate commission based on nutrient quality
  */
 async function calculateNutrientBasedCommission(orderId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     // Get order items with nutrient information
@@ -765,7 +765,7 @@ async function calculateNutrientBasedCommission(orderId) {
  * Search products by nutrient criteria
  */
 async function searchByNutrientCriteria(criteria) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   
   try {
     const {
@@ -838,7 +838,7 @@ async function searchByNutrientCriteria(criteria) {
     const result = await pg.query(query, params);
     
     // Parse nutrient content for each product
-    const products = result.rows.map(product => ({
+    let products = result.rows.map(product => ({
       ...product,
       verified_nutrient_content: JSON.parse(product.verified_nutrient_content)
     }));

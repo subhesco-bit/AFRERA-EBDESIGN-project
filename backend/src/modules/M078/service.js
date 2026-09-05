@@ -207,7 +207,7 @@ function generateId() {
 
 async function getRainfallPatterns(state, district) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM rainfall_patterns WHERE state = $1 AND district = $2 ORDER BY month',
       [state, district]
     );
@@ -264,7 +264,7 @@ async function getEnvironmentalFactors(state, district) {
 
 async function getRainfallReceived(systemId, period) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(rainfall_mm) as total FROM rainfall_records WHERE system_id = $1 AND record_date >= $2',
       [systemId, period]
     );
@@ -276,7 +276,7 @@ async function getRainfallReceived(systemId, period) {
 
 async function getWaterCollected(systemId, period) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(collected_liters) as total FROM collection_records WHERE system_id = $1 AND collection_date >= $2',
       [systemId, period]
     );
@@ -294,7 +294,7 @@ async function calculateCollectionEfficiency(systemId, period) {
 
 async function getStorageLevel(systemId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT current_level, total_capacity FROM storage_tanks WHERE system_id = $1',
       [systemId]
     );
@@ -337,7 +337,7 @@ async function getExpectedRainfall(systemId, timeFrame) {
 }
 
 async function getExpectedCollection(systemId, timeFrame) {
-  const rainfall = await getExpectedRainfall(systemId, timeFrame);
+  let rainfall = await getExpectedRainfall(systemId, timeFrame);
   if (!rainfall.configured) return { configured: false, reason: rainfall.reason };
   return {
     expected_liters: rainfall.expected_liters * 0.65,

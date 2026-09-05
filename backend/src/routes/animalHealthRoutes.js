@@ -89,7 +89,7 @@ router.post('/examinations', async (req, res, next) => {
  */
 router.put('/examinations/:id', async (req, res, next) => {
   try {
-    const examination = await updateExamination(req.params.id, req.body);
+    let examination = await updateExamination(req.params.id, req.body);
     if (!examination) {
       return res.status(404).json({ success: false, error: 'Examination not found' });
     }
@@ -124,7 +124,7 @@ router.delete('/examinations/:id', async (req, res, next) => {
 router.get('/treatments', async (req, res, next) => {
   try {
     const { page, limit, animal_type } = req.query;
-    const result = await listTreatments({ page, limit, animal_type });
+    let result = await listTreatments({ page, limit, animal_type });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('animalHealthRoutes:listTreatments', { error: error.message });
@@ -167,7 +167,7 @@ router.post('/treatments', async (req, res, next) => {
  */
 router.put('/treatments/:id', async (req, res, next) => {
   try {
-    const treatment = await updateTreatment(req.params.id, req.body);
+    let treatment = await updateTreatment(req.params.id, req.body);
     if (!treatment) {
       return res.status(404).json({ success: false, error: 'Treatment not found' });
     }
@@ -184,7 +184,7 @@ router.put('/treatments/:id', async (req, res, next) => {
  */
 router.delete('/treatments/:id', async (req, res, next) => {
   try {
-    const deleted = await deleteTreatment(req.params.id);
+    let deleted = await deleteTreatment(req.params.id);
     if (!deleted) {
       return res.status(404).json({ success: false, error: 'Treatment not found' });
     }
@@ -202,7 +202,7 @@ router.delete('/treatments/:id', async (req, res, next) => {
 router.get('/outbreaks', async (req, res, next) => {
   try {
     const { page, limit, status, affected_animal_type } = req.query;
-    const result = await listOutbreaks({ page, limit, status, affected_animal_type });
+    let result = await listOutbreaks({ page, limit, status, affected_animal_type });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('animalHealthRoutes:listOutbreaks', { error: error.message });
@@ -245,7 +245,7 @@ router.post('/outbreaks', async (req, res, next) => {
  */
 router.put('/outbreaks/:id', async (req, res, next) => {
   try {
-    const outbreak = await updateOutbreak(req.params.id, req.body);
+    let outbreak = await updateOutbreak(req.params.id, req.body);
     if (!outbreak) {
       return res.status(404).json({ success: false, error: 'Outbreak not found' });
     }
@@ -262,7 +262,7 @@ router.put('/outbreaks/:id', async (req, res, next) => {
  */
 router.delete('/outbreaks/:id', async (req, res, next) => {
   try {
-    const deleted = await deleteOutbreak(req.params.id);
+    let deleted = await deleteOutbreak(req.params.id);
     if (!deleted) {
       return res.status(404).json({ success: false, error: 'Outbreak not found' });
     }
@@ -280,7 +280,7 @@ router.delete('/outbreaks/:id', async (req, res, next) => {
 router.get('/quarantines', async (req, res, next) => {
   try {
     const { page, limit, status, animal_type } = req.query;
-    const result = await listQuarantines({ page, limit, status, animal_type });
+    let result = await listQuarantines({ page, limit, status, animal_type });
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('animalHealthRoutes:listQuarantines', { error: error.message });
@@ -323,7 +323,7 @@ router.post('/quarantines', async (req, res, next) => {
  */
 router.put('/quarantines/:id', async (req, res, next) => {
   try {
-    const quarantine = await updateQuarantine(req.params.id, req.body);
+    let quarantine = await updateQuarantine(req.params.id, req.body);
     if (!quarantine) {
       return res.status(404).json({ success: false, error: 'Quarantine not found' });
     }
@@ -340,7 +340,7 @@ router.put('/quarantines/:id', async (req, res, next) => {
  */
 router.delete('/quarantines/:id', async (req, res, next) => {
   try {
-    const deleted = await deleteQuarantine(req.params.id);
+    let deleted = await deleteQuarantine(req.params.id);
     if (!deleted) {
       return res.status(404).json({ success: false, error: 'Quarantine record not found' });
     }

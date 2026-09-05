@@ -56,7 +56,7 @@ async function applyForLoan(loanData) {
  */
 async function getFarmerLoans(farmerId, filters = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const { status } = filters;
     
@@ -78,7 +78,7 @@ async function getFarmerLoans(farmerId, filters = {}) {
     
     query += ' ORDER BY l.application_date DESC';
     
-    const result = await pg.query(query, params);
+    let result = await pg.query(query, params);
     
     return result.rows;
   } catch (error) {
@@ -92,7 +92,7 @@ async function getFarmerLoans(farmerId, filters = {}) {
  */
 async function approveLoan(loanId, approvalData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get loan details
     const loanQuery = 'SELECT * FROM loans WHERE id = $1';
@@ -129,7 +129,7 @@ async function approveLoan(loanId, approvalData) {
  */
 async function generateEMISchedule(loan) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     const monthlyRate = loan.interest_rate / 12 / 100;
     const emi = (loan.amount * monthlyRate * Math.pow(1 + monthlyRate, loan.term_months)) /
@@ -196,7 +196,7 @@ async function generateEMISchedule(loan) {
  */
 async function requestAdvance(advanceData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get farmer to check FDI
     const farmerQuery = 'SELECT fdi_score, max_advance_percentage FROM farmers WHERE id = $1';
@@ -215,14 +215,14 @@ async function requestAdvance(advanceData) {
     
     const advanceNumber = generateAdvanceNumber();
     
-    const query = `
+    let query = `
       INSERT INTO advances (advance_number, farmer_id, contract_id, amount, advance_percentage,
                            tranche_number, total_tranches, as_input_credit, input_items)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
     `;
     
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       advanceNumber,
       advanceData.farmer_id,
       advanceData.contract_id || null,
@@ -248,9 +248,9 @@ async function requestAdvance(advanceData) {
  */
 async function getFarmerAdvances(farmerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT a.*, c.contract_number
       FROM advances a
       LEFT JOIN contracts c ON a.contract_id = c.id
@@ -258,7 +258,7 @@ async function getFarmerAdvances(farmerId) {
       ORDER BY a.created_at DESC
     `;
     
-    const result = await pg.query(query, [farmerId]);
+    let result = await pg.query(query, [farmerId]);
     
     return result.rows;
   } catch (error) {
@@ -272,15 +272,15 @@ async function getFarmerAdvances(farmerId) {
  */
 async function getEMISchedule(loanId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT * FROM emi_schedule
       WHERE loan_id = $1
       ORDER BY installment_number
     `;
     
-    const result = await pg.query(query, [loanId]);
+    let result = await pg.query(query, [loanId]);
     
     return result.rows;
   } catch (error) {
@@ -294,7 +294,7 @@ async function getEMISchedule(loanId) {
  */
 async function payEMI(emiId, paymentData) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get EMI details
     const emiQuery = 'SELECT * FROM emi_schedule WHERE id = $1';
@@ -304,7 +304,7 @@ async function payEMI(emiId, paymentData) {
       throw new Error('EMI not found');
     }
     
-    const emi = emiResult.rows[0];
+    let emi = emiResult.rows[0];
     
     if (emi.status === 'paid') {
       throw new Error('EMI already paid');
@@ -363,16 +363,16 @@ async function payEMI(emiId, paymentData) {
  */
 async function getCreditScore(farmerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
-    const query = `
+    let query = `
       SELECT * FROM credit_scores
       WHERE farmer_id = $1
       ORDER BY calculated_at DESC
       LIMIT 1
     `;
     
-    const result = await pg.query(query, [farmerId]);
+    let result = await pg.query(query, [farmerId]);
     
     if (result.rows.length === 0) {
       // Generate initial credit score
@@ -391,10 +391,10 @@ async function getCreditScore(farmerId) {
  */
 async function generateCreditScore(farmerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     
     // Get farmer data
-    const farmerQuery = `
+    let farmerQuery = `
       SELECT f.*, 
              (SELECT COUNT(*) FROM loans WHERE farmer_id = f.id AND status = 'completed') as completed_loans,
              (SELECT COUNT(*) FROM loans WHERE farmer_id = f.id AND status = 'defaulted') as defaulted_loans
@@ -402,8 +402,8 @@ async function generateCreditScore(farmerId) {
       WHERE f.id = $1
     `;
     
-    const farmerResult = await pg.query(farmerQuery, [farmerId]);
-    const farmer = farmerResult.rows[0];
+    let farmerResult = await pg.query(farmerQuery, [farmerId]);
+    let farmer = farmerResult.rows[0];
     
     if (!farmer) {
       throw new Error('Farmer not found');
@@ -427,13 +427,13 @@ async function generateCreditScore(farmerId) {
     else if (score >= 40) grade = 'Fair';
     else grade = 'Poor';
     
-    const query = `
+    let query = `
       INSERT INTO credit_scores (farmer_id, score, grade, factors, calculated_at, valid_until)
       VALUES ($1, $2, $3, $4, NOW(), NOW() + INTERVAL '90 days')
       RETURNING *
     `;
     
-    const result = await pg.query(query, [
+    let result = await pg.query(query, [
       farmerId,
       score,
       grade,
@@ -471,7 +471,7 @@ async function generateCreditScore(farmerId) {
  */
 async function getBuyerCreditEligibility(buyerId) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
 
     const { rows } = await pg.query(
       `SELECT id, name, buyer_type, annual_turnover_cr, business_established_year
@@ -533,7 +533,7 @@ async function getBuyerCreditEligibility(buyerId) {
  */
 async function farmerCreditRiskScore(farmerId, opts = {}) {
   try {
-    const pg = getPostgreSQL();
+    let pg = getPostgreSQL();
     const actorId = opts.actorId || 'financialService:farmerCreditRiskScore';
 
     const { rows: farmerRows } = await pg.query(
@@ -544,7 +544,7 @@ async function farmerCreditRiskScore(farmerId, opts = {}) {
     if (farmerRows.length === 0) {
       throw new Error('Farmer not found');
     }
-    const farmer = farmerRows[0];
+    let farmer = farmerRows[0];
 
     // Loan/advance repayment: EMIs actually due so far, on-time vs overdue,
     // plus any loan that has genuinely defaulted.
@@ -561,7 +561,7 @@ async function farmerCreditRiskScore(farmerId, opts = {}) {
         WHERE l.farmer_id = $1`,
       [farmerId]
     );
-    const emi = emiRows[0] || {};
+    let emi = emiRows[0] || {};
 
     // Payment history: real settled farmer_revenue transactions, trailing 12mo.
     const { rows: revRows } = await pg.query(
@@ -629,7 +629,7 @@ async function farmerCreditRiskScore(farmerId, opts = {}) {
       { name: 'Order fulfilment track record', weight: 0.15, score: trackScore, dataQuality: trackQuality },
     ];
 
-    const result = mcda(criteria);
+    let result = mcda(criteria);
     const riskBand = result.total >= 70 ? 'low_risk' : result.total >= 45 ? 'medium_risk' : 'high_risk';
 
     // Log the prediction so its accuracy is measurable later. Never blocks or
@@ -675,7 +675,7 @@ function generateLoanNumber() {
 }
 
 function generateAdvanceNumber() {
-  const timestamp = Date.now().toString(36).toUpperCase();
+  let timestamp = Date.now().toString(36).toUpperCase();
   return `ADV-${timestamp}`;
 }
 
@@ -698,7 +698,7 @@ router.get('/overview', authMiddleware, async (req, res) => {
 // Apply for loan
 router.post('/loans', authMiddleware, async (req, res) => {
   try {
-    const loan = await applyForLoan(req.body);
+    let loan = await applyForLoan(req.body);
     res.status(201).json(loan);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -719,7 +719,7 @@ router.get('/loans/farmer/:farmerId', async (req, res) => {
 // Approve loan
 router.post('/loans/:id/approve', authMiddleware, async (req, res) => {
   try {
-    const result = await approveLoan(req.params.id, req.body);
+    let result = await approveLoan(req.params.id, req.body);
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -739,7 +739,7 @@ router.get('/loans/:id/emi', async (req, res) => {
 // Pay EMI
 router.post('/emi/:id/pay', authMiddleware, async (req, res) => {
   try {
-    const result = await payEMI(req.params.id, req.body);
+    let result = await payEMI(req.params.id, req.body);
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -779,7 +779,7 @@ router.get('/credit-score/:farmerId', async (req, res) => {
 // Corporate (B2B) buyer credit eligibility — NET0/NET30/NET60 gating
 router.get('/buyers/:buyerId/credit-eligibility', authMiddleware, async (req, res) => {
   try {
-    const eligibility = await getBuyerCreditEligibility(req.params.buyerId);
+    let eligibility = await getBuyerCreditEligibility(req.params.buyerId);
     res.json(eligibility);
   } catch (error) {
     res.status(error.message === 'Buyer not found' ? 404 : 500).json({ error: error.message });
@@ -790,8 +790,8 @@ router.get('/buyers/:buyerId/credit-eligibility', authMiddleware, async (req, re
 // /credit-score/:farmerId above, which is the pre-existing bespoke score.
 router.get('/credit-risk-score/:farmerId', authMiddleware, async (req, res) => {
   try {
-    const actorId = req.user?.id ? `user:${req.user.id}` : undefined;
-    const result = await farmerCreditRiskScore(req.params.farmerId, { actorId });
+    let actorId = req.user?.id ? `user:${req.user.id}` : undefined;
+    let result = await farmerCreditRiskScore(req.params.farmerId, { actorId });
     res.json(result);
   } catch (error) {
     res.status(error.message === 'Farmer not found' ? 404 : 500).json({ error: error.message });

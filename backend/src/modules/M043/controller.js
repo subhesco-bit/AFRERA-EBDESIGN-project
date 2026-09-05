@@ -37,7 +37,7 @@ async function listCropRegistrations(req, res) {
 
 async function updateCropRegistration(req, res) {
   try {
-    const registration = await service.updateCropRegistration(req.params.registrationId, req.body);
+    let registration = await service.updateCropRegistration(req.params.registrationId, req.body);
     if (!registration) return res.status(404).json({ success: false, error: 'Crop registration not found' });
     res.json({ success: true, data: registration });
   } catch (error) {

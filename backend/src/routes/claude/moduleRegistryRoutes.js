@@ -61,7 +61,7 @@ router.get('/loaded', rateLimiters.api, authMiddleware, async (req, res) => {
 router.post('/:moduleId/load', rateLimiters.api, authMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
-    const result = await registry.load(req.params.moduleId);
+    let result = await registry.load(req.params.moduleId);
     res.status(result.success ? 200 : 404).json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -75,7 +75,7 @@ router.post('/:moduleId/execute', rateLimiters.api, authMiddleware, async (req, 
     if (!operation) {
       return res.status(400).json({ success: false, error: 'operation is required' });
     }
-    const result = await registry.execute(req.params.moduleId, operation, parameters, context);
+    let result = await registry.execute(req.params.moduleId, operation, parameters, context);
     res.status(result.success ? 200 : 500).json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -85,7 +85,7 @@ router.post('/:moduleId/execute', rateLimiters.api, authMiddleware, async (req, 
 router.get('/:moduleId/health', rateLimiters.api, authMiddleware, async (req, res) => {
   try {
     await ensureInitialized();
-    const result = await registry.getHealth(req.params.moduleId);
+    let result = await registry.getHealth(req.params.moduleId);
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

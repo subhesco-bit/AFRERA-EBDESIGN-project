@@ -51,7 +51,7 @@ async function initiateOAuthFlow(provider, redirectUri) {
 }
 
 async function handleOAuthCallback(provider, code, state) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Verify state
@@ -61,7 +61,7 @@ async function handleOAuthCallback(provider, code, state) {
   }
   
   // Get provider configuration
-  const providerConfig = await getProviderConfig(provider);
+  let providerConfig = await getProviderConfig(provider);
   if (!providerConfig) {
     return { success: false, error: 'Provider not configured' };
   }
@@ -110,10 +110,10 @@ async function handleOAuthCallback(provider, code, state) {
 
 // SAML Integration
 async function initiateSAMLFlow(provider, redirectUri) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const providerConfig = await getProviderConfig(provider);
+  let providerConfig = await getProviderConfig(provider);
   if (!providerConfig || !providerConfig.saml_config) {
     return { success: false, error: 'SAML not configured for this provider' };
   }
@@ -129,10 +129,10 @@ async function initiateSAMLFlow(provider, redirectUri) {
 }
 
 async function handleSAMLResponse(provider, samlResponse) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const providerConfig = await getProviderConfig(provider);
+  let providerConfig = await getProviderConfig(provider);
   if (!providerConfig || !providerConfig.saml_config) {
     return { success: false, error: 'SAML not configured for this provider' };
   }
@@ -144,11 +144,11 @@ async function handleSAMLResponse(provider, samlResponse) {
   }
   
   // Find or create user
-  const user = await findOrCreateUserFromSSO(provider, samlData);
+  let user = await findOrCreateUserFromSSO(provider, samlData);
   
   // Generate tokens
-  const accessToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-  const refreshToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
+  let accessToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+  let refreshToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
   
   // Log SSO login
   await logSSOEvent(user.id, provider, 'saml_login_success');
@@ -163,7 +163,7 @@ async function handleSAMLResponse(provider, samlResponse) {
 
 // Provider configuration management
 async function getProviderConfig(provider) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const res = await pg.query(
@@ -175,12 +175,12 @@ async function getProviderConfig(provider) {
 }
 
 async function createProviderConfig(providerData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { providerName, clientId, clientSecret, authUrl, tokenUrl, userInfoUrl, samlConfig, scopes } = providerData;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO sso_providers (provider_name, client_id, client_secret, auth_url, token_url, user_info_url, saml_config, scopes, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
      RETURNING *`,
@@ -202,16 +202,16 @@ async function createProviderConfig(providerData) {
 }
 
 async function listProviders() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT id, provider_name, is_active, created_at FROM sso_providers ORDER BY provider_name');
+  let res = await pg.query('SELECT id, provider_name, is_active, created_at FROM sso_providers ORDER BY provider_name');
   return res.rows;
 }
 
 // User provisioning
 async function findOrCreateUserFromSSO(provider, userInfo) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Try to find existing user by email
@@ -232,14 +232,14 @@ async function findOrCreateUserFromSSO(provider, userInfo) {
   }
   
   // Create new user
-  const res = await pg.query(
+  let res = await pg.query(
     `INSERT INTO users (name, email, role, status, created_at)
      VALUES ($1, $2, 'farmer', 'active', NOW())
      RETURNING *`,
     [userInfo.name, userInfo.email]
   );
   
-  const user = res.rows[0];
+  let user = res.rows[0];
   
   // Create SSO mapping
   await pg.query(
@@ -253,7 +253,7 @@ async function findOrCreateUserFromSSO(provider, userInfo) {
 
 // AI-powered SSO analytics
 async function getSSOAnalytics({ provider, startDate, endDate } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -280,7 +280,7 @@ async function getSSOAnalytics({ provider, startDate, endDate } = {}) {
   
   query += ` GROUP BY provider, DATE(created_at) ORDER BY date DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     events: res.rows,
@@ -290,7 +290,7 @@ async function getSSOAnalytics({ provider, startDate, endDate } = {}) {
 }
 
 async function detectSSOAnomalies() {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const anomalies = [];
@@ -335,7 +335,7 @@ async function detectSSOAnomalies() {
 
 // Helper functions
 async function storeOAuthState(state, provider, redirectUri) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -345,10 +345,10 @@ async function storeOAuthState(state, provider, redirectUri) {
 }
 
 async function verifyOAuthState(state) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     'SELECT * FROM oauth_states WHERE state = $1 AND expires_at > NOW()',
     [state]
   );
@@ -363,7 +363,7 @@ async function verifyOAuthState(state) {
 }
 
 function buildAuthUrl(providerConfig, state, redirectUri) {
-  const params = new URLSearchParams({
+  let params = new URLSearchParams({
     client_id: providerConfig.client_id,
     redirect_uri: redirectUri,
     response_type: 'code',
@@ -411,7 +411,7 @@ async function validateSAMLResponse(providerConfig, samlResponse) {
 }
 
 async function logSSOEvent(userId, provider, eventType) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(

@@ -210,7 +210,7 @@ class WebSocketService {
    * Get rooms for a specific client
    */
   getClientRooms(socketId) {
-    const clientData = this.connectedClients.get(socketId);
+    let clientData = this.connectedClients.get(socketId);
     return clientData ? clientData.rooms : [];
   }
 

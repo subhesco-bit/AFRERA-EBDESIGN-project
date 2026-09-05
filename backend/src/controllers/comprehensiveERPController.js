@@ -25,7 +25,7 @@ const generalLedgerController = {
 
   createGLAccount: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.generalLedger.createGLAccount(req.body);
+      let result = await comprehensiveERPService.generalLedger.createGLAccount(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating GL account', { error: error.message });
@@ -35,7 +35,7 @@ const generalLedgerController = {
 
   postJournalEntry: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.generalLedger.postJournalEntry(req.body);
+      let result = await comprehensiveERPService.generalLedger.postJournalEntry(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error posting journal entry', { error: error.message });
@@ -46,7 +46,7 @@ const generalLedgerController = {
   generateTrialBalance: async (req, res) => {
     try {
       const { from_date, to_date, chart_id } = req.query;
-      const result = await comprehensiveERPService.generalLedger.generateTrialBalance(from_date, to_date, chart_id);
+      let result = await comprehensiveERPService.generalLedger.generateTrialBalance(from_date, to_date, chart_id);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating trial balance', { error: error.message });
@@ -57,7 +57,7 @@ const generalLedgerController = {
   generateBalanceSheet: async (req, res) => {
     try {
       const { as_of_date, chart_id } = req.query;
-      const result = await comprehensiveERPService.generalLedger.generateBalanceSheet(as_of_date, chart_id);
+      let result = await comprehensiveERPService.generalLedger.generateBalanceSheet(as_of_date, chart_id);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating balance sheet', { error: error.message });
@@ -68,7 +68,7 @@ const generalLedgerController = {
   generateProfitLoss: async (req, res) => {
     try {
       const { from_date, to_date, chart_id } = req.query;
-      const result = await comprehensiveERPService.generalLedger.generateProfitLoss(from_date, to_date, chart_id);
+      let result = await comprehensiveERPService.generalLedger.generateProfitLoss(from_date, to_date, chart_id);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating profit and loss', { error: error.message });
@@ -79,7 +79,7 @@ const generalLedgerController = {
   analyzeFinancialsAI: async (req, res) => {
     try {
       const { from_date, to_date, chart_id } = req.query;
-      const result = await comprehensiveERPService.generalLedger.analyzeFinancialsAI(from_date, to_date, chart_id);
+      let result = await comprehensiveERPService.generalLedger.analyzeFinancialsAI(from_date, to_date, chart_id);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in AI financial analysis', { error: error.message });
@@ -95,7 +95,7 @@ const generalLedgerController = {
 const controllingController = {
   createCostCenter: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.controlling.createCostCenter(req.body);
+      let result = await comprehensiveERPService.controlling.createCostCenter(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating cost center', { error: error.message });
@@ -105,7 +105,7 @@ const controllingController = {
 
   createProfitCenter: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.controlling.createProfitCenter(req.body);
+      let result = await comprehensiveERPService.controlling.createProfitCenter(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating profit center', { error: error.message });
@@ -115,7 +115,7 @@ const controllingController = {
 
   postCostAllocation: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.controlling.postCostAllocation(req.body);
+      let result = await comprehensiveERPService.controlling.postCostAllocation(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error posting cost allocation', { error: error.message });
@@ -126,7 +126,7 @@ const controllingController = {
   generateCostCenterReport: async (req, res) => {
     try {
       const { cost_center_code, from_date, to_date } = req.query;
-      const result = await comprehensiveERPService.controlling.generateCostCenterReport(cost_center_code, from_date, to_date);
+      let result = await comprehensiveERPService.controlling.generateCostCenterReport(cost_center_code, from_date, to_date);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating cost center report', { error: error.message });
@@ -137,7 +137,7 @@ const controllingController = {
   generateProfitCenterReport: async (req, res) => {
     try {
       const { profit_center_code, from_date, to_date } = req.query;
-      const result = await comprehensiveERPService.controlling.generateProfitCenterReport(profit_center_code, from_date, to_date);
+      let result = await comprehensiveERPService.controlling.generateProfitCenterReport(profit_center_code, from_date, to_date);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating profit center report', { error: error.message });
@@ -153,7 +153,7 @@ const controllingController = {
 const materialsManagementController = {
   createMaterialMaster: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.materialsManagement.createMaterialMaster(req.body);
+      let result = await comprehensiveERPService.materialsManagement.createMaterialMaster(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating material master', { error: error.message });
@@ -163,7 +163,7 @@ const materialsManagementController = {
 
   createPurchaseOrder: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.materialsManagement.createPurchaseOrder(req.body);
+      let result = await comprehensiveERPService.materialsManagement.createPurchaseOrder(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating purchase order', { error: error.message });
@@ -173,7 +173,7 @@ const materialsManagementController = {
 
   createGoodsReceipt: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.materialsManagement.createGoodsReceipt(req.body);
+      let result = await comprehensiveERPService.materialsManagement.createGoodsReceipt(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating goods receipt', { error: error.message });
@@ -184,7 +184,7 @@ const materialsManagementController = {
   getInventoryOverview: async (req, res) => {
     try {
       const { material_code, storage_location } = req.query;
-      const result = await comprehensiveERPService.materialsManagement.getInventoryOverview(material_code, storage_location);
+      let result = await comprehensiveERPService.materialsManagement.getInventoryOverview(material_code, storage_location);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error getting inventory overview', { error: error.message });
@@ -195,7 +195,7 @@ const materialsManagementController = {
   optimizeSupplyChainAI: async (req, res) => {
     try {
       const { material_code, storage_location } = req.query;
-      const result = await comprehensiveERPService.materialsManagement.optimizeSupplyChainAI(material_code, storage_location);
+      let result = await comprehensiveERPService.materialsManagement.optimizeSupplyChainAI(material_code, storage_location);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in AI supply chain optimization', { error: error.message });
@@ -211,7 +211,7 @@ const materialsManagementController = {
 const salesDistributionController = {
   createCustomerMaster: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.salesDistribution.createCustomerMaster(req.body);
+      let result = await comprehensiveERPService.salesDistribution.createCustomerMaster(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating customer master', { error: error.message });
@@ -221,7 +221,7 @@ const salesDistributionController = {
 
   createSalesOrder: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.salesDistribution.createSalesOrder(req.body);
+      let result = await comprehensiveERPService.salesDistribution.createSalesOrder(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating sales order', { error: error.message });
@@ -231,7 +231,7 @@ const salesDistributionController = {
 
   createDelivery: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.salesDistribution.createDelivery(req.body);
+      let result = await comprehensiveERPService.salesDistribution.createDelivery(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating delivery', { error: error.message });
@@ -241,7 +241,7 @@ const salesDistributionController = {
 
   createInvoice: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.salesDistribution.createInvoice(req.body);
+      let result = await comprehensiveERPService.salesDistribution.createInvoice(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating invoice', { error: error.message });
@@ -257,7 +257,7 @@ const salesDistributionController = {
 const productionPlanningController = {
   createProductionOrder: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.productionPlanning.createProductionOrder(req.body);
+      let result = await comprehensiveERPService.productionPlanning.createProductionOrder(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating production order', { error: error.message });
@@ -268,7 +268,7 @@ const productionPlanningController = {
   releaseProductionOrder: async (req, res) => {
     try {
       const { production_order } = req.params;
-      const result = await comprehensiveERPService.productionPlanning.releaseProductionOrder(production_order);
+      let result = await comprehensiveERPService.productionPlanning.releaseProductionOrder(production_order);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error releasing production order', { error: error.message });
@@ -279,7 +279,7 @@ const productionPlanningController = {
   confirmProductionOrder: async (req, res) => {
     try {
       const { production_order } = req.params;
-      const result = await comprehensiveERPService.productionPlanning.confirmProductionOrder(production_order, req.body);
+      let result = await comprehensiveERPService.productionPlanning.confirmProductionOrder(production_order, req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error confirming production order', { error: error.message });
@@ -290,7 +290,7 @@ const productionPlanningController = {
   optimizeProductionAI: async (req, res) => {
     try {
       const { production_plant, from_date, to_date } = req.query;
-      const result = await comprehensiveERPService.productionPlanning.optimizeProductionAI(production_plant, from_date, to_date);
+      let result = await comprehensiveERPService.productionPlanning.optimizeProductionAI(production_plant, from_date, to_date);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in AI production optimization', { error: error.message });
@@ -306,7 +306,7 @@ const productionPlanningController = {
 const qualityManagementController = {
   createInspectionLot: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.qualityManagement.createInspectionLot(req.body);
+      let result = await comprehensiveERPService.qualityManagement.createInspectionLot(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating inspection lot', { error: error.message });
@@ -316,7 +316,7 @@ const qualityManagementController = {
 
   recordInspectionResult: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.qualityManagement.recordInspectionResult(req.body);
+      let result = await comprehensiveERPService.qualityManagement.recordInspectionResult(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error recording inspection result', { error: error.message });
@@ -327,7 +327,7 @@ const qualityManagementController = {
   makeUsageDecision: async (req, res) => {
     try {
       const { inspection_lot } = req.params;
-      const result = await comprehensiveERPService.qualityManagement.makeUsageDecision(inspection_lot, req.body);
+      let result = await comprehensiveERPService.qualityManagement.makeUsageDecision(inspection_lot, req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error making usage decision', { error: error.message });
@@ -343,7 +343,7 @@ const qualityManagementController = {
 const plantMaintenanceController = {
   createEquipmentMaster: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.plantMaintenance.createEquipmentMaster(req.body);
+      let result = await comprehensiveERPService.plantMaintenance.createEquipmentMaster(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating equipment master', { error: error.message });
@@ -353,7 +353,7 @@ const plantMaintenanceController = {
 
   createMaintenanceOrder: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.plantMaintenance.createMaintenanceOrder(req.body);
+      let result = await comprehensiveERPService.plantMaintenance.createMaintenanceOrder(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating maintenance order', { error: error.message });
@@ -364,7 +364,7 @@ const plantMaintenanceController = {
   confirmMaintenanceOrder: async (req, res) => {
     try {
       const { maintenance_order } = req.params;
-      const result = await comprehensiveERPService.plantMaintenance.confirmMaintenanceOrder(maintenance_order, req.body);
+      let result = await comprehensiveERPService.plantMaintenance.confirmMaintenanceOrder(maintenance_order, req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error confirming maintenance order', { error: error.message });
@@ -380,7 +380,7 @@ const plantMaintenanceController = {
 const humanResourcesController = {
   createEmployeeMaster: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.humanResources.createEmployeeMaster(req.body);
+      let result = await comprehensiveERPService.humanResources.createEmployeeMaster(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating employee master', { error: error.message });
@@ -390,7 +390,7 @@ const humanResourcesController = {
 
   createOrganizationalUnit: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.humanResources.createOrganizationalUnit(req.body);
+      let result = await comprehensiveERPService.humanResources.createOrganizationalUnit(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating organizational unit', { error: error.message });
@@ -400,7 +400,7 @@ const humanResourcesController = {
 
   processPayroll: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.humanResources.processPayroll(req.body);
+      let result = await comprehensiveERPService.humanResources.processPayroll(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error processing payroll', { error: error.message });
@@ -411,7 +411,7 @@ const humanResourcesController = {
   analyzeHRAI: async (req, res) => {
     try {
       const { period, year } = req.query;
-      const result = await comprehensiveERPService.humanResources.analyzeHRAI(period, year);
+      let result = await comprehensiveERPService.humanResources.analyzeHRAI(period, year);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in AI HR analysis', { error: error.message });
@@ -427,7 +427,7 @@ const humanResourcesController = {
 const projectSystemController = {
   createProjectDefinition: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.projectSystem.createProjectDefinition(req.body);
+      let result = await comprehensiveERPService.projectSystem.createProjectDefinition(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating project definition', { error: error.message });
@@ -437,7 +437,7 @@ const projectSystemController = {
 
   createWBS: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.projectSystem.createWBS(req.body);
+      let result = await comprehensiveERPService.projectSystem.createWBS(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating WBS element', { error: error.message });
@@ -448,7 +448,7 @@ const projectSystemController = {
   updateProjectStatus: async (req, res) => {
     try {
       const { project_code } = req.params;
-      const result = await comprehensiveERPService.projectSystem.updateProjectStatus(project_code, req.body);
+      let result = await comprehensiveERPService.projectSystem.updateProjectStatus(project_code, req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error updating project status', { error: error.message });
@@ -459,7 +459,7 @@ const projectSystemController = {
   analyzeProjectAI: async (req, res) => {
     try {
       const { project_code } = req.params;
-      const result = await comprehensiveERPService.projectSystem.analyzeProjectAI(project_code);
+      let result = await comprehensiveERPService.projectSystem.analyzeProjectAI(project_code);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in AI project analysis', { error: error.message });
@@ -475,7 +475,7 @@ const projectSystemController = {
 const treasuryController = {
   createBankAccount: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.treasury.createBankAccount(req.body);
+      let result = await comprehensiveERPService.treasury.createBankAccount(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating bank account', { error: error.message });
@@ -485,7 +485,7 @@ const treasuryController = {
 
   recordCashFlow: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.treasury.recordCashFlow(req.body);
+      let result = await comprehensiveERPService.treasury.recordCashFlow(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error recording cash flow', { error: error.message });
@@ -496,7 +496,7 @@ const treasuryController = {
   getCashPosition: async (req, res) => {
     try {
       const { as_of_date, currency } = req.query;
-      const result = await comprehensiveERPService.treasury.getCashPosition(as_of_date, currency);
+      let result = await comprehensiveERPService.treasury.getCashPosition(as_of_date, currency);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error getting cash position', { error: error.message });
@@ -512,7 +512,7 @@ const treasuryController = {
 const assetManagementController = {
   createFixedAsset: async (req, res) => {
     try {
-      const result = await comprehensiveERPService.assetManagement.createFixedAsset(req.body);
+      let result = await comprehensiveERPService.assetManagement.createFixedAsset(req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error('Error creating fixed asset', { error: error.message });
@@ -524,7 +524,7 @@ const assetManagementController = {
     try {
       const { asset_code } = req.params;
       const { from_date, to_date } = req.query;
-      const result = await comprehensiveERPService.assetManagement.calculateDepreciation(asset_code, from_date, to_date);
+      let result = await comprehensiveERPService.assetManagement.calculateDepreciation(asset_code, from_date, to_date);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error calculating depreciation', { error: error.message });
@@ -541,7 +541,7 @@ const businessIntelligenceController = {
   generateExecutiveDashboard: async (req, res) => {
     try {
       const { from_date, to_date } = req.query;
-      const result = await comprehensiveERPService.businessIntelligence.generateExecutiveDashboard(from_date, to_date);
+      let result = await comprehensiveERPService.businessIntelligence.generateExecutiveDashboard(from_date, to_date);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating executive dashboard', { error: error.message });
@@ -552,7 +552,7 @@ const businessIntelligenceController = {
   generateProfitabilityAnalysis: async (req, res) => {
     try {
       const { from_date, to_date, profit_center_code } = req.query;
-      const result = await comprehensiveERPService.businessIntelligence.generateProfitabilityAnalysis(from_date, to_date, profit_center_code);
+      let result = await comprehensiveERPService.businessIntelligence.generateProfitabilityAnalysis(from_date, to_date, profit_center_code);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error generating profitability analysis', { error: error.message });

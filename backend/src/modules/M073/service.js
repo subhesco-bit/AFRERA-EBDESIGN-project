@@ -33,14 +33,14 @@ async function registerGoatHerd(herdData) {
 }
 
 async function getGoatHerd(herdId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  const res = await pg.query('SELECT * FROM goat_herds WHERE id = $1', [herdId]);
+  let res = await pg.query('SELECT * FROM goat_herds WHERE id = $1', [herdId]);
   return res.rows[0] || null;
 }
 
 async function listGoatHerds({ page = 1, limit = 20, farmId, breed, status } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const offset = (page - 1) * limit;
@@ -64,7 +64,7 @@ async function listGoatHerds({ page = 1, limit = 20, farmId, breed, status } = {
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   const totalRes = await pg.query(query.replace(`SELECT * FROM goat_herds`, 'SELECT COUNT(*) FROM goat_herds').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
   
@@ -72,12 +72,12 @@ async function listGoatHerds({ page = 1, limit = 20, farmId, breed, status } = {
 }
 
 async function updateGoatHerd(herdId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { herdName, breed, goatCount, location, averageMilkProduction, meatProductionTarget, healthStatus, status } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE goat_herds 
      SET herd_name = COALESCE($1, herd_name),
          breed = COALESCE($2, breed),
@@ -107,7 +107,7 @@ async function updateGoatHerd(herdId, updates) {
 }
 
 async function analyzeGoatProduction(herdId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const herd = await getGoatHerd(herdId);
@@ -156,7 +156,7 @@ function generateFeedOptimization(herd) {
 }
 
 function generateBreedingRecommendations(herd) {
-  const recommendations = [];
+  let recommendations = [];
   if (herd.goat_count && herd.goat_count < 15) {
     recommendations.push({
       type: 'breeding',
@@ -180,7 +180,7 @@ function generateHealthAlerts(herd) {
 }
 
 async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   let query = `
@@ -192,7 +192,7 @@ async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
     FROM goat_herds
     WHERE 1=1
   `;
-  const params = [];
+  let params = [];
   let paramIndex = 1;
   
   if (startDate) {
@@ -210,7 +210,7 @@ async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
   
   query += ` GROUP BY breed ORDER BY total_goats DESC`;
   
-  const res = await pg.query(query, params);
+  let res = await pg.query(query, params);
   
   return {
     byBreed: res.rows,
@@ -221,7 +221,7 @@ async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
 }
 
 function generateGoatAnalyticsRecommendations(breedData) {
-  const recommendations = [];
+  let recommendations = [];
   const topBreed = breedData[0];
   if (topBreed) {
     recommendations.push({

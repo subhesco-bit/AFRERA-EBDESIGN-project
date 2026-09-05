@@ -350,8 +350,8 @@ function categorizeError(error) {
  * Create error fingerprint for grouping
  */
 function createErrorFingerprint(error, category) {
-  const message = error.message || 'unknown';
-  const name = error.name || 'Error';
+  let message = error.message || 'unknown';
+  let name = error.name || 'Error';
 
   // Create a fingerprint based on error type and key parts of the message
   const keyParts = message

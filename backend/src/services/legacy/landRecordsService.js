@@ -108,7 +108,7 @@ class LandRecordsService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       // Calculate total land area
       const totalQuery = `
@@ -148,14 +148,14 @@ class LandRecordsService {
         WHERE lr.id = $1
       `;
 
-      const params = [recordId];
+      let params = [recordId];
 
       if (!isAdmin) {
         query += ' AND lr.farmer_id = $2';
         params.push(farmerId);
       }
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       if (result.rows.length === 0) {
         throw new Error('Land record not found');
@@ -175,7 +175,7 @@ class LandRecordsService {
     try {
       const currentRecord = await this.getLandRecord(recordId, farmerId);
 
-      const query = `
+      let query = `
         UPDATE land_records
         SET 
           survey_number = COALESCE($1, survey_number),
@@ -198,7 +198,7 @@ class LandRecordsService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         updateData.surveyNumber,
         updateData.village,
         updateData.district,
@@ -236,7 +236,7 @@ class LandRecordsService {
     const { verified, governmentReference, notes } = verificationData;
 
     try {
-      const query = `
+      let query = `
         UPDATE land_records
         SET 
           verification_status = $1,
@@ -248,7 +248,7 @@ class LandRecordsService {
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [
+      let result = await this.pool.query(query, [
         verified ? 'verified' : 'rejected',
         adminId,
         governmentReference,
@@ -379,7 +379,7 @@ class LandRecordsService {
    */
   async updateFarmerFDIForLand(farmerId) {
     try {
-      const query = `
+      let query = `
         UPDATE farmers
         SET 
           fdi_score = fdi_score + 5,
@@ -388,7 +388,7 @@ class LandRecordsService {
         RETURNING fdi_score
       `;
 
-      const result = await this.pool.query(query, [farmerId]);
+      let result = await this.pool.query(query, [farmerId]);
       return result.rows[0].fdi_score;
     } catch (error) {
       logger.error('Error updating farmer FDI', { error: error.message, stack: error.stack });
@@ -421,7 +421,7 @@ class LandRecordsService {
         WHERE verification_status = 'verified'
       `;
 
-      const params = [];
+      let params = [];
       let paramCount = 0;
 
       if (state) {
@@ -444,7 +444,7 @@ class LandRecordsService {
 
       query += ' GROUP BY state, district, village ORDER BY total_hectares DESC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
 
       return result.rows;
     } catch (error) {
@@ -458,13 +458,13 @@ class LandRecordsService {
    */
   async deleteLandRecord(recordId, farmerId) {
     try {
-      const query = `
+      let query = `
         DELETE FROM land_records
         WHERE id = $1 AND farmer_id = $2 AND verification_status = 'pending'
         RETURNING *
       `;
 
-      const result = await this.pool.query(query, [recordId, farmerId]);
+      let result = await this.pool.query(query, [recordId, farmerId]);
 
       if (result.rows.length === 0) {
         throw new Error('Land record not found or cannot be deleted');

@@ -37,7 +37,7 @@ function crudRouter(service) {
   });
   router.post('/', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
     try { 
-      const item = await service.create(req.body);
+      let item = await service.create(req.body);
       return apiResponseHandler.sendSuccess(res, item, 'Item created successfully', 201);
     }
     catch (e) { 
@@ -46,7 +46,7 @@ function crudRouter(service) {
   });
   router.put('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
     try {
-      const item = await service.update(req.params.id, req.body);
+      let item = await service.update(req.params.id, req.body);
       if (!item) return apiResponseHandler.sendError(res, 'Item not found', 404, 'NOT_FOUND');
       return apiResponseHandler.sendSuccess(res, item, 'Item updated successfully');
     } catch (e) { 

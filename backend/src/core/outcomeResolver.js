@@ -256,7 +256,7 @@ async function gateFor(actorId) {
  * use before acting on an agent's number.
  */
 async function applyGate(actorId, statedConfidence) {
-  const g = await gateFor(actorId);
+  let g = await gateFor(actorId);
   return {
     ...g,
     statedConfidence,

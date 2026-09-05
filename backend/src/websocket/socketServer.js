@@ -178,7 +178,7 @@ class SocketServer {
    * Unsubscribe from shipment tracking updates
    */
   unsubscribeTracking(userId, shipmentId) {
-    const roomName = `tracking:${shipmentId}`;
+    let roomName = `tracking:${shipmentId}`;
     this.leaveRoom(userId, roomName);
     logger.debug(`User ${userId} unsubscribed from tracking: ${shipmentId}`);
   }
@@ -240,7 +240,7 @@ class SocketServer {
    * Send shipment tracking update
    */
   sendTrackingUpdate(shipmentId, update) {
-    const roomName = `tracking:${shipmentId}`;
+    let roomName = `tracking:${shipmentId}`;
     return this.sendToRoom(roomName, {
       type: 'tracking_update',
       timestamp: new Date().toISOString(),
@@ -253,7 +253,7 @@ class SocketServer {
    * Send order status update
    */
   sendOrderUpdate(orderId, update) {
-    const roomName = `order:${orderId}`;
+    let roomName = `order:${orderId}`;
     return this.sendToRoom(roomName, {
       type: 'order_update',
       timestamp: new Date().toISOString(),
@@ -266,7 +266,7 @@ class SocketServer {
    * Send price alert
    */
   sendPriceAlert(productId, priceData) {
-    const roomName = `product:${productId}`;
+    let roomName = `product:${productId}`;
     return this.sendToRoom(roomName, {
       type: 'price_alert',
       timestamp: new Date().toISOString(),
@@ -279,7 +279,7 @@ class SocketServer {
    * Send weather alert
    */
   sendWeatherAlert(location, weatherData) {
-    const roomName = `weather:${location}`;
+    let roomName = `weather:${location}`;
     return this.sendToRoom(roomName, {
       type: 'weather_alert',
       timestamp: new Date().toISOString(),

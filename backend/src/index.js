@@ -472,7 +472,7 @@ async function startup() {
     // Step 11: Route discovery API (for debugging)
     app.get('/api/v1/system/routes', async (req, res) => {
       try {
-        const result = routeLoader.getMountedRoutes();
+        let result = routeLoader.getMountedRoutes();
         res.json({
           total: result.length,
           routes: result.slice(0, 100)

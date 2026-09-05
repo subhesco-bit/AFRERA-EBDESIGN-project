@@ -46,7 +46,7 @@ const KnowledgeExplorer = ({ initialNodeId = null }) => {
 
     setLoading(true);
     try {
-      const response = await knowledgeGraphAPI.searchNodes(searchQuery);
+      let response = await knowledgeGraphAPI.searchNodes(searchQuery);
       setSearchResults(response.data);
     } catch (err) {
       console.error('Search failed:', err);

@@ -65,8 +65,8 @@ export default function FarmerRevenueLedgerPage() {
 
   const calculateROI = () => {
     if (!ledger) return 0;
-    const netRevenue = Number(ledger.revenue?.net_revenue || 0);
-    const netCost = Number(ledger.cost?.net_cost || 0);
+    let netRevenue = Number(ledger.revenue?.net_revenue || 0);
+    let netCost = Number(ledger.cost?.net_cost || 0);
     if (netCost === 0) return 0;
     return ((netRevenue - netCost) / netCost) * 100;
   };

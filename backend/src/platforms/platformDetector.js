@@ -177,7 +177,7 @@ class PlatformDetector {
    * @returns {string} Database type
    */
   static getOfflineDbType(platform) {
-    const capabilities = this.getCapabilities(platform);
+    let capabilities = this.getCapabilities(platform);
     return capabilities.offlineSyncDbType || 'indexeddb';
   }
 
@@ -187,7 +187,7 @@ class PlatformDetector {
    * @returns {number} Storage in GB
    */
   static getMaxStorage(platform) {
-    const capabilities = this.getCapabilities(platform);
+    let capabilities = this.getCapabilities(platform);
     return capabilities.maxStorageGB || 0.05;
   }
 
@@ -240,7 +240,7 @@ class PlatformDetector {
   }
 
   static _getIOSVersion(userAgent) {
-    const match = userAgent.match(/OS\s([0-9_]*)\s/i);
+    let match = userAgent.match(/OS\s([0-9_]*)\s/i);
     return match ? match[1].replace(/_/g, '.') : 'unknown';
   }
 
@@ -252,12 +252,12 @@ class PlatformDetector {
   }
 
   static _getMacOSVersion(userAgent) {
-    const match = userAgent.match(/Mac OS X\s([0-9._]*)/i);
+    let match = userAgent.match(/Mac OS X\s([0-9._]*)/i);
     return match ? match[1].replace(/_/g, '.') : 'unknown';
   }
 
   static _getLinuxVersion(userAgent) {
-    const match = userAgent.match(/Linux\s([^;]*)/i);
+    let match = userAgent.match(/Linux\s([^;]*)/i);
     return match ? match[1] : 'unknown';
   }
 }

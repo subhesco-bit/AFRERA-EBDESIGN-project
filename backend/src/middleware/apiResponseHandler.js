@@ -69,7 +69,7 @@ function success(res, data, metadata = {}) {
 function error(res, errorCode, customMessage = null, details = null) {
   const errorInfo = ERROR_CODES[errorCode] || ERROR_CODES.INTERNAL_ERROR;
   
-  const response = {
+  let response = {
     success: false,
     error: {
       code: errorInfo.code,
@@ -93,7 +93,7 @@ function error(res, errorCode, customMessage = null, details = null) {
  * `sendSuccess is not a function`.
  */
 function sendSuccess(res, data, message = null, status = 200) {
-  const response = {
+  let response = {
     success: true,
     data,
     message: message || undefined,
@@ -113,7 +113,7 @@ function sendSuccess(res, data, message = null, status = 200) {
  * message plus their own numeric status and code string directly.
  */
 function sendError(res, message, status = 500, code = 'INTERNAL_ERROR', details = null) {
-  const response = {
+  let response = {
     success: false,
     error: {
       code,

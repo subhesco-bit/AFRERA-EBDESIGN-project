@@ -184,7 +184,7 @@ class DataValidationService {
   validatePattern(value, constraints, message) {
     const { pattern } = constraints;
     const regex = new RegExp(pattern);
-    const valid = regex.test(value);
+    let valid = regex.test(value);
 
     return {
       valid,
@@ -218,7 +218,7 @@ class DataValidationService {
    */
   validateEnum(value, constraints, message) {
     const { values } = constraints;
-    const valid = values.includes(value);
+    let valid = values.includes(value);
 
     return {
       valid,
@@ -232,7 +232,7 @@ class DataValidationService {
   validateCustom(value, constraints, message) {
     const { validator } = constraints;
     try {
-      const valid = validator(value);
+      let valid = validator(value);
       return {
         valid,
         message: message || 'Custom validation failed'
@@ -253,7 +253,7 @@ class DataValidationService {
       const query = `
         SELECT * FROM validation_rules ORDER BY rule_set, field
       `;
-      const result = await this.db.query(query);
+      let result = await this.db.query(query);
 
       // Group rules by rule set
       for (const row of result.rows) {
@@ -283,13 +283,13 @@ class DataValidationService {
     const { ruleSet, field, type, constraints, severity = 'error', message } = ruleData;
 
     try {
-      const query = `
+      let query = `
         INSERT INTO validation_rules (
           rule_set, field, type, constraints, severity, message, created_at
         ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
         RETURNING *
       `;
-      const result = await this.db.query(query, [
+      let result = await this.db.query(query, [
         ruleSet,
         field,
         type,
@@ -323,7 +323,7 @@ class DataValidationService {
    */
   async validateRecord(table, record) {
     try {
-      const ruleSet = table;
+      let ruleSet = table;
       const validation = await this.validate(record, ruleSet);
 
       // Log validation result
@@ -347,7 +347,7 @@ class DataValidationService {
    */
   async logValidationResult(result) {
     try {
-      const query = `
+      let query = `
         INSERT INTO validation_logs (
           table_name, record_id, valid, errors, warnings, created_at
         ) VALUES ($1, $2, $3, $4, $5, NOW())
@@ -401,7 +401,7 @@ class DataValidationService {
         params.push(endDate);
       }
 
-      const result = await this.db.query(query, params);
+      let result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get validation statistics failed', error);
@@ -414,11 +414,11 @@ class DataValidationService {
    */
   async cleanOldLogs(daysToKeep = 30) {
     try {
-      const query = `
+      let query = `
         DELETE FROM validation_logs
         WHERE created_at < NOW() - INTERVAL '${daysToKeep} days'
       `;
-      const result = await this.db.query(query);
+      let result = await this.db.query(query);
       
       logger.info(`Cleaned ${result.rowCount} old validation logs`);
       return result.rowCount;

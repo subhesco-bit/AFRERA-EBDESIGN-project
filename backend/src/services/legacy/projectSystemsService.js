@@ -119,7 +119,7 @@ class ProjectSystemsService {
 
       query += ' ORDER BY project_code ASC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting projects', { error: error.message, stack: error.stack });
@@ -129,7 +129,7 @@ class ProjectSystemsService {
 
   async getProject(projectId) {
     try {
-      const result = await this.pool.query('SELECT * FROM projects WHERE id = $1', [projectId]);
+      let result = await this.pool.query('SELECT * FROM projects WHERE id = $1', [projectId]);
       if (result.rows.length === 0) throw new Error('Project not found');
       return result.rows[0];
     } catch (error) {
@@ -151,7 +151,7 @@ class ProjectSystemsService {
       }
       const { actualStartDate, actualEndDate } = dates;
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE projects
          SET status = $1,
              actual_start_date = COALESCE($2, actual_start_date),
@@ -198,7 +198,7 @@ class ProjectSystemsService {
         }
       }
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO project_wbs
            (project_id, parent_id, wbs_code, wbs_name, sequence_number,
             planned_start_date, planned_end_date, planned_cost)
@@ -220,7 +220,7 @@ class ProjectSystemsService {
 
   async getProjectWbs(projectId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         'SELECT * FROM project_wbs WHERE project_id = $1 ORDER BY sequence_number ASC, id ASC',
         [projectId]
       );
@@ -233,7 +233,7 @@ class ProjectSystemsService {
 
   async getWbsElement(wbsId) {
     try {
-      const result = await this.pool.query('SELECT * FROM project_wbs WHERE id = $1', [wbsId]);
+      let result = await this.pool.query('SELECT * FROM project_wbs WHERE id = $1', [wbsId]);
       if (result.rows.length === 0) throw new Error('WBS element not found');
       return result.rows[0];
     } catch (error) {
@@ -249,7 +249,7 @@ class ProjectSystemsService {
       }
       const { actualStartDate, actualEndDate } = dates;
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE project_wbs
          SET status = $1,
              actual_start_date = COALESCE($2, actual_start_date),
@@ -382,7 +382,7 @@ class ProjectSystemsService {
         }
       }
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `INSERT INTO project_milestones (project_id, wbs_id, milestone_name, target_date, notes)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
@@ -400,7 +400,7 @@ class ProjectSystemsService {
   async getProjectMilestones(projectId, filters = {}) {
     try {
       let query = 'SELECT * FROM project_milestones WHERE project_id = $1';
-      const params = [projectId];
+      let params = [projectId];
 
       if (filters.status) {
         if (!MILESTONE_STATUSES.includes(filters.status)) {
@@ -412,7 +412,7 @@ class ProjectSystemsService {
 
       query += ' ORDER BY target_date ASC';
 
-      const result = await this.pool.query(query, params);
+      let result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting project milestones', { error: error.message, stack: error.stack });
@@ -424,7 +424,7 @@ class ProjectSystemsService {
     try {
       if (!actualCompletionDate) throw new Error('actualCompletionDate is required');
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `UPDATE project_milestones
          SET status = 'completed', actual_completion_date = $1
          WHERE id = $2 AND status NOT IN ('completed', 'cancelled')
@@ -500,7 +500,7 @@ class ProjectSystemsService {
     try {
       const project = await this.getProject(projectId);
 
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT SUM(CASE WHEN coa.normal_balance = 'DR' THEN jl.debit - jl.credit ELSE jl.credit - jl.debit END) AS amount
          FROM journal_lines jl
          JOIN journal_entries je ON je.id = jl.journal_entry_id

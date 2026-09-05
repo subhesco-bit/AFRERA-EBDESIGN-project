@@ -164,14 +164,14 @@ class ClaudeAIEnhancedDecisionService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'optimizePrice',
         productId: productId,
         marketConditions: marketConditions
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: this.buildPriceOptimizationQuery(productId, marketConditions),
         context: { 
@@ -184,9 +184,9 @@ class ClaudeAIEnhancedDecisionService {
         agentPreference: 'business-analyst'
       });
 
-      const originalResult = await this.originalService.optimizePrice(productId, marketConditions, options);
+      let originalResult = await this.originalService.optimizePrice(productId, marketConditions, options);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_optimization_strategy: aiEnhancement.content || null,
@@ -231,14 +231,14 @@ class ClaudeAIEnhancedDecisionService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'assessCreditRisk',
         farmerId: farmerId,
         loanApplication: loanApplication
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'assessment',
         query: this.buildCreditRiskQuery(farmerId, loanApplication),
         context: { 
@@ -251,9 +251,9 @@ class ClaudeAIEnhancedDecisionService {
         agentPreference: 'governance-agent'
       });
 
-      const originalResult = await this.originalService.assessCreditRisk(farmerId, loanApplication);
+      let originalResult = await this.originalService.assessCreditRisk(farmerId, loanApplication);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_risk_factors: aiEnhancement.content || null,
@@ -298,13 +298,13 @@ class ClaudeAIEnhancedDecisionService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'detectFraud',
         transactionData: transactionData
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'detection',
         query: this.buildFraudDetectionQuery(transactionData),
         context: { 
@@ -316,9 +316,9 @@ class ClaudeAIEnhancedDecisionService {
         agentPreference: 'governance-agent'
       });
 
-      const originalResult = await this.originalService.detectFraud(transactionData, options);
+      let originalResult = await this.originalService.detectFraud(transactionData, options);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_fraud_indicators: aiEnhancement.content || null,
@@ -363,14 +363,14 @@ class ClaudeAIEnhancedDecisionService {
         status: 'in_progress'
       });
 
-      const libraryContext = await libraryKnowledgeService.buildAIContext({
+      let libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'generateRecommendations',
         userId: userId,
         context: context
       });
 
-      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'recommendation',
         query: this.buildRecommendationQuery(userId, context),
         context: { 
@@ -383,9 +383,9 @@ class ClaudeAIEnhancedDecisionService {
         agentPreference: 'farmer-advisor'
       });
 
-      const originalResult = await this.originalService.generateRecommendations(userId, context, options);
+      let originalResult = await this.originalService.generateRecommendations(userId, context, options);
       
-      const enhancedResult = {
+      let enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_personalized_recommendations: aiEnhancement.content || null,
@@ -493,7 +493,7 @@ class ClaudeAIEnhancedDecisionService {
     if (!aiContent) return [];
     
     const steps = [];
-    const lines = aiContent.split('\n');
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('investigate') || line.includes('verify') || line.includes('check')) {
@@ -512,7 +512,7 @@ class ClaudeAIEnhancedDecisionService {
     
     // Extract reasoning from AI content
     const reasoningLines = [];
-    const lines = aiContent.split('\n');
+    let lines = aiContent.split('\n');
     
     lines.forEach(line => {
       if (line.includes('because') || line.includes('due to') || line.includes('based on') || line.includes('reason')) {

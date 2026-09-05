@@ -26,7 +26,7 @@ const getFuelPurchase = async (req, res) => {
 
 const recordFuelPurchase = async (req, res) => {
   try {
-    const purchase = await fuelService.recordFuelPurchase(req.body);
+    let purchase = await fuelService.recordFuelPurchase(req.body);
     res.status(201).json({ success: true, data: purchase });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

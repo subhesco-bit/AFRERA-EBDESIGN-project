@@ -88,7 +88,7 @@ router.post('/register', async (req, res) => {
     const newUser = { id: userId, name, email, password };
     users.set(userId, newUser);
 
-    const token = generateToken(userId);
+    let token = generateToken(userId);
     sessions.set(token, userId);
 
     res.status(201).json({
@@ -113,7 +113,7 @@ router.post('/register', async (req, res) => {
 // POST /auth/logout
 router.post('/logout', async (req, res) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    let token = req.headers.authorization?.replace('Bearer ', '');
     if (token) {
       sessions.delete(token);
     }
@@ -142,7 +142,7 @@ router.post('/refresh', async (req, res) => {
       });
     }
 
-    const userId = sessions.get(token);
+    let userId = sessions.get(token);
     const newToken = generateToken(userId);
     sessions.set(newToken, userId);
     sessions.delete(token);

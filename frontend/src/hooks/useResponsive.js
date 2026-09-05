@@ -104,7 +104,7 @@ export function useOrientationChange(callback) {
  */
 export function useViewportChange(callback) {
   useEffect(() => {
-    const unsubscribe = deviceDetection.onViewportChange((info) => {
+    let unsubscribe = deviceDetection.onViewportChange((info) => {
       callback?.(info);
     });
 
@@ -124,7 +124,7 @@ export function useResponsiveComponent(components = {}) {
   useEffect(() => {
     let resizeTimeout;
 
-    const handleResize = () => {
+    let handleResize = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
         setViewport({
@@ -142,7 +142,7 @@ export function useResponsiveComponent(components = {}) {
   }, []);
 
   const getComponent = useCallback(() => {
-    const width = viewport.width;
+    let width = viewport.width;
 
     if (width < 480) return components.xs || components.mobile;
     if (width < 768) return components.sm || components.mobile;
@@ -220,7 +220,7 @@ export function useResponsiveLayoutTest() {
     if (window.innerWidth < 768) {
       const buttons = document.querySelectorAll('button, a');
       buttons.forEach(btn => {
-        const rect = btn.getBoundingClientRect();
+        let rect = btn.getBoundingClientRect();
         if (rect.width < 44 || rect.height < 44) {
           testIssues.push({
             type: 'small-touch-target',

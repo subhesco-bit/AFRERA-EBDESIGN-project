@@ -28,7 +28,7 @@ async function listProposals({ user, status, domain }) {
     values.push(user.id);
     filters.push(`proposed_by = $${values.length}`);
   }
-  const result = await pool.query(
+  let result = await pool.query(
     `SELECT * FROM ai_proposals ${filters.length ? `WHERE ${filters.join(' AND ')}` : ''} ORDER BY created_at DESC LIMIT 100`, values
   );
   return result.rows;
@@ -37,7 +37,7 @@ async function listProposals({ user, status, domain }) {
 async function decideProposal({ proposalId, user, decision, rejectionReason }) {
   if (!['approved', 'rejected'].includes(decision)) throw new Error('Invalid proposal decision');
   if (decision === 'rejected' && !rejectionReason?.trim()) throw new Error('Rejection reason is required');
-  const result = await pool.query(
+  let result = await pool.query(
     `UPDATE ai_proposals SET status = $1,
       approved_by = CASE WHEN $1 = 'approved' THEN $2 ELSE approved_by END,
       approved_at = CASE WHEN $1 = 'approved' THEN NOW() ELSE approved_at END,
@@ -52,7 +52,7 @@ async function decideProposal({ proposalId, user, decision, rejectionReason }) {
 }
 
 async function executeProposal({ proposalId, user }) {
-  const result = await pool.query(
+  let result = await pool.query(
     `UPDATE ai_proposals SET status = 'executed', executed_at = NOW()
      WHERE id = $1 AND status = 'approved' AND approved_by IS NOT NULL RETURNING *`, [proposalId]
   );

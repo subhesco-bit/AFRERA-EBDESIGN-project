@@ -315,11 +315,11 @@ class PreSeasonPurchaseService {
    */
   async trackProgress(agreementId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get agreement details
-        const agreementResult = await client.query(
+        let agreementResult = await client.query(
           `SELECT a.*, f.name as farmer_name, b.name as buyer_name,
                   c.name as crop_name, v.variety_name
            FROM pre_season_agreements a
@@ -421,13 +421,13 @@ class PreSeasonPurchaseService {
    * @returns {Object} Settlement result
    */
   async settleAgreement(agreementId, settlementData) {
-    const client = await this.pool.connect();
+    let client = await this.pool.connect();
     
     try {
       await client.query('BEGIN');
       
       // Get agreement details
-      const agreementResult = await client.query(
+      let agreementResult = await client.query(
         `SELECT * FROM pre_season_agreements WHERE id = $1`,
         [agreementId]
       );
@@ -436,7 +436,7 @@ class PreSeasonPurchaseService {
         throw new Error('Agreement not found');
       }
       
-      const agreement = agreementResult.rows[0];
+      let agreement = agreementResult.rows[0];
       
       // Verify quality
       const qualityVerification = await this.verifyQuality(
@@ -446,7 +446,7 @@ class PreSeasonPurchaseService {
       );
       
       // Calculate final price based on quality and market conditions
-      const finalPrice = await this.calculateFinalPrice(
+      let finalPrice = await this.calculateFinalPrice(
         client,
         agreement,
         qualityVerification,
@@ -514,7 +514,7 @@ class PreSeasonPurchaseService {
   async verifyQuality(client, agreementId, qualityData) {
     try {
       // Get agreement quality standards
-      const agreementResult = await client.query(
+      let agreementResult = await client.query(
         `SELECT quality_standards FROM pre_season_agreements WHERE id = $1`,
         [agreementId]
       );
@@ -580,7 +580,7 @@ class PreSeasonPurchaseService {
         });
       } else if (qualityVerification.score > 95) {
         const qualityBonus = (qualityVerification.score - 95) / 100;
-        const qualityAdjustment = finalAmount * qualityBonus;
+        let qualityAdjustment = finalAmount * qualityBonus;
         finalAmount += qualityAdjustment;
         adjustments.push({
           type: 'quality_bonus',
@@ -629,7 +629,7 @@ class PreSeasonPurchaseService {
    */
   async getCurrentMarketPrice(client, cropId, varietyId) {
     try {
-      const result = await client.query(
+      let result = await client.query(
         `SELECT AVG(price_per_unit) as current_price
          FROM market_prices 
          WHERE crop_id = $1 AND variety_id = $2 
@@ -671,7 +671,7 @@ class PreSeasonPurchaseService {
         throw new Error('Farmer bank details not found');
       }
       
-      const farmer = farmerResult.rows[0];
+      let farmer = farmerResult.rows[0];
       
       // Integrate with payment service (placeholder)
       // In production, this would call actual payment gateway API
@@ -718,7 +718,7 @@ class PreSeasonPurchaseService {
    */
   async getAvailableOpportunities(farmerId) {
     try {
-      const result = await this.pool.query(
+      let result = await this.pool.query(
         `SELECT o.id, o.buyer_id, b.name as buyer_name, o.crop_id, 
                 c.name as crop_name, o.variety_id, v.variety_name,
                 o.quantity_required, o.offered_price, o.delivery_date,
@@ -748,7 +748,7 @@ class PreSeasonPurchaseService {
    */
   async getBuyerPortfolio(buyerId) {
     try {
-      const client = await this.pool.connect();
+      let client = await this.pool.connect();
       
       try {
         // Get portfolio summary

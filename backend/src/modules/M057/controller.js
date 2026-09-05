@@ -14,7 +14,7 @@ const create = async (req, res) => {
 
 const track = async (req, res) => {
   try {
-    const shipment = await shippingService.trackShipment(req.params.id);
+    let shipment = await shippingService.trackShipment(req.params.id);
     if (!shipment) return res.status(404).json({ success: false, error: 'Shipment not found' });
     res.status(200).json({ success: true, data: shipment });
   } catch (error) {
@@ -24,7 +24,7 @@ const track = async (req, res) => {
 
 const updateStatus = async (req, res) => {
   try {
-    const shipment = await shippingService.updateShipmentStatus(req.params.id, req.body.status, req.body.location);
+    let shipment = await shippingService.updateShipmentStatus(req.params.id, req.body.status, req.body.location);
     if (!shipment) return res.status(404).json({ success: false, error: 'Shipment not found' });
     res.status(200).json({ success: true, data: shipment });
   } catch (error) {

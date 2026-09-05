@@ -143,7 +143,7 @@ async function trackWaterUsage(budgetId, period) {
  */
 async function optimizeWaterAllocation(budgetId, constraints) {
   try {
-    const aiRequest = {
+    let aiRequest = {
       task: 'water_allocation_optimization',
       parameters: {
         budget_id: budgetId,
@@ -156,7 +156,7 @@ async function optimizeWaterAllocation(budgetId, constraints) {
       }
     };
 
-    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const optimization = {
       optimization_id: generateId(),
@@ -209,7 +209,7 @@ function generateId() {
 
 async function getHistoricalWaterUsage(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM water_usage_history WHERE location_id = $1 ORDER BY date DESC LIMIT 365',
       [locationId]
     );
@@ -230,7 +230,7 @@ async function getWeatherForecast(state, district) {
 
 async function getCropPatterns(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT crop_type, area, water_requirement FROM crop_patterns WHERE location_id = $1',
       [locationId]
     );
@@ -242,7 +242,7 @@ async function getCropPatterns(locationId) {
 
 async function getGroundwaterLevels(locationId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT level, date FROM groundwater_levels WHERE location_id = $1 ORDER BY date DESC LIMIT 12',
       [locationId]
     );
@@ -263,7 +263,7 @@ async function getEfficiencyRecommendations(locationId) {
 
 async function getActualWaterUsage(budgetId, period) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT SUM(usage_amount) as total FROM water_usage_records WHERE budget_id = $1 AND period = $2',
       [budgetId, period]
     );
@@ -275,7 +275,7 @@ async function getActualWaterUsage(budgetId, period) {
 
 async function getBudgetLimits(budgetId) {
   try {
-    const result = await pool.query(
+    let result = await pool.query(
       'SELECT * FROM water_budgets WHERE budget_id = $1',
       [budgetId]
     );
@@ -287,7 +287,7 @@ async function getBudgetLimits(budgetId) {
 
 async function calculateVariance(budgetId, period) {
   const actual = await getActualWaterUsage(budgetId, period);
-  const budget = await getBudgetLimits(budgetId);
+  let budget = await getBudgetLimits(budgetId);
   const variance = actual - (budget.total_allocation || 0);
   const variance_percentage = budget.total_allocation > 0 ? (variance / budget.total_allocation) * 100 : 0;
   
@@ -308,7 +308,7 @@ async function calculateEfficiencyMetrics(budgetId, period) {
 }
 
 async function generateUsageRecommendations(budgetId, period) {
-  const variance = await calculateVariance(budgetId, period);
+  let variance = await calculateVariance(budgetId, period);
   
   if (variance.status === 'over_budget') {
     return [
@@ -328,7 +328,7 @@ async function generateUsageRecommendations(budgetId, period) {
 }
 
 async function getCurrentAllocation(budgetId) {
-  const budget = await getBudgetLimits(budgetId);
+  let budget = await getBudgetLimits(budgetId);
   return budget.allocations || {};
 }
 

@@ -62,7 +62,7 @@ class ModuleRegistry {
       const query = requirements.requiredCapabilities.join(' ') + ' ' + 
                    requirements.optionalCapabilities.join(' ');
       
-      const result = await this.discover(query, context);
+      let result = await this.discover(query, context);
       
       // Filter by capability requirements
       const filteredModules = result.modules.filter(module => {
@@ -294,7 +294,7 @@ class ModuleRegistry {
 
       // Execute operation
       const startTime = Date.now();
-      const result = await moduleInstance.execute(operation, parameters, context);
+      let result = await moduleInstance.execute(operation, parameters, context);
       const executionTime = Date.now() - startTime;
 
       // Add execution metadata
@@ -341,8 +341,8 @@ class ModuleRegistry {
         };
       }
 
-      const moduleData = this.loadedModules.get(moduleId);
-      const moduleInstance = moduleData.instance;
+      let moduleData = this.loadedModules.get(moduleId);
+      let moduleInstance = moduleData.instance;
 
       // Shutdown module if method exists
       if (typeof moduleInstance.shutdown === 'function') {
@@ -387,8 +387,8 @@ class ModuleRegistry {
         };
       }
 
-      const moduleData = this.loadedModules.get(moduleId);
-      const moduleInstance = moduleData.instance;
+      let moduleData = this.loadedModules.get(moduleId);
+      let moduleInstance = moduleData.instance;
 
       if (typeof moduleInstance.healthCheck === 'function') {
         const health = await moduleInstance.healthCheck();
@@ -454,7 +454,7 @@ class ModuleRegistry {
     for (const step of workflowSteps) {
       const { moduleId, operation, parameters } = step;
       
-      const result = await this.execute(moduleId, operation, parameters, context);
+      let result = await this.execute(moduleId, operation, parameters, context);
       results.push({
         step: step,
         result: result

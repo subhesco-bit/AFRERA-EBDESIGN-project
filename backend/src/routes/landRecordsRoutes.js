@@ -28,7 +28,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const result = await landRecordsService.getFarmerLandRecords(req.user.id, req.query);
+    let result = await landRecordsService.getFarmerLandRecords(req.user.id, req.query);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -37,7 +37,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 router.get('/regional-statistics', async (req, res) => {
   try {
-    const result = await landRecordsService.getRegionalLandStatistics(req.query);
+    let result = await landRecordsService.getRegionalLandStatistics(req.query);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -47,7 +47,7 @@ router.get('/regional-statistics', async (req, res) => {
 router.get('/:recordId', authMiddleware, async (req, res) => {
   try {
     const isAdmin = req.user.role === 'admin';
-    const result = await landRecordsService.getLandRecord(req.params.recordId, req.user.id, isAdmin);
+    let result = await landRecordsService.getLandRecord(req.params.recordId, req.user.id, isAdmin);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -56,7 +56,7 @@ router.get('/:recordId', authMiddleware, async (req, res) => {
 
 router.put('/:recordId', authMiddleware, async (req, res) => {
   try {
-    const result = await landRecordsService.updateLandRecord(req.params.recordId, req.user.id, req.body);
+    let result = await landRecordsService.updateLandRecord(req.params.recordId, req.user.id, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -65,7 +65,7 @@ router.put('/:recordId', authMiddleware, async (req, res) => {
 
 router.delete('/:recordId', authMiddleware, async (req, res) => {
   try {
-    const result = await landRecordsService.deleteLandRecord(req.params.recordId, req.user.id);
+    let result = await landRecordsService.deleteLandRecord(req.params.recordId, req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -74,7 +74,7 @@ router.delete('/:recordId', authMiddleware, async (req, res) => {
 
 router.post('/:recordId/verify', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const result = await landRecordsService.verifyLandRecord(req.params.recordId, req.user.id, req.body);
+    let result = await landRecordsService.verifyLandRecord(req.params.recordId, req.user.id, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -83,7 +83,7 @@ router.post('/:recordId/verify', authMiddleware, adminMiddleware, async (req, re
 
 router.post('/sync-government', authMiddleware, async (req, res) => {
   try {
-    const result = await landRecordsService.syncWithGovernmentLandRecords(req.user.id);
+    let result = await landRecordsService.syncWithGovernmentLandRecords(req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

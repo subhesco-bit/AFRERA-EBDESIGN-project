@@ -218,7 +218,7 @@ function validateConfig() {
 
   for (const [key, schema] of Object.entries(configSchema)) {
     if (schema.required) {
-      const value = getConfigValue(key);
+      let value = getConfigValue(key);
       if (!value || value === schema.default) {
         errors.push(key);
       }
@@ -260,7 +260,7 @@ const features = {
 /**
  * Public API
  */
-const config = {
+let config = {
   Environment,
   getCurrentEnvironment,
   getConfigValue,

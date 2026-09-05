@@ -44,20 +44,20 @@ async function createProfile(profileData) {
 }
 
 async function getProfile(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('SELECT * FROM user_profiles WHERE user_id = $1', [userId]);
+  let res = await pg.query('SELECT * FROM user_profiles WHERE user_id = $1', [userId]);
   return res.rows[0] || null;
 }
 
 async function updateProfile(userId, updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { firstName, lastName, displayName, bio, avatarUrl, location, website, socialLinks, preferences } = updates;
   
-  const res = await pg.query(
+  let res = await pg.query(
     `UPDATE user_profiles 
      SET first_name = COALESCE($1, first_name),
          last_name = COALESCE($2, last_name),
@@ -89,16 +89,16 @@ async function updateProfile(userId, updates) {
 }
 
 async function deleteProfile(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query('DELETE FROM user_profiles WHERE user_id = $1 RETURNING id', [userId]);
+  let res = await pg.query('DELETE FROM user_profiles WHERE user_id = $1 RETURNING id', [userId]);
   return !!res.rows[0];
 }
 
 // Profile enrichment
 async function enrichProfile(userId, enrichmentData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const existingProfile = await getProfile(userId);
@@ -118,7 +118,7 @@ async function enrichProfile(userId, enrichmentData) {
 
 // AI-powered profile completion
 async function suggestProfileCompletion(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const profile = await getProfile(userId);
@@ -181,15 +181,15 @@ async function suggestProfileCompletion(userId) {
 
 // Social media integration
 async function linkSocialAccount(userId, platform, accountData) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const profile = await getProfile(userId);
+  let profile = await getProfile(userId);
   if (!profile) {
     return { success: false, error: 'Profile not found' };
   }
   
-  const socialLinks = profile.social_links || {};
+  let socialLinks = profile.social_links || {};
   socialLinks[platform] = accountData;
   
   await updateProfile(userId, { social_links: socialLinks });
@@ -210,15 +210,15 @@ async function linkSocialAccount(userId, platform, accountData) {
 }
 
 async function unlinkSocialAccount(userId, platform) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const profile = await getProfile(userId);
+  let profile = await getProfile(userId);
   if (!profile) {
     return { success: false, error: 'Profile not found' };
   }
   
-  const socialLinks = profile.social_links || {};
+  let socialLinks = profile.social_links || {};
   delete socialLinks[platform];
   
   await updateProfile(userId, { socialLinks });
@@ -228,10 +228,10 @@ async function unlinkSocialAccount(userId, platform) {
 
 // Profile visibility controls
 async function setProfileVisibility(userId, visibilitySettings) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const profile = await getProfile(userId);
+  let profile = await getProfile(userId);
   if (!profile) {
     return { success: false, error: 'Profile not found' };
   }
@@ -245,10 +245,10 @@ async function setProfileVisibility(userId, visibilitySettings) {
 }
 
 async function getProfileVisibility(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const profile = await getProfile(userId);
+  let profile = await getProfile(userId);
   if (!profile) {
     return { success: false, error: 'Profile not found' };
   }
@@ -266,7 +266,7 @@ async function getProfileVisibility(userId) {
 
 // Profile activity tracking
 async function logProfileActivity(userId, activityType, details) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   await pg.query(
@@ -277,10 +277,10 @@ async function logProfileActivity(userId, activityType, details) {
 }
 
 async function getProfileActivity(userId, { limit = 20 } = {}) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
-  const res = await pg.query(
+  let res = await pg.query(
     `SELECT * FROM profile_activity 
      WHERE user_id = $1 
      ORDER BY created_at DESC 
@@ -293,7 +293,7 @@ async function getProfileActivity(userId, { limit = 20 } = {}) {
 
 // Profile search and discovery
 async function searchProfiles(searchCriteria) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const { query, location, skills, limit = 20 } = searchCriteria;
@@ -321,13 +321,13 @@ async function searchProfiles(searchCriteria) {
   sql += ` ORDER BY up.updated_at DESC LIMIT $${paramIndex++}`;
   params.push(limit);
   
-  const res = await pg.query(sql, params);
+  let res = await pg.query(sql, params);
   return res.rows;
 }
 
 // Profile recommendations
 async function getProfileRecommendations(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const userProfile = await getProfile(userId);
@@ -356,7 +356,7 @@ async function getProfileRecommendations(userId) {
 
 // Profile analytics
 async function getProfileAnalytics(userId) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   // Get profile views
@@ -407,14 +407,14 @@ function calculateEngagementScore(views, activity) {
 
 // Bulk profile operations
 async function bulkUpdateProfiles(updates) {
-  const pg = getPostgreSQL();
+  let pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   
   const results = [];
   
   for (const update of updates) {
     try {
-      const profile = await updateProfile(update.userId, update.updates);
+      let profile = await updateProfile(update.userId, update.updates);
       results.push({ success: true, userId: update.userId, profile });
     } catch (error) {
       results.push({ success: false, userId: update.userId, error: error.message });

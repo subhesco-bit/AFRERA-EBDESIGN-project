@@ -65,7 +65,7 @@ router.put
     // Log request
     logger.debug('router.put request');('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const seed = await seedVaultService.updateSeed(req.params.seedId, req.farmerId, req.body);
+    let seed = await seedVaultService.updateSeed(req.params.seedId, req.farmerId, req.body);
     res.json({ success: true, data: seed });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -76,7 +76,7 @@ router.post
     // Log request
     logger.debug('router.post request');('/:seedId/record-usage', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const seed = await seedVaultService.recordUsage(req.params.seedId, req.farmerId, req.body?.amountUsed);
+    let seed = await seedVaultService.recordUsage(req.params.seedId, req.farmerId, req.body?.amountUsed);
     res.json({ success: true, data: seed });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -87,7 +87,7 @@ router.delete
     // Log request
     logger.debug('router.delete request');('/:seedId', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
-    const result = await seedVaultService.deleteSeed(req.params.seedId, req.farmerId);
+    let result = await seedVaultService.deleteSeed(req.params.seedId, req.farmerId);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
