@@ -679,7 +679,8 @@ app.use('/api/advancedsearch', advancedSearchRoutes);
 app.use('/api/advancedfeatures', advancedFeatures);
 app.use('/api/advancedanalytics', advancedAnalyticsRoutes);
 
-app.use('/api/index', index);
+// Routes index is a module exporter, not a router - don't mount it
+// app.use('/api/index', index);
 
 app.use('/health', healthRoutes);
     logger.info('✅ Health check routes mounted at /health');
