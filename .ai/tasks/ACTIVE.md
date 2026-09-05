@@ -1,5 +1,32 @@
 # ACTIVE TASKS
 
+## IN PROGRESS - AI module integration hardening (2026-09-05)
+
+Verified and repaired the first shared AI integration slice:
+
+- Fixed nutrition recipe route authentication, argument mapping, and response handling.
+- Aligned nutrition frontend calls with the mounted backend route.
+- Fixed malformed product media AI Express registrations.
+- Aligned product media API calls with the unified AI gateway mount.
+- Removed the image creator's fabricated canvas fallback; provider failures are now explicit.
+- Added backend route coverage in `backend/src/tests/productMediaAIRoutes.test.js`.
+- Added frontend coverage in `frontend/src/components/AIImageGenerator.test.jsx`.
+
+Validation completed:
+
+- Focused diet service tests: passing.
+- Product media route tests: passing.
+- Image creator frontend test: passing.
+- Focused frontend and backend lint: passing.
+- Frontend production build: previously passing; rerun after the latest image-client changes remains required.
+
+Known blockers for the remaining requested scope:
+
+- PostgreSQL is not running, so migration and database-backed integration validation cannot complete.
+- No dedicated public-data extractor route, source registry, or persistence contract is currently present.
+- Image/video providers are intentionally not configured or implemented for live generation in this environment.
+- APK signing/build prerequisites have not yet been verified.
+
 ## DONE — Multi-persona homepage fork + page-by-page honesty/functionality sweep (2026-09-04)
 
 User asked to stop producing strategy documents and actually fix pages, then to

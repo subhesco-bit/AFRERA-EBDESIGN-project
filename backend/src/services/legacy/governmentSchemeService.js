@@ -5,7 +5,7 @@
 
 const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { socketServer } = require('../../../websocket');
+const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware\/auth');
 // Shared pool (2026-08-04 convention, see database/pool.js): the AI-matching
 // functions above never touched Postgres, but the scheme registry added in

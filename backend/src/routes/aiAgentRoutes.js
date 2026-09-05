@@ -12,6 +12,9 @@
 const express = require('express');
 const router = express.Router();
 const aiAgentService = require('../services/aiAgentService');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+
+router.use(authMiddleware, requireRole('admin', 'superadmin'));
 
 /**
  * Execute an agent task

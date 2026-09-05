@@ -12,7 +12,7 @@ import { RouteAnalytics, RouteMetadata, UserJourneyTracker, ScrollTracker, Engag
 import { ErrorPage, NotFoundPage, UnauthorizedPage } from './components/RouteErrorBoundary';
 import { RouteSuspense } from './components/RouteLoading';
 import { RoutePreloader } from './utils/routePreloader';
-import { publicRoutes, protectedRoutes, farmerRoutes, adminRoutes, dashboardRoutes, managementRoutes, getRouteByPath } from './config/routes';
+import { publicRoutes, protectedRoutes, farmerRoutes, adminRoutes, dashboardRoutes, managementRoutes, getRouteByPath, getAllRoutes } from './config/routes';
 import config from './config/env';
 import monitoring from './utils/monitoring';
 import analytics from './utils/analytics';

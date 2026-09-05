@@ -4,7 +4,7 @@
 
 const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { socketServer } = require('../../../websocket');
+const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware\/auth');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 

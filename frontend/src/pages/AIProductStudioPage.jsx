@@ -13,7 +13,7 @@ export default function AIProductStudioPage() {
 
   const { data: wellnessData, isLoading: wellnessLoading, error: wellnessError } = useQuery({
     queryKey: ['wellness-practices'],
-    queryFn: () => nutritionAPI.getWellnessPractices({ category: selectedCategory || undefined }).then((r) => r.data || { practices: [] }),
+    queryFn: () => nutritionAPI.getWellnessPractices({ category: selectedCategory || undefined }).then((r) => r.data?.data || { practices: [] }),
   });
 
   const imagePrompt = useMemo(

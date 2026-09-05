@@ -1,4 +1,8 @@
 import { api } from './apiClient';
+import axios from 'axios';
+import config from '../config/env';
+
+const API_BASE_URL = config.API_URL;
 export { authAPI, dashboardAPI, userAPI, mfaAPI, privacyAPI, libraryAPI } from './coreApi';
 export { productsAPI, productReviewsAPI, ordersAPI, blockchainVerificationAPI, enterpriseIntegrationAPI, farmersAPI, seedVaultAPI } from './commerceApi';
 export { financialAPI, logisticsAPI, insuranceAPI } from './operationsApi';
@@ -78,10 +82,10 @@ export const aiAPI = {
 // provider status is honestly not_configured until an image/video provider
 // key is set; buildVideoScript works today with no external AI dependency.
 export const productMediaAIAPI = {
-  getProviderStatus: () => api.get('/ai/product-media-ai/status'),
-  generateImage: (productId, prompt) => api.post(`/ai/product-media-ai/products/${productId}/image`, { prompt }),
-  buildVideoScript: (productId) => api.post(`/ai/product-media-ai/products/${productId}/video-script`),
-  generateVideo: (productId) => api.post(`/ai/product-media-ai/products/${productId}/video`),
+  getProviderStatus: () => api.get('/unifiedaigateway/product-media-ai/status'),
+  generateImage: (productId, prompt) => api.post(`/unifiedaigateway/product-media-ai/products/${productId}/image`, { prompt }),
+  buildVideoScript: (productId) => api.post(`/unifiedaigateway/product-media-ai/products/${productId}/video-script`),
+  generateVideo: (productId) => api.post(`/unifiedaigateway/product-media-ai/products/${productId}/video`),
 };
 
 // Wearable Integration API — Fitbit (real OAuth2), Apple Health / Samsung
@@ -1387,28 +1391,34 @@ export const multilingualAPI = {
 
 /** Nutrition intelligence (components/NutritionIntelligence/NutritionLabel.jsx). */
 export const nutritionAPI = {
-  getProductNutrition: (productId) => api.get(`/ai/nutrition-intelligence/product-nutrition/${productId}`),
-  getNutritionScore: (productId) => api.get(`/ai/nutrition-intelligence/product-nutrition/${productId}/score`),
-  getDietaryProfiles: () => api.get('/ai/nutrition-intelligence/dietary-profiles'),
-  getRecommendations: () => api.get('/ai/nutrition-intelligence/recommendations'),
+  getProductNutrition: (productId) => api.get(`/nutritionintelligence/product-nutrition/${productId}`),
+  getNutritionScore: (productId) => api.get(`/nutritionintelligence/product-nutrition/${productId}/score`),
+  getDietaryProfiles: () => api.get('/nutritionintelligence/dietary-profiles'),
+  getRecommendations: () => api.get('/nutritionintelligence/recommendations'),
   generateRecommendations: (dietaryProfileId, targetCalories, limit) =>
-    api.post('/ai/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit }),
-  getWellnessPractices: (params) => api.get('/ai/nutrition-intelligence/wellness-practices', { params }),
+    api.post('/nutritionintelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit }),
+  getWellnessPractices: (params) => api.get('/nutritionintelligence/wellness-practices', { params }),
   // AI-generated recipe grounded in real dietary profile + real matching AFRERA
   // products — see nutritionIntelligenceService.generateDietBasedRecipe. Returns
   // an honest status: 'generated' | 'ai_not_configured' | 'no_ingredients'.
   generateRecipe: (dietaryProfileId, targetCalories, provider) =>
-    api.post('/ai/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
+    api.post('/nutritionintelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
   // "Sell by nutrient, not by kg" — real per-100g comparison against category
   // peers, picks whichever recorded compound (protein, curcumin, Scoville,
   // ASTA color, etc.) actually differentiates this product. See
   // nutritionIntelligenceService.calculateValuePerNutrient.
-  getValuePerNutrient: (productId) => api.get(`/ai/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
+  getValuePerNutrient: (productId) => api.get(`/nutritionintelligence/product-nutrition/${productId}/value-per-nutrient`),
 };
 
 export const dietTherapyAPI = {
   createPlan: (profile, options = {}) => api.post('/diet-therapy/plan', { profile, options }),
   getRegionalFoodGroups: (region) => api.get('/diet-therapy/regional-food-groups', { params: { region } }),
+};
+
+export const publicDataAPI = {
+  listSources: () => api.get('/publicdata/sources'),
+  registerSource: (source) => api.post('/publicdata/sources', source),
+  extract: (sourceId, filter = {}) => api.post(`/publicdata/sources/${sourceId}/extract`, { filter }),
 };
 
 export const moduleAPI = {

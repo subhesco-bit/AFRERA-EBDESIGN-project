@@ -147,6 +147,7 @@ module.exports.preventiveMaintenanceRoutes = require('./preventiveMaintenanceRou
 module.exports.priceForecasting = require('./priceForecasting');
 module.exports.productCertifications = require('./productCertifications');
 module.exports.productMediaAIRoutes = require('./productMediaAIRoutes');
+module.exports.publicDataRoutes = require('./publicDataRoutes');
 module.exports.productReviewRoutes = require('./productReviewRoutes');
 module.exports.productRoutes = require('./productRoutes');
 module.exports.projectSystemsRoutes = require('./projectSystemsRoutes');

@@ -271,8 +271,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply trigger to all relevant tables
-CREATE TRIGGER update_product_listings_updated_at BEFORE UPDATE ON product_listings
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'update_product_listings_updated_at'
+          AND tgrelid = 'product_listings'::regclass
+    ) THEN
+        CREATE TRIGGER update_product_listings_updated_at BEFORE UPDATE ON product_listings
+            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END
+$$;
 
 -- 2026-08-30: removed 3 CREATE TRIGGER statements for gi_marketplace_listings/
 -- product_reviews/bulk_orders - all three tables are deferred collision losers
@@ -283,8 +293,18 @@ CREATE TRIGGER update_product_listings_updated_at BEFORE UPDATE ON product_listi
 -- 009_marketplace_enhancements.sql) - "trigger ... already exists" against a
 -- real database, since CREATE TRIGGER has no IF NOT EXISTS.
 
-CREATE TRIGGER update_quotations_updated_at BEFORE UPDATE ON quotations
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger
+        WHERE tgname = 'update_quotations_updated_at'
+          AND tgrelid = 'quotations'::regclass
+    ) THEN
+        CREATE TRIGGER update_quotations_updated_at BEFORE UPDATE ON quotations
+            FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    END IF;
+END
+$$;
 
 -- Comments for documentation
 COMMENT ON TABLE product_listings IS 'Main product listings table with AI-powered features';

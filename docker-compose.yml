@@ -6,11 +6,11 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-ebdesign}
       POSTGRES_USER: ${DB_USER:-ebdesign_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-ebdesign_dev_password_change_in_prod}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
       POSTGRES_INITDB_ARGS: "-c shared_buffers=256MB -c effective_cache_size=1GB"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/migrations:/docker-entrypoint-initdb.d:ro
+      - ./backend/src/database/migrations:/docker-entrypoint-initdb.d:ro
     ports:
       - "${DB_PORT:-5432}:5432"
     healthcheck:
@@ -67,11 +67,11 @@ services:
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-ebdesign}
       DB_USER: ${DB_USER:-ebdesign_user}
-      DB_PASSWORD: ${DB_PASSWORD:-ebdesign_dev_password_change_in_prod}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
-      JWT_SECRET: ${JWT_SECRET:-dev_jwt_secret_change_in_production}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_EXPIRY: 7d
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       CLAUDE_MODEL: claude-3-5-sonnet-20241022

@@ -10,6 +10,7 @@ const router = express.Router();
 const nutritionIntelligenceService = require('../services/legacy/nutritionIntelligenceService');
 const { authMiddleware } = require('../middleware/auth');
 const { apiLimiter } = require('../middleware/rateLimiter');
+const { NUTRITION_WELLNESS_DISCLAIMER } = require('../utils/disclaimers');
 
 // Middleware
 router.use(apiLimiter);
@@ -260,15 +261,22 @@ router.get('/wellness-practices', async (req, res) => {
  * @desc    Generate AI-powered recipes based on dietary profile
  * @access  Public
  */
-router.post('/recipes', async (req, res) => {
+router.post('/recipes', authMiddleware, async (req, res) => {
   try {
-    const { dietary_profile_id, target_calories, provider } = req.body;
+    const { dietary_profile_id, target_calories, provider } = req.body || {};
+    if (!dietary_profile_id) {
+      return res.status(400).json({
+        error: 'dietary_profile_id is required',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      });
+    }
+
     const recipe = await nutritionIntelligenceService.generateDietBasedRecipe(
+      req.user.id,
       dietary_profile_id, 
-      target_calories, 
-      provider
+      { targetCalories: target_calories, provider }
     );
-    res.json({ success: true, data: recipe });
+    res.json(recipe);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
