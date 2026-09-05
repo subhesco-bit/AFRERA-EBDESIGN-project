@@ -1,3 +1,4 @@
+const express = require('express');
 'use strict';
 
 const { validateId, parsePageQuery, bodyValidator, queryValidator, date, dateTime, enumValue, numberValue, fail, requestId } = require('./climateRouteSupport');
@@ -24,7 +25,10 @@ function emitMutation(req, operation, item, signalType, source) {
   });
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   validateId, parsePageQuery, bodyValidator, queryValidator, validateBody, fail, requestId,
   validateOperationsBody, emitMutation,
 };
+Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
+module.exports = router;

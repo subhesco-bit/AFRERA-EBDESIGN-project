@@ -60,10 +60,13 @@ function crudRouter(service) {
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   droughtMonitoringRoutes: crudRouter(droughtMonitoring),
   floodMonitoringRoutes: crudRouter(floodMonitoring),
   diseaseForecastingRoutes: crudRouter(diseaseForecasting),
   climateRiskRoutes: crudRouter(climateRisk),
   agroMeteorologyRoutes: crudRouter(agroMeteorology),
 };
+
+module.exports = router;

@@ -48,7 +48,8 @@ function crudRouter(service) {
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   landLeaseRoutes: crudRouter(landLease),
   gisLandMappingRoutes: crudRouter(gisLandMapping),
   soilMappingRoutes: crudRouter(soilMapping),
@@ -56,3 +57,5 @@ module.exports = {
   geoBoundaryRoutes: crudRouter(geoBoundary),
   surveyManagementRoutes: crudRouter(surveyManagement),
 };
+
+module.exports = router;

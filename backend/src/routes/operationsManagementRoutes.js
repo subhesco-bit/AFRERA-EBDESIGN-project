@@ -52,7 +52,8 @@ function crudRouter(service, validateCreate) {
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   farmActivityRoutes: crudRouter(farmActivities, (body) => validateOperationsBody(body, ['activity_name', 'activity_type'], { dates: ['scheduled_date', 'completed_date'] })),
   farmTaskRoutes: crudRouter(farmTasks, (body) => validateOperationsBody(body, ['task_name'], { dates: ['due_date'], enums: { priority: ['low', 'medium', 'high', 'urgent'], status: ['pending', 'in_progress', 'completed', 'cancelled'] } })),
   contractorRoutes: crudRouter(contractors, (body) => validateOperationsBody(body, ['contractor_name', 'service_type'], { dates: ['contract_start', 'contract_end'], numbers: { rate: { min: 0, max: 100000000 } } })),
@@ -62,3 +63,5 @@ module.exports = {
   farmProductivityRoutes: crudRouter(farmProductivity, (body) => validateOperationsBody(body, ['metric_name'], { numbers: { value: { min: 0, max: 1000000000 }, benchmark: { min: 0, max: 1000000000 } } })),
   farmOperationsDashboardRoutes: crudRouter(farmOperationsDashboard, (body) => validateOperationsBody(body, ['kpi_name'], { numbers: { value: { min: 0, max: 1000000000 }, target: { min: 0, max: 1000000000 } } })),
 };
+
+module.exports = router;

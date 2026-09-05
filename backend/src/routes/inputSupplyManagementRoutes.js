@@ -49,7 +49,8 @@ function crudRouter(service) {
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   biofertilizerRoutes: crudRouter(biofertilizer),
   pesticideInventoryRoutes: crudRouter(pesticideInventory),
   bioPesticideRoutes: crudRouter(bioPesticide),
@@ -59,3 +60,5 @@ module.exports = {
   inputDistributionRoutes: crudRouter(inputDistribution),
   inputTraceabilityRoutes: crudRouter(inputTraceability),
 };
+
+module.exports = router;

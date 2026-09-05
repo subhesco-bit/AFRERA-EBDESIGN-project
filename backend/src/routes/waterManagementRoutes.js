@@ -76,10 +76,13 @@ function emitMutation(req, operation, item) {
   });
 }
 
-module.exports = {
-  waterBudgetingRoutes: crudRouter(waterBudgeting, (body) => validateWaterBody(body, ['plot_name'])),
-  waterQualityRoutes: crudRouter(waterQuality, (body) => validateWaterBody(body, ['location', 'parameter'])),
-  rainwaterHarvestingRoutes: crudRouter(rainwaterHarvesting, (body) => validateWaterBody(body, ['structure_name', 'structure_type'])),
-  watershedManagementRoutes: crudRouter(watershedManagement, (body) => validateWaterBody(body, ['name'])),
-  waterAnalyticsRoutes: crudRouter(waterAnalytics, (body) => validateWaterBody(body, ['metric', 'period'])),
-};
+const mainRouter = express.Router();
+
+// Mount all water management sub-routes
+mainRouter.use('/budgeting', crudRouter(waterBudgeting, (body) => validateWaterBody(body, ['plot_name'])));
+mainRouter.use('/quality', crudRouter(waterQuality, (body) => validateWaterBody(body, ['location', 'parameter'])));
+mainRouter.use('/rainwater-harvesting', crudRouter(rainwaterHarvesting, (body) => validateWaterBody(body, ['structure_name', 'structure_type'])));
+mainRouter.use('/watershed', crudRouter(watershedManagement, (body) => validateWaterBody(body, ['name'])));
+mainRouter.use('/analytics', crudRouter(waterAnalytics, (body) => validateWaterBody(body, ['metric', 'period'])));
+
+module.exports = mainRouter;
