@@ -2,11 +2,11 @@
  * AI Agent Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/aiAgentService');
-const originalService = require('../../services/legacy/aiAgenticCompanionService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/aiAgentService.js');
+const originalService = require('../../services/legacy/aiAgenticCompanionService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

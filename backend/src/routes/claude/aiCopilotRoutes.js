@@ -9,11 +9,11 @@
  * - Original copilot endpoints
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/aiCopilotService');
-const originalService = require('../../services/legacy/aiCopilotService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/aiCopilotService.js');
+const originalService = require('../../services/legacy/aiCopilotService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

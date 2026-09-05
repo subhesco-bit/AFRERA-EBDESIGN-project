@@ -18,11 +18,11 @@
  * - POST /recommend - Original recommendation generation
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/aiDecisionService');
-const originalService = require('../../services/legacy/aiService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/aiDecisionService.js');
+const originalService = require('../../services/legacy/aiService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 // Apply authentication to all routes
 router.use(authMiddleware);

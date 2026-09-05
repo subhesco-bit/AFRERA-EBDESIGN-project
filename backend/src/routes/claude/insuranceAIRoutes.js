@@ -2,11 +2,11 @@
  * Insurance AI Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/insuranceAIService');
-const originalService = require('../../services/legacy/insuranceService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/insuranceAIService.js');
+const originalService = require('../../services/legacy/insuranceService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

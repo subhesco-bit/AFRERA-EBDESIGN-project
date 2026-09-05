@@ -2,11 +2,11 @@
  * Order AI Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/orderAIService');
-const originalService = require('../../services/legacy/orderService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/orderAIService.js');
+const originalService = require('../../services/legacy/orderService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

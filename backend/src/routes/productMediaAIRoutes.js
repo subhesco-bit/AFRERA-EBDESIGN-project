@@ -6,14 +6,14 @@
 const express = require('express');
 const productMediaAIController = require('../controllers/productMediaAIController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 const logger = console; // TODO: use Winston/Pino logger
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 router.get
     // Log request

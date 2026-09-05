@@ -2,11 +2,11 @@
  * Logistics AI Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/logisticsAIService');
-const originalService = require('../../services/legacy/logisticsService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/logisticsAIService.js');
+const originalService = require('../../services/legacy/logisticsService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

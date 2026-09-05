@@ -2,11 +2,11 @@
  * AI Coordination Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/aiCoordinationService');
-const originalService = require('../../services/legacy/aiOrchestrationService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/aiCoordinationService.js');
+const originalService = require('../../services/legacy/aiOrchestrationService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

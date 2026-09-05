@@ -3,12 +3,12 @@
  * API endpoints for household procurement planning
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const householdProcurementService = require('../../services/strategic/householdProcurementService');
-const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth');
+const householdProcurementService = require('../../services/strategic/householdProcurementService.js');
+const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');
 const authorize = (roles) => requireRole(...roles);
-const apiResponseHandler = require('../../middleware/apiResponseHandler');
+const apiResponseHandler = require('../../middleware/apiResponseHandler.js');
 
 const service = new householdProcurementService();
 

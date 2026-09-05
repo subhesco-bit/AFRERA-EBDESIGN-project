@@ -9,10 +9,10 @@ const express = require('express');
 const router = express.Router();
 const nutritionIntelligenceService = require('../services/legacy/nutritionIntelligenceService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Middleware
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 // ============================================================================
 // NUTRIENT DATA ROUTES
