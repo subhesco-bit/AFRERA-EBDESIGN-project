@@ -8,9 +8,9 @@
 const express = require('express');
 const crypto = require('crypto');
 const { Pool } = require('pg');
-const { logger } = require('..\/utils\/logger');
-const { authMiddleware } = require('..\/middleware\/auth');
-const { authLimiter } = require('..\/middleware\/rateLimiter');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
+const { authLimiter } = require('../../middleware\/rateLimiter');
 // Loaded on first QR generation, not at import — see authService for why.
 const QRCode = { toDataURL: (...args) => require('qrcode').toDataURL(...args) };
 
@@ -18,7 +18,7 @@ const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('..\/database\/pool');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // UNIQUE PRODUCT ID (CAP-269)
@@ -1057,6 +1057,7 @@ module.exports = {
   router,
   isHealthy
 };
+
 
 
 

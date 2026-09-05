@@ -24,7 +24,7 @@
 
 'use strict';
 
-const pool = require('..\/database\/pool');
+const pool = require('../../database\/pool');
 
 // ASSUMED weights (no historical conversion/complaint data exists yet to
 // calibrate these against real outcomes) — labeled as such rather than
@@ -127,5 +127,6 @@ class SellerRankingService {
 }
 
 module.exports = new SellerRankingService();
+
 
 

@@ -24,9 +24,9 @@
  * only the thresholds applied to real recorded dates are assumptions.
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 const aiBackbone = require('./aiBackboneService');
 
 // ---- Assumed constants (not stored in the schema; veterinary rules of
@@ -686,5 +686,6 @@ module.exports = {
   const { ...rest } = m071;
   Object.assign(module.exports, rest);
 }
+
 
 

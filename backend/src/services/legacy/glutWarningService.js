@@ -18,7 +18,7 @@
 
 'use strict';
 
-const pool = require('..\/database\/pool');
+const pool = require('../../database\/pool');
 
 const GLUT_SELLER_THRESHOLD = 3; // ASSUMED — see file header
 const WINDOW_DAYS = 14;
@@ -87,5 +87,6 @@ class GlutWarningService {
 }
 
 module.exports = new GlutWarningService();
+
 
 

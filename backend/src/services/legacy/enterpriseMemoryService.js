@@ -51,10 +51,10 @@
 'use strict';
 
 const express = require('express');
-const { logger } = require('..\/utils\/logger');
-const { authMiddleware } = require('..\/middleware\/auth');
-const pool = require('..\/database\/pool');
-const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
+const pool = require('../../database\/pool');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 const router = express.Router();
 
@@ -379,5 +379,6 @@ module.exports = {
   installSignalHooks,
   isHealthy,
 };
+
 
 

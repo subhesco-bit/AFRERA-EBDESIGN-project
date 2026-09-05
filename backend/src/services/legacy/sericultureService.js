@@ -3,7 +3,7 @@
  * Complete sericulture management with silk production and mulberry cultivation
  */
 
-const { getPostgreSQL } = require('..\/database\/connection');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class SericultureService {
   constructor() {
@@ -143,5 +143,6 @@ class SericultureService {
 }
 
 module.exports = new SericultureService();
+
 
 

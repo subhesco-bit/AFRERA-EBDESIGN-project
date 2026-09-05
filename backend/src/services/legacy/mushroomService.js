@@ -3,7 +3,7 @@
  * Complete mushroom cultivation management with spawn and substrate management
  */
 
-const { getPostgreSQL } = require('..\/database\/connection');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class MushroomService {
   constructor() {
@@ -144,5 +144,6 @@ class MushroomService {
 }
 
 module.exports = new MushroomService();
+
 
 

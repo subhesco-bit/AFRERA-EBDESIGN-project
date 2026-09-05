@@ -5,7 +5,7 @@
  * capabilities for production-ready data protection
  */
 
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 const { exec } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
@@ -332,5 +332,6 @@ class BackupService {
 const backupService = new BackupService();
 
 module.exports = backupService;
+
 
 

@@ -5,8 +5,8 @@
  * Based on latest IoT and smart farming research (2024-2025)
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class IoTSensorService {
   constructor() {
@@ -719,5 +719,6 @@ class IoTSensorService {
 }
 
 module.exports = new IoTSensorService();
+
 
 

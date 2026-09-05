@@ -3,7 +3,7 @@
  * Complete apiculture management with beekeeping and honey production
  */
 
-const { getPostgreSQL } = require('..\/database\/connection');
+const { getPostgreSQL } = require('../../database\/connection');
 
 class ApicultureService {
   constructor() {
@@ -143,5 +143,6 @@ class ApicultureService {
 }
 
 module.exports = new ApicultureService();
+
 
 

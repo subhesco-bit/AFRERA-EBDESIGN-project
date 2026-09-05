@@ -9,10 +9,10 @@
  * - Security threat detection
  */
 
-const DatabaseService = require('..\/database\/connection');
+const DatabaseService = require('../../database\/connection');
 const aiGatewayService = require('./aiGatewayService');
 const analyticsService = require('./analyticsService');
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 
 class SystemAdministrationService {
   constructor() {
@@ -552,4 +552,5 @@ class SystemAdministrationService {
 }
 
 module.exports = new SystemAdministrationService();
+
 

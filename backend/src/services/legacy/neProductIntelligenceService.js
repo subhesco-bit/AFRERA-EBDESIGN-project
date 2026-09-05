@@ -28,8 +28,8 @@
  */
 
 const express = require('express');
-const { logger } = require('..\/utils\/logger');
-const { authMiddleware } = require('..\/middleware\/auth');
+const { logger } = require('../../utils\/logger');
+const { authMiddleware } = require('../../middleware\/auth');
 
 const router = express.Router();
 
@@ -344,5 +344,6 @@ module.exports = {
   TURMERIC_CURCUMIN_PCT,
   LANDED_COSTS
 };
+
 
 

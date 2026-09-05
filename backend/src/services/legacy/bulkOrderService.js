@@ -3,13 +3,13 @@
  * Handles bulk/wholesale orders for AFRERA marketplace
  */
 
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 
 class BulkOrderService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('..\/database\/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -532,5 +532,6 @@ module.exports = new BulkOrderService();
   const { ...rest } = m053;
   Object.assign(module.exports, rest);
 }
+
 
 

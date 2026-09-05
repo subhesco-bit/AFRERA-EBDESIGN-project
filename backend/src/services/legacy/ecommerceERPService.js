@@ -19,9 +19,9 @@
  * - CRM integration for customer relationship management
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ============================================================================
 // FINANCIAL ERP INTEGRATION
@@ -630,5 +630,6 @@ module.exports = {
   // Production ERP
   createProductionOrder
 };
+
 
 

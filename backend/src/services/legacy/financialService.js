@@ -3,13 +3,13 @@
  * Manages loans, advances, credit scoring, and financial transactions
  */
 
-const { logger } = require('..\/utils\/logger');
-const { withTransaction } = require('..\/core\/withTransaction');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { authMiddleware } = require('..\/middleware\/auth');
+const { logger } = require('../../utils\/logger');
+const { withTransaction } = require('../../core\/withTransaction');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
 const decisionSupportService = require('./decisionSupportService');
-const { mcda } = require('..\/core\/mcda');
-const outcomeSink = require('..\/core\/outcomeSink');
+const { mcda } = require('../../core\/mcda');
+const outcomeSink = require('../../core\/outcomeSink');
 
 /**
  * Apply for loan
@@ -812,5 +812,6 @@ module.exports = {
   getBuyerCreditEligibility,
   farmerCreditRiskScore
 };
+
 
 

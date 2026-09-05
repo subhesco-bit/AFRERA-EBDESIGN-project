@@ -12,10 +12,10 @@
  */
 
 const express = require('express');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { authMiddleware } = require('..\/middleware\/auth');
-const { adminMiddleware } = require('..\/middleware\/admin');
-const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
+const { adminMiddleware } = require('../../middleware\/admin');
+const { logger } = require('../../utils\/logger');
 
 const router = express.Router();
 
@@ -464,5 +464,6 @@ module.exports = {
   validatePromo,
   getEngineRules
 };
+
 
 

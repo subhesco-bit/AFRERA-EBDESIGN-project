@@ -12,8 +12,8 @@
 
 'use strict';
 
-const pool = require('..\/database\/pool');
-const { logger } = require('..\/utils\/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -284,5 +284,6 @@ module.exports = {
   const { ...rest } = m077;
   Object.assign(module.exports, rest);
 }
+
 
 

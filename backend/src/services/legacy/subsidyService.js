@@ -4,9 +4,9 @@
  * Specifically for India and Northeast region
  */
 
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('..\/middleware\/auth');
+const { authMiddleware } = require('../../middleware\/auth');
 
 /**
  * Check subsidy eligibility for a project
@@ -589,5 +589,6 @@ module.exports = {
   calculateGSTApplicability,
   setupRoutes
 };
+
 
 

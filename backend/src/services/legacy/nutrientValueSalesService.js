@@ -21,9 +21,9 @@
  * - Premium for nutritional excellence
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ============================================================================
 // NUTRIENT-VALUE PRICING MODEL
@@ -888,5 +888,6 @@ module.exports = {
   // Nutrient-Value Search
   searchByNutrientCriteria
 };
+
 
 

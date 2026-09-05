@@ -20,9 +20,9 @@
  *  - ASSUMED_SHEARING_INTERVAL_DAYS: recommended interval between shearings
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ---- Assumed constants (not stored in the schema; sheep farming standards)
 const ASSUMED_VACCINATION_INTERVAL_DAYS = 180; // biannual vaccination cycle
@@ -1070,5 +1070,6 @@ module.exports = {
   const { ...rest } = m074;
   Object.assign(module.exports, rest);
 }
+
 
 

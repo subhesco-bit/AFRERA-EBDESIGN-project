@@ -25,7 +25,7 @@
 
 'use strict';
 
-const pool = require('..\/database\/pool');
+const pool = require('../../database\/pool');
 
 const FOLU_TRANSITIONS = [
   { id: 1, name: 'Healthy diets' },
@@ -187,5 +187,6 @@ class FoluBenchmarkService {
 }
 
 module.exports = new FoluBenchmarkService();
+
 
 

@@ -18,9 +18,9 @@
  *  - ASSUMED_TARGET_FCR_LAYER: target FCR for layer flocks
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ---- Assumed constants (not stored in the schema; poultry industry standards)
 const ASSUMED_VACCINATION_INTERVAL_DAYS = 30; // monthly vaccination cycle
@@ -948,5 +948,6 @@ module.exports = {
   const { registerPoultryFlock: registerPoultryFlockFromBE123, ...rest } = m123;
   Object.assign(module.exports, rest, { registerPoultryFlockFromBE123 });
 }
+
 
 
