@@ -5,8 +5,8 @@
  * for production-ready system health and performance tracking
  */
 
-const { logger } = require('../../utils\/logger');
-const pool = require('../../database\/pool');
+const { logger } = require('../../utils/logger');
+const pool = require('../../database/pool');
 
 class AnalyticsMonitoringService {
   constructor() {

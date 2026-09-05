@@ -8,7 +8,7 @@
 
 'use strict';
 
-const pool = require('../../database\/pool');
+const pool = require('../../database/pool');
 
 class EquipmentExchangeService {
   async createListing(listedBy, data) {

@@ -11,8 +11,8 @@
 
 'use strict';
 
-const pool = require('../../database\/pool');
-const { logger } = require('../../utils\/logger');
+const pool = require('../../database/pool');
+const { logger } = require('../../utils/logger');
 
 /** Revenue from contracts, by status. */
 async function getOverview({ from, to, buyerId } = {}) {

@@ -7,7 +7,7 @@
 
 'use strict';
 
-const pool = require('../../database\/pool');
+const pool = require('../../database/pool');
 
 class SeedVaultService {
   async listSeeds(farmerId) {

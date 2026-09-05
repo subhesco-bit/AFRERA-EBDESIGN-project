@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { getPostgreSQL } = require('../../database\/connection');
+const { getPostgreSQL } = require('../../database/connection');
 
 class LibraryKnowledgeService {
   constructor() {

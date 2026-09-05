@@ -3,7 +3,7 @@
  * Complete vermicompost management with earthworm and organic waste management
  */
 
-const { getPostgreSQL } = require('../../database\/connection');
+const { getPostgreSQL } = require('../../database/connection');
 
 class VermicompostService {
   constructor() {

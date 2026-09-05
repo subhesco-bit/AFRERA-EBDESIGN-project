@@ -19,9 +19,9 @@
  */
 
 const express = require('express');
-const { logger } = require('../../utils\/logger');
-const { authMiddleware } = require('../../middleware\/auth');
-const pool = require('../../database\/pool');
+const { logger } = require('../../utils/logger');
+const { authMiddleware } = require('../../middleware/auth');
+const pool = require('../../database/pool');
 
 const router = express.Router();
 

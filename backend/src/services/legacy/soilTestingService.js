@@ -3,10 +3,10 @@
  * AI-powered soil analysis and personalized fertilizer recommendations
  */
 
-const { logger } = require('../../utils\/logger');
+const { logger } = require('../../utils/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../middleware\/auth');
-const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware/auth');
+const { getPostgreSQL } = require('../../database/connection');
 
 /**
  * Submit soil sample for testing
