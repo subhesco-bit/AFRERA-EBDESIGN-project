@@ -1,5 +1,5 @@
 -- Phase 2: Loan Management Schema
-CREATE TABLE loans (
+CREATE TABLE IF NOT EXISTS loans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   farmer_id UUID NOT NULL REFERENCES users(id),
   amount DECIMAL(12,2) NOT NULL,
@@ -15,14 +15,14 @@ CREATE TABLE loans (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE loan_applications (
+CREATE TABLE IF NOT EXISTS loan_applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   loan_id UUID REFERENCES loans(id),
   status VARCHAR(50),
   created_at TIMESTAMP
 );
 
-CREATE TABLE loan_payments (
+CREATE TABLE IF NOT EXISTS loan_payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   loan_id UUID NOT NULL REFERENCES loans(id),
   amount DECIMAL(12,2),
@@ -32,6 +32,6 @@ CREATE TABLE loan_payments (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_loans_farmer ON loans(farmer_id);
-CREATE INDEX idx_loans_status ON loans(status);
-CREATE INDEX idx_payments_loan ON loan_payments(loan_id);
+CREATE INDEX IF NOT EXISTS idx_loans_farmer ON loans(farmer_id);
+CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status);
+CREATE INDEX IF NOT EXISTS idx_payments_loan ON loan_payments(loan_id);

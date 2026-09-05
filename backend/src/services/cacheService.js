@@ -25,10 +25,9 @@ class CacheService {
   async init() {
     try {
       this.client = redis.createClient({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
+        url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
         password: process.env.REDIS_PASSWORD || undefined,
-        db: process.env.REDIS_DB || 0,
+        database: Number.parseInt(process.env.REDIS_DB, 10) || 0,
       });
 
       this.client.on('error', (err) => console.error('Redis error:', err));

@@ -13,6 +13,153 @@
  */
 
 import { lazy } from 'react';
+import MobileWallet from '../pages/MobileWallet';
+import MobileSettings from '../pages/MobileSettings';
+import MobileProfile from '../pages/MobileProfile';
+import MobilePayments from '../pages/MobilePayments';
+import MobileOffers from '../pages/MobileOffers';
+import MobileNotifications from '../pages/MobileNotifications';
+import MobileMarketplace from '../pages/MobileMarketplace';
+import MobileHomepage from '../pages/MobileHomepage';
+import MobileHelp from '../pages/MobileHelp';
+import MobileChat from '../pages/MobileChat';
+import SubsidyApplicationPage from '../pages/SubsidyApplicationPage';
+import SchemeVerificationPage from '../pages/SchemeVerificationPage';
+import SchemeUpdate Notifier from '../pages/SchemeUpdate Notifier';
+import SchemeReportGenerator from '../pages/SchemeReportGenerator';
+import SchemeEligibilityChecker from '../pages/SchemeEligibilityChecker';
+import SchemeBeneficiaryList from '../pages/SchemeBeneficiaryList';
+import MobileVerification from '../pages/MobileVerification';
+import GovernmentSchemeDashboard from '../pages/GovernmentSchemeDashboard';
+import GovernmentNotificationCenter from '../pages/GovernmentNotificationCenter';
+import DocumentUploadPage from '../pages/DocumentUploadPage';
+import DisputeResolutionPage from '../pages/DisputeResolutionPage';
+import DeadlineTracker from '../pages/DeadlineTracker';
+import ComplianceValidator from '../pages/ComplianceValidator';
+import CancellationManagement from '../pages/CancellationManagement';
+import BiometricAuthentication from '../pages/BiometricAuthentication';
+import BeneficiaryManagement from '../pages/BeneficiaryManagement';
+import AuditLogPage from '../pages/AuditLogPage';
+import ApprovalWorkflow from '../pages/ApprovalWorkflow';
+import ApplicationStatusTracker from '../pages/ApplicationStatusTracker';
+import AnnouncementBoard from '../pages/AnnouncementBoard';
+import Page9 from '../pages/Page9';
+import Page88 from '../pages/Page88';
+import Page87 from '../pages/Page87';
+import Page86 from '../pages/Page86';
+import Page85 from '../pages/Page85';
+import Page84 from '../pages/Page84';
+import Page83 from '../pages/Page83';
+import Page82 from '../pages/Page82';
+import Page81 from '../pages/Page81';
+import Page80 from '../pages/Page80';
+import Page79 from '../pages/Page79';
+import Page78 from '../pages/Page78';
+import Page77 from '../pages/Page77';
+import Page76 from '../pages/Page76';
+import Page75 from '../pages/Page75';
+import Page74 from '../pages/Page74';
+import Page73 from '../pages/Page73';
+import Page72 from '../pages/Page72';
+import Page71 from '../pages/Page71';
+import Page70 from '../pages/Page70';
+import Page69 from '../pages/Page69';
+import Page68 from '../pages/Page68';
+import Page67 from '../pages/Page67';
+import Page66 from '../pages/Page66';
+import Page65 from '../pages/Page65';
+import Page64 from '../pages/Page64';
+import Page63 from '../pages/Page63';
+import Page62 from '../pages/Page62';
+import Page61 from '../pages/Page61';
+import Page60 from '../pages/Page60';
+import Page59 from '../pages/Page59';
+import Page58 from '../pages/Page58';
+import Page57 from '../pages/Page57';
+import Page56 from '../pages/Page56';
+import Page55 from '../pages/Page55';
+import Page54 from '../pages/Page54';
+import Page53 from '../pages/Page53';
+import Page52 from '../pages/Page52';
+import Page51 from '../pages/Page51';
+import Page50 from '../pages/Page50';
+import Page49 from '../pages/Page49';
+import Page48 from '../pages/Page48';
+import Page47 from '../pages/Page47';
+import Page46 from '../pages/Page46';
+import Page45 from '../pages/Page45';
+import Page44 from '../pages/Page44';
+import Page43 from '../pages/Page43';
+import Page42 from '../pages/Page42';
+import Page41 from '../pages/Page41';
+import Page40 from '../pages/Page40';
+import Page39 from '../pages/Page39';
+import Page38 from '../pages/Page38';
+import Page37 from '../pages/Page37';
+import Page36 from '../pages/Page36';
+import Page35 from '../pages/Page35';
+import Page34 from '../pages/Page34';
+import Page33 from '../pages/Page33';
+import Page32 from '../pages/Page32';
+import Page31 from '../pages/Page31';
+import Page30 from '../pages/Page30';
+import Page29 from '../pages/Page29';
+import Page28 from '../pages/Page28';
+import Page27 from '../pages/Page27';
+import Page26 from '../pages/Page26';
+import Page25 from '../pages/Page25';
+import Page24 from '../pages/Page24';
+import Page23 from '../pages/Page23';
+import Page22 from '../pages/Page22';
+import Page21 from '../pages/Page21';
+import Page20 from '../pages/Page20';
+import Page19 from '../pages/Page19';
+import Page18 from '../pages/Page18';
+import Page17 from '../pages/Page17';
+import Page16 from '../pages/Page16';
+import Page15 from '../pages/Page15';
+import Page14 from '../pages/Page14';
+import Page13 from '../pages/Page13';
+import Page12 from '../pages/Page12';
+import Page11 from '../pages/Page11';
+import Page10 from '../pages/Page10';
+import Page0 from '../pages/Page0';
+import EconomicDashboard from '../pages/EconomicDashboard';
+import WeatherImpactAssessment from '../pages/WeatherImpactAssessment';
+import UserEngagementStats from '../pages/UserEngagementStats';
+import SystemHealthMonitor from '../pages/SystemHealthMonitor';
+import SubsidyDistributionMap from '../pages/SubsidyDistributionMap';
+import RiskAssessment from '../pages/RiskAssessment';
+import ResponseTimeMetrics from '../pages/ResponseTimeMetrics';
+import RegionalComparison from '../pages/RegionalComparison';
+import PriceVolatilityChart from '../pages/PriceVolatilityChart';
+import PerformanceMetrics from '../pages/PerformanceMetrics';
+import OpportunitiesIdentifier from '../pages/OpportunitiesIdentifier';
+import MarketTrendAnalysis from '../pages/MarketTrendAnalysis';
+import IntelligenceReports from '../pages/IntelligenceReports';
+import HistoricalDataView from '../pages/HistoricalDataView';
+import ForecastingDashboard from '../pages/ForecastingDashboard';
+import FarmerBehaviorAnalytics from '../pages/FarmerBehaviorAnalytics';
+import ErrorRateAnalysis from '../pages/ErrorRateAnalysis';
+import DataQualityReport from '../pages/DataQualityReport';
+import CustomReportBuilder from '../pages/CustomReportBuilder';
+import CropYieldPrediction from '../pages/CropYieldPrediction';
+import AnomalyDetection from '../pages/AnomalyDetection';
+import UserManagement from '../pages/UserManagement';
+import SystemConfiguration from '../pages/SystemConfiguration';
+import SecuritySettings from '../pages/SecuritySettings';
+import RolePermissions from '../pages/RolePermissions';
+import ResourceMonitoring from '../pages/ResourceMonitoring';
+import PerformanceTuning from '../pages/PerformanceTuning';
+import NotificationPreferences from '../pages/NotificationPreferences';
+import LogViewer from '../pages/LogViewer';
+import IntegrationSettings from '../pages/IntegrationSettings';
+import ErrorHandling from '../pages/ErrorHandling';
+import DatabaseManagement from '../pages/DatabaseManagement';
+import CacheManagement from '../pages/CacheManagement';
+import BackupRecovery from '../pages/BackupRecovery';
+import AuditLogs from '../pages/AuditLogs';
+import APIManagement from '../pages/APIManagement';
 
 /**
  * Lazy load page components
@@ -240,6 +387,17 @@ const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministratio
 const LogisticsMatchingPage = lazy(() => import('../pages/LogisticsMatchingPage'));
 const MarketSignalsPage = lazy(() => import('../pages/MarketSignalsPage'));
 const CopilotHubPage = lazy(() => import('../pages/CopilotHubPage'));
+// Premium & AI Features (NEW)
+const PremiumMarketplacePage = lazy(() => import('../pages/PremiumMarketplacePage'));
+const AIImageGenerator = lazy(() => import('../components/AIImageGenerator'));
+// Wellness Features (NEW)
+const NutritionCalculatorPage = lazy(() => import('../pages/NutritionCalculatorPage'));
+const NaturalTherapistPage = lazy(() => import('../pages/NaturalTherapistPage'));
+
+// Payment and Wallet Pages
+const PaymentGatewayPage = lazy(() => import('../pages/PaymentGatewayPage'));
+const DigitalWalletPage = lazy(() => import('../pages/WalletPage'));
+const TransactionHistoryPage = lazy(() => import('../pages/TransactionHistoryPage'));
 
 /**
  * Public routes - no authentication required
@@ -269,6 +427,63 @@ export const publicRoutes = [
     keywords: 'marketplace, buy, sell, agricultural products, farming',
     transition: 'slide',
     preload: true,
+  },
+  {
+    path: '/premium-marketplace',
+    component: PremiumMarketplacePage,
+    title: 'Premium Marketplace - Certified Agricultural Products',
+    description: 'Premium marketplace with certified, high-quality agricultural products for bulk buyers',
+    keywords: 'premium, marketplace, certified, bulk, agriculture',
+    transition: 'slide',
+    preload: true,
+  },
+  {
+    path: '/ai-image-generator',
+    component: AIImageGenerator,
+    title: 'AI Image Generator - Create Product Photos',
+    description: 'Generate professional product images using AI for your agricultural products',
+    keywords: 'ai, image, generator, product, photography',
+    transition: 'fade',
+  },
+  {
+    path: '/nutrition-calculator',
+    component: NutritionCalculatorPage,
+    title: 'Nutrition Calculator - Personalized Nutrition Plan',
+    description: 'Calculate your daily nutrition requirements and get personalized recommendations',
+    keywords: 'nutrition, calculator, diet, health, calories',
+    transition: 'slide',
+  },
+  {
+    path: '/natural-therapist',
+    component: NaturalTherapistPage,
+    title: 'Natural Therapists - Wellness & Ayurveda Consultations',
+    description: 'Connect with certified natural healers for personalized wellness consultations',
+    keywords: 'therapist, wellness, ayurveda, natural, health',
+    transition: 'slide',
+  },
+  {
+    path: '/payment-gateway',
+    component: PaymentGatewayPage,
+    title: 'Payment Gateway - Secure Transactions',
+    description: 'Process secure payments through multiple payment gateways',
+    keywords: 'payment, gateway, transactions, secure',
+    transition: 'slide',
+  },
+  {
+    path: '/wallet',
+    component: DigitalWalletPage,
+    title: 'Digital Wallet - Manage Your Funds',
+    description: 'Manage your digital wallet, check balance, and view transactions',
+    keywords: 'wallet, digital, balance, funds',
+    transition: 'slide',
+  },
+  {
+    path: '/transactions',
+    component: TransactionHistoryPage,
+    title: 'Transaction History - Track Your Payments',
+    description: 'View your complete transaction history and payment status',
+    keywords: 'transactions, history, payments, tracking',
+    transition: 'slide',
   },
   {
     path: '/products/:id',

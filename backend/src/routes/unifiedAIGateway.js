@@ -36,6 +36,12 @@ const aiGatewayRoutes = require('./aiGatewayRoutes');
 const completeAIIntegrationRoutes = require('./completeAIIntegrationRoutes');
 const enterpriseAIRoutes = require('./enterpriseAIRoutes');
 const ecommerceAIRoutes = require('./ecommerceAIRoutes');
+const productMediaAIRoutes = require('./productMediaAIRoutes');
+const nutritionIntelligenceRoutes = require('./nutritionIntelligenceRoutes');
+const ecommerceRoutes = require('./ecommerceRoutes');
+const paymentGatewayRoutes = require('./paymentGatewayRoutes');
+const walletRoutes = require('./walletRoutes');
+const transactionRoutes = require('./transactionRoutes');
 
 // Middleware
 const { authMiddleware: authenticate } = require('../middleware/auth');
@@ -165,6 +171,24 @@ router.use('/complete', completeAIIntegrationRoutes);
 
 // Enterprise AI
 router.use('/enterprise', enterpriseAIRoutes);
+
+// Product Media AI (Image generation, cartoon creator, video scripts)
+router.use('/product-media-ai', productMediaAIRoutes);
+
+// Nutrition Intelligence (Nutrient calculator, wellness practices)
+router.use('/nutrition-intelligence', nutritionIntelligenceRoutes);
+
+// E-commerce Routes (Marketplace, listings, analytics)
+router.use('/ecommerce-marketplace', ecommerceRoutes);
+
+// Payment Gateway
+router.use('/payment-gateway', paymentGatewayRoutes);
+
+// Wallet
+router.use('/wallet', walletRoutes);
+
+// Transaction
+router.use('/transactions', transactionRoutes);
 
 // ============================================================================
 // SMART ROUTING - Automatic routing to appropriate service
