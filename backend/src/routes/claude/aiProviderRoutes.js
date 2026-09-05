@@ -2,7 +2,7 @@
  * AI Provider Routes - Claude AI Integration
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const service = require('../../services/claude/aiProviderService.js');
 const originalService = require('../../services/legacy/aiBackboneService.js');

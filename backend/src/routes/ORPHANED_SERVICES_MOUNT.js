@@ -1,22 +1,31 @@
 /**
- * ORPHANED SERVICES - IMMEDIATE MOUNT FIX
- * This adds all orphaned services to the Express app
- * Add this code to backend/src/index.js around line 800 (after all other routes)
+ * ORPHANED SERVICES - Router Module
+ * Mounts all orphaned services that have setupRoutes() but were never called
  */
 
+const express = require('express');
 const { logger } = require('../utils/logger');
 
-// ============================================================================
-// MOUNT ORPHANED SERVICES (Services with setupRoutes() that were never called)
-// ============================================================================
+// Import all orphaned services
+const dynamicPricingService = require('../services/legacy/dynamicPricingService');
+const farmerTrainingService = require('../services/legacy/farmerTrainingService');
+const governmentSchemeService = require('../services/legacy/governmentSchemeService');
+const greenhouseService = require('../services/legacy/greenhouseService');
+const insuranceClaimsService = require('../services/legacy/insuranceClaimsService');
+const preSeasonOrderService = require('../services/legacy/preSeasonOrderService');
+const sharedInfraService = require('../services/legacy/sharedInfrastructureService');
+const soilTestingService = require('../services/legacy/soilTestingService');
+const subsidyService = require('../services/legacy/subsidyService');
 
-logger.info('🔌 Mounting previously-orphaned services...');
+const router = express.Router();
+
+logger.info('🔌 Initializing orphaned services router...');
 
 // 1. Dynamic Pricing Service
 try {
   if (dynamicPricingService && typeof dynamicPricingService.setupRoutes === 'function') {
-    dynamicPricingService.setupRoutes(app);
-    logger.info('✅ Dynamic Pricing Service mounted at /api/v1/pricing');
+    dynamicPricingService.setupRoutes(router);
+    logger.info('✅ Dynamic Pricing Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Dynamic Pricing Service:', error.message);
@@ -25,8 +34,8 @@ try {
 // 2. Farmer Training Service
 try {
   if (farmerTrainingService && typeof farmerTrainingService.setupRoutes === 'function') {
-    farmerTrainingService.setupRoutes(app);
-    logger.info('✅ Farmer Training Service mounted at /api/v1/farmer-training');
+    farmerTrainingService.setupRoutes(router);
+    logger.info('✅ Farmer Training Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Farmer Training Service:', error.message);
@@ -35,8 +44,8 @@ try {
 // 3. Government Scheme Service
 try {
   if (governmentSchemeService && typeof governmentSchemeService.setupRoutes === 'function') {
-    governmentSchemeService.setupRoutes(app);
-    logger.info('✅ Government Scheme Service mounted at /api/v1/schemes');
+    governmentSchemeService.setupRoutes(router);
+    logger.info('✅ Government Scheme Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Government Scheme Service:', error.message);
@@ -45,8 +54,8 @@ try {
 // 4. Greenhouse Service
 try {
   if (greenhouseService && typeof greenhouseService.setupRoutes === 'function') {
-    greenhouseService.setupRoutes(app);
-    logger.info('✅ Greenhouse Service mounted at /api/v1/greenhouse');
+    greenhouseService.setupRoutes(router);
+    logger.info('✅ Greenhouse Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Greenhouse Service:', error.message);
@@ -55,8 +64,8 @@ try {
 // 5. Insurance Claims Service
 try {
   if (insuranceClaimsService && typeof insuranceClaimsService.setupRoutes === 'function') {
-    insuranceClaimsService.setupRoutes(app);
-    logger.info('✅ Insurance Claims Service mounted at /api/v1/claims');
+    insuranceClaimsService.setupRoutes(router);
+    logger.info('✅ Insurance Claims Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Insurance Claims Service:', error.message);
@@ -65,8 +74,8 @@ try {
 // 6. Pre-Season Order Service
 try {
   if (preSeasonOrderService && typeof preSeasonOrderService.setupRoutes === 'function') {
-    preSeasonOrderService.setupRoutes(app);
-    logger.info('✅ Pre-Season Order Service mounted at /api/v1/preseason');
+    preSeasonOrderService.setupRoutes(router);
+    logger.info('✅ Pre-Season Order Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Pre-Season Order Service:', error.message);
@@ -75,7 +84,7 @@ try {
 // 7. Shared Infrastructure Service
 try {
   if (sharedInfraService && typeof sharedInfraService.setupRoutes === 'function') {
-    sharedInfraService.setupRoutes(app);
+    sharedInfraService.setupRoutes(router);
     logger.info('✅ Shared Infrastructure Service mounted');
   }
 } catch (error) {
@@ -85,7 +94,7 @@ try {
 // 8. Soil Testing Service
 try {
   if (soilTestingService && typeof soilTestingService.setupRoutes === 'function') {
-    soilTestingService.setupRoutes(app);
+    soilTestingService.setupRoutes(router);
     logger.info('✅ Soil Testing Service mounted');
   }
 } catch (error) {
@@ -95,11 +104,13 @@ try {
 // 9. Subsidy Service
 try {
   if (subsidyService && typeof subsidyService.setupRoutes === 'function') {
-    subsidyService.setupRoutes(app);
-    logger.info('✅ Subsidy Service mounted at /api/v1/subsidy');
+    subsidyService.setupRoutes(router);
+    logger.info('✅ Subsidy Service mounted');
   }
 } catch (error) {
   logger.error('❌ Failed to mount Subsidy Service:', error.message);
 }
 
-logger.info('✅ Orphaned services mount attempt completed');
+logger.info('✅ Orphaned services router initialized');
+
+module.exports = router;

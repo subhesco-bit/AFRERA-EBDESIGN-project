@@ -18,7 +18,7 @@
  * - POST /recommend - Original recommendation generation
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const service = require('../../services/claude/aiDecisionService.js');
 const originalService = require('../../services/legacy/aiService.js');

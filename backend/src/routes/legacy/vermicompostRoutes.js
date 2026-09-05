@@ -3,7 +3,7 @@
  * RESTful API endpoints for vermicompost management (M030)
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const vermicompostService = require('../../services/legacy/vermicompostService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which

@@ -35,7 +35,7 @@ const animalHealthRoutes = require('../animalHealthRoutes');
 const fisheriesRoutes = require('../legacy/fisheriesRoutes');
 
 const app = express();
-app.use(express.json());
+app.use(expresson());
 app.use('/dairy', dairyRoutes);
 app.use('/animal-health', animalHealthRoutes);
 app.use('/fisheries', fisheriesRoutes);

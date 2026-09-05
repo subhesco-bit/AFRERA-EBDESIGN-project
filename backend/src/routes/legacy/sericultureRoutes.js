@@ -3,7 +3,7 @@
  * RESTful API endpoints for sericulture management (M027)
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const sericultureService = require('../../services/legacy/sericultureService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which

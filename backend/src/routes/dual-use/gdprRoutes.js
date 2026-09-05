@@ -2,7 +2,7 @@
  * GDPR Routes - GDPR Compliance API Endpoints
  */
 
-const express = require('express.js');
+const express = require('express');
 const router = express.Router();
 const gdprService = require('../../services/dual-use/gdprService.js');
 const { authMiddleware } = require('../../middleware/auth.js');

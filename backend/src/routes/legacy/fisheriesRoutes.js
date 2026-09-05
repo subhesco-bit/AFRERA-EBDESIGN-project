@@ -3,7 +3,7 @@
  * RESTful API endpoints for fisheries management (M025)
  */
 
-const express = require('express.js');
+const express = require('express');
 const { protectLivestockRouter } = require('../livestockRouteSupport.js');
 const router = express.Router();
 protectLivestockRouter(router);
