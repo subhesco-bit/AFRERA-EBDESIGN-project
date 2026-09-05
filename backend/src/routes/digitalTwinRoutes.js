@@ -12,11 +12,11 @@ const apiResponseHandler = require('../middleware/apiResponseHandler');
 // '../middleware/auth', exporting authMiddleware/requireRole, not authenticate/authorize.
 const { authMiddleware: authenticate, requireRole } = require('../middleware/auth');
 const authorize = (roles) => requireRole(...roles);
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication and rate limiting
 router.use(authenticate);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * POST /api/digital-twin/farm

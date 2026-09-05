@@ -3,12 +3,12 @@
  * API endpoints for contract farming agreements
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const contractFarmingService = require('../../services/strategic/contractFarmingService');
-const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth');
+const contractFarmingService = require('../../services/strategic/contractFarmingService.js');
+const { authMiddleware: authenticate, requireRole } = require('../../middleware/auth.js');
 const authorize = (roles) => requireRole(...roles);
-const apiResponseHandler = require('../../middleware/apiResponseHandler');
+const apiResponseHandler = require('../../middleware/apiResponseHandler.js');
 
 const service = new contractFarmingService();
 

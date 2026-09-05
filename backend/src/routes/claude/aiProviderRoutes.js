@@ -2,11 +2,11 @@
  * AI Provider Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/aiProviderService');
-const originalService = require('../../services/legacy/aiBackboneService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/aiProviderService.js');
+const originalService = require('../../services/legacy/aiBackboneService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

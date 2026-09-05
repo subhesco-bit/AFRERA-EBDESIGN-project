@@ -1,7 +1,7 @@
 'use strict';
 
 const { authMiddleware, requireRole } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { sanitizeObject } = require('../middleware/inputValidation');
 const { logger } = require('../utils/logger');
@@ -79,7 +79,7 @@ function requestGuard(req, res, next, mutationSignal = SIGNAL.LIVESTOCK_RECORD_C
 
 function protectLivestockRouter(router, { requireWriteRole = false, signal = SIGNAL.LIVESTOCK_RECORD_CHANGED } = {}) {
   ['id', 'animalId', 'flockId', 'femaleId', 'sowId'].forEach((name) => router.param(name, validateRouteParam));
-  router.use(rateLimiter);
+  router.use(apiLimiter);
   router.use((req, res, next) => requestGuard(req, res, next, signal));
   if (requireWriteRole) router.use((req, res, next) => req.method === 'GET' ? next() : authMiddleware(req, res, () => requireRole(...FARM_OPERATIONS_ROLES)(req, res, next)));
   return router;

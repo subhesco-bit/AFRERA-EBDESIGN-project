@@ -3,9 +3,9 @@
  * API endpoints for library browsing and AI integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const libraryKnowledgeService = require('../../services/legacy/libraryKnowledgeService');
+const libraryKnowledgeService = require('../../services/legacy/libraryKnowledgeService.js');
 
 /**
  * Initialize library service

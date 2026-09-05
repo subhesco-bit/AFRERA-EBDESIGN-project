@@ -9,11 +9,11 @@
  * - Original strategy generation endpoints
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/aiStrategyService');
-const originalService = require('../../services/legacy/aiBrainService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/aiStrategyService.js');
+const originalService = require('../../services/legacy/aiBrainService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

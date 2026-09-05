@@ -2,11 +2,11 @@
  * Financial AI Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/financialAIService');
-const originalService = require('../../services/legacy/financialService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/financialAIService.js');
+const originalService = require('../../services/legacy/financialService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

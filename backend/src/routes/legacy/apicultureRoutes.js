@@ -3,14 +3,14 @@
  * RESTful API endpoints for apiculture management (M028)
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const apicultureService = require('../../services/legacy/apicultureService');
+const apicultureService = require('../../services/legacy/apicultureService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - this route file could never be mounted without crashing
 // the boot. That is the real reason it sat unwired. Fixed to the real
 // middleware module.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/apiculture - Get all apiculture
 router.get('/', authenticate, async (req, res) => {

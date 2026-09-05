@@ -1,6 +1,6 @@
 'use strict';
 
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { sanitizeObject } = require('../middleware/inputValidation');
 const { logger } = require('../utils/logger');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
@@ -94,7 +94,7 @@ function requestGuard(req, res, next, { signal, advisory = false } = {}) {
 
 function protectRouter(router, options = {}) {
   Object.keys(options.params || {}).forEach((name) => router.param(name, validateRouteParam));
-  router.use(rateLimiter);
+  router.use(apiLimiter);
   router.use((req, res, next) => requestGuard(req, res, next, options));
   return router;
 }

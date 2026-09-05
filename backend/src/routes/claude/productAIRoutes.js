@@ -2,11 +2,11 @@
  * Product AI Routes - Claude AI Integration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const service = require('../../services/claude/productAIService');
-const originalService = require('../../services/legacy/productService');
-const { authMiddleware } = require('../../middleware/auth');
+const service = require('../../services/claude/productAIService.js');
+const originalService = require('../../services/legacy/productService.js');
+const { authMiddleware } = require('../../middleware/auth.js');
 
 router.use(authMiddleware);
 

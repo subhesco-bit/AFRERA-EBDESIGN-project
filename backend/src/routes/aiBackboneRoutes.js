@@ -8,13 +8,13 @@
 const express = require('express');
 const aiBackboneController = require('../controllers/aiBackboneController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 
 const router = express.Router();
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 // ============================================================================
 // AI BACKBONE ROUTES

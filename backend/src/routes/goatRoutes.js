@@ -30,7 +30,7 @@ const {
   recommendGoatBreeding,
 } = require('../services/legacy/goatService');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { logger } = require('../utils/logger');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { protectLivestockRouter } = require('./livestockRouteSupport');
@@ -39,7 +39,7 @@ const router = express.Router();
 protectLivestockRouter(router);
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 /**
  * GET /api/v1/goat/herd

@@ -3,12 +3,12 @@
  * RESTful API endpoints for mushroom cultivation (M029)
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const mushroomService = require('../../services/legacy/mushroomService');
+const mushroomService = require('../../services/legacy/mushroomService.js');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.
-const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { authMiddleware: authenticate } = require('../../middleware/auth.js');
 
 // GET /api/v1/mushroom - Get all mushroom cultivation
 router.get('/', authenticate, async (req, res) => {

@@ -6,10 +6,10 @@ const express = require('express');
 const router = express.Router();
 const paymentGatewayController = require('../controllers/paymentGatewayController');
 const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { apiLimiter } = require('../middleware/rateLimiter');
 
 router.use(authMiddleware);
-router.use(rateLimiter);
+router.use(apiLimiter);
 
 router.post('/process', paymentGatewayController.processPayment);
 router.get('/status/:paymentId', paymentGatewayController.getPaymentStatus);

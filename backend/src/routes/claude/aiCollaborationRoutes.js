@@ -3,9 +3,9 @@
  * API endpoints for Devin-Claude AI collaboration
  */
 
-const express = require('express');
+const express = require('express.js');
 const router = express.Router();
-const aiCollaborationService = require('../../services/claude/aiCollaborationService');
+const aiCollaborationService = require('../../services/claude/aiCollaborationService.js');
 
 /**
  * Get shared project context
