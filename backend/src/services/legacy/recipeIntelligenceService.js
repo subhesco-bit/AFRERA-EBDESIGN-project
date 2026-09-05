@@ -8,7 +8,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -23,7 +23,7 @@ const pool = require('../../database/pool');
 /**
  * Create recipe entry
  */
-router.post('/recipes', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/recipes', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       recipe_name,
@@ -154,7 +154,7 @@ router.get('/recipes/:id', authMiddleware, async (req, res) => {
 /**
  * Generate recipe using AI
  */
-router.post('/generate-recipe', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/generate-recipe', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       available_ingredients,
@@ -287,7 +287,7 @@ async function generateAIRecipe(params) {
 /**
  * Calculate nutrition for recipe
  */
-router.post('/nutrition-calculation', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/nutrition-calculation', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { ingredients, servings } = req.body;
 
@@ -388,7 +388,7 @@ router.get('/nutrition-data/:ingredient', authMiddleware, async (req, res) => {
 /**
  * Get ingredient substitutions
  */
-router.post('/ingredient-substitution', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/ingredient-substitution', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { ingredient, dietary_restrictions, availability, cuisine_type } = req.body;
 
@@ -447,7 +447,7 @@ async function findIngredientSubstitutions(params) {
 /**
  * Calculate recipe cost
  */
-router.post('/cost-calculation', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/cost-calculation', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { ingredients, servings, location } = req.body;
 
@@ -691,7 +691,7 @@ router.get('/regional-cuisine/:region', authMiddleware, async (req, res) => {
 /**
  * Create institutional recipe
  */
-router.post('/institutional-recipes', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/institutional-recipes', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       institution_id,
@@ -784,7 +784,7 @@ router.get('/institutional-recipes', authMiddleware, async (req, res) => {
 /**
  * Scale recipe for institutional use
  */
-router.post('/scale-recipe', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/scale-recipe', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { recipe_id, target_servings, institutional_constraints } = req.body;
 
@@ -904,3 +904,4 @@ module.exports = {
   router,
   isHealthy
 };
+

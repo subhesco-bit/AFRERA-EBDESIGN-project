@@ -8,7 +8,7 @@ const express = require('express');
 const router = express.Router();
 const ecommerceController = require('../controllers/ecommerceController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 const { adminMiddleware } = require('../middleware/admin');
 
 // ============================================================================
@@ -20,7 +20,7 @@ const { adminMiddleware } = require('../middleware/admin');
  * @desc    Create a new product listing with AI optimization
  * @access  Private (Seller)
  */
-router.post('/listings', authRateLimit, authMiddleware, ecommerceController.createListing);
+router.post('/listings', authLimiter, authMiddleware, ecommerceController.createListing);
 
 /**
  * @route   GET /api/ecommerce/listings
@@ -41,14 +41,14 @@ router.get('/listings/:id', ecommerceController.getListing);
  * @desc    Update listing
  * @access  Private (Seller only)
  */
-router.put('/listings/:id', authRateLimit, authMiddleware, ecommerceController.updateListing);
+router.put('/listings/:id', authLimiter, authMiddleware, ecommerceController.updateListing);
 
 /**
  * @route   DELETE /api/ecommerce/listings/:id
  * @desc    Delete listing
  * @access  Private (Seller only)
  */
-router.delete('/listings/:id', authRateLimit, authMiddleware, ecommerceController.deleteListing);
+router.delete('/listings/:id', authLimiter, authMiddleware, ecommerceController.deleteListing);
 
 // ============================================================================
 // SELLER ANALYTICS ROUTES
@@ -102,10 +102,11 @@ router.get('/market/demand/:categoryId', ecommerceController.getDemandAnalysis);
  * @desc    Get AI price recommendation for a product
  * @access  Private (Seller)
  */
-router.post('/price-recommendation', authRateLimit, authMiddleware, ecommerceController.getPriceRecommendation);
+router.post('/price-recommendation', authLimiter, authMiddleware, ecommerceController.getPriceRecommendation);
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
 module.exports = router;
+

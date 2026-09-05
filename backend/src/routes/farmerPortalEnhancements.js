@@ -11,7 +11,7 @@ const cropPlanningService = require('../services/legacy/cropPlanningService');
 const { getFarmerWallet, getWalletTransactions, depositToWallet, withdrawFromWallet, transferFromWallet, getWalletBalance, linkBankAccount } = require('../services/legacy/farmerService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 /**
  * FIXED 2026-08-15: every route below previously passed req.user.id (a
@@ -49,7 +49,7 @@ async function resolveFarmerId(req, res, next) {
 }
 
 // Land Records Routes
-router.post('/land-records', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.post('/land-records', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const landRecord = await landRecordsService.addLandRecord(req.farmerId, req.body);
     res.json({ success: true, data: landRecord });
@@ -77,7 +77,7 @@ router.get('/land-records/:recordId', authMiddleware, resolveFarmerId, async (re
   }
 });
 
-router.put('/land-records/:recordId', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.put('/land-records/:recordId', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { recordId } = req.params;
     let landRecord = await landRecordsService.updateLandRecord(recordId, req.farmerId, req.body);
@@ -134,7 +134,7 @@ router.delete('/land-records/:recordId', authMiddleware, resolveFarmerId, async 
 });
 
 // Crop Planning Routes
-router.post('/crop-plans', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.post('/crop-plans', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const cropPlan = await cropPlanningService.createCropPlan(req.farmerId, req.body);
     res.json({ success: true, data: cropPlan });
@@ -162,7 +162,7 @@ router.get('/crop-plans/recommendations/:landRecordId', authMiddleware, resolveF
   }
 });
 
-router.put('/crop-plans/:planId/status', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.put('/crop-plans/:planId/status', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { planId } = req.params;
     const { status, ...updateData } = req.body;
@@ -201,7 +201,7 @@ router.get('/wallet/transactions', authMiddleware, resolveFarmerId, async (req, 
   }
 });
 
-router.post('/wallet/deposit', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.post('/wallet/deposit', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { amount, paymentMethod, reference } = req.body;
     const transaction = await depositToWallet(req.farmerId, amount, paymentMethod, reference);
@@ -211,7 +211,7 @@ router.post('/wallet/deposit', authRateLimit, authMiddleware, resolveFarmerId, a
   }
 });
 
-router.post('/wallet/withdraw', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.post('/wallet/withdraw', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { amount, bankAccount, reference } = req.body;
     let transaction = await withdrawFromWallet(req.farmerId, amount, bankAccount, reference);
@@ -221,7 +221,7 @@ router.post('/wallet/withdraw', authRateLimit, authMiddleware, resolveFarmerId, 
   }
 });
 
-router.post('/wallet/transfer', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.post('/wallet/transfer', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { recipientId, amount, description } = req.body;
     let transaction = await transferFromWallet(req.farmerId, recipientId, amount, description);
@@ -240,7 +240,7 @@ router.get('/wallet/balance', authMiddleware, resolveFarmerId, async (req, res) 
   }
 });
 
-router.post('/wallet/link-bank', authRateLimit, authMiddleware, resolveFarmerId, async (req, res) => {
+router.post('/wallet/link-bank', authLimiter, authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     const { bankName, accountNumber, ifscCode, accountHolder } = req.body;
     let result = await linkBankAccount(req.farmerId, bankName, accountNumber, ifscCode, accountHolder);
@@ -251,3 +251,4 @@ router.post('/wallet/link-bank', authRateLimit, authMiddleware, resolveFarmerId,
 });
 
 module.exports = router;
+

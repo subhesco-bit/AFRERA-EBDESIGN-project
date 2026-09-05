@@ -9,7 +9,7 @@ const governanceService = require('../services/legacy/governanceService');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PROCUREMENT_ROLES } = require('../middleware/roleGroups');
 const { adminMiddleware } = require('../middleware/admin');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // Village Management Routes
 router.post('/villages', authMiddleware, adminMiddleware, async (req, res) => {
@@ -90,7 +90,7 @@ router.post('/panchayats/:panchayatId/schemes', authMiddleware, adminMiddleware,
 });
 
 // CSR Tracking Routes
-router.post('/csr-projects', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/csr-projects', authLimiter, authMiddleware, async (req, res) => {
   try {
     const project = await governanceService.createCSRProject(req.body);
     res.json({ success: true, data: project });
@@ -118,7 +118,7 @@ router.get('/csr-projects/:projectId', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/csr-projects/:projectId', authRateLimit, authMiddleware, requireRole(...PROCUREMENT_ROLES), async (req, res) => {
+router.put('/csr-projects/:projectId', authLimiter, authMiddleware, requireRole(...PROCUREMENT_ROLES), async (req, res) => {
   try {
     const { projectId } = req.params;
     let project = await governanceService.updateCSRProject(projectId, req.body);
@@ -128,7 +128,7 @@ router.put('/csr-projects/:projectId', authRateLimit, authMiddleware, requireRol
   }
 });
 
-router.post('/csr-projects/:projectId/contributions', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/csr-projects/:projectId/contributions', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { projectId } = req.params;
     const contribution = await governanceService.addCSRContribution(projectId, req.user.id, req.body);
@@ -148,7 +148,7 @@ router.get('/csr/statistics', authMiddleware, adminMiddleware, async (req, res) 
 });
 
 // Compliance Routes
-router.post('/compliance-reports', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/compliance-reports', authLimiter, authMiddleware, async (req, res) => {
   try {
     const report = await governanceService.createComplianceReport(req.body);
     res.json({ success: true, data: report });
@@ -233,7 +233,7 @@ router.get('/cooperatives', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/cooperatives/:cooperativeId/members', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/cooperatives/:cooperativeId/members', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { cooperativeId } = req.params;
     const membership = await governanceService.addCooperativeMember(cooperativeId, req.user.id, req.body);
@@ -244,3 +244,4 @@ router.post('/cooperatives/:cooperativeId/members', authRateLimit, authMiddlewar
 });
 
 module.exports = router;
+

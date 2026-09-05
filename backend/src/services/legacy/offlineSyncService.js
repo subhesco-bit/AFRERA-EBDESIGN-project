@@ -18,7 +18,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware } = require('../../middleware/auth');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 const crypto = require('crypto');
 
 const router = express.Router();
@@ -704,7 +704,7 @@ async function getOfflineDataSnapshot(userId, entityType, lastSyncTimestamp = nu
  * POST /api/v1/offline-sync/queue
  * Add data to sync queue
  */
-router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/queue', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { entity_type, entity_data, operation, priority } = req.body;
 
@@ -724,7 +724,7 @@ router.post('/queue', authRateLimit, authMiddleware, async (req, res) => {
  * POST /api/v1/offline-sync/process
  * Process sync queue for user
  */
-router.post('/process', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/process', authLimiter, authMiddleware, async (req, res) => {
   try {
     let result = await processSyncQueue(req.user.id);
     res.json(result);
@@ -752,7 +752,7 @@ router.get('/status', authMiddleware, async (req, res) => {
  * POST /api/v1/offline-sync/resolve-conflict
  * Resolve sync conflict
  */
-router.post('/resolve-conflict', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/resolve-conflict', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { conflict_id, resolution, resolved_data } = req.body;
 
@@ -787,7 +787,7 @@ router.get('/snapshot/:entityType', authMiddleware, async (req, res) => {
  * PUT /api/v1/offline-sync/preferences
  * Update sync preferences
  */
-router.put('/preferences', authRateLimit, authMiddleware, async (req, res) => {
+router.put('/preferences', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { sync_enabled, sync_frequency, sync_on_wifi_only } = req.body;
 

@@ -9,7 +9,7 @@ const { Pool } = require('pg');
 const { logger } = require('../../utils/logger');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../../middleware/roleGroups');
-const { authRateLimit } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../middleware/rateLimiter');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 
 const router = express.Router();
@@ -25,7 +25,7 @@ const pool = require('../../database/pool');
 /**
  * Create HACCP plan
  */
-router.post('/haccp', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/haccp', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       plan_name,
@@ -108,7 +108,7 @@ router.get('/haccp', authMiddleware, async (req, res) => {
 /**
  * Record HACCP monitoring data
  */
-router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/haccp/:id/monitoring', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       ccp_id,
@@ -147,7 +147,7 @@ router.post('/haccp/:id/monitoring', authRateLimit, authMiddleware, async (req, 
 /**
  * Create FSSAI compliance record
  */
-router.post('/fssai', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/fssai', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       license_number,
@@ -235,7 +235,7 @@ router.get('/fssai', authMiddleware, async (req, res) => {
 /**
  * Create ISO 22000 compliance record
  */
-router.post('/iso22000', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/iso22000', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       certificate_number,
@@ -324,7 +324,7 @@ router.get('/iso22000', authMiddleware, async (req, res) => {
 /**
  * Create recall record
  */
-router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/recalls', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       product_id,
@@ -390,7 +390,7 @@ router.post('/recalls', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update recall status
  */
-router.put('/recalls/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/recalls/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, recovery_rate, closure_notes, closed_by } = req.body;
 
@@ -475,7 +475,7 @@ router.get('/recalls', authMiddleware, async (req, res) => {
 /**
  * Create CAPA record
  */
-router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/capa', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       source_type,
@@ -517,7 +517,7 @@ router.post('/capa', authRateLimit, authMiddleware, async (req, res) => {
 /**
  * Update CAPA status
  */
-router.put('/capa/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/capa/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
@@ -596,7 +596,7 @@ router.get('/capa', authMiddleware, async (req, res) => {
 /**
  * Create food safety audit
  */
-router.post('/audits', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/audits', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       audit_type,
@@ -698,7 +698,7 @@ router.get('/audits', authMiddleware, async (req, res) => {
 /**
  * Create risk assessment
  */
-router.post('/risk-assessment', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/risk-assessment', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       assessment_type,
@@ -792,7 +792,7 @@ router.get('/risk-assessment', authMiddleware, async (req, res) => {
 /**
  * Create corrective action
  */
-router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, res) => {
+router.post('/corrective-actions', authLimiter, authMiddleware, async (req, res) => {
   try {
     const {
       source_type,
@@ -833,7 +833,7 @@ router.post('/corrective-actions', authRateLimit, authMiddleware, async (req, re
 /**
  * Update corrective action status
  */
-router.put('/corrective-actions/:id/status', authRateLimit, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.put('/corrective-actions/:id/status', authLimiter, authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { status, completion_notes, completed_by, effectiveness_result } = req.body;
 
@@ -955,3 +955,4 @@ module.exports = {
   router,
   isHealthy
 };
+

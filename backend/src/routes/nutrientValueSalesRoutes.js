@@ -16,7 +16,7 @@ const express = require('express');
 const router = express.Router();
 const nutrientValueSalesController = require('../controllers/nutrientValueSalesController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // ============================================================================
 // NUTRIENT-VALUE PRICING ROUTES
@@ -27,7 +27,7 @@ const { authRateLimit } = require('../middleware/rateLimiter');
  * @desc    Calculate nutrient-value-based price for product
  * @access  Private (Admin/Seller)
  */
-router.post('/calculate-price/:productId', authRateLimit, authMiddleware, nutrientValueSalesController.calculateNutrientValuePrice);
+router.post('/calculate-price/:productId', authLimiter, authMiddleware, nutrientValueSalesController.calculateNutrientValuePrice);
 
 // ============================================================================
 // NUTRIENT CONTENT VERIFICATION ROUTES
@@ -38,14 +38,14 @@ router.post('/calculate-price/:productId', authRateLimit, authMiddleware, nutrie
  * @desc    Submit nutrient content for lab verification
  * @access  Private (Seller)
  */
-router.post('/submit-verification', authRateLimit, authMiddleware, nutrientValueSalesController.submitNutrientContent);
+router.post('/submit-verification', authLimiter, authMiddleware, nutrientValueSalesController.submitNutrientContent);
 
 /**
  * @route   POST /api/nutrient-value/approve-verification/:verificationId
  * @desc    Approve nutrient content verification
  * @access  Private (Admin/Lab)
  */
-router.post('/approve-verification/:verificationId', authRateLimit, authMiddleware, nutrientValueSalesController.approveNutrientVerification);
+router.post('/approve-verification/:verificationId', authLimiter, authMiddleware, nutrientValueSalesController.approveNutrientVerification);
 
 // ============================================================================
 // NUTRIENT-VALUE LISTINGS ROUTES
@@ -56,7 +56,7 @@ router.post('/approve-verification/:verificationId', authRateLimit, authMiddlewa
  * @desc    Create nutrient-value-based product listing
  * @access  Private (Seller)
  */
-router.post('/create-listing', authRateLimit, authMiddleware, nutrientValueSalesController.createNutrientValueListing);
+router.post('/create-listing', authLimiter, authMiddleware, nutrientValueSalesController.createNutrientValueListing);
 
 // ============================================================================
 // NUTRIENT QUALITY TIERS ROUTES
@@ -67,7 +67,7 @@ router.post('/create-listing', authRateLimit, authMiddleware, nutrientValueSales
  * @desc    Assign nutrient quality tier to product
  * @access  Private (Admin)
  */
-router.post('/assign-tier/:productId', authRateLimit, authMiddleware, nutrientValueSalesController.assignNutrientTier);
+router.post('/assign-tier/:productId', authLimiter, authMiddleware, nutrientValueSalesController.assignNutrientTier);
 
 // ============================================================================
 // NUTRIENT-BASED COMPARISON ROUTES
@@ -89,7 +89,7 @@ router.post('/compare-products', nutrientValueSalesController.compareProductsByN
  * @desc    Issue nutrient quality certificate
  * @access  Private (Admin/Certifying Body)
  */
-router.post('/issue-certificate', authRateLimit, authMiddleware, nutrientValueSalesController.issueNutrientCertificate);
+router.post('/issue-certificate', authLimiter, authMiddleware, nutrientValueSalesController.issueNutrientCertificate);
 
 // ============================================================================
 // NUTRIENT-BASED COMMISSION ROUTES
@@ -100,7 +100,7 @@ router.post('/issue-certificate', authRateLimit, authMiddleware, nutrientValueSa
  * @desc    Calculate commission based on nutrient quality
  * @access  Private (Admin)
  */
-router.post('/calculate-commission/:orderId', authRateLimit, authMiddleware, nutrientValueSalesController.calculateNutrientBasedCommission);
+router.post('/calculate-commission/:orderId', authLimiter, authMiddleware, nutrientValueSalesController.calculateNutrientBasedCommission);
 
 // ============================================================================
 // NUTRIENT-VALUE SEARCH ROUTES
@@ -118,3 +118,4 @@ router.get('/search', nutrientValueSalesController.searchByNutrientCriteria);
 // ============================================================================
 
 module.exports = router;
+

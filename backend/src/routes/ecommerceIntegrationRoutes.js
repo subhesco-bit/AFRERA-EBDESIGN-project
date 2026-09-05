@@ -13,7 +13,7 @@ const express = require('express');
 const router = express.Router();
 const ecommerceIntegrationController = require('../controllers/ecommerceIntegrationController');
 const { authMiddleware } = require('../middleware/auth');
-const { authRateLimit } = require('../middleware/rateLimiter');
+const { authLimiter } = require('../middleware/rateLimiter');
 
 // ============================================================================
 // NUTRITION SCORING ROUTES
@@ -24,7 +24,7 @@ const { authRateLimit } = require('../middleware/rateLimiter');
  * @desc    Calculate nutrition score for a product
  * @access  Private (Admin/Seller)
  */
-router.post('/nutrition-score/:productId', authRateLimit, authMiddleware, ecommerceIntegrationController.calculateNutritionScore);
+router.post('/nutrition-score/:productId', authLimiter, authMiddleware, ecommerceIntegrationController.calculateNutritionScore);
 
 /**
  * @route   GET /api/ecommerce-integration/nutrition-price/:productId
@@ -78,14 +78,14 @@ router.get('/compatibility/:productId', authMiddleware, ecommerceIntegrationCont
  * @desc    Calculate nutrition for shopping cart
  * @access  Private
  */
-router.post('/cart-nutrition', authRateLimit, authMiddleware, ecommerceIntegrationController.calculateCartNutrition);
+router.post('/cart-nutrition', authLimiter, authMiddleware, ecommerceIntegrationController.calculateCartNutrition);
 
 /**
  * @route   POST /api/ecommerce-integration/cart-rda
  * @desc    Calculate RDA percentage for cart
  * @access  Private
  */
-router.post('/cart-rda', authRateLimit, authMiddleware, ecommerceIntegrationController.calculateCartRDA);
+router.post('/cart-rda', authLimiter, authMiddleware, ecommerceIntegrationController.calculateCartRDA);
 
 // ============================================================================
 // DIETITIAN INTEGRATION ROUTES
@@ -110,3 +110,4 @@ router.get('/dietitian-recommendation', authMiddleware, ecommerceIntegrationCont
 // ============================================================================
 
 module.exports = router;
+
