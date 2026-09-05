@@ -11,6 +11,8 @@ const express = require('express');
 const claudeAICoordinator = require('../core/claudeAICoordinator');
 const { authMiddleware } = require('../middleware/auth');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 const AGENTS = [
@@ -62,31 +64,45 @@ async function coordinate(req, res, requestType, agentPreference) {
   }
 }
 
-router.post('/unified', authMiddleware, (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/unified', authMiddleware, (req, res) => {
   coordinate(req, res, req.body?.requestType || 'conversational', req.body?.agentPreference);
 });
 
-router.post('/conversational', authMiddleware, (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/conversational', authMiddleware, (req, res) => {
   coordinate(req, res, 'conversational', 'farmer-advisor');
 });
 
-router.post('/analytical', authMiddleware, (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/analytical', authMiddleware, (req, res) => {
   coordinate(req, res, 'analytical', 'business-analyst');
 });
 
-router.post('/automation', authMiddleware, (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/automation', authMiddleware, (req, res) => {
   coordinate(req, res, 'automation', 'operations-manager');
 });
 
-router.post('/governance', authMiddleware, (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/governance', authMiddleware, (req, res) => {
   coordinate(req, res, 'monitoring', 'governance-agent');
 });
 
-router.get('/agents', authMiddleware, (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/agents', authMiddleware, (req, res) => {
   res.json({ success: true, data: AGENTS });
 });
 
-router.get('/usage', authMiddleware, (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/usage', authMiddleware, (req, res) => {
   res.json({
     success: true,
     data: {

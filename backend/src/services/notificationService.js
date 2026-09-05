@@ -27,6 +27,9 @@ class NotificationService extends EventEmitter {
    * Send notification
    */
   async sendNotification(notificationData) {
+  // Validate inputs
+  if (!notificationData) throw new Error('Missing required parameter');
+
     const { 
       userId, 
       type, 

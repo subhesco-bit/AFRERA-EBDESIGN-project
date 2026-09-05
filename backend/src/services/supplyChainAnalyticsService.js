@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class SupplyChainAnalyticsService {
   async analyzeShipments(origin, destination) {
+  // Validate inputs
+  if (!origin) throw new Error('Missing required parameter');
+
     try {
       const shipments = await db('shipments').where('origin', origin).andWhere('destination', destination);
       const avgDeliveryTime = shipments.length ? shipments.reduce((sum, s) => sum + (s.delivery_time || 0), 0) / shipments.length : 0;

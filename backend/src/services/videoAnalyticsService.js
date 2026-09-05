@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class VideoAnalyticsService {
   async analyzeVideo(videoId, analysisType) {
+  // Validate inputs
+  if (!videoId) throw new Error('Missing required parameter');
+
     try {
       const id = require('uuid').v4();
       await db('video_analyses').insert({

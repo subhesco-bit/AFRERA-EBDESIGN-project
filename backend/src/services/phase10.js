@@ -3,7 +3,10 @@ const db = require('../database/dbConnection');
 const logger = require('../utils/logger');
 
 class Phase10Services {
-  async erp(erpId) { try { await db('erp_integrations').insert({ id: require('uuid').v4(), erp_id: erpId, created_at: new Date() }); return { erp_id: erpId, status: 'connected' }; } catch (e) { throw e; } }
+  async erp(erpId) {
+  // Validate inputs
+  if (!erpId) throw new Error('Missing required parameter');
+ try { await db('erp_integrations').insert({ id: require('uuid').v4(), erp_id: erpId, created_at: new Date() }); return { erp_id: erpId, status: 'connected' }; } catch (e) { throw e; } }
   async crm(crmId) { try { await db('crm_integrations').insert({ id: require('uuid').v4(), crm_id: crmId, created_at: new Date() }); return { crm_id: crmId, status: 'connected' }; } catch (e) { throw e; } }
   async payment(providerId) { try { await db('payment_gateways').insert({ id: require('uuid').v4(), provider_id: providerId, created_at: new Date() }); return { provider_id: providerId, status: 'active' }; } catch (e) { throw e; } }
   async logistics(logisticsId) { try { await db('logistics_partners').insert({ id: require('uuid').v4(), logistics_id: logisticsId, created_at: new Date() }); return { logistics_id: logisticsId, status: 'active' }; } catch (e) { throw e; } }

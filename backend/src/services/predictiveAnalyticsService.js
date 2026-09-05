@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class PredictiveAnalyticsService {
   async predictDemand(productId) {
+  // Validate inputs
+  if (!productId) throw new Error('Missing required parameter');
+
     try {
       const orders = await db('orders').where('product_id', productId).orderBy('created_at', 'desc').limit(60);
       const avgMonthlyDemand = orders.length / 2; // Rough estimate

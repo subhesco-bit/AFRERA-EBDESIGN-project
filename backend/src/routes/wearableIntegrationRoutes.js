@@ -9,17 +9,33 @@ const wearableIntegrationController = require('../controllers/wearableIntegratio
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 router.use(authMiddleware);
 router.use(rateLimiter);
 
-router.get('/status', wearableIntegrationController.getStatus);
-router.get('/fitbit/auth-url', wearableIntegrationController.getFitbitAuthUrl);
-router.post('/fitbit/callback', wearableIntegrationController.fitbitCallback);
-router.post('/fitbit/sync', wearableIntegrationController.syncFitbit);
-router.post('/sync', wearableIntegrationController.ingestDeviceActivity);
-router.get('/activity/recent', wearableIntegrationController.getRecentActivity);
-router.delete('/:provider', wearableIntegrationController.disconnect);
+router.get
+    // Log request
+    logger.debug('router.get request');('/status', wearableIntegrationController.getStatus);
+router.get
+    // Log request
+    logger.debug('router.get request');('/fitbit/auth-url', wearableIntegrationController.getFitbitAuthUrl);
+router.post
+    // Log request
+    logger.debug('router.post request');('/fitbit/callback', wearableIntegrationController.fitbitCallback);
+router.post
+    // Log request
+    logger.debug('router.post request');('/fitbit/sync', wearableIntegrationController.syncFitbit);
+router.post
+    // Log request
+    logger.debug('router.post request');('/sync', wearableIntegrationController.ingestDeviceActivity);
+router.get
+    // Log request
+    logger.debug('router.get request');('/activity/recent', wearableIntegrationController.getRecentActivity);
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/:provider', wearableIntegrationController.disconnect);
 
 module.exports = router;

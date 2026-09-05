@@ -9,12 +9,16 @@
 'use strict';
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const productReviewService = require('../services/legacy/productReviewService');
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 
-router.post('/products/:productId', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/products/:productId', authMiddleware, async (req, res) => {
   try {
     const result = await productReviewService.createReview(req.user.id, req.params.productId, req.body);
     res.status(201).json({ success: true, data: result });
@@ -23,7 +27,9 @@ router.post('/products/:productId', authMiddleware, async (req, res) => {
   }
 });
 
-router.get('/products/:productId', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/products/:productId', async (req, res) => {
   try {
     const result = await productReviewService.getProductReviews(req.params.productId, req.query);
     res.json({ success: true, data: result });
@@ -32,7 +38,9 @@ router.get('/products/:productId', async (req, res) => {
   }
 });
 
-router.get('/products/:productId/stats', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/products/:productId/stats', async (req, res) => {
   try {
     const result = await productReviewService.getProductReviewStats(req.params.productId);
     res.json({ success: true, data: result });
@@ -41,7 +49,9 @@ router.get('/products/:productId/stats', async (req, res) => {
   }
 });
 
-router.get('/me', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/me', authMiddleware, async (req, res) => {
   try {
     const { page, limit } = req.query;
     const result = await productReviewService.getUserReviews(req.user.id, page, limit);
@@ -51,7 +61,9 @@ router.get('/me', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/:reviewId', authMiddleware, async (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/:reviewId', authMiddleware, async (req, res) => {
   try {
     const result = await productReviewService.updateReview(req.params.reviewId, req.user.id, req.body);
     res.json({ success: true, data: result });
@@ -60,7 +72,9 @@ router.put('/:reviewId', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/:reviewId', authMiddleware, async (req, res) => {
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/:reviewId', authMiddleware, async (req, res) => {
   try {
     const isAdmin = req.user.role === 'admin';
     const result = await productReviewService.deleteReview(req.params.reviewId, req.user.id, isAdmin);
@@ -70,7 +84,9 @@ router.delete('/:reviewId', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/:reviewId/helpful', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/:reviewId/helpful', authMiddleware, async (req, res) => {
   try {
     const result = await productReviewService.markReviewHelpful(req.params.reviewId, req.user.id);
     res.json({ success: true, data: result });
@@ -79,7 +95,9 @@ router.post('/:reviewId/helpful', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/:reviewId/report', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/:reviewId/report', authMiddleware, async (req, res) => {
   try {
     const result = await productReviewService.reportReview(req.params.reviewId, req.user.id, req.body.reason);
     res.json({ success: true, data: result });
@@ -88,7 +106,9 @@ router.post('/:reviewId/report', authMiddleware, async (req, res) => {
   }
 });
 
-router.patch('/:reviewId/moderate', authMiddleware, adminMiddleware, async (req, res) => {
+router.patch
+    // Log request
+    logger.debug('router.patch request');('/:reviewId/moderate', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await productReviewService.moderateReview(req.params.reviewId, req.body.status, req.user.id);
     res.json({ success: true, data: result });

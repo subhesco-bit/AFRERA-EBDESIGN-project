@@ -9,6 +9,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
@@ -21,7 +23,9 @@ protectRouter(router, { signal: 'commerce.vendor.changed', params: { buyerId: tr
  */
 
 // Get buyer profile and credit status
-router.get('/corporate/:buyerId/profile', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/corporate/:buyerId/profile', authMiddleware, async (req, res) => {
   try {
     const { buyerId } = req.params;
     // Mock data - would come from database
@@ -42,7 +46,9 @@ router.get('/corporate/:buyerId/profile', authMiddleware, async (req, res) => {
 });
 
 // Get credit eligibility status
-router.get('/corporate/:buyerId/credit-status', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/corporate/:buyerId/credit-status', authMiddleware, async (req, res) => {
   try {
     const { buyerId } = req.params;
     const decisionSupportService = require('../services/legacy/decisionSupportService');
@@ -65,7 +71,9 @@ router.get('/corporate/:buyerId/credit-status', authMiddleware, async (req, res)
 });
 
 // Get active orders for buyer
-router.get('/corporate/:buyerId/orders', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/corporate/:buyerId/orders', authMiddleware, async (req, res) => {
   try {
     const { buyerId } = req.params;
     // Mock data
@@ -96,7 +104,9 @@ router.get('/corporate/:buyerId/orders', authMiddleware, async (req, res) => {
 });
 
 // Create corporate order
-router.post('/corporate/orders', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/corporate/orders', authMiddleware, async (req, res) => {
   try {
     const { product, quantity, destination, delivery_date } = req.body;
     
@@ -130,7 +140,9 @@ router.post('/corporate/orders', authMiddleware, async (req, res) => {
  */
 
 // Get logistics provider profile
-router.get('/logistics/:providerId/profile', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/logistics/:providerId/profile', authMiddleware, async (req, res) => {
   try {
     const { providerId } = req.params;
     const profile = {
@@ -148,7 +160,9 @@ router.get('/logistics/:providerId/profile', authMiddleware, async (req, res) =>
 });
 
 // Get active shipments
-router.get('/logistics/:providerId/shipments', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/logistics/:providerId/shipments', authMiddleware, async (req, res) => {
   try {
     const { providerId } = req.params;
     const shipments = [
@@ -180,7 +194,9 @@ router.get('/logistics/:providerId/shipments', authMiddleware, async (req, res) 
 });
 
 // Get cold-chain network nodes
-router.get('/logistics/coldchain-nodes', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/logistics/coldchain-nodes', authMiddleware, async (req, res) => {
   try {
     const nodes = [
       { id: 1, name: 'Dimapur Hub', type: 'transit', capacity: 500, utilization: 78, temp: 4 },
@@ -197,7 +213,9 @@ router.get('/logistics/coldchain-nodes', authMiddleware, async (req, res) => {
 });
 
 // Get return truck opportunities
-router.get('/logistics/return-trucks', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/logistics/return-trucks', authMiddleware, async (req, res) => {
   try {
     const lanes = [
       {
@@ -230,7 +248,9 @@ router.get('/logistics/return-trucks', authMiddleware, async (req, res) => {
 });
 
 // Create logistics booking
-router.post('/logistics/bookings', authMiddleware, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/logistics/bookings', authMiddleware, async (req, res) => {
   try {
     const { origin, destination, quantity, temperature, pickup_date } = req.body;
     
@@ -262,7 +282,9 @@ router.post('/logistics/bookings', authMiddleware, async (req, res) => {
  * Food Processor Endpoints
  */
 
-router.get('/processor/:processorId/profile', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/processor/:processorId/profile', authMiddleware, async (req, res) => {
   try {
     const { processorId } = req.params;
     const profile = {
@@ -282,7 +304,9 @@ router.get('/processor/:processorId/profile', authMiddleware, async (req, res) =
  * Retailer Endpoints
  */
 
-router.get('/retailer/:retailerId/profile', authMiddleware, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/retailer/:retailerId/profile', authMiddleware, async (req, res) => {
   try {
     const { retailerId } = req.params;
     const profile = {

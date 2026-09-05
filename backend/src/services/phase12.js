@@ -1,7 +1,10 @@
 // Phase 12: Future-Ready Services (12 services - consolidated)
 const db = require('../database/dbConnection');
 class Phase12Services {
-  async blockchain(blockchainId) { try { await db('blockchain_systems').insert({ id: require('uuid').v4(), blockchain_id: blockchainId, created_at: new Date() }); return { blockchain_id: blockchainId, status: 'active' }; } catch (e) { throw e; } }
+  async blockchain(blockchainId) {
+  // Validate inputs
+  if (!blockchainId) throw new Error('Missing required parameter');
+ try { await db('blockchain_systems').insert({ id: require('uuid').v4(), blockchain_id: blockchainId, created_at: new Date() }); return { blockchain_id: blockchainId, status: 'active' }; } catch (e) { throw e; } }
   async quantum(quantumId) { try { await db('quantum_services').insert({ id: require('uuid').v4(), quantum_id: quantumId, created_at: new Date() }); return { quantum_id: quantumId, status: 'active' }; } catch (e) { throw e; } }
   async ai(aiId) { try { await db('ai_services').insert({ id: require('uuid').v4(), ai_id: aiId, created_at: new Date() }); return { ai_id: aiId, status: 'active' }; } catch (e) { throw e; } }
   async iot5g(iotId) { try { await db('iot_5g_services').insert({ id: require('uuid').v4(), iot_id: iotId, created_at: new Date() }); return { iot_id: iotId, status: 'active' }; } catch (e) { throw e; } }

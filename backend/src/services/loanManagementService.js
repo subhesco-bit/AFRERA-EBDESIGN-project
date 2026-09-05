@@ -15,6 +15,9 @@ class LoanManagementService {
    * Create loan application
    */
   async createLoanApplication(farmerId, loanData) {
+  // Validate inputs
+  if (!farmerId) throw new Error('Missing required parameter');
+
     try {
       if (!farmerId || !loanData.amount || !loanData.purpose) {
         throw new ValidationError('Missing required fields');

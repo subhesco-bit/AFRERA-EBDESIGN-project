@@ -29,6 +29,9 @@ class ETLService {
    * Extract data from various sources
    */
   async extract(sourceConfig) {
+  // Validate inputs
+  if (!sourceConfig) throw new Error('Missing required parameter');
+
     const { type, config } = sourceConfig;
 
     try {

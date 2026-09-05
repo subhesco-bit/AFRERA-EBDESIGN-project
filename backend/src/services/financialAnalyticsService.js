@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class FinancialAnalyticsService {
   async generateFinancialStatement(userId) {
+  // Validate inputs
+  if (!userId) throw new Error('Missing required parameter');
+
     try {
       const orders = await db('orders').where('user_id', userId);
       const totalRevenue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);

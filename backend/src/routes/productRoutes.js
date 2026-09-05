@@ -1,4 +1,6 @@
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 /**
@@ -55,7 +57,9 @@ const products = [
 ];
 
 // GET /products
-router.get('/', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/', async (req, res) => {
   try {
     const { category, search } = req.query;
     let filtered = products;
@@ -83,7 +87,9 @@ router.get('/', async (req, res) => {
 });
 
 // GET /products/:id
-router.get('/:id', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/:id', async (req, res) => {
   try {
     const product = products.find((p) => p.id === req.params.id);
 
@@ -104,7 +110,9 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /products (admin only)
-router.post('/', verifyToken, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/', verifyToken, async (req, res) => {
   try {
     const { name, price, category, description, stock } = req.body;
 
@@ -138,7 +146,9 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // PUT /products/:id (admin only)
-router.put('/:id', verifyToken, async (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/:id', verifyToken, async (req, res) => {
   try {
     const product = products.find((p) => p.id === req.params.id);
 
@@ -161,7 +171,9 @@ router.put('/:id', verifyToken, async (req, res) => {
 });
 
 // DELETE /products/:id (admin only)
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/:id', verifyToken, async (req, res) => {
   try {
     const index = products.findIndex((p) => p.id === req.params.id);
 

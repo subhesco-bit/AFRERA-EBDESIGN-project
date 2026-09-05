@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class FreightPoolingService {
   async createFreightPool(data) {
+  // Validate inputs
+  if (!data) throw new Error('Missing required parameter');
+
     try {
       const id = require('uuid').v4();
       await db('freight_pools').insert({

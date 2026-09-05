@@ -10,12 +10,16 @@
 'use strict';
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { PLATFORM_STAFF_ROLES } = require('../middleware/roleGroups');
 const realtimeMonitoringService = require('../services/legacy/realtimeMonitoringService');
 
-router.post('/monitors', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/monitors', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { resourceId, config } = req.body || {};
     if (!resourceId) return res.status(400).json({ success: false, error: 'resourceId is required' });
@@ -26,7 +30,9 @@ router.post('/monitors', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), a
   }
 });
 
-router.get('/monitors', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/monitors', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const monitors = await realtimeMonitoringService.getAllMonitors();
     res.json({ success: true, data: monitors });
@@ -35,7 +41,9 @@ router.get('/monitors', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), as
   }
 });
 
-router.get('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const status = await realtimeMonitoringService.getMonitoringStatus(req.params.id);
     res.json({ success: true, data: status });
@@ -44,7 +52,9 @@ router.get('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES)
   }
 });
 
-router.delete('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
+router.delete
+    // Log request
+    logger.debug('router.delete request');('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const monitor = await realtimeMonitoringService.stopMonitoring(req.params.id);
     res.json({ success: true, data: monitor });
@@ -53,7 +63,9 @@ router.delete('/monitors/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROL
   }
 });
 
-router.get('/health', async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/health', async (req, res) => {
   try {
     const health = await realtimeMonitoringService.healthCheck();
     res.json({ success: true, data: health });

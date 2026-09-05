@@ -4,6 +4,9 @@ const { ValidationError, NotFoundError } = require('../utils/errors');
 
 class SupplyChainTrackingService {
   async createShipment(productId, origin, destination) {
+  // Validate inputs
+  if (!productId) throw new Error('Missing required parameter');
+
     try {
       const shipmentId = require('uuid').v4();
       const shipment = await db('shipments').insert({
