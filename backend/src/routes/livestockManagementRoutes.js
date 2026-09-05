@@ -47,8 +47,11 @@ function crudRouter(service) {
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   cattleRegistryRoutes: crudRouter(cattleRegistry),
   feedManagementRoutes: crudRouter(feedManagement),
   livestockAnalyticsRoutes: crudRouter(livestockAnalytics),
 };
+
+module.exports = router;

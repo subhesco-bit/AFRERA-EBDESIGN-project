@@ -79,7 +79,8 @@ sessionRouter.delete('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES
   } catch (e) { res.status(500).json({ success: false, error: e.message }); }
 });
 
-module.exports = {
+const router = express.Router();
+const routes = {
   permissionManagementRoutes: crudRouter(permissionManagement),
   ssoRoutes: crudRouter(ssoManagement),
   mfaManagementRoutes: crudRouter(mfaManagement),
@@ -87,3 +88,5 @@ module.exports = {
   consentManagementRoutes: crudRouter(consentManagement),
   sessionManagementRoutes: sessionRouter,
 };
+
+module.exports = router;

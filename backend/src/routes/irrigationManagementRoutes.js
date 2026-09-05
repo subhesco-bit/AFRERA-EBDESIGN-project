@@ -49,8 +49,11 @@ function crudRouter(service) {
   return router;
 }
 
-module.exports = {
+const router = express.Router();
+const routes = {
   irrigationSchedulesRoutes: crudRouter(irrigationSchedules),
   irrigationWaterSourcesRoutes: crudRouter(irrigationWaterSources),
   irrigationLogsRoutes: crudRouter(irrigationLogs),
 };
+
+module.exports = router;

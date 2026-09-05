@@ -1,3 +1,4 @@
+const express = require('express');
 'use strict';
 
 const { logger } = require('../utils/logger');
@@ -66,4 +67,7 @@ function queryValidator(validate) {
   return (req, res, next) => { try { validate(req.query); next(); } catch (error) { return fail(req, res, error, 'validateQuery', error.status || 400); } };
 }
 
-module.exports = { requestId, fail, invalid, validateId, parsePageQuery, date, dateTime, enumValue, numberValue, bodyValidator, queryValidator };
+const router = express.Router();
+const routes = { requestId, fail, invalid, validateId, parsePageQuery, date, dateTime, enumValue, numberValue, bodyValidator, queryValidator };
+Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
+module.exports = router;

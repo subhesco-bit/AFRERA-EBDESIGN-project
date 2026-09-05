@@ -1,3 +1,4 @@
+const express = require('express');
 'use strict';
 
 const { authMiddleware, requireRole } = require('../middleware/auth');
@@ -85,4 +86,7 @@ function protectLivestockRouter(router, { requireWriteRole = false, signal = SIG
   return router;
 }
 
-module.exports = { protectLivestockRouter, requestGuard, fail };
+const router = express.Router();
+const routes = { protectLivestockRouter, requestGuard, fail };
+Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
+module.exports = router;
