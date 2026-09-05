@@ -7,7 +7,7 @@ const express = require('express');
 const router = express.Router();
 const productCertificationService = require('../services/productCertificationService');
 const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
-const { validateRequest } = require('../middleware/validation');
+const { validateBody: validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
 /**
@@ -124,4 +124,5 @@ router.delete('/certifications/:id',
 );
 
 module.exports = router;
+
 

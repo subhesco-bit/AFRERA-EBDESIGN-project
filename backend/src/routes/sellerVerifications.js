@@ -9,7 +9,7 @@
 const express = require('express');
 const sellerVerificationService = require('../services/sellerVerificationService');
 const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
-const { validateRequest } = require('../middleware/validation');
+const { validateBody: validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
 const router = express.Router();
@@ -155,4 +155,5 @@ router.post('/admin/sellers/:id/verify/reject',
 );
 
 module.exports = router;
+
 
