@@ -22,7 +22,7 @@ export default function DietRecipesPage() {
 
   const { data: profiles, isLoading: profilesLoading, error: profilesError } = useQuery({
     queryKey: ['dietary-profiles'],
-    queryFn: () => nutritionAPI.getDietaryProfiles().then((r) => r.data || []),
+    queryFn: () => nutritionAPI.getDietaryProfiles().then((r) => r.data?.data || []),
   });
 
   const recipeMutation = useMutation({

@@ -17,7 +17,7 @@ echo "Redis is ready!"
 
 # Run migrations
 echo "Running database migrations..."
-npm run migrate || echo "Migrations may have already run"
+npm run migrate
 
 # Start the application
 echo "Starting backend application..."

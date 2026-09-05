@@ -112,7 +112,8 @@ class AIAgentService {
       }
     });
     
-    // Calculation tools
+    // Calculation tools use a deliberately narrow parser. Never evaluate
+    // caller-supplied JavaScript inside an API process.
     this.registerTool('calculate', {
       description: 'Perform mathematical calculations',
       parameters: {
@@ -124,7 +125,39 @@ class AIAgentService {
       },
       handler: async (params) => {
         try {
-          const result = eval(params.expression);
+          const expression = String(params.expression || '').replace(/\s+/g, '');
+          if (!/^[0-9+\-*/().]+$/.test(expression) || expression.length > 200) {
+            throw new Error('Only numeric arithmetic expressions are allowed');
+          }
+          const tokens = expression.match(/(?:\d+(?:\.\d+)?|[()+\-*/])/g) || [];
+          if (tokens.join('') !== expression) throw new Error('Invalid arithmetic expression');
+          const values = [];
+          const operators = [];
+          const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
+          const apply = () => {
+            const operator = operators.pop();
+            const right = values.pop();
+            const left = values.pop();
+            if (operator === '/' && right === 0) throw new Error('Division by zero');
+            values.push(operator === '+' ? left + right : operator === '-' ? left - right : operator === '*' ? left * right : left / right);
+          };
+          for (const token of tokens) {
+            if (!Number.isNaN(Number(token))) values.push(Number(token));
+            else if (token === '(') operators.push(token);
+            else if (token === ')') {
+              while (operators.length && operators[operators.length - 1] !== '(') apply();
+              if (operators.pop() !== '(') throw new Error('Unbalanced parentheses');
+            } else {
+              while (operators.length && operators[operators.length - 1] !== '(' && precedence[operators[operators.length - 1]] >= precedence[token]) apply();
+              operators.push(token);
+            }
+          }
+          while (operators.length) {
+            if (operators[operators.length - 1] === '(') throw new Error('Unbalanced parentheses');
+            apply();
+          }
+          if (values.length !== 1 || !Number.isFinite(values[0])) throw new Error('Invalid arithmetic expression');
+          const result = values[0];
           return { success: true, result };
         } catch (error) {
           return { success: false, error: error.message };

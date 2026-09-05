@@ -43,6 +43,7 @@ const projectSystemsRoutes = require('./routes/projectSystemsRoutes.js');
 const productRoutes = require('./routes/productRoutes.js');
 const productReviewRoutes = require('./routes/productReviewRoutes.js');
 const productMediaAIRoutes = require('./routes/productMediaAIRoutes.js');
+const publicDataRoutes = require('./routes/publicDataRoutes.js');
 const productCertifications = require('./routes/productCertifications.js');
 const priceForecasting = require('./routes/priceForecasting.js');
 const preventiveMaintenanceRoutes = require('./routes/preventiveMaintenanceRoutes.js');
@@ -482,23 +483,9 @@ async function startup() {
       }
     });
 
-    // Step 12: Global error handler (must be last)
-    app.use(errorHandler);
+    // WebSocket handlers are registered by websocketService.attach(io)
 
-    // Step 13: WebSocket handlers are registered by websocketService.attach(io)
-
-    // Step 14: Mount orphaned services with setupRoutes()
-    logger.info('🔌 Mounting previously-orphaned services with setupRoutes()...');
-    if (app.locals.serviceLoader) {
-      try {
-        const orphanedMountStats = await app.locals.serviceLoader.mountServiceRoutes(app);
-        logger.info(`✅ Orphaned services mount completed`, orphanedMountStats);
-      } catch (error) {
-        logger.warn('⚠️  Orphaned services mount encountered issues', { error: error.message });
-      }
-    }
-
-    // Step 15: Mount health check routes
+    // Mount health check routes
     logger.info('🏥 Mounting health check routes...');
     const healthRoutes = require('./routes/healthRoutes');
     app.use('/api/yieldmanagement', yieldManagement);
@@ -545,6 +532,7 @@ app.use('/api/projectsystems', projectSystemsRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/productreview', productReviewRoutes);
 app.use('/api/productmediaai', productMediaAIRoutes);
+app.use('/api/publicdata', publicDataRoutes);
 app.use('/api/productcertifications', productCertifications);
 app.use('/api/priceforecasting', priceForecasting);
 app.use('/api/preventivemaintenance', preventiveMaintenanceRoutes);
@@ -695,6 +683,9 @@ app.use('/api/index', index);
 
 app.use('/health', healthRoutes);
     logger.info('✅ Health check routes mounted at /health');
+
+  // Error handling must follow every route registration.
+  app.use(errorHandler);
 
     // ========================================================================
     // START SERVER

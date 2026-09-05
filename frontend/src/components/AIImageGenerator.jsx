@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './AIImageGenerator.module.css';
+import { productMediaAIAPI } from '../services/api';
 
-function AIImageGenerator({ productName, onImageGenerated }) {
+function AIImageGenerator({ productId, productName, onImageGenerated }) {
   const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(productId || '');
   const [prompt, setPrompt] = useState(`High-quality product photo of ${productName || 'agricultural product'}`);
   const [error, setError] = useState(null);
 
   const generateImage = async () => {
+    if (!selectedProductId.trim()) {
+      setError('A product ID is required so the generated asset can be audited and stored.');
+      return;
+    }
     if (!prompt.trim()) {
       setError('Please enter a description');
       return;
@@ -18,70 +24,18 @@ function AIImageGenerator({ productName, onImageGenerated }) {
       setError(null);
       setLoading(true);
 
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Try real API first
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('/api/v1/productMediaAIRoutes/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            prompt,
-            productName,
-            style: 'professional-product-photo',
-          }),
-          signal: AbortSignal.timeout(5000),
-        });
-
-        if (response?.ok) {
-          const data = await response.json();
-          setGeneratedImage(data.imageUrl);
-          if (onImageGenerated) onImageGenerated(data.imageUrl);
-          return;
-        }
-      } catch (_apiErr) {
-        // API call failed, fallback to demo image
+      const response = await productMediaAIAPI.generateImage(selectedProductId, prompt);
+      const result = response.data?.data || response.data;
+      if (!result?.ok || !result.imageUrl) {
+        setError(result?.envVar ?
+          `Image provider is not configured. Configure ${result.envVar} before generating assets.` :
+          'The image provider did not return an image. No placeholder was created.');
+        return;
       }
-
-      // Fallback: Generate data URL with gradient (simulated AI image)
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 400;
-      const ctx = canvas.getContext('2d');
-
-      // Create gradient background
-      const gradient = ctx.createLinearGradient(0, 0, 400, 400);
-      gradient.addColorStop(0, '#667eea');
-      gradient.addColorStop(1, '#764ba2');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 400, 400);
-
-      // Add text
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('AI Generated Product Image', 200, 150);
-      ctx.font = '16px Arial';
-      ctx.fillText(prompt.substring(0, 35), 200, 200);
-      ctx.fillText('Quality: Premium', 200, 240);
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '12px Arial';
-      ctx.fillText(`Generated: ${new Date().toLocaleTimeString()}`, 200, 350);
-
-      const imageUrl = canvas.toDataURL('image/png');
-      setGeneratedImage(imageUrl);
-
-      if (onImageGenerated) {
-        onImageGenerated(imageUrl);
-      }
+      setGeneratedImage(result.imageUrl);
+      if (onImageGenerated) onImageGenerated(result.imageUrl);
     } catch (err) {
-      setError('Demo mode active - using generated placeholder. Real API coming soon.');
-      console.error('Image generation error:', err);
+      setError(err.response?.data?.error || err.message || 'Image generation failed.');
     } finally {
       setLoading(false);
     }
@@ -103,6 +57,16 @@ function AIImageGenerator({ productName, onImageGenerated }) {
         <div className={styles.content}>
           {!generatedImage ? (
             <>
+              <div className={styles.promptSection}>
+                <label htmlFor="product-id">Product ID</label>
+                <input
+                  id="product-id"
+                  value={selectedProductId}
+                  onChange={(e) => setSelectedProductId(e.target.value)}
+                  placeholder="Enter the catalog product ID"
+                  className={styles.textarea}
+                />
+              </div>
               <div className={styles.promptSection}>
                 <label htmlFor="prompt">Product Description</label>
                 <textarea
@@ -181,6 +145,7 @@ function AIImageGenerator({ productName, onImageGenerated }) {
 }
 
 AIImageGenerator.propTypes = {
+  productId: PropTypes.string,
   productName: PropTypes.string,
   onImageGenerated: PropTypes.func,
 };

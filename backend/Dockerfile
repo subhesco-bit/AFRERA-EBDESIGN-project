@@ -10,16 +10,15 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++ ca-certificates
 
 # Copy package files
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Install all dependencies (dev + production)
 RUN npm ci
 
 # Copy source code
-COPY backend/src ./src
-COPY backend/migrations ./migrations 2>/dev/null || true
-COPY backend/scripts ./scripts 2>/dev/null || true
-COPY backend/jest.config.js backend/.eslintrc.json ./ 2>/dev/null || true
+COPY src ./src
+COPY scripts ./scripts
+COPY jest.config.js .eslintrc.json ./
 
 # Run linting and tests in build
 RUN npm run lint 2>/dev/null || true && \
@@ -47,12 +46,12 @@ COPY --from=builder --chown=ebdesign:ebdesign /app/node_modules ./node_modules
 
 # Copy application code
 COPY --from=builder --chown=ebdesign:ebdesign /app/src ./src
-COPY backend/migrations ./migrations 2>/dev/null || true
-COPY backend/scripts ./scripts 2>/dev/null || true
-COPY backend/package*.json ./
+COPY --from=builder --chown=ebdesign:ebdesign /app/src/database/migrations ./src/database/migrations
+COPY --from=builder --chown=ebdesign:ebdesign /app/scripts ./scripts
+COPY package*.json ./
 
 # Create entrypoint script inline if backend/entrypoint.sh doesn't exist
-RUN echo '#!/bin/sh\nset -e\necho "Waiting for PostgreSQL..."\nwhile ! nc -z ${DB_HOST:-localhost} ${DB_PORT:-5432}; do sleep 1; done\necho "PostgreSQL is ready!"\necho "Waiting for Redis..."\nwhile ! nc -z ${REDIS_HOST:-localhost} ${REDIS_PORT:-6379}; do sleep 1; done\necho "Redis is ready!"\necho "Running database migrations..."\nnpm run migrate 2>/dev/null || echo "Migrations may have already run"\necho "Starting backend application..."\nexec npm start' > /app/entrypoint.sh && \
+RUN echo '#!/bin/sh\nset -eu\necho "Waiting for PostgreSQL..."\nwhile ! nc -z ${DB_HOST:-localhost} ${DB_PORT:-5432}; do sleep 1; done\necho "PostgreSQL is ready!"\necho "Waiting for Redis..."\nwhile ! nc -z ${REDIS_HOST:-localhost} ${REDIS_PORT:-6379}; do sleep 1; done\necho "Redis is ready!"\necho "Running database migrations..."\nnpm run migrate\necho "Starting backend application..."\nexec npm start' > /app/entrypoint.sh && \
     chmod +x /app/entrypoint.sh && \
     chown ebdesign:ebdesign /app/entrypoint.sh
 

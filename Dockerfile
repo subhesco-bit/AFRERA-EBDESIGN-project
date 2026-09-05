@@ -67,7 +67,7 @@ COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/node_modules 
 
 # Copy backend code
 COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/src ./backend/src
-COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/migrations ./backend/migrations
+COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/src/database/migrations ./backend/src/database/migrations
 COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/scripts ./backend/scripts
 COPY --from=backend-builder --chown=ebdesign:ebdesign /app/backend/package*.json ./backend/
 
