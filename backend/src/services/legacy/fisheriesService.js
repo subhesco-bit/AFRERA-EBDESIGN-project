@@ -3,7 +3,7 @@
  * Complete fisheries management with pond management, fish species, and feed management
  */
 
-const { getPostgreSQL } = require('../../database/connection');
+const { getPostgreSQL } = require('../../../database/connection');
 
 class FisheriesService {
   constructor() {
@@ -170,3 +170,4 @@ module.exports = new FisheriesService();
   const { ...rest } = m132;
   Object.assign(module.exports, rest);
 }
+

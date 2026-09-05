@@ -18,8 +18,8 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
+const pool = require('../../../database/pool');
+const { logger } = require('../../../utils/logger');
 
 /**
  * Forecasts for a product and/or region.
@@ -153,3 +153,4 @@ async function getMandiSignal({ commodity, days = 30 } = {}) {
 }
 
 module.exports = { getForecast, getHeatmap, getMandiSignal };
+

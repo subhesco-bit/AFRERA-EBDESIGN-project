@@ -18,9 +18,9 @@
 
 'use strict';
 
-const pool = require('../../database/pool');
-const { logger } = require('../../utils/logger');
-const { withTransaction } = require('../../core/withTransaction');
+const pool = require('../../../database/pool');
+const { logger } = require('../../../utils/logger');
+const { withTransaction } = require('../../../core/withTransaction');
 
 // ASSUMED freight-rate slabs: rate per kg falls as truck fill % rises.
 // A deployment should replace these with real historical freight-cost
@@ -165,3 +165,4 @@ class FreightPoolingService {
 }
 
 module.exports = new FreightPoolingService();
+

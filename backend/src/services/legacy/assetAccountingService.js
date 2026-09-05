@@ -29,8 +29,8 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const { withTransaction } = require('../../core/withTransaction');
+const { logger } = require('../../../utils/logger');
+const { withTransaction } = require('../../../core/withTransaction');
 
 const SUPPORTED_METHODS = ['straight_line'];
 const ALL_SCHEMA_METHODS = ['straight_line', 'declining_balance', 'units_of_production', 'wdv'];
@@ -53,7 +53,7 @@ class AssetAccountingService {
   constructor() {
     // Shared pool — see backend/src/database/pool.js for why this is a proxy
     // and not `new Pool()` per service.
-    this.pool = require('../../database/pool');
+    this.pool = require('../../../database/pool');
   }
 
   // -------------------------------------------------------------------
@@ -394,3 +394,4 @@ module.exports = new AssetAccountingService();
   const { getAsset: getAssetFromBE110, ...rest } = m110;
   Object.assign(module.exports, rest, { getAssetFromBE110 });
 }
+

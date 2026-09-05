@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
+    require('../../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
     return null;
   }
 }
@@ -503,3 +503,4 @@ class AIBrainService {
 const aiBrainService = new AIBrainService();
 
 module.exports = aiBrainService;
+

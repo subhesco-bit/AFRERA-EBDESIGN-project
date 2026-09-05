@@ -3,8 +3,8 @@
  * Business logic and operations
  */
 
-const { logger } = require('../utils/logger');
-const { getPostgreSQL } = require('../database/connection');
+const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database/connection');
 
 class FarmerfamilyService {
   constructor() {
@@ -53,3 +53,4 @@ class FarmerfamilyService {
 }
 
 module.exports = new FarmerfamilyService();
+

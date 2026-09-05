@@ -3,12 +3,12 @@
  * Manages farmer training programs, certifications, and FOLU (Food Systems, Land Use, and Restoration) compliance
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../../utils/logger');
 const aiBackbone = require('./aiBackboneService');
 const { aiAPI } = require('./aiService');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
-const { authMiddleware } = require('../../middleware/auth');
+const { getPostgreSQL } = require('../../../database/connection');
+const { signalBus } = require('../../../core/signalBus');
+const { authMiddleware } = require('../../../middleware/auth');
 
 /**
  * Create training program
@@ -790,3 +790,4 @@ Object.assign(module.exports, require("../../modules/M023/service"));
   const { healthCheck: healthCheckFromBE030, execute: executeFromBE030, ...rest } = m030;
   Object.assign(module.exports, rest, { healthCheckFromBE030, executeFromBE030 });
 }
+

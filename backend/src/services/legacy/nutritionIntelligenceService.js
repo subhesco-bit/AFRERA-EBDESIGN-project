@@ -5,9 +5,9 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
-const { NUTRITION_WELLNESS_DISCLAIMER } = require('../../utils/disclaimers');
+const { logger } = require('../../../utils/logger');
+const { authMiddleware } = require('../../../middleware/auth');
+const { NUTRITION_WELLNESS_DISCLAIMER } = require('../../../utils/disclaimers');
 const aiBackboneService = require('./aiBackboneService');
 
 const router = express.Router();
@@ -126,7 +126,7 @@ if (process.env.NODE_ENV === 'test') {
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../../database/pool');
 
 // Helper for test stub
 function dataOrEmpty(x, productId) { return {}; }
@@ -1209,3 +1209,4 @@ module.exports = {
   calculateNutrientTotals,
   isHealthy
 };
+

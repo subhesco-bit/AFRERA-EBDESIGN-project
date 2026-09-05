@@ -14,9 +14,9 @@
  * - Customer ERP (CRM integration, customer data sync)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { signalBus } = require('../../../core/signalBus');
 
 // ============================================================================
 // FARMER MODULE ERP INTEGRATION
@@ -931,3 +931,4 @@ module.exports = {
   syncSheepProductionWithERP,
   syncPigProductionWithERP
 };
+

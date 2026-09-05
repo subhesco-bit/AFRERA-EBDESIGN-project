@@ -31,3 +31,4 @@ const irrigationLogs = createCrudService('irrigation_logs', {
 });
 
 module.exports = { irrigationSchedules, irrigationWaterSources, irrigationLogs };
+

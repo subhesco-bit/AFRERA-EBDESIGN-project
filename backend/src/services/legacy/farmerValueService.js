@@ -32,10 +32,10 @@
 'use strict';
 
 const express = require('express');
-const pool = require('../../database/pool');
-const { authMiddleware } = require('../../middleware/auth');
-const { logger } = require('../../utils/logger');
-const { mcda, DATA_QUALITY_WEIGHT } = require('../../core/mcda');
+const pool = require('../../../database/pool');
+const { authMiddleware } = require('../../../middleware/auth');
+const { logger } = require('../../../utils/logger');
+const { mcda, DATA_QUALITY_WEIGHT } = require('../../../core/mcda');
 
 const router = express.Router();
 
@@ -459,3 +459,4 @@ module.exports = {
   BASIS_QUALITY,
   DATA_QUALITY_WEIGHT,
 };
+

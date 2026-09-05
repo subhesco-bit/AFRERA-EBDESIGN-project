@@ -5,8 +5,8 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../../utils/logger');
+const { authMiddleware } = require('../../../middleware/auth');
 
 const router = express.Router();
 // Test-mode lightweight stubs to avoid DB dependency during unit tests
@@ -62,7 +62,7 @@ if (process.env.NODE_ENV === 'test') {
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../database/pool');
+const pool = require('../../../database/pool');
 
 // ============================================================================
 // VALUE FACTORS
@@ -508,3 +508,4 @@ module.exports = {
   getValueTiers,
   isHealthy
 };
+

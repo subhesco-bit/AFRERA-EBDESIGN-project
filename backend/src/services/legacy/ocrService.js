@@ -47,8 +47,8 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
+const { logger } = require('../../../utils/logger');
+const pool = require('../../../database/pool');
 
 function assertBuffer(buffer, fnName) {
   if (!Buffer.isBuffer(buffer)) {
@@ -136,3 +136,4 @@ module.exports = {
   extractTextFromImage,
   extractAndStoreCertificateText,
 };
+

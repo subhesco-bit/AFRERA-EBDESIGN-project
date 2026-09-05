@@ -7,9 +7,9 @@
  * - Natural language processing (document analysis, query understanding)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL, getMongoDatabase } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL, getMongoDatabase } = require('../../../database/connection');
+const { authMiddleware } = require('../../../middleware/auth');
 
 // AI Models configuration
 const AI_MODELS = {
@@ -713,4 +713,5 @@ module.exports = {
   generateRecommendations,
   isHealthy
 };
+
 

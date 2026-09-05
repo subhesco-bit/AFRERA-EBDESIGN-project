@@ -4,11 +4,11 @@
  */
 
 const crypto = require('crypto');
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
-const { adminMiddleware } = require('../../middleware/admin');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { authMiddleware } = require('../../../middleware/auth');
+const { adminMiddleware } = require('../../../middleware/admin');
+const { signalBus, SIGNAL, SEVERITY } = require('../../../core/signalBus');
 const gstService = require('./gstService');
 
 /**
@@ -348,7 +348,7 @@ async function createOrder(userId, orderData) {
     // ---- end transaction -------------------------------------------------
 
     // Emit WebSocket event
-    const io = require('../../index').app.get('io');
+    const io = require('../../../index').app.get('io');
     if (io) {
       io.to(`user:${userId}`).emit('order_created', {
         order_id: order.id,
@@ -512,7 +512,7 @@ async function updateOrderStatus(orderId, status, notes = null) {
     let order = result.rows[0];
     
     // Emit WebSocket event
-    let io = require('../../index').app.get('io');
+    let io = require('../../../index').app.get('io');
     if (io) {
       io.to(`order:${orderId}`).emit('order_status_updated', {
         order_id: orderId,
@@ -879,3 +879,4 @@ module.exports = {
   updateOrderStatus,
   processPayment
 };
+

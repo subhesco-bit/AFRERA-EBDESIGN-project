@@ -20,9 +20,9 @@
  *  - ASSUMED_TARGET_WEIGHT_GAIN_KG_PER_DAY: target daily weight gain for fattening pigs
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { signalBus } = require('../../../core/signalBus');
 
 // ---- Assumed constants (not stored in the schema; pig farming standards)
 const ASSUMED_VACCINATION_INTERVAL_DAYS = 180; // biannual vaccination cycle
@@ -1058,3 +1058,4 @@ module.exports = {
   optimizePigFeed,
   recommendPigBreeding,
 };
+

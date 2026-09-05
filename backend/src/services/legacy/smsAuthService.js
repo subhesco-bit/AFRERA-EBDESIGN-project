@@ -4,8 +4,8 @@
  * Supports multiple languages, voice calls, and accessibility features
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
 const crypto = require('crypto');
 
 // Twilio Configuration
@@ -297,7 +297,7 @@ async function verifySMSOTP(phoneNumber, otp) {
     );
 
     // Generate tokens
-    const authService = require('../dual-use/authService');
+    const authService = require('../../dual-use/authService');
     const accessToken = authService.generateAccessToken(user);
     const refreshToken = authService.generateRefreshToken(user);
 
@@ -421,7 +421,7 @@ async function completePhoneRegistration(phoneNumber, otp) {
 
     // Create user
     const userData = JSON.parse(registration.user_data);
-    let authService = require('../dual-use/authService');
+    let authService = require('../../dual-use/authService');
 
     let user = await authService.registerUser({
       ...userData,
@@ -479,7 +479,7 @@ const express = require('express');
 // correct control is rate limiting: an unthrottled OTP /initiate is an SMS
 // bombing vector against a citizen's phone AND a direct cost attack on the
 // SMS gateway. authLimiter is the strictest bucket available.
-const { authLimiter } = require('../../middleware/rateLimiter');
+const { authLimiter } = require('../../../middleware/rateLimiter');
 const router = express.Router();
 
 /**
@@ -594,3 +594,4 @@ module.exports = {
   sendVoiceOTP,
   isHealthy
 };
+

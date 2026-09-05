@@ -3,10 +3,10 @@
  * AI-powered soil analysis and personalized fertilizer recommendations
  */
 
-const { logger } = require('../../utils/logger');
+const { logger } = require('../../../utils/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../middleware/auth');
-const { getPostgreSQL } = require('../../database/connection');
+const { authMiddleware } = require('../../../middleware/auth');
+const { getPostgreSQL } = require('../../../database/connection');
 
 /**
  * Submit soil sample for testing
@@ -686,3 +686,4 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M032 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M032/service"));
+

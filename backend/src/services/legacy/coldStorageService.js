@@ -20,9 +20,9 @@
 
 'use strict';
 
-const { logger } = require('../../utils/logger');
-const pool = require('../../database/pool');
-const { withTransaction } = require('../../core/withTransaction');
+const { logger } = require('../../../utils/logger');
+const pool = require('../../../database/pool');
+const { withTransaction } = require('../../../core/withTransaction');
 
 class ColdStorageService {
   constructor() {
@@ -302,3 +302,4 @@ module.exports = new ColdStorageService();
   const { ...rest } = m078;
   Object.assign(module.exports, rest);
 }
+

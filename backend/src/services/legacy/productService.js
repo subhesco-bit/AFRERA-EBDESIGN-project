@@ -3,9 +3,9 @@
  * Manages product catalog, categories, and inventory
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { authMiddleware } = require('../../middleware/auth');
+const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('../../../database/connection');
+const { authMiddleware } = require('../../../middleware/auth');
 const productMediaAIService = require('./productMediaAIService');
 
 /**
@@ -632,3 +632,4 @@ module.exports = {
   getStates,
   searchProducts
 };
+

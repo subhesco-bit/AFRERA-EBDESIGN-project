@@ -59,3 +59,4 @@ module.exports = {
   biofertilizer, pesticideInventory, bioPesticide, micronutrient,
   organicInput, inputProcurement, inputDistribution, inputTraceability,
 };
+
