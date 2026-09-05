@@ -3,13 +3,13 @@
  * Comprehensive audit trail and reporting system
  */
 
-const logger = require('../../../utils/logger');
+const logger = require('..\/utils\/logger');
 
 class AuditService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../../database/pool');
+    this.pool = require('..\/database\/pool');
   }
 
   /**
@@ -367,4 +367,5 @@ class AuditService {
 }
 
 module.exports = new AuditService();
+
 

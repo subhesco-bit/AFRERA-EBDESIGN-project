@@ -3,9 +3,9 @@
  * AI-driven design, modelling, and microclimate control for greenhouses
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../../middleware/auth');
+const { authMiddleware } = require('..\/middleware\/auth');
 
 /**
  * Design greenhouse based on AI recommendations
@@ -540,4 +540,5 @@ module.exports = {
   const { ...rest } = m144;
   Object.assign(module.exports, rest);
 }
+
 

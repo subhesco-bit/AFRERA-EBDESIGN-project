@@ -14,9 +14,9 @@
  * - Anomaly Detection (fraud detection, unusual patterns)
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
-const { signalBus } = require('../../../core/signalBus');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { signalBus } = require('..\/core\/signalBus');
 
 // ============================================================================
 // AI-POWERED CUSTOMER SEGMENTATION
@@ -881,4 +881,5 @@ module.exports = {
   // Market Basket Analysis
   analyzeMarketBasket
 };
+
 

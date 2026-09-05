@@ -14,8 +14,8 @@
  */
 
 const fetch = require('node-fetch');
-const { getPostgreSQL } = require('../../../database/connection');
-const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { logger } = require('..\/utils\/logger');
 
 const FITBIT_CLIENT_ID = process.env.FITBIT_CLIENT_ID;
 const FITBIT_CLIENT_SECRET = process.env.FITBIT_CLIENT_SECRET;
@@ -244,4 +244,5 @@ module.exports = {
   getRecentActivitySummary,
   disconnectProvider,
 };
+
 

@@ -3,10 +3,10 @@
  * AI-powered pre-season order placement, contract farming, and escrow management
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const { aiAPI } = require('./aiService');
 const { socketServer } = require('../../../websocket');
-const { authMiddleware } = require('../../../middleware/auth');
+const { authMiddleware } = require('..\/middleware\/auth');
 const { createEscrowTransaction } = require('./escrowService');
 
 /**
@@ -790,4 +790,5 @@ module.exports = {
   getContractDashboard,
   setupRoutes
 };
+
 

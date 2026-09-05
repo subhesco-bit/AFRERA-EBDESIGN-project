@@ -4,8 +4,8 @@
  * Real-time data processing, trend analysis, and predictive analytics
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 
 class AnalyticsService {
   constructor() {
@@ -642,3 +642,4 @@ class AnalyticsService {
 }
 
 module.exports = new AnalyticsService();
+

@@ -21,7 +21,7 @@
 'use strict';
 
 const axios = require('axios');
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 
 const USER_AGENT = 'AFRERA-Platform/1.0 (rural-economy-erp; contact: subhesco@gmail.com)';
 const API_BASE = 'https://en.wikipedia.org';
@@ -134,4 +134,5 @@ module.exports = {
   findBestTitle,
   getSummaryByTitle,
 };
+
 

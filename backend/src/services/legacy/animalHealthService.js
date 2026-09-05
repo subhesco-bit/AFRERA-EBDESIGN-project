@@ -17,8 +17,8 @@
  *  - ASSUMED_CRITICAL_TEMP_C: body temperature threshold for critical status
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 
 // ---- Assumed constants (not stored in the schema; veterinary standards)
 const ASSUMED_ROUTINE_EXAM_INTERVAL_DAYS = 90; // quarterly routine exams
@@ -541,4 +541,5 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M127 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M127/service"));
+
 

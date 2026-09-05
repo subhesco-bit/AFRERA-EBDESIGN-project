@@ -4,8 +4,8 @@
  * Crop prediction, soil analysis, weather intelligence, and farming optimization
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 const aiGateway = require('./aiGatewayService');
 const analytics = require('./analyticsService');
 
@@ -467,3 +467,4 @@ class AgriculturalIntelligenceService {
 }
 
 module.exports = new AgriculturalIntelligenceService();
+

@@ -12,7 +12,7 @@
  * Provides unified AI interface for all ERP modules
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const fetch = require('node-fetch');
 
 // ============================================================================
@@ -899,4 +899,5 @@ module.exports = {
   AI_PROVIDERS,
   aiRequestTracker
 };
+
 

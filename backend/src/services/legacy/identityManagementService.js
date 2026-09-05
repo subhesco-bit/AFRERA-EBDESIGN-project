@@ -21,7 +21,7 @@
 
 'use strict';
 
-const pool = require('../../../database/pool');
+const pool = require('..\/database\/pool');
 const { createCrudService } = require('./resourceCrudFactory');
 
 const permissionManagement = createCrudService('identity_permissions', {
@@ -126,4 +126,5 @@ module.exports = {
   const { ...rest } = m016;
   Object.assign(module.exports, rest);
 }
+
 

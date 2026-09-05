@@ -19,11 +19,11 @@
  */
 
 const express = require('express');
-const { getPostgreSQL } = require('../../../database/connection');
-const { authMiddleware } = require('../../../middleware/auth');
-const { adminMiddleware } = require('../../../middleware/admin');
-const { logger } = require('../../../utils/logger');
-const { signalBus, SIGNAL, SEVERITY } = require('../../../core/signalBus');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { authMiddleware } = require('..\/middleware\/auth');
+const { adminMiddleware } = require('..\/middleware\/admin');
+const { logger } = require('..\/utils\/logger');
+const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
 
 const router = express.Router();
 
@@ -562,4 +562,5 @@ module.exports = {
   listActiveIncidents,
   SEVERITY_RANK
 };
+
 

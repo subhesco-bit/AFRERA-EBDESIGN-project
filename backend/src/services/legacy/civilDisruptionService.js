@@ -17,9 +17,9 @@
 
 'use strict';
 
-const { logger } = require('../../../utils/logger');
-const pool = require('../../../database/pool');
-const { signalBus, SIGNAL, SEVERITY } = require('../../../core/signalBus');
+const { logger } = require('..\/utils\/logger');
+const pool = require('..\/database\/pool');
+const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
 
 class CivilDisruptionService {
   async report(data) {
@@ -131,4 +131,5 @@ class CivilDisruptionService {
 }
 
 module.exports = new CivilDisruptionService();
+
 

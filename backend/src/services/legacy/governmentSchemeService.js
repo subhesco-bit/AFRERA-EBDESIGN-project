@@ -3,16 +3,16 @@
  * CSR integration, government support schemes, weather alerts, and official announcements
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const { aiAPI } = require('./aiService');
 const { socketServer } = require('../../../websocket');
-const { authMiddleware } = require('../../../middleware/auth');
+const { authMiddleware } = require('..\/middleware\/auth');
 // Shared pool (2026-08-04 convention, see database/pool.js): the AI-matching
 // functions above never touched Postgres, but the scheme registry added in
 // migration 9995_scheme_verification_map_protection.sql does — every scheme
 // those functions return was AI-generated or hardcoded, with no stored
 // verification status/expiry anywhere (see that migration's header).
-const pool = require('../../../database/pool');
+const pool = require('..\/database\/pool');
 
 /**
  * List verified schemes from the registry table (government_schemes).
@@ -945,4 +945,5 @@ module.exports = {
   checkSchemeEligibility,
   setupRoutes
 };
+
 

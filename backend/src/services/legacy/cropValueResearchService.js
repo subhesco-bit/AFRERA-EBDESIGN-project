@@ -18,8 +18,8 @@
  */
 
 const fetch = require('node-fetch');
-const { getPostgreSQL } = require('../../../database/connection');
-const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { logger } = require('..\/utils\/logger');
 const aiBackboneService = require('./aiBackboneService');
 
 const SEARCH_PROVIDER_ENV = {
@@ -168,4 +168,5 @@ module.exports = {
   getPendingSuggestions,
   reviewSuggestion,
 };
+
 
