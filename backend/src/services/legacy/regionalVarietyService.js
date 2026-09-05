@@ -10,8 +10,8 @@
 
 'use strict';
 
-const { logger } = require('..\/utils\/logger');
-const pool = require('..\/database\/pool');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
 const productMediaAIService = require('./productMediaAIService');
 const cropValueResearchService = require('./cropValueResearchService');
 
@@ -114,5 +114,6 @@ class RegionalVarietyService {
 }
 
 module.exports = new RegionalVarietyService();
+
 
 

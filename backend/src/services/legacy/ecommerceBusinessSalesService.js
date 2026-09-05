@@ -14,9 +14,9 @@
  * - Negotiation Support (counter-offers, revision tracking)
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus } = require('../../core\/signalBus');
 
 // ============================================================================
 // B2B BULK ORDER MANAGEMENT
@@ -664,5 +664,6 @@ module.exports = {
   // Commission Management
   calculateCommission
 };
+
 
 

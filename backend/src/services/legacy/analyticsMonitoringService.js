@@ -5,8 +5,8 @@
  * for production-ready system health and performance tracking
  */
 
-const { logger } = require('..\/utils\/logger');
-const pool = require('..\/database\/pool');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
 
 class AnalyticsMonitoringService {
   constructor() {
@@ -427,5 +427,6 @@ module.exports = analyticsMonitoringService;
 // Merged unique operations from backend/src/modules/M086 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M086/service"));
+
 
 

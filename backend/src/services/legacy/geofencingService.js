@@ -37,10 +37,10 @@
 
 'use strict';
 
-const pool = require('..\/database\/pool');
-const { logger } = require('..\/utils\/logger');
-const geo = require('..\/utils\/geo');
-const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
+const geo = require('../../utils\/geo');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 
 class GeofencingService {
   // ==========================================================================
@@ -305,5 +305,6 @@ class GeofencingService {
 }
 
 module.exports = new GeofencingService();
+
 
 

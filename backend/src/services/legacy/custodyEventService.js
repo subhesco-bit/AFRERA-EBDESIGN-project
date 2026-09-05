@@ -18,8 +18,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const pool = require('..\/database\/pool');
-const { logger } = require('..\/utils\/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 // State machine transitions - defines valid event type sequences
 // ASSUMED: Based on common logistics custody patterns
@@ -418,5 +418,6 @@ module.exports = {
   isValidTransition,
   STATE_TRANSITIONS
 };
+
 
 

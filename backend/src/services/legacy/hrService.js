@@ -9,12 +9,12 @@
  * - Machine Learning: Skill gap analysis, training recommendations, career path prediction
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { signalBus, SIGNAL, SEVERITY } = require('../../core\/signalBus');
 const aiGatewayService = require('./aiGatewayService');
 const aiAgentService = require('../../aiAgentService');
-const stats = require('..\/utils\/statistics');
+const stats = require('../../utils\/statistics');
 
 class HRService {
   constructor() {
@@ -910,5 +910,6 @@ class HRService {
 }
 
 module.exports = new HRService();
+
 
 

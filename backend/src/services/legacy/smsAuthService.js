@@ -4,8 +4,8 @@
  * Supports multiple languages, voice calls, and accessibility features
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
 const crypto = require('crypto');
 
 // Twilio Configuration
@@ -479,7 +479,7 @@ const express = require('express');
 // correct control is rate limiting: an unthrottled OTP /initiate is an SMS
 // bombing vector against a citizen's phone AND a direct cost attack on the
 // SMS gateway. authLimiter is the strictest bucket available.
-const { authLimiter } = require('..\/middleware\/rateLimiter');
+const { authLimiter } = require('../../middleware\/rateLimiter');
 const router = express.Router();
 
 /**
@@ -594,5 +594,6 @@ module.exports = {
   sendVoiceOTP,
   isHealthy
 };
+
 
 

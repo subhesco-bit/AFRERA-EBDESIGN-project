@@ -3,13 +3,13 @@
  * Intelligent crop planning based on land records, weather, and market demand
  */
 
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 
 class CropPlanningService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('..\/database\/pool');
+    this.pool = require('../../database\/pool');
   }
 
   /**
@@ -531,5 +531,6 @@ module.exports = new CropPlanningService();
   const { ...rest } = m079;
   Object.assign(module.exports, rest);
 }
+
 
 

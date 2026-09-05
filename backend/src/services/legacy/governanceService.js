@@ -3,13 +3,13 @@
  * Handles village management, panchayat integration, CSR tracking, and compliance
  */
 
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 
 class GovernanceService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('..\/database\/pool');
+    this.pool = require('../../database\/pool');
   }
 
   // Village Management
@@ -619,5 +619,6 @@ class GovernanceService {
 }
 
 module.exports = new GovernanceService();
+
 
 

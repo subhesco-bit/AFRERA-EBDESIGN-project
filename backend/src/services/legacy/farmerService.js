@@ -3,9 +3,9 @@
  * Manages farmer profiles, FPOs, certifications, FDI calculations, and Wallet
  */
 
-const { logger } = require('..\/utils\/logger');
-const { getPostgreSQL } = require('..\/database\/connection');
-const { authMiddleware } = require('..\/middleware\/auth');
+const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database\/connection');
+const { authMiddleware } = require('../../middleware\/auth');
 
 /**
  * Get farmer by ID
@@ -691,5 +691,6 @@ module.exports = {
   getWalletBalance,
   linkBankAccount
 };
+
 
 

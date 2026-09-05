@@ -32,8 +32,8 @@
 
 'use strict';
 
-const { logger } = require('..\/utils\/logger');
-const pool = require('..\/database\/pool');
+const { logger } = require('../../utils\/logger');
+const pool = require('../../database\/pool');
 
 // ============================================================================
 // CONFIG + CLIENT (mirrors services/smsAuthService.js exactly)
@@ -420,5 +420,6 @@ module.exports = {
   routeInboundMessage,
   isHealthy
 };
+
 
 

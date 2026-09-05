@@ -7,8 +7,8 @@
 
 'use strict';
 
-const pool = require('..\/database\/pool');
-const { logger } = require('..\/utils\/logger');
+const pool = require('../../database\/pool');
+const { logger } = require('../../utils\/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
@@ -319,7 +319,7 @@ async function searchRuralEnterprises(filters) {
 function setupRoutes(app) {
   const express = require('express');
   const router = express.Router();
-  const authMiddleware = require('..\/middleware\/auth');
+  const authMiddleware = require('../../middleware\/auth');
 
   router.use(authMiddleware);
 
@@ -400,5 +400,6 @@ module.exports = {
   searchRuralEnterprises,
   setupRoutes
 };
+
 
 

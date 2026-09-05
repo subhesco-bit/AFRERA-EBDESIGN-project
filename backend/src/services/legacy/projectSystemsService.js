@@ -32,7 +32,7 @@
 
 'use strict';
 
-const { logger } = require('..\/utils\/logger');
+const { logger } = require('../../utils\/logger');
 
 const PROJECT_TYPES = ['infrastructure', 'equipment', 'capacity_building', 'other'];
 const PROJECT_STATUSES = ['planned', 'active', 'on_hold', 'completed', 'cancelled'];
@@ -46,7 +46,7 @@ class ProjectSystemsService {
   constructor() {
     // Shared pool — see backend/src/database/pool.js for why this is a proxy
     // and not `new Pool()` per service.
-    this.pool = require('..\/database\/pool');
+    this.pool = require('../../database\/pool');
   }
 
   // -------------------------------------------------------------------
@@ -523,5 +523,6 @@ class ProjectSystemsService {
 }
 
 module.exports = new ProjectSystemsService();
+
 
 
