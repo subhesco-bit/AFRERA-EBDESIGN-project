@@ -15,7 +15,7 @@
 
 'use strict';
 
-const pool = require('../../database\/pool');
+const pool = require('../../database/pool');
 
 async function getCostBreakup({ productId, regionId, from, to } = {}) {
   const params = [];

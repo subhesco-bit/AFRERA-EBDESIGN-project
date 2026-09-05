@@ -23,9 +23,9 @@
  * says so explicitly, rather than being presented as measured facts.
  */
 
-const { logger } = require('../../utils\/logger');
-const { getPostgreSQL } = require('../../database\/connection');
-const { withTransaction } = require('../../core\/withTransaction');
+const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database/connection');
+const { withTransaction } = require('../../core/withTransaction');
 
 // ---- Assumed constants (not stored anywhere in the schema) ------------
 const ASSUMED_LEAD_TIME_DAYS = 7; // typical local-dealer resupply time

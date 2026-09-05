@@ -13,8 +13,8 @@
  */
 
 const os = require('os');
-const { getPostgreSQL } = require('../../database\/connection');
-const { logger } = require('../../utils\/logger');
+const { getPostgreSQL } = require('../../database/connection');
+const { logger } = require('../../utils/logger');
 
 /** Real Node/OS-level metrics — no external monitoring agent required. */
 function getSystemMetrics() {

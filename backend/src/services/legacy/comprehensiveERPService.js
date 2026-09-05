@@ -8,9 +8,9 @@
  * Compliance: IFRS, GAAP, GST, VAT, local regulations
  */
 
-const { logger } = require('../../utils\/logger');
-const { getPostgreSQL } = require('../../database\/connection');
-const { signalBus } = require('../../core\/signalBus');
+const { logger } = require('../../utils/logger');
+const { getPostgreSQL } = require('../../database/connection');
+const { signalBus } = require('../../core/signalBus');
 const aiBackbone = require('./aiBackboneService');
 
 // ============================================================================

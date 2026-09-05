@@ -3,7 +3,7 @@
  * Complete forestry management with timber, plantations, and forest resources
  */
 
-const { getPostgreSQL } = require('../../database\/connection');
+const { getPostgreSQL } = require('../../database/connection');
 
 class ForestryService {
   constructor() {

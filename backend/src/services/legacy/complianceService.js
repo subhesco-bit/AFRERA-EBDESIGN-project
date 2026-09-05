@@ -12,8 +12,8 @@
 
 'use strict';
 
-const pool = require('../../database\/pool');
-const { logger } = require('../../utils\/logger');
+const pool = require('../../database/pool');
+const { logger } = require('../../utils/logger');
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
