@@ -13,7 +13,7 @@ const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 const aiGatewayService = require('./aiGatewayService');
-const aiAgentService = require('../../aiAgentService');
+const aiAgentService = require('../aiAgentService');
 const stats = require('../../utils/statistics');
 
 class HRService {

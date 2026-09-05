@@ -4,6 +4,8 @@
  * Add this code to backend/src/index.js around line 800 (after all other routes)
  */
 
+const { logger } = require('../utils/logger');
+
 // ============================================================================
 // MOUNT ORPHANED SERVICES (Services with setupRoutes() that were never called)
 // ============================================================================
