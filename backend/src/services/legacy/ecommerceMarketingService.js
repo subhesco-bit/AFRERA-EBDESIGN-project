@@ -15,9 +15,9 @@
  * - Influencer Marketing (partnerships, affiliate programs)
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
-const { signalBus } = require('../../../core/signalBus');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { signalBus } = require('..\/core\/signalBus');
 
 // ============================================================================
 // CAMPAIGN MANAGEMENT
@@ -773,4 +773,5 @@ module.exports = {
   // Analytics
   getMarketingAnalytics
 };
+
 

@@ -8,7 +8,7 @@
 
 'use strict';
 
-const pool = require('../../../database/pool');
+const pool = require('..\/database\/pool');
 
 class EquipmentExchangeService {
   async createListing(listedBy, data) {
@@ -99,4 +99,5 @@ module.exports = new EquipmentExchangeService();
   const { ...rest } = m107;
   Object.assign(module.exports, rest);
 }
+
 

@@ -9,7 +9,7 @@
  */
 
 const express = require('express');
-const decisionSupportRoutes = require('../../../routes/decisionSupportRoutes');
+const decisionSupportRoutes = require('..\/routes\/decisionSupportRoutes');
 
 class DecisionSupportService {
   /**
@@ -414,3 +414,4 @@ class DecisionSupportService {
 }
 
 module.exports = new DecisionSupportService();
+

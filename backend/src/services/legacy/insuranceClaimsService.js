@@ -2,11 +2,11 @@
  * AI-Based Insurance Claims Processing and Settlement Follow-up Service
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const { aiAPI } = require('./aiService');
 const { socketServer } = require('../../../websocket');
-const { authMiddleware } = require('../../../middleware/auth');
-const { signalBus, SIGNAL, SEVERITY } = require('../../../core/signalBus');
+const { authMiddleware } = require('..\/middleware\/auth');
+const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
 
 /**
  * Submit insurance claim with AI validation
@@ -604,4 +604,5 @@ module.exports = {
   calculateClaimPayout,
   setupRoutes
 };
+
 

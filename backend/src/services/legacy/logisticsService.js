@@ -3,10 +3,10 @@
  * Manages shipments, vehicles, drivers, and tracking
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
-const { authMiddleware, requireRole } = require('../../../middleware/auth');
-const { LOGISTICS_ROLES } = require('../../../middleware/roleGroups');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { authMiddleware, requireRole } = require('..\/middleware\/auth');
+const { LOGISTICS_ROLES } = require('..\/middleware\/roleGroups');
 const decisionSupportService = require('./decisionSupportService');
 
 /**
@@ -697,4 +697,5 @@ module.exports = {
   getShipmentModes,
   getEcoLogisticsScore
 };
+
 

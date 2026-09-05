@@ -4,8 +4,8 @@
  * WebSocket-based real-time data streaming and event processing
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 
 class RealtimeMonitoringService {
   constructor() {
@@ -570,3 +570,4 @@ class RealtimeMonitoringService {
 }
 
 module.exports = new RealtimeMonitoringService();
+

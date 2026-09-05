@@ -30,3 +30,4 @@ const fertilityManagement = createCrudService('fertility_management_records', {
 
 module.exports = { soilHealth, nutrientManagement, fertilityManagement };
 
+

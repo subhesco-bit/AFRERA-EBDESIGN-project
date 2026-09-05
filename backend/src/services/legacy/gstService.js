@@ -31,8 +31,8 @@
  * see the migration's comment on that column.
  */
 
-const { logger } = require('../../../utils/logger');
-const { withTransaction } = require('../../../core/withTransaction');
+const { logger } = require('..\/utils\/logger');
+const { withTransaction } = require('..\/core\/withTransaction');
 
 /** Round to 2 decimal places — matches this schema's DECIMAL(12,2)/(4,2) money columns. */
 const r2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
@@ -47,7 +47,7 @@ class GSTService {
   constructor() {
     // Shared pool (2026-08-04): was a per-instance Pool. 42 services each
     // holding one meant ~420 connections vs a PostgreSQL default of 100.
-    this.pool = require('../../../database/pool');
+    this.pool = require('..\/database\/pool');
   }
 
   /**
@@ -653,4 +653,5 @@ class GSTService {
 }
 
 module.exports = new GSTService();
+
 

@@ -7,7 +7,7 @@
 
 'use strict';
 
-const pool = require('../../../database/pool');
+const pool = require('..\/database\/pool');
 
 class ReturnLoadBoardService {
   async postCapacity(postedBy, data) {
@@ -62,4 +62,5 @@ class ReturnLoadBoardService {
 }
 
 module.exports = new ReturnLoadBoardService();
+
 

@@ -5,15 +5,15 @@
 
 const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../../utils/logger');
-const { authMiddleware } = require('../../../middleware/auth');
+const { logger } = require('..\/utils\/logger');
+const { authMiddleware } = require('..\/middleware\/auth');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
-const pool = require('../../../database/pool');
-const { persistTestFallback } = require('../../../utils/testFallbackStore');
+const pool = require('..\/database\/pool');
+const { persistTestFallback } = require('..\/utils\/testFallbackStore');
 
 // database/pool.js's in-memory test pool only recognises statements it has a
 // handler for; an INSERT ... RETURNING * this file sends that the mock
@@ -788,4 +788,5 @@ module.exports = {
   const { ...rest } = m087;
   Object.assign(module.exports, rest);
 }
+
 

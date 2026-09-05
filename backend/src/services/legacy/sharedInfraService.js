@@ -31,10 +31,10 @@
  *     says so explicitly instead of silently returning a mock empty array.
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../../middleware/auth');
-const pool = require('../../../database/pool');
+const { authMiddleware } = require('..\/middleware\/auth');
+const pool = require('..\/database\/pool');
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_ACCESS_MODELS = [
@@ -877,4 +877,5 @@ module.exports = {
   getEquipmentUtilizationAnalytics,
   setupRoutes
 };
+
 

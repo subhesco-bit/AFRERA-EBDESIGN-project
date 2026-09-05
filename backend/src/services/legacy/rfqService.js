@@ -9,8 +9,8 @@
 'use strict';
 
 const crypto = require('crypto');
-const pool = require('../../../database/pool');
-const { signalBus, SIGNAL, SEVERITY } = require('../../../core/signalBus');
+const pool = require('..\/database\/pool');
+const { signalBus, SIGNAL, SEVERITY } = require('..\/core\/signalBus');
 
 /** Stable pseudonym per bidder per RFQ. Same bidder, same handle, no identity. */
 function handleFor(rfqId, bidderId) {
@@ -237,4 +237,5 @@ module.exports = {
   raiseQcHold, releaseQcHold, activeHolds,
   centrePnl,
 };
+
 

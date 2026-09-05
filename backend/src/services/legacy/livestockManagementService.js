@@ -62,3 +62,4 @@ module.exports = { cattleRegistry, feedManagement, livestockAnalytics };
   Object.assign(module.exports, rest);
 }
 
+

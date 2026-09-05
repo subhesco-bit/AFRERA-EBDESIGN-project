@@ -4,8 +4,8 @@
  * Dynamic role assignment, permission inheritance, and access analytics
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 const aiGateway = require('./aiGatewayService');
 const analytics = require('./analyticsService');
 
@@ -376,3 +376,4 @@ class RoleManagementService {
 }
 
 module.exports = new RoleManagementService();
+

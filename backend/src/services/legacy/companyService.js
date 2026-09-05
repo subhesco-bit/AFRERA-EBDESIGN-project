@@ -6,8 +6,8 @@
  * instead of requiring manual ID entry.
  */
 
-const { getPostgreSQL } = require('../../../database/connection');
-const { logger } = require('../../../utils/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { logger } = require('..\/utils\/logger');
 
 /**
  * List all active companies.
@@ -73,4 +73,5 @@ module.exports = {
   getFiscalYears,
   getChartOfAccounts,
 };
+
 

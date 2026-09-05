@@ -4,8 +4,8 @@
  * Inspired by AgriERP's AgriCompanion and next-gen agricultural AI systems
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 
 class AIAgenticCompanionService {
   constructor() {
@@ -858,4 +858,5 @@ class AIAgenticCompanionService {
 }
 
 module.exports = new AIAgenticCompanionService();
+
 

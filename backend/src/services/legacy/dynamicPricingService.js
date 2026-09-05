@@ -3,10 +3,10 @@
  * Local market-based and nutrient-based dynamic pricing
  */
 
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 const { aiAPI } = require('./aiService');
-const { authMiddleware } = require('../../../middleware/auth');
-const { mcda } = require('../../../core/mcda');
+const { authMiddleware } = require('..\/middleware\/auth');
+const { mcda } = require('..\/core\/mcda');
 
 /**
  * Calculate dynamic price based on local market conditions
@@ -435,7 +435,7 @@ function generateId() {
 // overbooking function below and there should not be one.
 // ===========================================================================
 
-const ymPool = require('../../../database/pool');
+const ymPool = require('..\/database\/pool');
 
 /**
  * Price a lot right now, given time remaining and how much is unsold.
@@ -1089,4 +1089,5 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M055 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M055/service"));
+
 

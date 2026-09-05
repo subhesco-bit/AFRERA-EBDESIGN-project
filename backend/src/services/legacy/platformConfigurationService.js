@@ -9,10 +9,10 @@
  * - Compliance checking automation
  */
 
-const DatabaseService = require('../../../database/connection');
+const DatabaseService = require('..\/database\/connection');
 const aiGatewayService = require('./aiGatewayService');
 const analyticsService = require('./analyticsService');
-const { logger } = require('../../../utils/logger');
+const { logger } = require('..\/utils\/logger');
 
 class PlatformConfigurationService {
   constructor() {
@@ -534,4 +534,5 @@ module.exports = new PlatformConfigurationService();
   const { ...rest } = m005;
   Object.assign(module.exports, rest);
 }
+
 

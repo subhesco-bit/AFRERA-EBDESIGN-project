@@ -18,9 +18,9 @@
  *  - ASSUMED_TARGET_MILK_FAT_PCT: target fat content for goat milk
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
-const { signalBus } = require('../../../core/signalBus');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
+const { signalBus } = require('..\/core\/signalBus');
 
 // ---- Assumed constants (not stored in the schema; goat farming standards)
 const ASSUMED_VACCINATION_INTERVAL_DAYS = 180; // biannual vaccination cycle
@@ -1056,4 +1056,5 @@ module.exports = {
   const { ...rest } = m073;
   Object.assign(module.exports, rest);
 }
+
 

@@ -4,8 +4,8 @@
  * Holds payments in escrow until delivery confirmation
  */
 
-const { logger } = require('../../../utils/logger');
-const pool = require('../../../database/pool');
+const { logger } = require('..\/utils\/logger');
+const pool = require('..\/database\/pool');
 
 /**
  * Create escrow transaction
@@ -336,4 +336,5 @@ module.exports = {
   getUserEscrowTransactions,
   setupRoutes
 };
+
 

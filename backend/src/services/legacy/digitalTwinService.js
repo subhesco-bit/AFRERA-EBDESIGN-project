@@ -5,8 +5,8 @@
  * Based on latest research in agricultural digital twins (2024-2025)
  */
 
-const { logger } = require('../../../utils/logger');
-const { getPostgreSQL } = require('../../../database/connection');
+const { logger } = require('..\/utils\/logger');
+const { getPostgreSQL } = require('..\/database\/connection');
 
 class DigitalTwinService {
   constructor() {
@@ -831,4 +831,5 @@ class DigitalTwinService {
 }
 
 module.exports = new DigitalTwinService();
+
 
