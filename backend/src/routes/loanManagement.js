@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 const loanManagementService = require('../services/loanManagementService');
 const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
-const { validateRequest } = require('../middleware/validation');
+const { validateBody: validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
 router.post('/loans/apply',
@@ -76,4 +76,5 @@ router.get('/loans/:id/payments', authenticateToken, async (req, res, next) => {
 });
 
 module.exports = router;
+
 

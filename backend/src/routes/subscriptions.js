@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const subscriptionService = require('../services/subscriptionService');
 const { authMiddleware: authenticateToken } = require('../middleware/auth');
-const { validateRequest } = require('../middleware/validation');
+const { validateBody: validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
 router.post('/subscriptions', authenticateToken, validateRequest({ body: { plan_id: 'string|required' } }), async (req, res, next) => {
@@ -34,4 +34,5 @@ router.delete('/subscriptions/:id', authenticateToken, async (req, res, next) =>
 });
 
 module.exports = router;
+
 
