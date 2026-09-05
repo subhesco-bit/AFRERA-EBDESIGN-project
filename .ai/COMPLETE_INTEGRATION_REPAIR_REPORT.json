@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-09-05T10:31:09.052Z",
-  "totalTime": 3874,
+  "timestamp": "2026-09-05T10:34:49.377Z",
+  "totalTime": 16651,
   "timeline": {
-    "discovery": 3825,
-    "repair": 15,
-    "validation": 30,
+    "discovery": 7113,
+    "repair": 29,
+    "validation": 9130,
     "enhancement": 1,
     "testing": 0
   },
@@ -7116,21 +7116,10 @@
         "severity": "high"
       }
     ],
-    "missing": [
-      {
-        "file": "backend\\src\\routes\\index.js",
-        "name": "index",
-        "varName": "index",
-        "type": "route_not_wired"
-      }
-    ]
+    "missing": []
   },
   "repair": {
     "successful": [
-      {
-        "type": "route_wiring",
-        "count": 1
-      },
       {
         "type": "index_file_creation",
         "count": 0

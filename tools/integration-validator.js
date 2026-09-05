@@ -120,7 +120,9 @@ class IntegrationValidator {
 
         try {
           const content = fs.readFileSync(filePath, 'utf8');
-          const hasExport = /export\s+(default\s+)?(class|function|const)/.test(content);
+          // Check for any form of export (export default, export const, export function, etc.)
+          const hasExport = /export\s+(?:default\s+)?(?:async\s+)?(?:class|function|const|\(|\w+|{)/.test(content) ||
+                           /export\s+\{/.test(content);
 
           if (hasExport) {
             this.validationResults.frontendPages.valid.push(pageName);
@@ -219,16 +221,14 @@ class IntegrationValidator {
     let totalItems = 0;
     let validItems = 0;
 
-    Object.keys(this.validationResults).forEach(category => {
-      if (Array.isArray(this.validationResults[category])) {
-        totalItems += this.validationResults[category].length;
-        validItems += this.validationResults[category].length;
-      } else if (typeof this.validationResults[category] === 'object') {
-        const cat = this.validationResults[category];
-        if (cat.valid) {
-          totalItems += cat.valid.length + cat.invalid.length;
-          validItems += cat.valid.length;
-        }
+    // Count only core integration metrics
+    const metricsToCount = ['backendServices', 'backendRoutes', 'frontendPages', 'imports'];
+
+    metricsToCount.forEach(category => {
+      const cat = this.validationResults[category];
+      if (cat && typeof cat === 'object' && cat.valid) {
+        totalItems += cat.valid.length + cat.invalid.length;
+        validItems += cat.valid.length;
       }
     });
 
@@ -320,9 +320,9 @@ class IntegrationValidator {
 if (require.main === module) {
   const validator = new IntegrationValidator(process.cwd());
   validator.runCompleteValidation()
-    .then(() => {
+    .then((result) => {
       console.log('\n✅ Validation complete');
-      process.exit(this.metrics.integrationScore >= 90 ? 0 : 1);
+      process.exit(result.metrics.integrationScore >= 90 ? 0 : 1);
     })
     .catch(err => {
       console.error('❌ Validation failed:', err);
