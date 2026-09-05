@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const buyerTrustService = require('../services/buyerTrustService');
-const { authenticateToken } = require('../middleware/auth');
+const { authMiddleware: authenticateToken } = require('../middleware/auth');
 const { validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
@@ -95,3 +95,4 @@ router.post('/buyers/:id/fraud-report',
 );
 
 module.exports = router;
+

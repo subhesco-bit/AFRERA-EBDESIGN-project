@@ -8,7 +8,7 @@
 
 const express = require('express');
 const sellerVerificationService = require('../services/sellerVerificationService');
-const { authenticateToken, authorize } = require('../middleware/auth');
+const { authMiddleware: authenticateToken, requireRole: authorize } = require('../middleware/auth');
 const { validateRequest } = require('../middleware/validation');
 const logger = require('../utils/logger');
 
@@ -155,3 +155,4 @@ router.post('/admin/sellers/:id/verify/reject',
 );
 
 module.exports = router;
+
