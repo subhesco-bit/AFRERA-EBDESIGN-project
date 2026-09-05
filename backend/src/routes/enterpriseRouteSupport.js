@@ -107,6 +107,11 @@ function requireHumanAuthorization(req, res, next) {
 }
 
 const router = express.Router();
-const routes = { protectRouter, requireHumanAuthorization, correlationId, fail };
-Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
-module.exports = router;
+
+module.exports = {
+  router,
+  protectRouter,
+  requireHumanAuthorization,
+  correlationId,
+  fail
+};

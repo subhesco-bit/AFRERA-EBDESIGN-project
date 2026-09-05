@@ -68,6 +68,18 @@ function queryValidator(validate) {
 }
 
 const router = express.Router();
-const routes = { requestId, fail, invalid, validateId, parsePageQuery, date, dateTime, enumValue, numberValue, bodyValidator, queryValidator };
-Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
-module.exports = router;
+
+module.exports = {
+  router,
+  requestId,
+  fail,
+  invalid,
+  validateId,
+  parsePageQuery,
+  date,
+  dateTime,
+  enumValue,
+  numberValue,
+  bodyValidator,
+  queryValidator
+};
