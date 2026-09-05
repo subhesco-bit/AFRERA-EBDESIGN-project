@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class WarehouseManagementService {
   async createWarehouse(data) {
+  // Validate inputs
+  if (!data) throw new Error('Missing required parameter');
+
     try {
       const id = require('uuid').v4();
       await db('warehouses').insert({ id, name: data.name, location: data.location, capacity: data.capacity, created_at: new Date() });

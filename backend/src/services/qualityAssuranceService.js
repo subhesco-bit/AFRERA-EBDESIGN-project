@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class QualityAssuranceService {
   async inspectProduct(productId, inspectionData) {
+  // Validate inputs
+  if (!productId) throw new Error('Missing required parameter');
+
     try {
       const result = inspectionData.quality_score >= 80 ? 'pass' : 'fail';
       const id = require('uuid').v4();

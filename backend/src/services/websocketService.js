@@ -16,6 +16,9 @@ class WebSocketService {
    * Attach an existing Socket.IO server (avoids a second Server on the same HTTP port).
    */
   attach(io) {
+  // Validate inputs
+  if (!io) throw new Error('Missing required parameter');
+
     this.io = io;
     this.setupEventHandlers();
     return this.io;

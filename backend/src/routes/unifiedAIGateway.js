@@ -4,6 +4,8 @@
  */
 
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 // Import Claude AI Coordinator (NEW unified endpoint)
@@ -53,7 +55,9 @@ router.use(authenticate);
 // HEALTH CHECK - Unified system health
 // ============================================================================
 
-router.get('/health', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -194,7 +198,9 @@ router.use('/transactions', transactionRoutes);
 // SMART ROUTING - Automatic routing to appropriate service
 // ============================================================================
 
-router.post('/route', async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/route', async (req, res) => {
   try {
     const { requestType, query, context, options } = req.body;
     
@@ -328,7 +334,9 @@ function getAlternativeEndpoints(requestType) {
 // SERVICE DISCOVERY - List all available AI services
 // ============================================================================
 
-router.get('/services', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/services', (req, res) => {
   res.json({
     services: {
       coordinator: {
@@ -408,7 +416,9 @@ router.get('/services', (req, res) => {
 // ARCHITECTURE INFO - System architecture information
 // ============================================================================
 
-router.get('/architecture', (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/architecture', (req, res) => {
   res.json({
     name: 'Unified AI Gateway',
     version: '2.0.0',

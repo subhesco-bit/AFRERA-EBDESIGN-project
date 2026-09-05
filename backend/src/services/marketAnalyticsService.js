@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class MarketAnalyticsService {
   async analyzeMarket(productId) {
+  // Validate inputs
+  if (!productId) throw new Error('Missing required parameter');
+
     try {
       const prices = await db('price_history').where('product_id', productId).orderBy('created_at', 'desc').limit(30);
       const avgPrice = prices.length ? prices.reduce((sum, p) => sum + p.price, 0) / prices.length : 0;

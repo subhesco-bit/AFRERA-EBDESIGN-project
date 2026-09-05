@@ -24,6 +24,9 @@ class TransactionService {
    * Create a new transaction
    */
   async createTransaction(transactionData) {
+  // Validate inputs
+  if (!transactionData) throw new Error('Missing required parameter');
+
     const {
       userId,
       type,

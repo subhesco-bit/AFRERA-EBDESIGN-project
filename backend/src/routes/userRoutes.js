@@ -1,4 +1,6 @@
 const express = require('express');
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 /**
@@ -39,7 +41,9 @@ function getProfile(userId) {
 }
 
 // GET /users/profile
-router.get('/profile', verifyToken, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/profile', verifyToken, async (req, res) => {
   try {
     const profile = getProfile(req.userId);
 
@@ -53,7 +57,9 @@ router.get('/profile', verifyToken, async (req, res) => {
 });
 
 // PUT /users/profile
-router.put('/profile', verifyToken, async (req, res) => {
+router.put
+    // Log request
+    logger.debug('router.put request');('/profile', verifyToken, async (req, res) => {
   try {
     const profile = getProfile(req.userId);
     const { name, phone, profilePic, preferences } = req.body;
@@ -76,7 +82,9 @@ router.put('/profile', verifyToken, async (req, res) => {
 });
 
 // GET /users/addresses
-router.get('/addresses', verifyToken, async (req, res) => {
+router.get
+    // Log request
+    logger.debug('router.get request');('/addresses', verifyToken, async (req, res) => {
   try {
     const profile = getProfile(req.userId);
 
@@ -93,7 +101,9 @@ router.get('/addresses', verifyToken, async (req, res) => {
 });
 
 // POST /users/addresses
-router.post('/addresses', verifyToken, async (req, res) => {
+router.post
+    // Log request
+    logger.debug('router.post request');('/addresses', verifyToken, async (req, res) => {
   try {
     const { street, city, state, zipCode, country, isDefault } = req.body;
 

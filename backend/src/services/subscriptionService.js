@@ -4,6 +4,9 @@ const { ValidationError, NotFoundError } = require('../utils/errors');
 
 class SubscriptionService {
   async createSubscription(userId, planId) {
+  // Validate inputs
+  if (!userId) throw new Error('Missing required parameter');
+
     try {
       const subId = require('uuid').v4();
       const sub = await db('subscriptions').insert({

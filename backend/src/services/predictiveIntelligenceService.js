@@ -62,6 +62,9 @@ class PredictiveIntelligenceService {
    * Predict optimal pricing
    */
   async predictOptimalPricing(cropType, region, qualityGrade) {
+  // Validate inputs
+  if (!cropType) throw new Error('Missing required parameter');
+
     try {
       const marketData = await this.getMarketPricingData(cropType, region, 60);
       

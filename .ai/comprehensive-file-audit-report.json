@@ -1,0 +1,1829 @@
+{
+  "totalFiles": 2155,
+  "skeletonFiles": [
+    {
+      "file": "frontend\\src\\pages\\index.js",
+      "lines": 1,
+      "reason": "Minimal stub with no functional code"
+    },
+    {
+      "file": "frontend\\src\\pages\\index.js",
+      "lines": 1,
+      "reason": "File contains only comments"
+    },
+    {
+      "file": "frontend\\src\\components\\index.js",
+      "lines": 1,
+      "reason": "Minimal stub with no functional code"
+    },
+    {
+      "file": "frontend\\src\\components\\index.js",
+      "lines": 1,
+      "reason": "File contains only comments"
+    }
+  ],
+  "prototypeFiles": [
+    {
+      "file": "backend\\src\\utils\\statistics.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\utils\\productionGates.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\tests\\setup.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\test-mocks\\pg.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\predictiveIntelligenceService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\paymentService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\paymentGatewayService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\notificationService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\jobQueueService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\etlService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\batchProcessingService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\advancedVoiceAI.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\strategic\\preSeasonPurchaseService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\strategic\\governmentSubsidyService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\strategic\\contractFarmingService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\whatsappService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\weatherService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\valueCommerceService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\soilTestingService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\smsAuthService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\shelfLifeService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\sharedInfraService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\revenueService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\resourceCrudFactory.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\recipeIntelligenceService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\realtimeMonitoringService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\predictiveAnalyticsService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\platformTelemetryService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\orderService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\omnichannelAIService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\nutritionIntelligenceService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\multilingualService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\knowledgeGraphService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\iotIntegrationService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\hrService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\giIntelligenceService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\formService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\foodIntelligenceService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\erpService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\engineeringProjectService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\digitalTwinService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\digitalProductPassportService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\demandService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\costService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\consumerHealthService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\completeAIIntegrationService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\bulkOrderService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\blockchainTraceabilityService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\biodiversityService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\analyticsService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\analyticsMonitoringService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\aiService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\aiOrchestrationService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\aiGatewayService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\aiAgenticCompanionService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\dual-use\\platformCoreService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\dual-use\\mfaService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\dual-use\\authService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\claude\\productAIService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\claude\\logisticsAIService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\claude\\insuranceAIService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\claude\\financialAIService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\services\\claude\\aiCoordinationService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\vendorRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\productRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\hrRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\foodRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\enterpriseAIRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\energyRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\cropPlanningRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\authRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\routes\\dual-use\\mfaRoutes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M141\\routes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M132\\routes.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M132\\controller.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M127\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M123\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M122\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M110\\index.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M087\\index.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M080\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M079\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M078\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M077\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M076\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M069\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M026\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M020\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M014\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M010\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\modules\\M005\\service.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\middleware\\requestLogger.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\middleware\\dual-use\\mfaMiddleware.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\database\\seed.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\database\\pool.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\database\\connection.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\database\\advanced_pool.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\database\\migrations\\enhanced_migrate.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\core\\productionService.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\core\\businessCell.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\core\\aiOrchestrator.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "backend\\src\\core\\ai\\aiOrchestratorCore.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\test\\components\\ErrorBoundary.test.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\YieldManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\WhatGrowPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\WeatherAnalyticsPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\WaterManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\WalletPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\VillageRegistryPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\VarietyDirectoryPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\TransactionHistoryPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\TractorManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SustainabilityDashboardPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SubsidyManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SowingManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SoilManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ShgManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SheepFarmingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SharedInfraPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SellerProductFormPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SeedVaultPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SeedPlanningPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SAPModuleArchitecturePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\SalesReportPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ResearchDashboardPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ResearchAndDevelopmentPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\RegisterPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\RealtimeMonitoringPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ProjectSystemsPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ProductDetailPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PriceCheckPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PriceBuildPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PreOrderPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PremiumMarketplacePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PredictiveIntelligencePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PoultryManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PlatformManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PigFarmingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PaymentProcessingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\PaymentGatewayPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\OperationsReportPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\OperationsManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\NutrientValueMarketplace.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\NurseryManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\NervousSystemPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ModuleHubPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\MarketSignalsPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\MarketplacePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\MarketingCenter.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\MachineryManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LogisticsProviderPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LogisticsPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LogisticsMatchingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LogisticsEnhancementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LoginPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LoanManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LivestockManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LandUseCarbonPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LandRegistryPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\LandManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\KnowledgeBasePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\InventoryReportPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\InsuranceManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\InputSupplyManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\InformationSharingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\IdentityManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\HorticultureManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\HomePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\HarvestPlanPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\GoatFarmingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FormManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FisheriesManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FinancialReportPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FertilizerInventoryPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerVerificationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerSkillPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerSellPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerRevenueLedgerPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerReportPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerProfilePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerHealthWelfarePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerFieldPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmerFamilyPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmCostingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\FarmAdvisorPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EscrowPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ERPDashboard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EnterpriseIntegrationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EnterpriseControlPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EnterpriseAIPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EngineeringProjectPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EMICalculatorPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EcommerceMarketplacePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\EcommerceIntegrationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DynamicPricingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DisruptionPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DiscoverPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DigitalTwinPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DietRecipesPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DefenseFitnessPrepPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DecisionSupportPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\DairyManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CropVarietyPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CropRegistrationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CropMonitoringPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CropCalendarPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CostControlPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CorridorEconomicsPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CorporateBuyerPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CooperativeSharePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ContractListingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ContractFarmingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ComprehensiveERPPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CompliancePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CompleteERPIntegrationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CompleteAIIntegrationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CommunityManagementPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CommunityForumPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ColdStoragePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ClimateMonitoringPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\ClimateAdvisoryPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\CheckoutPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\BulkPurchasePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\BulkOrderPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\BlockchainVerificationPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\B2BMarketplace.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AssetAccountingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AnimalHealthPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AISelfHealingPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AIOperationIntelligencePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AIDashboard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AIBrainPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AIBackbonePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AIAgentPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AgriculturalIntelligencePage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\AdvancedSearchPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\government\\GovernmentSchemeDashboard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\Generated\\Page3.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\Generated\\Page1.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\pages\\analytics\\AdvancedAnalyticsDashboard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\modules\\criticalModules.test.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\modules\\M072\\M072Page.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\modules\\M027\\M027Page.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\modules\\M016\\M016Page.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\modules\\M011\\M011Page.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\PlaceholderPage.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\Header.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\AIImageGenerator.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\ui\\textarea.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\ui\\select.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\ui\\input.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\ui\\common.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\PredictiveAnalytics\\DemandForecast.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\OrganicTraceability\\QRCodeScanner.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\OrganicTraceability\\OrganicFarmRegistration.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\Modals\\InputModal.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\MFA\\MFASetup.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\Marketplace\\ProductReview.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\Marketplace\\GSTCalculator.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\Library\\LibraryBrowser.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\LaboratoryERP\\SampleRegistration.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\KnowledgeGraph\\KnowledgeExplorer.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\GIIntelligence\\GIProductCard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\forms\\RegisterForm.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\forms\\LoginForm.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\forms\\FormPreviewPanel.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\forms\\FormBuilderPanel.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\forms\\EnhancedFormValidator.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\Display\\WalletCard.test.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\ConversationalAI\\ChatInterface.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\common\\ResourceManager.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\common\\ModuleOperationPanel.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\common\\DataPrimitives.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\common\\ActionCard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\ArVr\\ExperienceViewer.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\AI\\CopilotChat.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\AI\\AICollaborationDashboard.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\AI\\AIChat.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\components\\AdvancedUIPatterns\\AdvancedUIPatterns.jsx",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\test\\setup.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\test\\e2eHelpers.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\services\\api.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "frontend\\src\\hooks\\useResponsive.js",
+      "reason": "Contains stub/placeholder implementation"
+    },
+    {
+      "file": "_EBDESIGN_LIBRARY\\25_DISCOVERY_INDEX\\full-system-audit.md",
+      "reason": "Contains stub/placeholder implementation"
+    }
+  ],
+  "incompleteFiles": [
+    {
+      "file": "backend\\src\\services\\jobService.js",
+      "todos": 7,
+      "reason": "7 TODO/FIXME comments"
+    },
+    {
+      "file": "backend\\src\\services\\legacy\\whatsappService.js",
+      "todos": 3,
+      "reason": "3 TODO/FIXME comments"
+    },
+    {
+      "file": "backend\\src\\routes\\userRoutes.js",
+      "todos": 3,
+      "reason": "3 TODO/FIXME comments"
+    },
+    {
+      "file": "backend\\src\\routes\\platformCoreRoutes.js",
+      "reason": "Contains NotImplementedError"
+    },
+    {
+      "file": "backend\\src\\routes\\logisticsEnhancementRoutes.js",
+      "reason": "Contains NotImplementedError"
+    },
+    {
+      "file": "backend\\src\\routes\\enterpriseAIRoutes.js",
+      "reason": "Contains NotImplementedError"
+    },
+    {
+      "file": "backend\\src\\routes\\aiGatewayRoutes.js",
+      "reason": "Contains NotImplementedError"
+    },
+    {
+      "file": "backend\\src\\core\\serviceAuditAndEnhancement.js",
+      "todos": 3,
+      "reason": "3 TODO/FIXME comments"
+    },
+    {
+      "file": "backend\\src\\core\\businessCell.js",
+      "reason": "Contains NotImplementedError"
+    },
+    {
+      "file": "frontend\\src\\pages\\SubsidyManagementPage.jsx",
+      "todos": 4,
+      "reason": "4 TODO/FIXME comments"
+    }
+  ],
+  "orphanedFiles": [
+    {
+      "file": "backend\\src\\routes\\ORPHANED_SERVICES_MOUNT.js",
+      "reason": "No imports or exports, may be unused"
+    }
+  ],
+  "missingIntegration": [],
+  "productionReady": [
+    "backend\\src\\index.js",
+    "backend\\src\\websocket\\socketServer.js",
+    "backend\\src\\utils\\testFallbackStore.js",
+    "backend\\src\\utils\\productionGates.js",
+    "backend\\src\\utils\\logger.js",
+    "backend\\src\\tests\\setup.js",
+    "backend\\src\\services\\websocketService.js",
+    "backend\\src\\services\\weatherAdvisoryService.js",
+    "backend\\src\\services\\walletService.js",
+    "backend\\src\\services\\transactionService.js",
+    "backend\\src\\services\\sellerVerificationService.js",
+    "backend\\src\\services\\redisCacheService.js",
+    "backend\\src\\services\\productionExampleService.js",
+    "backend\\src\\services\\productCertificationService.js",
+    "backend\\src\\services\\predictiveIntelligenceService.js",
+    "backend\\src\\services\\paymentService.js",
+    "backend\\src\\services\\paymentGatewayService.js",
+    "backend\\src\\services\\notificationService.js",
+    "backend\\src\\services\\loggingService.js",
+    "backend\\src\\services\\loanManagementService.js",
+    "backend\\src\\services\\jobService.js",
+    "backend\\src\\services\\jobQueueService.js",
+    "backend\\src\\services\\iotIntegrationService.js",
+    "backend\\src\\services\\etlService.js",
+    "backend\\src\\services\\enterpriseIntegrationService.js",
+    "backend\\src\\services\\digitalTwinService.js",
+    "backend\\src\\services\\dataValidationService.js",
+    "backend\\src\\services\\cacheService.js",
+    "backend\\src\\services\\buyerTrustService.js",
+    "backend\\src\\services\\blockchainVerificationService.js",
+    "backend\\src\\services\\batchProcessingService.js",
+    "backend\\src\\services\\auditService.js",
+    "backend\\src\\services\\aiAgentService.js",
+    "backend\\src\\services\\advancedVoiceAI.js",
+    "backend\\src\\services\\advancedAnalyticsService.js",
+    "backend\\src\\services\\strategic\\preSeasonPurchaseService.js",
+    "backend\\src\\services\\strategic\\householdProcurementService.js",
+    "backend\\src\\services\\strategic\\governmentSubsidyService.js",
+    "backend\\src\\services\\strategic\\contractFarmingService.js",
+    "backend\\src\\services\\legacy\\wikipediaService.js",
+    "backend\\src\\services\\legacy\\whatsappService.js",
+    "backend\\src\\services\\legacy\\weatherService.js",
+    "backend\\src\\services\\legacy\\wearableIntegrationService.js",
+    "backend\\src\\services\\legacy\\voiceAIService.js",
+    "backend\\src\\services\\legacy\\visionService.js",
+    "backend\\src\\services\\legacy\\villageProfileService.js",
+    "backend\\src\\services\\legacy\\valueCommerceService.js",
+    "backend\\src\\services\\legacy\\v42IntelligenceService.js",
+    "backend\\src\\services\\legacy\\tenantManagementService.js",
+    "backend\\src\\services\\legacy\\systemAdministrationService.js",
+    "backend\\src\\services\\legacy\\subsidyService.js",
+    "backend\\src\\services\\legacy\\soilTestingService.js",
+    "backend\\src\\services\\legacy\\smsAuthService.js",
+    "backend\\src\\services\\legacy\\shelfLifeService.js",
+    "backend\\src\\services\\legacy\\sheepService.js",
+    "backend\\src\\services\\legacy\\sharedInfrastructureService.js",
+    "backend\\src\\services\\legacy\\sharedInfraService.js",
+    "backend\\src\\services\\legacy\\sellerRankingService.js",
+    "backend\\src\\services\\legacy\\sapModuleArchitectureService.js",
+    "backend\\src\\services\\legacy\\ruralFinanceService.js",
+    "backend\\src\\services\\legacy\\ruralEnterpriseService.js",
+    "backend\\src\\services\\legacy\\roleManagementService.js",
+    "backend\\src\\services\\legacy\\riskPricingService.js",
+    "backend\\src\\services\\legacy\\revenueService.js",
+    "backend\\src\\services\\legacy\\resourceCrudFactory.js",
+    "backend\\src\\services\\legacy\\renewableEnergyService.js",
+    "backend\\src\\services\\legacy\\regionalVarietyService.js",
+    "backend\\src\\services\\legacy\\recoveredFinanceService.js",
+    "backend\\src\\services\\legacy\\recipeIntelligenceService.js",
+    "backend\\src\\services\\legacy\\realtimeMonitoringService.js",
+    "backend\\src\\services\\legacy\\projectSystemsService.js",
+    "backend\\src\\services\\legacy\\productService.js",
+    "backend\\src\\services\\legacy\\productReviewService.js",
+    "backend\\src\\services\\legacy\\productMediaAIService.js",
+    "backend\\src\\services\\legacy\\procurementSubscriptionService.js",
+    "backend\\src\\services\\legacy\\preSeasonOrderService.js",
+    "backend\\src\\services\\legacy\\predictiveAnalyticsService.js",
+    "backend\\src\\services\\legacy\\poultryService.js",
+    "backend\\src\\services\\legacy\\platformTelemetryService.js",
+    "backend\\src\\services\\legacy\\platformConfigurationService.js",
+    "backend\\src\\services\\legacy\\pigService.js",
+    "backend\\src\\services\\legacy\\organizationManagementService.js",
+    "backend\\src\\services\\legacy\\organicTraceabilityService.js",
+    "backend\\src\\services\\legacy\\orderService.js",
+    "backend\\src\\services\\legacy\\omnichannelAIService.js",
+    "backend\\src\\services\\legacy\\offlineSyncService.js",
+    "backend\\src\\services\\legacy\\offlinePaymentService.js",
+    "backend\\src\\services\\legacy\\ocrService.js",
+    "backend\\src\\services\\legacy\\nutritionIntelligenceService.js",
+    "backend\\src\\services\\legacy\\nutrientValueSalesService.js",
+    "backend\\src\\services\\legacy\\neProductIntelligenceService.js",
+    "backend\\src\\services\\legacy\\multilingualService.js",
+    "backend\\src\\services\\legacy\\moduleCatalogService.js",
+    "backend\\src\\services\\legacy\\mobilityRidesService.js",
+    "backend\\src\\services\\legacy\\millCircuitService.js",
+    "backend\\src\\services\\legacy\\merchandisingService.js",
+    "backend\\src\\services\\legacy\\marketIntelligenceService.js",
+    "backend\\src\\services\\legacy\\marketDataService.js",
+    "backend\\src\\services\\legacy\\marketAccessService.js",
+    "backend\\src\\services\\legacy\\machineryAccessService.js",
+    "backend\\src\\services\\legacy\\logisticsService.js",
+    "backend\\src\\services\\legacy\\logisticsEnhancementService.js",
+    "backend\\src\\services\\legacy\\libraryKnowledgeService.js",
+    "backend\\src\\services\\legacy\\landRecordsService.js",
+    "backend\\src\\services\\legacy\\laboratoryERPService.js",
+    "backend\\src\\services\\legacy\\knowledgeService.js",
+    "backend\\src\\services\\legacy\\knowledgeGraphService.js",
+    "backend\\src\\services\\legacy\\iotSensorService.js",
+    "backend\\src\\services\\legacy\\iotIntegrationService.js",
+    "backend\\src\\services\\legacy\\insuranceService.js",
+    "backend\\src\\services\\legacy\\insurancePremiumService.js",
+    "backend\\src\\services\\legacy\\insurancePolicyIssuanceService.js",
+    "backend\\src\\services\\legacy\\insuranceFraudDetectionService.js",
+    "backend\\src\\services\\legacy\\insuranceClaimsService.js",
+    "backend\\src\\services\\legacy\\institutionalProcurementService.js",
+    "backend\\src\\services\\legacy\\informationSharingService.js",
+    "backend\\src\\services\\legacy\\indigenousKnowledgeService.js",
+    "backend\\src\\services\\legacy\\hrService.js",
+    "backend\\src\\services\\legacy\\householdEconomyService.js",
+    "backend\\src\\services\\legacy\\gstService.js",
+    "backend\\src\\services\\legacy\\greenhouseService.js",
+    "backend\\src\\services\\legacy\\governmentSchemeService.js",
+    "backend\\src\\services\\legacy\\governanceService.js",
+    "backend\\src\\services\\legacy\\goatService.js",
+    "backend\\src\\services\\legacy\\glutWarningService.js",
+    "backend\\src\\services\\legacy\\giIntelligenceService.js",
+    "backend\\src\\services\\legacy\\geofencingService.js",
+    "backend\\src\\services\\legacy\\freightPoolingService.js",
+    "backend\\src\\services\\legacy\\formService.js",
+    "backend\\src\\services\\legacy\\foodSafetyService.js",
+    "backend\\src\\services\\legacy\\foodIntelligenceService.js",
+    "backend\\src\\services\\legacy\\foluBenchmarkService.js",
+    "backend\\src\\services\\legacy\\financialService.js",
+    "backend\\src\\services\\legacy\\fertilizerInventoryService.js",
+    "backend\\src\\services\\legacy\\farmerValueService.js",
+    "backend\\src\\services\\legacy\\farmerTrainingService.js",
+    "backend\\src\\services\\legacy\\farmerService.js",
+    "backend\\src\\services\\legacy\\experienceLayerService.js",
+    "backend\\src\\services\\legacy\\escrowService.js",
+    "backend\\src\\services\\legacy\\erpService.js",
+    "backend\\src\\services\\legacy\\enterpriseMemoryService.js",
+    "backend\\src\\services\\legacy\\enterpriseControlService.js",
+    "backend\\src\\services\\legacy\\engineeringProjectService.js",
+    "backend\\src\\services\\legacy\\ecommerceService.js",
+    "backend\\src\\services\\legacy\\ecommerceMarketingService.js",
+    "backend\\src\\services\\legacy\\ecommerceIntegrationService.js",
+    "backend\\src\\services\\legacy\\ecommerceERPService.js",
+    "backend\\src\\services\\legacy\\ecommerceBusinessSalesService.js",
+    "backend\\src\\services\\legacy\\ecommerceAIService.js",
+    "backend\\src\\services\\legacy\\dynamicPricingService.js",
+    "backend\\src\\services\\legacy\\dprGenerationService.js",
+    "backend\\src\\services\\legacy\\digitalTwinService.js",
+    "backend\\src\\services\\legacy\\digitalProductPassportService.js",
+    "backend\\src\\services\\legacy\\demandService.js",
+    "backend\\src\\services\\legacy\\decisionSupportService.js",
+    "backend\\src\\services\\legacy\\dairyService.js",
+    "backend\\src\\services\\legacy\\custodyEventService.js",
+    "backend\\src\\services\\legacy\\custodyEventRoutes.js",
+    "backend\\src\\services\\legacy\\cropValueResearchService.js",
+    "backend\\src\\services\\legacy\\cropPlanningService.js",
+    "backend\\src\\services\\legacy\\costControlService.js",
+    "backend\\src\\services\\legacy\\cooperativeShareService.js",
+    "backend\\src\\services\\legacy\\conversationalAIService.js",
+    "backend\\src\\services\\legacy\\consumerHealthService.js",
+    "backend\\src\\services\\legacy\\comprehensiveERPService.js",
+    "backend\\src\\services\\legacy\\complianceService.js",
+    "backend\\src\\services\\legacy\\completeERPIntegrationService.js",
+    "backend\\src\\services\\legacy\\completeAIIntegrationService.js",
+    "backend\\src\\services\\legacy\\companyService.js",
+    "backend\\src\\services\\legacy\\commerceRulesService.js",
+    "backend\\src\\services\\legacy\\coldStorageService.js",
+    "backend\\src\\services\\legacy\\civilDisruptionService.js",
+    "backend\\src\\services\\legacy\\catalogIntelligenceService.js",
+    "backend\\src\\services\\legacy\\buyingClubService.js",
+    "backend\\src\\services\\legacy\\bulkOrderService.js",
+    "backend\\src\\services\\legacy\\blockchainTraceabilityService.js",
+    "backend\\src\\services\\legacy\\biodiversityService.js",
+    "backend\\src\\services\\legacy\\backupService.js",
+    "backend\\src\\services\\legacy\\auditService.js",
+    "backend\\src\\services\\legacy\\assetAccountingService.js",
+    "backend\\src\\services\\legacy\\arVrService.js",
+    "backend\\src\\services\\legacy\\animalHealthService.js",
+    "backend\\src\\services\\legacy\\analyticsService.js",
+    "backend\\src\\services\\legacy\\analyticsMonitoringService.js",
+    "backend\\src\\services\\legacy\\aiService.js",
+    "backend\\src\\services\\legacy\\aiSelfHealingService.js",
+    "backend\\src\\services\\legacy\\aiOperationIntelligenceService.js",
+    "backend\\src\\services\\legacy\\aiGatewayService.js",
+    "backend\\src\\services\\legacy\\aiCopilotService.js",
+    "backend\\src\\services\\legacy\\aiBrainService.js",
+    "backend\\src\\services\\legacy\\aiBackboneService.js",
+    "backend\\src\\services\\legacy\\aiAgenticCompanionService.js",
+    "backend\\src\\services\\legacy\\aiAdvisoryService.js",
+    "backend\\src\\services\\legacy\\agriculturalIntelligenceService.js",
+    "backend\\src\\services\\legacy\\advancedFeaturesService.js",
+    "backend\\src\\services\\legacy\\advancedAIService.js",
+    "backend\\src\\services\\dual-use\\platformCoreService.js",
+    "backend\\src\\services\\dual-use\\mfaService.js",
+    "backend\\src\\services\\dual-use\\gdprService.js",
+    "backend\\src\\services\\dual-use\\authService.js",
+    "backend\\src\\services\\claude\\unifiedConfigService.js",
+    "backend\\src\\services\\claude\\productAIService.js",
+    "backend\\src\\services\\claude\\orderAIService.js",
+    "backend\\src\\services\\claude\\logisticsAIService.js",
+    "backend\\src\\services\\claude\\insuranceAIService.js",
+    "backend\\src\\services\\claude\\financialAIService.js",
+    "backend\\src\\services\\claude\\enhancedLibraryKnowledgeService.js",
+    "backend\\src\\services\\claude\\aiStrategyService.js",
+    "backend\\src\\services\\claude\\aiRecoveryService.js",
+    "backend\\src\\services\\claude\\aiProviderService.js",
+    "backend\\src\\services\\claude\\aiOptimizationService.js",
+    "backend\\src\\services\\claude\\aiDecisionService.js",
+    "backend\\src\\services\\claude\\aiCopilotService.js",
+    "backend\\src\\services\\claude\\aiCoordinationService.js",
+    "backend\\src\\services\\claude\\aiAgentService.js",
+    "backend\\src\\routes\\weatherRoutes.js",
+    "backend\\src\\routes\\weatherAdvisory.js",
+    "backend\\src\\routes\\waterManagementRoutes.js",
+    "backend\\src\\routes\\vendorRoutes.js",
+    "backend\\src\\routes\\userRoutes.js",
+    "backend\\src\\routes\\unifiedAIRoutes.js",
+    "backend\\src\\routes\\unifiedAIGateway.js",
+    "backend\\src\\routes\\tenantManagementRoutes.js",
+    "backend\\src\\routes\\systemAdministrationRoutes.js",
+    "backend\\src\\routes\\subscriptions.js",
+    "backend\\src\\routes\\soilManagementRoutes.js",
+    "backend\\src\\routes\\sheepRoutes.js",
+    "backend\\src\\routes\\sellerVerifications.js",
+    "backend\\src\\routes\\sapModuleArchitectureRoutes.js",
+    "backend\\src\\routes\\recoveredFinanceRoutes.js",
+    "backend\\src\\routes\\realtimeMonitoringRoutes.js",
+    "backend\\src\\routes\\productRoutes.js",
+    "backend\\src\\routes\\productCertifications.js",
+    "backend\\src\\routes\\preventiveMaintenanceRoutes.js",
+    "backend\\src\\routes\\predictiveIntelligenceRoutes.js",
+    "backend\\src\\routes\\poultryRoutes.js",
+    "backend\\src\\routes\\platformCoreRoutes.js",
+    "backend\\src\\routes\\platformConfigurationRoutes.js",
+    "backend\\src\\routes\\pigRoutes.js",
+    "backend\\src\\routes\\organizationManagementRoutes.js",
+    "backend\\src\\routes\\orderRoutes.js",
+    "backend\\src\\routes\\operationsRouteSupport.js",
+    "backend\\src\\routes\\operationsManagementRoutes.js",
+    "backend\\src\\routes\\marketplaceEnhancements.js",
+    "backend\\src\\routes\\m400AiBackboneRoutes.js",
+    "backend\\src\\routes\\logisticsEnhancementRoutes.js",
+    "backend\\src\\routes\\loanManagement.js",
+    "backend\\src\\routes\\livestockRouteSupport.js",
+    "backend\\src\\routes\\landRecordsRoutes.js",
+    "backend\\src\\routes\\knowledgeRoutes.js",
+    "backend\\src\\routes\\iotIntegrationRoutes.js",
+    "backend\\src\\routes\\informationSharingRoutes.js",
+    "backend\\src\\routes\\healthRoutes.js",
+    "backend\\src\\routes\\gstRoutes.js",
+    "backend\\src\\routes\\goatRoutes.js",
+    "backend\\src\\routes\\glutWarningRoutes.js",
+    "backend\\src\\routes\\geofencingRoutes.js",
+    "backend\\src\\routes\\foodRoutes.js",
+    "backend\\src\\routes\\farmerRoutes.js",
+    "backend\\src\\routes\\farmerPortalEnhancements.js",
+    "backend\\src\\routes\\farmerHealthRoutes.js",
+    "backend\\src\\routes\\experienceRoutes.js",
+    "backend\\src\\routes\\equipmentExchangeRoutes.js",
+    "backend\\src\\routes\\enterpriseRouteSupport.js",
+    "backend\\src\\routes\\enterpriseIntegrationRoutes.js",
+    "backend\\src\\routes\\enterpriseAIRoutes.js",
+    "backend\\src\\routes\\digitalTwinRoutes.js",
+    "backend\\src\\routes\\decisionSupportRoutes.js",
+    "backend\\src\\routes\\dashboardRoutes.js",
+    "backend\\src\\routes\\dairyRoutes.js",
+    "backend\\src\\routes\\companyRoutes.js",
+    "backend\\src\\routes\\coldStorageRoutes.js",
+    "backend\\src\\routes\\climateRouteSupport.js",
+    "backend\\src\\routes\\climateMonitoringRoutes.js",
+    "backend\\src\\routes\\climateAdvisoryRoutes.js",
+    "backend\\src\\routes\\civilDisruptionRoutes.js",
+    "backend\\src\\routes\\buyerTrust.js",
+    "backend\\src\\routes\\blockchainVerificationRoutes.js",
+    "backend\\src\\routes\\authRoutes.js",
+    "backend\\src\\routes\\animalHealthRoutes.js",
+    "backend\\src\\routes\\aiSelfHealingRoutes.js",
+    "backend\\src\\routes\\aiOperationIntelligenceRoutes.js",
+    "backend\\src\\routes\\aiBrainRoutes.js",
+    "backend\\src\\routes\\aiAgentRoutes.js",
+    "backend\\src\\routes\\agriculturalIntelligenceRoutes.js",
+    "backend\\src\\routes\\advancedAnalyticsRoutes.js",
+    "backend\\src\\routes\\dual-use\\mfaRoutes.js",
+    "backend\\src\\routes\\dual-use\\gdprRoutes.js",
+    "backend\\src\\routes\\claude\\unifiedAIRoutes.js",
+    "backend\\src\\routes\\claude\\moduleRegistryRoutes.js",
+    "backend\\src\\routes\\claude\\libraryRoutes.js",
+    "backend\\src\\monitoring\\performance.js",
+    "backend\\src\\monitoring\\infrastructure.js",
+    "backend\\src\\monitoring\\alerts.js",
+    "backend\\src\\modules\\M144\\service.js",
+    "backend\\src\\modules\\M141\\service.js",
+    "backend\\src\\modules\\M141\\controller.js",
+    "backend\\src\\modules\\M132\\service.js",
+    "backend\\src\\modules\\M132\\controller.js",
+    "backend\\src\\modules\\M127\\service.js",
+    "backend\\src\\modules\\M123\\service.js",
+    "backend\\src\\modules\\M122\\service.js",
+    "backend\\src\\modules\\M110\\service.js",
+    "backend\\src\\modules\\M109\\service.js",
+    "backend\\src\\modules\\M108\\service.js",
+    "backend\\src\\modules\\M107\\service.js",
+    "backend\\src\\modules\\M105\\service.js",
+    "backend\\src\\modules\\M104\\service.js",
+    "backend\\src\\modules\\M103\\service.js",
+    "backend\\src\\modules\\M102\\service.js",
+    "backend\\src\\modules\\M101\\service.js",
+    "backend\\src\\modules\\M087\\service.js",
+    "backend\\src\\modules\\M086\\service.js",
+    "backend\\src\\modules\\M085\\service.js",
+    "backend\\src\\modules\\M084\\service.js",
+    "backend\\src\\modules\\M083\\service.js",
+    "backend\\src\\modules\\M082\\service.js",
+    "backend\\src\\modules\\M081\\service.js",
+    "backend\\src\\modules\\M080\\service.js",
+    "backend\\src\\modules\\M079\\service.js",
+    "backend\\src\\modules\\M078\\service.js",
+    "backend\\src\\modules\\M077\\service.js",
+    "backend\\src\\modules\\M076\\service.js",
+    "backend\\src\\modules\\M075\\service.js",
+    "backend\\src\\modules\\M075\\controller.js",
+    "backend\\src\\modules\\M074\\service.js",
+    "backend\\src\\modules\\M074\\controller.js",
+    "backend\\src\\modules\\M073\\service.js",
+    "backend\\src\\modules\\M073\\controller.js",
+    "backend\\src\\modules\\M072\\service.js",
+    "backend\\src\\modules\\M072\\controller.js",
+    "backend\\src\\modules\\M071\\service.js",
+    "backend\\src\\modules\\M071\\controller.js",
+    "backend\\src\\modules\\M069\\service.js",
+    "backend\\src\\modules\\M069\\controller.js",
+    "backend\\src\\modules\\M060\\service.js",
+    "backend\\src\\modules\\M059\\service.js",
+    "backend\\src\\modules\\M058\\service.js",
+    "backend\\src\\modules\\M057\\service.js",
+    "backend\\src\\modules\\M056\\service.js",
+    "backend\\src\\modules\\M055\\service.js",
+    "backend\\src\\modules\\M054\\service.js",
+    "backend\\src\\modules\\M053\\service.js",
+    "backend\\src\\modules\\M052\\service.js",
+    "backend\\src\\modules\\M051\\service.js",
+    "backend\\src\\modules\\M046\\service.js",
+    "backend\\src\\modules\\M046\\controller.js",
+    "backend\\src\\modules\\M045\\service.js",
+    "backend\\src\\modules\\M045\\controller.js",
+    "backend\\src\\modules\\M044\\service.js",
+    "backend\\src\\modules\\M044\\controller.js",
+    "backend\\src\\modules\\M043\\service.js",
+    "backend\\src\\modules\\M043\\controller.js",
+    "backend\\src\\modules\\M042\\service.js",
+    "backend\\src\\modules\\M041\\service.js",
+    "backend\\src\\modules\\M032\\service.js",
+    "backend\\src\\modules\\M031\\service.js",
+    "backend\\src\\modules\\M030\\service.js",
+    "backend\\src\\modules\\M030\\controller.js",
+    "backend\\src\\modules\\M029\\service.js",
+    "backend\\src\\modules\\M028\\service.js",
+    "backend\\src\\modules\\M027\\service.js",
+    "backend\\src\\modules\\M026\\service.js",
+    "backend\\src\\modules\\M025\\service.js",
+    "backend\\src\\modules\\M024\\service.js",
+    "backend\\src\\modules\\M023\\service.js",
+    "backend\\src\\modules\\M022\\service.js",
+    "backend\\src\\modules\\M021\\service.js",
+    "backend\\src\\modules\\M021\\controller.js",
+    "backend\\src\\modules\\M020\\service.js",
+    "backend\\src\\modules\\M020\\controller.js",
+    "backend\\src\\modules\\M019\\service.js",
+    "backend\\src\\modules\\M019\\controller.js",
+    "backend\\src\\modules\\M018\\service.js",
+    "backend\\src\\modules\\M018\\controller.js",
+    "backend\\src\\modules\\M017\\service.js",
+    "backend\\src\\modules\\M017\\controller.js",
+    "backend\\src\\modules\\M016\\service.js",
+    "backend\\src\\modules\\M016\\controller.js",
+    "backend\\src\\modules\\M015\\service.js",
+    "backend\\src\\modules\\M015\\controller.js",
+    "backend\\src\\modules\\M014\\service.js",
+    "backend\\src\\modules\\M014\\controller.js",
+    "backend\\src\\modules\\M013\\service.js",
+    "backend\\src\\modules\\M012\\service.js",
+    "backend\\src\\modules\\M012\\controller.js",
+    "backend\\src\\modules\\M011\\service.js",
+    "backend\\src\\modules\\M011\\controller.js",
+    "backend\\src\\modules\\M010\\service.js",
+    "backend\\src\\modules\\M010\\controller.js",
+    "backend\\src\\modules\\M009\\service.js",
+    "backend\\src\\modules\\M009\\controller.js",
+    "backend\\src\\modules\\M008\\service.js",
+    "backend\\src\\modules\\M008\\controller.js",
+    "backend\\src\\modules\\M007\\service.js",
+    "backend\\src\\modules\\M007\\controller.js",
+    "backend\\src\\modules\\M006\\service.js",
+    "backend\\src\\modules\\M006\\controller.js",
+    "backend\\src\\modules\\M005\\service.js",
+    "backend\\src\\modules\\M004\\service.js",
+    "backend\\src\\modules\\M003\\service.js",
+    "backend\\src\\modules\\M002\\service.js",
+    "backend\\src\\middleware\\validation.js",
+    "backend\\src\\middleware\\securityMiddleware.js",
+    "backend\\src\\middleware\\routeMonitoring.js",
+    "backend\\src\\middleware\\responseFormatter.js",
+    "backend\\src\\middleware\\requestValidator.js",
+    "backend\\src\\middleware\\requestLogger.js",
+    "backend\\src\\middleware\\requestId.js",
+    "backend\\src\\middleware\\rateLimiter.js",
+    "backend\\src\\middleware\\rateLimit.js",
+    "backend\\src\\middleware\\ownership.js",
+    "backend\\src\\middleware\\inputValidation.js",
+    "backend\\src\\middleware\\index.js",
+    "backend\\src\\middleware\\errorHandler.js",
+    "backend\\src\\middleware\\compliance.js",
+    "backend\\src\\middleware\\auth.js",
+    "backend\\src\\middleware\\admin.js",
+    "backend\\src\\middleware\\dual-use\\mfaMiddleware.js",
+    "backend\\src\\jobs\\loadMandiPrices.js",
+    "backend\\src\\database\\seed_economic.js",
+    "backend\\src\\database\\pool.js",
+    "backend\\src\\database\\migration_preflight.js",
+    "backend\\src\\database\\migrate.js",
+    "backend\\src\\database\\initializeDB.js",
+    "backend\\src\\database\\database_enhancements.js",
+    "backend\\src\\database\\connection.js",
+    "backend\\src\\database\\advanced_pool.js",
+    "backend\\src\\database\\transactions\\transaction_manager.js",
+    "backend\\src\\database\\security\\database_security.js",
+    "backend\\src\\database\\optimization\\query_optimizer.js",
+    "backend\\src\\database\\monitoring\\database_monitor.js",
+    "backend\\src\\database\\migrations\\enhanced_migrate.js",
+    "backend\\src\\database\\cache\\redis_cache.js",
+    "backend\\src\\database\\backup\\backup_manager.js",
+    "backend\\src\\core\\withTransaction.js",
+    "backend\\src\\core\\validation.js",
+    "backend\\src\\core\\signalBus.js",
+    "backend\\src\\core\\serviceLocator.js",
+    "backend\\src\\core\\serviceAuditAndEnhancement.js",
+    "backend\\src\\core\\reflexEngine.js",
+    "backend\\src\\core\\productionService.js",
+    "backend\\src\\core\\outcomeSink.js",
+    "backend\\src\\core\\outcomeResolver.js",
+    "backend\\src\\core\\nervousSystem.js",
+    "backend\\src\\core\\monitoring.js",
+    "backend\\src\\core\\moduleRegistry.js",
+    "backend\\src\\core\\mcda.js",
+    "backend\\src\\core\\fileConnectivityAudit.js",
+    "backend\\src\\core\\errorHandler.js",
+    "backend\\src\\core\\erpAgents.js",
+    "backend\\src\\core\\enhancedServiceFramework.js",
+    "backend\\src\\core\\effectors.js",
+    "backend\\src\\core\\dynamicServiceLoader.js",
+    "backend\\src\\core\\dynamicRouteLoader.js",
+    "backend\\src\\core\\disruptionRoutingAgent.js",
+    "backend\\src\\core\\decisionEngine.js",
+    "backend\\src\\core\\configRegistry.js",
+    "backend\\src\\core\\claudeAICoordinator.js",
+    "backend\\src\\core\\cache.js",
+    "backend\\src\\core\\businessCell.js",
+    "backend\\src\\core\\aiOrchestrator.js",
+    "backend\\src\\core\\ai\\index.js",
+    "backend\\src\\core\\ai\\aiProviderAdapters.js",
+    "backend\\src\\core\\ai\\aiOrchestratorCore.js",
+    "backend\\src\\core\\ai\\aiGuardrails.js",
+    "backend\\src\\core\\ai\\aiEngineRegistry.js",
+    "backend\\src\\core\\ai\\aiCostController.js",
+    "backend\\src\\core\\ai\\aiConfidenceEngine.js",
+    "backend\\src\\core\\ai\\aiAuditLogger.js",
+    "backend\\src\\controllers\\walletController.js",
+    "backend\\src\\controllers\\transactionController.js",
+    "backend\\src\\controllers\\productMediaAIController.js",
+    "backend\\src\\controllers\\paymentGatewayController.js",
+    "backend\\src\\controllers\\nutrientValueSalesController.js",
+    "backend\\src\\controllers\\nervousSystemController.js",
+    "backend\\src\\controllers\\farmerTrainingController.js",
+    "backend\\src\\controllers\\ecommerceMarketingController.js",
+    "backend\\src\\controllers\\ecommerceIntegrationController.js",
+    "backend\\src\\controllers\\ecommerceERPController.js",
+    "backend\\src\\controllers\\ecommerceController.js",
+    "backend\\src\\controllers\\ecommerceBusinessSalesController.js",
+    "backend\\src\\controllers\\ecommerceAIController.js",
+    "backend\\src\\controllers\\comprehensiveERPController.js",
+    "backend\\src\\controllers\\completeERPIntegrationController.js",
+    "backend\\src\\controllers\\completeAIIntegrationController.js",
+    "backend\\src\\controllers\\bulkOrderController.js",
+    "backend\\src\\controllers\\aiBackboneController.js",
+    "backend\\src\\cache\\redis.js",
+    "frontend\\src\\App.jsx",
+    "frontend\\src\\utils\\performanceOptimizations.jsx",
+    "frontend\\src\\pages\\YieldManagementPage.jsx",
+    "frontend\\src\\pages\\WeatherAnalyticsPage.jsx",
+    "frontend\\src\\pages\\WearablesPage.jsx",
+    "frontend\\src\\pages\\WaterManagementPage.jsx",
+    "frontend\\src\\pages\\VarietyDirectoryPage.jsx",
+    "frontend\\src\\pages\\TractorManagementPage.jsx",
+    "frontend\\src\\pages\\SystemAdministrationPage.jsx",
+    "frontend\\src\\pages\\SowingManagementPage.jsx",
+    "frontend\\src\\pages\\SoilManagementPage.jsx",
+    "frontend\\src\\pages\\ShgManagementPage.jsx",
+    "frontend\\src\\pages\\SheepFarmingPage.jsx",
+    "frontend\\src\\pages\\SellerProductFormPage.jsx",
+    "frontend\\src\\pages\\SeedVaultPage.jsx",
+    "frontend\\src\\pages\\RegisterPage.jsx",
+    "frontend\\src\\pages\\ProductDetailPage.jsx",
+    "frontend\\src\\pages\\PriceBuildPage.jsx",
+    "frontend\\src\\pages\\PreSeasonPurchasePage.jsx",
+    "frontend\\src\\pages\\PreOrderPage.jsx",
+    "frontend\\src\\pages\\PremiumMarketplacePage.jsx",
+    "frontend\\src\\pages\\PoultryManagementPage.jsx",
+    "frontend\\src\\pages\\PondManagementPage.jsx",
+    "frontend\\src\\pages\\PlatformManagementPage.jsx",
+    "frontend\\src\\pages\\PaymentProcessingPage.jsx",
+    "frontend\\src\\pages\\PaymentGatewayPage.jsx",
+    "frontend\\src\\pages\\OrderDetailPage.jsx",
+    "frontend\\src\\pages\\OrchardManagementPage.jsx",
+    "frontend\\src\\pages\\NutrientValueMarketplace.jsx",
+    "frontend\\src\\pages\\MarketplacePage.jsx",
+    "frontend\\src\\pages\\MachineryManagementPage.jsx",
+    "frontend\\src\\pages\\LogisticsProviderPage.jsx",
+    "frontend\\src\\pages\\LivestockManagementPage.jsx",
+    "frontend\\src\\pages\\LedgerPage.jsx",
+    "frontend\\src\\pages\\LandUseCarbonPage.jsx",
+    "frontend\\src\\pages\\LandRegistryPage.jsx",
+    "frontend\\src\\pages\\LabourManagementPage.jsx",
+    "frontend\\src\\pages\\IrrigationManagementPage.jsx",
+    "frontend\\src\\pages\\InsuranceManagementPage.jsx",
+    "frontend\\src\\pages\\HouseholdProcurementPage.jsx",
+    "frontend\\src\\pages\\HomePage.jsx",
+    "frontend\\src\\pages\\HarvestPlanPage.jsx",
+    "frontend\\src\\pages\\GovernmentSubsidyPage.jsx",
+    "frontend\\src\\pages\\GoatFarmingPage.jsx",
+    "frontend\\src\\pages\\FertilizerInventoryPage.jsx",
+    "frontend\\src\\pages\\FarmerVerificationPage.jsx",
+    "frontend\\src\\pages\\FarmerSellPage.jsx",
+    "frontend\\src\\pages\\FarmerKycPage.jsx",
+    "frontend\\src\\pages\\FarmerHealthWelfarePage.jsx",
+    "frontend\\src\\pages\\FarmerFieldPage.jsx",
+    "frontend\\src\\pages\\FarmCostingPage.jsx",
+    "frontend\\src\\pages\\ExportDocumentationPage.jsx",
+    "frontend\\src\\pages\\ExperienceLayerPage.jsx",
+    "frontend\\src\\pages\\EscrowPage.jsx",
+    "frontend\\src\\pages\\ERPDashboard.jsx",
+    "frontend\\src\\pages\\EnterpriseControlPage.jsx",
+    "frontend\\src\\pages\\EcommerceMarketplacePage.jsx",
+    "frontend\\src\\pages\\DisruptionPage.jsx",
+    "frontend\\src\\pages\\DefenseFitnessPrepPage.jsx",
+    "frontend\\src\\pages\\DairyManagementPage.jsx",
+    "frontend\\src\\pages\\CropValueReviewPage.jsx",
+    "frontend\\src\\pages\\CorporateBuyerPage.jsx",
+    "frontend\\src\\pages\\ContractFarmingPage.jsx",
+    "frontend\\src\\pages\\CompliancePage.jsx",
+    "frontend\\src\\pages\\CompetitivePositionPage.jsx",
+    "frontend\\src\\pages\\ClimateWeatherPage.jsx",
+    "frontend\\src\\pages\\ClimateAdvisoryPage.jsx",
+    "frontend\\src\\pages\\CheckoutPage.jsx",
+    "frontend\\src\\pages\\CartPage.jsx",
+    "frontend\\src\\pages\\CADashboardPage.jsx",
+    "frontend\\src\\pages\\BulkOrderPage.jsx",
+    "frontend\\src\\pages\\BlockchainVerificationPage.jsx",
+    "frontend\\src\\pages\\BankPassportPage.jsx",
+    "frontend\\src\\pages\\B2BMarketplace.jsx",
+    "frontend\\src\\pages\\AuthorizationPage.jsx",
+    "frontend\\src\\pages\\AnalyticsPage.jsx",
+    "frontend\\src\\pages\\AISelfHealingPage.jsx",
+    "frontend\\src\\pages\\AIOperationIntelligencePage.jsx",
+    "frontend\\src\\pages\\AIBrainPage.jsx",
+    "frontend\\src\\pages\\AIBackbonePage.jsx",
+    "frontend\\src\\pages\\AIAgentPage.jsx",
+    "frontend\\src\\pages\\government\\SchemeEligibilityChecker.jsx",
+    "frontend\\src\\components\\RouteGuard.jsx",
+    "frontend\\src\\components\\RouteErrorBoundary.jsx",
+    "frontend\\src\\components\\NotificationBell.jsx",
+    "frontend\\src\\components\\ui\\Toast.jsx",
+    "frontend\\src\\components\\testing\\ResponsiveTestWrapper.jsx",
+    "frontend\\src\\components\\OrganicTraceability\\QRCodeScanner.jsx",
+    "frontend\\src\\components\\MFA\\MFASetup.jsx",
+    "frontend\\src\\components\\Marketplace\\ProductReview.jsx",
+    "frontend\\src\\components\\Logistics\\CustodyChainViewer.jsx",
+    "frontend\\src\\components\\Library\\LibraryBrowser.jsx",
+    "frontend\\src\\components\\LaboratoryERP\\SampleRegistration.jsx",
+    "frontend\\src\\components\\GIIntelligence\\GIProductCard.jsx",
+    "frontend\\src\\components\\GDPR\\GDPRConsent.jsx",
+    "frontend\\src\\components\\forms\\EnhancedFormValidator.jsx",
+    "frontend\\src\\components\\FarmerPortal\\LandRecords.jsx",
+    "frontend\\src\\components\\ErrorBoundary\\EnhancedErrorBoundary.jsx",
+    "frontend\\src\\components\\common\\ResourceManager.jsx",
+    "frontend\\src\\components\\common\\DataPrimitives.jsx",
+    "frontend\\src\\components\\BlockchainTraceability\\TraceabilityViewer.jsx",
+    "frontend\\src\\components\\AI\\AIChat.jsx",
+    "frontend\\src\\components\\Accessibility\\AccessibilityEnhancements.jsx",
+    "frontend\\src\\utils\\validation.js",
+    "frontend\\src\\utils\\security.js",
+    "frontend\\src\\utils\\routePreloader.js",
+    "frontend\\src\\utils\\pushNotifications.js",
+    "frontend\\src\\utils\\monitoring.js",
+    "frontend\\src\\utils\\i18n.js",
+    "frontend\\src\\utils\\errorMonitoring.js",
+    "frontend\\src\\utils\\deviceDetection.js",
+    "frontend\\src\\utils\\cache.js",
+    "frontend\\src\\utils\\analytics.js",
+    "frontend\\src\\test\\e2eHelpers.js",
+    "frontend\\src\\services\\api.js",
+    "frontend\\src\\hooks\\useResponsive.js",
+    "frontend\\src\\hooks\\useGeolocation.js",
+    "frontend\\src\\config\\routes.js",
+    "frontend\\src\\config\\env.js"
+  ],
+  "warnings": [],
+  "stats": {}
+}

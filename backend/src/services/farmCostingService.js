@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class FarmCostingService {
   async calculateFarmCost(farmId, crops) {
+  // Validate inputs
+  if (!farmId) throw new Error('Missing required parameter');
+
     try {
       let totalCost = 0;
       for (const crop of crops) {

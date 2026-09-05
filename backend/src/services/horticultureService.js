@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class HorticultureService {
   async manageFruit(farmId, fruitType, area, plantingDate) {
+  // Validate inputs
+  if (!farmId) throw new Error('Missing required parameter');
+
     try {
       const id = require('uuid').v4();
       await db('fruit_orchards').insert({

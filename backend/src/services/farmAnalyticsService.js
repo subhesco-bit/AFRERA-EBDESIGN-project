@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class FarmAnalyticsService {
   async generateFarmReport(farmId) {
+  // Validate inputs
+  if (!farmId) throw new Error('Missing required parameter');
+
     try {
       const yields = await db('yields').where('farm_id', farmId);
       const costs = await db('farm_costs').where('farm_id', farmId).first();

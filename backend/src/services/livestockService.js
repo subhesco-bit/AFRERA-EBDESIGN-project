@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class LivestockService {
   async registerLivestock(farmId, type, count, breed) {
+  // Validate inputs
+  if (!farmId) throw new Error('Missing required parameter');
+
     try {
       const id = require('uuid').v4();
       await db('livestock').insert({

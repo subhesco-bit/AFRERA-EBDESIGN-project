@@ -20,6 +20,9 @@ class PriceForecastingService {
   }
 
   async getHistoricalPrices(productId) {
+  // Validate inputs
+  if (!productId) throw new Error('Missing required parameter');
+
     try {
       const prices = await db('price_history').where('product_id', productId).orderBy('date', 'desc').limit(365);
       return { product_id: productId, prices: prices.length, data: prices };

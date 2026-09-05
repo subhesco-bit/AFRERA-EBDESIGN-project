@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class RiskAssessmentService {
   async assessRisk(entityId, riskFactors) {
+  // Validate inputs
+  if (!entityId) throw new Error('Missing required parameter');
+
     try {
       const riskScore = riskFactors.reduce((sum, f) => sum + f.weight, 0);
       const riskLevel = riskScore >= 70 ? 'high' : riskScore >= 40 ? 'medium' : 'low';

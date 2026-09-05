@@ -195,6 +195,9 @@ class JobService {
 
   // Enqueue a job
   async enqueue(jobType, data) {
+  // Validate inputs
+  if (!jobType) throw new Error('Missing required parameter');
+
     try {
       const queue = this.queues[jobType];
       if (!queue) {

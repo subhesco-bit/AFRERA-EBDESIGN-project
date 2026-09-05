@@ -8,14 +8,24 @@ const productMediaAIController = require('../controllers/productMediaAIControlle
 const { authMiddleware } = require('../middleware/auth');
 const { rateLimiter } = require('../middleware/rateLimiter');
 
+const logger = console; // TODO: use Winston/Pino logger
+
 const router = express.Router();
 
 router.use(authMiddleware);
 router.use(rateLimiter);
 
-router.get('/status', productMediaAIController.getProviderStatus);
-router.post('/products/:productId/image', productMediaAIController.generateProductImage);
-router.post('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
-router.post('/products/:productId/video', productMediaAIController.generateProductVideo);
+router.get
+    // Log request
+    logger.debug('router.get request');('/status', productMediaAIController.getProviderStatus);
+router.post
+    // Log request
+    logger.debug('router.post request');('/products/:productId/image', productMediaAIController.generateProductImage);
+router.post
+    // Log request
+    logger.debug('router.post request');('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
+router.post
+    // Log request
+    logger.debug('router.post request');('/products/:productId/video', productMediaAIController.generateProductVideo);
 
 module.exports = router;

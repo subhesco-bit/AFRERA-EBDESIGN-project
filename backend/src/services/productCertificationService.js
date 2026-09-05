@@ -15,6 +15,9 @@ class ProductCertificationService {
    * Add certification to product
    */
   async addCertification(productId, certData) {
+  // Validate inputs
+  if (!productId) throw new Error('Missing required parameter');
+
     try {
       if (!productId || !certData.certification_type) {
         throw new ValidationError('Missing required fields: productId, certification_type');

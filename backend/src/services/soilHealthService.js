@@ -3,6 +3,9 @@ const logger = require('../utils/logger');
 
 class SoilHealthService {
   async recordSoilTest(farmId, ph, nitrogen, phosphorus, potassium) {
+  // Validate inputs
+  if (!farmId) throw new Error('Missing required parameter');
+
     try {
       const id = require('uuid').v4();
       await db('soil_tests').insert({
