@@ -7106,12 +7106,5 @@
       "severity": "high"
     }
   ],
-  "missing": [
-    {
-      "file": "backend\\src\\routes\\index.js",
-      "name": "index",
-      "varName": "index",
-      "type": "route_not_wired"
-    }
-  ]
+  "missing": []
 }

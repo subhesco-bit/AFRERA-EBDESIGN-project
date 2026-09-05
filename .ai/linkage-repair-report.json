@@ -1,10 +1,6 @@
 {
   "successful": [
     {
-      "type": "route_wiring",
-      "count": 1
-    },
-    {
       "type": "index_file_creation",
       "count": 0
     },
