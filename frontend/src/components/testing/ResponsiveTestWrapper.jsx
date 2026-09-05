@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import deviceDetection from '../utils/deviceDetection';
+import deviceDetection from '../../utils/deviceDetection';
 
 // Viewport definitions matching Tailwind breakpoints
 const VIEWPORTS = {

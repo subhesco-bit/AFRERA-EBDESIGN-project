@@ -3,15 +3,25 @@
  * Handles Capacitor-based device-level detection and runtime checks
  */
 
-import { Capacitor } from '@capacitor/core';
-import { Device } from '@capacitor/device';
-import { ScreenOrientation } from '@capacitor/screen-orientation';
+// Conditional imports for Capacitor (only available in native builds)
+let Capacitor, Device, ScreenOrientation;
+try {
+  const capacitorCore = require('@capacitor/core');
+  const capacitorDevice = require('@capacitor/device');
+  const capacitorScreenOrientation = require('@capacitor/screen-orientation');
+  Capacitor = capacitorCore;
+  Device = capacitorDevice;
+  ScreenOrientation = capacitorScreenOrientation;
+} catch (error) {
+  // Capacitor not available - will use web fallback
+  console.warn('Capacitor not available, using web fallback for device detection');
+}
 
 class DeviceDetectionService {
   constructor() {
     this.deviceInfo = null;
-    this.isNative = Capacitor.isNativePlatform();
-    this.platform = Capacitor.getPlatform();
+    this.isNative = Capacitor ? Capacitor.isNativePlatform() : false;
+    this.platform = Capacitor ? Capacitor.getPlatform() : 'web';
     this.initialized = false;
   }
 
@@ -66,7 +76,8 @@ class DeviceDetectionService {
       };
     } catch (error) {
       console.error('Native device initialization failed:', error);
-      throw error;
+      // Fall back to web detection if Capacitor fails
+      this._initializeWebDevice();
     }
   }
 

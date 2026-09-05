@@ -1,0 +1,326 @@
+﻿[
+    {
+        "System":  "EBDESIGN",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+        "Files":  23534,
+        "SourceFiles":  22797,
+        "LinkageCandidates":  1025551,
+        "SizeGB":  0.28,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\EBDESIGN"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\confident-satoshi-a53ac8\\backend",
+        "Files":  1375,
+        "SourceFiles":  1373,
+        "LinkageCandidates":  33614,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\confident-satoshi-a53ac8\\frontend",
+        "Files":  825,
+        "SourceFiles":  821,
+        "LinkageCandidates":  8446,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "enterprise-audit",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit",
+        "Files":  3623,
+        "SourceFiles":  3522,
+        "LinkageCandidates":  127458,
+        "SizeGB":  0.03,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\enterprise-audit"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit\\backend",
+        "Files":  1736,
+        "SourceFiles":  1728,
+        "LinkageCandidates":  56486,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "local-image-gen",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit\\backend\\services\\local-image-gen",
+        "Files":  5,
+        "SourceFiles":  2,
+        "LinkageCandidates":  74,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\local-image-gen"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit\\frontend",
+        "Files":  1103,
+        "SourceFiles":  1054,
+        "LinkageCandidates":  15241,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "android",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit\\frontend\\android",
+        "Files":  53,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\android"
+    },
+    {
+        "System":  "app",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit\\frontend\\android\\app",
+        "Files":  43,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\app"
+    },
+    {
+        "System":  "src-tauri",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\enterprise-audit\\frontend\\src-tauri",
+        "Files":  5,
+        "SourceFiles":  2,
+        "LinkageCandidates":  12,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\src-tauri"
+    },
+    {
+        "System":  "intelligent-sutherland-9f1488",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\intelligent-sutherland-9f1488",
+        "Files":  3238,
+        "SourceFiles":  3141,
+        "LinkageCandidates":  122467,
+        "SizeGB":  0.03,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\intelligent-sutherland-9f1488"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\intelligent-sutherland-9f1488\\backend",
+        "Files":  1366,
+        "SourceFiles":  1361,
+        "LinkageCandidates":  52168,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\intelligent-sutherland-9f1488\\frontend",
+        "Files":  1091,
+        "SourceFiles":  1042,
+        "LinkageCandidates":  14858,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "android",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\intelligent-sutherland-9f1488\\frontend\\android",
+        "Files":  53,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\android"
+    },
+    {
+        "System":  "app",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\intelligent-sutherland-9f1488\\frontend\\android\\app",
+        "Files":  43,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\app"
+    },
+    {
+        "System":  "src-tauri",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\intelligent-sutherland-9f1488\\frontend\\src-tauri",
+        "Files":  5,
+        "SourceFiles":  2,
+        "LinkageCandidates":  12,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\src-tauri"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\jolly-feynman-9d174f\\backend",
+        "Files":  1591,
+        "SourceFiles":  1588,
+        "LinkageCandidates":  49711,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\jolly-feynman-9d174f\\frontend",
+        "Files":  1039,
+        "SourceFiles":  975,
+        "LinkageCandidates":  10827,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "android",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\jolly-feynman-9d174f\\frontend\\android",
+        "Files":  53,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\android"
+    },
+    {
+        "System":  "app",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\jolly-feynman-9d174f\\frontend\\android\\app",
+        "Files":  43,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\app"
+    },
+    {
+        "System":  "src-tauri",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\jolly-feynman-9d174f\\frontend\\src-tauri",
+        "Files":  22,
+        "SourceFiles":  2,
+        "LinkageCandidates":  12,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\src-tauri"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\musing-bartik-79ce5a\\backend",
+        "Files":  1589,
+        "SourceFiles":  1587,
+        "LinkageCandidates":  48932,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\musing-bartik-79ce5a\\frontend",
+        "Files":  1030,
+        "SourceFiles":  982,
+        "LinkageCandidates":  11184,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "android",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\musing-bartik-79ce5a\\frontend\\android",
+        "Files":  53,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\android"
+    },
+    {
+        "System":  "app",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\musing-bartik-79ce5a\\frontend\\android\\app",
+        "Files":  43,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\app"
+    },
+    {
+        "System":  "src-tauri",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\musing-bartik-79ce5a\\frontend\\src-tauri",
+        "Files":  5,
+        "SourceFiles":  2,
+        "LinkageCandidates":  12,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\src-tauri"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\reverent-hellman-fc7e32\\backend",
+        "Files":  1591,
+        "SourceFiles":  1589,
+        "LinkageCandidates":  48986,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\reverent-hellman-fc7e32\\frontend",
+        "Files":  1030,
+        "SourceFiles":  982,
+        "LinkageCandidates":  11187,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "android",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\reverent-hellman-fc7e32\\frontend\\android",
+        "Files":  53,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\android"
+    },
+    {
+        "System":  "app",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\reverent-hellman-fc7e32\\frontend\\android\\app",
+        "Files":  43,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\app"
+    },
+    {
+        "System":  "src-tauri",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.claude\\worktrees\\reverent-hellman-fc7e32\\frontend\\src-tauri",
+        "Files":  5,
+        "SourceFiles":  2,
+        "LinkageCandidates":  12,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\src-tauri"
+    },
+    {
+        "System":  "backend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend",
+        "Files":  2386,
+        "SourceFiles":  2360,
+        "LinkageCandidates":  59382,
+        "SizeGB":  0.01,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\backend"
+    },
+    {
+        "System":  "frontend",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend",
+        "Files":  1587,
+        "SourceFiles":  1532,
+        "LinkageCandidates":  19365,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\frontend"
+    },
+    {
+        "System":  "android",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\android",
+        "Files":  53,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\android"
+    },
+    {
+        "System":  "app",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\android\\app",
+        "Files":  43,
+        "SourceFiles":  13,
+        "LinkageCandidates":  31,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\app"
+    },
+    {
+        "System":  "src-tauri",
+        "Root":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\frontend\\src-tauri",
+        "Files":  5,
+        "SourceFiles":  2,
+        "LinkageCandidates":  12,
+        "SizeGB":  0,
+        "ReportFolder":  "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\.system-audit\\src-tauri"
+    }
+]

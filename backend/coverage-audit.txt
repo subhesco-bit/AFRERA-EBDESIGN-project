@@ -1,0 +1,146 @@
+npm notice run afrera-backend@1.0.0 audit:coverage
+npm notice run node ../tools/route-audit.js
+2026-09-05 00:06:17:617 [[33mwarn[39m]: [33mJWT_SECRET not set - using a random per-process secret for this dev/test run. Set JWT_SECRET to persist sessions across restarts.[39m
+2026-09-05 00:06:17:617 [[32minfo[39m]: [32mAI Gateway Service initialized with models:[39m {"0":"prediction","1":"optimization","2":"analysis","3":"recommendation"}
+2026-09-05 00:06:17:617 [[32minfo[39m]: [32mAnalytics Service initialized[39m
+2026-09-05 00:06:19:619 [[32minfo[39m]: [32mHR AI models initialized:[39m {"0":"attrition_prediction","1":"performance_forecasting","2":"shift_optimization","3":"sentiment_analysis"}
+2026-09-05 00:06:20:620 [[32minfo[39m]: [32mReal-time Monitoring Service initialized[39m
+{
+  "routeFiles": 222,
+  "loadableRoutes": 191,
+  "failedRoutes": 31,
+  "dynamicLoaderConfigured": true,
+  "categories": {
+    "erp": 14,
+    "ai": 40,
+    "analytics": 9,
+    "admin": 4,
+    "notification": 0
+  },
+  "failures": [
+    {
+      "file": "src\\routes\\buyerTrust.js",
+      "error": "Cannot find module '../utils/errors'"
+    },
+    {
+      "file": "src\\routes\\climateMonitoringRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\climateRouteSupport.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\communityManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\cropManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\cropRecommendations.js",
+      "error": "Route.post() requires a callback function but got a [object Undefined]"
+    },
+    {
+      "file": "src\\routes\\enterpriseRouteSupport.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\fisheriesManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\horticultureManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\identityManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\inputSupplyManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\irrigationManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\landManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\livestockManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\livestockRouteSupport.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\loanManagement.js",
+      "error": "Cannot find module '../utils/errors'"
+    },
+    {
+      "file": "src\\routes\\operationsManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\operationsRouteSupport.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\ORPHANED_SERVICES_MOUNT.js",
+      "error": "logger is not defined"
+    },
+    {
+      "file": "src\\routes\\productCertifications.js",
+      "error": "Cannot find module '../utils/errors'"
+    },
+    {
+      "file": "src\\routes\\sellerVerifications.js",
+      "error": "Cannot find module '../utils/errors'"
+    },
+    {
+      "file": "src\\routes\\soilManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\subscriptions.js",
+      "error": "Cannot find module '../utils/errors'"
+    },
+    {
+      "file": "src\\routes\\supplyChainTracking.js",
+      "error": "Cannot find module '../utils/errors'"
+    },
+    {
+      "file": "src\\routes\\waterManagementRoutes.js",
+      "error": "module does not export an Express router"
+    },
+    {
+      "file": "src\\routes\\__tests__\\climateRoutes.test.js",
+      "error": "jest is not defined"
+    },
+    {
+      "file": "src\\routes\\__tests__\\enterpriseCommerceSafety.test.js",
+      "error": "jest is not defined"
+    },
+    {
+      "file": "src\\routes\\__tests__\\livestockFisheriesRoutes.test.js",
+      "error": "jest is not defined"
+    },
+    {
+      "file": "src\\routes\\__tests__\\operationsMachineryRoutes.test.js",
+      "error": "jest is not defined"
+    },
+    {
+      "file": "src\\routes\\__tests__\\platformFoundationRoutes.test.js",
+      "error": "jest is not defined"
+    },
+    {
+      "file": "src\\routes\\__tests__\\waterSoilManagementRoutes.test.js",
+      "error": "jest is not defined"
+    }
+  ]
+}

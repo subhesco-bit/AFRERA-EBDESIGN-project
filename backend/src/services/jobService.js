@@ -19,8 +19,7 @@ class JobService {
     try {
       // Initialize Redis connection for Bull queues
       this.redisClient = redis.createClient({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379,
+        url: process.env.REDIS_URL || `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || 6379}`,
         password: process.env.REDIS_PASSWORD || undefined,
       });
 
@@ -29,24 +28,31 @@ class JobService {
       // Create job queues for different job types
       this.queues = {
         emailNotifications: new Queue('email-notifications', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { attempts: 3, backoff: { type: 'exponential', delay: 2000 } },
         }),
         smsAlerts: new Queue('sms-alerts', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { attempts: 3, backoff: { type: 'exponential', delay: 2000 } },
         }),
         dataExports: new Queue('data-exports', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { timeout: 30000, attempts: 2 },
         }),
         reportGeneration: new Queue('report-generation', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { timeout: 60000, attempts: 2 },
         }),
         paymentProcessing: new Queue('payment-processing', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 1000 } },
         }),
         dataSync: new Queue('data-sync', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { timeout: 120000, attempts: 3 },
         }),
         analyticsAggregation: new Queue('analytics-aggregation', {
+          redis: process.env.REDIS_URL || undefined,
           defaultJobOptions: { timeout: 60000, attempts: 2 },
         }),
       };

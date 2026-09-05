@@ -13,6 +13,15 @@ class WebSocketService {
   }
 
   /**
+   * Attach an existing Socket.IO server (avoids a second Server on the same HTTP port).
+   */
+  attach(io) {
+    this.io = io;
+    this.setupEventHandlers();
+    return this.io;
+  }
+
+  /**
    * Initialize WebSocket service with HTTP server
    */
   initialize(httpServer) {

@@ -1,0 +1,24 @@
+{
+  "successful": [
+    {
+      "type": "route_wiring",
+      "count": 1
+    },
+    {
+      "type": "index_file_creation",
+      "count": 0
+    },
+    {
+      "type": "import_path_fix",
+      "count": 0
+    }
+  ],
+  "failed": [],
+  "skipped": [
+    {
+      "type": "circular_dependencies",
+      "count": 4,
+      "reason": "Requires manual code restructuring"
+    }
+  ]
+}

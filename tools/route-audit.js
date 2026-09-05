@@ -1,159 +1,68 @@
 /**
- * Route Audit and Repair Script
- * 
- * This script audits the backend route structure to identify:
- * 1. Missing route files that are imported in index.js
- * 2. Orphaned route files that are not imported
- * 3. Broken route references
- * 4. Duplicate route registrations
+ * Runtime route coverage audit.
+ * The filesystem is the source of truth; hard-coded route lists go stale.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const ROUTES_DIR = path.join(__dirname, '../backend/src/routes');
-const INDEX_FILE = path.join(__dirname, '../backend/src/index.js');
+const routesDir = path.resolve(__dirname, '../backend/src/routes');
+const indexFile = path.resolve(__dirname, '../backend/src/index.js');
 
-// Routes imported in index.js (extracted from the grep results)
-const IMPORTED_ROUTES = [
-  'marketplaceEnhancements',
-  'ecommerceRoutes',
-  'ecommerceIntegrationRoutes',
-  'ecommerceAIRoutes',
-  'ecommerceERPRoutes',
-  'ecommerceBusinessSalesRoutes',
-  'ecommerceMarketingRoutes',
-  'nutrientValueSalesRoutes',
-  'nervousSystemRoutes',
-  'bulkOrderRoutes',
-  'completeERPIntegrationRoutes',
-  'completeAIIntegrationRoutes',
-  'comprehensiveERPRoutes',
-  'aiBackboneRoutes',
-  'productMediaAIRoutes',
-  'wearableIntegrationRoutes',
-  'defenseFitnessPrepRoutes',
-  'cropValueResearchRoutes',
-  'platformTelemetryRoutes',
-  'farmerTrainingRoutes',
-  'insuranceEnhancements',
-  'farmerPortalEnhancements',
-  'governanceModule',
-  'logisticsEnhancements',
-  'advancedFeatures',
-  'enterpriseAIRoutes',
-  'gstRoutes',
-  'logisticsOpsRoutes',
-  'farmerRoutes',
-  'auditRoutes',
-  'dairyRoutes',
-  'fertilizerRoutes',
-  'poultryRoutes',
-  'goatRoutes',
-  'sheepRoutes',
-  'pigRoutes',
-  'animalHealthRoutes',
-  'enterpriseControlRoutes',
-  'hrRoutes',
-  'revenueRoutes',
-  'riskPricingRoutes',
-  'recoveredFinanceRoutes',
-  'droughtMonitoringRoutes',
-  'floodMonitoringRoutes',
-  'diseaseForecastingRoutes',
-  'climateRiskRoutes',
-  'agroMeteorologyRoutes',
-  'farmActivityRoutes',
-  'farmTaskRoutes',
-  'contractorRoutes',
-  'machineryOperationsRoutes',
-  'equipmentSchedulingRoutes',
-  'inputConsumptionRoutes',
-  'farmProductivityRoutes',
-  'farmOperationsDashboardRoutes',
-  'waterBudgetingRoutes',
-  'waterQualityRoutes',
-  'rainwaterHarvestingRoutes',
-  'watershedManagementRoutes',
-  'waterAnalyticsRoutes',
-  'soilHealthRoutes',
-  'nutrientManagementRoutes',
-  'fertilityManagementRoutes',
-  'blockManagementRoutes',
-  'districtManagementRoutes',
-  'stateManagementRoutes',
-  'producerGroupRoutes',
-  'communityAssetRoutes',
-  'ruralDevelopmentRoutes',
-  'biofertilizerRoutes',
-  'pesticideInventoryRoutes',
-  'bioPesticideRoutes',
-  'micronutrientRoutes',
-  'organicInputRoutes',
-  'inputProcurementRoutes',
-  'inputDistributionRoutes',
-  'inputTraceabilityRoutes',
-  'cattleRegistryRoutes',
-  'feedManagementRoutes',
-  'livestockAnalyticsRoutes',
-  'farmerFamilyRoutes',
-  'landLeaseRoutes',
-  'gisLandMappingRoutes',
-  'soilMappingRoutes',
-  'waterResourceMappingRoutes',
-  'geoBoundaryRoutes'
-];
-
-async function auditRoutes() {
-  console.log('🔍 Starting Route Audit...\n');
-
-  // Get all route files that actually exist
-  const existingFiles = fs.readdirSync(ROUTES_DIR)
-    .filter(file => file.endsWith('.js'))
-    .map(file => file.replace('.js', ''));
-
-  console.log(`📁 Found ${existingFiles.length} route files in ${ROUTES_DIR}`);
-
-  // Check for missing routes
-  const missingRoutes = IMPORTED_ROUTES.filter(route => !existingFiles.includes(route));
-  
-  if (missingRoutes.length > 0) {
-    console.log(`\n❌ Missing ${missingRoutes.length} route files imported in index.js:`);
-    missingRoutes.forEach(route => console.log(`   - ${route}.js`));
-  } else {
-    console.log('✅ All imported routes exist');
-  }
-
-  // Check for orphaned routes (exist but not imported)
-  const orphanedRoutes = existingFiles.filter(file => !IMPORTED_ROUTES.includes(file));
-  
-  if (orphanedRoutes.length > 0) {
-    console.log(`\n⚠️  Found ${orphanedRoutes.length} orphaned route files (not imported):`);
-    orphanedRoutes.forEach(route => console.log(`   - ${route}.js`));
-  } else {
-    console.log('✅ No orphaned route files');
-  }
-
-  // Summary
-  console.log('\n📊 Summary:');
-  console.log(`   Imported routes: ${IMPORTED_ROUTES.length}`);
-  console.log(`   Existing files: ${existingFiles.length}`);
-  console.log(`   Missing files: ${missingRoutes.length}`);
-  console.log(`   Orphaned files: ${orphanedRoutes.length}`);
-
-  return {
-    imported: IMPORTED_ROUTES,
-    existing: existingFiles,
-    missing: missingRoutes,
-    orphaned: orphanedRoutes
-  };
+function filesIn(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
+    const fullPath = path.join(directory, entry.name);
+    if (entry.isDirectory() && !entry.name.startsWith('.')) return filesIn(fullPath);
+    return entry.isFile() && entry.name.endsWith('.js') ? [fullPath] : [];
+  });
 }
 
-// Run the audit
-auditRoutes().then(result => {
-  console.log('\n✅ Route audit complete');
-  process.exit(0);
-}).catch(error => {
-  console.error('❌ Route audit failed:', error);
-  process.exit(1);
-});
+function audit() {
+  const routeFiles = filesIn(routesDir);
+  const failures = [];
+  const loadableRoutes = [];
+
+  for (const file of routeFiles) {
+    try {
+      const exported = require(file);
+      const router = exported.router || exported.default || exported;
+      if (typeof router !== 'function') {
+        throw new TypeError('module does not export an Express router');
+      }
+      loadableRoutes.push(path.relative(process.cwd(), file));
+    } catch (error) {
+      failures.push({
+        file: path.relative(process.cwd(), file),
+        error: error.message.split('\n')[0]
+      });
+    }
+  }
+
+  const indexSource = fs.readFileSync(indexFile, 'utf8');
+  const categories = {
+    erp: routeFiles.filter(file => /erp|accounting|gst|cost|optimization/i.test(file)).length,
+    ai: routeFiles.filter(file => /ai|intelligence|copilot|predictive/i.test(file)).length,
+    analytics: routeFiles.filter(file => /analytic|report|dashboard/i.test(file)).length,
+    admin: routeFiles.filter(file => /admin|governance|tenant|role/i.test(file)).length,
+    notification: routeFiles.filter(file => /notification|message|alert/i.test(file)).length
+  };
+
+  const report = {
+    routeFiles: routeFiles.length,
+    loadableRoutes: loadableRoutes.length,
+    failedRoutes: failures.length,
+    dynamicLoaderConfigured: indexSource.includes('DynamicRouteLoader'),
+    categories,
+    failures
+  };
+
+  console.log(JSON.stringify(report, null, 2));
+  return report;
+}
+
+if (require.main === module) {
+  const report = audit();
+  process.exitCode = report.failedRoutes > 0 || !report.dynamicLoaderConfigured ? 1 : 0;
+}
+
+module.exports = { audit };

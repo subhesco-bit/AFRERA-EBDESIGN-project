@@ -1,250 +1,7 @@
-import axios from 'axios';
-import config from '../config/env';
-
-const API_BASE_URL = config.API_URL;
-
-// Create axios instance
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    try {
-      const storedModes = JSON.parse(localStorage.getItem('afrera.a11y') || '{}');
-      const modes = Object.entries({ ...storedModes, sms: storedModes.sms === undefined ? true : storedModes.sms })
-        .filter(([, enabled]) => enabled)
-        .map(([mode]) => mode);
-      config.headers['X-A11y-Modes'] = modes.length ? modes.join(',') : 'none';
-      config.headers['X-Low-Bandwidth'] = storedModes.sms ? '1' : '0';
-    } catch {
-      config.headers['X-A11y-Modes'] = 'none';
-      config.headers['X-Low-Bandwidth'] = '0';
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
-
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Handle 401 Unauthorized - try to refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
-        }
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-          refresh_token: refreshToken,
-        });
-
-        const { access_token, refresh_token: newRefreshToken } = response.data;
-
-        localStorage.setItem('access_token', access_token);
-        localStorage.setItem('refresh_token', newRefreshToken);
-
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed, logout user
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  },
-);
-
-// Auth API
-export const authAPI = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  logout: (data) => api.post('/auth/logout', data),
-  refresh: (data) => api.post('/auth/refresh', data),
-  getMe: () => api.get('/auth/me'),
-  setup2FA: (userId) => api.post('/auth/2fa/setup', { user_id: userId }),
-  verify2FA: (userId, code) => api.post('/auth/2fa/verify', { user_id: userId, code }),
-  disable2FA: (userId, password) => api.post('/auth/2fa/disable', { user_id: userId, password }),
-};
-
-export const dashboardAPI = {
-  getStats: () => api.get('/dashboard/stats'),
-};
-
-export const userAPI = {
-  getProfile: () => api.get('/users/profile'),
-  updateProfile: (data) => api.put('/users/profile', data),
-  getAddresses: () => api.get('/users/addresses'),
-  addAddress: (data) => api.post('/users/addresses', data),
-};
-
-// MFA and privacy APIs use dedicated backend route groups.
-export const mfaAPI = {
-  setup: () => api.post('/mfa/setup'),
-  verify: (userId, token) => api.post('/mfa/verify', { userId, token }),
-  disable: () => api.post('/mfa/disable'),
-};
-
-export const privacyAPI = {
-  recordConsent: (consentType, consentGiven) => api.post('/privacy/consent', { consentType, consentGiven }),
-  getConsent: (userId) => api.get(`/privacy/consent/${userId}`),
-  requestDeletion: (reason) => api.post('/privacy/rtbf', { reason }),
-};
-
-// Library Knowledge API
-export const libraryAPI = {
-  initialize: (options = {}) => api.post('/library/initialize', options),
-  getStatistics: () => api.get('/library/statistics'),
-  verifyCatalog: () => api.get('/library/verify'),
-  search: (params = {}) => api.get('/library/search', { params }),
-  getModules: (params = {}) => api.get('/library/modules', { params }),
-  getModule: (moduleId) => api.get(`/library/modules/${encodeURIComponent(moduleId)}`),
-  buildAIContext: (data) => api.post('/library/ai-context', data),
-};
-
-// Products API
-export const productsAPI = {
-  getProducts: (filters, pagination) => api.get('/products', { params: { ...filters, ...pagination } }),
-  getProduct: (id) => api.get(`/products/${id}`),
-  createProduct: (data) => api.post('/products', data),
-  updateProduct: (id, data) => api.put(`/products/${id}`, data),
-  deleteProduct: (id) => api.delete(`/products/${id}`),
-  getCategories: () => api.get('/products/categories/list'),
-  getStates: () => api.get('/products/states/list'),
-  searchProducts: (query) => api.get('/products/search', { params: { q: query } }),
-  // Real provider-adapter pipeline (services/productMediaAIService.js), mounted
-  // at /api/v1/product-media-ai - honestly reports not_configured with no
-  // image-gen API key present, rather than inventing an image.
-  requestImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
-};
-
-// Product Reviews API — real table-backed reviews (product_reviews, migration
-// 009_marketplace_enhancements.sql), mounted at /api/v1/product-reviews.
-// getStats is unauthenticated: used to show a real average rating on the
-// product detail page instead of a fabricated one.
-export const productReviewsAPI = {
-  getReviews: (productId, params = {}) => api.get(`/product-reviews/products/${productId}`, { params }),
-  getStats: (productId) => api.get(`/product-reviews/products/${productId}/stats`),
-  createReview: (productId, data) => api.post(`/product-reviews/products/${productId}`, data),
-};
-
-// Orders API
-export const ordersAPI = {
-  getCart: () => api.get('/orders/cart'),
-  addToCart: (data) => api.post('/orders/cart', data),
-  updateCartItem: (id, data) => api.put(`/orders/cart/${id}`, data),
-  removeFromCart: (id) => api.delete(`/orders/cart/${id}`),
-  clearCart: () => api.delete('/orders/cart'),
-  createOrder: (data) => api.post('/orders', data),
-  getOrder: (id) => api.get(`/orders/${id}`),
-  getOrders: (filters, pagination) => api.get('/orders', { params: { ...filters, ...pagination } }),
-  updateOrderStatus: (id, data) => api.put(`/orders/${id}/status`, data),
-  processPayment: (id, data) => api.post(`/orders/${id}/payment`, data),
-  cancelOrder: (id) => api.delete(`/orders/${id}`),
-};
-
-export const blockchainVerificationAPI = {
-  getStats: () => api.get('/blockchain/stats'),
-  verifyProduct: (productId) => api.get(`/blockchain/products/${productId}/verify`),
-};
-
-export const enterpriseIntegrationAPI = {
-  getCurrentOrganizationIntegrations: () => api.get('/enterprise/organizations/current/integrations'),
-  getSystemStatus: () => api.get('/enterprise/system/status'),
-  getIntegrationHealth: (integrationId) => api.get(`/enterprise/integrations/${integrationId}/health`),
-};
-
-// Farmers API
-export const farmersAPI = {
-  getFarmer: (id) => api.get(`/farmers/${id}`),
-  getFarmers: (filters, pagination) => api.get('/farmers', { params: { ...filters, ...pagination } }),
-  calculateFDI: (id) => api.post(`/farmers/${id}/fdi`),
-  addCertification: (id, data) => api.post(`/farmers/${id}/certifications`, data),
-  getCertifications: (id) => api.get(`/farmers/${id}/certifications`),
-  getFPOs: (filters) => api.get('/farmers/fpos/list', { params: filters }),
-};
-
-/**
- * Seed Vault — real backend added 2026-08-15. SeedVaultPage.jsx previously
- * called farmersAPI.getSeedVault/getSeedCategories/deleteSeed, none of
- * which existed anywhere (a live, fully broken page).
- */
-export const seedVaultAPI = {
-  getSeeds: () => api.get('/seed-vault'),
-  getCategories: () => api.get('/seed-vault/categories'),
-  addSeed: (data) => api.post('/seed-vault', data),
-  updateSeed: (id, data) => api.put(`/seed-vault/${id}`, data),
-  recordUsage: (id, amountUsed) => api.post(`/seed-vault/${id}/record-usage`, { amountUsed }),
-  deleteSeed: (id) => api.delete(`/seed-vault/${id}`),
-};
-
-// Financial API
-export const financialAPI = {
-  getOverview: (timeRange) => api.get('/financial/overview', { params: { timeRange } }),
-  getLoans: (params) => api.get('/financial/loans', { params }),
-  applyForLoan: (data) => api.post('/financial/loans', data),
-  getFarmerLoans: (farmerId, filters) => api.get(`/financial/loans/farmer/${farmerId}`, { params: filters }),
-  approveLoan: (id, data) => api.post(`/financial/loans/${id}/approve`, data),
-  getEMISchedule: (id) => api.get(`/financial/loans/${id}/emi`),
-  payEMI: (id, data) => api.post(`/financial/emi/${id}/pay`, data),
-  requestAdvance: (data) => api.post('/financial/advances', data),
-  getFarmerAdvances: (farmerId) => api.get(`/financial/advances/farmer/${farmerId}`),
-  getCreditScore: (farmerId) => api.get(`/financial/credit-score/${farmerId}`),
-};
-
-// Logistics API
-export const logisticsAPI = {
-  createShipment: (data) => api.post('/logistics/shipments', data),
-  getShipment: (id) => api.get(`/logistics/shipments/${id}`),
-  getShipments: (filters, pagination) => api.get('/logistics/shipments', { params: { ...filters, ...pagination } }),
-  updateShipmentStatus: (id, data) => api.put(`/logistics/shipments/${id}/status`, data),
-  addTrackingUpdate: (id, data) => api.post(`/logistics/shipments/${id}/tracking`, data),
-  getShipmentTracking: (id) => api.get(`/logistics/shipments/${id}/tracking`),
-  registerVehicle: (data) => api.post('/logistics/vehicles', data),
-  getVehicles: (filters) => api.get('/logistics/vehicles', { params: filters }),
-  registerDriver: (data) => api.post('/logistics/drivers', data),
-  getDrivers: (filters) => api.get('/logistics/drivers', { params: filters }),
-  getShipmentModes: () => api.get('/logistics/modes'),
-  getLiveTracking: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/live-tracking`),
-  getTemperatureData: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature`),
-  getTemperatureAlerts: (shipmentId) => api.get(`/logistics/shipments/${shipmentId}/temperature-alerts`),
-};
-
-// Insurance API
-export const insuranceAPI = {
-  createPolicy: (data) => api.post('/insurance/policies', data),
-  getPolicy: (id) => api.get(`/insurance/policies/${id}`),
-  getPolicies: (filters, pagination) => api.get('/insurance/policies', { params: { ...filters, ...pagination } }),
-  submitClaim: (data) => api.post('/insurance/claims', data),
-  getClaim: (id) => api.get(`/insurance/claims/${id}`),
-  getClaims: (filters, pagination) => api.get('/insurance/claims', { params: { ...filters, ...pagination } }),
-  processClaim: (id, data) => api.put(`/insurance/claims/${id}/process`, data),
-  createMasterPolicy: (data) => api.post('/insurance/master-policies', data),
-  getMasterPolicies: (filters) => api.get('/insurance/master-policies', { params: filters }),
-  getInsuranceProducts: (filters) => api.get('/insurance/products', { params: filters }),
-  calculatePremium: (data) => api.post('/insurance/calculate-premium', data),
-  calculatePremiumByType: (type, data) => api.post(`/insurance/calculate/${type}`, data),
-  generateQuote: (data) => api.post('/insurance/quotes', data),
-};
+import { api } from './apiClient';
+export { authAPI, dashboardAPI, userAPI, mfaAPI, privacyAPI, libraryAPI } from './coreApi';
+export { productsAPI, productReviewsAPI, ordersAPI, blockchainVerificationAPI, enterpriseIntegrationAPI, farmersAPI, seedVaultAPI } from './commerceApi';
+export { financialAPI, logisticsAPI, insuranceAPI } from './operationsApi';
 
 // AI API - Unified AI Gateway Integration
 export const aiAPI = {
@@ -321,10 +78,10 @@ export const aiAPI = {
 // provider status is honestly not_configured until an image/video provider
 // key is set; buildVideoScript works today with no external AI dependency.
 export const productMediaAIAPI = {
-  getProviderStatus: () => api.get('/product-media-ai/status'),
-  generateImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
-  buildVideoScript: (productId) => api.post(`/product-media-ai/products/${productId}/video-script`),
-  generateVideo: (productId) => api.post(`/product-media-ai/products/${productId}/video`),
+  getProviderStatus: () => api.get('/ai/product-media-ai/status'),
+  generateImage: (productId, prompt) => api.post(`/ai/product-media-ai/products/${productId}/image`, { prompt }),
+  buildVideoScript: (productId) => api.post(`/ai/product-media-ai/products/${productId}/video-script`),
+  generateVideo: (productId) => api.post(`/ai/product-media-ai/products/${productId}/video`),
 };
 
 // Wearable Integration API — Fitbit (real OAuth2), Apple Health / Samsung
@@ -922,23 +679,47 @@ export const preSeasonAPI = {
  *  Real backend at backend/src/services/ecommerceService.js */
 export const ecommerceAPI = {
   // Product Listings
-  createListing: (data) => api.post('/ecommerce/listings', data),
-  getListings: (filters, pagination) => api.get('/ecommerce/listings', { params: { ...filters, ...pagination } }),
-  getListing: (id) => api.get(`/ecommerce/listings/${id}`),
-  updateListing: (id, data) => api.put(`/ecommerce/listings/${id}`, data),
-  deleteListing: (id) => api.delete(`/ecommerce/listings/${id}`),
+  createListing: (data) => api.post('/ai/ecommerce-marketplace/listings', data),
+  getListings: (filters, pagination) => api.get('/ai/ecommerce-marketplace/listings', { params: { ...filters, ...pagination } }),
+  getListing: (id) => api.get(`/ai/ecommerce-marketplace/listings/${id}`),
+  updateListing: (id, data) => api.put(`/ai/ecommerce-marketplace/listings/${id}`, data),
+  deleteListing: (id) => api.delete(`/ai/ecommerce-marketplace/listings/${id}`),
 
   // Seller Analytics
-  getSellerAnalytics: (period) => api.get('/ecommerce/seller/analytics', { params: { period } }),
-  getSellerListings: () => api.get('/ecommerce/seller/listings'),
+  getSellerAnalytics: (period) => api.get('/ai/ecommerce-marketplace/seller/analytics', { params: { period } }),
+  getSellerListings: () => api.get('/ai/ecommerce-marketplace/seller/listings'),
 
   // GI Marketplace
-  getGIListings: (filters) => api.get('/ecommerce/gi-listings', { params: filters }),
+  getGIListings: (filters) => api.get('/ai/ecommerce-marketplace/gi-listings', { params: filters }),
 
   // Market Intelligence
-  getPriceTrends: (categoryId, period) => api.get(`/ecommerce/market/price-trends/${categoryId}`, { params: { period } }),
-  getDemandAnalysis: (categoryId) => api.get(`/ecommerce/market/demand/${categoryId}`),
-  getPriceRecommendation: (data) => api.post('/ecommerce/price-recommendation', data),
+  getPriceTrends: (categoryId, period) => api.get(`/ai/ecommerce-marketplace/market/price-trends/${categoryId}`, { params: { period } }),
+  getDemandAnalysis: (categoryId) => api.get(`/ai/ecommerce-marketplace/market/demand/${categoryId}`),
+  getPriceRecommendation: (data) => api.post('/ai/ecommerce-marketplace/price-recommendation', data),
+};
+
+// Payment Gateway API
+export const paymentGatewayAPI = {
+  processPayment: (data) => api.post('/ai/payment-gateway/process', data),
+  getPaymentStatus: (paymentId) => api.get(`/ai/payment-gateway/status/${paymentId}`),
+  refundPayment: (paymentId, data) => api.post(`/ai/payment-gateway/refund/${paymentId}`, data),
+  getSupportedGateways: () => api.get('/ai/payment-gateway/gateways'),
+};
+
+// Digital Wallet API (new unified wallet system)
+export const digitalWalletAPI = {
+  getBalance: (userId) => api.get(`/ai/wallet/balance/${userId}`),
+  createWallet: (data) => api.post('/ai/wallet/create', data),
+  addFunds: (walletId, data) => api.post(`/ai/wallet/add-funds/${walletId}`, data),
+  getTransactionHistory: (walletId) => api.get(`/ai/wallet/transactions/${walletId}`),
+};
+
+// Transaction API
+export const transactionAPI = {
+  createTransaction: (data) => api.post('/ai/transactions/create', data),
+  getTransaction: (transactionId) => api.get(`/ai/transactions/${transactionId}`),
+  getUserTransactions: (userId) => api.get(`/ai/transactions/user/${userId}`),
+  updateStatus: (transactionId, data) => api.put(`/ai/transactions/${transactionId}/status`, data),
 };
 
 /** AFRERA E-Commerce Integration Service
@@ -1606,23 +1387,23 @@ export const multilingualAPI = {
 
 /** Nutrition intelligence (components/NutritionIntelligence/NutritionLabel.jsx). */
 export const nutritionAPI = {
-  getProductNutrition: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}`),
-  getNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
-  getDietaryProfiles: () => api.get('/nutrition-intelligence/dietary-profiles'),
-  getRecommendations: () => api.get('/nutrition-intelligence/recommendations'),
+  getProductNutrition: (productId) => api.get(`/ai/nutrition-intelligence/product-nutrition/${productId}`),
+  getNutritionScore: (productId) => api.get(`/ai/nutrition-intelligence/product-nutrition/${productId}/score`),
+  getDietaryProfiles: () => api.get('/ai/nutrition-intelligence/dietary-profiles'),
+  getRecommendations: () => api.get('/ai/nutrition-intelligence/recommendations'),
   generateRecommendations: (dietaryProfileId, targetCalories, limit) =>
-    api.post('/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit }),
-  getWellnessPractices: (params) => api.get('/nutrition-intelligence/wellness-practices', { params }),
+    api.post('/ai/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit }),
+  getWellnessPractices: (params) => api.get('/ai/nutrition-intelligence/wellness-practices', { params }),
   // AI-generated recipe grounded in real dietary profile + real matching AFRERA
   // products — see nutritionIntelligenceService.generateDietBasedRecipe. Returns
   // an honest status: 'generated' | 'ai_not_configured' | 'no_ingredients'.
   generateRecipe: (dietaryProfileId, targetCalories, provider) =>
-    api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
+    api.post('/ai/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
   // "Sell by nutrient, not by kg" — real per-100g comparison against category
   // peers, picks whichever recorded compound (protein, curcumin, Scoville,
   // ASTA color, etc.) actually differentiates this product. See
   // nutritionIntelligenceService.calculateValuePerNutrient.
-  getValuePerNutrient: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
+  getValuePerNutrient: (productId) => api.get(`/ai/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
 };
 
 export const dietTherapyAPI = {

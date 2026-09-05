@@ -4,31 +4,57 @@
  * STUB: Requires real Stripe/Razorpay credentials in .env
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_');
-const Razorpay = require('razorpay');
-const db = require('../database/db');
+const crypto = require('crypto');
+const { getPostgreSQL } = require('../database/connection');
 const cacheService = require('./cacheService');
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'test_key_id',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'test_key_secret',
-});
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
+  : null;
+const Razorpay = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
+  ? require('razorpay')
+  : null;
+const razorpay = Razorpay
+  ? new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+  })
+  : null;
+
+function database() {
+  const db = getPostgreSQL();
+  if (!db) throw new Error('PostgreSQL is not connected');
+  return db;
+}
+
+function validateAmount(amount) {
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Payment amount must be greater than zero');
+  }
+}
 
 class PaymentService {
   // Initialize payment gateways
   async init() {
-    try {
-      console.log('✅ Payment service initialized');
-      this.setupWebhooks();
-    } catch (error) {
-      console.error('Payment service init error:', error);
+    if (!stripe && !razorpay) {
+      throw new Error('No payment gateway credentials configured');
     }
+    this.setupWebhooks();
+    return this.getStatus();
+  }
+
+  getStatus() {
+    return {
+      stripe: Boolean(stripe),
+      razorpay: Boolean(razorpay),
+      configured: Boolean(stripe || razorpay),
+    };
   }
 
   // Create wallet for user
   async createWallet(userId) {
     try {
-      const result = await db.query(
+      const result = await database().query(
         'INSERT INTO wallets (user_id, balance, created_at) VALUES ($1, $2, NOW()) RETURNING *',
         [userId, 0]
       );
@@ -45,7 +71,7 @@ class PaymentService {
       const cached = await cacheService.get(`wallet:${userId}:balance`);
       if (cached) return cached;
 
-      const result = await db.query(
+      const result = await database().query(
         'SELECT balance FROM wallets WHERE user_id = $1',
         [userId]
       );
@@ -62,6 +88,8 @@ class PaymentService {
   // Process payment via Stripe
   async processStripePayment(userId, amount, paymentMethodId) {
     try {
+      validateAmount(amount);
+      if (!stripe) throw new Error('Stripe is not configured');
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: 'inr',
@@ -86,6 +114,8 @@ class PaymentService {
   // Process payment via Razorpay
   async processRazorpayPayment(userId, amount, orderId) {
     try {
+      validateAmount(amount);
+      if (!razorpay) throw new Error('Razorpay is not configured');
       const payment = await razorpay.payments.fetch(orderId);
 
       if (payment.status === 'captured') {
@@ -104,7 +134,7 @@ class PaymentService {
   // Record transaction
   async recordTransaction(userId, amount, gateway, transactionId) {
     try {
-      const result = await db.query(
+      const result = await database().query(
         `INSERT INTO transactions
          (user_id, amount, gateway, transaction_id, status, created_at)
          VALUES ($1, $2, $3, $4, $5, NOW())
@@ -123,7 +153,7 @@ class PaymentService {
   // Update wallet balance
   async updateBalance(userId, amount) {
     try {
-      const result = await db.query(
+      const result = await database().query(
         'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2 RETURNING *',
         [amount, userId]
       );
@@ -139,19 +169,20 @@ class PaymentService {
   // Transfer funds between users
   async transferFunds(fromUserId, toUserId, amount) {
     try {
+      validateAmount(amount);
       const fromBalance = await this.getBalance(fromUserId);
       if (fromBalance < amount) {
         throw new Error('Insufficient balance');
       }
 
       // Debit from user
-      await db.query(
+      await database().query(
         'UPDATE wallets SET balance = balance - $1 WHERE user_id = $2',
         [amount, fromUserId]
       );
 
       // Credit to user
-      await db.query(
+      await database().query(
         'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2',
         [amount, toUserId]
       );
@@ -173,7 +204,7 @@ class PaymentService {
       const cached = await cacheService.get(`transactions:${userId}:history`);
       if (cached) return cached;
 
-      const result = await db.query(
+      const result = await database().query(
         `SELECT * FROM transactions WHERE user_id = $1
          ORDER BY created_at DESC LIMIT $2`,
         [userId, limit]
@@ -190,6 +221,9 @@ class PaymentService {
 
   // Handle Stripe webhook
   async handleStripeWebhook(event) {
+    if (!event || typeof event.type !== 'string') {
+      throw new Error('Invalid Stripe webhook event');
+    }
     switch (event.type) {
       case 'payment_intent.succeeded':
         console.log('Payment succeeded:', event.data.object);
@@ -204,6 +238,7 @@ class PaymentService {
 
   // Handle Razorpay webhook
   async handleRazorpayWebhook(event) {
+    if (!event || !event.payload) throw new Error('Invalid Razorpay webhook event');
     const { payload } = event;
     if (event.event === 'payment.authorized') {
       console.log('Payment authorized:', payload.payment.entity);
@@ -213,6 +248,18 @@ class PaymentService {
   setupWebhooks() {
     // Webhooks would be configured in routes/paymentRoutes.js
     console.log('Payment webhooks configured');
+  }
+
+  verifyRazorpaySignature(payload, signature) {
+    if (!process.env.RAZORPAY_WEBHOOK_SECRET || !signature) return false;
+    const expected = crypto
+      .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET)
+      .update(payload)
+      .digest('hex');
+    const expectedBuffer = Buffer.from(expected);
+    const signatureBuffer = Buffer.from(signature);
+    return expectedBuffer.length === signatureBuffer.length
+      && crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
   }
 }
 
