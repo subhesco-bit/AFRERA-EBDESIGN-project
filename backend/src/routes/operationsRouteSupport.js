@@ -26,9 +26,16 @@ function emitMutation(req, operation, item, signalType, source) {
 }
 
 const router = express.Router();
-const routes = {
-  validateId, parsePageQuery, bodyValidator, queryValidator, validateBody, fail, requestId,
-  validateOperationsBody, emitMutation,
+
+module.exports = {
+  router,
+  validateId,
+  parsePageQuery,
+  bodyValidator,
+  queryValidator,
+  validateBody,
+  fail,
+  requestId,
+  validateOperationsBody,
+  emitMutation
 };
-Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
-module.exports = router;
