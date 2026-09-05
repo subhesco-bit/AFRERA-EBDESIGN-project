@@ -567,7 +567,7 @@ app.use('/api/m400aibackbone', m400AiBackboneRoutes);
 app.use('/api/logisticsenhancements', logisticsEnhancements);
 app.use('/api/logisticsenhancement', logisticsEnhancementRoutes);
 app.use('/api/loanmanagement', loanManagement);
-app.use('/api/livestockroutesupport', livestockRouteSupport);
+app.use('/api/livestockroutesupport', livestockRouteSupport.router);
 app.use('/api/livestockmanagement', livestockManagementRoutes);
 app.use('/api/livestock', livestock);
 app.use('/api/library', libraryRoutes);
