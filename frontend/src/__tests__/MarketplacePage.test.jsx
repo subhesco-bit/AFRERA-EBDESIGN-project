@@ -1,6 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import MarketplacePage from '../pages/MarketplacePage';
-import * as api from '../services/api';
 import * as rq from '@tanstack/react-query';
 
 jest.mock('@tanstack/react-query', () => ({

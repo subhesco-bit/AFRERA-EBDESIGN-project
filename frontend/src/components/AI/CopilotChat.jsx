@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { aiAPI } from '../../services/componentApi';
 
 /**
@@ -54,25 +55,25 @@ export default function CopilotChat({ copilotType }) {
   const fileInputRef = useRef(null);
   const meta = COPILOT_META[copilotType] || { icon: '🤖', label: copilotType, placeholder: 'Ask a question…' };
 
-  useEffect(() => {
-    setSessionId(null);
-    setMessages([]);
-    setError(null);
-    loadChatHistory();
-  }, [copilotType]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  async function loadChatHistory() {
+  const loadChatHistory = useCallback(async () => {
     try {
       const res = await aiAPI.copilot.getSessionHistory(copilotType);
       setChatHistory(res.data?.sessions || []);
     } catch (err) {
       console.error('Failed to load chat history:', err);
     }
-  }
+  }, [copilotType]);
+
+  useEffect(() => {
+    setSessionId(null);
+    setMessages([]);
+    setError(null);
+    loadChatHistory();
+  }, [copilotType, loadChatHistory]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   async function ensureSession() {
     if (sessionId) return sessionId;
@@ -331,5 +332,9 @@ export default function CopilotChat({ copilotType }) {
     </div>
   );
 }
+
+CopilotChat.propTypes = {
+  copilotType: PropTypes.string,
+};
 
 export { COPILOT_META };

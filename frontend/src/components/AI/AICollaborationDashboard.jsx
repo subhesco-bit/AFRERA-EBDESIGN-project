@@ -11,7 +11,7 @@ export default function AICollaborationDashboard() {
   const [stats, setStats] = useState(null);
   const [devinWork, setDevinWork] = useState([]);
   const [claudeWork, setClaudeWork] = useState([]);
-  const [pendingHandoffs, setPendingHandoffs] = useState([]);
+  const [_pendingHandoffs, _setPendingHandoffs] = useState([]);
   const [aiDecisions, setAIDecisions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [autoMode, setAutoMode] = useState(false);
@@ -319,23 +319,23 @@ export default function AICollaborationDashboard() {
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">From AI</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded">
+              <label htmlFor="from-ai" className="block text-sm font-medium text-gray-700 mb-1">From AI</label>
+              <select id="from-ai" className="w-full px-3 py-2 border border-gray-300 rounded">
                 <option value="devin">Devin</option>
                 <option value="claude">Claude</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">To AI</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded">
+              <label htmlFor="to-ai" className="block text-sm font-medium text-gray-700 mb-1">To AI</label>
+              <select id="to-ai" className="w-full px-3 py-2 border border-gray-300 rounded">
                 <option value="claude">Claude</option>
                 <option value="devin">Devin</option>
               </select>
             </div>
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Work Description</label>
-            <textarea className="w-full px-3 py-2 border border-gray-300 rounded" rows="3" placeholder="Describe the work to hand off..."></textarea>
+            <label htmlFor="work-description" className="block text-sm font-medium text-gray-700 mb-1">Work Description</label>
+            <textarea id="work-description" className="w-full px-3 py-2 border border-gray-300 rounded" rows="3" placeholder="Describe the work to hand off..." />
           </div>
           <button
             onClick={() => createHandoff('devin', 'claude', { description: 'Test handoff' })}

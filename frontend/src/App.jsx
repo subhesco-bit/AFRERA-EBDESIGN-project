@@ -6,13 +6,13 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import { errorMonitoring } from './utils/errorMonitoring';
 import { LoadingSpinner } from './components/ui/Skeleton';
-import { ProtectedRoute, PublicRoute, RoleRoute } from './components/RouteGuard';
+import { ProtectedRoute, RoleRoute } from './components/RouteGuard';
 import { PageTransition } from './components/RouteTransition';
 import { RouteAnalytics, RouteMetadata, UserJourneyTracker, ScrollTracker, EngagementTracker } from './components/RouteAnalytics';
-import { RouteErrorBoundary, ErrorPage, NotFoundPage, UnauthorizedPage } from './components/RouteErrorBoundary';
-import { RouteSuspense, SmartRouteLoading } from './components/RouteLoading';
+import { ErrorPage, NotFoundPage, UnauthorizedPage } from './components/RouteErrorBoundary';
+import { RouteSuspense } from './components/RouteLoading';
 import { RoutePreloader } from './utils/routePreloader';
-import { publicRoutes, protectedRoutes, farmerRoutes, adminRoutes, dashboardRoutes, managementRoutes, getRouteByPath, getAllRoutes } from './config/routes';
+import { publicRoutes, protectedRoutes, farmerRoutes, adminRoutes, dashboardRoutes, managementRoutes, getRouteByPath } from './config/routes';
 import config from './config/env';
 import monitoring from './utils/monitoring';
 import analytics from './utils/analytics';
@@ -63,11 +63,11 @@ function App() {
     // production builds, where this is actually wanted.
     if (import.meta.env.PROD && config.ENABLE_PWA && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-
+        .then(() => {
+          // Service worker registered successfully
         })
-        .catch((error) => {
-
+        .catch((_error) => {
+          // Service worker registration failed
         });
     }
   }, []);

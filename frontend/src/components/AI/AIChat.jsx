@@ -40,7 +40,7 @@ export default function AIChat() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const loadChatHistory = async () => {
+  const _loadChatHistory = async () => {
     try {
       const response = await api.get('/ai/chat/history');
       setChatHistory(response.data.data || []);
