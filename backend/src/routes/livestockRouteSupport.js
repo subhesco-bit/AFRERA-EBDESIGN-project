@@ -87,6 +87,10 @@ function protectLivestockRouter(router, { requireWriteRole = false, signal = SIG
 }
 
 const router = express.Router();
-const routes = { protectLivestockRouter, requestGuard, fail };
-Object.keys(routes).forEach(key => { if (routes[key]) router.use('/' + key, routes[key]); });
-module.exports = router;
+
+module.exports = {
+  router,
+  protectLivestockRouter,
+  requestGuard,
+  fail
+};
