@@ -200,8 +200,8 @@ CREATE TRIGGER trigger_hydroponics_systems_updated_at
 
 -- Insert sample data for demonstration
 INSERT INTO orchards (farmer_id, name, location, area, orchard_type, tree_count, planting_date, varieties, soil_type, irrigation_system) VALUES
-(1, 'Mango Orchard', 'North Field', 2.5, 'FRUIT', 150, '2020-03-15', '[{"variety": "Alphonso", "count": 100}, {"variety": "Kesar", "count": 50}]', 'LOAMY', 'DRIP'),
-(1, 'Coconut Grove', 'South Field', 1.8, 'FRUIT', 80, '2018-06-20', '[{"variety": "Tall", "count": 60}, {"variety": "Dwarf", "count": 20}]', 'SANDY', 'SPRINKLER')
+('550e8400-e29b-41d4-a716-446655440000'::UUID, 'Mango Orchard', 'North Field', 2.5, 'FRUIT', 150, '2020-03-15', '[{"variety": "Alphonso", "count": 100}, {"variety": "Kesar", "count": 50}]', 'LOAMY', 'DRIP'),
+('550e8400-e29b-41d4-a716-446655440001'::UUID, 'Coconut Grove', 'South Field', 1.8, 'FRUIT', 80, '2018-06-20', '[{"variety": "Tall", "count": 60}, {"variety": "Dwarf", "count": 20}]', 'SANDY', 'SPRINKLER')
 ON CONFLICT DO NOTHING;
 
 -- Grant permissions (adjust as needed for your setup)
