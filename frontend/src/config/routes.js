@@ -60,6 +60,7 @@ const EnterpriseIntegrationPage = lazy(() => import('../pages/EnterpriseIntegrat
 // Additional Dashboard Pages
 const FinancialServicesDashboard = lazy(() => import('../pages/FinancialServicesDashboard'))
 const OperationalDashboard = lazy(() => import('../pages/OperationalDashboard'))
+// const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
 
 // Financial Services Pages
 const LoanManagementPage = lazy(() => import('../pages/LoanManagementPage'))
@@ -154,16 +155,17 @@ const MarketingCenter = lazy(() => import('../pages/MarketingCenter'))
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'))
 
 // Report pages
-const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
-const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
-const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
-const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
-const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
-const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
-const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
-const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
-const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
-const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
+// TODO: Create missing report pages
+// const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
+// const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
+// const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
+// const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
+// const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
+// const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
+// const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
+// const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
+// const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
+// const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
 const CreditScorePage = lazy(() => import('../pages/CreditScorePage'))
 const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'))
 
@@ -433,86 +435,87 @@ export const protectedRoutes = [
     keywords: 'analytics, insights, data',
     transition: 'fade'
   },
-  {
-    path: '/reports',
-    component: ReportsDashboardPage,
-    title: 'Reports Dashboard - AFRERA',
-    description: 'Generate and manage comprehensive reports',
-    keywords: 'reports, dashboard, analytics',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/sales',
-    component: SalesReportPage,
-    title: 'Sales Report - AFRERA',
-    description: 'Sales performance analysis and metrics',
-    keywords: 'sales, report, performance',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/inventory',
-    component: InventoryReportPage,
-    title: 'Inventory Report - AFRERA',
-    description: 'Inventory status and analysis',
-    keywords: 'inventory, report, stock',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/farmer',
-    component: FarmerReportPage,
-    title: 'Farmer Report - AFRERA',
-    description: 'Farmer performance and demographics',
-    keywords: 'farmer, report, performance',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/financial',
-    component: FinancialReportPage,
-    title: 'Financial Report - AFRERA',
-    description: 'Financial performance analysis',
-    keywords: 'financial, report, profit',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/operations',
-    component: OperationsReportPage,
-    title: 'Operations Report - AFRERA',
-    description: 'Logistics and warehouse performance',
-    keywords: 'operations, report, logistics',
-    transition: 'fade'
-  },
-  {
-    path: '/reports/audit',
-    component: AuditReportPage,
-    title: 'Audit Report - AFRERA',
-    description: 'System compliance and security audit',
-    keywords: 'audit, report, compliance',
-    transition: 'fade'
-  },
-  {
-    path: '/marketplace/bulk-purchase',
-    component: BulkPurchasePage,
-    title: 'Bulk Purchase - AFRERA',
-    description: 'Order agricultural products in bulk',
-    keywords: 'bulk, purchase, wholesale',
-    transition: 'fade'
-  },
-  {
-    path: 'marketplace/contract-listing',
-    component: ContractListingPage,
-    title: 'Contract Listings - AFRERA',
-    description: 'Browse farming contracts',
-    keywords: 'contract, farming, agreement',
-    transition: 'fade'
-  },
-  {
-    path: '/marketplace/group-buying',
-    component: GroupBuyingPage,
-    title: 'Group Buying - AFRERA',
-    description: 'Join group purchases for discounts',
-    keywords: 'group, buying, discount',
-    transition: 'fade'
-  },
+  // TODO: Create missing report pages
+  // {
+  //   path: '/reports',
+  //   component: ReportsDashboardPage,
+  //   title: 'Reports Dashboard - AFRERA',
+  //   description: 'Generate and manage comprehensive reports',
+  //   keywords: 'reports, dashboard, analytics',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/reports/sales',
+  //   component: SalesReportPage,
+  //   title: 'Sales Report - AFRERA',
+  //   description: 'Sales performance analysis and metrics',
+  //   keywords: 'sales, report, performance',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/reports/inventory',
+  //   component: InventoryReportPage,
+  //   title: 'Inventory Report - AFRERA',
+  //   description: 'Inventory status and analysis',
+  //   keywords: 'inventory, report, stock',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/reports/farmer',
+  //   component: FarmerReportPage,
+  //   title: 'Farmer Report - AFRERA',
+  //   description: 'Farmer performance and demographics',
+  //   keywords: 'farmer, report, performance',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/reports/financial',
+  //   component: FinancialReportPage,
+  //   title: 'Financial Report - AFRERA',
+  //   description: 'Financial performance analysis',
+  //   keywords: 'financial, report, profit',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/reports/operations',
+  //   component: OperationsReportPage,
+  //   title: 'Operations Report - AFRERA',
+  //   description: 'Logistics and warehouse performance',
+  //   keywords: 'operations, report, logistics',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/reports/audit',
+  //   component: AuditReportPage,
+  //   title: 'Audit Report - AFRERA',
+  //   description: 'System compliance and security audit',
+  //   keywords: 'audit, report, compliance',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/marketplace/bulk-purchase',
+  //   component: BulkPurchasePage,
+  //   title: 'Bulk Purchase - AFRERA',
+  //   description: 'Order agricultural products in bulk',
+  //   keywords: 'bulk, purchase, wholesale',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: 'marketplace/contract-listing',
+  //   component: ContractListingPage,
+  //   title: 'Contract Listings - AFRERA',
+  //   description: 'Browse farming contracts',
+  //   keywords: 'contract, farming, agreement',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/marketplace/group-buying',
+  //   component: GroupBuyingPage,
+  //   title: 'Group Buying - AFRERA',
+  //   description: 'Join group purchases for discounts',
+  //   keywords: 'group, buying, discount',
+  //   transition: 'fade'
+  // },
   {
     path: '/financial/credit-score',
     component: CreditScorePage,
