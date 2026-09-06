@@ -1,0 +1,62 @@
+{
+  "transferStatus": "IN_PROGRESS",
+  "date": "2026-09-06",
+  "projectRoot": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN",
+  "globalTransferMechanism": {
+    "phase": "CONSOLIDATION",
+    "action": "REMOVE_OLD_WORKTREES",
+    "action_reason": "Consolidate all non-transferred files into main project structure",
+    "oldWorktrees": [
+      ".claude/worktrees/confident-satoshi-a53ac8",
+      ".claude/worktrees/enterprise-audit",
+      ".claude/worktrees/intelligent-sutherland-9f1488",
+      ".claude/worktrees/jolly-feynman-9d174f",
+      ".claude/worktrees/musing-bartik-79ce5a",
+      ".claude/worktrees/reverent-hellman-fc7e32"
+    ],
+    "stagingDirectories": [
+      ".ai/staging/canonical-plug-and-play",
+      ".ai/staging/claude-visual-validation",
+      ".ai/staging/claude-visual-validation-2"
+    ],
+    "integrationTargets": {
+      "backendServices": {
+        "location": "backend/src/services",
+        "count": 11,
+        "status": "NEED_EXPORT_VERIFICATION"
+      },
+      "routes": {
+        "location": "backend/src/routes",
+        "count": 140,
+        "status": "NEED_MOUNT_VERIFICATION"
+      },
+      "pages": {
+        "location": "frontend/src/pages",
+        "count": 182,
+        "status": "NEED_ROUTE_VERIFICATION"
+      },
+      "components": {
+        "location": "frontend/src/components",
+        "count": 72,
+        "status": "NEED_INTEGRATION_VERIFICATION"
+      }
+    },
+    "transferActions": [
+      "VERIFY: All services properly exported",
+      "VERIFY: All routes properly mounted",
+      "VERIFY: All pages in route configuration",
+      "FIX: Any lint errors",
+      "FIX: Any build errors",
+      "CLEANUP: Remove old worktrees",
+      "CLEANUP: Archive staging directories"
+    ],
+    "expectedOutcomes": {
+      "orphanedFiles": 0,
+      "unlinkedServices": 0,
+      "unmountedRoutes": 0,
+      "unmappedPages": 0,
+      "lintErrors": 0,
+      "buildErrors": 0
+    }
+  }
+}
