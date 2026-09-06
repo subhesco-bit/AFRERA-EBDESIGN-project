@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/status', (req, res) => {
-  res.json({ status: 'connected' });
+router.post('/decide', (req, res) => {
+  res.json({ decision: 'AI decision made' });
 });
 
 module.exports = router;
