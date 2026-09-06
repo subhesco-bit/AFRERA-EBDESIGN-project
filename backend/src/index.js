@@ -180,16 +180,8 @@ const backupService = require('./services/legacy/backupService');
 const analyticsMonitoringService = require('./services/legacy/analyticsMonitoringService');
 // AI Agentic Companion Service
 const aiAgenticCompanionService = require('./services/legacy/aiAgenticCompanionService');
-// NOTE: services/legacy/digitalTwinService.js is NOT required here - see
-// schema-decisions.json's "digital_twins" entry. It queries digital_twins.farm_id/
-// configuration/is_active and a `farms` table, none of which have ever existed;
-// the only real digital_twins table (072_tier1_m025_m030_schema.sql) uses
-// entity_type/entity_id/owner_id/current_state, which is what
-// services/digitalTwinService.js (mounted below via routes/digitalTwinRoutes.js
-// at /api/v1/digital-twin) actually targets. The legacy file was dead on arrival
-// and, where its routes didn't collide with the real ones, was 500ing on every
-// call. Left on disk, not deleted, in case its simulation-model logic
-// (cropGrowthSimulation etc.) is worth salvaging later.
+// Digital Twin Service
+const digitalTwinService = require('./services/legacy/digitalTwinService');
 // AI Gateway Service - Real AI Backbone System
 const aiGatewayService = require('./services/legacy/aiGatewayService');
 // AI Agent Service - Agentic AI Capabilities
@@ -215,25 +207,6 @@ const platformCoreRoutes = require('./routes/platformCoreRoutes');
 const unifiedAIRoutes = require('./routes/unifiedAIRoutes');
 const libraryRoutes = require('./routes/libraryRoutes');
 const aiCollaborationRoutes = require('./routes/aiCollaborationRoutes');
-// Unified AI Gateway - NEW single entry point for all AI services
-const unifiedAIGateway = require('./routes/unifiedAIGateway');
-// Claude AI-Ready Services (Phase 1 Core AI Services Conversion)
-const claudeAIDecisionService = require('./services/claude/aiDecisionService');
-const claudeAIStrategyService = require('./services/claude/aiStrategyService');
-const claudeAICopilotService = require('./services/claude/aiCopilotService');
-const claudeAIProviderService = require('./services/claude/aiProviderService');
-const claudeAICoordinationService = require('./services/claude/aiCoordinationService');
-const claudeAIAgentService = require('./services/claude/aiAgentService');
-const claudeAIOptimizationService = require('./services/claude/aiOptimizationService');
-const claudeAIRecoveryService = require('./services/claude/aiRecoveryService');
-// Claude AI-Ready Services (Phase 2 Business Logic Services Conversion)
-const claudeFinancialAIService = require('./services/claude/financialAIService');
-const claudeLogisticsAIService = require('./services/claude/logisticsAIService');
-const claudeInsuranceAIService = require('./services/claude/insuranceAIService');
-const claudeProductAIService = require('./services/claude/productAIService');
-const claudeOrderAIService = require('./services/claude/orderAIService');
-// Claude AI-Ready Routes
-const claudeAIDecisionRoutes = require('./routes/claude/aiDecisionRoutes');
 // Generic plug-and-play module discovery/load/execute bridge (backend/src/core/moduleRegistry.js)
 const moduleRegistryRoutes = require('./routes/claude/moduleRegistryRoutes');
 // REST bridge exposing backend/src/modules/M0XX's real functions over HTTP
@@ -396,7 +369,6 @@ const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
 const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
 const decisionSupportRoutes = require('./routes/decisionSupportRoutes');
-const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes');
 // Genuinely orphaned services found during the 2026-08-29 gap-index audit -
 // real, substantial code, zero prior route/index.js wiring. See .ai/tasks/ACTIVE.md.
 // (The 3 insurance-* route files originally added here were themselves a
@@ -498,7 +470,7 @@ const { responseFormatter } = require('./middleware/responseFormatter');
 const { requestLogger, errorLogger } = require('./middleware/requestLogger');
 const { validateBody, validateQuery, validateParams } = require('./middleware/validation');
 const { authMiddleware } = require('./middleware/auth');
-const { sanitizeObject } = require('./middleware/inputValidation');
+const { validateBody: validateBodyOld } = require('./middleware/inputValidation');
 const { requestId } = require('./middleware/requestId');
 const { securityHeaders, productionSecurityHeaders } = require('./middleware/securityHeaders');
 const { routeMonitoring, criticalRouteMonitoring, healthCheckMonitoring } = require('./middleware/routeMonitoring');
@@ -506,9 +478,6 @@ const { logger } = require('./utils/logger');
 
 // Database Enhancements Integration
 const { initializeDatabaseEnhancements, shutdownDatabaseEnhancements, getDatabaseEnhancements } = require('./database/database_enhancements');
-
-// WebSocket Service for Real-time Updates
-const websocketService = require('./services/websocketService');
 
 // Initialize Express app
 const app = express();
@@ -519,9 +488,6 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
-
-// Initialize WebSocket service
-websocketService.initialize(httpServer);
 
 // Trust proxy configuration for rate limiting security
 // Rate limiters key on req.ip, which is attacker-controlled via X-Forwarded-For
@@ -568,24 +534,6 @@ app.use(morgan('combined', { stream: { write: message => logger.info(message.tri
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 2026-08-31: middleware/inputValidation.js's sanitizeInput/sanitizeObject
-// (strips HTML tags, javascript: protocol, inline event handlers from every
-// string in req.body) was written and tested but never actually applied
-// anywhere - validateBodyOld was imported and unused. Wiring a thin
-// sanitize-only pass globally so every route gets basic XSS-input
-// sanitization by default. Deliberately NOT using validateBodyOld() itself
-// here - it 400-rejects whenever req.body is falsy, which is every GET
-// request and every multipart/file-upload request (express.json()/
-// urlencoded() only populate req.body for matching content-types, leaving
-// it undefined otherwise) - wiring that globally would have 400'd nearly
-// the entire read-only API surface and all file uploads.
-app.use((req, res, next) => {
-  if (req.body && typeof req.body === 'object') {
-    req.body = sanitizeObject(req.body);
-  }
-  next();
-});
-
 // Request ID middleware for distributed tracing (must come before other middleware)
 app.use(requestId);
 
@@ -624,16 +572,7 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-// UNIFIED AI GATEWAY - Single entry point for all AI services with reconstructed architecture
-// Integrates 16gm AI Copilot Framework, M400 AI Backbone, Claude AI Coordinator, and all existing AI services
-app.use('/api/v1/ai', unifiedAIGateway);
-// Claude AI-Ready Routes (Phase 1 Core AI Services)
-app.use('/api/v1/claude/ai-decision', claudeAIDecisionRoutes);
-// All Claude AI routes (strategy, copilot, provider, coordination, agent, optimization, recovery,
-// financial, logistics, insurance, product, order) are mounted earlier at lines 633-650 from
-// their initial requires at lines 236-245. Lines 626-650 were duplicate dead weight - removed 2026-08-31
-// Legacy aiService functionality preserved at /api/v1/ai-legacy for backward compatibility
-mountRoute('/api/v1/ai-legacy', aiService);
+mountRoute('/api/v1/ai', aiService);
 mountRoute('/api/v1/erp', erpService);
 mountRoute('/api/v1/multilingual', multilingualService);
 mountRoute('/api/v1/organic-traceability', organicTraceabilityService);
@@ -776,22 +715,6 @@ app.use('/api/v1/ai-collaboration', aiCollaborationRoutes);
 app.use('/api/v1/advanced', advancedFeatures);
 app.use('/api/v1/enterprise-ai', enterpriseAIRoutes);
 
-// Tier 1 Advanced Modules (M025-M030) - Production-level services
-const advancedAnalyticsRoutes = require('./routes/advancedAnalyticsRoutes');
-const predictiveIntelligenceRoutes = require('./routes/predictiveIntelligenceRoutes');
-const iotIntegrationRoutes = require('./routes/iotIntegrationRoutes');
-const blockchainVerificationRoutes = require('./routes/blockchainVerificationRoutes');
-const digitalTwinRoutes = require('./routes/digitalTwinRoutes');
-const enterpriseIntegrationRoutes = require('./routes/enterpriseIntegrationRoutes');
-
-// CORRECTION: Standardized Tier 1 routes to /api/v1/ prefix for consistency
-app.use('/api/v1/analytics', advancedAnalyticsRoutes);
-app.use('/api/v1/predictive', predictiveIntelligenceRoutes);
-app.use('/api/v1/iot', iotIntegrationRoutes);
-app.use('/api/v1/blockchain', blockchainVerificationRoutes);
-app.use('/api/v1/digital-twin', digitalTwinRoutes);
-app.use('/api/v1/enterprise', enterpriseIntegrationRoutes);
-
 // Routes that existed but were never mounted anywhere
 app.use('/api/v1/gst', gstRoutes);
 // REMOVED: logisticsOpsRoutes - missing file, will crash app
@@ -911,17 +834,6 @@ app.use('/api/v1/hydroponics', hydroponicsRoutes);
 app.use('/api/v1/aeroponics', aeroponicsRoutes);
 app.use('/api/v1/precision-horticulture', precisionHorticultureRoutes);
 app.use('/api/v1/protected-cultivation', protectedCultivationRoutes);
-
-// Strategic Services Routes - Multi-Role Ecosystem Support
-const preSeasonPurchaseRoutes = require('./routes/strategic/preSeasonPurchaseRoutes');
-const contractFarmingRoutes = require('./routes/strategic/contractFarmingRoutes');
-const householdProcurementRoutes = require('./routes/strategic/householdProcurementRoutes');
-const governmentSubsidyRoutes = require('./routes/strategic/governmentSubsidyRoutes');
-
-app.use('/api/v1/strategic/pre-season', preSeasonPurchaseRoutes);
-app.use('/api/v1/strategic/contract-farming', contractFarmingRoutes);
-app.use('/api/v1/strategic/household', householdProcurementRoutes);
-app.use('/api/v1/strategic/government', governmentSubsidyRoutes);
 app.use('/api/v1/horticulture-analytics', horticultureAnalyticsRoutes);
 app.use('/api/v1/drought-monitoring', droughtMonitoringRoutes);
 app.use('/api/v1/flood-monitoring', floodMonitoringRoutes);
@@ -966,7 +878,6 @@ app.use('/api/v1/erp/projects', projectSystemsRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/decision-support', decisionSupportRoutes);
-app.use('/api/v1/m400-ai-backbone', m400AiBackboneRoutes);
 app.use('/api/v1/crop-planning', cropPlanningRoutes);
 app.use('/api/v1/land-records', landRecordsRoutes);
 app.use('/api/v1/nutrition-intelligence', nutritionIntelligenceRoutes);
@@ -1212,16 +1123,19 @@ aiAgenticCompanionService.initialize().catch(error => {
   logger.warn('AI Agentic Companion service initialization failed', { error: error.message });
 });
 
-// Digital Twin service: services/legacy/digitalTwinService.js is not
-// initialized here - see the note near its require() above. The real digital
-// twin system is services/digitalTwinService.js, mounted via
-// routes/digitalTwinRoutes.js at /api/v1/digital-twin.
+// Initialize Digital Twin service
+digitalTwinService.initialize().catch(error => {
+  logger.warn('Digital Twin service initialization failed', { error: error.message });
+});
 
 // Setup analytics monitoring routes
 analyticsMonitoringService.setupRoutes(app);
 
 // Setup AI Agentic Companion routes
 aiAgenticCompanionService.setupRoutes(app);
+
+// Setup Digital Twin routes
+digitalTwinService.setupRoutes(app);
 
 // Observability for the decision layer.
 // ERP agent catalogue and evaluation.

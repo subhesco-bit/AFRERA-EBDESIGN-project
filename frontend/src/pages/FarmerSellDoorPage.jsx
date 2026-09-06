@@ -8,23 +8,23 @@ import { Wheat, ArrowLeft, ArrowRight, LogIn } from 'lucide-react'
 // behind requiredRole="farmer" — only the explanation is public.
 const ACTIONS = [
   {
-    label: 'See indicative forward prices before you list anything',
-    to: '/pricing/forward',
+    label: 'See indicative prices before you list anything',
+    to: '/pricecheck',
     note: 'Open — no sign-in needed',
   },
   {
     label: 'Track how your price moves through the season',
-    to: '/dynamic-pricing',
-    note: 'Requires signing in to this section',
+    to: '/dynamicpricing',
+    note: 'Open — no sign-in needed',
   },
   {
     label: 'Time your sale: glut and season advice',
-    to: '/sell-timing',
-    note: 'Requires signing in to this section',
+    to: '/selltiming',
+    note: 'Open — no sign-in needed',
   },
   {
     label: 'List a lot with a private floor price and get an advance',
-    to: '/farmer-sell',
+    to: '/farmersell',
     note: 'Requires signing in to this section',
   },
 ]
@@ -74,14 +74,14 @@ function FarmerSellDoorPage() {
 
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
-            to="/pricing/forward"
+            to="/pricecheck"
             className="flex-1 px-6 py-3 bg-v42-paddy border-2 border-v42-forest text-v42-forest rounded-lg font-semibold hover:bg-v42-paddy2 transition text-center"
           >
             Open without signing in
           </Link>
           <Link
             to="/login"
-            state={{ from: '/farmer-sell' }}
+            state={{ from: '/farmersell' }}
             className="flex-1 px-6 py-3 bg-v42-forest text-white rounded-lg font-semibold hover:bg-v42-forestd transition inline-flex items-center justify-center gap-2"
           >
             <LogIn className="w-5 h-5" /> Sign in to this section
