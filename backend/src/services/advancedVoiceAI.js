@@ -13,7 +13,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
-const smsAuthService = require('./legacy/smsAuthService');
+const smsAuthService = require('./smsAuthService');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.
@@ -352,19 +352,17 @@ async function fetchIntentData(intent, entities, userId) {
         }
         break;
 
-      case 'loan_inquiry': {
+      case 'loan_inquiry':
         const userData = await getUserCreditProfile(userId);
         data.amount = userData.eligible_amount;
         data.interest_rate = userData.interest_rate;
         break;
-      }
 
-      case 'subsidy_inquiry': {
+      case 'subsidy_inquiry':
         const subsidyData = await getUserEligibleSubsidies(userId, entities.crop);
         data.scheme = subsidyData.scheme_name;
         data.amount = subsidyData.amount;
         break;
-      }
 
       case 'order_status':
         if (entities.order_id) {
