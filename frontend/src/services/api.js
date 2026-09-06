@@ -3664,4 +3664,20 @@ export const informationSharingAPI = {
   getHealthStatus: () => api.get('/information-sharing/health'),
 }
 
+/** Strategic API - contract farming, strategic partnerships */
+export const strategicAPI = {
+  contractFarming: {
+    getFarmerContracts: (params) => api.get('/strategic/contract-farming/farmer-contracts', { params }),
+    getOpportunities: (params) => api.get('/strategic/contract-farming/opportunities', { params }),
+    createContract: (data) => api.post('/strategic/contract-farming/contracts', data),
+    updateContract: (contractId, data) => api.put(`/strategic/contract-farming/contracts/${contractId}`, data),
+    deleteContract: (contractId) => api.delete(`/strategic/contract-farming/contracts/${contractId}`),
+    getContractDetails: (contractId) => api.get(`/strategic/contract-farming/contracts/${contractId}`),
+  },
+  partnerships: {
+    getPartnerships: (params) => api.get('/strategic/partnerships', { params }),
+    createPartnership: (data) => api.post('/strategic/partnerships', data),
+  },
+}
+
 export default api
