@@ -1,6 +1,6 @@
 /**
  * HR Controller with AI Integration
- * 
+ *
  * Controller layer for HR module with AI-powered capabilities
  * Handles HTTP requests and responses, delegates to service layer
  */
@@ -17,12 +17,12 @@ class HRController {
       res.status(201).json({
         success: true,
         message: 'Employee created successfully with AI recommendations',
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -33,15 +33,15 @@ class HRController {
   async predictAttrition(req, res) {
     try {
       const { employeeId } = req.params;
-      let result = await hrService.predictEmployeeAttrition(employeeId);
+      const result = await hrService.predictEmployeeAttrition(employeeId);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -53,15 +53,15 @@ class HRController {
     try {
       const { employeeId } = req.params;
       const timeframe = req.query.timeframe || '30 days';
-      let result = await hrService.analyzeEmployeeSentiment(employeeId, timeframe);
+      const result = await hrService.analyzeEmployeeSentiment(employeeId, timeframe);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -72,15 +72,15 @@ class HRController {
   async getTrainingRecommendations(req, res) {
     try {
       const { employeeId } = req.params;
-      let result = await hrService.recommendTraining(employeeId);
+      const result = await hrService.recommendTraining(employeeId);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -91,16 +91,16 @@ class HRController {
   async optimizeShiftSchedule(req, res) {
     try {
       const { departmentId, startDate, endDate } = req.body;
-      let result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
+      const result = await hrService.optimizeShiftSchedule(departmentId, startDate, endDate);
       res.json({
         success: true,
         message: 'Shift schedule optimized successfully',
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -110,15 +110,15 @@ class HRController {
    */
   async detectTimesheetAnomalies(req, res) {
     try {
-      let result = await hrService.detectTimesheetAnomalies(req.body);
+      const result = await hrService.detectTimesheetAnomalies(req.body);
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -136,13 +136,13 @@ class HRController {
           'skill_gap_analysis',
           'performance_distribution',
           'sentiment_trends',
-          'training_effectiveness'
-        ]
+          'training_effectiveness',
+        ],
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -159,13 +159,13 @@ class HRController {
           'headcount_forecasting',
           'budget_predictions',
           'succession_planning',
-          'hiring_demand_forecast'
-        ]
+          'hiring_demand_forecast',
+        ],
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
   }

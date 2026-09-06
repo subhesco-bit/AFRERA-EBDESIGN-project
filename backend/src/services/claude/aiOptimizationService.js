@@ -1,22 +1,22 @@
 /**
  * AI Optimization Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: Real-time optimization with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, performance metrics, optimization strategies, resource allocation
  * Collaboration Mode: Optimization tracking, decision logging, learning feedback
- * 
+ *
  * Original Devin Implementation: AI operation intelligence with real-time monitoring, predictive optimization, resource allocation
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware optimization using library knowledge
  * - AI-powered predictive optimization
  * - Historical performance pattern analysis
  * - Multi-factor resource optimization
  * - Real-time optimization confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All optimization strategies preserved
  * - Original optimization logic maintained
@@ -52,44 +52,44 @@ class ClaudeAIEnhancedOptimizationService {
         work_type: 'optimization_analysis',
         service: this.serviceName,
         params: { operationType, metrics, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'analyzeOptimization',
-        operationType: operationType,
-        metrics: metrics
+        operationType,
+        metrics,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: this.buildOptimizationQuery(operationType, metrics, options),
-        context: { 
-          operationType, 
-          metrics, 
+        context: {
+          operationType,
+          metrics,
           options,
           libraryContext,
-          availableStrategies: this.getAvailableOptimizationStrategies()
+          availableStrategies: this.getAvailableOptimizationStrategies(),
         },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
       const originalResult = await this.originalService.analyzeOptimization(operationType, metrics);
-      
+
       const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_optimization_strategy: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_optimization_recommendations: this.extractOptimizationRecommendations(aiEnhancement.content)
+        ai_optimization_recommendations: this.extractOptimizationRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'optimization_analysis',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -98,9 +98,9 @@ class ClaudeAIEnhancedOptimizationService {
         work_type: 'optimization_analysis',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.analyzeOptimization(operationType, metrics);
     }
@@ -119,45 +119,45 @@ class ClaudeAIEnhancedOptimizationService {
         work_type: 'resource_allocation',
         service: this.serviceName,
         params: { resources, tasks, constraints, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
-      let libraryContext = await libraryKnowledgeService.buildAIContext({
+      const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'allocateResources',
-        resources: resources,
-        tasks: tasks,
-        constraints: constraints
+        resources,
+        tasks,
+        constraints,
       });
 
-      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'decision',
         query: this.buildResourceAllocationQuery(resources, tasks, constraints, options),
-        context: { 
-          resources, 
-          tasks, 
-          constraints, 
+        context: {
+          resources,
+          tasks,
+          constraints,
           options,
-          libraryContext
+          libraryContext,
         },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
-      let originalResult = await this.originalService.allocateResources(resources, tasks, constraints);
-      
-      let enhancedResult = {
+      const originalResult = await this.originalService.allocateResources(resources, tasks, constraints);
+
+      const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_allocation_strategy: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_resource_recommendations: this.extractResourceRecommendations(aiEnhancement.content)
+        ai_resource_recommendations: this.extractResourceRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'resource_allocation',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -166,9 +166,9 @@ class ClaudeAIEnhancedOptimizationService {
         work_type: 'resource_allocation',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.allocateResources(resources, tasks, constraints);
     }
@@ -183,7 +183,7 @@ class ClaudeAIEnhancedOptimizationService {
       'supply_chain',
       'resource_allocation',
       'process_automation',
-      'energy_consumption'
+      'energy_consumption',
     ];
   }
 
@@ -206,16 +206,16 @@ class ClaudeAIEnhancedOptimizationService {
    */
   extractOptimizationRecommendations(aiContent) {
     if (!aiContent) return [];
-    
+
     const recommendations = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('optimize') || line.includes('improve') || line.includes('enhance')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -224,16 +224,16 @@ class ClaudeAIEnhancedOptimizationService {
    */
   extractResourceRecommendations(aiContent) {
     if (!aiContent) return [];
-    
-    let recommendations = [];
-    let lines = aiContent.split('\n');
-    
+
+    const recommendations = [];
+    const lines = aiContent.split('\n');
+
     lines.forEach(line => {
       if (line.includes('allocate') || line.includes('assign') || line.includes('distribute')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -267,7 +267,7 @@ class ClaudeAIEnhancedOptimizationService {
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
       optimization_strategies: this.getAvailableOptimizationStrategies(),
-      ai_enhanced_methods: ['analyzeOptimizationAI', 'allocateResourcesAI']
+      ai_enhanced_methods: ['analyzeOptimizationAI', 'allocateResourcesAI'],
     };
   }
 }

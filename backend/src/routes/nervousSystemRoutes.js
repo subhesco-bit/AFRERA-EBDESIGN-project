@@ -1,6 +1,6 @@
 /**
  * AFRERA Nervous System Routes
- * 
+ *
  * Enterprise route control with biological architecture:
  * - Brain decision making
  * - Heart beat monitoring

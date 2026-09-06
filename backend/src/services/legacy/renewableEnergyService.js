@@ -1,6 +1,6 @@
 /**
  * Renewable Energy Systems Service
- * 
+ *
  * Wires the existing `renewable_energy_systems` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for renewable energy infrastructure
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getRenewableEnergySystem(systemId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM renewable_energy_systems WHERE system_id = $1`,
-      [systemId]
+      'SELECT * FROM renewable_energy_systems WHERE system_id = $1',
+      [systemId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Renewable energy system not found: ${systemId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get renewable energy system: ${error.message}`);
@@ -43,10 +43,10 @@ async function getRenewableEnergySystem(systemId) {
 async function getRenewableEnergySystemsByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM renewable_energy_systems WHERE village_id = $1 ORDER BY installation_date DESC`,
-      [villageId]
+      'SELECT * FROM renewable_energy_systems WHERE village_id = $1 ORDER BY installation_date DESC',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get renewable energy systems by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getRenewableEnergySystemsByVillage(villageId) {
 async function getRenewableEnergySystemsByType(energyType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM renewable_energy_systems WHERE energy_type = $1 ORDER by installation_date DESC`,
-      [energyType]
+      'SELECT * FROM renewable_energy_systems WHERE energy_type = $1 ORDER by installation_date DESC',
+      [energyType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get renewable energy systems by type: ${error.message}`);
@@ -95,7 +95,7 @@ async function createRenewableEnergySystem(system) {
       storage_capacity_kwh,
       annual_generation_kwh,
       maintenance_schedule,
-      status
+      status,
     } = system;
 
     const { rows } = await pool.query(
@@ -107,9 +107,9 @@ async function createRenewableEnergySystem(system) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
        RETURNING *`,
       [system_id, village_id, district, energy_type, capacity_kw,
-       installation_date, owner_type, owner_id, technology_provider,
-       funding_source, grid_connected, storage_capacity_kwh,
-       annual_generation_kwh, maintenance_schedule, status]
+        installation_date, owner_type, owner_id, technology_provider,
+        funding_source, grid_connected, storage_capacity_kwh,
+        annual_generation_kwh, maintenance_schedule, status],
     );
 
     logger.info(`Renewable energy system created: ${system_id}`);
@@ -131,9 +131,9 @@ async function updateRenewableEnergySystem(systemId, updates) {
     const allowedFields = [
       'capacity_kw', 'owner_type', 'owner_id', 'technology_provider',
       'funding_source', 'grid_connected', 'storage_capacity_kwh',
-      'annual_generation_kwh', 'maintenance_schedule', 'status'
+      'annual_generation_kwh', 'maintenance_schedule', 'status',
     ];
-    
+
     const setClauses = [];
     const values = [];
     let paramIndex = 1;
@@ -160,7 +160,7 @@ async function updateRenewableEnergySystem(systemId, updates) {
     `;
 
     const { rows } = await pool.query(query, values);
-    
+
     if (!rows.length) {
       throw new Error(`Renewable energy system not found: ${systemId}`);
     }
@@ -181,7 +181,7 @@ async function updateRenewableEnergySystem(systemId, updates) {
 async function getRenewableEnergyStatistics(filters = {}) {
   try {
     const { district, village_id, energy_type, status } = filters;
-    
+
     let query = `
       SELECT 
         COUNT(*) as total_systems,
@@ -195,7 +195,7 @@ async function getRenewableEnergyStatistics(filters = {}) {
       FROM renewable_energy_systems
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramIndex = 1;
 
@@ -234,7 +234,7 @@ async function getRenewableEnergyStatistics(filters = {}) {
       totalCapacityKW: stats.total_capacity_kw ? r2(stats.total_capacity_kw) : 0,
       avgCapacityKW: stats.avg_capacity_kw ? r2(stats.avg_capacity_kw) : 0,
       totalAnnualGenerationKWh: stats.total_annual_generation_kwh ? r2(stats.total_annual_generation_kwh) : 0,
-      totalStorageCapacityKWh: stats.total_storage_capacity_kwh ? r2(stats.total_storage_capacity_kwh) : 0
+      totalStorageCapacityKWh: stats.total_storage_capacity_kwh ? r2(stats.total_storage_capacity_kwh) : 0,
     };
   } catch (error) {
     logger.error(`Failed to get renewable energy statistics: ${error.message}`);
@@ -269,7 +269,7 @@ function setupRoutes(app) {
 
   router.get('/systems/type/:energyType', async (req, res) => {
     try {
-      let systems = await getRenewableEnergySystemsByType(req.params.energyType);
+      const systems = await getRenewableEnergySystemsByType(req.params.energyType);
       res.json({ success: true, data: systems });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -278,7 +278,7 @@ function setupRoutes(app) {
 
   router.post('/systems', async (req, res) => {
     try {
-      let system = await createRenewableEnergySystem(req.body);
+      const system = await createRenewableEnergySystem(req.body);
       res.status(201).json({ success: true, data: system });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -287,7 +287,7 @@ function setupRoutes(app) {
 
   router.put('/systems/:systemId', async (req, res) => {
     try {
-      let system = await updateRenewableEnergySystem(req.params.systemId, req.body);
+      const system = await updateRenewableEnergySystem(req.params.systemId, req.body);
       res.json({ success: true, data: system });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -296,7 +296,7 @@ function setupRoutes(app) {
 
   router.get('/systems/statistics', async (req, res) => {
     try {
-      let stats = await getRenewableEnergyStatistics(req.query);
+      const stats = await getRenewableEnergyStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -314,8 +314,6 @@ module.exports = {
   createRenewableEnergySystem,
   updateRenewableEnergySystem,
   getRenewableEnergyStatistics,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

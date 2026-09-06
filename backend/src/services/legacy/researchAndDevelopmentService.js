@@ -1,6 +1,6 @@
 /**
  * Research and Development (R&D) Service
- * 
+ *
  * This service provides comprehensive R&D management capabilities including
  * project management, research collaboration, innovation tracking, patent management,
  * funding management, and AI-powered research assistance.
@@ -10,28 +10,28 @@ class ResearchAndDevelopmentService {
   constructor() {
     // R&D projects storage
     this.rdProjects = new Map();
-    
+
     // Research collaborations
     this.collaborations = new Map();
-    
+
     // Innovation tracking
     this.innovations = new Map();
-    
+
     // Patent management
     this.patents = new Map();
-    
+
     // Funding opportunities
     this.fundingOpportunities = new Map();
-    
+
     // Research publications
     this.publications = new Map();
-    
+
     // AI research assistants
     this.aiAssistants = new Map();
-    
+
     // Research knowledge base
     this.knowledgeBase = new Map();
-    
+
     // Initialize default data
     this.initializeDefaultData();
   }
@@ -56,14 +56,14 @@ class ResearchAndDevelopmentService {
       milestones: [
         { id: 'm1', name: 'Sensor Deployment', status: 'completed', dueDate: '2024-06-30' },
         { id: 'm2', name: 'ML Model Training', status: 'in-progress', dueDate: '2024-12-31' },
-        { id: 'm3', name: 'Field Testing', status: 'pending', dueDate: '2025-06-30' }
+        { id: 'm3', name: 'Field Testing', status: 'pending', dueDate: '2025-06-30' },
       ],
       aiIntegration: {
         enabled: true,
         models: ['tensorflow', 'pytorch'],
-        features: ['predictive-analytics', 'anomaly-detection']
+        features: ['predictive-analytics', 'anomaly-detection'],
       },
-      createdAt: '2024-01-15T00:00:00Z'
+      createdAt: '2024-01-15T00:00:00Z',
     });
 
     this.rdProjects.set('rd-002', {
@@ -80,14 +80,14 @@ class ResearchAndDevelopmentService {
       team: ['researcher-004', 'researcher-005'],
       milestones: [
         { id: 'm1', name: 'Data Collection', status: 'completed', dueDate: '2024-09-30' },
-        { id: 'm2', name: 'Model Development', status: 'in-progress', dueDate: '2025-03-31' }
+        { id: 'm2', name: 'Model Development', status: 'in-progress', dueDate: '2025-03-31' },
       ],
       aiIntegration: {
         enabled: true,
         models: ['tensorflow', 'opencv'],
-        features: ['image-classification', 'object-detection']
+        features: ['image-classification', 'object-detection'],
       },
-      createdAt: '2024-03-01T00:00:00Z'
+      createdAt: '2024-03-01T00:00:00Z',
     });
 
     // Sample funding opportunities
@@ -102,7 +102,7 @@ class ResearchAndDevelopmentService {
       eligibility: ['agriculture-technology', 'plant-health'],
       status: 'open',
       applicationUrl: '/grants/apply/fund-001',
-      createdAt: '2024-01-01T00:00:00Z'
+      createdAt: '2024-01-01T00:00:00Z',
     });
   }
 
@@ -111,7 +111,7 @@ class ResearchAndDevelopmentService {
    */
   createRDProject(projectData) {
     const projectId = projectData.id || `rd-${Date.now()}`;
-    
+
     const project = {
       id: projectId,
       name: projectData.name,
@@ -128,11 +128,11 @@ class ResearchAndDevelopmentService {
       aiIntegration: projectData.aiIntegration || {
         enabled: false,
         models: [],
-        features: []
+        features: [],
       },
       metadata: projectData.metadata || {},
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.rdProjects.set(projectId, project);
@@ -175,7 +175,7 @@ class ResearchAndDevelopmentService {
    * Update R&D project
    */
   updateRDProject(projectId, updates) {
-    let project = this.rdProjects.get(projectId);
+    const project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -183,7 +183,7 @@ class ResearchAndDevelopmentService {
     const updatedProject = {
       ...project,
       ...updates,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.rdProjects.set(projectId, updatedProject);
@@ -194,7 +194,7 @@ class ResearchAndDevelopmentService {
    * Delete R&D project
    */
   deleteRDProject(projectId) {
-    let project = this.rdProjects.get(projectId);
+    const project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -207,7 +207,7 @@ class ResearchAndDevelopmentService {
    * Add milestone to project
    */
   addMilestone(projectId, milestoneData) {
-    let project = this.rdProjects.get(projectId);
+    const project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
@@ -218,7 +218,7 @@ class ResearchAndDevelopmentService {
       description: milestoneData.description,
       status: milestoneData.status || 'pending',
       dueDate: milestoneData.dueDate,
-      completedAt: milestoneData.completedAt || null
+      completedAt: milestoneData.completedAt || null,
     };
 
     project.milestones.push(milestone);
@@ -232,12 +232,12 @@ class ResearchAndDevelopmentService {
    * Update milestone status
    */
   updateMilestone(projectId, milestoneId, updates) {
-    let project = this.rdProjects.get(projectId);
+    const project = this.rdProjects.get(projectId);
     if (!project) {
       throw new Error(`R&D project ${projectId} not found`);
     }
 
-    let milestone = project.milestones.find(m => m.id === milestoneId);
+    const milestone = project.milestones.find(m => m.id === milestoneId);
     if (!milestone) {
       throw new Error(`Milestone ${milestoneId} not found`);
     }
@@ -258,7 +258,7 @@ class ResearchAndDevelopmentService {
    */
   createCollaboration(collaborationData) {
     const collaborationId = collaborationData.id || `collab-${Date.now()}`;
-    
+
     const collaboration = {
       id: collaborationId,
       name: collaborationData.name,
@@ -273,7 +273,7 @@ class ResearchAndDevelopmentService {
       objectives: collaborationData.objectives || [],
       deliverables: collaborationData.deliverables || [],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.collaborations.set(collaborationId, collaboration);
@@ -306,7 +306,7 @@ class ResearchAndDevelopmentService {
    */
   createInnovation(innovationData) {
     const innovationId = innovationData.id || `innovation-${Date.now()}`;
-    
+
     const innovation = {
       id: innovationId,
       title: innovationData.title,
@@ -320,7 +320,7 @@ class ResearchAndDevelopmentService {
       estimatedValue: innovationData.estimatedValue || 0,
       patentStatus: innovationData.patentStatus || 'not-filed',
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.innovations.set(innovationId, innovation);
@@ -357,7 +357,7 @@ class ResearchAndDevelopmentService {
    */
   createPatent(patentData) {
     const patentId = patentData.id || `patent-${Date.now()}`;
-    
+
     const patent = {
       id: patentId,
       title: patentData.title,
@@ -373,7 +373,7 @@ class ResearchAndDevelopmentService {
       expirationDate: patentData.expirationDate || null,
       maintenanceFees: patentData.maintenanceFees || [],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.patents.set(patentId, patent);
@@ -406,7 +406,7 @@ class ResearchAndDevelopmentService {
    */
   createFundingOpportunity(fundingData) {
     const fundingId = fundingData.id || `fund-${Date.now()}`;
-    
+
     const funding = {
       id: fundingId,
       name: fundingData.name,
@@ -422,7 +422,7 @@ class ResearchAndDevelopmentService {
       applicationUrl: fundingData.applicationUrl,
       documents: fundingData.documents || [],
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.fundingOpportunities.set(fundingId, funding);
@@ -454,21 +454,21 @@ class ResearchAndDevelopmentService {
    * Apply for funding
    */
   applyForFunding(fundingId, applicationData) {
-    let funding = this.fundingOpportunities.get(fundingId);
+    const funding = this.fundingOpportunities.get(fundingId);
     if (!funding) {
       throw new Error(`Funding opportunity ${fundingId} not found`);
     }
 
     const application = {
       id: `app-${Date.now()}`,
-      fundingId: fundingId,
+      fundingId,
       projectId: applicationData.projectId,
       applicant: applicationData.applicant,
       proposal: applicationData.proposal,
       budget: applicationData.budget,
       timeline: applicationData.timeline,
       status: 'submitted',
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
     };
 
     // Store application in funding record
@@ -487,7 +487,7 @@ class ResearchAndDevelopmentService {
    */
   createPublication(publicationData) {
     const publicationId = publicationData.id || `pub-${Date.now()}`;
-    
+
     const publication = {
       id: publicationId,
       title: publicationData.title,
@@ -503,7 +503,7 @@ class ResearchAndDevelopmentService {
       citations: publicationData.citations || 0,
       downloads: publicationData.downloads || 0,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.publications.set(publicationId, publication);
@@ -537,14 +537,14 @@ class ResearchAndDevelopmentService {
   async getAIResearchAssistance(query, context = {}) {
     // Simulate AI research assistance
     const assistance = {
-      query: query,
+      query,
       response: this.generateAIResponse(query, context),
       sources: this.generateRelevantSources(query),
       suggestions: this.generateSuggestions(query, context),
       confidence: null,
       implemented: false,
       reason: 'No real research-assistance AI model is connected to this service — response/sources/suggestions below are template-generated, not model output.',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return assistance;
@@ -560,11 +560,11 @@ class ResearchAndDevelopmentService {
     return {
       status: 'unavailable',
       reason: 'Research AI service not configured. Implement Claude AI integration or provide ANTHROPIC_API_KEY.',
-      query: query,
-      context: context,
+      query,
+      context,
       available_features: ['AI research assistant', 'literature review', 'experimental design'],
       configuration_required: 'ANTHROPIC_API_KEY',
-      suggested_approach: 'Claude AI coordinator can provide research assistance when configured'
+      suggested_approach: 'Claude AI coordinator can provide research assistance when configured',
     };
   }
 
@@ -576,7 +576,7 @@ class ResearchAndDevelopmentService {
       { type: 'journal', title: 'Agricultural Technology Advances', year: 2024 },
       { type: 'conference', title: 'AI in Agriculture Summit', year: 2024 },
       { type: 'dataset', title: 'Crop Yield Historical Data', year: 2023 },
-      { type: 'repository', title: 'Open Agricultural Models', year: 2024 }
+      { type: 'repository', title: 'Open Agricultural Models', year: 2024 },
     ];
   }
 
@@ -588,7 +588,7 @@ class ResearchAndDevelopmentService {
       'Consider implementing a pilot study before full deployment',
       'Integrate with existing IoT infrastructure for data collection',
       'Collaborate with agricultural research institutions for validation',
-      'Develop a scalable architecture for future expansion'
+      'Develop a scalable architecture for future expansion',
     ];
   }
 
@@ -597,7 +597,7 @@ class ResearchAndDevelopmentService {
    */
   addKnowledge(knowledgeData) {
     const knowledgeId = knowledgeData.id || `kb-${Date.now()}`;
-    
+
     const knowledge = {
       id: knowledgeId,
       title: knowledgeData.title,
@@ -609,7 +609,7 @@ class ResearchAndDevelopmentService {
       confidence: knowledgeData.confidence || 0.8,
       verified: knowledgeData.verified || false,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.knowledgeBase.set(knowledgeId, knowledge);
@@ -625,10 +625,10 @@ class ResearchAndDevelopmentService {
     // Simple keyword matching
     if (query) {
       const queryLower = query.toLowerCase();
-      knowledge = knowledge.filter(k => 
+      knowledge = knowledge.filter(k =>
         k.title.toLowerCase().includes(queryLower) ||
         k.content.toLowerCase().includes(queryLower) ||
-        k.tags.some(t => t.toLowerCase().includes(queryLower))
+        k.tags.some(t => t.toLowerCase().includes(queryLower)),
       );
     }
 
@@ -659,28 +659,28 @@ class ResearchAndDevelopmentService {
         completed: projects.filter(p => p.status === 'completed').length,
         totalBudget: projects.reduce((sum, p) => sum + p.budget, 0),
         totalSpent: projects.reduce((sum, p) => sum + p.spent, 0),
-        aiEnabled: projects.filter(p => p.aiIntegration.enabled).length
+        aiEnabled: projects.filter(p => p.aiIntegration.enabled).length,
       },
       innovations: {
         total: innovations.length,
         patented: innovations.filter(i => i.patentStatus === 'granted').length,
         inDevelopment: innovations.filter(i => i.status === 'in-development').length,
-        totalValue: innovations.reduce((sum, i) => sum + i.estimatedValue, 0)
+        totalValue: innovations.reduce((sum, i) => sum + i.estimatedValue, 0),
       },
       patents: {
         total: patents.length,
         granted: patents.filter(p => p.status === 'granted').length,
-        pending: patents.filter(p => p.status === 'pending').length
+        pending: patents.filter(p => p.status === 'pending').length,
       },
       publications: {
         total: publications.length,
         published: publications.filter(p => p.status === 'published').length,
-        totalCitations: publications.reduce((sum, p) => sum + p.citations, 0)
+        totalCitations: publications.reduce((sum, p) => sum + p.citations, 0),
       },
       collaborations: {
         total: this.collaborations.size,
-        active: Array.from(this.collaborations.values()).filter(c => c.status === 'active').length
-      }
+        active: Array.from(this.collaborations.values()).filter(c => c.status === 'active').length,
+      },
     };
   }
 
@@ -697,7 +697,7 @@ class ResearchAndDevelopmentService {
       patents: this.patents.size,
       fundingOpportunities: this.fundingOpportunities.size,
       publications: this.publications.size,
-      knowledgeBase: this.knowledgeBase.size
+      knowledgeBase: this.knowledgeBase.size,
     };
   }
 }
@@ -706,6 +706,4 @@ class ResearchAndDevelopmentService {
 const researchAndDevelopmentService = new ResearchAndDevelopmentService();
 
 module.exports = researchAndDevelopmentService;
-
-
 

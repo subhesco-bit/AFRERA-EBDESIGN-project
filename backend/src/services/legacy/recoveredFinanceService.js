@@ -49,10 +49,10 @@ async function trialBalance() {
     totalCredit: Number(c.total_credit || 0),
     difference: Number(c.difference || 0),
     balanced: Boolean(c.balanced),
-    note: c.balanced === false
-      ? 'Debits do not equal credits. With a chained ledger this means an entry was '
-      + 'inserted outside appendLedgerEntry(), not that arithmetic drifted.'
-      : null,
+    note: c.balanced === false ?
+      'Debits do not equal credits. With a chained ledger this means an entry was ' +
+      'inserted outside appendLedgerEntry(), not that arithmetic drifted.' :
+      null,
   };
 }
 
@@ -64,10 +64,10 @@ async function verifyLedger() {
     ok: broken.length === 0,
     length: len[0].n,
     broken,
-    note: broken.length
-      ? 'The chain is broken. Every entry after the first break is unverifiable, '
-      + 'so the earliest sequence_no listed is where to look.'
-      : null,
+    note: broken.length ?
+      'The chain is broken. Every entry after the first break is unverifiable, ' +
+      'so the earliest sequence_no listed is where to look.' :
+      null,
   };
 }
 
@@ -85,7 +85,7 @@ const NE_STATES = ['Nagaland', 'Meghalaya', 'Manipur', 'Assam', 'Mizoram',
  */
 async function matchSchemes(projectType, state) {
   const { rows } = await pool.query(
-    "SELECT * FROM dpr_schemes WHERE status <> 'lapsed'"
+    'SELECT * FROM dpr_schemes WHERE status <> \'lapsed\'',
   );
   const isNE = NE_STATES.includes(state);
 
@@ -147,15 +147,15 @@ async function issueEnwr({ bookingId, facilityId, farmerId, commodity, quantityQ
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
      RETURNING *`,
     [receiptNo, bookingId ?? null, facilityId ?? null, farmerId ?? null, commodity ?? null,
-      quantityQtl, estimatedValueInr, haircutPct, validUntil ?? null, issuedBy ?? null]
+      quantityQtl, estimatedValueInr, haircutPct, validUntil ?? null, issuedBy ?? null],
   );
   const r = rows[0];
   return {
     ...r,
     max_collateral_inr: Number(r.max_collateral_inr),
-    note: `Up to Rs ${Number(r.max_collateral_inr).toLocaleString('en-IN')} is pledgeable — `
-        + `${100 - haircutPct}% of estimated value, the standard agri-collateral haircut. `
-        + 'The margin exists so a price fall does not leave the farmer owing more than the crop is worth.',
+    note: `Up to Rs ${Number(r.max_collateral_inr).toLocaleString('en-IN')} is pledgeable — ` +
+        `${100 - haircutPct}% of estimated value, the standard agri-collateral haircut. ` +
+        'The margin exists so a price fall does not leave the farmer owing more than the crop is worth.',
   };
 }
 
@@ -166,8 +166,8 @@ async function issueEnwr({ bookingId, facilityId, farmerId, commodity, quantityQ
  */
 async function listMyEnwrReceipts(farmerId) {
   const { rows } = await pool.query(
-    `SELECT * FROM enwr_receipts WHERE farmer_id = $1 ORDER BY issued_at DESC`,
-    [farmerId]
+    'SELECT * FROM enwr_receipts WHERE farmer_id = $1 ORDER BY issued_at DESC',
+    [farmerId],
   );
   return rows.map((r) => ({ ...r, max_collateral_inr: Number(r.max_collateral_inr) }));
 }
@@ -179,10 +179,10 @@ async function listMyEnwrReceipts(farmerId) {
 /** Rate per kg for a lane and transport class. */
 async function freightRate({ laneKm, classKey, utilisationPct }) {
   const { rows: cls } = await pool.query(
-    'SELECT * FROM transport_classes WHERE class_key = $1', [classKey]
+    'SELECT * FROM transport_classes WHERE class_key = $1', [classKey],
   );
   if (!cls.length) throw new Error(`Unknown transport class: ${classKey}`);
-  let c = cls[0];
+  const c = cls[0];
 
   // v42: km * 0.0055 * class multiplier.
   const base = Number(laneKm) * 0.0055;
@@ -194,7 +194,7 @@ async function freightRate({ laneKm, classKey, utilisationPct }) {
       `SELECT * FROM freight_utilisation_slabs
         WHERE min_utilisation_pct <= $1
         ORDER BY min_utilisation_pct DESC LIMIT 1`,
-      [utilisationPct]
+      [utilisationPct],
     );
     slab = s[0] || null;
   }
@@ -209,10 +209,10 @@ async function freightRate({ laneKm, classKey, utilisationPct }) {
       ratePerKg: Number(slab.rate_per_kg),
       note: slab.notes,
     },
-    caveat: c.temperature_controlled
-      ? 'Cold chain costs more and is not optional for perishables. Comparing it '
-      + 'against economy freight is not like-for-like — the cheap option delivers spoiled goods.'
-      : null,
+    caveat: c.temperature_controlled ?
+      'Cold chain costs more and is not optional for perishables. Comparing it ' +
+      'against economy freight is not like-for-like — the cheap option delivers spoiled goods.' :
+      null,
   };
 }
 
@@ -222,7 +222,7 @@ async function freightRate({ laneKm, classKey, utilisationPct }) {
 
 async function equipmentSubsidy(priceInr, tier = 'general') {
   const { rows } = await pool.query(
-    'SELECT * FROM equipment_subsidy_bands WHERE tier = $1', [tier]
+    'SELECT * FROM equipment_subsidy_bands WHERE tier = $1', [tier],
   );
   if (!rows.length) throw new Error(`Unknown subsidy tier: ${tier}`);
   const b = rows[0];
@@ -235,8 +235,8 @@ async function equipmentSubsidy(priceInr, tier = 'general') {
     cappedByCeiling: capped !== amount,
     farmerPaysInr: Math.round(priceInr - capped),
     note: b.note,
-    disclaimer: 'Indicative estimate only. Actual sanction depends on the state '
-              + 'agency, scheme window and applicant category — this is not a commitment.',
+    disclaimer: 'Indicative estimate only. Actual sanction depends on the state ' +
+              'agency, scheme window and applicant category — this is not a commitment.',
   };
 }
 
@@ -249,7 +249,7 @@ async function recordRiskEvent({ partyId, partyType = 'user', eventType, weight,
   const { rows } = await pool.query(
     `INSERT INTO party_risk_events (party_id, party_type, event_type, weight, reference, detail)
      VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [partyId, partyType, eventType, w, reference ?? null, detail ?? null]
+    [partyId, partyType, eventType, w, reference ?? null, detail ?? null],
   );
   return rows[0];
 }
@@ -259,11 +259,11 @@ async function partyRisk(partyId) {
   if (!rows.length) {
     return {
       partyId, riskScore: 0, riskLevel: 'unknown', events: 0,
-      note: 'No recorded events. That is an absence of evidence, not a clean record — '
-          + 'a party nobody has transacted with has an unknown risk, not a low one.',
+      note: 'No recorded events. That is an absence of evidence, not a clean record — ' +
+          'a party nobody has transacted with has an unknown risk, not a low one.',
     };
   }
-  let r = rows[0];
+  const r = rows[0];
   return {
     partyId,
     riskScore: Number(r.risk_score),
@@ -284,7 +284,7 @@ async function certExpiryAlerts(days = 120) {
         WHERE valid_until IS NOT NULL
           AND valid_until <= CURRENT_DATE + ($1 || ' days')::interval
         ORDER BY valid_until`,
-      [days]
+      [days],
     );
     return rows.map((c) => ({
       ...c,
@@ -304,6 +304,4 @@ module.exports = {
   freightRate,
   equipmentSubsidy, recordRiskEvent, partyRisk, certExpiryAlerts,
 };
-
-
 

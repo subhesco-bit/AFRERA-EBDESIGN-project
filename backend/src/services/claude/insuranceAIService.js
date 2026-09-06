@@ -1,22 +1,22 @@
 /**
  * Insurance AI Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: Insurance risk assessment with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, insurance data, risk factors, claim history
  * Collaboration Mode: Insurance decision tracking, outcome logging, learning feedback
- * 
+ *
  * Original Devin Implementation: Insurance service with policies, claims, risk assessment
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware risk assessment using library knowledge
  * - AI-powered premium calculation
  * - Historical claim pattern analysis
  * - Multi-factor risk evaluation
  * - Real-time insurance confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All insurance operations preserved (policies, claims, risk assessment)
  * - Original insurance logic maintained
@@ -52,42 +52,42 @@ class ClaudeAIEnhancedInsuranceService {
         work_type: 'risk_assessment',
         service: this.serviceName,
         params: { insuranceData, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'assessRisk',
-        insuranceData: insuranceData
+        insuranceData,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'assessment',
         query: this.buildRiskAssessmentQuery(insuranceData, options),
-        context: { 
-          insuranceData, 
+        context: {
+          insuranceData,
           options,
           libraryContext,
-          historicalData: await this.getHistoricalRiskData()
+          historicalData: await this.getHistoricalRiskData(),
         },
-        agentPreference: 'governance-agent'
+        agentPreference: 'governance-agent',
       });
 
       const originalResult = await this.originalService.assessRisk(insuranceData);
-      
+
       const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_risk_analysis: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_risk_mitigation: this.extractRiskMitigation(aiEnhancement.content)
+        ai_risk_mitigation: this.extractRiskMitigation(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'risk_assessment',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -96,9 +96,9 @@ class ClaudeAIEnhancedInsuranceService {
         work_type: 'risk_assessment',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.assessRisk(insuranceData);
     }
@@ -112,7 +112,7 @@ class ClaudeAIEnhancedInsuranceService {
     return {
       claim_history: [],
       risk_trends: [],
-      industry_benchmarks: {}
+      industry_benchmarks: {},
     };
   }
 
@@ -128,16 +128,16 @@ class ClaudeAIEnhancedInsuranceService {
    */
   extractRiskMitigation(aiContent) {
     if (!aiContent) return [];
-    
+
     const mitigations = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('mitigate') || line.includes('reduce') || line.includes('prevent')) {
         mitigations.push(line.trim());
       }
     });
-    
+
     return mitigations;
   }
 
@@ -166,7 +166,7 @@ class ClaudeAIEnhancedInsuranceService {
       ai_coordinator: claudeAICoordinator ? 'available' : 'unavailable',
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
-      ai_enhanced_methods: ['assessRiskAI']
+      ai_enhanced_methods: ['assessRiskAI'],
     };
   }
 }

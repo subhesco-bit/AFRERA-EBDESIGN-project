@@ -62,5 +62,3 @@ module.exports = {
   aeroponics, precisionHorticulture, protectedCultivation, horticultureAnalytics,
 };
 
-
-

@@ -44,7 +44,7 @@ class ApicultureService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting apiculture:', error);
@@ -58,12 +58,12 @@ class ApicultureService {
   async getApicultureById(apicultureId) {
     try {
       const query = 'SELECT * FROM apiculture WHERE id = $1';
-      let result = await this.pool.query(query, [apicultureId]);
-      
+      const result = await this.pool.query(query, [apicultureId]);
+
       if (result.rows.length === 0) {
         throw new Error('Apiculture not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting apiculture by ID:', error);
@@ -83,17 +83,17 @@ class ApicultureService {
         honey_type,
         hive_count,
         colony_strength,
-        expected_honey_kg
+        expected_honey_kg,
       } = apicultureData;
 
-      let query = `
+      const query = `
         INSERT INTO apiculture (farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
-        farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg
+      const result = await this.pool.query(query, [
+        farmer_id, name, location, honey_type, hive_count, colony_strength, expected_honey_kg,
       ]);
 
       return result.rows[0];
@@ -108,13 +108,13 @@ class ApicultureService {
    */
   async getHoneyProduction(apicultureId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM honey_production
         WHERE apiculture_id = $1
         ORDER BY harvest_date DESC
       `;
 
-      let result = await this.pool.query(query, [apicultureId]);
+      const result = await this.pool.query(query, [apicultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting honey production:', error);
@@ -127,13 +127,13 @@ class ApicultureService {
    */
   async getHiveHealth(apicultureId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM hive_health
         WHERE apiculture_id = $1
         ORDER BY inspection_date DESC
       `;
 
-      let result = await this.pool.query(query, [apicultureId]);
+      const result = await this.pool.query(query, [apicultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting hive health:', error);
@@ -143,6 +143,4 @@ class ApicultureService {
 }
 
 module.exports = new ApicultureService();
-
-
 

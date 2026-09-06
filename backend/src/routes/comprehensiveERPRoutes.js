@@ -1,6 +1,6 @@
 /**
  * Comprehensive ERP Routes - Oracle/SAP Standards
- * 
+ *
  * REST API routes for all ERP modules
  * Following Oracle E-Business Suite and SAP S/4HANA routing conventions
  */
@@ -18,7 +18,7 @@ const {
   projectSystemController,
   treasuryController,
   assetManagementController,
-  businessIntelligenceController
+  businessIntelligenceController,
 } = require('../controllers/comprehensiveERPController');
 const { authMiddleware } = require('../middleware/auth');
 const { requireRole } = require('../middleware/auth');

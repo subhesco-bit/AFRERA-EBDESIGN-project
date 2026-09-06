@@ -44,5 +44,5 @@ module.exports = {
   createLandParcel,
   transferLandOwnership,
   getLandByFarmer,
-  getLandAnalytics
+  getLandAnalytics,
 };

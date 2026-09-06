@@ -1,6 +1,6 @@
 /**
  * AI Operation Intelligence Routes
- * 
+ *
  * API endpoints for real-time optimization capabilities including:
  * - Performance monitoring
  * - Optimization recommendations
@@ -21,16 +21,16 @@ const aiOperationIntelligenceService = require('../services/legacy/aiOperationIn
 router.get('/metrics', (req, res) => {
   try {
     const metrics = aiOperationIntelligenceService.getPerformanceMetrics();
-    
+
     res.json({
       success: true,
-      metrics: metrics
+      metrics,
     });
   } catch (error) {
     console.error('Error getting performance metrics:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -42,22 +42,22 @@ router.get('/metrics', (req, res) => {
 router.post('/analyze', async (req, res) => {
   try {
     const { metrics } = req.body;
-    
+
     if (!metrics) {
       return res.status(400).json({
         success: false,
-        error: 'metrics is required'
+        error: 'metrics is required',
       });
     }
-    
+
     const result = await aiOperationIntelligenceService.analyzePerformance(metrics);
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error analyzing performance:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -69,22 +69,22 @@ router.post('/analyze', async (req, res) => {
 router.post('/recommend', async (req, res) => {
   try {
     const { analysis } = req.body;
-    
+
     if (!analysis) {
       return res.status(400).json({
         success: false,
-        error: 'analysis is required'
+        error: 'analysis is required',
       });
     }
-    
-    let result = await aiOperationIntelligenceService.generateOptimizationRecommendations(analysis);
-    
+
+    const result = await aiOperationIntelligenceService.generateOptimizationRecommendations(analysis);
+
     res.json(result);
   } catch (error) {
     console.error('Error generating optimization recommendations:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -96,22 +96,22 @@ router.post('/recommend', async (req, res) => {
 router.post('/optimize', async (req, res) => {
   try {
     const { optimizations } = req.body;
-    
+
     if (!optimizations) {
       return res.status(400).json({
         success: false,
-        error: 'optimizations is required'
+        error: 'optimizations is required',
       });
     }
-    
-    let result = await aiOperationIntelligenceService.executeOptimizations(optimizations);
-    
+
+    const result = await aiOperationIntelligenceService.executeOptimizations(optimizations);
+
     res.json(result);
   } catch (error) {
     console.error('Error executing optimizations:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -124,47 +124,47 @@ router.post('/cycle', async (req, res) => {
   try {
     // Collect metrics
     await aiOperationIntelligenceService.collectPerformanceMetrics();
-    let metrics = aiOperationIntelligenceService.performanceMetrics.get('current');
-    
+    const metrics = aiOperationIntelligenceService.performanceMetrics.get('current');
+
     // Analyze performance
     const analysis = await aiOperationIntelligenceService.analyzePerformance(metrics);
     if (!analysis.success) {
       return res.json(analysis);
     }
-    
+
     // Generate recommendations
     const recommendations = await aiOperationIntelligenceService.generateOptimizationRecommendations(analysis);
-    
+
     // Execute optimizations if approved
     if (recommendations.success && recommendations.recommendations.auto_execute) {
       const execution = await aiOperationIntelligenceService.executeOptimizations(recommendations.recommendations.optimizations);
-      
+
       return res.json({
         success: true,
         cycle: {
-          metrics: metrics,
+          metrics,
           analysis: analysis.analysis,
           recommendations: recommendations.recommendations,
-          execution: execution
+          execution,
         },
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
-    
+
     res.json({
       success: true,
       cycle: {
-        metrics: metrics,
+        metrics,
         analysis: analysis.analysis,
-        recommendations: recommendations.recommendations
+        recommendations: recommendations.recommendations,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } catch (error) {
     console.error('Error in optimization cycle:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -176,14 +176,14 @@ router.post('/cycle', async (req, res) => {
 router.get('/predict', async (req, res) => {
   try {
     const horizon = parseInt(req.query.horizon) || 24;
-    let result = await aiOperationIntelligenceService.predictiveOptimization(horizon);
-    
+    const result = await aiOperationIntelligenceService.predictiveOptimization(horizon);
+
     res.json(result);
   } catch (error) {
     console.error('Error in predictive optimization:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -194,14 +194,14 @@ router.get('/predict', async (req, res) => {
  */
 router.get('/anomalies', async (req, res) => {
   try {
-    let result = await aiOperationIntelligenceService.detectAnomalies();
-    
+    const result = await aiOperationIntelligenceService.detectAnomalies();
+
     res.json(result);
   } catch (error) {
     console.error('Error detecting anomalies:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -212,14 +212,14 @@ router.get('/anomalies', async (req, res) => {
  */
 router.get('/improvements', async (req, res) => {
   try {
-    let result = await aiOperationIntelligenceService.continuousImprovement();
-    
+    const result = await aiOperationIntelligenceService.continuousImprovement();
+
     res.json(result);
   } catch (error) {
     console.error('Error in continuous improvement analysis:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -231,16 +231,16 @@ router.get('/improvements', async (req, res) => {
 router.get('/strategies', (req, res) => {
   try {
     const strategies = aiOperationIntelligenceService.getOptimizationStrategies();
-    
+
     res.json({
       success: true,
-      strategies: strategies
+      strategies,
     });
   } catch (error) {
     console.error('Error getting optimization strategies:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -252,29 +252,29 @@ router.get('/strategies', (req, res) => {
 router.post('/strategy', (req, res) => {
   try {
     const { name, description, parameters, objectives } = req.body;
-    
+
     if (!name || !description || !parameters || !objectives) {
       return res.status(400).json({
         success: false,
-        error: 'name, description, parameters, and objectives are required'
+        error: 'name, description, parameters, and objectives are required',
       });
     }
-    
+
     aiOperationIntelligenceService.addOptimizationStrategy(name, {
       description,
       parameters,
-      objectives
+      objectives,
     });
-    
+
     res.json({
       success: true,
-      strategy: { name, description, parameters, objectives }
+      strategy: { name, description, parameters, objectives },
     });
   } catch (error) {
     console.error('Error adding optimization strategy:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -286,16 +286,16 @@ router.post('/strategy', (req, res) => {
 router.get('/resources', (req, res) => {
   try {
     const resources = aiOperationIntelligenceService.getResourceAllocation();
-    
+
     res.json({
       success: true,
-      resources: resources
+      resources,
     });
   } catch (error) {
     console.error('Error getting resource allocation:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -308,16 +308,16 @@ router.get('/history', (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;
     const history = aiOperationIntelligenceService.getOperationHistory(limit);
-    
+
     res.json({
       success: true,
-      history: history
+      history,
     });
   } catch (error) {
     console.error('Error getting operation history:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -334,7 +334,7 @@ router.get('/service-health', (req, res) => {
     performance_metrics: aiOperationIntelligenceService.performanceMetrics.size,
     operation_history_size: aiOperationIntelligenceService.operationHistory.length,
     resource_allocation: aiOperationIntelligenceService.resourceAllocation.size,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

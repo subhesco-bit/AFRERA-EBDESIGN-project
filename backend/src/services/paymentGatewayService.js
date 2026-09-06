@@ -25,14 +25,14 @@ class PaymentGatewayService {
    * Process a payment through the specified gateway
    */
   async processPayment(paymentData) {
-    const { 
-      userId, 
-      amount, 
-      currency = 'INR', 
+    const {
+      userId,
+      amount,
+      currency = 'INR',
       gateway = 'razorpay',
       paymentMethod,
       description,
-      metadata = {} 
+      metadata = {},
     } = paymentData;
 
     try {
@@ -50,7 +50,7 @@ class PaymentGatewayService {
         paymentMethod,
         description,
         status: 'pending',
-        metadata
+        metadata,
       });
 
       // Process payment through gateway
@@ -59,7 +59,7 @@ class PaymentGatewayService {
         amount,
         currency,
         paymentMethod,
-        description
+        description,
       });
 
       // Update payment status
@@ -68,7 +68,7 @@ class PaymentGatewayService {
       return {
         paymentId,
         status: gatewayResult.status,
-        gatewayResponse: gatewayResult
+        gatewayResponse: gatewayResult,
       };
     } catch (error) {
       logger.error('Payment processing failed', error);
@@ -86,7 +86,7 @@ class PaymentGatewayService {
         WHERE payment_id = $1
       `;
       const result = await this.db.query(query, [paymentId]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Payment not found');
       }
@@ -107,7 +107,7 @@ class PaymentGatewayService {
     try {
       // Get payment details
       const payment = await this.getPaymentStatus(paymentId);
-      
+
       if (payment.status !== 'completed') {
         throw new Error('Can only refund completed payments');
       }
@@ -117,7 +117,7 @@ class PaymentGatewayService {
         payment.gateway,
         payment.gateway_transaction_id,
         amount || payment.amount,
-        reason
+        reason,
       );
 
       // Create refund record
@@ -126,7 +126,7 @@ class PaymentGatewayService {
         amount: amount || payment.amount,
         reason,
         gatewayRefundId: refundResult.refund_id,
-        status: refundResult.status
+        status: refundResult.status,
       });
 
       return refundResult;
@@ -146,8 +146,8 @@ class PaymentGatewayService {
         stripe: { cards: true, upi: false, netbanking: true },
         razorpay: { cards: true, upi: true, netbanking: true, wallet: true },
         paytm: { cards: true, upi: true, wallet: true, netbanking: true },
-        phonepe: { cards: true, upi: true, wallet: true }
-      }
+        phonepe: { cards: true, upi: true, wallet: true },
+      },
     };
   }
 
@@ -156,7 +156,7 @@ class PaymentGatewayService {
    */
   async createPaymentRecord(paymentData) {
     try {
-      let query = `
+      const query = `
         INSERT INTO payments (
           user_id, amount, currency, gateway, payment_method, 
           description, status, metadata, created_at
@@ -171,10 +171,10 @@ class PaymentGatewayService {
         paymentData.paymentMethod,
         paymentData.description,
         paymentData.status,
-        JSON.stringify(paymentData.metadata)
+        JSON.stringify(paymentData.metadata),
       ];
-      
-      let result = await this.db.query(query, values);
+
+      const result = await this.db.query(query, values);
       return result.rows[0].payment_id;
     } catch (error) {
       logger.error('Create payment record failed', error);
@@ -187,7 +187,7 @@ class PaymentGatewayService {
    */
   async updatePaymentStatus(paymentId, status, gatewayResponse) {
     try {
-      let query = `
+      const query = `
         UPDATE payments 
         SET status = $1, 
             gateway_transaction_id = $2,
@@ -199,7 +199,7 @@ class PaymentGatewayService {
         status,
         gatewayResponse.transaction_id,
         JSON.stringify(gatewayResponse),
-        paymentId
+        paymentId,
       ]);
     } catch (error) {
       logger.error('Update payment status failed', error);
@@ -213,12 +213,12 @@ class PaymentGatewayService {
   async processWithGateway(gateway, paymentData) {
     // Mock implementation - replace with actual gateway SDK calls
     logger.info(`Processing payment with ${gateway}`, paymentData);
-    
+
     // Simulate gateway processing
     return {
       status: 'completed',
       transaction_id: `txn_${Date.now()}`,
-      message: 'Payment processed successfully'
+      message: 'Payment processed successfully',
     };
   }
 
@@ -228,11 +228,11 @@ class PaymentGatewayService {
   async processRefundWithGateway(gateway, transactionId, amount, reason) {
     // Mock implementation - replace with actual gateway SDK calls
     logger.info(`Processing refund with ${gateway}`, { transactionId, amount, reason });
-    
+
     return {
       status: 'completed',
       refund_id: `ref_${Date.now()}`,
-      message: 'Refund processed successfully'
+      message: 'Refund processed successfully',
     };
   }
 
@@ -241,7 +241,7 @@ class PaymentGatewayService {
    */
   async createRefundRecord(refundData) {
     try {
-      let query = `
+      const query = `
         INSERT INTO refunds (
           payment_id, amount, reason, gateway_refund_id, 
           status, created_at
@@ -252,7 +252,7 @@ class PaymentGatewayService {
         refundData.amount,
         refundData.reason,
         refundData.gatewayRefundId,
-        refundData.status
+        refundData.status,
       ]);
     } catch (error) {
       logger.error('Create refund record failed', error);

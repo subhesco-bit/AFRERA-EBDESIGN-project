@@ -25,14 +25,14 @@ describe.skip('Marketplace Enhancements', () => {
   beforeAll(async () => {
     // Setup test database connection
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     // Create test user
     const userResult = await pool.query(
       `INSERT INTO users (name, email, password, role) 
        VALUES ('Test User', 'test@example.com', '$2a$10$test', 'farmer')
-       RETURNING id`
+       RETURNING id`,
     );
     testUserId = userResult.rows[0].id;
 
@@ -40,7 +40,7 @@ describe.skip('Marketplace Enhancements', () => {
     const productResult = await pool.query(
       `INSERT INTO products (name, price, category, gst_applicable) 
        VALUES ('Test Product', 100, 'vegetables', true)
-       RETURNING id`
+       RETURNING id`,
     );
     testProductId = productResult.rows[0].id;
 
@@ -67,7 +67,7 @@ describe.skip('Marketplace Enhancements', () => {
           productId: testProductId,
           name: 'Test Product',
           price: 100,
-          category: 'vegetables'
+          category: 'vegetables',
         });
 
       expect(response.status).toBe(200);
@@ -94,7 +94,7 @@ describe.skip('Marketplace Enhancements', () => {
         `INSERT INTO orders (user_id, total_amount, status) 
          VALUES ($1, 100, 'completed')
          RETURNING id`,
-        [testUserId]
+        [testUserId],
       );
       testOrderId = orderResult.rows[0].id;
 
@@ -117,7 +117,7 @@ describe.skip('Marketplace Enhancements', () => {
           productId: testProductId,
           rating: 5,
           title: 'Great product',
-          comment: 'Excellent quality and fast delivery'
+          comment: 'Excellent quality and fast delivery',
         });
 
       expect(response.status).toBe(200);
@@ -152,7 +152,7 @@ describe.skip('Marketplace Enhancements', () => {
           productId: testProductId,
           rating: 4,
           title: 'Good product',
-          comment: 'Nice product'
+          comment: 'Nice product',
         });
 
       const reviewId = reviewResponse.body.data.id;
@@ -178,7 +178,7 @@ describe.skip('Marketplace Enhancements', () => {
           deliveryLocation: 'Guwahati, Assam',
           contactPerson: 'Test Contact',
           contactPhone: '9876543210',
-          contactEmail: 'test@example.com'
+          contactEmail: 'test@example.com',
         });
 
       expect(response.status).toBe(200);

@@ -17,7 +17,7 @@ const wearableIntegrationController = {
       const url = wearableIntegrationService.getFitbitAuthUrl(req.user.id);
       res.json({ success: true, data: { authUrl: url } });
     } catch (error) {
-      let status = error.code === 'not_configured' ? 200 : 500;
+      const status = error.code === 'not_configured' ? 200 : 500;
       res.status(status).json({ success: false, code: error.code, error: error.message });
     }
   },
@@ -35,10 +35,10 @@ const wearableIntegrationController = {
 
   syncFitbit: async (req, res) => {
     try {
-      let result = await wearableIntegrationService.syncFitbitActivity(req.user.id);
+      const result = await wearableIntegrationService.syncFitbitActivity(req.user.id);
       res.json({ success: true, data: result });
     } catch (error) {
-      let status = error.code === 'not_connected' ? 400 : 500;
+      const status = error.code === 'not_connected' ? 400 : 500;
       res.status(status).json({ success: false, code: error.code, error: error.message });
     }
   },
@@ -46,7 +46,7 @@ const wearableIntegrationController = {
   ingestDeviceActivity: async (req, res) => {
     try {
       const { provider, activity_date, activity } = req.body;
-      let result = await wearableIntegrationService.ingestDeviceActivity(req.user.id, provider, activity_date, activity);
+      const result = await wearableIntegrationService.ingestDeviceActivity(req.user.id, provider, activity_date, activity);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error ingesting device wearable activity', { error: error.message });
@@ -68,7 +68,7 @@ const wearableIntegrationController = {
   disconnect: async (req, res) => {
     try {
       const { provider } = req.params;
-      let result = await wearableIntegrationService.disconnectProvider(req.user.id, provider);
+      const result = await wearableIntegrationService.disconnectProvider(req.user.id, provider);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error disconnecting wearable provider', { error: error.message });

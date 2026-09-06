@@ -41,9 +41,7 @@ function getProfile(userId) {
 }
 
 // GET /users/profile
-router.get
-    // Log request
-    logger.debug('router.get request');('/profile', verifyToken, async (req, res) => {
+router.get('/profile', verifyToken, async (req, res) => {
   try {
     const profile = getProfile(req.userId);
 
@@ -57,11 +55,9 @@ router.get
 });
 
 // PUT /users/profile
-router.put
-    // Log request
-    logger.debug('router.put request');('/profile', verifyToken, async (req, res) => {
+router.put('/profile', verifyToken, async (req, res) => {
   try {
-    let profile = getProfile(req.userId);
+    const profile = getProfile(req.userId);
     const { name, phone, profilePic, preferences } = req.body;
 
     if (name) profile.name = name;
@@ -82,11 +78,9 @@ router.put
 });
 
 // GET /users/addresses
-router.get
-    // Log request
-    logger.debug('router.get request');('/addresses', verifyToken, async (req, res) => {
+router.get('/addresses', verifyToken, async (req, res) => {
   try {
-    let profile = getProfile(req.userId);
+    const profile = getProfile(req.userId);
 
     res.json({
       success: true,
@@ -101,9 +95,7 @@ router.get
 });
 
 // POST /users/addresses
-router.post
-    // Log request
-    logger.debug('router.post request');('/addresses', verifyToken, async (req, res) => {
+router.post('/addresses', verifyToken, async (req, res) => {
   try {
     const { street, city, state, zipCode, country, isDefault } = req.body;
 
@@ -114,7 +106,7 @@ router.post
       });
     }
 
-    let profile = getProfile(req.userId);
+    const profile = getProfile(req.userId);
 
     // If this is the default address, unset others
     if (isDefault) {

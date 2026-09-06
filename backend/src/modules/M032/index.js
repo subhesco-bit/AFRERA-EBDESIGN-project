@@ -6,8 +6,8 @@ const controller = require('./controller');
 router.post('/samples', controller.createSoilSample);
 router.get('/farmers/:farmerId/parcels/:parcelId/recommendations', controller.getSoilRecommendations);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

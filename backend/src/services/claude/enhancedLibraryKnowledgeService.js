@@ -32,7 +32,7 @@ class EnhancedLibraryKnowledgeService {
   async initialize() {
     try {
       console.log('Initializing Enhanced Library Knowledge Service...');
-      
+
       await this.buildIndex();
       await this.computeContentHashes();
       await this.buildModuleRegistry();
@@ -46,7 +46,7 @@ class EnhancedLibraryKnowledgeService {
         console.warn('Database sync skipped; continuing with in-memory registry only:', error.message);
       }
       await this.initializeSemanticSearch();
-      
+
       console.log('Enhanced Library Knowledge Service initialized successfully');
     } catch (error) {
       console.error('Failed to initialize enhanced library service:', error);
@@ -59,7 +59,7 @@ class EnhancedLibraryKnowledgeService {
    */
   async buildIndex() {
     console.log('Building enhanced library index...');
-    
+
     // Index plug-and-play modules from modules/ directory
     await this.indexPlugAndPlayModules();
 
@@ -68,7 +68,7 @@ class EnhancedLibraryKnowledgeService {
 
     // Index legacy library cards
     await this.indexLibraryCards();
-    
+
     console.log(`Indexed ${this.index.size} library items`);
   }
 
@@ -88,17 +88,17 @@ class EnhancedLibraryKnowledgeService {
     for (const moduleDir of moduleDirs) {
       const modulePath = path.join(this.modulesRoot, moduleDir);
       const moduleJsonPath = path.join(modulePath, 'module.json');
-      
+
       if (fs.existsSync(moduleJsonPath)) {
         try {
           const moduleJson = JSON.parse(fs.readFileSync(moduleJsonPath, 'utf8'));
-          
+
           this.index.set(moduleJson.moduleId, {
             type: 'plug-and-play-module',
             data: moduleJson,
             path: modulePath,
             lastModified: fs.statSync(moduleJsonPath).mtime,
-            isProductionReady: moduleJson.status === 'production'
+            isProductionReady: moduleJson.status === 'production',
           });
         } catch (error) {
           console.error(`Failed to parse module.json for ${moduleDir}:`, error);
@@ -126,12 +126,12 @@ class EnhancedLibraryKnowledgeService {
       return;
     }
 
-    let moduleDirs = fs.readdirSync(this.backendModulesRoot, { withFileTypes: true })
+    const moduleDirs = fs.readdirSync(this.backendModulesRoot, { withFileTypes: true })
       .filter(dirent => dirent.isDirectory() && /^M\d+$/.test(dirent.name))
       .map(dirent => dirent.name);
 
     for (const moduleDir of moduleDirs) {
-      let modulePath = path.join(this.backendModulesRoot, moduleDir);
+      const modulePath = path.join(this.backendModulesRoot, moduleDir);
       const servicePath = path.join(modulePath, 'service.js');
       if (!fs.existsSync(servicePath)) continue;
 
@@ -158,10 +158,10 @@ class EnhancedLibraryKnowledgeService {
         discovery: {
           keywords,
           capabilities: [],
-          aiContext: `${description}. Express router module; mount via its routes.js/index.js. hasRoutes=${hasRoutes} hasDatabaseModel=${hasModel}.`
+          aiContext: `${description}. Express router module; mount via its routes.js/index.js. hasRoutes=${hasRoutes} hasDatabaseModel=${hasModel}.`,
         },
         dependencies: { modules: [], services: [], libraries: {} },
-        invocation: { style: 'backend-module-family', servicePath, hasRoutes, hasModel }
+        invocation: { style: 'backend-module-family', servicePath, hasRoutes, hasModel },
       };
 
       this.index.set(syntheticManifest.moduleId, {
@@ -169,7 +169,7 @@ class EnhancedLibraryKnowledgeService {
         data: syntheticManifest,
         path: modulePath,
         lastModified: fs.statSync(servicePath).mtime,
-        isProductionReady: false
+        isProductionReady: false,
       });
     }
   }
@@ -182,17 +182,17 @@ class EnhancedLibraryKnowledgeService {
     const modulesDir = path.join(this.modulesPath, 'Module_Cards');
     if (fs.existsSync(modulesDir)) {
       const moduleFiles = fs.readdirSync(modulesDir).filter(f => f.endsWith('.md'));
-      
+
       for (const file of moduleFiles) {
         const filePath = path.join(modulesDir, file);
         const content = fs.readFileSync(filePath, 'utf8');
         const moduleData = this.parseModuleCard(content);
-        
+
         this.index.set(file, {
           type: 'legacy-module',
           data: moduleData,
           path: filePath,
-          lastModified: fs.statSync(filePath).mtime
+          lastModified: fs.statSync(filePath).mtime,
         });
       }
     }
@@ -201,17 +201,17 @@ class EnhancedLibraryKnowledgeService {
     const componentsDir = path.join(this.modulesPath, 'Component_Cards');
     if (fs.existsSync(componentsDir)) {
       const componentFiles = fs.readdirSync(componentsDir).filter(f => f.endsWith('.md'));
-      
+
       for (const file of componentFiles) {
-        let filePath = path.join(componentsDir, file);
-        let content = fs.readFileSync(filePath, 'utf8');
+        const filePath = path.join(componentsDir, file);
+        const content = fs.readFileSync(filePath, 'utf8');
         const componentData = this.parseComponentCard(content);
-        
+
         this.index.set(file, {
           type: 'legacy-component',
           data: componentData,
           path: filePath,
-          lastModified: fs.statSync(filePath).mtime
+          lastModified: fs.statSync(filePath).mtime,
         });
       }
     }
@@ -222,11 +222,11 @@ class EnhancedLibraryKnowledgeService {
    */
   async buildModuleRegistry() {
     console.log('Building module registry...');
-    
+
     for (const [key, item] of this.index) {
       if (item.type === 'plug-and-play-module') {
-        let moduleData = item.data;
-        
+        const moduleData = item.data;
+
         this.moduleRegistry.set(moduleData.moduleId, {
           moduleId: moduleData.moduleId,
           version: moduleData.version,
@@ -240,7 +240,7 @@ class EnhancedLibraryKnowledgeService {
           claudeIntegration: moduleData.claudeIntegration,
           loaded: false,
           initialized: false,
-          healthy: false
+          healthy: false,
         });
       }
     }
@@ -253,15 +253,15 @@ class EnhancedLibraryKnowledgeService {
    */
   async buildDependencyGraph() {
     console.log('Building dependency graph...');
-    
+
     for (const [moduleId, moduleInfo] of this.moduleRegistry) {
       const dependencies = moduleInfo.dependencies.modules || [];
-      
+
       this.dependencyGraph.set(moduleId, {
-        moduleId: moduleId,
-        dependencies: dependencies,
+        moduleId,
+        dependencies,
         dependents: [],
-        resolved: false
+        resolved: false,
       });
     }
 
@@ -282,10 +282,10 @@ class EnhancedLibraryKnowledgeService {
    */
   async initializeSemanticSearch() {
     console.log('Initializing semantic search...');
-    
+
     // Build capability index
     this.capabilityIndex = new Map();
-    
+
     for (const [moduleId, moduleInfo] of this.moduleRegistry) {
       for (const capability of moduleInfo.capabilities) {
         if (!this.capabilityIndex.has(capability)) {
@@ -301,9 +301,9 @@ class EnhancedLibraryKnowledgeService {
     this.keywordIndex = new Map();
 
     for (const [moduleId, moduleInfo] of this.moduleRegistry) {
-      let moduleData = this.index.get(moduleId)?.data;
-      let keywords = moduleData?.discovery?.keywords
-        || [moduleId, moduleInfo.name].join(' ').toLowerCase().split(/[\s_-]+/).filter(w => w.length >= 3);
+      const moduleData = this.index.get(moduleId)?.data;
+      const keywords = moduleData?.discovery?.keywords ||
+        [moduleId, moduleInfo.name].join(' ').toLowerCase().split(/[\s_-]+/).filter(w => w.length >= 3);
       for (const keyword of keywords) {
         const k = String(keyword).toLowerCase();
         if (!this.keywordIndex.has(k)) {
@@ -321,10 +321,10 @@ class EnhancedLibraryKnowledgeService {
    */
   async discoverModules(query, context = {}) {
     console.log(`Discovering modules for query: "${query}"`);
-    
+
     const results = [];
     const queryLower = query.toLowerCase();
-    
+
     // Semantic search based on capabilities and keywords. Non-production modules
     // (skeletons, unverified backend-family modules) stay visible rather than being
     // hidden - Claude needs to know they exist even if not yet production-ready -
@@ -332,7 +332,7 @@ class EnhancedLibraryKnowledgeService {
     // so nothing is presented as more finished than it is.
     for (const [moduleId, moduleInfo] of this.moduleRegistry) {
       let matchScore = 0;
-      let moduleData = this.index.get(moduleId)?.data;
+      const moduleData = this.index.get(moduleId)?.data;
 
       // Keywords: use declared discovery.keywords when present, otherwise fall back to
       // deriving from the module name/id so skeleton modules (no discovery block) are
@@ -342,10 +342,10 @@ class EnhancedLibraryKnowledgeService {
       // otherwise a query like "dairy" ranks a dozen unrelated ERP/analytics modules
       // above the actual dairy module because they all happen to share common words.
       const totalModules = this.moduleRegistry.size;
-      let keywords = moduleData?.discovery?.keywords
-        || [moduleId, moduleInfo.name].join(' ').toLowerCase().split(/[\s_-]+/).filter(w => w.length >= 3);
+      const keywords = moduleData?.discovery?.keywords ||
+        [moduleId, moduleInfo.name].join(' ').toLowerCase().split(/[\s_-]+/).filter(w => w.length >= 3);
       for (const keyword of keywords) {
-        let k = String(keyword).toLowerCase();
+        const k = String(keyword).toLowerCase();
         if (queryLower.includes(k)) {
           const docFreq = this.keywordIndex?.get(k)?.length || 1;
           const idf = Math.log((totalModules + 1) / docFreq);
@@ -375,15 +375,15 @@ class EnhancedLibraryKnowledgeService {
 
       if (matchScore > 0) {
         results.push({
-          moduleId: moduleId,
+          moduleId,
           name: moduleInfo.name,
-          matchScore: matchScore,
+          matchScore,
           capabilities: moduleInfo.capabilities,
           aiContext: moduleData?.discovery?.aiContext || '',
           dependencies: moduleInfo.dependencies,
           status: moduleInfo.status,
           category: moduleInfo.category,
-          isProductionReady: moduleInfo.isProductionReady
+          isProductionReady: moduleInfo.isProductionReady,
         });
       }
     }
@@ -397,8 +397,8 @@ class EnhancedLibraryKnowledgeService {
       metadata: {
         totalMatches: results.length,
         searchTime: '50ms',
-        queryProcessed: true
-      }
+        queryProcessed: true,
+      },
     };
   }
 
@@ -409,19 +409,19 @@ class EnhancedLibraryKnowledgeService {
     if (!this.moduleRegistry.has(moduleId)) {
       return {
         success: false,
-        error: `Module ${moduleId} not found in registry`
+        error: `Module ${moduleId} not found in registry`,
       };
     }
 
     const moduleInfo = this.moduleRegistry.get(moduleId);
-    let moduleData = this.index.get(moduleId)?.data;
+    const moduleData = this.index.get(moduleId)?.data;
 
     return {
       success: true,
       module: {
         ...moduleInfo,
-        fullMetadata: moduleData
-      }
+        fullMetadata: moduleData,
+      },
     };
   }
 
@@ -432,17 +432,17 @@ class EnhancedLibraryKnowledgeService {
     if (!this.dependencyGraph.has(moduleId)) {
       return {
         success: false,
-        error: `Module ${moduleId} not found in dependency graph`
+        error: `Module ${moduleId} not found in dependency graph`,
       };
     }
 
     const resolved = [];
     const visited = new Set();
-    
+
     const resolve = (mid) => {
       if (visited.has(mid)) return;
       visited.add(mid);
-      
+
       const depInfo = this.dependencyGraph.get(mid);
       if (depInfo) {
         for (const depId of depInfo.dependencies) {
@@ -452,7 +452,7 @@ class EnhancedLibraryKnowledgeService {
           }
         }
       }
-      
+
       if (!resolved.includes(mid)) {
         resolved.push(mid);
       }
@@ -463,7 +463,7 @@ class EnhancedLibraryKnowledgeService {
     return {
       success: true,
       resolutionOrder: resolved,
-      modules: resolved.map(mid => this.moduleRegistry.get(mid))
+      modules: resolved.map(mid => this.moduleRegistry.get(mid)),
     };
   }
 
@@ -474,11 +474,11 @@ class EnhancedLibraryKnowledgeService {
     if (!this.moduleRegistry.has(moduleId)) {
       return {
         success: false,
-        error: `Module ${moduleId} not found in registry`
+        error: `Module ${moduleId} not found in registry`,
       };
     }
 
-    let moduleInfo = this.moduleRegistry.get(moduleId);
+    const moduleInfo = this.moduleRegistry.get(moduleId);
     Object.assign(moduleInfo, status);
 
     // Update database
@@ -496,7 +496,7 @@ class EnhancedLibraryKnowledgeService {
         status.loaded || false,
         status.initialized || false,
         status.healthy || false,
-        moduleId
+        moduleId,
       ]);
     } catch (error) {
       console.error('Failed to update module status in database:', error);
@@ -504,7 +504,7 @@ class EnhancedLibraryKnowledgeService {
 
     return {
       success: true,
-      module: moduleInfo
+      module: moduleInfo,
     };
   }
 
@@ -513,30 +513,30 @@ class EnhancedLibraryKnowledgeService {
    */
   async computeContentHashes() {
     console.log('Computing content hashes...');
-    
+
     for (const [filename, item] of this.index) {
       if (item.type === 'plug-and-play-module') {
-        let moduleJsonPath = path.join(item.path, 'module.json');
+        const moduleJsonPath = path.join(item.path, 'module.json');
         if (fs.existsSync(moduleJsonPath)) {
-          let content = fs.readFileSync(moduleJsonPath, 'utf8');
+          const content = fs.readFileSync(moduleJsonPath, 'utf8');
           const hash = crypto.createHash('sha256').update(content).digest('hex');
-          
+
           this.contentHashes.set(filename, {
             hash,
             path: moduleJsonPath,
             size: Buffer.byteLength(content),
-            computedAt: new Date().toISOString()
+            computedAt: new Date().toISOString(),
           });
         }
       } else {
-        let content = fs.readFileSync(item.path, 'utf8');
-        let hash = crypto.createHash('sha256').update(content).digest('hex');
-        
+        const content = fs.readFileSync(item.path, 'utf8');
+        const hash = crypto.createHash('sha256').update(content).digest('hex');
+
         this.contentHashes.set(filename, {
           hash,
           path: item.path,
           size: Buffer.byteLength(content),
-          computedAt: new Date().toISOString()
+          computedAt: new Date().toISOString(),
         });
       }
     }
@@ -549,8 +549,8 @@ class EnhancedLibraryKnowledgeService {
    */
   async syncToDatabase() {
     try {
-      let pool = await getPostgreSQL();
-      
+      const pool = await getPostgreSQL();
+
       // Create enhanced library_knowledge table
       await pool.query(`
         CREATE TABLE IF NOT EXISTS library_knowledge (
@@ -606,7 +606,7 @@ class EnhancedLibraryKnowledgeService {
       // Insert/update library items
       for (const [key, item] of this.index) {
         const hashData = this.contentHashes.get(key);
-        
+
         await pool.query(`
           INSERT INTO library_knowledge (key, type, content_hash, data, file_path, file_size, last_modified, is_production_ready)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -627,14 +627,14 @@ class EnhancedLibraryKnowledgeService {
           item.path,
           hashData.size,
           item.lastModified,
-          item.isProductionReady || false
+          item.isProductionReady || false,
         ]);
       }
 
       // Insert/update module registry
       for (const [moduleId, moduleInfo] of this.moduleRegistry) {
-        let moduleData = this.index.get(moduleId)?.data;
-        
+        const moduleData = this.index.get(moduleId)?.data;
+
         await pool.query(`
           INSERT INTO module_registry (module_id, version, name, category, status, capabilities, dependencies, discovery_metadata, execution_metadata, claude_integration, module_path, loaded, initialized, healthy)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
@@ -667,7 +667,7 @@ class EnhancedLibraryKnowledgeService {
           moduleInfo.path,
           moduleInfo.loaded,
           moduleInfo.initialized,
-          moduleInfo.healthy
+          moduleInfo.healthy,
         ]);
       }
 
@@ -686,7 +686,7 @@ class EnhancedLibraryKnowledgeService {
           hashData.hash,
           hashData.path,
           hashData.size,
-          hashData.computedAt
+          hashData.computedAt,
         ]);
       }
 
@@ -701,13 +701,13 @@ class EnhancedLibraryKnowledgeService {
    * Parse module card from markdown
    */
   parseModuleCard(content) {
-    let moduleData = {
+    const moduleData = {
       id: '',
       name: '',
       domain: '',
       status: '',
       implementation: '',
-      components: []
+      components: [],
     };
 
     const lines = content.split('\n');
@@ -732,15 +732,15 @@ class EnhancedLibraryKnowledgeService {
    * Parse component card from markdown
    */
   parseComponentCard(content) {
-    let componentData = {
+    const componentData = {
       id: '',
       name: '',
       type: '',
       module: '',
-      status: ''
+      status: '',
     };
 
-    let lines = content.split('\n');
+    const lines = content.split('\n');
     for (const line of lines) {
       if (line.startsWith('# Component ID:')) {
         componentData.id = line.replace('# Component ID:', '').trim();
@@ -769,7 +769,7 @@ class EnhancedLibraryKnowledgeService {
       registeredModules: this.moduleRegistry.size,
       productionReady: Array.from(this.moduleRegistry.values()).filter(m => m.isProductionReady).length,
       contentHashes: this.contentHashes.size,
-      dependencyGraphEntries: this.dependencyGraph.size
+      dependencyGraphEntries: this.dependencyGraph.size,
     };
   }
 }

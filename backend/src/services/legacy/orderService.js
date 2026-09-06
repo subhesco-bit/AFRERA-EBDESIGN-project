@@ -17,17 +17,17 @@ const gstService = require('./gstService');
 async function getCart(userId) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Validate database connection
     if (!pg) {
       throw new Error('Database connection not available');
     }
-    
+
     // Validate user ID
     if (!userId) {
       throw new Error('User ID is required');
     }
-    
+
     const query = `
       SELECT c.*, p.name as product_name, p.base_price, p.images, p.slug,
              u.symbol as unit_symbol
@@ -37,20 +37,20 @@ async function getCart(userId) {
       WHERE c.user_id = $1
       ORDER BY c.created_at DESC
     `;
-    
+
     const result = await pg.query(query, [userId]);
-    
+
     const cartItems = result.rows.map(item => ({
       ...item,
-      total_price: item.base_price * item.quantity
+      total_price: item.base_price * item.quantity,
     }));
-    
+
     const total = cartItems.reduce((sum, item) => sum + item.total_price, 0);
-    
+
     return {
       items: cartItems,
       total_items: cartItems.reduce((sum, item) => sum + item.quantity, 0),
-      total_amount: total
+      total_amount: total,
     };
   } catch (error) {
     logger.error('Error fetching cart', { error: error.message, stack: error.stack });
@@ -63,26 +63,26 @@ async function getCart(userId) {
  */
 async function addToCart(userId, productId, quantity = 1, attributes = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Check if product exists
     const productQuery = 'SELECT id, base_price, is_active FROM products WHERE id = $1';
     const productResult = await pg.query(productQuery, [productId]);
-    
+
     if (productResult.rows.length === 0) {
       throw new Error('Product not found');
     }
-    
+
     const product = productResult.rows[0];
-    
+
     if (!product.is_active) {
       throw new Error('Product is not available');
     }
-    
+
     // Check if item already exists in cart
     const existingQuery = 'SELECT id, quantity FROM cart WHERE user_id = $1 AND product_id = $2';
     const existingResult = await pg.query(existingQuery, [userId, productId]);
-    
+
     if (existingResult.rows.length > 0) {
       // Update quantity
       const updateQuery = `
@@ -91,13 +91,13 @@ async function addToCart(userId, productId, quantity = 1, attributes = {}) {
         WHERE id = $3
         RETURNING *
       `;
-      
+
       const updateResult = await pg.query(updateQuery, [
         quantity,
         JSON.stringify(attributes),
-        existingResult.rows[0].id
+        existingResult.rows[0].id,
       ]);
-      
+
       logger.info(`Cart item updated: user ${userId}, product ${productId}`);
       return updateResult.rows[0];
     } else {
@@ -107,9 +107,9 @@ async function addToCart(userId, productId, quantity = 1, attributes = {}) {
         VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
-      
+
       const insertResult = await pg.query(insertQuery, [userId, productId, quantity, JSON.stringify(attributes)]);
-      
+
       logger.info(`Item added to cart: user ${userId}, product ${productId}`);
       return insertResult.rows[0];
     }
@@ -124,34 +124,34 @@ async function addToCart(userId, productId, quantity = 1, attributes = {}) {
  */
 async function updateCartItem(userId, cartItemId, quantity) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     if (quantity <= 0) {
       // Remove item
       const deleteQuery = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
       const deleteResult = await pg.query(deleteQuery, [cartItemId, userId]);
-      
+
       if (deleteResult.rows.length === 0) {
         throw new Error('Cart item not found');
       }
-      
+
       logger.info(`Cart item removed: ${cartItemId}`);
       return deleteResult.rows[0];
     } else {
       // Update quantity
-      let updateQuery = `
+      const updateQuery = `
         UPDATE cart
         SET quantity = $1, updated_at = NOW()
         WHERE id = $2 AND user_id = $3
         RETURNING *
       `;
-      
-      let updateResult = await pg.query(updateQuery, [quantity, cartItemId, userId]);
-      
+
+      const updateResult = await pg.query(updateQuery, [quantity, cartItemId, userId]);
+
       if (updateResult.rows.length === 0) {
         throw new Error('Cart item not found');
       }
-      
+
       logger.info(`Cart item updated: ${cartItemId}`);
       return updateResult.rows[0];
     }
@@ -166,15 +166,15 @@ async function updateCartItem(userId, cartItemId, quantity) {
  */
 async function removeFromCart(userId, cartItemId) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
-    let result = await pg.query(query, [cartItemId, userId]);
-    
+    const pg = getPostgreSQL();
+
+    const query = 'DELETE FROM cart WHERE id = $1 AND user_id = $2 RETURNING *';
+    const result = await pg.query(query, [cartItemId, userId]);
+
     if (result.rows.length === 0) {
       throw new Error('Cart item not found');
     }
-    
+
     logger.info(`Cart item removed: ${cartItemId}`);
     return result.rows[0];
   } catch (error) {
@@ -188,11 +188,11 @@ async function removeFromCart(userId, cartItemId) {
  */
 async function clearCart(userId) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = 'DELETE FROM cart WHERE user_id = $1';
+    const pg = getPostgreSQL();
+
+    const query = 'DELETE FROM cart WHERE user_id = $1';
     await pg.query(query, [userId]);
-    
+
     logger.info(`Cart cleared for user: ${userId}`);
     return { success: true };
   } catch (error) {
@@ -206,8 +206,8 @@ async function clearCart(userId) {
  */
 async function createOrder(userId, orderData) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get cart items — pulls the same HSN/branding columns gstService.calculateOrderGST
     // uses, so tax can be computed for real per item instead of guessed as a flat rate.
     const cartQuery = `
@@ -226,7 +226,7 @@ async function createOrder(userId, orderData) {
       throw new Error('Cart is empty');
     }
 
-    let cartItems = cartResult.rows;
+    const cartItems = cartResult.rows;
 
     // Real stock check — nothing here previously verified availability before
     // creating an order, so two buyers could both "successfully" order the
@@ -260,10 +260,10 @@ async function createOrder(userId, orderData) {
     const shippingAmount = subtotal > 1500 ? 0 : 60;
     const discountAmount = orderData.coupon_code ? await calculateDiscount(orderData.coupon_code, subtotal) : 0;
     const totalAmount = subtotal + taxAmount + shippingAmount - discountAmount;
-    
+
     // Generate order number
     const orderNumber = generateOrderNumber();
-    
+
     // ---- TRANSACTION BOUNDARY (BR-08) -----------------------------------
     //
     // The order header, its line items and the cart clear are ONE unit.
@@ -300,7 +300,7 @@ async function createOrder(userId, orderData) {
         orderData.billing_address_id || null,
         orderData.expected_delivery_date || null,
         orderData.notes || null,
-        orderData.coupon_code || null
+        orderData.coupon_code || null,
       ]);
 
       order = orderResult.rows[0];
@@ -315,10 +315,10 @@ async function createOrder(userId, orderData) {
           `UPDATE products SET stock_quantity = stock_quantity - $1
            WHERE id = $2 AND (stock_quantity IS NULL OR stock_quantity >= $1)
            RETURNING stock_quantity`,
-          [cartItem.quantity, cartItem.product_id]
+          [cartItem.quantity, cartItem.product_id],
         );
         if (stockResult.rows.length === 0) {
-          let err = new Error(`Not enough stock for ${cartItem.product_name}`);
+          const err = new Error(`Not enough stock for ${cartItem.product_name}`);
           err.code = 'insufficient_stock';
           throw err;
         }
@@ -330,7 +330,7 @@ async function createOrder(userId, orderData) {
           [order.id, cartItem.product_id, cartItem.product_name, null,
             cartItem.quantity, cartItem.base_price,
             cartItem.base_price * cartItem.quantity,
-            JSON.stringify(cartItem.attributes || {})]
+            JSON.stringify(cartItem.attributes || {})],
         );
       }
 
@@ -353,12 +353,12 @@ async function createOrder(userId, orderData) {
       io.to(`user:${userId}`).emit('order_created', {
         order_id: order.id,
         order_number: order.order_number,
-        total_amount: order.total_amount
+        total_amount: order.total_amount,
       });
     }
-    
+
     logger.info(`Order created: ${orderNumber} for user ${userId}`);
-    
+
     return order;
   } catch (error) {
     logger.error('Error creating order', { error: error.message, stack: error.stack });
@@ -371,8 +371,8 @@ async function createOrder(userId, orderData) {
  */
 async function getOrderById(orderId, userId = null) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     let query = `
       SELECT o.*, u.name as customer_name, u.email as customer_email,
              sa.address_line1 as shipping_line1, sa.city as shipping_city,
@@ -385,23 +385,23 @@ async function getOrderById(orderId, userId = null) {
       LEFT JOIN addresses ba ON o.billing_address_id = ba.id
       WHERE o.id = $1
     `;
-    
+
     const params = [orderId];
-    
+
     // If userId provided, add user filter
     if (userId) {
       query += ' AND o.user_id = $2';
       params.push(userId);
     }
-    
-    let result = await pg.query(query, params);
-    
+
+    const result = await pg.query(query, params);
+
     if (result.rows.length === 0) {
       throw new Error('Order not found');
     }
-    
+
     const order = result.rows[0];
-    
+
     // Get order items
     const itemsQuery = `
       SELECT oi.*, p.slug, p.images
@@ -409,11 +409,11 @@ async function getOrderById(orderId, userId = null) {
       LEFT JOIN products p ON oi.product_id = p.id
       WHERE oi.order_id = $1
     `;
-    
+
     const itemsResult = await pg.query(itemsQuery, [orderId]);
-    
+
     order.items = itemsResult.rows;
-    
+
     return order;
   } catch (error) {
     logger.error('Error fetching order', { error: error.message, stack: error.stack });
@@ -426,62 +426,62 @@ async function getOrderById(orderId, userId = null) {
  */
 async function getUserOrders(userId, filters = {}, pagination = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     const { status, search } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
-    
+
     const offset = (page - 1) * limit;
-    
+
     let query = `
       SELECT o.*, COUNT(oi.id) as item_count
       FROM orders o
       LEFT JOIN order_items oi ON o.id = oi.order_id
       WHERE o.user_id = $1
     `;
-    
-    let params = [userId];
+
+    const params = [userId];
     let paramCount = 1;
-    
+
     if (status) {
       paramCount++;
       query += ` AND o.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     if (search) {
       paramCount++;
       query += ` AND (o.order_number ILIKE $${paramCount})`;
       params.push(`%${search}%`);
     }
-    
+
     query += ` GROUP BY o.id ORDER BY o.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
-    
-    let result = await pg.query(query, params);
-    
+
+    const result = await pg.query(query, params);
+
     // Get total count
     const countQuery = `
       SELECT COUNT(*) FROM orders WHERE user_id = $1
-      ${status ? `AND status = $2` : ''}
+      ${status ? 'AND status = $2' : ''}
       ${search ? `AND order_number ILIKE $${status ? 3 : 2}` : ''}
     `;
-    
+
     const countParams = [userId];
     if (status) countParams.push(status);
     if (search) countParams.push(`%${search}%`);
-    
+
     const countResult = await pg.query(countQuery, countParams);
-    let total = parseInt(countResult.rows[0].count);
-    
+    const total = parseInt(countResult.rows[0].count);
+
     return {
       orders: result.rows,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching user orders', { error: error.message, stack: error.stack });
@@ -494,40 +494,40 @@ async function getUserOrders(userId, filters = {}, pagination = {}) {
  */
 async function updateOrderStatus(orderId, status, notes = null) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       UPDATE orders
       SET status = $1, notes = COALESCE($2, notes), updated_at = NOW()
       WHERE id = $3
       RETURNING *
     `;
-    
-    let result = await pg.query(query, [status, notes, orderId]);
-    
+
+    const result = await pg.query(query, [status, notes, orderId]);
+
     if (result.rows.length === 0) {
       throw new Error('Order not found');
     }
-    
-    let order = result.rows[0];
-    
+
+    const order = result.rows[0];
+
     // Emit WebSocket event
-    let io = require('../../../index').app.get('io');
+    const io = require('../../../index').app.get('io');
     if (io) {
       io.to(`order:${orderId}`).emit('order_status_updated', {
         order_id: orderId,
-        status: status,
-        notes: notes
+        status,
+        notes,
       });
-      
+
       io.to(`user:${order.user_id}`).emit('order_updated', {
         order_id: orderId,
-        status: status
+        status,
       });
     }
-    
+
     logger.info(`Order status updated: ${orderId} to ${status}`);
-    
+
     return order;
   } catch (error) {
     logger.error('Error updating order status', { error: error.message, stack: error.stack });
@@ -540,32 +540,32 @@ async function updateOrderStatus(orderId, status, notes = null) {
  */
 async function processPayment(orderId, paymentData, userId = null) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get order with optional ownership check
     let orderQuery = 'SELECT * FROM orders WHERE id = $1';
     const queryParams = [orderId];
-    
+
     if (userId) {
       orderQuery += ' AND user_id = $2';
       queryParams.push(userId);
     }
-    
-    let orderResult = await pg.query(orderQuery, queryParams);
-    
+
+    const orderResult = await pg.query(orderQuery, queryParams);
+
     if (orderResult.rows.length === 0) {
       throw new Error('Order not found');
     }
-    
-    let order = orderResult.rows[0];
-    
+
+    const order = orderResult.rows[0];
+
     if (order.payment_status === 'completed') {
       throw new Error('Payment already completed');
     }
-    
+
     // Process payment (in production, integrate with payment gateway)
     const paymentResult = await processPaymentGateway(paymentData, order.total_amount);
-    
+
     // ---- TRANSACTION BOUNDARY (BR-08) -----------------------------------
     //
     // The payment record and the order's payment_status must commit together.
@@ -592,12 +592,12 @@ async function processPayment(orderId, paymentData, userId = null) {
          RETURNING *`,
         [orderId, order.user_id, order.total_amount, 'INR',
           paymentData.payment_method, 'completed', paymentResult.transaction_id,
-          JSON.stringify(paymentResult)]
+          JSON.stringify(paymentResult)],
       );
 
       await payClient.query(
         'UPDATE orders SET payment_status = $1, status = $2 WHERE id = $3',
-        ['completed', 'confirmed', orderId]
+        ['completed', 'confirmed', orderId],
       );
 
       await payClient.query('COMMIT');
@@ -614,7 +614,6 @@ async function processPayment(orderId, paymentData, userId = null) {
     }
     // ---- end transaction -------------------------------------------------
 
-    
     logger.info(`Payment processed: order ${orderId}, amount ${order.total_amount}`);
 
     // Afferent signal: this is what gives the fraud rule its financial context.
@@ -626,9 +625,9 @@ async function processPayment(orderId, paymentData, userId = null) {
         order_id: orderId,
         amount: Number(order.total_amount) || 0,
         method: paymentData.payment_method,
-        transaction_id: paymentResult.transaction_id
+        transaction_id: paymentResult.transaction_id,
       },
-      { severity: SEVERITY.INFO, source: 'orderService', entityId: order.user_id }
+      { severity: SEVERITY.INFO, source: 'orderService', entityId: order.user_id },
     );
 
     return paymentRecord.rows[0];
@@ -643,34 +642,34 @@ async function processPayment(orderId, paymentData, userId = null) {
  */
 async function calculateDiscount(couponCode, orderAmount) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       SELECT * FROM coupons
       WHERE code = $1
         AND is_active = TRUE
         AND (valid_from IS NULL OR valid_from <= NOW())
         AND (valid_until IS NULL OR valid_until >= NOW())
     `;
-    
-    let result = await pg.query(query, [couponCode.toUpperCase()]);
-    
+
+    const result = await pg.query(query, [couponCode.toUpperCase()]);
+
     if (result.rows.length === 0) {
       return 0;
     }
-    
+
     const coupon = result.rows[0];
-    
+
     // Check minimum order value
     if (coupon.minimum_order_value && orderAmount < coupon.minimum_order_value) {
       return 0;
     }
-    
+
     // Check usage limit
     if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
       return 0;
     }
-    
+
     // Calculate discount
     let discount = 0;
     if (coupon.discount_type === 'percentage') {
@@ -678,18 +677,18 @@ async function calculateDiscount(couponCode, orderAmount) {
     } else {
       discount = coupon.discount_value;
     }
-    
+
     // Apply maximum discount limit
     if (coupon.maximum_discount_amount && discount > coupon.maximum_discount_amount) {
       discount = coupon.maximum_discount_amount;
     }
-    
+
     // Update used count
     await pg.query(
       'UPDATE coupons SET used_count = used_count + 1 WHERE id = $1',
-      [coupon.id]
+      [coupon.id],
     );
-    
+
     return Math.round(discount);
   } catch (error) {
     logger.error('Error calculating discount', { error: error.message, stack: error.stack });
@@ -714,9 +713,9 @@ async function processPaymentGateway(paymentData, amount) {
   return {
     success: true,
     transaction_id: `TXN-${Date.now()}`,
-    amount: amount,
+    amount,
     currency: 'INR',
-    payment_method: paymentData.payment_method
+    payment_method: paymentData.payment_method,
   };
 }
 
@@ -746,7 +745,7 @@ router.get('/cart', authMiddleware, async (req, res) => {
 // Add to cart
 router.post('/cart', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
+    const userId = req.user.id;
     const { product_id, quantity, attributes } = req.body;
     const cartItem = await addToCart(userId, product_id, quantity, attributes);
     res.json(cartItem);
@@ -758,9 +757,9 @@ router.post('/cart', authMiddleware, async (req, res) => {
 // Update cart item
 router.put('/cart/:id', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
+    const userId = req.user.id;
     const { quantity } = req.body;
-    let cartItem = await updateCartItem(userId, req.params.id, quantity);
+    const cartItem = await updateCartItem(userId, req.params.id, quantity);
     res.json(cartItem);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -770,8 +769,8 @@ router.put('/cart/:id', authMiddleware, async (req, res) => {
 // Remove from cart
 router.delete('/cart/:id', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
-    let cartItem = await removeFromCart(userId, req.params.id);
+    const userId = req.user.id;
+    const cartItem = await removeFromCart(userId, req.params.id);
     res.json(cartItem);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -781,8 +780,8 @@ router.delete('/cart/:id', authMiddleware, async (req, res) => {
 // Clear cart
 router.delete('/cart', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
-    let result = await clearCart(userId);
+    const userId = req.user.id;
+    const result = await clearCart(userId);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -792,8 +791,8 @@ router.delete('/cart', authMiddleware, async (req, res) => {
 // Create order
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
-    let order = await createOrder(userId, req.body);
+    const userId = req.user.id;
+    const order = await createOrder(userId, req.body);
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -803,8 +802,8 @@ router.post('/', authMiddleware, async (req, res) => {
 // Get order by ID
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
-    let order = await getOrderById(req.params.id, userId);
+    const userId = req.user.id;
+    const order = await getOrderById(req.params.id, userId);
     res.json(order);
   } catch (error) {
     if (error.message === 'Order not found') {
@@ -818,18 +817,18 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // Get user orders
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
+    const userId = req.user.id;
     const filters = {
       status: req.query.status,
-      search: req.query.search
+      search: req.query.search,
     };
     const pagination = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
       sort_by: req.query.sort_by,
-      sort_order: req.query.sort_order
+      sort_order: req.query.sort_order,
     };
-    let result = await getUserOrders(userId, filters, pagination);
+    const result = await getUserOrders(userId, filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -843,7 +842,7 @@ router.get('/', authMiddleware, async (req, res) => {
 router.put('/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { status, notes } = req.body;
-    let order = await updateOrderStatus(req.params.id, status, notes);
+    const order = await updateOrderStatus(req.params.id, status, notes);
     res.json(order);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -877,8 +876,6 @@ module.exports = {
   getOrderById,
   getUserOrders,
   updateOrderStatus,
-  processPayment
+  processPayment,
 };
-
-
 

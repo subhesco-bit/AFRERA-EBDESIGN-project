@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Rate Limiting Middleware
- * 
+ *
  * Production-ready rate limiting with:
  * - Redis backend for distributed systems (with in-memory fallback)
  * - Sliding window algorithm for accurate rate limiting
@@ -26,7 +26,7 @@ const RateLimitStrategy = {
   FIXED_WINDOW: 'fixed_window',
   SLIDING_WINDOW: 'sliding_window',
   TOKEN_BUCKET: 'token_bucket',
-  LEAKY_BUCKET: 'leaky_bucket'
+  LEAKY_BUCKET: 'leaky_bucket',
 };
 
 /**
@@ -52,7 +52,7 @@ class InMemoryRateLimitStore {
   }
 
   incr(key) {
-    let entry = this.store.get(key);
+    const entry = this.store.get(key);
     if (!entry) {
       this.store.set(key, { value: 1, expiresAt: Date.now() + 86400000 });
       return 1;
@@ -62,7 +62,7 @@ class InMemoryRateLimitStore {
   }
 
   incrby(key, amount) {
-    let entry = this.store.get(key);
+    const entry = this.store.get(key);
     if (!entry) {
       this.store.set(key, { value: amount, expiresAt: Date.now() + 86400000 });
       return amount;
@@ -72,7 +72,7 @@ class InMemoryRateLimitStore {
   }
 
   expire(key, ttl) {
-    let entry = this.store.get(key);
+    const entry = this.store.get(key);
     if (entry) {
       entry.expiresAt = Date.now() + ttl;
     }
@@ -119,28 +119,28 @@ class SlidingWindowRateLimiter {
   }
 
   async check(identifier) {
-    let now = Date.now();
+    const now = Date.now();
     const key = generateKey('sliding', identifier);
     const windowStart = now - this.windowMs;
 
     // Get current requests in window
     const requests = this.store.get(key) || [];
-    
+
     // Remove expired requests
     const validRequests = requests.filter(timestamp => timestamp > windowStart);
-    
+
     // Check if limit exceeded
     if (validRequests.length >= this.max) {
       const oldestRequest = validRequests[0];
       const resetTime = oldestRequest + this.windowMs;
-      
+
       return {
         allowed: false,
         count: validRequests.length,
         limit: this.max,
         remaining: 0,
         resetTime,
-        retryAfter: Math.ceil((resetTime - now) / 1000)
+        retryAfter: Math.ceil((resetTime - now) / 1000),
       };
     }
 
@@ -154,7 +154,7 @@ class SlidingWindowRateLimiter {
       limit: this.max,
       remaining: this.max - validRequests.length,
       resetTime: now + this.windowMs,
-      retryAfter: 0
+      retryAfter: 0,
     };
   }
 }
@@ -170,12 +170,12 @@ class TokenBucketRateLimiter {
   }
 
   async check(identifier) {
-    let now = Date.now();
-    let key = generateKey('tokenbucket', identifier);
-    
+    const now = Date.now();
+    const key = generateKey('tokenbucket', identifier);
+
     const state = this.store.get(key) || {
       tokens: this.capacity,
-      lastRefill: now
+      lastRefill: now,
     };
 
     // Refill tokens
@@ -187,14 +187,14 @@ class TokenBucketRateLimiter {
     // Check if tokens available
     if (state.tokens < 1) {
       const timeToNextToken = (1 - state.tokens) / this.refillRate;
-      
+
       return {
         allowed: false,
         count: Math.floor(this.capacity - state.tokens),
         limit: this.capacity,
         remaining: 0,
         resetTime: now + (timeToNextToken * 1000),
-        retryAfter: Math.ceil(timeToNextToken)
+        retryAfter: Math.ceil(timeToNextToken),
       };
     }
 
@@ -208,7 +208,7 @@ class TokenBucketRateLimiter {
       limit: this.capacity,
       remaining: Math.floor(state.tokens),
       resetTime: now + ((this.capacity - state.tokens) / this.refillRate * 1000),
-      retryAfter: 0
+      retryAfter: 0,
     };
   }
 }
@@ -224,23 +224,23 @@ class FixedWindowRateLimiter {
   }
 
   async check(identifier) {
-    let now = Date.now();
-    let windowStart = Math.floor(now / this.windowMs) * this.windowMs;
-    let key = generateKey('fixed', `${identifier}:${windowStart}`);
-    
+    const now = Date.now();
+    const windowStart = Math.floor(now / this.windowMs) * this.windowMs;
+    const key = generateKey('fixed', `${identifier}:${windowStart}`);
+
     const count = this.store.incr(key);
     this.store.expire(key, this.windowMs);
 
     if (count > this.max) {
-      let resetTime = windowStart + this.windowMs;
-      
+      const resetTime = windowStart + this.windowMs;
+
       return {
         allowed: false,
         count,
         limit: this.max,
         remaining: 0,
         resetTime,
-        retryAfter: Math.ceil((resetTime - now) / 1000)
+        retryAfter: Math.ceil((resetTime - now) / 1000),
       };
     }
 
@@ -250,7 +250,7 @@ class FixedWindowRateLimiter {
       limit: this.max,
       remaining: this.max - count,
       resetTime: windowStart + this.windowMs,
-      retryAfter: 0
+      retryAfter: 0,
     };
   }
 }
@@ -267,7 +267,7 @@ function createRateLimiter(options = {}) {
     keyGenerator = (req) => req.ip,
     whitelist = [],
     blacklist = [],
-    store = memoryStore
+    store = memoryStore,
   } = options;
 
   // Create appropriate limiter based on strategy
@@ -293,7 +293,7 @@ function createRateLimiter(options = {}) {
       return res.status(403).json({
         success: false,
         error: 'Access denied',
-        message: 'Your access has been temporarily restricted'
+        message: 'Your access has been temporarily restricted',
       });
     }
 
@@ -309,17 +309,17 @@ function createRateLimiter(options = {}) {
     res.setHeader('X-RateLimit-Limit', result.limit);
     res.setHeader('X-RateLimit-Remaining', result.remaining);
     res.setHeader('X-RateLimit-Reset', new Date(result.resetTime).toISOString());
-    
+
     if (!result.allowed) {
       res.setHeader('Retry-After', result.retryAfter);
-      
+
       logger.warn('Rate limit exceeded', {
         ip: req.ip,
         path: req.path,
         method: req.method,
         identifier,
         count: result.count,
-        limit: result.limit
+        limit: result.limit,
       });
 
       return res.status(429).json({
@@ -328,7 +328,7 @@ function createRateLimiter(options = {}) {
         message,
         retryAfter: result.retryAfter,
         limit: result.limit,
-        remaining: result.remaining
+        remaining: result.remaining,
       });
     }
 
@@ -346,22 +346,22 @@ function createDynamicRateLimiter(options = {}) {
       admin: 1000,
       premium: 500,
       standard: 100,
-      free: 10
+      free: 10,
     },
     windowMs = 60000,
     keyGenerator = (req) => req.ip,
-    getRole = (req) => req.user?.role || 'free'
+    getRole = (req) => req.user?.role || 'free',
   } = options;
 
   return async (req, res, next) => {
     const role = getRole(req);
     const limit = roleLimits[role] || defaultLimit;
-    
+
     const limiter = createRateLimiter({
       windowMs,
       max: limit,
       keyGenerator,
-      message: `Rate limit exceeded for ${role} users`
+      message: `Rate limit exceeded for ${role} users`,
     });
 
     return limiter(req, res, next);
@@ -377,7 +377,7 @@ const rateLimiters = {
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // 5 requests per 15 minutes
     strategy: RateLimitStrategy.SLIDING_WINDOW,
-    message: 'Too many authentication attempts, please try again later'
+    message: 'Too many authentication attempts, please try again later',
   }),
 
   // Moderate rate limiting for general API
@@ -385,7 +385,7 @@ const rateLimiters = {
     windowMs: 60 * 1000, // 1 minute
     max: 100, // 100 requests per minute
     strategy: RateLimitStrategy.SLIDING_WINDOW,
-    message: 'Too many requests, please try again later'
+    message: 'Too many requests, please try again later',
   }),
 
   // Lenient rate limiting for read-only operations
@@ -393,7 +393,7 @@ const rateLimiters = {
     windowMs: 60 * 1000, // 1 minute
     max: 200, // 200 requests per minute
     strategy: RateLimitStrategy.TOKEN_BUCKET,
-    message: 'Too many read requests, please try again later'
+    message: 'Too many read requests, please try again later',
   }),
 
   // Strict rate limiting for write operations
@@ -401,7 +401,7 @@ const rateLimiters = {
     windowMs: 60 * 1000, // 1 minute
     max: 50, // 50 requests per minute
     strategy: RateLimitStrategy.SLIDING_WINDOW,
-    message: 'Too many write operations, please try again later'
+    message: 'Too many write operations, please try again later',
   }),
 
   // Dynamic rate limiting based on user role
@@ -411,9 +411,9 @@ const rateLimiters = {
       admin: 1000,
       premium: 500,
       standard: 100,
-      free: 10
-    }
-  })
+      free: 10,
+    },
+  }),
 };
 
 module.exports = {
@@ -425,5 +425,5 @@ module.exports = {
   TokenBucketRateLimiter,
   FixedWindowRateLimiter,
   InMemoryRateLimitStore,
-  memoryStore
+  memoryStore,
 };

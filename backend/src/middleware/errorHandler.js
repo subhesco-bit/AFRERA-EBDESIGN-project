@@ -29,7 +29,7 @@ const errorHandler = (err, req, res, next) => {
     path: req.path,
     method: req.method,
     ip: req.ip,
-    stack: err.stack
+    stack: err.stack,
   });
 
   // Mongoose bad ObjectId
@@ -40,35 +40,35 @@ const errorHandler = (err, req, res, next) => {
 
   // Mongoose duplicate key
   if (err.code === 11000) {
-    let message = 'Duplicate field value entered';
+    const message = 'Duplicate field value entered';
     error = new AppError(message, 400, 'DUPLICATE_FIELD');
   }
 
   // Mongoose validation error
   if (err.name === 'ValidationError') {
-    let message = Object.values(err.errors).map(val => val.message).join(', ');
+    const message = Object.values(err.errors).map(val => val.message).join(', ');
     error = new AppError(message, 400, 'VALIDATION_ERROR');
   }
 
   // JWT errors
   if (err.name === 'JsonWebTokenError') {
-    let message = 'Invalid token. Please log in again.';
+    const message = 'Invalid token. Please log in again.';
     error = new AppError(message, 401, 'INVALID_TOKEN');
   }
 
   if (err.name === 'TokenExpiredError') {
-    let message = 'Your token has expired. Please log in again.';
+    const message = 'Your token has expired. Please log in again.';
     error = new AppError(message, 401, 'TOKEN_EXPIRED');
   }
 
   // PostgreSQL errors
   if (err.code === '23505') {
-    let message = 'Duplicate entry';
+    const message = 'Duplicate entry';
     error = new AppError(message, 409, 'DUPLICATE_ENTRY');
   }
 
   if (err.code === '23503') {
-    let message = 'Foreign key violation';
+    const message = 'Foreign key violation';
     error = new AppError(message, 400, 'FOREIGN_KEY_VIOLATION');
   }
 
@@ -80,8 +80,8 @@ const errorHandler = (err, req, res, next) => {
         message: error.message,
         code: error.code,
         stack: err.stack,
-        details: error.details
-      }
+        details: error.details,
+      },
     });
   } else {
     // Production: don't leak stack traces
@@ -89,8 +89,8 @@ const errorHandler = (err, req, res, next) => {
       success: false,
       error: {
         message: error.message || 'Internal Server Error',
-        code: error.code
-      }
+        code: error.code,
+      },
     });
   }
 };
@@ -111,5 +111,5 @@ module.exports = {
   AppError,
   errorHandler,
   notFound,
-  catchAsync
+  catchAsync,
 };

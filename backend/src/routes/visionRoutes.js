@@ -50,15 +50,13 @@ function requireFile(req, res) {
 }
 
 /** POST /analyze-quality — real sharp-based blur/brightness heuristic. */
-router.post
-    // Log request
-    logger.debug('router.post request');('/analyze-quality', upload.single('image'), async (req, res, next) => {
+router.post('/analyze-quality', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
     const result = await route(
       'vision_engine',
       { buffer: req.file.buffer, operation: 'analyze_quality' },
-      { actorId: 'visionRoutes:analyze-quality' }
+      { actorId: 'visionRoutes:analyze-quality' },
     );
     res.status(result.ok ? 200 : 422).json(result);
   } catch (error) {
@@ -67,15 +65,13 @@ router.post
 });
 
 /** POST /metadata — real sharp(buffer).metadata() (dimensions, format, size). */
-router.post
-    // Log request
-    logger.debug('router.post request');('/metadata', upload.single('image'), async (req, res, next) => {
+router.post('/metadata', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
-    let result = await route(
+    const result = await route(
       'vision_engine',
       { buffer: req.file.buffer, operation: 'metadata' },
-      { actorId: 'visionRoutes:metadata' }
+      { actorId: 'visionRoutes:metadata' },
     );
     res.status(result.ok ? 200 : 422).json(result);
   } catch (error) {
@@ -84,13 +80,11 @@ router.post
 });
 
 /** POST /thumbnail — real sharp resize; returns the encoded image bytes directly. */
-router.post
-    // Log request
-    logger.debug('router.post request');('/thumbnail', upload.single('image'), async (req, res, next) => {
+router.post('/thumbnail', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
     const { width, height, fit, format } = req.body;
-    let result = await route(
+    const result = await route(
       'vision_engine',
       {
         buffer: req.file.buffer,
@@ -100,7 +94,7 @@ router.post
         fit,
         format,
       },
-      { actorId: 'visionRoutes:thumbnail' }
+      { actorId: 'visionRoutes:thumbnail' },
     );
 
     if (!result.ok) return res.status(422).json(result);
@@ -118,16 +112,14 @@ router.post
  * body field additionally persists the extracted text into the matching
  * `certification_reports.report_data` row (see services/ocrService.js).
  */
-router.post
-    // Log request
-    logger.debug('router.post request');('/ocr', upload.single('image'), async (req, res, next) => {
+router.post('/ocr', upload.single('image'), async (req, res, next) => {
   try {
     if (!requireFile(req, res)) return;
     const { language, reportNumber } = req.body;
-    let result = await route(
+    const result = await route(
       'ocr_engine',
       { buffer: req.file.buffer, language, reportNumber },
-      { actorId: 'visionRoutes:ocr' }
+      { actorId: 'visionRoutes:ocr' },
     );
     res.status(result.ok ? 200 : 422).json(result);
   } catch (error) {

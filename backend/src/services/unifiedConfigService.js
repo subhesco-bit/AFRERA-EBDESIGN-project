@@ -40,22 +40,22 @@ class UnifiedconfigService {
         model: 'claude-opus-5',
         contextWindow: 200000,
         temperature: 0.7,
-        maxTokens: 4096
+        maxTokens: 4096,
       },
       database: {
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 15432,
         database: process.env.DB_NAME || 'ebdesign',
         user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || ''
+        password: process.env.DB_PASSWORD || '',
       },
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: process.env.REDIS_PORT || 6379
+        port: process.env.REDIS_PORT || 6379,
       },
       mongodb: {
-        url: process.env.MONGODB_URL || 'mongodb://localhost:27017/ebdesign'
-      }
+        url: process.env.MONGODB_URL || 'mongodb://localhost:27017/ebdesign',
+      },
     };
 
     return configs[serviceName] || {};
@@ -74,7 +74,7 @@ class UnifiedconfigService {
       return {
         success: true,
         message: 'Operation completed',
-        data: null
+        data: null,
       };
     } catch (error) {
       logger.error('unifiedConfigService execute failed', error);

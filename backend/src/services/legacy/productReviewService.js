@@ -24,7 +24,7 @@ class ProductReviewService {
         `SELECT id FROM order_items 
          WHERE product_id = $1 
          AND order_id IN (SELECT id FROM orders WHERE user_id = $2)`,
-        [productId, userId]
+        [productId, userId],
       );
 
       const hasPurchased = purchaseCheck.rows.length > 0;
@@ -47,7 +47,7 @@ class ProductReviewService {
         title,
         comment,
         JSON.stringify(images || []),
-        hasPurchased
+        hasPurchased,
       ]);
 
       // Update product average rating
@@ -121,7 +121,7 @@ class ProductReviewService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       // Get total count
       const countQuery = `
@@ -138,8 +138,8 @@ class ProductReviewService {
           page,
           limit,
           total: parseInt(countResult.rows[0].total),
-          totalPages: Math.ceil(countResult.rows[0].total / limit)
-        }
+          totalPages: Math.ceil(countResult.rows[0].total / limit),
+        },
       };
     } catch (error) {
       logger.error('Error getting product reviews', { error: error.message, stack: error.stack });
@@ -152,7 +152,7 @@ class ProductReviewService {
    */
   async getProductReviewStats(productId) {
     try {
-      let query = `
+      const query = `
         SELECT 
           COUNT(*) as total_reviews,
           AVG(rating) as average_rating,
@@ -166,7 +166,7 @@ class ProductReviewService {
         WHERE product_id = $1 AND status = 'approved'
       `;
 
-      let result = await this.pool.query(query, [productId]);
+      const result = await this.pool.query(query, [productId]);
       const stats = result.rows[0];
 
       return {
@@ -178,9 +178,9 @@ class ProductReviewService {
           4: parseInt(stats.four_star),
           3: parseInt(stats.three_star),
           2: parseInt(stats.two_star),
-          1: parseInt(stats.one_star)
+          1: parseInt(stats.one_star),
         },
-        verifiedPurchaseCount: parseInt(stats.verified_purchase_count)
+        verifiedPurchaseCount: parseInt(stats.verified_purchase_count),
       };
     } catch (error) {
       logger.error('Error getting review stats', { error: error.message, stack: error.stack });
@@ -193,7 +193,7 @@ class ProductReviewService {
    */
   async updateProductRating(productId) {
     try {
-      let query = `
+      const query = `
         UPDATE products
         SET 
           average_rating = (
@@ -211,7 +211,7 @@ class ProductReviewService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [productId]);
+      const result = await this.pool.query(query, [productId]);
       return result.rows[0];
     } catch (error) {
       logger.error('Error updating product rating', { error: error.message, stack: error.stack });
@@ -228,7 +228,7 @@ class ProductReviewService {
       const existing = await this.pool.query(
         `SELECT id FROM review_helpful 
          WHERE review_id = $1 AND user_id = $2`,
-        [reviewId, userId]
+        [reviewId, userId],
       );
 
       if (existing.rows.length > 0) {
@@ -236,14 +236,14 @@ class ProductReviewService {
         await this.pool.query(
           `DELETE FROM review_helpful 
            WHERE review_id = $1 AND user_id = $2`,
-          [reviewId, userId]
+          [reviewId, userId],
         );
 
         await this.pool.query(
           `UPDATE product_reviews 
            SET helpful_count = helpful_count - 1 
            WHERE id = $1`,
-          [reviewId]
+          [reviewId],
         );
 
         return { marked: false };
@@ -252,14 +252,14 @@ class ProductReviewService {
         await this.pool.query(
           `INSERT INTO review_helpful (review_id, user_id)
            VALUES ($1, $2)`,
-          [reviewId, userId]
+          [reviewId, userId],
         );
 
         await this.pool.query(
           `UPDATE product_reviews 
            SET helpful_count = helpful_count + 1 
            WHERE id = $1`,
-          [reviewId]
+          [reviewId],
         );
 
         return { marked: true };
@@ -277,7 +277,7 @@ class ProductReviewService {
     const { rating, title, comment, images } = updateData;
 
     try {
-      let query = `
+      const query = `
         UPDATE product_reviews
         SET 
           rating = COALESCE($1, rating),
@@ -289,13 +289,13 @@ class ProductReviewService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         rating,
         title,
         comment,
         images ? JSON.stringify(images) : null,
         reviewId,
-        userId
+        userId,
       ]);
 
       if (result.rows.length === 0) {
@@ -318,14 +318,14 @@ class ProductReviewService {
   async deleteReview(reviewId, userId, isAdmin = false) {
     try {
       let query = 'DELETE FROM product_reviews WHERE id = $1';
-      let params = [reviewId];
+      const params = [reviewId];
 
       if (!isAdmin) {
         query += ' AND user_id = $2';
         params.push(userId);
       }
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       if (result.rowCount === 0) {
         throw new Error('Review not found or unauthorized');
@@ -344,7 +344,7 @@ class ProductReviewService {
    */
   async moderateReview(reviewId, status, moderatorId) {
     try {
-      let query = `
+      const query = `
         UPDATE product_reviews
         SET 
           status = $1,
@@ -354,7 +354,7 @@ class ProductReviewService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [status, moderatorId, reviewId]);
+      const result = await this.pool.query(query, [status, moderatorId, reviewId]);
 
       // Update product rating if approved
       if (status === 'approved') {
@@ -373,9 +373,9 @@ class ProductReviewService {
    */
   async getUserReviews(userId, page = 1, limit = 20) {
     try {
-      let offset = (page - 1) * limit;
+      const offset = (page - 1) * limit;
 
-      let query = `
+      const query = `
         SELECT 
           pr.*,
           p.name as product_name,
@@ -388,11 +388,11 @@ class ProductReviewService {
         LIMIT $2 OFFSET $3
       `;
 
-      let result = await this.pool.query(query, [userId, limit, offset]);
+      const result = await this.pool.query(query, [userId, limit, offset]);
 
       return {
         reviews: result.rows,
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting user reviews', { error: error.message, stack: error.stack });
@@ -405,13 +405,13 @@ class ProductReviewService {
    */
   async reportReview(reviewId, userId, reason) {
     try {
-      let query = `
+      const query = `
         INSERT INTO review_reports (review_id, reporter_id, reason, status)
         VALUES ($1, $2, $3, 'pending')
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [reviewId, userId, reason]);
+      const result = await this.pool.query(query, [reviewId, userId, reason]);
 
       logger.info(`Review ${reviewId} reported by user ${userId}`);
       return result.rows[0];
@@ -430,24 +430,22 @@ module.exports = new ProductReviewService();
 // (product_reviews+users join vs a simpler reviews table) - both already had live callers
 // with the original signature (marketplaceEnhancements.js) - aliased rather than overwritten.
 {
-  const m060 = require("../../modules/M060/service");
+  const m060 = require('../../modules/M060/service');
   const { createReview: createReviewSimple, getProductReviews: getProductReviewsSimple, ...rest } = m060;
   Object.assign(module.exports, rest, { createReviewSimple, getProductReviewsSimple });
 }
 
 // Merged from backend/src/modules/M052
 {
-  const m052 = require("../../modules/M052/service");
+  const m052 = require('../../modules/M052/service');
   const { ...rest } = m052;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M058
 {
-  const m058 = require("../../modules/M058/service");
+  const m058 = require('../../modules/M058/service');
   const { ...rest } = m058;
   Object.assign(module.exports, rest);
 }
-
-
 

@@ -70,7 +70,7 @@ function normalizeCertification(payload = {}, existing = {}) {
     status: inferStatus(source, daysToExpiry),
     complianceScore,
     aiSignals: buildCertificationSignals({ daysToExpiry, complianceScore, auditFindings }),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -84,7 +84,7 @@ function buildCertificationSignals({ daysToExpiry, complianceScore, auditFinding
 }
 
 async function listItems({ page = 1, limit = 20, farmerId, type, status } = {}) {
-  let client = pg();
+  const client = pg();
   const safePage = Math.max(parseInt(page, 10) || 1, 1);
   const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
   const offset = (safePage - 1) * safeLimit;
@@ -109,26 +109,26 @@ async function listItems({ page = 1, limit = 20, farmerId, type, status } = {}) 
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await client.query(
     `SELECT * FROM ${tableName} ${where} ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
-    [...params, safeLimit, offset]
+    [...params, safeLimit, offset],
   );
 
   return {
     items: res.rows.map(row => ({ ...row, data: normalizeCertification(row.data || {}, row) })),
-    pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) }
+    pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
   };
 }
 
 async function getItem(id) {
-  let res = await pg().query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+  const res = await pg().query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
   const row = res.rows[0];
   return row ? { ...row, data: normalizeCertification(row.data || {}, row) } : null;
 }
 
 async function createItem(payload) {
   const data = normalizeCertification(payload);
-  let res = await pg().query(
+  const res = await pg().query(
     `INSERT INTO ${tableName} (data, created_at, updated_at) VALUES ($1, NOW(), NOW()) RETURNING *`,
-    [data]
+    [data],
   );
   return res.rows[0];
 }
@@ -136,17 +136,17 @@ async function createItem(payload) {
 async function updateItem(id, payload) {
   const current = await getItem(id);
   if (!current) return null;
-  let data = normalizeCertification(payload, current);
-  let res = await pg().query(
+  const data = normalizeCertification(payload, current);
+  const res = await pg().query(
     `UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-    [data, id]
+    [data, id],
   );
   return res.rows[0] || null;
 }
 
 async function deleteItem(id) {
-  let res = await pg().query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
+  const res = await pg().query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+  return Boolean(res.rows[0]);
 }
 
 async function getCertificationPortfolio(farmerId) {
@@ -160,10 +160,10 @@ async function getCertificationPortfolio(farmerId) {
     activeCount: certifications.filter(item => item.status === 'active').length,
     renewalDueCount: certifications.filter(item => item.status === 'renewal_due').length,
     expiredCount: certifications.filter(item => item.status === 'expired').length,
-    averageComplianceScore: certifications.length
-      ? Math.round(certifications.reduce((sum, item) => sum + item.complianceScore, 0) / certifications.length)
-      : 0,
-    certifications
+    averageComplianceScore: certifications.length ?
+      Math.round(certifications.reduce((sum, item) => sum + item.complianceScore, 0) / certifications.length) :
+      0,
+    certifications,
   };
 }
 
@@ -182,9 +182,9 @@ async function recommendCertificationPath(farmerId, targetMarket = 'premium_mark
       .map(item => ({
         certificationType: item.certificationType,
         certificateNumber: item.certificateNumber,
-        action: item.status === 'expired' ? 'Reapply or restore certification' : 'Submit renewal before expiry'
+        action: item.status === 'expired' ? 'Reapply or restore certification' : 'Submit renewal before expiry',
       })),
-    marketReadiness: missing.length === 0 && portfolio.expiredCount === 0 ? 'ready' : 'action_required'
+    marketReadiness: missing.length === 0 && portfolio.expiredCount === 0 ? 'ready' : 'action_required',
   };
 }
 
@@ -224,5 +224,5 @@ module.exports = {
   getCertificationPortfolio,
   recommendCertificationPath,
   healthCheck,
-  execute
+  execute,
 };

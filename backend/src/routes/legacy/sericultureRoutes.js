@@ -16,7 +16,7 @@ router.get('/', authenticate, async (req, res) => {
     const filters = {
       farmer_id: req.query.farmer_id,
       variety: req.query.variety,
-      status: req.query.status
+      status: req.query.status,
     };
     const sericulture = await sericultureService.getAllSericulture(filters);
     res.json({ success: true, data: sericulture });
@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/sericulture/:id - Get sericulture by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    let sericulture = await sericultureService.getSericultureById(req.params.id);
+    const sericulture = await sericultureService.getSericultureById(req.params.id);
     res.json({ success: true, data: sericulture });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/sericulture - Create sericulture
 router.post('/', authenticate, async (req, res) => {
   try {
-    let sericulture = await sericultureService.createSericulture(req.body);
+    const sericulture = await sericultureService.createSericulture(req.body);
     res.status(201).json({ success: true, data: sericulture });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

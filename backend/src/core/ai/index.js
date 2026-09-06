@@ -1,7 +1,7 @@
 /**
  * AI Intelligence Fabric - Main Entry Point
  * Module ID: EBD-MOD-00000001
- * 
+ *
  * This module exports all AI intelligence fabric components
  * in a structured, professional manner with unique IDs.
  */
@@ -59,12 +59,12 @@ function getAIStatus() {
 async function handleAIRequest(req, res) {
   try {
     const { taskType, payload, options } = req.body;
-    
+
     const result = await orchestrator.route(taskType, payload, {
       user: req.user,
       ...options,
     });
-    
+
     res.json({
       success: true,
       data: result,
@@ -87,14 +87,14 @@ module.exports = {
   aiCostController,
   aiGuardrails,
   aiAuditLogger,
-  
+
   // Module Registry
   AI_MODULE_REGISTRY,
-  
+
   // Initialization
   initializeAI,
   getAIStatus,
-  
+
   // Route Handler
   handleAIRequest,
 };

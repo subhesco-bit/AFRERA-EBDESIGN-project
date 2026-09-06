@@ -65,5 +65,5 @@ module.exports = {
   ForbiddenError,
   ConflictError,
   RateLimitError,
-  ServiceError
+  ServiceError,
 };

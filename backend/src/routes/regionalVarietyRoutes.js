@@ -12,9 +12,7 @@ const router = express.Router();
 const regionalVarietyService = require('../services/legacy/regionalVarietyService');
 const { authMiddleware } = require('../middleware/auth');
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { category, giStatus, state, search } = req.query;
     const varieties = await regionalVarietyService.list({ category, giStatus, state, search });
@@ -24,9 +22,7 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/categories', async (req, res) => {
+router.get('/categories', async (req, res) => {
   try {
     const categories = await regionalVarietyService.listCategories();
     res.json({ success: true, data: categories });
@@ -35,9 +31,7 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const variety = await regionalVarietyService.getById(req.params.id);
     res.json({ success: true, data: variety });
@@ -46,9 +40,7 @@ router.get
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/:id/generate-image', authMiddleware, async (req, res) => {
+router.post('/:id/generate-image', authMiddleware, async (req, res) => {
   try {
     const result = await regionalVarietyService.requestVarietyImage(req.params.id);
     res.json({ success: true, data: result });
@@ -57,9 +49,7 @@ router.post
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/:id/create-listing', authMiddleware, async (req, res) => {
+router.post('/:id/create-listing', authMiddleware, async (req, res) => {
   try {
     const product = await regionalVarietyService.createListingFromVariety(req.params.id, {
       ...req.body,

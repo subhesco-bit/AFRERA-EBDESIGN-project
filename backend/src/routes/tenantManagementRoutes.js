@@ -1,6 +1,6 @@
 /**
  * Tenant Management Module Routes - AI Enhanced
- * 
+ *
  * Routes for tenant management with AI-powered capabilities:
  * - Tenant CRUD operations
  * - Resource allocation optimization
@@ -62,20 +62,20 @@ const writeAdmin = [rateLimiters.write, authMiddleware, requireRole('admin')];
 router.post('/tenants', ...writeAdmin, validateBody(), body, createBody, async (req, res) => {
   try {
     const result = await tenantManagementService.createTenant(req.body);
-    
+
     // Emit signal for tenant creation
     signalBus.emitSignal(SIGNAL.TENANT_CREATED, {
       tenantId: result.tenant.id,
       tenantName: result.tenant.name,
       tier: result.tenant.tier,
-      resourceAllocation: result.resourceAllocation
+      resourceAllocation: result.resourceAllocation,
     }, {
       severity: SEVERITY.INFO,
       source: 'tenant_management_routes',
       entityId: result.tenant.id,
-      correlationId: requestId(req)
+      correlationId: requestId(req),
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('tenantManagementRoutes:createTenant', { error: error.message });
@@ -112,19 +112,19 @@ router.get('/tenants', ...admin, (req, res, next) => {
 // Update tenant
 router.put('/tenants/:id', ...writeAdmin, validId, validateBody(), body, updateBody, async (req, res) => {
   try {
-    let result = await tenantManagementService.updateTenant(req.params.id, req.body);
-    
+    const result = await tenantManagementService.updateTenant(req.params.id, req.body);
+
     // Emit signal for tenant update
     signalBus.emitSignal(SIGNAL.TENANT_UPDATED, {
       tenantId: req.params.id,
-      updates: req.body
+      updates: req.body,
     }, {
       severity: SEVERITY.INFO,
       source: 'tenant_management_routes',
       entityId: req.params.id,
-      correlationId: requestId(req)
+      correlationId: requestId(req),
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('tenantManagementRoutes:updateTenant', { error: error.message });
@@ -135,18 +135,18 @@ router.put('/tenants/:id', ...writeAdmin, validId, validateBody(), body, updateB
 // Delete tenant
 router.delete('/tenants/:id', ...writeAdmin, validId, async (req, res) => {
   try {
-    let result = await tenantManagementService.deleteTenant(req.params.id);
-    
+    const result = await tenantManagementService.deleteTenant(req.params.id);
+
     // Emit signal for tenant deletion
     signalBus.emitSignal(SIGNAL.TENANT_DELETED, {
-      tenantId: req.params.id
+      tenantId: req.params.id,
     }, {
       severity: SEVERITY.WARNING,
       source: 'tenant_management_routes',
       entityId: req.params.id,
-      correlationId: requestId(req)
+      correlationId: requestId(req),
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('tenantManagementRoutes:deleteTenant', { error: error.message });
@@ -194,7 +194,7 @@ router.get('/tenants/:id/recommend-tier', ...admin, validId, async (req, res) =>
 // Optimize tenant cost
 router.post('/tenants/:id/optimize-cost', ...writeAdmin, validId, async (req, res) => {
   try {
-    let optimization = await tenantManagementService.optimizeTenantCost(req.params.id);
+    const optimization = await tenantManagementService.optimizeTenantCost(req.params.id);
     res.json(optimization);
   } catch (error) {
     logger.error('tenantManagementRoutes:optimizeCost', { error: error.message });

@@ -7,47 +7,47 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function registerGoatHerd(herdData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { herdName, breed, goatCount, location, farmId, averageMilkProduction, meatProductionTarget, healthStatus } = herdData;
-  
+
   const res = await pg.query(
     `INSERT INTO goat_herds (herd_name, breed, goat_count, location, farm_id, average_milk_production, meat_production_target, health_status, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', NOW(), NOW())
      RETURNING *`,
-    [herdName, breed, goatCount, JSON.stringify(location), farmId, averageMilkProduction, meatProductionTarget, healthStatus]
+    [herdName, breed, goatCount, JSON.stringify(location), farmId, averageMilkProduction, meatProductionTarget, healthStatus],
   );
-  
+
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'goat_herd',
     herdId: res.rows[0].id,
     herdName,
     breed,
-    goatCount
+    goatCount,
   }, {
     severity: SEVERITY.INFO,
     source: 'goat_management_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
 async function getGoatHerd(herdId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query('SELECT * FROM goat_herds WHERE id = $1', [herdId]);
+  const res = await pg.query('SELECT * FROM goat_herds WHERE id = $1', [herdId]);
   return res.rows[0] || null;
 }
 
 async function listGoatHerds({ page = 1, limit = 20, farmId, breed, status } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const offset = (page - 1) * limit;
   let query = 'SELECT * FROM goat_herds WHERE 1=1';
   const params = [];
   let paramIndex = 1;
-  
+
   if (farmId) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
@@ -60,24 +60,24 @@ async function listGoatHerds({ page = 1, limit = 20, farmId, breed, status } = {
     query += ` AND status = $${paramIndex++}`;
     params.push(status);
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
-  
-  let res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM goat_herds`, 'SELECT COUNT(*) FROM goat_herds').split('LIMIT')[0], params.slice(0, -2));
+
+  const res = await pg.query(query, params);
+  const totalRes = await pg.query(query.replace('SELECT * FROM goat_herds', 'SELECT COUNT(*) FROM goat_herds').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
-  
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updateGoatHerd(herdId, updates) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { herdName, breed, goatCount, location, averageMilkProduction, meatProductionTarget, healthStatus, status } = updates;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `UPDATE goat_herds 
      SET herd_name = COALESCE($1, herd_name),
          breed = COALESCE($2, breed),
@@ -90,31 +90,31 @@ async function updateGoatHerd(herdId, updates) {
          updated_at = NOW()
      WHERE id = $9
      RETURNING *`,
-    [herdName, breed, goatCount, location ? JSON.stringify(location) : null, averageMilkProduction, meatProductionTarget, healthStatus, status, herdId]
+    [herdName, breed, goatCount, location ? JSON.stringify(location) : null, averageMilkProduction, meatProductionTarget, healthStatus, status, herdId],
   );
-  
+
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'goat_herd',
     herdId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'goat_management_service',
-    entityId: herdId
+    entityId: herdId,
   });
-  
+
   return res.rows[0] || null;
 }
 
 async function analyzeGoatProduction(herdId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const herd = await getGoatHerd(herdId);
   if (!herd) {
     return { success: false, error: 'Herd not found' };
   }
-  
+
   const analysis = {
     herdId,
     herdName: herd.herd_name,
@@ -122,9 +122,9 @@ async function analyzeGoatProduction(herdId) {
     efficiencyScore: calculateEfficiencyScore(herd),
     feedOptimization: generateFeedOptimization(herd),
     breedingRecommendations: generateBreedingRecommendations(herd),
-    healthAlerts: generateHealthAlerts(herd)
+    healthAlerts: generateHealthAlerts(herd),
   };
-  
+
   return { success: true, data: analysis };
 }
 
@@ -149,19 +149,19 @@ function generateFeedOptimization(herd) {
     recommendations.push({
       type: 'feed',
       message: 'Increase nutrient density in feed to boost milk production',
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;
 }
 
 function generateBreedingRecommendations(herd) {
-  let recommendations = [];
+  const recommendations = [];
   if (herd.goat_count && herd.goat_count < 15) {
     recommendations.push({
       type: 'breeding',
       message: 'Consider expanding herd size for optimal production',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
   return recommendations;
@@ -173,16 +173,16 @@ function generateHealthAlerts(herd) {
     alerts.push({
       type: 'health',
       message: 'Health status requires attention',
-      priority: 'high'
+      priority: 'high',
     });
   }
   return alerts;
 }
 
 async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = `
     SELECT 
       breed,
@@ -192,9 +192,9 @@ async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
     FROM goat_herds
     WHERE 1=1
   `;
-  let params = [];
+  const params = [];
   let paramIndex = 1;
-  
+
   if (startDate) {
     query += ` AND created_at >= $${paramIndex++}`;
     params.push(startDate);
@@ -207,27 +207,27 @@ async function getGoatAnalytics({ startDate, endDate, farmId } = {}) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
   }
-  
-  query += ` GROUP BY breed ORDER BY total_goats DESC`;
-  
-  let res = await pg.query(query, params);
-  
+
+  query += ' GROUP BY breed ORDER BY total_goats DESC';
+
+  const res = await pg.query(query, params);
+
   return {
     byBreed: res.rows,
     totalHerds: res.rows.reduce((sum, row) => sum + parseInt(row.herd_count), 0),
     totalGoats: res.rows.reduce((sum, row) => sum + parseInt(row.total_goats), 0),
-    recommendations: generateGoatAnalyticsRecommendations(res.rows)
+    recommendations: generateGoatAnalyticsRecommendations(res.rows),
   };
 }
 
 function generateGoatAnalyticsRecommendations(breedData) {
-  let recommendations = [];
+  const recommendations = [];
   const topBreed = breedData[0];
   if (topBreed) {
     recommendations.push({
       type: 'resource_allocation',
       message: `Highest concentration of ${topBreed.breed}. Allocate specialized resources.`,
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;

@@ -14,13 +14,13 @@ const SCHEMA_MIGRATIONS_TABLE = `
 `;
 
 const SCHEMA_MIGRATIONS_COMPATIBILITY_COLUMNS = [
-  "ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS version VARCHAR(50) NOT NULL DEFAULT '1.0.0'",
-  "ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS checksum VARCHAR(64) NOT NULL DEFAULT ''",
+  'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS version VARCHAR(50) NOT NULL DEFAULT \'1.0.0\'',
+  'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS checksum VARCHAR(64) NOT NULL DEFAULT \'\'',
   'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS execution_time_ms INTEGER',
   'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS success BOOLEAN DEFAULT TRUE',
   'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS rollback_filename VARCHAR(255)',
   'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS dependencies TEXT[]',
-  'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS description TEXT'
+  'ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS description TEXT',
 ];
 
 async function ensureSchemaMigrations(client) {
@@ -33,5 +33,5 @@ async function ensureSchemaMigrations(client) {
 module.exports = {
   SCHEMA_MIGRATIONS_TABLE,
   SCHEMA_MIGRATIONS_COMPATIBILITY_COLUMNS,
-  ensureSchemaMigrations
+  ensureSchemaMigrations,
 };

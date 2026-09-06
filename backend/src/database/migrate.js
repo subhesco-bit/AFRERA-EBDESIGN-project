@@ -6,10 +6,34 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 const { Pool } = require('pg');
 require('dotenv').config();
 
 const migrationsDir = path.join(__dirname, 'migrations');
+
+function getMigrationFiles() {
+  return fs.readdirSync(migrationsDir)
+    .filter(file => file.endsWith('.sql'))
+    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+}
+
+function stripTransactionMarkers(sql) {
+  return sql
+    .replace(/^\s*(BEGIN|START\s+TRANSACTION)\s*;\s*$/gim, '')
+    .replace(/^\s*(COMMIT|END|ROLLBACK)\s*;\s*$/gim, '');
+}
+
+function runPreflight() {
+  const output = execFileSync(process.execPath, [path.join(__dirname, 'migration_preflight.js'), '--json'], {
+    encoding: 'utf8',
+  });
+  const report = JSON.parse(output);
+  if (report.blockers > 0) {
+    throw new Error(`Migration preflight found ${report.blockers} blocking issue(s)`);
+  }
+  return report;
+}
 
 async function runMigrations() {
   const pool = new Pool({
@@ -22,6 +46,8 @@ async function runMigrations() {
 
   try {
     console.log('✅ Connected to PostgreSQL');
+    const preflight = runPreflight();
+    console.log(`✅ Migration preflight passed: ${preflight.migrationCount} files, ${preflight.blockers} blockers`);
 
     // Create migrations table if it doesn't exist
     await pool.query(`
@@ -34,9 +60,7 @@ async function runMigrations() {
     console.log('✅ Migrations table ready');
 
     // Get list of migration files
-    const migrationFiles = fs.readdirSync(migrationsDir)
-      .filter(f => f.endsWith('.sql'))
-      .sort();
+    const migrationFiles = getMigrationFiles();
 
     console.log(`\n📋 Found ${migrationFiles.length} migration files\n`);
 
@@ -44,7 +68,7 @@ async function runMigrations() {
       // Check if already executed
       const result = await pool.query(
         'SELECT * FROM migrations WHERE name = $1',
-        [file]
+        [file],
       );
 
       if (result.rows.length > 0) {
@@ -54,16 +78,19 @@ async function runMigrations() {
 
       // Read and execute migration
       const filePath = path.join(migrationsDir, file);
-      const sql = fs.readFileSync(filePath, 'utf8');
+      const sql = stripTransactionMarkers(fs.readFileSync(filePath, 'utf8'));
 
       try {
+        await pool.query('BEGIN');
         await pool.query(sql);
         await pool.query(
           'INSERT INTO migrations (name) VALUES ($1)',
-          [file]
+          [file],
         );
+        await pool.query('COMMIT');
         console.log(`✅ Executed ${file}`);
       } catch (err) {
+        await pool.query('ROLLBACK').catch(() => {});
         console.error(`❌ Failed to execute ${file}:`, err.message);
         throw err;
       }

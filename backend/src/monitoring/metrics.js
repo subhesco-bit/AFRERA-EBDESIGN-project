@@ -11,20 +11,20 @@ const httpRequestDurationMicroseconds = new promClient.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'route', 'status_code'],
-  buckets: [0.1, 0.5, 1, 1.5, 2, 5]
+  buckets: [0.1, 0.5, 1, 1.5, 2, 5],
 });
 
 // HTTP request counter
 const httpRequestsTotal = new promClient.Counter({
   name: 'http_requests_total',
   help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status_code']
+  labelNames: ['method', 'route', 'status_code'],
 });
 
 // Active connections gauge
 const activeConnections = new promClient.Gauge({
   name: 'active_connections',
-  help: 'Number of active connections'
+  help: 'Number of active connections',
 });
 
 // Database query duration
@@ -32,13 +32,13 @@ const dbQueryDuration = new promClient.Histogram({
   name: 'db_query_duration_seconds',
   help: 'Duration of database queries in seconds',
   labelNames: ['operation', 'table'],
-  buckets: [0.01, 0.05, 0.1, 0.5, 1, 2]
+  buckets: [0.01, 0.05, 0.1, 0.5, 1, 2],
 });
 
 // Cache hit rate
 const cacheHitRate = new promClient.Gauge({
   name: 'cache_hit_rate',
-  help: 'Cache hit rate percentage'
+  help: 'Cache hit rate percentage',
 });
 
 // API response time
@@ -46,41 +46,41 @@ const apiResponseTime = new promClient.Histogram({
   name: 'api_response_time_seconds',
   help: 'API response time in seconds',
   labelNames: ['endpoint'],
-  buckets: [0.1, 0.5, 1, 2, 5, 10]
+  buckets: [0.1, 0.5, 1, 2, 5, 10],
 });
 
 // Error rate
 const errorRate = new promClient.Gauge({
   name: 'error_rate',
   help: 'Error rate percentage',
-  labelNames: ['type']
+  labelNames: ['type'],
 });
 
 // Business metrics
 const activeUsers = new promClient.Gauge({
   name: 'active_users',
-  help: 'Number of active users'
+  help: 'Number of active users',
 });
 
 const totalOrders = new promClient.Counter({
   name: 'total_orders',
   help: 'Total number of orders',
-  labelNames: ['status']
+  labelNames: ['status'],
 });
 
 const totalRevenue = new promClient.Gauge({
   name: 'total_revenue',
-  help: 'Total revenue in INR'
+  help: 'Total revenue in INR',
 });
 
 const farmerCount = new promClient.Gauge({
   name: 'farmer_count',
-  help: 'Total number of farmers'
+  help: 'Total number of farmers',
 });
 
 const productCount = new promClient.Gauge({
   name: 'product_count',
-  help: 'Total number of products'
+  help: 'Total number of products',
 });
 
 // Register all metrics
@@ -104,16 +104,16 @@ const trackHttpRequests = (req, res, next) => {
   res.on('finish', () => {
     const duration = (Date.now() - start) / 1000;
     const route = req.route ? req.route.path : req.path;
-    
+
     httpRequestDurationMicroseconds.observe(
       { method: req.method, route, status_code: res.statusCode },
-      duration
+      duration,
     );
 
     httpRequestsTotal.inc({
       method: req.method,
       route,
-      status_code: res.statusCode
+      status_code: res.statusCode,
     });
 
     // Track error rate
@@ -129,7 +129,7 @@ const trackHttpRequests = (req, res, next) => {
 // Middleware to track active connections
 const trackConnections = (req, res, next) => {
   activeConnections.inc();
-  
+
   res.on('finish', () => {
     activeConnections.dec();
   });
@@ -197,5 +197,5 @@ module.exports = {
   updateBusinessMetrics,
   trackDbQuery,
   updateCacheHitRate,
-  trackApiResponse
+  trackApiResponse,
 };

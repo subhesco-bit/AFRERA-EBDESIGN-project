@@ -9,8 +9,8 @@ router.put('/configurations/:id', controller.updateConfiguration);
 router.post('/configurations/bulk', controller.bulkUpdateConfigurations);
 router.get('/configurations/:id/history', controller.getConfigurationHistory);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

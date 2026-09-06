@@ -47,7 +47,7 @@ router.get('/', verifyToken, async (req, res) => {
 router.get('/:id', verifyToken, async (req, res) => {
   try {
     const order = orders.find(
-      (o) => o.id === req.params.id && o.userId === req.userId
+      (o) => o.id === req.params.id && o.userId === req.userId,
     );
 
     if (!order) {
@@ -103,8 +103,8 @@ router.post('/', verifyToken, async (req, res) => {
 // PUT /orders/:id
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    let order = orders.find(
-      (o) => o.id === req.params.id && o.userId === req.userId
+    const order = orders.find(
+      (o) => o.id === req.params.id && o.userId === req.userId,
     );
 
     if (!order) {
@@ -133,7 +133,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const index = orders.findIndex(
-      (o) => o.id === req.params.id && o.userId === req.userId
+      (o) => o.id === req.params.id && o.userId === req.userId,
     );
 
     if (index === -1) {

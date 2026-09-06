@@ -2,7 +2,7 @@
  * AI Provider Adapters
  * Component ID: EBD-CMP-00000002
  * Purpose: Provider-agnostic LLM provider interfaces
- * 
+ *
  * This module provides a unified interface for multiple AI providers
  * ensuring the system is not coupled to any single vendor.
  */
@@ -29,7 +29,7 @@ const PROVIDER_ENV = {
 function providerStatus(providerKey) {
   const env = PROVIDER_ENV[providerKey];
   if (!env) return { provider: providerKey, known: false, configured: false };
-  
+
   const configured = Boolean(process.env[env.primary] || (env.alt && process.env[env.alt]));
   return {
     provider: providerKey,
@@ -64,18 +64,18 @@ function getProviderEnv(providerKey) {
  * Validate provider configuration
  */
 function validateProviderConfig(providerKey) {
-  let env = PROVIDER_ENV[providerKey];
+  const env = PROVIDER_ENV[providerKey];
   if (!env) {
     return { valid: false, reason: 'Unknown provider' };
   }
-  
+
   const hasPrimary = Boolean(process.env[env.primary]);
   const hasAlt = env.alt && Boolean(process.env[env.alt]);
-  
+
   if (!hasPrimary && !hasAlt) {
     return { valid: false, reason: 'No API key configured' };
   }
-  
+
   return { valid: true, hasPrimary, hasAlt };
 }
 

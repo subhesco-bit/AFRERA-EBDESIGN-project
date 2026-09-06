@@ -21,7 +21,7 @@ async function createAlertRule(ruleData) {
       condition_config,
       severity,
       description,
-      created_by
+      created_by,
     } = ruleData;
 
     const rule = {
@@ -36,18 +36,18 @@ async function createAlertRule(ruleData) {
       description,
       is_active: true,
       created_by,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered rule optimization
     const aiRequest = {
       task: 'alert_rule_optimization',
       parameters: {
-        rule_type: rule_type,
-        condition_config: condition_config,
+        rule_type,
+        condition_config,
         best_practices: await getAlertBestPractices(rule_type),
-        similar_rules: await getSimilarRules(rule_type)
-      }
+        similar_rules: await getSimilarRules(rule_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -71,8 +71,8 @@ async function createAlertRule(ruleData) {
         rule.description,
         rule.is_active,
         rule.created_by,
-        rule.created_at
-      ]
+        rule.created_at,
+      ],
     );
 
     logger.info(`Alert rule created: ${rule.rule_id}`);
@@ -94,10 +94,10 @@ async function addNotification(notificationData) {
       notification_config,
       recipients,
       priority,
-      retry_policy
+      retry_policy,
     } = notificationData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO alert_notifications 
        (notification_id, rule_id, notification_type, notification_config, 
         recipients, priority, retry_policy, is_active, created_at)
@@ -112,8 +112,8 @@ async function addNotification(notificationData) {
         priority || 'normal',
         JSON.stringify(retry_policy || {}),
         true,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Notification added: ${result.rows[0].notification_id}`);
@@ -136,7 +136,7 @@ async function createIncident(incidentData) {
       triggered_value,
       threshold_value,
       context_data,
-      description
+      description,
     } = incidentData;
 
     const incident = {
@@ -149,24 +149,24 @@ async function createIncident(incidentData) {
       threshold_value,
       context_data: context_data || {},
       description,
-      detected_at: new Date().toISOString()
+      detected_at: new Date().toISOString(),
     };
 
     // AI-powered incident classification
-    let aiRequest = {
+    const aiRequest = {
       task: 'incident_classification',
       parameters: {
-        incident_type: incident_type,
-        context_data: context_data,
+        incident_type,
+        context_data,
         historical_incidents: await getHistoricalIncidents(rule_id),
-        pattern_recognition: await recognizePatterns(rule_id)
-      }
+        pattern_recognition: await recognizePatterns(rule_id),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     incident.ai_classification = aiResponse;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO alert_incidents 
        (incident_id, rule_id, incident_type, severity, status, triggered_value, 
         threshold_value, context_data, description, detected_at)
@@ -182,8 +182,8 @@ async function createIncident(incidentData) {
         incident.threshold_value,
         JSON.stringify(incident.context_data),
         incident.description,
-        incident.detected_at
-      ]
+        incident.detected_at,
+      ],
     );
 
     // Trigger notifications
@@ -202,12 +202,12 @@ async function createIncident(incidentData) {
  */
 async function acknowledgeIncident(incidentId, acknowledgedBy) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE alert_incidents 
        SET status = $1, acknowledged_by = $2, acknowledged_at = $3 
        WHERE incident_id = $4 
        RETURNING *`,
-      ['acknowledged', acknowledgedBy, new Date().toISOString(), incidentId]
+      ['acknowledged', acknowledgedBy, new Date().toISOString(), incidentId],
     );
 
     // Log history
@@ -230,12 +230,12 @@ async function acknowledgeIncident(incidentId, acknowledgedBy) {
 async function resolveIncident(incidentId, resolvedBy, resolutionDetails) {
   try {
     const wasFalsePositive = Boolean(resolutionDetails && resolutionDetails.wasFalsePositive);
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE alert_incidents
        SET status = $1, resolved_by = $2, resolved_at = $3, is_false_positive = $4
        WHERE incident_id = $5
        RETURNING *`,
-      ['resolved', resolvedBy, new Date().toISOString(), wasFalsePositive, incidentId]
+      ['resolved', resolvedBy, new Date().toISOString(), wasFalsePositive, incidentId],
     );
 
     // Log history
@@ -285,7 +285,7 @@ async function getIncidents(filters = {}) {
 
     query += ' ORDER BY detected_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting incidents', { error: error.message });
@@ -303,10 +303,10 @@ async function addEscalation(escalationData) {
       escalation_level,
       escalation_config,
       wait_time_minutes,
-      auto_escalate
+      auto_escalate,
     } = escalationData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO alert_escalations 
        (escalation_id, rule_id, escalation_level, escalation_config, 
         wait_time_minutes, auto_escalate, is_active, created_at)
@@ -320,8 +320,8 @@ async function addEscalation(escalationData) {
         wait_time_minutes,
         auto_escalate || true,
         true,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Escalation added: ${result.rows[0].escalation_id}`);
@@ -344,10 +344,10 @@ async function createSuppression(suppressionData) {
       start_time,
       end_time,
       reason,
-      created_by
+      created_by,
     } = suppressionData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO alert_suppressions 
        (suppression_id, rule_id, suppression_type, suppression_config, 
         start_time, end_time, reason, created_by, status, created_at)
@@ -363,8 +363,8 @@ async function createSuppression(suppressionData) {
         reason,
         created_by,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Suppression created: ${result.rows[0].suppression_id}`);
@@ -387,10 +387,10 @@ async function createMaintenanceWindow(windowData) {
       end_time,
       affected_rules,
       description,
-      created_by
+      created_by,
     } = windowData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO alert_maintenance_windows 
        (window_id, window_name, window_type, start_time, end_time, 
         affected_rules, description, created_by, status, created_at)
@@ -406,8 +406,8 @@ async function createMaintenanceWindow(windowData) {
         description,
         created_by,
         'scheduled',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Maintenance window created: ${result.rows[0].window_id}`);
@@ -426,7 +426,7 @@ async function calculateAlertStatistics(ruleId, periodType, periodStart, periodE
     const incidents = await getIncidents({
       rule_id: ruleId,
       start_time: periodStart,
-      end_time: periodEnd
+      end_time: periodEnd,
     });
 
     const totalIncidents = incidents.length;
@@ -437,7 +437,7 @@ async function calculateAlertStatistics(ruleId, periodType, periodStart, periodE
     const mtr = calculateMeanTimeToResolve(incidents);
     const fpr = calculateFalsePositiveRate(incidents);
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO alert_statistics 
        (stat_id, rule_id, period_type, period_start, period_end, 
         total_incidents, acknowledged_incidents, resolved_incidents, 
@@ -456,8 +456,8 @@ async function calculateAlertStatistics(ruleId, periodType, periodStart, periodE
         mta,
         mtr,
         fpr,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Alert statistics calculated: ${result.rows[0].stat_id}`);
@@ -477,15 +477,15 @@ async function getAlertBestPractices(ruleType) {
   return {
     recommended_severities: ['low', 'medium', 'high', 'critical'],
     condition_types: ['threshold', 'anomaly', 'pattern', 'composite'],
-    notification_strategies: ['immediate', 'batch', 'digest']
+    notification_strategies: ['immediate', 'batch', 'digest'],
   };
 }
 
 async function getSimilarRules(ruleType) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM alert_rules WHERE rule_type = $1 LIMIT 5',
-      [ruleType]
+      [ruleType],
     );
     return result.rows;
   } catch (error) {
@@ -495,9 +495,9 @@ async function getSimilarRules(ruleType) {
 
 async function getHistoricalIncidents(ruleId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM alert_incidents WHERE rule_id = $1 ORDER BY detected_at DESC LIMIT 50',
-      [ruleId]
+      [ruleId],
     );
     return result.rows;
   } catch (error) {
@@ -509,7 +509,7 @@ async function recognizePatterns(ruleId) {
   return {
     has_seasonal_pattern: false,
     has_trend_pattern: false,
-    common_triggers: []
+    common_triggers: [],
   };
 }
 
@@ -517,7 +517,7 @@ async function triggerNotifications(ruleId, incident) {
   try {
     const notifications = await pool.query(
       'SELECT * FROM alert_notifications WHERE rule_id = $1 AND is_active = $2',
-      [ruleId, true]
+      [ruleId, true],
     );
 
     for (const notification of notifications.rows) {
@@ -541,8 +541,8 @@ async function logIncidentHistory(incidentId, actionType, actionDetails, perform
         actionType,
         JSON.stringify(actionDetails),
         performedBy,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
   } catch (error) {
     logger.error('Error logging incident history', { error: error.message });
@@ -555,7 +555,7 @@ function calculateMeanTimeToAcknowledge(incidents) {
 
   const times = acknowledged.map(i => {
     const detected = new Date(i.detected_at).getTime();
-    let acknowledged = new Date(i.acknowledged_at).getTime();
+    const acknowledged = new Date(i.acknowledged_at).getTime();
     return (acknowledged - detected) / 1000 / 60; // minutes
   });
 
@@ -566,9 +566,9 @@ function calculateMeanTimeToResolve(incidents) {
   const resolved = incidents.filter(i => i.resolved_at && i.detected_at);
   if (resolved.length === 0) return 0;
 
-  let times = resolved.map(i => {
-    let detected = new Date(i.detected_at).getTime();
-    let resolved = new Date(i.resolved_at).getTime();
+  const times = resolved.map(i => {
+    const detected = new Date(i.detected_at).getTime();
+    const resolved = new Date(i.resolved_at).getTime();
     return (resolved - detected) / 1000 / 60; // minutes
   });
 
@@ -581,7 +581,7 @@ function calculateMeanTimeToResolve(incidents) {
  * is no honest rate to report from zero resolutions.
  */
 function calculateFalsePositiveRate(incidents) {
-  let resolved = incidents.filter((i) => i.status === 'resolved');
+  const resolved = incidents.filter((i) => i.status === 'resolved');
   if (resolved.length === 0) return null;
   const falsePositives = resolved.filter((i) => i.is_false_positive === true).length;
   return falsePositives / resolved.length;
@@ -597,5 +597,5 @@ module.exports = {
   addEscalation,
   createSuppression,
   createMaintenanceWindow,
-  calculateAlertStatistics
+  calculateAlertStatistics,
 };

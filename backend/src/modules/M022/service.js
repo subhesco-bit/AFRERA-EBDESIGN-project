@@ -25,7 +25,7 @@ async function createProfile(profileData) {
       occupation,
       annual_income,
       household_size,
-      dependents
+      dependents,
     } = profileData;
 
     const profile = {
@@ -45,7 +45,7 @@ async function createProfile(profileData) {
       dependents,
       profile_completeness: calculateCompleteness(profileData),
       verification_status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered profile analysis
@@ -55,8 +55,8 @@ async function createProfile(profileData) {
         profile_data: profileData,
         demographic_patterns: await getDemographicPatterns(),
         regional_characteristics: await getRegionalCharacteristics(profileData.state),
-        profile_enrichment_suggestions: await generateEnrichmentSuggestions(profileData)
-      }
+        profile_enrichment_suggestions: await generateEnrichmentSuggestions(profileData),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -88,8 +88,8 @@ async function createProfile(profileData) {
         profile.profile_completeness,
         profile.verification_status,
         JSON.stringify(profile.ai_recommendations),
-        profile.created_at
-      ]
+        profile.created_at,
+      ],
     );
 
     logger.info(`Farmer profile created: ${profile.profile_id}`);
@@ -105,9 +105,9 @@ async function createProfile(profileData) {
  */
 async function getProfile(profileId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM farmer_profiles WHERE profile_id = $1',
-      [profileId]
+      [profileId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -121,9 +121,9 @@ async function getProfile(profileId) {
  */
 async function getProfileByFarmerId(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM farmer_profiles WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -156,12 +156,12 @@ async function listProfiles({ page = 1, limit = 20, verificationStatus, minCompl
 
     const res = await pool.query(query, params);
     const totalRes = await pool.query(
-      query.replace(`SELECT * FROM farmer_profiles`, 'SELECT COUNT(*) FROM farmer_profiles').split('LIMIT')[0],
-      params.slice(0, -2)
+      query.replace('SELECT * FROM farmer_profiles', 'SELECT COUNT(*) FROM farmer_profiles').split('LIMIT')[0],
+      params.slice(0, -2),
     );
     const total = parseInt(totalRes.rows[0].count || '0');
 
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   } catch (error) {
     logger.error('Error listing farmer profiles', { error: error.message });
     throw new Error('Failed to list farmer profiles');
@@ -186,7 +186,7 @@ async function updateProfile(profileId, updates) {
       annual_income,
       household_size,
       dependents,
-      verification_status
+      verification_status,
     } = updates;
 
     const currentProfile = await getProfile(profileId);
@@ -203,7 +203,7 @@ async function updateProfile(profileId, updates) {
       await logEnrichment(profileId, 'update', 'first_name', currentProfile.first_name, first_name, 'manual');
     }
 
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE farmer_profiles 
        SET first_name = COALESCE($1, first_name),
            last_name = COALESCE($2, last_name),
@@ -226,8 +226,8 @@ async function updateProfile(profileId, updates) {
         first_name, last_name, date_of_birth, gender, marital_status,
         nationality, language, education_level, occupation, annual_income,
         household_size, dependents, verification_status,
-        updatedData.profile_completeness, profileId
-      ]
+        updatedData.profile_completeness, profileId,
+      ],
     );
 
     logger.info(`Farmer profile updated: ${profileId}`);
@@ -254,7 +254,7 @@ async function addContactInfo(profileId, contactData) {
       state,
       postal_code,
       country,
-      is_primary
+      is_primary,
     } = contactData;
 
     const contact = {
@@ -271,10 +271,10 @@ async function addContactInfo(profileId, contactData) {
       postal_code,
       country: country || 'India',
       is_primary: is_primary || false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO farmer_contact_info 
        (contact_id, profile_id, phone, alternate_phone, email, address_line1, 
         address_line2, city, district, state, postal_code, country, is_primary, created_at)
@@ -284,8 +284,8 @@ async function addContactInfo(profileId, contactData) {
         contact.contact_id, contact.profile_id, contact.phone, contact.alternate_phone,
         contact.email, contact.address_line1, contact.address_line2, contact.city,
         contact.district, contact.state, contact.postal_code, contact.country,
-        contact.is_primary, contact.created_at
-      ]
+        contact.is_primary, contact.created_at,
+      ],
     );
 
     logger.info(`Contact info added: ${contact.contact_id}`);
@@ -309,7 +309,7 @@ async function addHouseholdMember(profileId, memberData) {
       education,
       occupation,
       income_contribution,
-      is_working_on_farm
+      is_working_on_farm,
     } = memberData;
 
     const member = {
@@ -323,10 +323,10 @@ async function addHouseholdMember(profileId, memberData) {
       occupation,
       income_contribution,
       is_working_on_farm: is_working_on_farm || false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO farmer_household 
        (household_id, profile_id, member_name, relationship, age, gender, 
         education, occupation, income_contribution, is_working_on_farm, created_at)
@@ -335,8 +335,8 @@ async function addHouseholdMember(profileId, memberData) {
       [
         member.household_id, member.profile_id, member.member_name, member.relationship,
         member.age, member.gender, member.education, member.occupation,
-        member.income_contribution, member.is_working_on_farm, member.created_at
-      ]
+        member.income_contribution, member.is_working_on_farm, member.created_at,
+      ],
     );
 
     logger.info(`Household member added: ${member.household_id}`);
@@ -358,7 +358,7 @@ async function addSkill(profileId, skillData) {
       proficiency_level,
       years_experience,
       certification,
-      certification_date
+      certification_date,
     } = skillData;
 
     const skill = {
@@ -370,10 +370,10 @@ async function addSkill(profileId, skillData) {
       years_experience,
       certification,
       certification_date,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO farmer_skills 
        (skill_id, profile_id, skill_name, skill_category, proficiency_level, 
         years_experience, certification, certification_date, created_at)
@@ -382,8 +382,8 @@ async function addSkill(profileId, skillData) {
       [
         skill.skill_id, skill.profile_id, skill.skill_name, skill.skill_category,
         skill.proficiency_level, skill.years_experience, skill.certification,
-        skill.certification_date, skill.created_at
-      ]
+        skill.certification_date, skill.created_at,
+      ],
     );
 
     logger.info(`Skill added: ${skill.skill_id}`);
@@ -399,23 +399,23 @@ async function addSkill(profileId, skillData) {
  */
 async function enrichProfile(profileId) {
   try {
-    let profile = await getProfile(profileId);
+    const profile = await getProfile(profileId);
     if (!profile) {
       throw new Error('Profile not found');
     }
 
-    let aiRequest = {
+    const aiRequest = {
       task: 'profile_enrichment',
       parameters: {
         profile_data: profile,
         missing_fields: identifyMissingFields(profile),
         demographic_data: await getDemographicData(profile.state, profile.district),
         regional_patterns: await getRegionalPatterns(profile.state),
-        similar_profiles: await getSimilarProfiles(profile)
-      }
+        similar_profiles: await getSimilarProfiles(profile),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     // Apply AI recommendations
     const enrichmentResults = [];
@@ -425,7 +425,7 @@ async function enrichProfile(profileId) {
           field: recommendation.field,
           suggested_value: recommendation.value,
           confidence: recommendation.confidence,
-          applied: true
+          applied: true,
         });
 
         await logEnrichment(
@@ -434,7 +434,7 @@ async function enrichProfile(profileId) {
           recommendation.field,
           null,
           recommendation.value,
-          'ai_service'
+          'ai_service',
         );
       }
     }
@@ -443,7 +443,7 @@ async function enrichProfile(profileId) {
     return {
       profile_id: profileId,
       enrichment_results: enrichmentResults,
-      ai_recommendations: aiResponse
+      ai_recommendations: aiResponse,
     };
   } catch (error) {
     logger.error('Error enriching profile', { error: error.message, stack: error.stack });
@@ -456,7 +456,7 @@ async function enrichProfile(profileId) {
  */
 async function analyzeProfileCompleteness(profileId) {
   try {
-    let profile = await getProfile(profileId);
+    const profile = await getProfile(profileId);
     if (!profile) {
       throw new Error('Profile not found');
     }
@@ -468,7 +468,7 @@ async function analyzeProfileCompleteness(profileId) {
       required_fields: getRequiredFields(),
       optional_fields: getOptionalFields(),
       suggestions: generateCompletenessSuggestions(profile),
-      estimated_completion_time: estimateCompletionTime(profile)
+      estimated_completion_time: estimateCompletionTime(profile),
     };
 
     return analysis;
@@ -483,29 +483,29 @@ async function analyzeProfileCompleteness(profileId) {
  */
 async function getFullProfile(profileId) {
   try {
-    let profile = await getProfile(profileId);
+    const profile = await getProfile(profileId);
     if (!profile) {
       return null;
     }
 
     const contacts = await pool.query(
       'SELECT * FROM farmer_contact_info WHERE profile_id = $1',
-      [profileId]
+      [profileId],
     );
 
     const household = await pool.query(
       'SELECT * FROM farmer_household WHERE profile_id = $1',
-      [profileId]
+      [profileId],
     );
 
     const education = await pool.query(
       'SELECT * FROM farmer_education WHERE profile_id = $1',
-      [profileId]
+      [profileId],
     );
 
     const skills = await pool.query(
       'SELECT * FROM farmer_skills WHERE profile_id = $1',
-      [profileId]
+      [profileId],
     );
 
     return {
@@ -513,7 +513,7 @@ async function getFullProfile(profileId) {
       contacts: contacts.rows,
       household: household.rows,
       education: education.rows,
-      skills: skills.rows
+      skills: skills.rows,
     };
   } catch (error) {
     logger.error('Error getting full profile', { error: error.message, stack: error.stack });
@@ -529,11 +529,11 @@ function generateId() {
 function calculateCompleteness(profileData) {
   const requiredFields = [
     'first_name', 'last_name', 'date_of_birth', 'gender',
-    'education_level', 'household_size'
+    'education_level', 'household_size',
   ];
   const optionalFields = [
     'marital_status', 'nationality', 'language', 'occupation',
-    'annual_income', 'dependents'
+    'annual_income', 'dependents',
   ];
 
   let requiredCount = 0;
@@ -557,7 +557,7 @@ function identifyMissingFields(profile) {
   const allFields = [
     'first_name', 'last_name', 'date_of_birth', 'gender',
     'marital_status', 'nationality', 'language', 'education_level',
-    'occupation', 'annual_income', 'household_size', 'dependents'
+    'occupation', 'annual_income', 'household_size', 'dependents',
   ];
 
   return allFields.filter(field => !profile[field]);
@@ -566,14 +566,14 @@ function identifyMissingFields(profile) {
 function getRequiredFields() {
   return [
     'first_name', 'last_name', 'date_of_birth', 'gender',
-    'education_level', 'household_size'
+    'education_level', 'household_size',
   ];
 }
 
 function getOptionalFields() {
   return [
     'marital_status', 'nationality', 'language', 'occupation',
-    'annual_income', 'dependents'
+    'annual_income', 'dependents',
   ];
 }
 
@@ -603,7 +603,7 @@ async function getDemographicPatterns() {
   return {
     common_occupations: ['farming', 'agricultural_labor', 'small_business'],
     common_education_levels: ['primary', 'secondary', 'higher_secondary'],
-    average_household_size: 5
+    average_household_size: 5,
   };
 }
 
@@ -611,14 +611,14 @@ async function getRegionalCharacteristics(state) {
   return {
     common_crops: ['wheat', 'rice', 'vegetables'],
     language_distribution: { hindi: 0.6, regional: 0.4 },
-    education_index: 0.7
+    education_index: 0.7,
   };
 }
 
 const REGIONAL_LANGUAGE_DEFAULTS = {
   assam: 'assamese', meghalaya: 'khasi', tripura: 'bengali',
   manipur: 'manipuri', mizoram: 'mizo', nagaland: 'english',
-  'arunachal pradesh': 'hindi', sikkim: 'nepali'
+  'arunachal pradesh': 'hindi', sikkim: 'nepali',
 };
 
 // Honest-degradation pattern (matches services/dual-use/platformCoreService.js):
@@ -627,16 +627,16 @@ const REGIONAL_LANGUAGE_DEFAULTS = {
 // Any suggestion without a real per-farmer signal is labeled source: 'static'
 // instead of carrying a fabricated confidence score.
 async function generateEnrichmentSuggestions(profileData) {
-  let profile = profileData || {};
-  let missing = identifyMissingFields(profile);
-  let suggestions = [];
+  const profile = profileData || {};
+  const missing = identifyMissingFields(profile);
+  const suggestions = [];
 
   if (missing.includes('occupation')) {
     suggestions.push({
       field: 'occupation',
       suggested_value: 'farming',
       source: 'static',
-      reason: 'Most common occupation among registered farmer profiles; no per-farmer signal available'
+      reason: 'Most common occupation among registered farmer profiles; no per-farmer signal available',
     });
   }
 
@@ -647,9 +647,9 @@ async function generateEnrichmentSuggestions(profileData) {
       field: 'language',
       suggested_value: regionalDefault || 'hindi',
       source: regionalDefault ? 'regional_default' : 'static',
-      reason: regionalDefault
-        ? `Default language for ${profile.state}`
-        : 'No matching state on file; falling back to national default'
+      reason: regionalDefault ?
+        `Default language for ${profile.state}` :
+        'No matching state on file; falling back to national default',
     });
   }
 
@@ -660,7 +660,7 @@ async function getDemographicData(state, district) {
   return {
     population_density: 500,
     literacy_rate: 0.75,
-    main_occupation: 'agriculture'
+    main_occupation: 'agriculture',
   };
 }
 
@@ -668,17 +668,17 @@ async function getRegionalPatterns(state) {
   return {
     farming_practices: ['traditional', 'mixed'],
     common_crops: ['rice', 'wheat'],
-    irrigation_methods: ['canal', 'groundwater']
+    irrigation_methods: ['canal', 'groundwater'],
   };
 }
 
 async function getSimilarProfiles(profile) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM farmer_profiles 
        WHERE state = $1 AND education_level = $2 
        LIMIT 5`,
-      [profile.state, profile.education_level]
+      [profile.state, profile.education_level],
     );
     return result.rows;
   } catch (error) {
@@ -692,7 +692,7 @@ async function logEnrichment(profileId, enrichmentType, fieldName, previousValue
       `INSERT INTO profile_enrichment_log 
        (profile_id, enrichment_type, field_name, previous_value, new_value, enrichment_source, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)`,
-      [profileId, enrichmentType, fieldName, previousValue, newValue, source]
+      [profileId, enrichmentType, fieldName, previousValue, newValue, source],
     );
   } catch (error) {
     logger.error('Error logging enrichment', { error: error.message });
@@ -710,5 +710,5 @@ module.exports = {
   addSkill,
   enrichProfile,
   analyzeProfileCompleteness,
-  getFullProfile
+  getFullProfile,
 };

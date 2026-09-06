@@ -60,7 +60,7 @@ async function registerIoTDevice(data) {
     location_id,
     assigned_to,
     device_config,
-    metadata
+    metadata,
   } = data;
 
   try {
@@ -81,8 +81,8 @@ async function registerIoTDevice(data) {
         location_id,
         assigned_to,
         JSON.stringify(device_config),
-        JSON.stringify(metadata)
-      ]
+        JSON.stringify(metadata),
+      ],
     );
 
     return result.rows[0];
@@ -97,7 +97,7 @@ async function registerIoTDevice(data) {
  */
 router.post('/iot-devices', authMiddleware, async (req, res) => {
   try {
-    let result = await registerIoTDevice(req.body);
+    const result = await registerIoTDevice(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register IoT device API error', { error: error.message, stack: error.stack });
@@ -114,23 +114,23 @@ async function getIoTDevices(filters = {}) {
     const params = [];
 
     if (filters.device_type) {
-      query += ' AND device_type = $' + (params.length + 1);
+      query += ` AND device_type = $${ params.length + 1}`;
       params.push(filters.device_type);
     }
 
     if (filters.status) {
-      query += ' AND status = $' + (params.length + 1);
+      query += ` AND status = $${ params.length + 1}`;
       params.push(filters.status);
     }
 
     if (filters.assigned_to) {
-      query += ' AND assigned_to = $' + (params.length + 1);
+      query += ` AND assigned_to = $${ params.length + 1}`;
       params.push(filters.assigned_to);
     }
 
     query += ' ORDER BY created_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get IoT devices error', { error: error.message, stack: error.stack });
@@ -144,7 +144,7 @@ async function getIoTDevices(filters = {}) {
 router.get('/iot-devices', authMiddleware, async (req, res) => {
   try {
     const { device_type, status, assigned_to } = req.query;
-    let result = await getIoTDevices({ device_type, status, assigned_to });
+    const result = await getIoTDevices({ device_type, status, assigned_to });
     res.json(result);
   } catch (error) {
     logger.error('Get IoT devices API error', { error: error.message, stack: error.stack });
@@ -157,12 +157,12 @@ router.get('/iot-devices', authMiddleware, async (req, res) => {
  */
 async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE iot_devices
        SET status = $1, battery_level = $2, signal_strength = $3, last_seen = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
        WHERE id = $4
        RETURNING *`,
-      [status, batteryLevel, signalStrength, deviceId]
+      [status, batteryLevel, signalStrength, deviceId],
     );
 
     if (result.rows.length === 0) {
@@ -184,9 +184,9 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
           deviceId: device.id,
           deviceType: device.device_type ?? null,
           locationId: device.location_id ?? null,
-          lastSeen: device.last_seen
+          lastSeen: device.last_seen,
         },
-        { severity: SEVERITY.WARNING, source: 'iotIntegrationService.updateDeviceStatus', entityId: device.id }
+        { severity: SEVERITY.WARNING, source: 'iotIntegrationService.updateDeviceStatus', entityId: device.id },
       );
     }
 
@@ -203,7 +203,7 @@ async function updateDeviceStatus(deviceId, status, batteryLevel, signalStrength
 router.patch('/iot-devices/:deviceId/status', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
     const { status, battery_level, signal_strength } = req.body;
-    let result = await updateDeviceStatus(req.params.deviceId, status, battery_level, signal_strength);
+    const result = await updateDeviceStatus(req.params.deviceId, status, battery_level, signal_strength);
     res.json(result);
   } catch (error) {
     logger.error('Update device status API error', { error: error.message, stack: error.stack });
@@ -227,11 +227,11 @@ async function recordSensorData(data) {
     reading_timestamp,
     location_id,
     quality_score,
-    metadata
+    metadata,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO sensor_data 
        (device_id, sensor_type, sensor_value, unit, reading_timestamp, location_id, quality_score, metadata)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -244,8 +244,8 @@ async function recordSensorData(data) {
         reading_timestamp || new Date(),
         location_id,
         quality_score,
-        JSON.stringify(metadata)
-      ]
+        JSON.stringify(metadata),
+      ],
     );
 
     const reading = result.rows[0];
@@ -264,8 +264,8 @@ async function recordSensorData(data) {
             severity: temp > COLD_CHAIN_MAX_C + 5 ? SEVERITY.CRITICAL : SEVERITY.WARNING,
             source: 'iotIntegrationService',
             // Correlate on the shipment when known, else the device itself.
-            entityId: metadata?.shipment_id || device_id
-          }
+            entityId: metadata?.shipment_id || device_id,
+          },
         );
       }
     }
@@ -282,7 +282,7 @@ async function recordSensorData(data) {
  */
 router.post('/sensor-data', authMiddleware, async (req, res) => {
   try {
-    let result = await recordSensorData(req.body);
+    const result = await recordSensorData(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record sensor data API error', { error: error.message, stack: error.stack });
@@ -296,7 +296,7 @@ router.post('/sensor-data', authMiddleware, async (req, res) => {
 async function getSensorData(deviceId, sensorType = null, startDate = null, endDate = null, limit = 100) {
   try {
     let query = 'SELECT * FROM sensor_data WHERE device_id = $1';
-    let params = [deviceId];
+    const params = [deviceId];
 
     if (sensorType) {
       query += ' AND sensor_type = $2';
@@ -304,19 +304,19 @@ async function getSensorData(deviceId, sensorType = null, startDate = null, endD
     }
 
     if (startDate) {
-      query += ' AND reading_timestamp >= $' + (params.length + 1);
+      query += ` AND reading_timestamp >= $${ params.length + 1}`;
       params.push(startDate);
     }
 
     if (endDate) {
-      query += ' AND reading_timestamp <= $' + (params.length + 1);
+      query += ` AND reading_timestamp <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
-    query += ' ORDER BY reading_timestamp DESC LIMIT $' + (params.length + 1);
+    query += ` ORDER BY reading_timestamp DESC LIMIT $${ params.length + 1}`;
     params.push(limit);
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get sensor data error', { error: error.message, stack: error.stack });
@@ -330,12 +330,12 @@ async function getSensorData(deviceId, sensorType = null, startDate = null, endD
 router.get('/sensor-data/:deviceId', async (req, res) => {
   try {
     const { sensor_type, start_date, end_date, limit } = req.query;
-    let result = await getSensorData(
+    const result = await getSensorData(
       req.params.deviceId,
       sensor_type,
       start_date,
       end_date,
-      parseInt(limit) || 100
+      parseInt(limit) || 100,
     );
     res.json(result);
   } catch (error) {
@@ -355,16 +355,16 @@ async function sendDeviceCommand(data) {
   const {
     device_id,
     command_type,
-    command_payload
+    command_payload,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO device_commands 
        (device_id, command_type, command_payload, status, sent_at)
        VALUES ($1, $2, $3, 'sent', CURRENT_TIMESTAMP)
        RETURNING *`,
-      [device_id, command_type, JSON.stringify(command_payload)]
+      [device_id, command_type, JSON.stringify(command_payload)],
     );
 
     return result.rows[0];
@@ -379,7 +379,7 @@ async function sendDeviceCommand(data) {
  */
 router.post('/device-commands', authMiddleware, async (req, res) => {
   try {
-    let result = await sendDeviceCommand(req.body);
+    const result = await sendDeviceCommand(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Send device command API error', { error: error.message, stack: error.stack });
@@ -393,7 +393,7 @@ router.post('/device-commands', authMiddleware, async (req, res) => {
 async function getDeviceCommands(deviceId, status = null) {
   try {
     let query = 'SELECT * FROM device_commands WHERE device_id = $1';
-    let params = [deviceId];
+    const params = [deviceId];
 
     if (status) {
       query += ' AND status = $2';
@@ -402,7 +402,7 @@ async function getDeviceCommands(deviceId, status = null) {
 
     query += ' ORDER BY sent_at DESC LIMIT 50';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get device commands error', { error: error.message, stack: error.stack });
@@ -416,7 +416,7 @@ async function getDeviceCommands(deviceId, status = null) {
 router.get('/device-commands/:deviceId', authMiddleware, async (req, res) => {
   try {
     const { status } = req.query;
-    let result = await getDeviceCommands(req.params.deviceId, status);
+    const result = await getDeviceCommands(req.params.deviceId, status);
     res.json(result);
   } catch (error) {
     logger.error('Get device commands API error', { error: error.message, stack: error.stack });
@@ -437,11 +437,11 @@ async function createDeviceAlert(data) {
     alert_type,
     alert_severity,
     alert_message,
-    alert_data
+    alert_data,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO device_alerts 
        (device_id, alert_type, alert_severity, alert_message, alert_data)
        VALUES ($1, $2, $3, $4, $5)
@@ -451,8 +451,8 @@ async function createDeviceAlert(data) {
         alert_type,
         alert_severity,
         alert_message,
-        JSON.stringify(alert_data)
-      ]
+        JSON.stringify(alert_data),
+      ],
     );
 
     return result.rows[0];
@@ -467,7 +467,7 @@ async function createDeviceAlert(data) {
  */
 router.post('/device-alerts', authMiddleware, async (req, res) => {
   try {
-    let result = await createDeviceAlert(req.body);
+    const result = await createDeviceAlert(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create device alert API error', { error: error.message, stack: error.stack });
@@ -480,12 +480,12 @@ router.post('/device-alerts', authMiddleware, async (req, res) => {
  */
 async function getUnacknowledgedAlerts() {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT da.*, d.device_name, d.device_type
        FROM device_alerts da
        LEFT JOIN iot_devices d ON da.device_id = d.id
        WHERE da.is_acknowledged = false
-       ORDER BY da.created_at DESC`
+       ORDER BY da.created_at DESC`,
     );
 
     return result.rows;
@@ -500,7 +500,7 @@ async function getUnacknowledgedAlerts() {
  */
 router.get('/device-alerts/unacknowledged', authMiddleware, async (req, res) => {
   try {
-    let result = await getUnacknowledgedAlerts();
+    const result = await getUnacknowledgedAlerts();
     res.json(result);
   } catch (error) {
     logger.error('Get unacknowledged alerts API error', { error: error.message, stack: error.stack });
@@ -517,9 +517,9 @@ router.get('/device-alerts/unacknowledged', authMiddleware, async (req, res) => 
  */
 async function checkDeviceHealth(deviceId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT check_device_health($1) as health',
-      [deviceId]
+      [deviceId],
     );
 
     return result.rows[0].health;
@@ -534,7 +534,7 @@ async function checkDeviceHealth(deviceId) {
  */
 router.get('/iot-devices/:deviceId/health', authMiddleware, async (req, res) => {
   try {
-    let result = await checkDeviceHealth(req.params.deviceId);
+    const result = await checkDeviceHealth(req.params.deviceId);
     res.json(result);
   } catch (error) {
     logger.error('Check device health API error', { error: error.message, stack: error.stack });
@@ -551,7 +551,7 @@ router.get('/iot-devices/:deviceId/health', authMiddleware, async (req, res) => 
  */
 async function recordIoTAnalytics(metrics) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO iot_analytics 
        (date, total_devices, active_devices, offline_devices, total_sensor_readings, 
         anomaly_count, alert_count, average_signal_strength, average_battery_level)
@@ -570,8 +570,8 @@ async function recordIoTAnalytics(metrics) {
         metrics.anomaly_count || 0,
         metrics.alert_count || 0,
         metrics.avg_signal || 0,
-        metrics.avg_battery || 0
-      ]
+        metrics.avg_battery || 0,
+      ],
     );
 
     return result.rows[0];
@@ -587,7 +587,7 @@ async function recordIoTAnalytics(metrics) {
 router.post('/iot-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    let result = await recordIoTAnalytics(metrics);
+    const result = await recordIoTAnalytics(metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record IoT analytics API error', { error: error.message, stack: error.stack });
@@ -616,8 +616,6 @@ module.exports = {
   getUnacknowledgedAlerts,
   checkDeviceHealth,
   recordIoTAnalytics,
-  isHealthy
+  isHealthy,
 };
-
-
 

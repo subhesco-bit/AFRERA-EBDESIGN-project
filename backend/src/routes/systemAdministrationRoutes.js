@@ -1,6 +1,6 @@
 /**
  * System Administration Module Routes - AI Enhanced
- * 
+ *
  * Routes for system administration with AI-powered capabilities:
  * - System initialization
  * - Incident prediction
@@ -82,21 +82,21 @@ router.post('/self-healing', ...writeAdmin, validateBody(), body, (req, res, nex
   next();
 }, async (req, res) => {
   try {
-    let result = await systemAdministrationService.triggerSelfHealing(req.body);
-    
+    const result = await systemAdministrationService.triggerSelfHealing(req.body);
+
     // Emit signal for self-healing action
     signalBus.emitSignal(SIGNAL.SYSTEM_HEALTH_CHANGED, {
       issueId: req.body.id,
       action: result.action,
       success: result.success,
-      confidence: result.confidence
+      confidence: result.confidence,
     }, {
       severity: result.success ? SEVERITY.INFO : SEVERITY.WARNING,
       source: 'system_administration_routes',
       entityId: req.body.id,
-      correlationId: requestId(req)
+      correlationId: requestId(req),
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('systemAdministrationRoutes:triggerSelfHealing', { error: error.message });
@@ -109,18 +109,18 @@ router.get('/capacity/forecast', ...admin, timeframe, async (req, res) => {
   try {
     const { timeframe = '90d' } = req.query;
     const forecast = await systemAdministrationService.forecastCapacity(timeframe);
-    
+
     // Emit signal for capacity forecast update
     signalBus.emitSignal(SIGNAL.CAPACITY_FORECAST_UPDATED, {
-      timeframe: timeframe,
+      timeframe,
       forecast: forecast.forecastedCapacity,
-      recommendations: forecast.recommendations
+      recommendations: forecast.recommendations,
     }, {
       severity: SEVERITY.INFO,
       source: 'system_administration_routes',
-      correlationId: requestId(req)
+      correlationId: requestId(req),
     });
-    
+
     res.json(forecast);
   } catch (error) {
     logger.error('systemAdministrationRoutes:forecastCapacity', { error: error.message });
@@ -132,20 +132,20 @@ router.get('/capacity/forecast', ...admin, timeframe, async (req, res) => {
 router.post('/security/threats/detect', ...writeAdmin, async (req, res) => {
   try {
     const detection = await systemAdministrationService.detectSecurityThreats();
-    
+
     // Emit signal for security threats if found
     if (detection.threats && detection.threats.length > 0) {
       signalBus.emitSignal(SIGNAL.SECURITY_THREAT_DETECTED, {
         scanId: detection.scanId,
         threats: detection.threats,
-        riskLevel: detection.riskLevel
+        riskLevel: detection.riskLevel,
       }, {
         severity: detection.riskLevel === 'high' ? SEVERITY.CRITICAL : SEVERITY.WARNING,
         source: 'system_administration_routes',
-        correlationId: requestId(req)
+        correlationId: requestId(req),
       });
     }
-    
+
     res.json(detection);
   } catch (error) {
     logger.error('systemAdministrationRoutes:detectSecurityThreats', { error: error.message });
@@ -167,7 +167,7 @@ router.get('/dashboard/health', ...admin, async (req, res) => {
 // Perform automated maintenance
 router.post('/maintenance/automated', ...writeAdmin, async (req, res) => {
   try {
-    let result = await systemAdministrationService.performAutomatedMaintenance();
+    const result = await systemAdministrationService.performAutomatedMaintenance();
     res.json(result);
   } catch (error) {
     logger.error('systemAdministrationRoutes:performAutomatedMaintenance', { error: error.message });

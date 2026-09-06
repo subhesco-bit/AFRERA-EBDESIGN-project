@@ -158,7 +158,7 @@ class FoodIntelligenceEngine {
 
     // Shelf life factors
     const baseShelfLife = this._getBaseShelfLife(productType);
-    
+
     let temperatureFactor = 1;
     if (storageTemperature <= 4) temperatureFactor = 1.8;
     else if (storageTemperature <= 10) temperatureFactor = 1.5;
@@ -172,7 +172,7 @@ class FoodIntelligenceEngine {
 
     const packagingFactor = this._getPackagingFactor(packagingType);
 
-    const adjustedShelfLife = baseShelfLife * temperatureFactor * 
+    const adjustedShelfLife = baseShelfLife * temperatureFactor *
       humidityFactor * packagingFactor * (initialQuality / 100);
 
     const expirationDate = new Date();
@@ -184,9 +184,9 @@ class FoodIntelligenceEngine {
       adjustedShelfLifeDays: Math.round(adjustedShelfLife),
       expirationDate,
       storageRecommendations: this._generateStorageRecommendations(
-        storageTemperature, 
-        storageHumidity, 
-        packagingType
+        storageTemperature,
+        storageHumidity,
+        packagingType,
       ),
       qualityDegradationRate: {
         daily: (100 / adjustedShelfLife).toFixed(2),
@@ -194,9 +194,9 @@ class FoodIntelligenceEngine {
         monthly: (3000 / adjustedShelfLife).toFixed(2),
       },
       riskFactors: this._identifyShelfLifeRisks(
-        storageTemperature, 
-        storageHumidity, 
-        packagingType
+        storageTemperature,
+        storageHumidity,
+        packagingType,
       ),
     };
   }
@@ -252,7 +252,7 @@ class FoodIntelligenceEngine {
     const eligibilityScore = this._calculateOrganicEligibility(
       cropHistory,
       chemicalUsageRecords,
-      pestManagementLogs
+      pestManagementLogs,
     );
 
     return {
@@ -260,7 +260,7 @@ class FoodIntelligenceEngine {
       farmId,
       eligibilityScore,
       recommendation: eligibilityScore >= 80 ? 'ELIGIBLE' : 'NOT_ELIGIBLE',
-      requiredActions: eligibilityScore < 80 ? 
+      requiredActions: eligibilityScore < 80 ?
         this._generateOrganicRoadmap(eligibilityScore) : [],
       certificationBody: eligibilityScore >= 80 ? 'REFER_TO_APEDA' : null,
       estimatedTimeToEligibility: this._estimateCertificationTimeline(eligibilityScore),
@@ -274,10 +274,10 @@ class FoodIntelligenceEngine {
 
   static _initializeProcessStages(processingMethod) {
     const stages = {
-      'FRESH': ['QUALITY_CHECK', 'GRADING', 'PACKAGING', 'LABELING'],
-      'PROCESSED': ['WASHING', 'DRYING', 'GRINDING', 'PACKAGING', 'LABELING'],
-      'FROZEN': ['PREPARATION', 'FREEZING', 'PACKAGING', 'LABELING'],
-      'CANNED': ['PREPARATION', 'COOKING', 'CANNING', 'STERILIZATION', 'COOLING', 'LABELING'],
+      FRESH: ['QUALITY_CHECK', 'GRADING', 'PACKAGING', 'LABELING'],
+      PROCESSED: ['WASHING', 'DRYING', 'GRINDING', 'PACKAGING', 'LABELING'],
+      FROZEN: ['PREPARATION', 'FREEZING', 'PACKAGING', 'LABELING'],
+      CANNED: ['PREPARATION', 'COOKING', 'CANNING', 'STERILIZATION', 'COOLING', 'LABELING'],
     };
     return (stages[processingMethod] || []).map(stage => ({
       name: stage,
@@ -290,11 +290,11 @@ class FoodIntelligenceEngine {
 
   static _getNutritionDatabase() {
     return {
-      'RICE': { calories: 130, protein: 2.7, carbohydrates: 28, fat: 0.3, fiber: 0.4 },
-      'WHEAT': { calories: 364, protein: 13, carbohydrates: 71, fat: 1.7, fiber: 12 },
-      'POTATO': { calories: 77, protein: 2, carbohydrates: 17, fat: 0.1, fiber: 2.1 },
-      'TOMATO': { calories: 18, protein: 0.9, carbohydrates: 3.9, fat: 0.2, fiber: 1.2 },
-      'ONION': { calories: 40, protein: 1.1, carbohydrates: 9, fat: 0.1, fiber: 1.7 },
+      RICE: { calories: 130, protein: 2.7, carbohydrates: 28, fat: 0.3, fiber: 0.4 },
+      WHEAT: { calories: 364, protein: 13, carbohydrates: 71, fat: 1.7, fiber: 12 },
+      POTATO: { calories: 77, protein: 2, carbohydrates: 17, fat: 0.1, fiber: 2.1 },
+      TOMATO: { calories: 18, protein: 0.9, carbohydrates: 3.9, fat: 0.2, fiber: 1.2 },
+      ONION: { calories: 40, protein: 1.1, carbohydrates: 9, fat: 0.1, fiber: 1.7 },
     };
   }
 
@@ -329,22 +329,22 @@ class FoodIntelligenceEngine {
 
   static _getBaseShelfLife(productType) {
     const shelfLifeMap = {
-      'FRESH': 5,
-      'REFRIGERATED': 15,
-      'FROZEN': 365,
-      'CANNED': 730,
-      'DRY': 365,
+      FRESH: 5,
+      REFRIGERATED: 15,
+      FROZEN: 365,
+      CANNED: 730,
+      DRY: 365,
     };
     return shelfLifeMap[productType] || 30;
   }
 
   static _getPackagingFactor(packagingType) {
     const factors = {
-      'VACUUM_SEALED': 1.5,
-      'MODIFIED_ATMOSPHERE': 1.3,
-      'REFRIGERATED': 1.2,
-      'STANDARD': 1.0,
-      'PAPER': 0.8,
+      VACUUM_SEALED: 1.5,
+      MODIFIED_ATMOSPHERE: 1.3,
+      REFRIGERATED: 1.2,
+      STANDARD: 1.0,
+      PAPER: 0.8,
     };
     return factors[packagingType] || 1.0;
   }

@@ -25,7 +25,7 @@ router.post('/quotes', authLimiter, authMiddleware, async (req, res) => {
 router.get('/quotes/:quoteId', authMiddleware, async (req, res) => {
   try {
     const { quoteId } = req.params;
-    let quote = await insurancePremiumService.getQuote(quoteId);
+    const quote = await insurancePremiumService.getQuote(quoteId);
     res.json({ success: true, data: quote });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -43,7 +43,7 @@ router.post('/calculate/crop', authLimiter, authMiddleware, async (req, res) => 
 
 router.post('/calculate/transit', authLimiter, authMiddleware, async (req, res) => {
   try {
-    let premium = await insurancePremiumService.calculateTransitPremium(req.body);
+    const premium = await insurancePremiumService.calculateTransitPremium(req.body);
     res.json({ success: true, data: premium });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -52,7 +52,7 @@ router.post('/calculate/transit', authLimiter, authMiddleware, async (req, res) 
 
 router.post('/calculate/warehouse', authLimiter, authMiddleware, async (req, res) => {
   try {
-    let premium = await insurancePremiumService.calculateWarehousePremium(req.body);
+    const premium = await insurancePremiumService.calculateWarehousePremium(req.body);
     res.json({ success: true, data: premium });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -61,7 +61,7 @@ router.post('/calculate/warehouse', authLimiter, authMiddleware, async (req, res
 
 router.post('/calculate/livestock', authLimiter, authMiddleware, async (req, res) => {
   try {
-    let premium = await insurancePremiumService.calculateLivestockPremium(req.body);
+    const premium = await insurancePremiumService.calculateLivestockPremium(req.body);
     res.json({ success: true, data: premium });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -81,7 +81,7 @@ router.post('/policies', authLimiter, authMiddleware, async (req, res) => {
 router.get('/policies/:policyId', authMiddleware, async (req, res) => {
   try {
     const { policyId } = req.params;
-    let policy = await insurancePolicyIssuanceService.getPolicy(policyId, req.user.id, req.user.role === 'admin');
+    const policy = await insurancePolicyIssuanceService.getPolicy(policyId, req.user.id, req.user.role === 'admin');
     res.json({ success: true, data: policy });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -91,7 +91,7 @@ router.get('/policies/:policyId', authMiddleware, async (req, res) => {
 router.get('/policies/number/:policyNumber', authMiddleware, async (req, res) => {
   try {
     const { policyNumber } = req.params;
-    let policy = await insurancePolicyIssuanceService.getPolicyByNumber(policyNumber);
+    const policy = await insurancePolicyIssuanceService.getPolicyByNumber(policyNumber);
     res.json({ success: true, data: policy });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -110,8 +110,8 @@ router.get('/policies', authMiddleware, async (req, res) => {
 router.put('/policies/:policyId/renew', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { policyId } = req.params;
-    let policy = await insurancePolicyIssuanceService.renewPolicy(
-      policyId, req.body, req.user.id, req.user.role === 'admin'
+    const policy = await insurancePolicyIssuanceService.renewPolicy(
+      policyId, req.body, req.user.id, req.user.role === 'admin',
     );
     res.json({ success: true, data: policy });
   } catch (error) {
@@ -133,7 +133,7 @@ router.delete('/policies/:policyId', authLimiter, authMiddleware, async (req, re
 router.post('/policies/:policyId/payments/:installmentNumber', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { policyId, installmentNumber } = req.params;
-    let policy = await insurancePolicyIssuanceService.processPayment(policyId, installmentNumber, req.body);
+    const policy = await insurancePolicyIssuanceService.processPayment(policyId, installmentNumber, req.body);
     res.json({ success: true, data: policy });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -165,7 +165,7 @@ router.post('/policies/:policyId/documents', authMiddleware, async (req, res) =>
 // didn't already have.
 router.patch('/quotes/:quoteId/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    let result = await insurancePolicyIssuanceService.updateQuoteStatus(req.params.quoteId, req.body.status);
+    const result = await insurancePolicyIssuanceService.updateQuoteStatus(req.params.quoteId, req.body.status);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -186,7 +186,7 @@ router.post('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, 
 router.get('/claims/:claimId/fraud-analysis', authMiddleware, async (req, res) => {
   try {
     const { claimId } = req.params;
-    let analysis = await insuranceFraudDetectionService.getFraudAnalysis(claimId);
+    const analysis = await insuranceFraudDetectionService.getFraudAnalysis(claimId);
     res.json({ success: true, data: analysis });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

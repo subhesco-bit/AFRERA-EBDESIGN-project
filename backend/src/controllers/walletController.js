@@ -48,7 +48,7 @@ const walletController = {
       logger.error('Get transaction history failed', error);
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 module.exports = walletController;

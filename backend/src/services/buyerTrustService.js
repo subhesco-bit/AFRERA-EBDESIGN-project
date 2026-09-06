@@ -66,8 +66,8 @@ class BuyerTrustService {
           completed_orders: completedOrders.count,
           average_rating: reviews.avg_rating || 0,
           disputes: disputes.count,
-          on_time_payments: payments.count
-        }
+          on_time_payments: payments.count,
+        },
       };
     } catch (error) {
       logger.error(`Calculate buyer trust score failed: ${error.message}`);
@@ -90,7 +90,7 @@ class BuyerTrustService {
       return {
         buyer_id: buyerId,
         badge,
-        score: trustScore.trust_score
+        score: trustScore.trust_score,
       };
     } catch (error) {
       logger.error(`Get buyer reputation failed: ${error.message}`);
@@ -113,14 +113,14 @@ class BuyerTrustService {
         reason,
         status: 'pending',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       }).returning('*');
 
       logger.info(`Fraud report created: ${buyerId}`);
 
       return {
         report_id: report[0].id,
-        status: 'pending'
+        status: 'pending',
       };
     } catch (error) {
       logger.error(`Report fraud suspicion failed: ${error.message}`);
@@ -133,7 +133,7 @@ class BuyerTrustService {
    */
   async getBuyerPaymentHistory(buyerId) {
     try {
-      let payments = await db('order_payments')
+      const payments = await db('order_payments')
         .where('buyer_id', buyerId)
         .orderBy('created_at', 'desc')
         .limit(100);
@@ -148,7 +148,7 @@ class BuyerTrustService {
         on_time: onTime,
         late,
         failed,
-        reliability_percentage: Math.round((onTime / payments.length) * 100) || 0
+        reliability_percentage: Math.round((onTime / payments.length) * 100) || 0,
       };
     } catch (error) {
       logger.error(`Get buyer payment history failed: ${error.message}`);

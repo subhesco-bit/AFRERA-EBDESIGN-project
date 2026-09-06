@@ -8,6 +8,7 @@ const router = express.Router();
 const { logger } = require('../utils/logger');
 const { getPostgreSQL } = require('../database/connection');
 const redisCacheService = require('../services/redisCacheService');
+const { authMiddleware, requireRole } = require('../middleware/auth');
 
 // Basic health check
 router.get('/', async (req, res) => {
@@ -18,20 +19,20 @@ router.get('/', async (req, res) => {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
-      version: process.env.npm_package_version || '1.0.0'
+      version: process.env.npm_package_version || '1.0.0',
     });
   } catch (error) {
     logger.error('Health check failed', error);
     res.status(500).json({
       success: false,
       status: 'unhealthy',
-      error: 'Health check failed'
+      error: 'Health check failed',
     });
   }
 });
 
 // Detailed health check with database and cache status
-router.get('/detailed', async (req, res) => {
+router.get('/detailed', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
   const health = {
     success: true,
     status: 'healthy',
@@ -43,8 +44,8 @@ router.get('/detailed', async (req, res) => {
       database: { status: 'unknown', message: 'Not checked' },
       redis: { status: 'unknown', message: 'Not checked' },
       memory: { status: 'unknown', message: 'Not checked' },
-      disk: { status: 'unknown', message: 'Not checked' }
-    }
+      disk: { status: 'unknown', message: 'Not checked' },
+    },
   };
 
   let overallStatus = 'healthy';
@@ -56,12 +57,12 @@ router.get('/detailed', async (req, res) => {
       await db.query('SELECT 1');
       health.checks.database = {
         status: 'healthy',
-        message: 'Database connection successful'
+        message: 'Database connection successful',
       };
     } catch (error) {
       health.checks.database = {
         status: 'unhealthy',
-        message: error.message
+        message: error.message,
       };
       overallStatus = 'degraded';
     }
@@ -73,7 +74,7 @@ router.get('/detailed', async (req, res) => {
         status: stats.connected ? 'healthy' : 'unhealthy',
         message: stats.connected ? 'Redis connection successful' : 'Redis not connected',
         keys: stats.keys,
-        memory: stats.memory
+        memory: stats.memory,
       };
       if (!stats.connected) {
         overallStatus = 'degraded';
@@ -81,7 +82,7 @@ router.get('/detailed', async (req, res) => {
     } catch (error) {
       health.checks.redis = {
         status: 'unhealthy',
-        message: error.message
+        message: error.message,
       };
       overallStatus = 'degraded';
     }
@@ -92,14 +93,14 @@ router.get('/detailed', async (req, res) => {
       rss: Math.round(memoryUsage.rss / 1024 / 1024),
       heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024),
       heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024),
-      external: Math.round(memoryUsage.external / 1024 / 1024)
+      external: Math.round(memoryUsage.external / 1024 / 1024),
     };
 
     const memoryPercent = (memoryUsageMB.heapUsed / memoryUsageMB.heapTotal) * 100;
     health.checks.memory = {
       status: memoryPercent > 90 ? 'unhealthy' : memoryPercent > 70 ? 'degraded' : 'healthy',
       message: `Memory usage: ${memoryPercent.toFixed(2)}%`,
-      usage: memoryUsageMB
+      usage: memoryUsageMB,
     };
 
     if (memoryPercent > 90) {
@@ -111,15 +112,15 @@ router.get('/detailed', async (req, res) => {
     // Check disk space (if available)
     try {
       const fs = require('fs');
-      let stats = fs.statSync('.');
+      const stats = fs.statSync('.');
       health.checks.disk = {
         status: 'healthy',
-        message: 'Disk space check not implemented'
+        message: 'Disk space check not implemented',
       };
     } catch (error) {
       health.checks.disk = {
         status: 'unknown',
-        message: 'Could not check disk space'
+        message: 'Could not check disk space',
       };
     }
 
@@ -138,20 +139,20 @@ router.get('/detailed', async (req, res) => {
 router.get('/ready', async (req, res) => {
   try {
     // Check if all critical services are ready
-    let db = getPostgreSQL();
+    const db = getPostgreSQL();
     await db.query('SELECT 1');
 
     res.status(200).json({
       success: true,
       status: 'ready',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     logger.error('Readiness check failed', error);
     res.status(503).json({
       success: false,
       status: 'not ready',
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -164,20 +165,20 @@ router.get('/live', async (req, res) => {
       success: true,
       status: 'alive',
       timestamp: new Date().toISOString(),
-      uptime: process.uptime()
+      uptime: process.uptime(),
     });
   } catch (error) {
     logger.error('Liveness check failed', error);
     res.status(503).json({
       success: false,
       status: 'dead',
-      error: error.message
+      error: error.message,
     });
   }
 });
 
 // Metrics endpoint (for monitoring systems)
-router.get('/metrics', async (req, res) => {
+router.get('/metrics', authMiddleware, requireRole('admin', 'superadmin'), async (req, res) => {
   try {
     const metrics = {
       timestamp: new Date().toISOString(),
@@ -186,7 +187,7 @@ router.get('/metrics', async (req, res) => {
       cpu: process.cpuUsage(),
       platform: process.platform,
       nodeVersion: process.version,
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
     };
 
     // Add custom metrics if available
@@ -199,7 +200,7 @@ router.get('/metrics', async (req, res) => {
     logger.error('Metrics collection failed', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to collect metrics'
+      error: 'Failed to collect metrics',
     });
   }
 });

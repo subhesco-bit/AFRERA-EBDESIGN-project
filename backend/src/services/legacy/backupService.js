@@ -71,7 +71,7 @@ class BackupService {
       }
 
       // Parse database URL
-      const dbMatch = dbUrl.match(/postgresql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)/);
+      const dbMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
       if (!dbMatch) {
         throw new Error('Invalid DATABASE_URL format');
       }
@@ -173,7 +173,7 @@ class BackupService {
 
       // Get database connection details
       let dbUrl = process.env.DATABASE_URL;
-      let dbMatch = dbUrl.match(/postgresql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)/);
+      let dbMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
       if (!dbMatch) {
         throw new Error('Invalid DATABASE_URL format');
       }

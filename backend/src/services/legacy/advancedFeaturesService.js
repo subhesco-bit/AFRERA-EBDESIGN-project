@@ -43,7 +43,7 @@ class AdvancedFeaturesService {
         module,
         recommendations,
         generatedAt: new Date(),
-        algorithm: 'collaborative-filtering+content-based'
+        algorithm: 'collaborative-filtering+content-based',
       };
     } catch (error) {
       logger.error('Error generating personalized recommendations', { error: error.message, stack: error.stack });
@@ -52,7 +52,7 @@ class AdvancedFeaturesService {
   }
 
   generateAIRecommendations(module, userData, preferences, behavior) {
-    let recommendations = [];
+    const recommendations = [];
 
     switch (module) {
       case 'marketplace':
@@ -61,14 +61,14 @@ class AdvancedFeaturesService {
           title: 'Seasonal Products for Your Region',
           items: ['Kharif Crops', 'Organic Vegetables', 'GI Tagged Products'],
           confidence: 0.85,
-          reason: 'Based on your location and purchase history'
+          reason: 'Based on your location and purchase history',
         });
         recommendations.push({
           type: 'promotion',
           title: 'Bulk Purchase Discount',
           description: 'Get 15% off on orders above ₹50,000',
           confidence: 0.72,
-          reason: 'Your average order value qualifies'
+          reason: 'Your average order value qualifies',
         });
         break;
 
@@ -78,7 +78,7 @@ class AdvancedFeaturesService {
           title: 'Comprehensive Crop Insurance Bundle',
           items: ['PMFBY + Weather Index + Livestock'],
           confidence: 0.88,
-          reason: 'Complete coverage for your farming operations'
+          reason: 'Complete coverage for your farming operations',
         });
         break;
 
@@ -89,7 +89,7 @@ class AdvancedFeaturesService {
           amount: (userData.avg_order_value || 10000) * 3,
           interestRate: '7.5%',
           confidence: 0.91,
-          reason: 'Based on your FDI score and payment history'
+          reason: 'Based on your FDI score and payment history',
         });
         break;
     }
@@ -107,7 +107,7 @@ class AdvancedFeaturesService {
       terms,
       conditions,
       value,
-      currency = 'INR'
+      currency = 'INR',
     } = contractData;
 
     try {
@@ -139,7 +139,7 @@ class AdvancedFeaturesService {
         JSON.stringify(conditions),
         value,
         currency,
-        blockchainHash
+        blockchainHash,
       ]);
 
       logger.info(`Smart contract recorded (not deployed to any blockchain network — no provider configured): ${result.rows[0].id}`);
@@ -154,7 +154,7 @@ class AdvancedFeaturesService {
     try {
       const { action, parameters, executorId } = executionData;
 
-      let query = `
+      const query = `
         UPDATE smart_contracts
         SET 
           status = $1,
@@ -165,11 +165,11 @@ class AdvancedFeaturesService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         action === 'fulfill' ? 'fulfilled' : 'rejected',
         JSON.stringify({ action, parameters }),
         executorId,
-        contractId
+        contractId,
       ]);
 
       logger.info(`Smart contract ${contractId} executed: ${action}`);
@@ -190,24 +190,24 @@ class AdvancedFeaturesService {
       location,
       capabilities,
       owner,
-      metadata = {}
+      metadata = {},
     } = deviceData;
 
     try {
-      let query = `
+      const query = `
         INSERT INTO iot_devices 
         (device_id, device_type, location, capabilities, owner, metadata, status)
         VALUES ($1, $2, $3, $4, $5, $6, 'active')
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         deviceId,
         deviceType,
         JSON.stringify(location),
         JSON.stringify(capabilities),
         owner,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ]);
 
       logger.info(`IoT device registered: ${deviceId}`);
@@ -222,18 +222,18 @@ class AdvancedFeaturesService {
     try {
       const { readings, timestamp, deviceStatus } = sensorData;
 
-      let query = `
+      const query = `
         INSERT INTO iot_readings 
         (device_id, readings, timestamp, device_status)
         VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         deviceId,
         JSON.stringify(readings),
         timestamp,
-        deviceStatus
+        deviceStatus,
       ]);
 
       // Trigger automation based on sensor data
@@ -250,12 +250,12 @@ class AdvancedFeaturesService {
   async triggerIoTAutomation(deviceId, readings) {
     try {
       // Get device automation rules
-      let query = `
+      const query = `
         SELECT * FROM iot_automation_rules
         WHERE device_id = $1 AND enabled = true
       `;
 
-      let result = await this.pool.query(query, [deviceId]);
+      const result = await this.pool.query(query, [deviceId]);
       const rules = result.rows;
 
       for (const rule of rules) {
@@ -313,19 +313,19 @@ class AdvancedFeaturesService {
       // Simple demand forecasting algorithm
       const forecast = this.calculateDemandForecast(productId, region, timeframe, historicalData);
 
-      let query = `
+      const query = `
         INSERT INTO demand_forecasts 
         (product_id, region, timeframe, forecast_data, accuracy, created_at)
         VALUES ($1, $2, $3, $4, $5, NOW())
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         productId,
         region,
         timeframe,
         JSON.stringify(forecast),
-        forecast.accuracy
+        forecast.accuracy,
       ]);
 
       logger.info(`Demand forecast generated for product ${productId}`);
@@ -342,7 +342,7 @@ class AdvancedFeaturesService {
     const average = values.reduce((a, b) => a + b, 0) / values.length;
     const trend = (values[values.length - 1] - values[0]) / values.length;
 
-    let forecast = {
+    const forecast = {
       productId,
       region,
       timeframe,
@@ -350,7 +350,7 @@ class AdvancedFeaturesService {
       averageDemand: average,
       trend: trend > 0 ? 'increasing' : trend < 0 ? 'decreasing' : 'stable',
       confidence: 0.75,
-      accuracy: 0.85
+      accuracy: 0.85,
     };
 
     // Generate predictions for each period
@@ -359,7 +359,7 @@ class AdvancedFeaturesService {
       const predictedValue = average + (trend * i);
       forecast.predictions.push({
         period: i,
-        predictedValue: Math.max(0, predictedValue)
+        predictedValue: Math.max(0, predictedValue),
       });
     }
 
@@ -375,14 +375,14 @@ class AdvancedFeaturesService {
       const intent = this.parseVoiceIntent(command);
 
       // Execute the command
-      let result = await this.executeVoiceIntent(intent, userId);
+      const result = await this.executeVoiceIntent(intent, userId);
 
       return {
         command,
         intent,
         result,
         confidence: intent.confidence,
-        processedAt: new Date()
+        processedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error processing voice command', { error: error.message, stack: error.stack });
@@ -440,23 +440,23 @@ class AdvancedFeaturesService {
       productId,
       content,
       interactivity,
-      requirements
+      requirements,
     } = experienceData;
 
     try {
-      let query = `
+      const query = `
         INSERT INTO ar_vr_experiences 
         (experience_type, product_id, content, interactivity, requirements, status)
         VALUES ($1, $2, $3, $4, $5, 'active')
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         experienceType,
         productId,
         JSON.stringify(content),
         JSON.stringify(interactivity),
-        JSON.stringify(requirements)
+        JSON.stringify(requirements),
       ]);
 
       logger.info(`AR/VR experience created: ${result.rows[0].id}`);
@@ -478,7 +478,7 @@ class AdvancedFeaturesService {
         queryType,
         params,
         graphData,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error querying knowledge graph', { error: error.message, stack: error.stack });
@@ -488,20 +488,20 @@ class AdvancedFeaturesService {
 
   async buildKnowledgeGraphQuery(queryType, params) {
     // Simulated knowledge graph data
-    let graphData = {
+    const graphData = {
       nodes: [],
       edges: [],
-      relationships: []
+      relationships: [],
     };
 
     switch (queryType) {
       case 'product_connections':
         graphData.nodes = [
           { id: 'rice', type: 'crop', properties: { season: 'kharif', regions: ['Assam', 'Bengal'] } },
-          { id: 'fertilizer', type: 'input', properties: { type: 'urea', brands: ['IFFCO', 'KRIBHCO'] } }
+          { id: 'fertilizer', type: 'input', properties: { type: 'urea', brands: ['IFFCO', 'KRIBHCO'] } },
         ];
         graphData.edges = [
-          { from: 'rice', to: 'fertilizer', relationship: 'requires', strength: 0.9 }
+          { from: 'rice', to: 'fertilizer', relationship: 'requires', strength: 0.9 },
         ];
         break;
 
@@ -510,12 +510,12 @@ class AdvancedFeaturesService {
           { id: 'farmer', type: 'entity' },
           { id: 'fpo', type: 'organization' },
           { id: 'processor', type: 'entity' },
-          { id: 'retailer', type: 'entity' }
+          { id: 'retailer', type: 'entity' },
         ];
         graphData.edges = [
           { from: 'farmer', to: 'fpo', relationship: 'supplies_to' },
           { from: 'fpo', to: 'processor', relationship: 'sells_to' },
-          { from: 'processor', to: 'retailer', relationship: 'distributes_to' }
+          { from: 'processor', to: 'retailer', relationship: 'distributes_to' },
         ];
         break;
     }
@@ -525,6 +525,4 @@ class AdvancedFeaturesService {
 }
 
 module.exports = new AdvancedFeaturesService();
-
-
 

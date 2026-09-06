@@ -36,7 +36,7 @@ async function registerLaboratory(data) {
     contact_email,
     contact_phone,
     testing_capabilities,
-    equipment_list
+    equipment_list,
   } = data;
 
   try {
@@ -60,8 +60,8 @@ async function registerLaboratory(data) {
         contact_email,
         contact_phone,
         JSON.stringify(testing_capabilities),
-        JSON.stringify(equipment_list)
-      ]
+        JSON.stringify(equipment_list),
+      ],
     );
 
     return result.rows[0];
@@ -76,7 +76,7 @@ async function registerLaboratory(data) {
  */
 router.post('/laboratories', authMiddleware, async (req, res) => {
   try {
-    let result = await registerLaboratory(req.body);
+    const result = await registerLaboratory(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register laboratory API error', { error: error.message, stack: error.stack });
@@ -89,12 +89,12 @@ router.post('/laboratories', authMiddleware, async (req, res) => {
  */
 async function getLaboratories() {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT l.*, a.city, a.state 
        FROM laboratories l
        LEFT JOIN addresses a ON l.location_id = a.id
        WHERE l.status = 'active'
-       ORDER BY l.lab_name`
+       ORDER BY l.lab_name`,
     );
     return result.rows;
   } catch (error) {
@@ -108,7 +108,7 @@ async function getLaboratories() {
  */
 router.get('/laboratories', async (req, res) => {
   try {
-    let result = await getLaboratories();
+    const result = await getLaboratories();
     res.json(result);
   } catch (error) {
     logger.error('Get laboratories API error', { error: error.message, stack: error.stack });
@@ -125,8 +125,8 @@ router.get('/laboratories', async (req, res) => {
  */
 async function getTestCategories() {
   try {
-    let result = await pool.query(
-      'SELECT * FROM test_categories WHERE is_active = true ORDER BY name'
+    const result = await pool.query(
+      'SELECT * FROM test_categories WHERE is_active = true ORDER BY name',
     );
     return result.rows;
   } catch (error) {
@@ -140,7 +140,7 @@ async function getTestCategories() {
  */
 router.get('/test-categories', async (req, res) => {
   try {
-    let result = await getTestCategories();
+    const result = await getTestCategories();
     res.json(result);
   } catch (error) {
     logger.error('Get test categories API error', { error: error.message, stack: error.stack });
@@ -163,7 +163,7 @@ async function getTestMethods(categoryId = null) {
 
     query += ' ORDER BY tm.name';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get test methods error', { error: error.message, stack: error.stack });
@@ -177,7 +177,7 @@ async function getTestMethods(categoryId = null) {
 router.get('/test-methods', async (req, res) => {
   try {
     const { category_id } = req.query;
-    let result = await getTestMethods(category_id);
+    const result = await getTestMethods(category_id);
     res.json(result);
   } catch (error) {
     logger.error('Get test methods API error', { error: error.message, stack: error.stack });
@@ -205,14 +205,14 @@ async function registerSample(data) {
     batch_number,
     priority,
     requested_tests,
-    special_instructions
+    special_instructions,
   } = data;
 
   try {
     // Generate sample number
-    const sampleNumber = `SMP-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const sampleNumber = `SMP-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO sample_registrations 
        (sample_number, submitted_by, laboratory_id, sample_type, sample_source, collection_date, 
         collection_method, sample_description, quantity_g, batch_number, priority, 
@@ -232,8 +232,8 @@ async function registerSample(data) {
         batch_number,
         priority,
         JSON.stringify(requested_tests),
-        special_instructions
-      ]
+        special_instructions,
+      ],
     );
 
     return result.rows[0];
@@ -248,9 +248,9 @@ async function registerSample(data) {
  */
 router.post('/samples', authMiddleware, async (req, res) => {
   try {
-    let result = await registerSample({
+    const result = await registerSample({
       ...req.body,
-      submitted_by: req.user.id
+      submitted_by: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -270,7 +270,7 @@ async function getSamples(userId, status = null) {
       LEFT JOIN laboratories l ON sr.laboratory_id = l.id
       WHERE sr.submitted_by = $1
     `;
-    let params = [userId];
+    const params = [userId];
 
     if (status) {
       query += ' AND sr.status = $2';
@@ -279,7 +279,7 @@ async function getSamples(userId, status = null) {
 
     query += ' ORDER BY sr.created_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get samples error', { error: error.message, stack: error.stack });
@@ -293,7 +293,7 @@ async function getSamples(userId, status = null) {
 router.get('/samples', authMiddleware, async (req, res) => {
   try {
     const { status } = req.query;
-    let result = await getSamples(req.user.id, status);
+    const result = await getSamples(req.user.id, status);
     res.json(result);
   } catch (error) {
     logger.error('Get samples API error', { error: error.message, stack: error.stack });
@@ -306,13 +306,13 @@ router.get('/samples', authMiddleware, async (req, res) => {
  */
 async function getSampleByNumber(sampleNumber) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT sr.*, l.lab_name, l.lab_code, a.city, a.state
        FROM sample_registrations sr
        LEFT JOIN laboratories l ON sr.laboratory_id = l.id
        LEFT JOIN addresses a ON l.location_id = a.id
        WHERE sr.sample_number = $1`,
-      [sampleNumber]
+      [sampleNumber],
     );
 
     if (result.rows.length === 0) {
@@ -331,7 +331,7 @@ async function getSampleByNumber(sampleNumber) {
  */
 router.get('/samples/:sampleNumber', authMiddleware, async (req, res) => {
   try {
-    let result = await getSampleByNumber(req.params.sampleNumber);
+    const result = await getSampleByNumber(req.params.sampleNumber);
     res.json(result);
   } catch (error) {
     logger.error('Get sample API error', { error: error.message, stack: error.stack });
@@ -348,12 +348,12 @@ router.get('/samples/:sampleNumber', authMiddleware, async (req, res) => {
  */
 async function assignTest(sampleId, testMethodId, assignedTo) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO test_assignments 
        (sample_id, test_method_id, assigned_to, status)
        VALUES ($1, $2, $3, 'assigned')
        RETURNING *`,
-      [sampleId, testMethodId, assignedTo]
+      [sampleId, testMethodId, assignedTo],
     );
 
     return result.rows[0];
@@ -369,7 +369,7 @@ async function assignTest(sampleId, testMethodId, assignedTo) {
 router.post('/test-assignments', authMiddleware, async (req, res) => {
   try {
     const { sample_id, test_method_id, assigned_to } = req.body;
-    let result = await assignTest(sample_id, test_method_id, assigned_to);
+    const result = await assignTest(sample_id, test_method_id, assigned_to);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Assign test API error', { error: error.message, stack: error.stack });
@@ -382,12 +382,12 @@ router.post('/test-assignments', authMiddleware, async (req, res) => {
  */
 async function updateTestResults(assignmentId, results, comments) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE test_assignments 
        SET results = $1, comments = $2, status = 'completed', completed_at = CURRENT_TIMESTAMP
        WHERE id = $3
        RETURNING *`,
-      [JSON.stringify(results), comments, assignmentId]
+      [JSON.stringify(results), comments, assignmentId],
     );
 
     return result.rows[0];
@@ -403,7 +403,7 @@ async function updateTestResults(assignmentId, results, comments) {
 router.put('/test-assignments/:assignmentId/results', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
     const { results, comments } = req.body;
-    let result = await updateTestResults(req.params.assignmentId, results, comments);
+    const result = await updateTestResults(req.params.assignmentId, results, comments);
     res.json(result);
   } catch (error) {
     logger.error('Update test results API error', { error: error.message, stack: error.stack });
@@ -420,12 +420,12 @@ router.put('/test-assignments/:assignmentId/results', authMiddleware, requireRol
  */
 async function generateCertificationReport(sampleId, reportType) {
   try {
-    const reportNumber = `RPT-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const reportNumber = `RPT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     // Get sample data
     const sample = await pool.query(
       'SELECT * FROM sample_registrations WHERE id = $1',
-      [sampleId]
+      [sampleId],
     );
 
     if (sample.rows.length === 0) {
@@ -435,21 +435,21 @@ async function generateCertificationReport(sampleId, reportType) {
     // Get test assignments and results
     const assignments = await pool.query(
       'SELECT * FROM test_assignments WHERE sample_id = $1',
-      [sampleId]
+      [sampleId],
     );
 
     const reportData = {
       sample: sample.rows[0],
       tests: assignments.rows,
-      generated_at: new Date()
+      generated_at: new Date(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO certification_reports 
        (sample_id, report_number, report_type, report_data, status)
        VALUES ($1, $2, $3, $4, 'draft')
        RETURNING *`,
-      [sampleId, reportNumber, reportType, JSON.stringify(reportData)]
+      [sampleId, reportNumber, reportType, JSON.stringify(reportData)],
     );
 
     return result.rows[0];
@@ -465,7 +465,7 @@ async function generateCertificationReport(sampleId, reportType) {
 router.post('/certification-reports', authMiddleware, async (req, res) => {
   try {
     const { sample_id, report_type } = req.body;
-    let result = await generateCertificationReport(sample_id, report_type);
+    const result = await generateCertificationReport(sample_id, report_type);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Generate certification report API error', { error: error.message, stack: error.stack });
@@ -478,9 +478,9 @@ router.post('/certification-reports', authMiddleware, async (req, res) => {
  */
 async function getCertificationReport(reportNumber) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM certification_reports WHERE report_number = $1',
-      [reportNumber]
+      [reportNumber],
     );
 
     if (result.rows.length === 0) {
@@ -499,7 +499,7 @@ async function getCertificationReport(reportNumber) {
  */
 router.get('/certification-reports/:reportNumber', authMiddleware, async (req, res) => {
   try {
-    let result = await getCertificationReport(req.params.reportNumber);
+    const result = await getCertificationReport(req.params.reportNumber);
     res.json(result);
   } catch (error) {
     logger.error('Get certification report API error', { error: error.message, stack: error.stack });
@@ -516,12 +516,12 @@ router.get('/certification-reports/:reportNumber', authMiddleware, async (req, r
  */
 async function addSampleTracking(sampleId, status, location, handledBy, notes) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO sample_tracking 
        (sample_id, status, location, handled_by, notes)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [sampleId, status, location, handledBy, notes]
+      [sampleId, status, location, handledBy, notes],
     );
 
     return result.rows[0];
@@ -537,7 +537,7 @@ async function addSampleTracking(sampleId, status, location, handledBy, notes) {
 router.post('/samples/:sampleId/tracking', authMiddleware, async (req, res) => {
   try {
     const { status, location, handled_by, notes } = req.body;
-    let result = await addSampleTracking(req.params.sampleId, status, location, handled_by, notes);
+    const result = await addSampleTracking(req.params.sampleId, status, location, handled_by, notes);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add sample tracking API error', { error: error.message, stack: error.stack });
@@ -550,9 +550,9 @@ router.post('/samples/:sampleId/tracking', authMiddleware, async (req, res) => {
  */
 async function getSampleTracking(sampleId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM sample_tracking WHERE sample_id = $1 ORDER BY timestamp ASC',
-      [sampleId]
+      [sampleId],
     );
 
     return result.rows;
@@ -567,7 +567,7 @@ async function getSampleTracking(sampleId) {
  */
 router.get('/samples/:sampleId/tracking', authMiddleware, async (req, res) => {
   try {
-    let result = await getSampleTracking(req.params.sampleId);
+    const result = await getSampleTracking(req.params.sampleId);
     res.json(result);
   } catch (error) {
     logger.error('Get sample tracking API error', { error: error.message, stack: error.stack });
@@ -598,8 +598,6 @@ module.exports = {
   getCertificationReport,
   addSampleTracking,
   getSampleTracking,
-  isHealthy
+  isHealthy,
 };
-
-
 

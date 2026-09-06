@@ -87,5 +87,5 @@ module.exports = {
   getBenchmarks,
   createComparisonAlert,
   getComparisonAlerts,
-  createSnapshot
+  createSnapshot,
 };

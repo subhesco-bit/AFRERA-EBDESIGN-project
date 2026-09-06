@@ -24,7 +24,7 @@ async function createKPIDefinition(kpiData) {
       threshold_min,
       threshold_max,
       aggregation_type,
-      time_granularity
+      time_granularity,
     } = kpiData;
 
     const kpi = {
@@ -42,7 +42,7 @@ async function createKPIDefinition(kpiData) {
       aggregation_type,
       time_granularity,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered KPI optimization
@@ -52,8 +52,8 @@ async function createKPIDefinition(kpiData) {
         kpi_category: category,
         industry_best_practices: await getIndustryBestPractices(category),
         similar_kpis: await getSimilarKPIs(category),
-        calculation_validation: await validateCalculationFormula(calculation_formula)
-      }
+        calculation_validation: await validateCalculationFormula(calculation_formula),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -81,8 +81,8 @@ async function createKPIDefinition(kpiData) {
         kpi.aggregation_type,
         kpi.time_granularity,
         kpi.status,
-        kpi.created_at
-      ]
+        kpi.created_at,
+      ],
     );
 
     logger.info(`KPI definition created: ${kpi.kpi_id}`);
@@ -98,9 +98,9 @@ async function createKPIDefinition(kpiData) {
  */
 async function getKPIDefinition(kpiId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM kpi_definitions WHERE kpi_id = $1',
-      [kpiId]
+      [kpiId],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -133,7 +133,7 @@ async function listKPIDefinitions(filters = {}) {
 
     query += ' ORDER BY created_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error listing KPI definitions', { error: error.message });
@@ -156,7 +156,7 @@ async function recordKPIMeasurement(measurementData) {
       period_start,
       period_end,
       dimensions,
-      metadata
+      metadata,
     } = measurementData;
 
     const measurement = {
@@ -171,25 +171,25 @@ async function recordKPIMeasurement(measurementData) {
       period_end,
       dimensions: dimensions || {},
       metadata: metadata || {},
-      recorded_at: new Date().toISOString()
+      recorded_at: new Date().toISOString(),
     };
 
     // AI-powered anomaly detection
-    let aiRequest = {
+    const aiRequest = {
       task: 'kpi_anomaly_detection',
       parameters: {
-        kpi_id: kpi_id,
+        kpi_id,
         current_value: measurement_value,
         historical_values: await getHistoricalMeasurements(kpi_id, entity_id),
         seasonality: await detectSeasonality(kpi_id),
-        thresholds: await getKPIThresholds(kpi_id)
-      }
+        thresholds: await getKPIThresholds(kpi_id),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     measurement.anomaly_analysis = aiResponse;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO kpi_measurements 
        (measurement_id, kpi_id, entity_id, entity_type, measurement_value, 
         measurement_date, period_type, period_start, period_end, dimensions, 
@@ -208,8 +208,8 @@ async function recordKPIMeasurement(measurementData) {
         measurement.period_end,
         JSON.stringify(measurement.dimensions),
         JSON.stringify(measurement.metadata),
-        measurement.recorded_at
-      ]
+        measurement.recorded_at,
+      ],
     );
 
     // Check for alerts
@@ -230,7 +230,7 @@ async function getKPIMeasurements(kpiId, filters = {}) {
   try {
     const { entity_id, period_start, period_end } = filters;
     let query = 'SELECT * FROM kpi_measurements WHERE kpi_id = $1';
-    let params = [kpiId];
+    const params = [kpiId];
     let paramCount = 1;
 
     if (entity_id) {
@@ -253,7 +253,7 @@ async function getKPIMeasurements(kpiId, filters = {}) {
 
     query += ' ORDER BY measurement_date DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting KPI measurements', { error: error.message });
@@ -276,10 +276,10 @@ async function setKPITarget(targetData) {
       period_start,
       period_end,
       weight,
-      is_stretch
+      is_stretch,
     } = targetData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO kpi_targets 
        (target_id, kpi_id, entity_id, entity_type, target_value, target_type, 
         period_type, period_start, period_end, weight, is_stretch, status, created_at)
@@ -298,8 +298,8 @@ async function setKPITarget(targetData) {
         weight || 1.0,
         is_stretch || false,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`KPI target set: ${result.rows[0].target_id}`);
@@ -317,7 +317,7 @@ async function getKPITargets(kpiId, filters = {}) {
   try {
     const { entity_id, period_start, period_end } = filters;
     let query = 'SELECT * FROM kpi_targets WHERE kpi_id = $1 AND status = $2';
-    let params = [kpiId, 'active'];
+    const params = [kpiId, 'active'];
     let paramCount = 2;
 
     if (entity_id) {
@@ -338,7 +338,7 @@ async function getKPITargets(kpiId, filters = {}) {
       params.push(period_end);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting KPI targets', { error: error.message });
@@ -358,13 +358,13 @@ async function calculateKPIScore(entityId, entityType, periodType, periodStart, 
       const measurements = await getKPIMeasurements(kpi.kpi_id, {
         entity_id: entityId,
         period_start: periodStart,
-        period_end: periodEnd
+        period_end: periodEnd,
       });
 
       const targets = await getKPITargets(kpi.kpi_id, {
         entity_id: entityId,
         period_start: periodStart,
-        period_end: periodEnd
+        period_end: periodEnd,
       });
 
       const score = await calculateIndividualKPIScore(kpi, measurements, targets);
@@ -387,10 +387,10 @@ async function calculateKPIScore(entityId, entityType, periodType, periodStart, 
       trend: await calculateTrend(entityId, entityType, periodType),
       rank: await calculateRank(entityId, entityType, overallScore),
       percentile: await calculatePercentile(entityId, entityType, overallScore),
-      calculated_at: new Date().toISOString()
+      calculated_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO kpi_scores 
        (score_id, entity_id, entity_type, period_type, period_start, period_end, 
         overall_score, category_scores, kpi_scores, trend, rank, percentile, calculated_at)
@@ -409,8 +409,8 @@ async function calculateKPIScore(entityId, entityType, periodType, periodStart, 
         scoreRecord.trend,
         scoreRecord.rank,
         scoreRecord.percentile,
-        scoreRecord.calculated_at
-      ]
+        scoreRecord.calculated_at,
+      ],
     );
 
     logger.info(`KPI score calculated: ${scoreRecord.score_id}`);
@@ -433,10 +433,10 @@ async function createKPIAlert(alertData) {
       threshold_value,
       severity,
       notification_channels,
-      recipients
+      recipients,
     } = alertData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO kpi_alerts 
        (alert_id, kpi_id, alert_type, condition_type, threshold_value, 
         severity, notification_channels, recipients, is_active, created_at)
@@ -452,8 +452,8 @@ async function createKPIAlert(alertData) {
         notification_channels,
         recipients,
         true,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`KPI alert created: ${result.rows[0].alert_id}`);
@@ -469,9 +469,9 @@ async function createKPIAlert(alertData) {
  */
 async function getKPIAlerts(kpiId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM kpi_alerts WHERE kpi_id = $1 AND is_active = $2',
-      [kpiId, true]
+      [kpiId, true],
     );
     return result.rows;
   } catch (error) {
@@ -495,10 +495,10 @@ async function addBenchmark(benchmarkData) {
       region,
       period,
       is_percentile,
-      percentile_value
+      percentile_value,
     } = benchmarkData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO metric_benchmarks 
        (benchmark_id, kpi_id, benchmark_name, benchmark_type, benchmark_value, 
         source, industry, region, period, is_percentile, percentile_value, status, created_at)
@@ -517,8 +517,8 @@ async function addBenchmark(benchmarkData) {
         is_percentile || false,
         percentile_value,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Benchmark added: ${result.rows[0].benchmark_id}`);
@@ -534,9 +534,9 @@ async function addBenchmark(benchmarkData) {
  */
 async function getBenchmarks(kpiId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM metric_benchmarks WHERE kpi_id = $1 AND status = $2',
-      [kpiId, 'active']
+      [kpiId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -556,10 +556,10 @@ async function addDimension(dimensionData) {
       dimension_type,
       dimension_values,
       is_drillable,
-      hierarchy_config
+      hierarchy_config,
     } = dimensionData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO kpi_dimensions 
        (dimension_id, kpi_id, dimension_name, dimension_type, dimension_values, 
         is_drillable, hierarchy_config, status, created_at)
@@ -574,8 +574,8 @@ async function addDimension(dimensionData) {
         is_drillable || true,
         JSON.stringify(hierarchy_config),
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Dimension added: ${result.rows[0].dimension_id}`);
@@ -591,9 +591,9 @@ async function addDimension(dimensionData) {
  */
 async function getDimensions(kpiId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM kpi_dimensions WHERE kpi_id = $1 AND status = $2',
-      [kpiId, 'active']
+      [kpiId, 'active'],
     );
     return result.rows;
   } catch (error) {
@@ -611,15 +611,15 @@ async function getIndustryBestPractices(category) {
   return {
     recommended_kpis: ['revenue', 'profit_margin', 'customer_satisfaction'],
     benchmark_sources: ['industry_reports', 'competitor_analysis'],
-    calculation_methods: ['standard', 'weighted_average', 'compounded']
+    calculation_methods: ['standard', 'weighted_average', 'compounded'],
   };
 }
 
 async function getSimilarKPIs(category) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM kpi_definitions WHERE category = $1 LIMIT 5',
-      [category]
+      [category],
     );
     return result.rows;
   } catch (error) {
@@ -631,15 +631,15 @@ async function validateCalculationFormula(formula) {
   return {
     is_valid: true,
     syntax_errors: [],
-    suggested_improvements: []
+    suggested_improvements: [],
   };
 }
 
 async function getHistoricalMeasurements(kpiId, entityId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT measurement_value, measurement_date FROM kpi_measurements WHERE kpi_id = $1 AND entity_id = $2 ORDER BY measurement_date DESC LIMIT 30',
-      [kpiId, entityId]
+      [kpiId, entityId],
     );
     return result.rows;
   } catch (error) {
@@ -651,15 +651,15 @@ async function detectSeasonality(kpiId) {
   return {
     has_seasonality: true,
     seasonal_pattern: 'quarterly',
-    peak_periods: ['Q1', 'Q4']
+    peak_periods: ['Q1', 'Q4'],
   };
 }
 
 async function getKPIThresholds(kpiId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT threshold_min, threshold_max FROM kpi_definitions WHERE kpi_id = $1',
-      [kpiId]
+      [kpiId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -706,12 +706,12 @@ async function calculateIndividualKPIScore(kpi, measurements, targets) {
   }
 
   const achievement = (latestMeasurement.measurement_value / target.target_value) * 100;
-  let score = Math.min(100, Math.max(0, achievement));
+  const score = Math.min(100, Math.max(0, achievement));
 
   return {
-    score: score,
-    achievement: achievement,
-    status: achievement >= 100 ? 'achieved' : achievement >= 80 ? 'on_track' : 'behind'
+    score,
+    achievement,
+    status: achievement >= 100 ? 'achieved' : achievement >= 80 ? 'on_track' : 'behind',
   };
 }
 
@@ -730,9 +730,9 @@ function calculateCategoryScores(kpiScores, kpis) {
     categories[kpi.category].push(kpiScores[kpi.kpi_id]);
   });
 
-  let result = {};
+  const result = {};
   Object.keys(categories).forEach(category => {
-    let scores = categories[category].map(s => s.score);
+    const scores = categories[category].map(s => s.score);
     result[category] = scores.reduce((a, b) => a + b, 0) / scores.length;
   });
 
@@ -765,5 +765,5 @@ module.exports = {
   addBenchmark,
   getBenchmarks,
   addDimension,
-  getDimensions
+  getDimensions,
 };

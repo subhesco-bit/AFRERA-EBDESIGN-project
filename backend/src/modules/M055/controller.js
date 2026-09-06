@@ -34,7 +34,7 @@ const get = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    let rule = await pricingService.updatePricingRule(req.params.id, req.body);
+    const rule = await pricingService.updatePricingRule(req.params.id, req.body);
     if (!rule) {
       return res.status(404).json({ success: false, error: 'Pricing rule not found' });
     }
@@ -61,5 +61,5 @@ module.exports = {
   list,
   get,
   update,
-  remove
+  remove,
 };

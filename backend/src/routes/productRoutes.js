@@ -57,9 +57,7 @@ const products = [
 ];
 
 // GET /products
-router.get
-    // Log request
-    logger.debug('router.get request');('/', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { category, search } = req.query;
     let filtered = products;
@@ -70,7 +68,7 @@ router.get
 
     if (search) {
       filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(search.toLowerCase())
+        p.name.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
@@ -87,9 +85,7 @@ router.get
 });
 
 // GET /products/:id
-router.get
-    // Log request
-    logger.debug('router.get request');('/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const product = products.find((p) => p.id === req.params.id);
 
@@ -110,9 +106,7 @@ router.get
 });
 
 // POST /products (admin only)
-router.post
-    // Log request
-    logger.debug('router.post request');('/', verifyToken, async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   try {
     const { name, price, category, description, stock } = req.body;
 
@@ -146,11 +140,9 @@ router.post
 });
 
 // PUT /products/:id (admin only)
-router.put
-    // Log request
-    logger.debug('router.put request');('/:id', verifyToken, async (req, res) => {
+router.put('/:id', verifyToken, async (req, res) => {
   try {
-    let product = products.find((p) => p.id === req.params.id);
+    const product = products.find((p) => p.id === req.params.id);
 
     if (!product) {
       return res.status(404).json({
@@ -171,9 +163,7 @@ router.put
 });
 
 // DELETE /products/:id (admin only)
-router.delete
-    // Log request
-    logger.debug('router.delete request');('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const index = products.findIndex((p) => p.id === req.params.id);
 

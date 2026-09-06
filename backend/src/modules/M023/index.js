@@ -11,8 +11,8 @@ router.post('/assessments/:assessmentId/submit', controller.submitAssessment);
 router.get('/farmers/:farmerId/recommendations', controller.getRecommendedPrograms);
 router.get('/analytics', controller.getTrainingAnalytics);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

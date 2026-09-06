@@ -18,7 +18,7 @@ const ERP_CONFIG = {
     client: process.env.SAP_CLIENT || '800',
     username: process.env.SAP_USER,
     password: process.env.SAP_PASSWORD,
-    systemId: process.env.SAP_SYSTEM_ID || 'A01'
+    systemId: process.env.SAP_SYSTEM_ID || 'A01',
   },
   oracle: {
     enabled: process.env.ORACLE_ENABLED === 'true',
@@ -26,13 +26,13 @@ const ERP_CONFIG = {
     port: parseInt(process.env.ORACLE_PORT) || 1521,
     service: process.env.ORACLE_SERVICE || 'ORCL',
     username: process.env.ORACLE_USER,
-    password: process.env.ORACLE_PASSWORD
+    password: process.env.ORACLE_PASSWORD,
   },
   custom: {
     enabled: process.env.CUSTOM_ERP_ENABLED === 'true',
     apiUrl: process.env.CUSTOM_ERP_API_URL,
-    apiKey: process.env.CUSTOM_ERP_API_KEY
-  }
+    apiKey: process.env.CUSTOM_ERP_API_KEY,
+  },
 };
 
 // Synchronization status tracking
@@ -40,7 +40,7 @@ const SYNC_STATUS = {
   lastSync: null,
   lastSyncStatus: 'idle',
   syncQueue: [],
-  activeSyncs: new Map()
+  activeSyncs: new Map(),
 };
 
 /**
@@ -91,7 +91,7 @@ async function initializeCustomERP() {
   // Test connection to custom ERP API
   if (ERP_CONFIG.custom.apiUrl) {
     const response = await fetch(`${ERP_CONFIG.custom.apiUrl}/health`, {
-      headers: { 'Authorization': `Bearer ${ERP_CONFIG.custom.apiKey}` }
+      headers: { Authorization: `Bearer ${ERP_CONFIG.custom.apiKey}` },
     });
     if (!response.ok) {
       throw new Error('Custom ERP health check failed');
@@ -107,7 +107,7 @@ async function initializeCustomERP() {
 async function syncProductToERP(productId, erpType = 'sap') {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get product data
     const productQuery = `
       SELECT p.*, c.name as category_name, s.name as state_name,
@@ -118,17 +118,17 @@ async function syncProductToERP(productId, erpType = 'sap') {
       LEFT JOIN units u ON p.unit_id = u.id
       WHERE p.id = $1
     `;
-    
+
     const productResult = await pg.query(productQuery, [productId]);
     const product = productResult.rows[0];
-    
+
     if (!product) {
       throw new Error('Product not found');
     }
-    
+
     // Transform to ERP format
     const erpProduct = transformProductToERPFormat(product, erpType);
-    
+
     // Send to ERP based on type
     let erpResponse;
     if (erpType === 'sap') {
@@ -138,18 +138,18 @@ async function syncProductToERP(productId, erpType = 'sap') {
     } else {
       erpResponse = await syncToCustomERP('product', erpProduct);
     }
-    
+
     // Log synchronization
     await logSyncOperation('product', productId, erpType, 'success', erpResponse);
-    
+
     logger.info(`Product ${productId} synced to ${erpType} ERP: ${erpResponse.materialId || erpResponse.itemId}`);
-    
+
     return {
       success: true,
-      productId: productId,
-      erpType: erpType,
+      productId,
+      erpType,
       erpId: erpResponse.materialId || erpResponse.itemId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     logger.error(`Error syncing product ${productId} to ERP:`, error);
@@ -163,8 +163,8 @@ async function syncProductToERP(productId, erpType = 'sap') {
  */
 async function syncOrderToERP(orderId, erpType = 'sap') {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get order data with items
     const orderQuery = `
       SELECT o.*, u.name as customer_name, u.email as customer_email,
@@ -174,10 +174,10 @@ async function syncOrderToERP(orderId, erpType = 'sap') {
       LEFT JOIN addresses a ON o.shipping_address_id = a.id
       WHERE o.id = $1
     `;
-    
+
     const orderResult = await pg.query(orderQuery, [orderId]);
     const order = orderResult.rows[0];
-    
+
     // Get order items
     const itemsQuery = `
       SELECT oi.*, p.name as product_name, p.sku
@@ -185,17 +185,17 @@ async function syncOrderToERP(orderId, erpType = 'sap') {
       JOIN products p ON oi.product_id = p.id
       WHERE oi.order_id = $1
     `;
-    
+
     const itemsResult = await pg.query(itemsQuery, [orderId]);
     const items = itemsResult.rows;
-    
+
     if (!order) {
       throw new Error('Order not found');
     }
-    
+
     // Transform to ERP format
     const erpOrder = transformOrderToERPFormat(order, items, erpType);
-    
+
     // Send to ERP based on type
     let erpResponse;
     if (erpType === 'sap') {
@@ -205,24 +205,24 @@ async function syncOrderToERP(orderId, erpType = 'sap') {
     } else {
       erpResponse = await syncToCustomERP('order', erpOrder);
     }
-    
+
     // Update order with ERP reference
     await pg.query(
       'UPDATE orders SET erp_reference = $1, erp_synced_at = NOW() WHERE id = $2',
-      [erpResponse.orderId, orderId]
+      [erpResponse.orderId, orderId],
     );
-    
+
     // Log synchronization
     await logSyncOperation('order', orderId, erpType, 'success', erpResponse);
-    
+
     logger.info(`Order ${orderId} synced to ${erpType} ERP: ${erpResponse.orderId}`);
-    
+
     return {
       success: true,
-      orderId: orderId,
-      erpType: erpType,
+      orderId,
+      erpType,
       erpOrderId: erpResponse.orderId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     logger.error(`Error syncing order ${orderId} to ERP:`, error);
@@ -236,8 +236,8 @@ async function syncOrderToERP(orderId, erpType = 'sap') {
  */
 async function syncFarmerToERP(farmerId, erpType = 'sap') {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get farmer data
     const farmerQuery = `
       SELECT f.*, u.name, u.email, u.phone,
@@ -249,17 +249,17 @@ async function syncFarmerToERP(farmerId, erpType = 'sap') {
       LEFT JOIN fpos fpo ON f.fpo_id = fpo.id
       WHERE f.id = $1
     `;
-    
+
     const farmerResult = await pg.query(farmerQuery, [farmerId]);
     const farmer = farmerResult.rows[0];
-    
+
     if (!farmer) {
       throw new Error('Farmer not found');
     }
-    
+
     // Transform to ERP format (vendor/business partner)
     const erpFarmer = transformFarmerToERPFormat(farmer, erpType);
-    
+
     // Send to ERP based on type
     let erpResponse;
     if (erpType === 'sap') {
@@ -269,24 +269,24 @@ async function syncFarmerToERP(farmerId, erpType = 'sap') {
     } else {
       erpResponse = await syncToCustomERP('farmer', erpFarmer);
     }
-    
+
     // Update farmer with ERP reference
     await pg.query(
       'UPDATE farmers SET erp_vendor_id = $1, erp_synced_at = NOW() WHERE id = $2',
-      [erpResponse.vendorId, farmerId]
+      [erpResponse.vendorId, farmerId],
     );
-    
+
     // Log synchronization
     await logSyncOperation('farmer', farmerId, erpType, 'success', erpResponse);
-    
+
     logger.info(`Farmer ${farmerId} synced to ${erpType} ERP: ${erpResponse.vendorId}`);
-    
+
     return {
       success: true,
-      farmerId: farmerId,
-      erpType: erpType,
+      farmerId,
+      erpType,
       erpVendorId: erpResponse.vendorId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     logger.error(`Error syncing farmer ${farmerId} to ERP:`, error);
@@ -300,8 +300,8 @@ async function syncFarmerToERP(farmerId, erpType = 'sap') {
  */
 async function syncFinancialTransaction(transactionId, erpType = 'sap') {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get transaction data
     const transactionQuery = `
       SELECT ft.*, u.name as user_name,
@@ -314,17 +314,17 @@ async function syncFinancialTransaction(transactionId, erpType = 'sap') {
       JOIN users u ON ft.user_id = u.id
       WHERE ft.id = $1
     `;
-    
+
     const transactionResult = await pg.query(transactionQuery, [transactionId]);
     const transaction = transactionResult.rows[0];
-    
+
     if (!transaction) {
       throw new Error('Transaction not found');
     }
-    
+
     // Transform to ERP format
     const erpTransaction = transformTransactionToERPFormat(transaction, erpType);
-    
+
     // Send to ERP based on type
     let erpResponse;
     if (erpType === 'sap') {
@@ -334,24 +334,24 @@ async function syncFinancialTransaction(transactionId, erpType = 'sap') {
     } else {
       erpResponse = await syncToCustomERP('transaction', erpTransaction);
     }
-    
+
     // Update transaction with ERP reference
     await pg.query(
       'UPDATE financial_transactions SET erp_reference = $1, erp_synced_at = NOW() WHERE id = $2',
-      [erpResponse.transactionId, transactionId]
+      [erpResponse.transactionId, transactionId],
     );
-    
+
     // Log synchronization
     await logSyncOperation('transaction', transactionId, erpType, 'success', erpResponse);
-    
+
     logger.info(`Transaction ${transactionId} synced to ${erpType} ERP: ${erpResponse.transactionId}`);
-    
+
     return {
       success: true,
-      transactionId: transactionId,
-      erpType: erpType,
+      transactionId,
+      erpType,
       erpTransactionId: erpResponse.transactionId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     logger.error(`Error syncing transaction ${transactionId} to ERP:`, error);
@@ -365,8 +365,8 @@ async function syncFinancialTransaction(transactionId, erpType = 'sap') {
  */
 async function syncAssetToERP(assetId, erpType = 'sap') {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get asset data
     const assetQuery = `
       SELECT a.*, l.name as location_name,
@@ -376,17 +376,17 @@ async function syncAssetToERP(assetId, erpType = 'sap') {
       LEFT JOIN users u ON a.responsible_user_id = u.id
       WHERE a.id = $1
     `;
-    
+
     const assetResult = await pg.query(assetQuery, [assetId]);
     const asset = assetResult.rows[0];
-    
+
     if (!asset) {
       throw new Error('Asset not found');
     }
-    
+
     // Transform to ERP format (fixed asset)
     const erpAsset = transformAssetToERPFormat(asset, erpType);
-    
+
     // Send to ERP based on type
     let erpResponse;
     if (erpType === 'sap') {
@@ -396,24 +396,24 @@ async function syncAssetToERP(assetId, erpType = 'sap') {
     } else {
       erpResponse = await syncToCustomERP('asset', erpAsset);
     }
-    
+
     // Update asset with ERP reference
     await pg.query(
       'UPDATE assets SET erp_asset_id = $1, erp_synced_at = NOW() WHERE id = $2',
-      [erpResponse.assetId, assetId]
+      [erpResponse.assetId, assetId],
     );
-    
+
     // Log synchronization
     await logSyncOperation('asset', assetId, erpType, 'success', erpResponse);
-    
+
     logger.info(`Asset ${assetId} synced to ${erpType} ERP: ${erpResponse.assetId}`);
-    
+
     return {
       success: true,
-      assetId: assetId,
-      erpType: erpType,
+      assetId,
+      erpType,
       erpAssetId: erpResponse.assetId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     logger.error(`Error syncing asset ${assetId} to ERP:`, error);
@@ -426,8 +426,8 @@ async function syncAssetToERP(assetId, erpType = 'sap') {
  * Get ERP synchronization status
  */
 async function getSyncStatus() {
-  let pg = getPostgreSQL();
-  
+  const pg = getPostgreSQL();
+
   const statusQuery = `
     SELECT 
       entity_type,
@@ -445,15 +445,15 @@ async function getSyncStatus() {
     ) combined
     GROUP BY entity_type
   `;
-  
+
   const statusResult = await pg.query(statusQuery);
-  
+
   return {
     overall: {
       lastSync: SYNC_STATUS.lastSync,
       status: SYNC_STATUS.lastSyncStatus,
       queueSize: SYNC_STATUS.syncQueue.length,
-      activeSyncs: SYNC_STATUS.activeSyncs.size
+      activeSyncs: SYNC_STATUS.activeSyncs.size,
     },
     byEntity: statusResult.rows.map(row => ({
       type: row.entity_type,
@@ -461,13 +461,13 @@ async function getSyncStatus() {
       synced: parseInt(row.synced),
       pending: parseInt(row.total) - parseInt(row.synced),
       syncRate: row.total > 0 ? (row.synced / row.total * 100).toFixed(1) : 0,
-      lastSync: row.last_sync
+      lastSync: row.last_sync,
     })),
     erpConnections: {
       sap: { enabled: ERP_CONFIG.sap.enabled, connected: ERP_CONFIG.sap.enabled },
       oracle: { enabled: ERP_CONFIG.oracle.enabled, connected: ERP_CONFIG.oracle.enabled },
-      custom: { enabled: ERP_CONFIG.custom.enabled, connected: ERP_CONFIG.custom.enabled }
-    }
+      custom: { enabled: ERP_CONFIG.custom.enabled, connected: ERP_CONFIG.custom.enabled },
+    },
   };
 }
 
@@ -476,8 +476,8 @@ async function getSyncStatus() {
  */
 async function triggerBulkSync(entityType, erpType = 'sap') {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     let query;
     if (entityType === 'product') {
       query = 'SELECT id FROM products WHERE erp_synced_at IS NULL LIMIT 100';
@@ -490,24 +490,24 @@ async function triggerBulkSync(entityType, erpType = 'sap') {
     } else {
       throw new Error('Invalid entity type');
     }
-    
+
     const params = entityType === 'order' ? ['completed'] : [];
     const result = await pg.query(query, params);
-    
+
     const syncPromises = result.rows.map(row => {
       if (entityType === 'product') return syncProductToERP(row.id, erpType);
       if (entityType === 'order') return syncOrderToERP(row.id, erpType);
       if (entityType === 'farmer') return syncFarmerToERP(row.id, erpType);
       if (entityType === 'asset') return syncAssetToERP(row.id, erpType);
     });
-    
+
     const results = await Promise.allSettled(syncPromises);
-    
+
     const successful = results.filter(r => r.status === 'fulfilled').length;
     const failed = results.filter(r => r.status === 'rejected').length;
-    
+
     logger.info(`Bulk sync completed for ${entityType}: ${successful} successful, ${failed} failed`);
-    
+
     return {
       entityType,
       erpType,
@@ -517,8 +517,8 @@ async function triggerBulkSync(entityType, erpType = 'sap') {
       results: results.map((r, i) => ({
         id: result.rows[i].id,
         status: r.status,
-        error: r.status === 'rejected' ? r.reason.message : null
-      }))
+        error: r.status === 'rejected' ? r.reason.message : null,
+      })),
     };
   } catch (error) {
     logger.error('Error in bulk sync', { error: error.message, stack: error.stack });
@@ -541,7 +541,7 @@ function transformProductToERPFormat(product, erpType) {
       description: product.name,
       taxClassification: mapStateToTaxCode(product.state_name),
       origin: product.state_name,
-      giCertified: product.gi_status
+      giCertified: product.gi_status,
     };
   } else if (erpType === 'oracle') {
     return {
@@ -551,7 +551,7 @@ function transformProductToERPFormat(product, erpType) {
       primaryUnit: product.unit_name || 'KG',
       category: product.category_name,
       taxCode: mapStateToTaxCode(product.state_name),
-      origin: product.state_name
+      origin: product.state_name,
     };
   } else {
     return {
@@ -562,7 +562,7 @@ function transformProductToERPFormat(product, erpType) {
       unit: product.unit_name || 'KG',
       price: product.base_price,
       origin: product.state_name,
-      gi_certified: product.gi_status
+      gi_certified: product.gi_status,
     };
   }
 }
@@ -582,8 +582,8 @@ function transformOrderToERPFormat(order, items, erpType) {
         material: item.sku || `AFR-${item.product_id}`,
         quantity: item.quantity,
         unit: 'KG',
-        price: item.price
-      }))
+        price: item.price,
+      })),
     };
   } else if (erpType === 'oracle') {
     return {
@@ -596,14 +596,14 @@ function transformOrderToERPFormat(order, items, erpType) {
         address1: order.address_line1,
         city: order.city,
         state: order.state,
-        postalCode: order.pincode
+        postalCode: order.pincode,
       },
       lines: items.map(item => ({
         itemNumber: item.sku || `AFR-${item.product_id}`,
         quantity: item.quantity,
         unitOfMeasure: 'KG',
-        unitPrice: item.price
-      }))
+        unitPrice: item.price,
+      })),
     };
   } else {
     return {
@@ -611,7 +611,7 @@ function transformOrderToERPFormat(order, items, erpType) {
       order_number: order.order_number,
       customer: {
         name: order.customer_name,
-        email: order.customer_email
+        email: order.customer_email,
       },
       total_amount: order.total_amount,
       currency: 'INR',
@@ -619,8 +619,8 @@ function transformOrderToERPFormat(order, items, erpType) {
         product_id: item.product_id,
         product_name: item.product_name,
         quantity: item.quantity,
-        price: item.price
-      }))
+        price: item.price,
+      })),
     };
   }
 }
@@ -639,7 +639,7 @@ function transformFarmerToERPFormat(farmer, erpType) {
       language: 'EN',
       taxNumber: farmer.fpo_reg || farmer.gst_number,
       paymentTerms: 'Z001',
-      currency: 'INR'
+      currency: 'INR',
     };
   } else if (erpType === 'oracle') {
     return {
@@ -652,10 +652,10 @@ function transformFarmerToERPFormat(farmer, erpType) {
         city: farmer.city,
         state: farmer.state,
         postalCode: farmer.pincode,
-        country: 'IN'
+        country: 'IN',
       },
       paymentTerms: 'NET30',
-      currency: 'INR'
+      currency: 'INR',
     };
   } else {
     return {
@@ -669,8 +669,8 @@ function transformFarmerToERPFormat(farmer, erpType) {
         street: farmer.address_line1,
         city: farmer.city,
         state: farmer.state,
-        pincode: farmer.pincode
-      }
+        pincode: farmer.pincode,
+      },
     };
   }
 }
@@ -684,7 +684,7 @@ function transformTransactionToERPFormat(transaction, erpType) {
       amount: transaction.amount,
       currency: 'INR',
       customerAccount: transaction.erp_customer_id || 'CUST001',
-      paymentMethod: transaction.payment_method
+      paymentMethod: transaction.payment_method,
     };
   } else if (erpType === 'oracle') {
     return {
@@ -694,7 +694,7 @@ function transformTransactionToERPFormat(transaction, erpType) {
       currency: 'INR',
       paymentDate: transaction.created_at,
       paymentMethod: transaction.payment_method,
-      reference: transaction.reference_number
+      reference: transaction.reference_number,
     };
   } else {
     return {
@@ -704,7 +704,7 @@ function transformTransactionToERPFormat(transaction, erpType) {
       currency: 'INR',
       payment_method: transaction.payment_method,
       reference: transaction.reference_number,
-      created_at: transaction.created_at
+      created_at: transaction.created_at,
     };
   }
 }
@@ -719,7 +719,7 @@ function transformAssetToERPFormat(asset, erpType) {
       capitalizationDate: asset.purchase_date,
       location: asset.location_name,
       costCenter: asset.cost_center || '1000',
-      usefulLife: asset.useful_life_years || 5
+      usefulLife: asset.useful_life_years || 5,
     };
   } else if (erpType === 'oracle') {
     return {
@@ -729,7 +729,7 @@ function transformAssetToERPFormat(asset, erpType) {
       location: asset.location_name,
       placedInServiceDate: asset.purchase_date,
       cost: asset.purchase_cost,
-      currency: 'INR'
+      currency: 'INR',
     };
   } else {
     return {
@@ -739,7 +739,7 @@ function transformAssetToERPFormat(asset, erpType) {
       location: asset.location_name,
       purchase_date: asset.purchase_date,
       purchase_cost: asset.purchase_cost,
-      useful_life_years: asset.useful_life_years
+      useful_life_years: asset.useful_life_years,
     };
   }
 }
@@ -750,36 +750,36 @@ function transformAssetToERPFormat(asset, erpType) {
 function mapCategoryToMaterialGroup(category) {
   const mapping = {
     'Grains & Millets': '001',
-    'Spices': '002',
-    'Fruits': '003',
+    Spices: '002',
+    Fruits: '003',
     'Vegetables & Greens': '004',
     'Tea & Beverages': '005',
-    'Honey & Sweeteners': '006'
+    'Honey & Sweeteners': '006',
   };
   return mapping[category] || '999';
 }
 
 function mapStateToTaxCode(state) {
-  let mapping = {
-    'Assam': 'AS',
-    'Nagaland': 'NL',
-    'Manipur': 'MN',
-    'Meghalaya': 'ML',
+  const mapping = {
+    Assam: 'AS',
+    Nagaland: 'NL',
+    Manipur: 'MN',
+    Meghalaya: 'ML',
     'Arunachal Pradesh': 'AR',
-    'Mizoram': 'MZ',
-    'Tripura': 'TR',
-    'Sikkim': 'SK'
+    Mizoram: 'MZ',
+    Tripura: 'TR',
+    Sikkim: 'SK',
   };
   return mapping[state] || 'OT';
 }
 
 function mapAssetTypeToClass(type) {
-  let mapping = {
-    'mobile_mill': 'MACH',
-    'reefer_truck': 'VEH',
-    'cold_storage': 'BUILD',
-    'solar_dryer': 'MACH',
-    'pack_house': 'BUILD'
+  const mapping = {
+    mobile_mill: 'MACH',
+    reefer_truck: 'VEH',
+    cold_storage: 'BUILD',
+    solar_dryer: 'MACH',
+    pack_house: 'BUILD',
   };
   return mapping[type] || 'GEN';
 }
@@ -806,7 +806,7 @@ async function syncToSAP(objectType, data) {
   throw new AppError(
     `SAP integration is not configured: no SAP connector is installed, so "${objectType}" was never sent to SAP`,
     501,
-    'ERP_INTEGRATION_NOT_CONFIGURED'
+    'ERP_INTEGRATION_NOT_CONFIGURED',
   );
 }
 
@@ -815,7 +815,7 @@ async function syncToOracle(objectType, data) {
   throw new AppError(
     `Oracle integration is not configured: no Oracle connector is installed, so "${objectType}" was never sent to Oracle`,
     501,
-    'ERP_INTEGRATION_NOT_CONFIGURED'
+    'ERP_INTEGRATION_NOT_CONFIGURED',
   );
 }
 
@@ -824,22 +824,22 @@ async function syncToCustomERP(objectType, data) {
   if (!ERP_CONFIG.custom.apiUrl) {
     throw new Error('Custom ERP API URL not configured');
   }
-  
+
   logger.info(`Syncing ${objectType} to Custom ERP`);
-  
-  let response = await fetch(`${ERP_CONFIG.custom.apiUrl}/${objectType}`, {
+
+  const response = await fetch(`${ERP_CONFIG.custom.apiUrl}/${objectType}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${ERP_CONFIG.custom.apiKey}`
+      Authorization: `Bearer ${ERP_CONFIG.custom.apiKey}`,
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
-  
+
   if (!response.ok) {
     throw new Error(`Custom ERP API error: ${response.statusText}`);
   }
-  
+
   return await response.json();
 }
 
@@ -847,8 +847,8 @@ async function syncToCustomERP(objectType, data) {
  * Log synchronization operation
  */
 async function logSyncOperation(entityType, entityId, erpType, status, details) {
-  let pg = getPostgreSQL();
-  
+  const pg = getPostgreSQL();
+
   await pg.query(`
     INSERT INTO erp_sync_logs (entity_type, entity_id, erp_type, status, details, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW())
@@ -873,7 +873,7 @@ router.get('/status', async (req, res) => {
 router.post('/sync/product', authMiddleware, async (req, res) => {
   try {
     const { product_id, erp_type } = req.body;
-    let result = await syncProductToERP(product_id, erp_type);
+    const result = await syncProductToERP(product_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -883,7 +883,7 @@ router.post('/sync/product', authMiddleware, async (req, res) => {
 router.post('/sync/order', authMiddleware, async (req, res) => {
   try {
     const { order_id, erp_type } = req.body;
-    let result = await syncOrderToERP(order_id, erp_type);
+    const result = await syncOrderToERP(order_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -893,7 +893,7 @@ router.post('/sync/order', authMiddleware, async (req, res) => {
 router.post('/sync/farmer', authMiddleware, async (req, res) => {
   try {
     const { farmer_id, erp_type } = req.body;
-    let result = await syncFarmerToERP(farmer_id, erp_type);
+    const result = await syncFarmerToERP(farmer_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -903,7 +903,7 @@ router.post('/sync/farmer', authMiddleware, async (req, res) => {
 router.post('/sync/transaction', authMiddleware, async (req, res) => {
   try {
     const { transaction_id, erp_type } = req.body;
-    let result = await syncFinancialTransaction(transaction_id, erp_type);
+    const result = await syncFinancialTransaction(transaction_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -913,7 +913,7 @@ router.post('/sync/transaction', authMiddleware, async (req, res) => {
 router.post('/sync/asset', authMiddleware, async (req, res) => {
   try {
     const { asset_id, erp_type } = req.body;
-    let result = await syncAssetToERP(asset_id, erp_type);
+    const result = await syncAssetToERP(asset_id, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -923,7 +923,7 @@ router.post('/sync/asset', authMiddleware, async (req, res) => {
 router.post('/sync/bulk', authMiddleware, async (req, res) => {
   try {
     const { entity_type, erp_type } = req.body;
-    let result = await triggerBulkSync(entity_type, erp_type);
+    const result = await triggerBulkSync(entity_type, erp_type);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -939,8 +939,6 @@ module.exports = {
   syncFinancialTransaction,
   syncAssetToERP,
   getSyncStatus,
-  triggerBulkSync
+  triggerBulkSync,
 };
-
-
 

@@ -25,28 +25,28 @@ class AiGatewayService {
         endpoint: process.env.AI_PREDICTION_ENDPOINT || 'internal',
         version: '1.0',
         accuracy: 0.92,
-        latency: 45
+        latency: 45,
       });
-      
+
       this.aiModels.set('optimization', {
         endpoint: process.env.AI_OPTIMIZATION_ENDPOINT || 'internal',
         version: '1.0',
         accuracy: 0.89,
-        latency: 52
+        latency: 52,
       });
-      
+
       this.aiModels.set('analysis', {
         endpoint: process.env.AI_ANALYSIS_ENDPOINT || 'internal',
         version: '1.0',
         accuracy: 0.94,
-        latency: 38
+        latency: 38,
       });
-      
+
       this.aiModels.set('recommendation', {
         endpoint: process.env.AI_RECOMMENDATION_ENDPOINT || 'internal',
         version: '1.0',
         accuracy: 0.91,
-        latency: 41
+        latency: 41,
       });
 
       logger.info('AI Gateway Service initialized with models:', Array.from(this.aiModels.keys()));
@@ -62,7 +62,7 @@ class AiGatewayService {
   async predict(modelType, parameters, context = {}) {
     try {
       const startTime = Date.now();
-      
+
       const model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
@@ -80,11 +80,11 @@ class AiGatewayService {
 
       // Perform prediction
       const result = await this.performPrediction(modelType, parameters, context);
-      
+
       // Cache result
       this.modelCache.set(cacheKey, {
         result,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       // Track performance
@@ -105,16 +105,16 @@ class AiGatewayService {
    */
   async optimize(modelType, parameters, constraints = {}) {
     try {
-      let startTime = Date.now();
-      
-      let model = this.aiModels.get(modelType);
+      const startTime = Date.now();
+
+      const model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
       }
 
-      let result = await this.performOptimization(modelType, parameters, constraints);
-      
-      let latency = Date.now() - startTime;
+      const result = await this.performOptimization(modelType, parameters, constraints);
+
+      const latency = Date.now() - startTime;
       this.trackPerformance(modelType, latency, true);
 
       logger.info(`Optimization completed for ${modelType} in ${latency}ms`);
@@ -131,16 +131,16 @@ class AiGatewayService {
    */
   async analyze(modelType, data, analysisType = 'standard') {
     try {
-      let startTime = Date.now();
-      
-      let model = this.aiModels.get(modelType);
+      const startTime = Date.now();
+
+      const model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
       }
 
-      let result = await this.performAnalysis(modelType, data, analysisType);
-      
-      let latency = Date.now() - startTime;
+      const result = await this.performAnalysis(modelType, data, analysisType);
+
+      const latency = Date.now() - startTime;
       this.trackPerformance(modelType, latency, true);
 
       logger.info(`Analysis completed for ${modelType} in ${latency}ms`);
@@ -157,16 +157,16 @@ class AiGatewayService {
    */
   async recommend(modelType, context, options = {}) {
     try {
-      let startTime = Date.now();
-      
-      let model = this.aiModels.get(modelType);
+      const startTime = Date.now();
+
+      const model = this.aiModels.get(modelType);
       if (!model) {
         throw new Error(`Model type ${modelType} not found`);
       }
 
-      let result = await this.performRecommendation(modelType, context, options);
-      
-      let latency = Date.now() - startTime;
+      const result = await this.performRecommendation(modelType, context, options);
+
+      const latency = Date.now() - startTime;
       this.trackPerformance(modelType, latency, true);
 
       logger.info(`Recommendation completed for ${modelType} in ${latency}ms`);
@@ -184,13 +184,13 @@ class AiGatewayService {
   async performPrediction(modelType, parameters, context) {
     // In production, this would call external AI services
     // For now, return mock predictions based on model type
-    
+
     const predictions = {
-      'crop_yield': this.predictCropYield(parameters, context),
-      'weather': this.predictWeather(parameters, context),
-      'market_price': this.predictMarketPrice(parameters, context),
-      'pest_outbreak': this.predictPestOutbreak(parameters, context),
-      'default': this.genericPrediction(parameters, context)
+      crop_yield: this.predictCropYield(parameters, context),
+      weather: this.predictWeather(parameters, context),
+      market_price: this.predictMarketPrice(parameters, context),
+      pest_outbreak: this.predictPestOutbreak(parameters, context),
+      default: this.genericPrediction(parameters, context),
     };
 
     return predictions[modelType] || predictions['default'];
@@ -201,11 +201,11 @@ class AiGatewayService {
    */
   async performOptimization(modelType, parameters, constraints) {
     const optimizations = {
-      'resource_allocation': this.optimizeResourceAllocation(parameters, constraints),
-      'scheduling': this.optimizeScheduling(parameters, constraints),
-      'inventory': this.optimizeInventory(parameters, constraints),
-      'logistics': this.optimizeLogistics(parameters, constraints),
-      'default': this.genericOptimization(parameters, constraints)
+      resource_allocation: this.optimizeResourceAllocation(parameters, constraints),
+      scheduling: this.optimizeScheduling(parameters, constraints),
+      inventory: this.optimizeInventory(parameters, constraints),
+      logistics: this.optimizeLogistics(parameters, constraints),
+      default: this.genericOptimization(parameters, constraints),
     };
 
     return optimizations[modelType] || optimizations['default'];
@@ -216,11 +216,11 @@ class AiGatewayService {
    */
   async performAnalysis(modelType, data, analysisType) {
     const analyses = {
-      'soil': this.analyzeSoil(data, analysisType),
-      'water': this.analyzeWater(data, analysisType),
-      'crop_health': this.analyzeCropHealth(data, analysisType),
-      'financial': this.analyzeFinancial(data, analysisType),
-      'default': this.genericAnalysis(data, analysisType)
+      soil: this.analyzeSoil(data, analysisType),
+      water: this.analyzeWater(data, analysisType),
+      crop_health: this.analyzeCropHealth(data, analysisType),
+      financial: this.analyzeFinancial(data, analysisType),
+      default: this.genericAnalysis(data, analysisType),
     };
 
     return analyses[modelType] || analyses['default'];
@@ -231,11 +231,11 @@ class AiGatewayService {
    */
   async performRecommendation(modelType, context, options) {
     const recommendations = {
-      'crop_selection': this.recommendCropSelection(context, options),
-      'fertilizer': this.recommendFertilizer(context, options),
-      'irrigation': this.recommendIrrigation(context, options),
-      'pest_control': this.recommendPestControl(context, options),
-      'default': this.genericRecommendation(context, options)
+      crop_selection: this.recommendCropSelection(context, options),
+      fertilizer: this.recommendFertilizer(context, options),
+      irrigation: this.recommendIrrigation(context, options),
+      pest_control: this.recommendPestControl(context, options),
+      default: this.genericRecommendation(context, options),
     };
 
     return recommendations[modelType] || recommendations['default'];
@@ -333,7 +333,7 @@ class AiGatewayService {
     return {
       pest_control_method: 'integrated_pest_management',
       action: 'monitor_and_treat_as_needed',
-      products: ['bio_pesticide', 'trap_crops']
+      products: ['bio_pesticide', 'trap_crops'],
     };
   }
 
@@ -358,7 +358,7 @@ class AiGatewayService {
         successful_calls: 0,
         failed_calls: 0,
         total_latency: 0,
-        avg_latency: 0
+        avg_latency: 0,
       });
     }
 
@@ -396,7 +396,7 @@ class AiGatewayService {
         modelStatus[modelType] = {
           status: 'healthy',
           version: model.version,
-          accuracy: model.accuracy
+          accuracy: model.accuracy,
         };
       }
 
@@ -404,19 +404,18 @@ class AiGatewayService {
         status: 'healthy',
         models: modelStatus,
         performance: this.getPerformanceMetrics(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('AI Gateway health check failed:', error);
       return {
         status: 'unhealthy',
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
 }
 
 module.exports = new AiGatewayService();
-
 

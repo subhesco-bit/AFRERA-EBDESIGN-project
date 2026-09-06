@@ -1,6 +1,6 @@
 /**
  * AI Operation Intelligence Service - Real-Time Optimization Layer
- * 
+ *
  * This service provides operation intelligence capabilities including:
  * - Real-time performance monitoring
  * - Predictive optimization
@@ -18,7 +18,7 @@ function tryRequireClient(envVar, loader) {
   try {
     return loader();
   } catch (error) {
-    require('../../utils/logger').warn(`aiClient:  is set but its SDK failed to load`, { error: error.message });
+    require('../../utils/logger').warn('aiClient:  is set but its SDK failed to load', { error: error.message });
     return null;
   }
 }
@@ -40,26 +40,26 @@ class AIOperationIntelligenceService {
       const { Anthropic } = require('@anthropic-ai/sdk');
       return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     });
-    
+
     // Performance metrics
     this.performanceMetrics = new Map();
-    
+
     // Optimization strategies
     this.optimizationStrategies = new Map();
-    
+
     // Resource allocation
     this.resourceAllocation = new Map();
-    
+
     // Operation history
     this.operationHistory = [];
-    
+
     // Initialize optimization strategies
     this.initializeOptimizationStrategies();
-    
+
     // Start real-time monitoring
     this.startRealTimeMonitoring();
   }
-  
+
   /**
    * Initialize optimization strategies
    */
@@ -68,45 +68,45 @@ class AIOperationIntelligenceService {
     this.addOptimizationStrategy('equipment_utilization', {
       description: 'Optimize equipment utilization across operations',
       parameters: ['availability', 'efficiency', 'cost', 'maintenance'],
-      objectives: ['maximize_utilization', 'minimize_downtime', 'optimize_cost']
+      objectives: ['maximize_utilization', 'minimize_downtime', 'optimize_cost'],
     });
-    
+
     // Supply chain optimization
     this.addOptimizationStrategy('supply_chain', {
       description: 'Optimize supply chain operations',
       parameters: ['inventory', 'logistics', 'demand', 'lead_time'],
-      objectives: ['minimize_cost', 'maximize_service_level', 'reduce_waste']
+      objectives: ['minimize_cost', 'maximize_service_level', 'reduce_waste'],
     });
-    
+
     // Resource optimization
     this.addOptimizationStrategy('resource_allocation', {
       description: 'Optimize resource allocation across tasks',
       parameters: ['capacity', 'skills', 'availability', 'cost'],
-      objectives: ['maximize_efficiency', 'minimize_cost', 'balance_workload']
+      objectives: ['maximize_efficiency', 'minimize_cost', 'balance_workload'],
     });
-    
+
     // Process optimization
     this.addOptimizationStrategy('process_automation', {
       description: 'Identify and automate manual processes',
       parameters: ['complexity', 'frequency', 'cost', 'risk'],
-      objectives: ['reduce_manual_effort', 'improve_accuracy', 'increase_speed']
+      objectives: ['reduce_manual_effort', 'improve_accuracy', 'increase_speed'],
     });
-    
+
     // Energy optimization
     this.addOptimizationStrategy('energy_consumption', {
       description: 'Optimize energy consumption in operations',
       parameters: ['usage', 'efficiency', 'cost', 'sustainability'],
-      objectives: ['minimize_consumption', 'reduce_cost', 'improve_sustainability']
+      objectives: ['minimize_consumption', 'reduce_cost', 'improve_sustainability'],
     });
   }
-  
+
   /**
    * Add optimization strategy
    */
   addOptimizationStrategy(name, strategy) {
     this.optimizationStrategies.set(name, strategy);
   }
-  
+
   /**
    * Start real-time monitoring
    */
@@ -136,7 +136,7 @@ class AIOperationIntelligenceService {
     if (this._metricsInterval) { clearInterval(this._metricsInterval); this._metricsInterval = null; }
     if (this._optimizationInterval) { clearInterval(this._optimizationInterval); this._optimizationInterval = null; }
   }
-  
+
   /**
    * Collect performance metrics
    */
@@ -147,43 +147,43 @@ class AIOperationIntelligenceService {
         system: {
           memory_usage: process.memoryUsage(),
           cpu_usage: process.cpuUsage(),
-          uptime: process.uptime()
+          uptime: process.uptime(),
         },
         operations: {
           active_tasks: this.operationHistory.filter(op => op.status === 'active').length,
           completed_tasks: this.operationHistory.filter(op => op.status === 'completed').length,
-          failed_tasks: this.operationHistory.filter(op => op.status === 'failed').length
+          failed_tasks: this.operationHistory.filter(op => op.status === 'failed').length,
         },
         resources: {
           allocated: Array.from(this.resourceAllocation.values()).length,
-          utilization: this.calculateResourceUtilization()
-        }
+          utilization: this.calculateResourceUtilization(),
+        },
       };
-      
+
       this.performanceMetrics.set('current', metrics);
-      
+
       // Keep last 1000 metrics
       const history = Array.from(this.performanceMetrics.entries()).filter(([key]) => key !== 'current');
       if (history.length > 1000) {
         history.slice(-1000).forEach(([key, value]) => this.performanceMetrics.set(key, value));
       }
-      
+
     } catch (error) {
       console.error('Error collecting performance metrics:', error);
     }
   }
-  
+
   /**
    * Calculate resource utilization
    */
   calculateResourceUtilization() {
     const allocations = Array.from(this.resourceAllocation.values());
     if (allocations.length === 0) return 0;
-    
+
     const utilized = allocations.filter(alloc => alloc.status === 'active').length;
     return (utilized / allocations.length) * 100;
   }
-  
+
   /**
    * Run optimization cycle
    */
@@ -195,27 +195,27 @@ class AIOperationIntelligenceService {
 
       // Analyze performance
       const analysis = await this.analyzePerformance(currentMetrics);
-      
+
       // Generate optimization recommendations
       const recommendations = await this.generateOptimizationRecommendations(analysis);
-      
+
       // Execute optimizations if approved
       if (recommendations.auto_execute) {
         await this.executeOptimizations(recommendations.optimizations);
       }
-      
+
       // Record optimization cycle
       this.recordOptimizationCycle({
         metrics: currentMetrics,
-        analysis: analysis,
-        recommendations: recommendations
+        analysis,
+        recommendations,
       });
-      
+
     } catch (error) {
       console.error('Error in optimization cycle:', error);
     }
   }
-  
+
   /**
    * Analyze performance
    */
@@ -233,35 +233,35 @@ class AIOperationIntelligenceService {
         
         Provide analysis in JSON format with detailed findings and recommendations.
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
-      let analysis = JSON.parse(response.choices[0].message.content);
-      
+
+      const analysis = JSON.parse(response.choices[0].message.content);
+
       return {
         success: true,
-        analysis: analysis
+        analysis,
       };
     } catch (error) {
       console.error('Error analyzing performance:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Generate optimization recommendations
    */
   async generateOptimizationRecommendations(analysis) {
     try {
-      let prompt = `
+      const prompt = `
         Based on the performance analysis, generate optimization recommendations:
         
         Analysis: ${JSON.stringify(analysis)}
@@ -275,54 +275,54 @@ class AIOperationIntelligenceService {
         - auto_execute: whether to auto-execute (true/false)
         - confidence: confidence in recommendation (0-1)
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      let response = await this.openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
-      let recommendations = JSON.parse(response.choices[0].message.content);
-      
+
+      const recommendations = JSON.parse(response.choices[0].message.content);
+
       return {
         success: true,
-        recommendations: recommendations
+        recommendations,
       };
     } catch (error) {
       console.error('Error generating optimization recommendations:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Execute optimizations
    */
   async executeOptimizations(optimizations) {
     try {
       const results = [];
-      
+
       for (const optimization of optimizations) {
         const result = await this.executeOptimization(optimization);
         results.push(result);
       }
-      
+
       return {
         success: true,
-        results: results
+        results,
       };
     } catch (error) {
       console.error('Error executing optimizations:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Execute single optimization
    */
@@ -342,18 +342,18 @@ class AIOperationIntelligenceService {
         default:
           return {
             success: false,
-            error: `Unknown optimization strategy: ${optimization.strategy}`
+            error: `Unknown optimization strategy: ${optimization.strategy}`,
           };
       }
     } catch (error) {
       console.error(`Error executing optimization ${optimization.strategy}:`, error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Optimize equipment utilization
    */
@@ -363,10 +363,10 @@ class AIOperationIntelligenceService {
       success: true,
       strategy: 'equipment_utilization',
       result: 'Equipment utilization optimized',
-      improvements: ['increased_efficiency', 'reduced_downtime']
+      improvements: ['increased_efficiency', 'reduced_downtime'],
     };
   }
-  
+
   /**
    * Optimize supply chain
    */
@@ -376,10 +376,10 @@ class AIOperationIntelligenceService {
       success: true,
       strategy: 'supply_chain',
       result: 'Supply chain optimized',
-      improvements: ['reduced_cost', 'improved_service_level']
+      improvements: ['reduced_cost', 'improved_service_level'],
     };
   }
-  
+
   /**
    * Optimize resource allocation
    */
@@ -389,10 +389,10 @@ class AIOperationIntelligenceService {
       success: true,
       strategy: 'resource_allocation',
       result: 'Resource allocation optimized',
-      improvements: ['balanced_workload', 'increased_efficiency']
+      improvements: ['balanced_workload', 'increased_efficiency'],
     };
   }
-  
+
   /**
    * Optimize process automation
    */
@@ -402,10 +402,10 @@ class AIOperationIntelligenceService {
       success: true,
       strategy: 'process_automation',
       result: 'Process automation optimized',
-      improvements: ['reduced_manual_effort', 'improved_accuracy']
+      improvements: ['reduced_manual_effort', 'improved_accuracy'],
     };
   }
-  
+
   /**
    * Optimize energy consumption
    */
@@ -415,10 +415,10 @@ class AIOperationIntelligenceService {
       success: true,
       strategy: 'energy_consumption',
       result: 'Energy consumption optimized',
-      improvements: ['reduced_consumption', 'improved_sustainability']
+      improvements: ['reduced_consumption', 'improved_sustainability'],
     };
   }
-  
+
   /**
    * Record optimization cycle
    */
@@ -426,58 +426,58 @@ class AIOperationIntelligenceService {
     this.operationHistory.push({
       timestamp: new Date(),
       type: 'optimization_cycle',
-      cycle: cycle
+      cycle,
     });
-    
+
     // Keep only last 1000 operations
     if (this.operationHistory.length > 1000) {
       this.operationHistory = this.operationHistory.slice(-1000);
     }
   }
-  
+
   /**
    * Get performance metrics
    */
   getPerformanceMetrics() {
     return {
       current: this.performanceMetrics.get('current'),
-      history: Array.from(this.performanceMetrics.entries()).filter(([key]) => key !== 'current')
+      history: Array.from(this.performanceMetrics.entries()).filter(([key]) => key !== 'current'),
     };
   }
-  
+
   /**
    * Get optimization strategies
    */
   getOptimizationStrategies() {
     return Array.from(this.optimizationStrategies.entries()).map(([name, strategy]) => ({
       name,
-      ...strategy
+      ...strategy,
     }));
   }
-  
+
   /**
    * Get resource allocation
    */
   getResourceAllocation() {
     return Array.from(this.resourceAllocation.entries());
   }
-  
+
   /**
    * Get operation history
    */
   getOperationHistory(limit = 100) {
     return this.operationHistory.slice(-limit);
   }
-  
+
   /**
    * Predictive optimization
    */
   async predictiveOptimization(horizon = 24) {
     try {
-      let currentMetrics = this.performanceMetrics.get('current');
-      let history = this.operationHistory.slice(-100);
-      
-      let prompt = `
+      const currentMetrics = this.performanceMetrics.get('current');
+      const history = this.operationHistory.slice(-100);
+
+      const prompt = `
         Perform predictive optimization analysis for the next ${horizon} hours:
         
         Current Metrics: ${JSON.stringify(currentMetrics)}
@@ -490,38 +490,38 @@ class AIOperationIntelligenceService {
         - resource_requirements: expected resource needs
         - confidence: confidence in prediction (0-1)
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      let response = await this.openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const prediction = JSON.parse(response.choices[0].message.content);
-      
+
       return {
         success: true,
-        prediction: prediction
+        prediction,
       };
     } catch (error) {
       console.error('Error in predictive optimization:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Anomaly detection
    */
   async detectAnomalies() {
     try {
-      let currentMetrics = this.performanceMetrics.get('current');
-      let history = Array.from(this.performanceMetrics.entries()).slice(-50);
-      
-      let prompt = `
+      const currentMetrics = this.performanceMetrics.get('current');
+      const history = Array.from(this.performanceMetrics.entries()).slice(-50);
+
+      const prompt = `
         Detect anomalies in the current performance metrics compared to historical data:
         
         Current Metrics: ${JSON.stringify(currentMetrics)}
@@ -534,37 +534,37 @@ class AIOperationIntelligenceService {
         - recommended_actions: recommended remediation actions
         - confidence: confidence in anomaly detection (0-1)
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      let response = await this.openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const anomalies = JSON.parse(response.choices[0].message.content);
-      
+
       return {
         success: true,
-        anomalies: anomalies
+        anomalies,
       };
     } catch (error) {
       console.error('Error detecting anomalies:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
-  
+
   /**
    * Continuous improvement
    */
   async continuousImprovement() {
     try {
-      let history = this.operationHistory.slice(-200);
-      
-      let prompt = `
+      const history = this.operationHistory.slice(-200);
+
+      const prompt = `
         Analyze operation history and identify continuous improvement opportunities:
         
         Operation History: ${JSON.stringify(history)}
@@ -576,25 +576,25 @@ class AIOperationIntelligenceService {
         - kpi_improvements: KPI improvement recommendations
         - confidence: confidence in recommendations (0-1)
       `;
-      
+
       if (!this.openai) throw new Error('OPENAI_API_KEY not configured - this AI capability is unavailable');
-      let response = await this.openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
-      
+
       const improvements = JSON.parse(response.choices[0].message.content);
-      
+
       return {
         success: true,
-        improvements: improvements
+        improvements,
       };
     } catch (error) {
       console.error('Error in continuous improvement analysis:', error);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -604,6 +604,4 @@ class AIOperationIntelligenceService {
 const aiOperationIntelligenceService = new AIOperationIntelligenceService();
 
 module.exports = aiOperationIntelligenceService;
-
-
 

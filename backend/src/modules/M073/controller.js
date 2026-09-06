@@ -14,7 +14,7 @@ async function registerGoatHerd(req, res) {
 
 async function getGoatHerd(req, res) {
   try {
-    let herd = await service.getGoatHerd(req.params.herdId);
+    const herd = await service.getGoatHerd(req.params.herdId);
     if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
     res.json({ success: true, data: herd });
   } catch (error) {
@@ -36,7 +36,7 @@ async function listGoatHerds(req, res) {
 
 async function updateGoatHerd(req, res) {
   try {
-    let herd = await service.updateGoatHerd(req.params.herdId, req.body);
+    const herd = await service.updateGoatHerd(req.params.herdId, req.body);
     if (!herd) return res.status(404).json({ success: false, error: 'Herd not found' });
     res.json({ success: true, data: herd });
   } catch (error) {

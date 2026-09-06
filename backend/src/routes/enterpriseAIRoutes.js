@@ -55,12 +55,12 @@ router.post('/credit-score', async (req, res, next) => {
       return res.json({ success: true, data: result });
     }
     if (buyerId) {
-      let result = await getBuyerCreditEligibility(buyerId);
+      const result = await getBuyerCreditEligibility(buyerId);
       return res.json({ success: true, data: result });
     }
     return res.status(400).json({
       success: false,
-      error: 'Provide either farmerId (farmer credit-risk score) or buyerId (buyer B2B credit eligibility) in the request body.'
+      error: 'Provide either farmerId (farmer credit-risk score) or buyerId (buyer B2B credit eligibility) in the request body.',
     });
   } catch (error) {
     if (error.message === 'Farmer not found' || error.message === 'Buyer not found') {
@@ -96,23 +96,23 @@ router.post('/scheme-eligibility', async (req, res, next) => {
           eligible: scheme.status === 'active',
           status: scheme.status,
           expiry: scheme.expiry_date,
-          notes: scheme.status === 'conditional'
-            ? 'Scheme is conditional — confirm current-year allocation with the primary source before committing.'
-            : scheme.status === 'expired'
-              ? 'Scheme has lapsed and is not eligible.'
-              : undefined
-        }
+          notes: scheme.status === 'conditional' ?
+            'Scheme is conditional — confirm current-year allocation with the primary source before committing.' :
+            scheme.status === 'expired' ?
+              'Scheme has lapsed and is not eligible.' :
+              undefined,
+        },
       });
     }
 
     if (category || state || farm_size) {
-      let result = await governmentSchemeService.checkSchemeEligibility({ category, state, farm_size });
+      const result = await governmentSchemeService.checkSchemeEligibility({ category, state, farm_size });
       return res.json({ success: true, data: result });
     }
 
     return res.status(400).json({
       success: false,
-      error: 'Provide either schemeId (verified single-scheme check) or category/state/farm_size (registry filter).'
+      error: 'Provide either schemeId (verified single-scheme check) or category/state/farm_size (registry filter).',
     });
   } catch (error) {
     if (error.message === 'Scheme not found') {
@@ -136,12 +136,12 @@ router.post('/assess-risk', async (req, res, next) => {
   res.status(501).json({
     implemented: false,
     error: 'Not Implemented',
-    message: 'Generic cross-domain stakeholder/transaction risk assessment does not exist yet. '
-      + 'The previous implementation returned hardcoded constants regardless of input and has been '
-      + 'removed rather than kept as a fabricated result. For crop price/forward-pricing risk see '
-      + '/api/v1/pricing (riskPricingService); for insurance claim fraud scoring see '
-      + 'decisionSupportService.claimFraudScore().',
-    code: 'ENTERPRISE_AI_RISK_ASSESSMENT_NOT_IMPLEMENTED'
+    message: 'Generic cross-domain stakeholder/transaction risk assessment does not exist yet. ' +
+      'The previous implementation returned hardcoded constants regardless of input and has been ' +
+      'removed rather than kept as a fabricated result. For crop price/forward-pricing risk see ' +
+      '/api/v1/pricing (riskPricingService); for insurance claim fraud scoring see ' +
+      'decisionSupportService.claimFraudScore().',
+    code: 'ENTERPRISE_AI_RISK_ASSESSMENT_NOT_IMPLEMENTED',
   });
 });
 
@@ -155,10 +155,10 @@ router.post('/recommendations', async (req, res, next) => {
   res.status(501).json({
     implemented: false,
     error: 'Not Implemented',
-    message: 'Cross-stakeholder recommendation generation does not exist yet. The previous '
-      + 'implementation returned two hardcoded recommendations per stakeholder type regardless of '
-      + 'context and has been removed rather than kept as a fabricated result.',
-    code: 'ENTERPRISE_AI_RECOMMENDATIONS_NOT_IMPLEMENTED'
+    message: 'Cross-stakeholder recommendation generation does not exist yet. The previous ' +
+      'implementation returned two hardcoded recommendations per stakeholder type regardless of ' +
+      'context and has been removed rather than kept as a fabricated result.',
+    code: 'ENTERPRISE_AI_RECOMMENDATIONS_NOT_IMPLEMENTED',
   });
 });
 
@@ -177,13 +177,13 @@ router.post('/entity-profile', async (req, res, next) => {
   res.status(501).json({
     implemented: false,
     error: 'Not Implemented',
-    message: 'Entity relationship/embedding profiles for arbitrary business entities do not exist '
-      + 'yet. services/knowledgeGraphService.js is real but operates on registered knowledge_nodes '
-      + 'by internal node ID, not on arbitrary (entityId, entityType) pairs — there is no mapping '
-      + 'layer between the two, so this endpoint is not wired rather than faked. Use '
-      + 'GET /api/v1/knowledge-graph/knowledge-nodes/:nodeId/related if you already hold a '
-      + 'knowledge_nodes ID.',
-    code: 'ENTERPRISE_AI_ENTITY_PROFILE_NOT_IMPLEMENTED'
+    message: 'Entity relationship/embedding profiles for arbitrary business entities do not exist ' +
+      'yet. services/knowledgeGraphService.js is real but operates on registered knowledge_nodes ' +
+      'by internal node ID, not on arbitrary (entityId, entityType) pairs — there is no mapping ' +
+      'layer between the two, so this endpoint is not wired rather than faked. Use ' +
+      'GET /api/v1/knowledge-graph/knowledge-nodes/:nodeId/related if you already hold a ' +
+      'knowledge_nodes ID.',
+    code: 'ENTERPRISE_AI_ENTITY_PROFILE_NOT_IMPLEMENTED',
   });
 });
 
@@ -199,11 +199,11 @@ router.post('/anomaly-detection', async (req, res, next) => {
   res.status(501).json({
     implemented: false,
     error: 'Not Implemented',
-    message: 'Generic transaction anomaly detection does not exist yet. The previous implementation '
-      + 'was structurally incapable of ever flagging anything (its baseline lookup always returned '
-      + 'an empty object) and has been removed rather than kept as dead code. For insurance-claim '
-      + 'fraud scoring specifically, see services/insuranceFraudDetectionService.js.',
-    code: 'ENTERPRISE_AI_ANOMALY_DETECTION_NOT_IMPLEMENTED'
+    message: 'Generic transaction anomaly detection does not exist yet. The previous implementation ' +
+      'was structurally incapable of ever flagging anything (its baseline lookup always returned ' +
+      'an empty object) and has been removed rather than kept as dead code. For insurance-claim ' +
+      'fraud scoring specifically, see services/insuranceFraudDetectionService.js.',
+    code: 'ENTERPRISE_AI_ANOMALY_DETECTION_NOT_IMPLEMENTED',
   });
 });
 
@@ -222,11 +222,11 @@ function notImplementedPrediction(code, subject) {
     res.status(501).json({
       implemented: false,
       error: 'Not Implemented',
-      message: `No real ${subject} prediction model exists yet. services/predictiveAnalyticsService.js `
-        + 'stores and retrieves predictions/forecasts computed elsewhere; it does not itself compute '
-        + `${subject} forecasts. The previous implementation fabricated one from stub helpers that all `
-        + 'returned empty/zero literals and has been removed.',
-      code
+      message: `No real ${subject} prediction model exists yet. services/predictiveAnalyticsService.js ` +
+        'stores and retrieves predictions/forecasts computed elsewhere; it does not itself compute ' +
+        `${subject} forecasts. The previous implementation fabricated one from stub helpers that all ` +
+        'returned empty/zero literals and has been removed.',
+      code,
     });
   };
 }
@@ -239,7 +239,7 @@ router.post('/predict-price', notImplementedPrediction('ENTERPRISE_AI_PREDICT_PR
 // DB-backed (ai_model_registry, migration 058), unchanged by this audit.
 router.get('/model-slots', async (req, res, next) => {
   try {
-    let result = await aiOrchestrationService.listModelSlots();
+    const result = await aiOrchestrationService.listModelSlots();
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -248,7 +248,7 @@ router.get('/model-slots', async (req, res, next) => {
 
 router.get('/unserved-intents', async (req, res, next) => {
   try {
-    let result = await aiOrchestrationService.listUnservedIntents();
+    const result = await aiOrchestrationService.listUnservedIntents();
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -257,7 +257,7 @@ router.get('/unserved-intents', async (req, res, next) => {
 
 router.post('/model-slots', async (req, res, next) => {
   try {
-    let result = await aiOrchestrationService.upsertModelSlot(req.body || {});
+    const result = await aiOrchestrationService.upsertModelSlot(req.body || {});
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);
@@ -286,11 +286,11 @@ router.post('/query', async (req, res, next) => {
     if (!query) {
       return res.status(400).json({ success: false, error: 'query is required' });
     }
-    let actorId = req.user?.id ? `user:${req.user.id}` : 'enterpriseAIRoutes:/query';
-    let result = await aiOrchestrator.route(
+    const actorId = req.user?.id ? `user:${req.user.id}` : 'enterpriseAIRoutes:/query';
+    const result = await aiOrchestrator.route(
       'llm',
       { message: query, context: context || {}, allowTemplateFallback: true },
-      { actorId }
+      { actorId },
     );
     res.json({ success: true, data: result });
   } catch (error) {

@@ -112,7 +112,7 @@ class ConfigRegistry {
     try {
       const result = await this.db.query(
         'SELECT * FROM service_configs WHERE service_name = $1',
-        [serviceName]
+        [serviceName],
       );
 
       if (result.rows[0]) {
@@ -134,7 +134,7 @@ class ConfigRegistry {
    */
   async getMultipleConfigs(...serviceNames) {
     return Promise.all(
-      serviceNames.map(name => this.getServiceConfig(name))
+      serviceNames.map(name => this.getServiceConfig(name)),
     );
   }
 
@@ -143,7 +143,7 @@ class ConfigRegistry {
    */
   async _createDefaultConfig(serviceName, metadata = {}) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `INSERT INTO service_configs
          (service_name, category, enabled, config, metadata)
          VALUES ($1, $2, $3, $4, $5)
@@ -154,11 +154,11 @@ class ConfigRegistry {
           metadata.category || 'default',
           true,
           JSON.stringify(metadata.config || {}),
-          JSON.stringify(metadata)
-        ]
+          JSON.stringify(metadata),
+        ],
       );
 
-      let config = result.rows[0];
+      const config = result.rows[0];
       this.cache.set(serviceName, config);
       return config;
     } catch (error) {
@@ -172,13 +172,13 @@ class ConfigRegistry {
    */
   async updateServiceConfig(serviceName, updates) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `UPDATE service_configs
          SET config = jsonb_set(config, '{}', $2),
              updated_at = NOW()
          WHERE service_name = $1
          RETURNING *`,
-        [serviceName, JSON.stringify(updates)]
+        [serviceName, JSON.stringify(updates)],
       );
 
       if (result.rows[0]) {
@@ -198,12 +198,12 @@ class ConfigRegistry {
    */
   async setServiceEnabled(serviceName, enabled) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `UPDATE service_configs
          SET enabled = $2, updated_at = NOW()
          WHERE service_name = $1
          RETURNING *`,
-        [serviceName, enabled]
+        [serviceName, enabled],
       );
 
       if (result.rows[0]) {
@@ -222,7 +222,7 @@ class ConfigRegistry {
    * Check if service is enabled
    */
   async isServiceEnabled(serviceName) {
-    let config = await this.getServiceConfig(serviceName);
+    const config = await this.getServiceConfig(serviceName);
     return config?.enabled ?? true;
   }
 
@@ -232,8 +232,8 @@ class ConfigRegistry {
    */
   async loadAllConfigs() {
     try {
-      let result = await this.db.query(
-        'SELECT * FROM service_configs ORDER BY priority DESC'
+      const result = await this.db.query(
+        'SELECT * FROM service_configs ORDER BY priority DESC',
       );
 
       for (const config of result.rows) {
@@ -259,9 +259,9 @@ class ConfigRegistry {
     }
 
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         'SELECT * FROM feature_flags WHERE feature_name = $1',
-        [featureName]
+        [featureName],
       );
 
       if (result.rows[0]) {
@@ -281,7 +281,7 @@ class ConfigRegistry {
    * Check if feature is enabled
    */
   async isFeatureEnabled(featureName) {
-    let flag = await this.getFeatureFlag(featureName);
+    const flag = await this.getFeatureFlag(featureName);
     return flag?.enabled ?? false;
   }
 
@@ -290,13 +290,13 @@ class ConfigRegistry {
    */
   async setFeatureFlag(featureName, enabled, config = {}) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `INSERT INTO feature_flags (feature_name, enabled, config)
          VALUES ($1, $2, $3)
          ON CONFLICT (feature_name)
          DO UPDATE SET enabled = $2, config = $3, updated_at = NOW()
          RETURNING *`,
-        [featureName, enabled, JSON.stringify(config)]
+        [featureName, enabled, JSON.stringify(config)],
       );
 
       if (result.rows[0]) {
@@ -316,7 +316,7 @@ class ConfigRegistry {
    */
   async loadAllFeatureFlags() {
     try {
-      let result = await this.db.query('SELECT * FROM feature_flags');
+      const result = await this.db.query('SELECT * FROM feature_flags');
 
       for (const flag of result.rows) {
         this.featureFlags.set(flag.feature_name, flag);
@@ -335,11 +335,11 @@ class ConfigRegistry {
    */
   async getVersionRouting(serviceName) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `SELECT * FROM version_routing
          WHERE service_name = $1 AND enabled = true
          ORDER BY percentage DESC`,
-        [serviceName]
+        [serviceName],
       );
 
       return result.rows;
@@ -354,17 +354,17 @@ class ConfigRegistry {
    */
   async setVersionRouting(serviceName, version, percentage, config = {}) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `INSERT INTO version_routing (service_name, version, percentage, config)
          VALUES ($1, $2, $3, $4)
          ON CONFLICT (service_name, version)
          DO UPDATE SET percentage = $3, config = $4, updated_at = NOW()
          RETURNING *`,
-        [serviceName, version, percentage, JSON.stringify(config)]
+        [serviceName, version, percentage, JSON.stringify(config)],
       );
 
       logger.info(
-        `Version routing set: ${serviceName} v${version} ${percentage}%`
+        `Version routing set: ${serviceName} v${version} ${percentage}%`,
       );
 
       return result.rows[0];
@@ -385,10 +385,10 @@ class ConfigRegistry {
     }
 
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `SELECT * FROM tenant_config_overrides
          WHERE tenant_id = $1 AND service_name = $2`,
-        [tenantId, serviceName]
+        [tenantId, serviceName],
       );
 
       if (result.rows[0]) {
@@ -400,7 +400,7 @@ class ConfigRegistry {
     } catch (error) {
       logger.error(
         `Failed to get tenant override: ${tenantId}/${serviceName}`,
-        error
+        error,
       );
       return null;
     }
@@ -411,16 +411,16 @@ class ConfigRegistry {
    */
   async setTenantConfigOverride(tenantId, serviceName, config) {
     try {
-      let result = await this.db.query(
+      const result = await this.db.query(
         `INSERT INTO tenant_config_overrides (tenant_id, service_name, config)
          VALUES ($1, $2, $3)
          ON CONFLICT (tenant_id, service_name)
          DO UPDATE SET config = $3, updated_at = NOW()
          RETURNING *`,
-        [tenantId, serviceName, JSON.stringify(config)]
+        [tenantId, serviceName, JSON.stringify(config)],
       );
 
-      let key = `${tenantId}:${serviceName}`;
+      const key = `${tenantId}:${serviceName}`;
       this.tenantOverrides.set(key, result.rows[0]);
 
       logger.info(`Tenant override set: ${tenantId}/${serviceName}`);
@@ -428,7 +428,7 @@ class ConfigRegistry {
     } catch (error) {
       logger.error(
         `Failed to set tenant override: ${tenantId}/${serviceName}`,
-        error
+        error,
       );
       throw error;
     }
@@ -455,8 +455,8 @@ class ConfigRegistry {
       ...baseConfig,
       config: {
         ...baseConfig.config,
-        ...override.config
-      }
+        ...override.config,
+      },
     };
   }
 
@@ -483,8 +483,8 @@ class ConfigRegistry {
    */
   async getDisabledServices() {
     try {
-      let result = await this.db.query(
-        'SELECT service_name FROM service_configs WHERE enabled = false'
+      const result = await this.db.query(
+        'SELECT service_name FROM service_configs WHERE enabled = false',
       );
 
       return result.rows.map(r => r.service_name);
@@ -502,10 +502,10 @@ class ConfigRegistry {
       cachedConfigs: this.cache.size,
       featureFlags: this.featureFlags.size,
       tenantOverrides: this.tenantOverrides.size,
-      lastSyncTime: this.lastSyncTime
-        ? new Date(this.lastSyncTime).toISOString()
-        : 'never',
-      isInitialized: this.isInitialized
+      lastSyncTime: this.lastSyncTime ?
+        new Date(this.lastSyncTime).toISOString() :
+        'never',
+      isInitialized: this.isInitialized,
     };
   }
 

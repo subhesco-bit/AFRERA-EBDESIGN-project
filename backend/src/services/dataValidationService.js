@@ -49,7 +49,7 @@ class DataValidationService {
       return {
         valid: errors.length === 0,
         errors,
-        warnings
+        warnings,
       };
     } catch (error) {
       logger.error('Data validation failed', error);
@@ -98,7 +98,7 @@ class DataValidationService {
     const valid = value !== null && value !== undefined && value !== '';
     return {
       valid,
-      message: message || 'Field is required'
+      message: message || 'Field is required',
     };
   }
 
@@ -138,7 +138,7 @@ class DataValidationService {
 
     return {
       valid,
-      message: message || `Field must be of type ${type}`
+      message: message || `Field must be of type ${type}`,
     };
   }
 
@@ -174,7 +174,7 @@ class DataValidationService {
 
     return {
       valid,
-      message: message || `Field must be between ${min} and ${max}`
+      message: message || `Field must be between ${min} and ${max}`,
     };
   }
 
@@ -184,11 +184,11 @@ class DataValidationService {
   validatePattern(value, constraints, message) {
     const { pattern } = constraints;
     const regex = new RegExp(pattern);
-    let valid = regex.test(value);
+    const valid = regex.test(value);
 
     return {
       valid,
-      message: message || 'Field does not match required pattern'
+      message: message || 'Field does not match required pattern',
     };
   }
 
@@ -209,7 +209,7 @@ class DataValidationService {
 
     return {
       valid,
-      message: message || `Field length must be between ${min} and ${max}`
+      message: message || `Field length must be between ${min} and ${max}`,
     };
   }
 
@@ -218,11 +218,11 @@ class DataValidationService {
    */
   validateEnum(value, constraints, message) {
     const { values } = constraints;
-    let valid = values.includes(value);
+    const valid = values.includes(value);
 
     return {
       valid,
-      message: message || `Field must be one of: ${values.join(', ')}`
+      message: message || `Field must be one of: ${values.join(', ')}`,
     };
   }
 
@@ -232,15 +232,15 @@ class DataValidationService {
   validateCustom(value, constraints, message) {
     const { validator } = constraints;
     try {
-      let valid = validator(value);
+      const valid = validator(value);
       return {
         valid,
-        message: message || 'Custom validation failed'
+        message: message || 'Custom validation failed',
       };
     } catch (error) {
       return {
         valid: false,
-        message: message || error.message
+        message: message || error.message,
       };
     }
   }
@@ -253,7 +253,7 @@ class DataValidationService {
       const query = `
         SELECT * FROM validation_rules ORDER BY rule_set, field
       `;
-      let result = await this.db.query(query);
+      const result = await this.db.query(query);
 
       // Group rules by rule set
       for (const row of result.rows) {
@@ -266,7 +266,7 @@ class DataValidationService {
           type: row.type,
           constraints: row.constraints ? JSON.parse(row.constraints) : {},
           severity: row.severity,
-          message: row.message
+          message: row.message,
         });
       }
 
@@ -283,19 +283,19 @@ class DataValidationService {
     const { ruleSet, field, type, constraints, severity = 'error', message } = ruleData;
 
     try {
-      let query = `
+      const query = `
         INSERT INTO validation_rules (
           rule_set, field, type, constraints, severity, message, created_at
         ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
         RETURNING *
       `;
-      let result = await this.db.query(query, [
+      const result = await this.db.query(query, [
         ruleSet,
         field,
         type,
         JSON.stringify(constraints),
         severity,
-        message
+        message,
       ]);
 
       // Update in-memory rules
@@ -307,7 +307,7 @@ class DataValidationService {
         type,
         constraints,
         severity,
-        message
+        message,
       });
 
       logger.info(`Validation rule added: ${ruleSet}.${field}`);
@@ -323,7 +323,7 @@ class DataValidationService {
    */
   async validateRecord(table, record) {
     try {
-      let ruleSet = table;
+      const ruleSet = table;
       const validation = await this.validate(record, ruleSet);
 
       // Log validation result
@@ -332,7 +332,7 @@ class DataValidationService {
         recordId: record.id || record.record_id,
         valid: validation.valid,
         errors: validation.errors,
-        warnings: validation.warnings
+        warnings: validation.warnings,
       });
 
       return validation;
@@ -347,7 +347,7 @@ class DataValidationService {
    */
   async logValidationResult(result) {
     try {
-      let query = `
+      const query = `
         INSERT INTO validation_logs (
           table_name, record_id, valid, errors, warnings, created_at
         ) VALUES ($1, $2, $3, $4, $5, NOW())
@@ -357,7 +357,7 @@ class DataValidationService {
         result.recordId,
         result.valid,
         JSON.stringify(result.errors),
-        JSON.stringify(result.warnings)
+        JSON.stringify(result.warnings),
       ]);
     } catch (error) {
       logger.error('Log validation result failed', error);
@@ -401,7 +401,7 @@ class DataValidationService {
         params.push(endDate);
       }
 
-      let result = await this.db.query(query, params);
+      const result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get validation statistics failed', error);
@@ -414,12 +414,12 @@ class DataValidationService {
    */
   async cleanOldLogs(daysToKeep = 30) {
     try {
-      let query = `
+      const query = `
         DELETE FROM validation_logs
         WHERE created_at < NOW() - INTERVAL '${daysToKeep} days'
       `;
-      let result = await this.db.query(query);
-      
+      const result = await this.db.query(query);
+
       logger.info(`Cleaned ${result.rowCount} old validation logs`);
       return result.rowCount;
     } catch (error) {

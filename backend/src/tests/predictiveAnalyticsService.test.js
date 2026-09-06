@@ -13,7 +13,7 @@ describe('Predictive Analytics Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('Predictive Analytics Service', () => {
       .send({
         email: 'pa-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -46,7 +46,7 @@ describe('Predictive Analytics Service', () => {
           accuracy_score: 0.92,
           precision_score: 0.89,
           recall_score: 0.87,
-          f1_score: 0.88
+          f1_score: 0.88,
         })
         .expect(201);
 
@@ -63,7 +63,7 @@ describe('Predictive Analytics Service', () => {
       const response = await request(app)
         .post('/api/v1/predictive-analytics/predictive-models')
         .send({
-          model_name: 'Test Model'
+          model_name: 'Test Model',
         })
         .expect(401);
     });
@@ -103,7 +103,7 @@ describe('Predictive Analytics Service', () => {
           confidence_interval_lower: 1400,
           confidence_interval_upper: 1600,
           confidence_score: 0.92,
-          prediction_metadata: { season: 'spring' }
+          prediction_metadata: { season: 'spring' },
         })
         .expect(201);
 
@@ -136,10 +136,10 @@ describe('Predictive Analytics Service', () => {
           forecast_values: [
             { date: '2024-02-01', value: 1500, confidence: 0.92 },
             { date: '2024-02-02', value: 1550, confidence: 0.91 },
-            { date: '2024-02-03', value: 1600, confidence: 0.90 }
+            { date: '2024-02-03', value: 1600, confidence: 0.90 },
           ],
           forecast_metadata: { model_version: '1.0' },
-          generated_by_model_id: testModelId
+          generated_by_model_id: testModelId,
         })
         .expect(201);
 
@@ -168,7 +168,7 @@ describe('Predictive Analytics Service', () => {
           alert_type: 'anomaly',
           alert_severity: 'high',
           alert_message: 'Unusual demand spike detected',
-          alert_data: { expected: 1000, actual: 2000 }
+          alert_data: { expected: 1000, actual: 2000 },
         })
         .expect(201);
 
@@ -200,8 +200,8 @@ describe('Predictive Analytics Service', () => {
             avg_confidence: 0.88,
             total_forecasts: 25,
             training_runs: 2,
-            active_models: 5
-          }
+            active_models: 5,
+          },
         })
         .expect(200);
 

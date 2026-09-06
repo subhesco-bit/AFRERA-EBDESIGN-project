@@ -43,7 +43,7 @@ class FarmerfamilyService {
       return {
         success: true,
         message: 'Operation completed',
-        data: null
+        data: null,
       };
     } catch (error) {
       logger.error('farmerFamilyService execute failed', error);
@@ -53,6 +53,4 @@ class FarmerfamilyService {
 }
 
 module.exports = new FarmerfamilyService();
-
-
 

@@ -23,26 +23,26 @@ router.post('/products/:id/certifications',
       certificate_number: 'string',
       issuer: 'string',
       issued_date: 'string',
-      valid_until: 'string'
-    }
+      valid_until: 'string',
+    },
   }),
   async (req, res, next) => {
     try {
       const result = await productCertificationService.addCertification(
         req.params.id,
-        req.body
+        req.body,
       );
 
       res.status(201).json({
         success: true,
         data: result,
-        message: 'Certification added successfully'
+        message: 'Certification added successfully',
       });
     } catch (error) {
       logger.error(`Add certification error: ${error.message}`);
       next(error);
     }
-  }
+  },
 );
 
 /**
@@ -51,11 +51,11 @@ router.post('/products/:id/certifications',
  */
 router.get('/products/:id/certifications', async (req, res, next) => {
   try {
-    let result = await productCertificationService.getProductCertifications(req.params.id);
+    const result = await productCertificationService.getProductCertifications(req.params.id);
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error(`Get certifications error: ${error.message}`);
@@ -72,24 +72,24 @@ router.post('/certifications/:id/verify',
   authorize(['admin']),
   validateRequest({
     body: {
-      certificate_number: 'string|required'
-    }
+      certificate_number: 'string|required',
+    },
   }),
   async (req, res, next) => {
     try {
-      let result = await productCertificationService.verifyCertification(
-        req.body.certificate_number
+      const result = await productCertificationService.verifyCertification(
+        req.body.certificate_number,
       );
 
       res.json({
         success: true,
-        data: result
+        data: result,
       });
     } catch (error) {
       logger.error(`Verify certification error: ${error.message}`);
       next(error);
     }
-  }
+  },
 );
 
 /**
@@ -101,28 +101,27 @@ router.delete('/certifications/:id',
   authorize(['admin']),
   validateRequest({
     body: {
-      reason: 'string'
-    }
+      reason: 'string',
+    },
   }),
   async (req, res, next) => {
     try {
-      let result = await productCertificationService.revokeCertification(
+      const result = await productCertificationService.revokeCertification(
         req.params.id,
-        req.body.reason
+        req.body.reason,
       );
 
       res.json({
         success: true,
         data: result,
-        message: 'Certification revoked'
+        message: 'Certification revoked',
       });
     } catch (error) {
       logger.error(`Revoke certification error: ${error.message}`);
       next(error);
     }
-  }
+  },
 );
 
 module.exports = router;
-
 

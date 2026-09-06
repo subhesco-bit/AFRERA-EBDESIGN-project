@@ -6,7 +6,7 @@ class BiometricService {
     try {
       const id = require('uuid').v4();
       await db('biometric_logs').insert({
-        id, user_id: userId, biometric_type: biometricData.type, verified: true, created_at: new Date()
+        id, user_id: userId, biometric_type: biometricData.type, verified: true, created_at: new Date(),
       });
       logger.info(`Biometric verified: ${userId}`);
       return { verification_id: id, user_id: userId, verified: true };

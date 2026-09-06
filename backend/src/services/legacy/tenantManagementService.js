@@ -1,6 +1,6 @@
 /**
  * Tenant Management Module Service - AI Enhanced
- * 
+ *
  * This service provides AI-powered tenant management:
  * - AI-powered tenant resource allocation
  * - Usage pattern prediction
@@ -37,7 +37,7 @@ class TenantManagementService {
         expectedUsers: tenantData.expectedUsers,
         expectedLoad: tenantData.expectedLoad,
         industry: tenantData.industry,
-        tier: tenantData.tier || 'standard'
+        tier: tenantData.tier || 'standard',
       });
 
       const tenant = await this.db.query(`
@@ -50,7 +50,7 @@ class TenantManagementService {
         tenantData.domain,
         tenantData.tier || 'standard',
         JSON.stringify(resourceAnalysis.allocatedResources || {}),
-        JSON.stringify(tenantData.config || {})
+        JSON.stringify(tenantData.config || {}),
       ]);
 
       // Initialize tenant monitoring
@@ -61,7 +61,7 @@ class TenantManagementService {
         tenant: tenant.rows[0],
         resourceAllocation: resourceAnalysis.allocatedResources,
         recommendations: resourceAnalysis.recommendations || [],
-        estimatedCost: resourceAnalysis.estimatedCost || 0
+        estimatedCost: resourceAnalysis.estimatedCost || 0,
       };
     } catch (error) {
       logger.error('Error creating tenant:', error);
@@ -74,9 +74,9 @@ class TenantManagementService {
    */
   async getTenant(tenantId) {
     try {
-      let tenant = await this.db.query(
+      const tenant = await this.db.query(
         'SELECT * FROM tenants WHERE id = $1',
-        [tenantId]
+        [tenantId],
       );
 
       if (tenant.rows.length === 0) {
@@ -90,10 +90,10 @@ class TenantManagementService {
 
       return {
         ...tenantData,
-        usageMetrics: usageMetrics,
-        healthScore: healthScore,
-        aiInsights: aiInsights,
-        recommendations: aiInsights.recommendations || []
+        usageMetrics,
+        healthScore,
+        aiInsights,
+        recommendations: aiInsights.recommendations || [],
       };
     } catch (error) {
       logger.error('Error getting tenant:', error);
@@ -113,30 +113,30 @@ class TenantManagementService {
 
       const optimization = await this.aiGateway.optimize({
         type: 'tenant_resource_optimization',
-        currentAllocation: currentAllocation,
-        usagePatterns: usagePatterns,
-        performanceMetrics: performanceMetrics,
-        growthPredictions: growthPredictions,
+        currentAllocation,
+        usagePatterns,
+        performanceMetrics,
+        growthPredictions,
         objectives: ['performance', 'cost_efficiency', 'scalability'],
         constraints: {
           minPerformance: 0.95,
-          maxCostIncrease: 0.2
-        }
+          maxCostIncrease: 0.2,
+        },
       });
 
       const optimizedAllocation = optimization.optimizedAllocation || currentAllocation;
 
       return {
-        currentAllocation: currentAllocation,
-        optimizedAllocation: optimizedAllocation,
+        currentAllocation,
+        optimizedAllocation,
         changes: optimization.changes || [],
         expectedBenefits: {
           performance: optimization.performanceImprovement || 0,
           cost: optimization.costSavings || 0,
-          scalability: optimization.scalabilityImprovement || 0
+          scalability: optimization.scalabilityImprovement || 0,
         },
         confidence: optimization.confidence || 0.85,
-        implementationPlan: optimization.implementationPlan || []
+        implementationPlan: optimization.implementationPlan || [],
       };
     } catch (error) {
       logger.error('Error optimizing tenant resources:', error);
@@ -156,22 +156,22 @@ class TenantManagementService {
 
       const prediction = await this.aiGateway.predict({
         type: 'tenant_usage_prediction',
-        historicalUsage: historicalUsage,
-        seasonalPatterns: seasonalPatterns,
-        businessEvents: businessEvents,
-        currentTrends: currentTrends,
-        timeframe: timeframe
+        historicalUsage,
+        seasonalPatterns,
+        businessEvents,
+        currentTrends,
+        timeframe,
       });
 
       this.resourcePredictions.set(tenantId, prediction);
 
       return {
-        tenantId: tenantId,
-        timeframe: timeframe,
+        tenantId,
+        timeframe,
         predictions: prediction.predictions || [],
         confidence: prediction.confidence || 0.85,
         riskFactors: prediction.riskFactors || [],
-        recommendations: prediction.recommendations || []
+        recommendations: prediction.recommendations || [],
       };
     } catch (error) {
       logger.error('Error predicting tenant usage:', error);
@@ -185,28 +185,28 @@ class TenantManagementService {
   async recommendTier(tenantId) {
     try {
       const currentTier = await this.getCurrentTenantTier(tenantId);
-      let usageMetrics = await this.getTenantUsageMetrics(tenantId);
+      const usageMetrics = await this.getTenantUsageMetrics(tenantId);
       const growthTrajectory = await this.getGrowthTrajectory(tenantId);
       const featureUsage = await this.getFeatureUsage(tenantId);
 
       const recommendation = await this.aiGateway.analyze({
         type: 'tier_recommendation',
-        currentTier: currentTier,
-        usageMetrics: usageMetrics,
-        growthTrajectory: growthTrajectory,
-        featureUsage: featureUsage,
+        currentTier,
+        usageMetrics,
+        growthTrajectory,
+        featureUsage,
         availableTiers: ['basic', 'standard', 'premium', 'enterprise'],
-        pricingModels: await this.getPricingModels()
+        pricingModels: await this.getPricingModels(),
       });
 
       return {
-        currentTier: currentTier,
+        currentTier,
         recommendedTier: recommendation.recommendedTier || currentTier,
         reason: recommendation.reason || 'Current tier is optimal',
         expectedBenefits: recommendation.benefits || {},
         costComparison: recommendation.costComparison || {},
         migrationPlan: recommendation.migrationPlan || [],
-        confidence: recommendation.confidence || 0.85
+        confidence: recommendation.confidence || 0.85,
       };
     } catch (error) {
       logger.error('Error recommending tier:', error);
@@ -224,27 +224,27 @@ class TenantManagementService {
       const usageEfficiency = await this.calculateUsageEfficiency(tenantId);
       const marketRates = await this.getCurrentMarketRates();
 
-      let optimization = await this.aiGateway.optimize({
+      const optimization = await this.aiGateway.optimize({
         type: 'tenant_cost_optimization',
-        currentCosts: currentCosts,
-        resourceUsage: resourceUsage,
-        usageEfficiency: usageEfficiency,
-        marketRates: marketRates,
+        currentCosts,
+        resourceUsage,
+        usageEfficiency,
+        marketRates,
         objectives: ['cost_reduction', 'performance_maintenance'],
         constraints: {
           minPerformance: 0.90,
-          maxServiceDisruption: 0.05
-        }
+          maxServiceDisruption: 0.05,
+        },
       });
 
       return {
-        currentCosts: currentCosts,
+        currentCosts,
         optimizedCosts: optimization.optimizedCosts || currentCosts,
         savings: optimization.savings || {},
         recommendations: optimization.recommendations || [],
         implementationSteps: optimization.steps || [],
         riskAssessment: optimization.risks || [],
-        expectedSavingsPercentage: optimization.savingsPercentage || 0
+        expectedSavingsPercentage: optimization.savingsPercentage || 0,
       };
     } catch (error) {
       logger.error('Error optimizing tenant cost:', error);
@@ -257,17 +257,17 @@ class TenantManagementService {
    */
   async calculateTenantHealth(tenantId, metrics) {
     try {
-      let healthScore = await this.aiGateway.analyze({
+      const healthScore = await this.aiGateway.analyze({
         type: 'tenant_health_scoring',
-        metrics: metrics,
+        metrics,
         benchmarks: await this.getHealthBenchmarks(),
         weights: {
           performance: 0.3,
           reliability: 0.25,
           efficiency: 0.2,
           satisfaction: 0.15,
-          growth: 0.1
-        }
+          growth: 0.1,
+        },
       });
 
       return {
@@ -277,11 +277,11 @@ class TenantManagementService {
           reliability: healthScore.reliability || 90,
           efficiency: healthScore.efficiency || 80,
           satisfaction: healthScore.satisfaction || 85,
-          growth: healthScore.growth || 75
+          growth: healthScore.growth || 75,
         },
         trend: healthScore.trend || 'stable',
         issues: healthScore.issues || [],
-        recommendations: healthScore.recommendations || []
+        recommendations: healthScore.recommendations || [],
       };
     } catch (error) {
       logger.error('Error calculating tenant health:', error);
@@ -290,7 +290,7 @@ class TenantManagementService {
         dimensions: {},
         trend: 'unknown',
         issues: [],
-        recommendations: []
+        recommendations: [],
       };
     }
   }
@@ -323,22 +323,22 @@ class TenantManagementService {
       // Enrich with AI insights for each tenant
       const enrichedTenants = await Promise.all(
         result.rows.map(async (tenant) => {
-          let healthScore = await this.calculateTenantHealth(
+          const healthScore = await this.calculateTenantHealth(
             tenant.id,
-            await this.getTenantUsageMetrics(tenant.id)
+            await this.getTenantUsageMetrics(tenant.id),
           );
           return {
             ...tenant,
             healthScore: healthScore.overallScore,
-            healthTrend: healthScore.trend
+            healthTrend: healthScore.trend,
           };
-        })
+        }),
       );
 
       return {
         tenants: enrichedTenants,
         total: enrichedTenants.length,
-        analytics: await this.getTenantAnalytics(enrichedTenants)
+        analytics: await this.getTenantAnalytics(enrichedTenants),
       };
     } catch (error) {
       logger.error('Error getting all tenants:', error);
@@ -357,15 +357,15 @@ class TenantManagementService {
       if (updates.allocatedResources) {
         const resourceValidation = await this.validateResourceAllocation(
           tenantId,
-          updates.allocatedResources
+          updates.allocatedResources,
         );
-        
+
         if (!resourceValidation.valid) {
           throw new Error(`Invalid resource allocation: ${resourceValidation.errors.join(', ')}`);
         }
       }
 
-      let result = await this.db.query(`
+      const result = await this.db.query(`
         UPDATE tenants 
         SET name = COALESCE($1, name),
             tier = COALESCE($2, tier),
@@ -379,13 +379,13 @@ class TenantManagementService {
         updates.tier,
         updates.allocatedResources ? JSON.stringify(updates.allocatedResources) : null,
         updates.config ? JSON.stringify(updates.config) : null,
-        tenantId
+        tenantId,
       ]);
 
       return {
         success: true,
         tenant: result.rows[0],
-        message: 'Tenant updated successfully'
+        message: 'Tenant updated successfully',
       };
     } catch (error) {
       logger.error('Error updating tenant:', error);
@@ -405,9 +405,9 @@ class TenantManagementService {
       await this.releaseTenantResources(tenantId);
       await this.archiveTenantRecords(tenantId);
 
-      let result = await this.db.query(
+      const result = await this.db.query(
         'DELETE FROM tenants WHERE id = $1 RETURNING *',
-        [tenantId]
+        [tenantId],
       );
 
       if (result.rows.length === 0) {
@@ -417,7 +417,7 @@ class TenantManagementService {
       return {
         success: true,
         deletedTenant: result.rows[0],
-        message: 'Tenant deleted successfully'
+        message: 'Tenant deleted successfully',
       };
     } catch (error) {
       logger.error('Error deleting tenant:', error);
@@ -431,7 +431,7 @@ class TenantManagementService {
     logger.info(`Initializing monitoring for tenant ${tenantId}`);
     this.tenantMetrics.set(tenantId, {
       createdAt: new Date(),
-      metrics: []
+      metrics: [],
     });
   }
 
@@ -442,7 +442,7 @@ class TenantManagementService {
       storageUsage: 55,
       requestCount: 10000,
       activeUsers: 500,
-      apiCalls: 50000
+      apiCalls: 50000,
     };
   }
 
@@ -453,15 +453,15 @@ class TenantManagementService {
       optimizationOpportunities: ['cache_optimization', 'query_optimization'],
       recommendations: [
         'Consider increasing cache size for better performance',
-        'Optimize database queries to reduce load'
-      ]
+        'Optimize database queries to reduce load',
+      ],
     };
   }
 
   async getCurrentTenantAllocation(tenantId) {
-    let result = await this.db.query(
+    const result = await this.db.query(
       'SELECT allocated_resources FROM tenants WHERE id = $1',
-      [tenantId]
+      [tenantId],
     );
     return result.rows[0]?.allocated_resources || {};
   }
@@ -474,7 +474,7 @@ class TenantManagementService {
     return {
       responseTime: 120,
       throughput: 1000,
-      errorRate: 0.01
+      errorRate: 0.01,
     };
   }
 
@@ -482,7 +482,7 @@ class TenantManagementService {
     return {
       userGrowth: 0.15,
       resourceGrowth: 0.20,
-      confidence: 0.85
+      confidence: 0.85,
     };
   }
 
@@ -503,9 +503,9 @@ class TenantManagementService {
   }
 
   async getCurrentTenantTier(tenantId) {
-    let result = await this.db.query(
+    const result = await this.db.query(
       'SELECT tier FROM tenants WHERE id = $1',
-      [tenantId]
+      [tenantId],
     );
     return result.rows[0]?.tier || 'standard';
   }
@@ -514,7 +514,7 @@ class TenantManagementService {
     return {
       current: 100,
       projected: 150,
-      timeframe: '90d'
+      timeframe: '90d',
     };
   }
 
@@ -531,7 +531,7 @@ class TenantManagementService {
       compute: 500,
       storage: 200,
       network: 100,
-      total: 800
+      total: 800,
     };
   }
 
@@ -553,7 +553,7 @@ class TenantManagementService {
       reliability: 90,
       efficiency: 80,
       satisfaction: 85,
-      growth: 75
+      growth: 75,
     };
   }
 
@@ -561,7 +561,7 @@ class TenantManagementService {
     return {
       totalTenants: tenants.length,
       averageHealthScore: tenants.reduce((sum, t) => sum + t.healthScore, 0) / tenants.length,
-      tierDistribution: this.calculateTierDistribution(tenants)
+      tierDistribution: this.calculateTierDistribution(tenants),
     };
   }
 
@@ -585,7 +585,7 @@ class TenantManagementService {
 
     return {
       valid: errors.length === 0,
-      errors: errors
+      errors,
     };
   }
 
@@ -603,5 +603,4 @@ class TenantManagementService {
 }
 
 module.exports = new TenantManagementService();
-
 

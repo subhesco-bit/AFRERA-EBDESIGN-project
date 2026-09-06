@@ -22,13 +22,13 @@ class AIAgenticCompanionService {
 
     try {
       logger.info('Initializing AI Agentic Companion Service');
-      
+
       // Initialize knowledge base with agricultural best practices
       await this.loadKnowledgeBase();
-      
+
       // Initialize specialized agents
       this.initializeAgents();
-      
+
       this.isInitialized = true;
       logger.info('AI Agentic Companion Service initialized successfully');
     } catch (error) {
@@ -76,7 +76,7 @@ class AIAgenticCompanionService {
       });
 
       logger.info('Knowledge base loaded successfully', {
-        entries: this.knowledgeBase.size
+        entries: this.knowledgeBase.size,
       });
     } catch (error) {
       logger.warn('Failed to load some knowledge base entries', { error: error.message });
@@ -91,9 +91,9 @@ class AIAgenticCompanionService {
         'crop_selection_advice',
         'planting_schedule_optimization',
         'harvest_timing_recommendation',
-        'yield_prediction'
+        'yield_prediction',
       ],
-      process: this.processCropManagementTask.bind(this)
+      process: this.processCropManagementTask.bind(this),
     });
 
     // Irrigation Agent
@@ -103,9 +103,9 @@ class AIAgenticCompanionService {
         'water_allocation_optimization',
         'irrigation_scheduling',
         'soil_moisture_monitoring',
-        'drought_prediction'
+        'drought_prediction',
       ],
-      process: this.processIrrigationTask.bind(this)
+      process: this.processIrrigationTask.bind(this),
     });
 
     // Pest Management Agent
@@ -115,9 +115,9 @@ class AIAgenticCompanionService {
         'pest_identification',
         'treatment_recommendation',
         'prevention_strategies',
-        'chemical_alternatives'
+        'chemical_alternatives',
       ],
-      process: this.processPestManagementTask.bind(this)
+      process: this.processPestManagementTask.bind(this),
     });
 
     // Financial Agent
@@ -127,9 +127,9 @@ class AIAgenticCompanionService {
         'cost_optimization',
         'revenue_forecasting',
         'budget_allocation',
-        'market_price_analysis'
+        'market_price_analysis',
       ],
-      process: this.processFinancialTask.bind(this)
+      process: this.processFinancialTask.bind(this),
     });
 
     // Weather Agent
@@ -139,20 +139,20 @@ class AIAgenticCompanionService {
         'weather_forecasting',
         'extreme_weather_alerts',
         'climate_adaptation_advice',
-        'seasonal_planning'
+        'seasonal_planning',
       ],
-      process: this.processWeatherTask.bind(this)
+      process: this.processWeatherTask.bind(this),
     });
 
     logger.info('AI agents initialized', {
-      agents: Array.from(this.activeAgents.keys())
+      agents: Array.from(this.activeAgents.keys()),
     });
   }
 
   async processTask(taskType, taskData, userId) {
     try {
       const agent = this.activeAgents.get(taskType);
-      
+
       if (!agent) {
         throw new Error(`No agent available for task type: ${taskType}`);
       }
@@ -160,7 +160,7 @@ class AIAgenticCompanionService {
       logger.info('Processing task with AI agent', {
         taskType,
         userId,
-        agent: agent.name
+        agent: agent.name,
       });
 
       const result = await agent.process(taskData, userId);
@@ -172,19 +172,19 @@ class AIAgenticCompanionService {
         success: true,
         agent: agent.name,
         result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Task processing failed', {
         taskType,
         userId,
-        error: error.message
+        error: error.message,
       });
 
       return {
         success: false,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -280,7 +280,7 @@ class AIAgenticCompanionService {
       recommendations.push({
         category: 'soil_compatibility',
         crops: soilGuideline.recommended_crops,
-        confidence: 0.85
+        confidence: 0.85,
       });
     }
 
@@ -290,7 +290,7 @@ class AIAgenticCompanionService {
       recommendations.push({
         category: 'seasonal_suitability',
         crops: seasonalCrops,
-        confidence: 0.90
+        confidence: 0.90,
       });
     }
 
@@ -299,23 +299,23 @@ class AIAgenticCompanionService {
     recommendations.push({
       category: 'market_demand',
       crops: marketTrends.high_demand_crops,
-      confidence: 0.75
+      confidence: 0.75,
     });
 
     return {
       recommendations,
       summary: this.generateCropSelectionSummary(recommendations),
-      next_steps: this.generateNextSteps(recommendations)
+      next_steps: this.generateNextSteps(recommendations),
     };
   }
 
   async getPlantingSchedule(crop, weatherData) {
     const cropGuideline = this.knowledgeBase.get(`crop_${crop}`);
-    
+
     if (!cropGuideline) {
       return {
         error: 'Crop guideline not found',
-        crop
+        crop,
       };
     }
 
@@ -325,20 +325,20 @@ class AIAgenticCompanionService {
       weather_considerations: this.analyzeWeatherForPlanting(weatherData),
       soil_preparation: this.getSoilPreparationSteps(crop),
       estimated_harvest: cropGuideline.harvesting_season,
-      risk_factors: this.identifyPlantingRisks(weatherData)
+      risk_factors: this.identifyPlantingRisks(weatherData),
     };
   }
 
   async getHarvestTimingAdvice(crop, fieldData) {
-    let cropGuideline = this.knowledgeBase.get(`crop_${crop}`);
-    
+    const cropGuideline = this.knowledgeBase.get(`crop_${crop}`);
+
     return {
       crop,
       optimal_harvest_window: cropGuideline?.harvesting_season || 'Not specified',
       maturity_indicators: this.getMaturityIndicators(crop),
       weather_conditions: this.analyzeHarvestWeather(fieldData),
       quality_factors: this.getQualityFactors(crop, fieldData),
-      recommended_actions: this.getHarvestRecommendations(crop, fieldData)
+      recommended_actions: this.getHarvestRecommendations(crop, fieldData),
     };
   }
 
@@ -359,9 +359,9 @@ class AIAgenticCompanionService {
       factors: {
         soil: soilFactor,
         weather: weatherFactor,
-        management: managementFactor
+        management: managementFactor,
       },
-      optimization_suggestions: this.getYieldOptimizationSuggestions(fieldData, weatherData)
+      optimization_suggestions: this.getYieldOptimizationSuggestions(fieldData, weatherData),
     };
   }
 
@@ -372,7 +372,7 @@ class AIAgenticCompanionService {
 
     const irrigationRequirement = Math.max(
       0,
-      cropWaterNeeds - rainfallForecast - soilMoistureRetention
+      cropWaterNeeds - rainfallForecast - soilMoistureRetention,
     );
 
     return {
@@ -380,7 +380,7 @@ class AIAgenticCompanionService {
       unit: 'mm/hectare',
       allocation_schedule: this.generateWaterAllocationSchedule(irrigationRequirement),
       cost_estimate: this.calculateIrrigationCost(irrigationRequirement),
-      efficiency_tips: this.getWaterEfficiencyTips()
+      efficiency_tips: this.getWaterEfficiencyTips(),
     };
   }
 
@@ -391,27 +391,27 @@ class AIAgenticCompanionService {
     for (let i = 0; i < daysAhead; i++) {
       const dayForecast = weatherForecast[i] || {};
       const moistureLevel = soilMoisture - (dayForecast.evaporation || 0) + (dayForecast.rainfall || 0);
-      
+
       if (moistureLevel < 30) {
         schedule.push({
           day: i + 1,
           action: 'irrigate',
           amount: this.calculateIrrigationAmount(moistureLevel),
-          priority: 'high'
+          priority: 'high',
         });
       } else if (moistureLevel < 50) {
         schedule.push({
           day: i + 1,
           action: 'monitor',
           amount: 0,
-          priority: 'medium'
+          priority: 'medium',
         });
       } else {
         schedule.push({
           day: i + 1,
           action: 'skip',
           amount: 0,
-          priority: 'low'
+          priority: 'low',
         });
       }
     }
@@ -419,7 +419,7 @@ class AIAgenticCompanionService {
     return {
       schedule,
       total_irrigation: schedule.reduce((sum, day) => sum + day.amount, 0),
-      recommendations: this.getIrrigationRecommendations(schedule)
+      recommendations: this.getIrrigationRecommendations(schedule),
     };
   }
 
@@ -434,10 +434,10 @@ class AIAgenticCompanionService {
       potential_pests: potentialPests.map(pest => ({
         name: pest.name,
         confidence: pest.confidence,
-        severity: pest.severity
+        severity: pest.severity,
       })),
       recommended_action: 'confirm_with_expert',
-      immediate_measures: this.getImmediatePestMeasures(potentialPests)
+      immediate_measures: this.getImmediatePestMeasures(potentialPests),
     };
   }
 
@@ -447,7 +447,7 @@ class AIAgenticCompanionService {
     if (!pestStrategy) {
       return {
         error: 'Pest strategy not found',
-        pest: pestData.pest_name
+        pest: pestData.pest_name,
       };
     }
 
@@ -458,7 +458,7 @@ class AIAgenticCompanionService {
       chemical_alternatives: pestStrategy.chemical_alternatives,
       application_schedule: this.generateTreatmentSchedule(pestStrategy),
       safety_precautions: this.getSafetyPrecautions(pestStrategy),
-      environmental_impact: this.assessEnvironmentalImpact(pestStrategy)
+      environmental_impact: this.assessEnvironmentalImpact(pestStrategy),
     };
   }
 
@@ -475,8 +475,8 @@ class AIAgenticCompanionService {
         recommendations: [
           'Bulk purchase seeds and fertilizers',
           'Use precision agriculture to reduce waste',
-          'Consider organic alternatives'
-        ]
+          'Consider organic alternatives',
+        ],
       },
       {
         category: 'labor_costs',
@@ -486,8 +486,8 @@ class AIAgenticCompanionService {
         recommendations: [
           'Automate repetitive tasks',
           'Optimize workforce scheduling',
-          'Use AI for task allocation'
-        ]
+          'Use AI for task allocation',
+        ],
       },
       {
         category: 'equipment_costs',
@@ -497,26 +497,26 @@ class AIAgenticCompanionService {
         recommendations: [
           'Share equipment with neighboring farms',
           'Implement predictive maintenance',
-          'Use energy-efficient machinery'
-        ]
-      }
+          'Use energy-efficient machinery',
+        ],
+      },
     ];
 
     const totalSavings = optimizationOpportunities.reduce(
       (sum, opp) => sum + opp.savings,
-      0
+      0,
     );
 
     return {
       optimization_opportunities: optimizationOpportunities,
       total_potential_savings: totalSavings,
       roi_percentage: (totalSavings / revenue) * 100,
-      implementation_priority: this.prioritizeOptimizations(optimizationOpportunities)
+      implementation_priority: this.prioritizeOptimizations(optimizationOpportunities),
     };
   }
 
   async forecastRevenue(cropData, marketData) {
-    let crop = cropData.crop_type;
+    const crop = cropData.crop_type;
     const expectedYield = cropData.expected_yield || 0;
     const marketPrice = marketData.current_price || 0;
     const priceTrend = marketData.price_trend || 'stable';
@@ -534,10 +534,10 @@ class AIAgenticCompanionService {
       factors: {
         base_revenue: baseRevenue,
         trend_adjustment: trendAdjustment,
-        seasonality_adjustment: seasonalityAdjustment
+        seasonality_adjustment: seasonalityAdjustment,
       },
       risk_factors: this.identifyRevenueRisks(marketData),
-      recommendations: this.getRevenueOptimizationRecommendations(marketData)
+      recommendations: this.getRevenueOptimizationRecommendations(marketData),
     };
   }
 
@@ -552,17 +552,17 @@ class AIAgenticCompanionService {
         if (!taskType || !taskData) {
           return res.status(400).json({
             success: false,
-            error: 'taskType and taskData are required'
+            error: 'taskType and taskData are required',
           });
         }
 
-        let result = await this.processTask(taskType, taskData, userId);
+        const result = await this.processTask(taskType, taskData, userId);
         res.json(result);
       } catch (error) {
         logger.error('AI companion task error', { error: error.message });
         res.status(500).json({
           success: false,
-          error: error.message
+          error: error.message,
         });
       }
     });
@@ -572,12 +572,12 @@ class AIAgenticCompanionService {
       const agents = Array.from(this.activeAgents.entries()).map(([id, agent]) => ({
         id,
         name: agent.name,
-        capabilities: agent.capabilities
+        capabilities: agent.capabilities,
       }));
 
       res.json({
         success: true,
-        agents
+        agents,
       });
     });
 
@@ -587,8 +587,8 @@ class AIAgenticCompanionService {
         success: true,
         entries: this.knowledgeBase.size,
         categories: Array.from(new Set(
-          Array.from(this.knowledgeBase.keys()).map(key => key.split('_')[0])
-        ))
+          Array.from(this.knowledgeBase.keys()).map(key => key.split('_')[0]),
+        )),
       });
     });
 
@@ -599,13 +599,13 @@ class AIAgenticCompanionService {
         const insights = await this.generateFarmInsights(farmId);
         res.json({
           success: true,
-          insights
+          insights,
         });
       } catch (error) {
         logger.error('Failed to generate farm insights', { error: error.message });
         res.status(500).json({
           success: false,
-          error: error.message
+          error: error.message,
         });
       }
     });
@@ -625,12 +625,12 @@ class AIAgenticCompanionService {
 
   async generateFarmInsights(farmId) {
     // Generate comprehensive insights for a specific farm
-    let insights = {
+    const insights = {
       crop_recommendations: [],
       irrigation_suggestions: [],
       pest_alerts: [],
       financial_overview: {},
-      weather_impact: {}
+      weather_impact: {},
     };
 
     // This would typically query farm-specific data and generate insights
@@ -648,7 +648,7 @@ class AIAgenticCompanionService {
     // Implementation would query market data
     return {
       high_demand_crops: ['rice', 'wheat', 'vegetables'],
-      price_trends: {}
+      price_trends: {},
     };
   }
 
@@ -728,7 +728,7 @@ class AIAgenticCompanionService {
       { week: 1, amount: requirement * 0.3 },
       { week: 2, amount: requirement * 0.25 },
       { week: 3, amount: requirement * 0.25 },
-      { week: 4, amount: requirement * 0.2 }
+      { week: 4, amount: requirement * 0.2 },
     ];
   }
 
@@ -752,7 +752,7 @@ class AIAgenticCompanionService {
     // Simplified pest matching
     return [
       { name: 'aphids', confidence: 0.75, severity: 'medium' },
-      { name: 'armyworm', confidence: 0.60, severity: 'high' }
+      { name: 'armyworm', confidence: 0.60, severity: 'high' },
     ];
   }
 
@@ -764,7 +764,7 @@ class AIAgenticCompanionService {
     return [
       { day: 1, action: 'apply_treatment' },
       { day: 7, action: 'monitor_effectiveness' },
-      { day: 14, action: 'reapply_if_needed' }
+      { day: 14, action: 'reapply_if_needed' },
     ];
   }
 
@@ -802,42 +802,42 @@ class AIAgenticCompanionService {
     return {
       location,
       timeframe,
-      forecast: []
+      forecast: [],
     };
   }
 
   async getExtremeWeatherAlerts(location, cropData) {
     return {
       alerts: [],
-      recommendations: []
+      recommendations: [],
     };
   }
 
   async getClimateAdaptationAdvice(location, cropData) {
     return {
       strategies: [],
-      timeline: []
+      timeline: [],
     };
   }
 
   async getSeasonalPlanningAdvice(location, timeframe) {
     return {
       recommendations: [],
-      calendar: []
+      calendar: [],
     };
   }
 
   async allocateBudget(financialData, cropData) {
     return {
       allocation: {},
-      recommendations: []
+      recommendations: [],
     };
   }
 
   async analyzeMarket(marketData, cropData) {
     return {
       analysis: {},
-      opportunities: []
+      opportunities: [],
     };
   }
 
@@ -845,19 +845,17 @@ class AIAgenticCompanionService {
     return {
       risk_level: 'low',
       probability: 0.2,
-      recommendations: []
+      recommendations: [],
     };
   }
 
   async getPreventionStrategies(pestData, environmentalData) {
     return {
       strategies: [],
-      timeline: []
+      timeline: [],
     };
   }
 }
 
 module.exports = new AIAgenticCompanionService();
-
-
 

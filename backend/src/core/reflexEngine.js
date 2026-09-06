@@ -122,7 +122,7 @@ class ReflexEngine {
       throw new Error(
         `Reflex "${id}".${field} is declared async — a reflex must be synchronous. ` +
         'If this needs to await anything (a database call, an HTTP call), it is a ' +
-        'decision, not a reflex: register it in decisionEngine.js instead.'
+        'decision, not a reflex: register it in decisionEngine.js instead.',
       );
     }
   }
@@ -166,7 +166,7 @@ class ReflexEngine {
           // budget measured below is meaningless if work is still in flight.
           throw new Error(
             `Reflex "${reflexId}" returned a thenable from act() — it is not ` +
-            'actually synchronous. Move it to decisionEngine.js.'
+            'actually synchronous. Move it to decisionEngine.js.',
           );
         }
       }

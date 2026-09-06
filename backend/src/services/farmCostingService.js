@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 class FarmCostingService {
   async calculateFarmCost(farmId, crops) {
   // Validate inputs
-  if (!farmId) throw new Error('Missing required parameter');
+    if (!farmId) throw new Error('Missing required parameter');
 
     try {
       let totalCost = 0;
@@ -15,7 +15,7 @@ class FarmCostingService {
         totalCost += cost;
       }
       await db('farm_costs').insert({
-        id: require('uuid').v4(), farm_id: farmId, total_cost: totalCost, created_at: new Date()
+        id: require('uuid').v4(), farm_id: farmId, total_cost: totalCost, created_at: new Date(),
       });
       logger.info(`Farm cost calculated: ${farmId}`);
       return { farm_id: farmId, total_cost: totalCost };

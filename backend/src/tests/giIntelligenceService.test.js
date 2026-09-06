@@ -13,7 +13,7 @@ describe('GI Intelligence Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('GI Intelligence Service', () => {
       .send({
         email: 'gi-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -49,7 +49,7 @@ describe('GI Intelligence Service', () => {
           historical_significance: 'Historically cultivated since British era',
           unique_characteristics: ['Malty flavor', 'Bright color', 'Strong aroma'],
           production_methods: ['Traditional orthodox', 'CTC'],
-          quality_standards: { moisture: 'max 8%', ash: 'max 5%' }
+          quality_standards: { moisture: 'max 8%', ash: 'max 5%' },
         })
         .expect(201);
 
@@ -62,7 +62,7 @@ describe('GI Intelligence Service', () => {
       const response = await request(app)
         .post('/api/v1/gi-intelligence/gi-products')
         .send({
-          gi_name: 'Test GI'
+          gi_name: 'Test GI',
         })
         .expect(401);
     });
@@ -97,7 +97,7 @@ describe('GI Intelligence Service', () => {
           farmer_id: 'test-farmer-id',
           production_location_id: null,
           certified_area_hectares: 50,
-          annual_production_tonnes: 100
+          annual_production_tonnes: 100,
         })
         .expect(201);
 
@@ -124,7 +124,7 @@ describe('GI Intelligence Service', () => {
         .send({
           product_id: 'test-product-id',
           base_price: 100,
-          gi_product_id: testGIProductId
+          gi_product_id: testGIProductId,
         })
         .expect(200);
 
@@ -144,7 +144,7 @@ describe('GI Intelligence Service', () => {
         .send({
           product_id: 'test-product-id',
           batch_number: 'BATCH-001',
-          producer_id: 'test-producer-id'
+          producer_id: 'test-producer-id',
         })
         .expect(201);
 
@@ -178,7 +178,7 @@ describe('GI Intelligence Service', () => {
           price_per_unit: 200,
           quality_tier: 'premium',
           harvest_date: '2024-01-15',
-          location_id: null
+          location_id: null,
         })
         .expect(201);
 
@@ -211,8 +211,8 @@ describe('GI Intelligence Service', () => {
             sales: 5000,
             quantity_sold: 25,
             avg_premium: 18.5,
-            unique_consumers: 30
-          }
+            unique_consumers: 30,
+          },
         })
         .expect(200);
 

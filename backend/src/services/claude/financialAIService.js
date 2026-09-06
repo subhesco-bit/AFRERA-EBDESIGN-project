@@ -1,22 +1,22 @@
 /**
  * Financial AI Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: Financial decision support with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, financial data, credit history, market conditions
  * Collaboration Mode: Financial decision tracking, outcome logging, learning feedback
- * 
+ *
  * Original Devin Implementation: Financial service with loans, advances, credit scoring, transactions
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware financial decisions using library knowledge
  * - AI-powered credit scoring enhancement
  * - Historical financial pattern analysis
  * - Multi-factor risk assessment
  * - Real-time financial confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All financial operations preserved (loans, advances, credit scoring)
  * - Original financial logic maintained
@@ -52,42 +52,42 @@ class ClaudeAIEnhancedFinancialService {
         work_type: 'loan_application',
         service: this.serviceName,
         params: { loanData, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'processLoanApplication',
-        loanData: loanData
+        loanData,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'decision',
         query: this.buildLoanApplicationQuery(loanData, options),
-        context: { 
-          loanData, 
+        context: {
+          loanData,
           options,
           libraryContext,
-          marketConditions: await this.getMarketConditions()
+          marketConditions: await this.getMarketConditions(),
         },
-        agentPreference: 'business-analyst'
+        agentPreference: 'business-analyst',
       });
 
       const originalResult = await this.originalService.applyForLoan(loanData);
-      
+
       const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_risk_assessment: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_financial_recommendations: this.extractFinancialRecommendations(aiEnhancement.content)
+        ai_financial_recommendations: this.extractFinancialRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'loan_application',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -96,9 +96,9 @@ class ClaudeAIEnhancedFinancialService {
         work_type: 'loan_application',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.applyForLoan(loanData);
     }
@@ -117,44 +117,44 @@ class ClaudeAIEnhancedFinancialService {
         work_type: 'credit_risk_assessment',
         service: this.serviceName,
         params: { farmerId, financialData, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
-      let libraryContext = await libraryKnowledgeService.buildAIContext({
+      const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'assessCreditRisk',
-        farmerId: farmerId,
-        financialData: financialData
+        farmerId,
+        financialData,
       });
 
-      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'assessment',
         query: this.buildCreditRiskQuery(farmerId, financialData, options),
-        context: { 
-          farmerId, 
-          financialData, 
+        context: {
+          farmerId,
+          financialData,
           options,
           libraryContext,
-          historicalData: await this.getFarmerFinancialHistory(farmerId)
+          historicalData: await this.getFarmerFinancialHistory(farmerId),
         },
-        agentPreference: 'governance-agent'
+        agentPreference: 'governance-agent',
       });
 
-      let originalResult = await this.originalService.assessCreditRisk(farmerId, financialData);
-      
-      let enhancedResult = {
+      const originalResult = await this.originalService.assessCreditRisk(farmerId, financialData);
+
+      const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_credit_analysis: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_risk_factors: this.extractRiskFactors(aiEnhancement.content)
+        ai_risk_factors: this.extractRiskFactors(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'credit_risk_assessment',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -163,9 +163,9 @@ class ClaudeAIEnhancedFinancialService {
         work_type: 'credit_risk_assessment',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.assessCreditRisk(farmerId, financialData);
     }
@@ -179,7 +179,7 @@ class ClaudeAIEnhancedFinancialService {
     return {
       interest_rates: { current: 8.5, trend: 'stable' },
       inflation: { current: 4.2, trend: 'increasing' },
-      demand: { agricultural: 'high', credit: 'moderate' }
+      demand: { agricultural: 'high', credit: 'moderate' },
     };
   }
 
@@ -191,7 +191,7 @@ class ClaudeAIEnhancedFinancialService {
     return {
       loan_history: [],
       repayment_history: [],
-      credit_score: 0
+      credit_score: 0,
     };
   }
 
@@ -214,16 +214,16 @@ class ClaudeAIEnhancedFinancialService {
    */
   extractFinancialRecommendations(aiContent) {
     if (!aiContent) return [];
-    
+
     const recommendations = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('recommend') || line.includes('suggest') || line.includes('advise')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -232,16 +232,16 @@ class ClaudeAIEnhancedFinancialService {
    */
   extractRiskFactors(aiContent) {
     if (!aiContent) return [];
-    
+
     const factors = [];
-    let lines = aiContent.split('\n');
-    
+    const lines = aiContent.split('\n');
+
     lines.forEach(line => {
       if (line.includes('risk') || line.includes('factor') || line.includes('concern')) {
         factors.push(line.trim());
       }
     });
-    
+
     return factors;
   }
 
@@ -274,7 +274,7 @@ class ClaudeAIEnhancedFinancialService {
       ai_coordinator: claudeAICoordinator ? 'available' : 'unavailable',
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
-      ai_enhanced_methods: ['processLoanApplicationAI', 'assessCreditRiskAI']
+      ai_enhanced_methods: ['processLoanApplicationAI', 'assessCreditRiskAI'],
     };
   }
 }

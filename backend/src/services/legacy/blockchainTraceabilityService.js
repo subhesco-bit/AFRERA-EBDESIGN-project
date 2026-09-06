@@ -46,7 +46,7 @@ async function recordBlockchainTransaction(data) {
     gas_used,
     gas_price,
     status,
-    metadata
+    metadata,
   } = data;
 
   try {
@@ -66,8 +66,8 @@ async function recordBlockchainTransaction(data) {
         gas_used,
         gas_price,
         status,
-        JSON.stringify(metadata)
-      ]
+        JSON.stringify(metadata),
+      ],
     );
 
     // Return the result from pool.query (test-store is handled internally by pool)
@@ -80,7 +80,7 @@ async function recordBlockchainTransaction(data) {
       throw new Error('Record blockchain transaction failed: database returned no row for INSERT ... RETURNING *');
     }
     const fallback = {
-      transaction_hash: transaction_hash || `0x${Math.random().toString(16).slice(2,66)}`,
+      transaction_hash: transaction_hash || `0x${Math.random().toString(16).slice(2, 66)}`,
       block_number: block_number || null,
       block_hash: block_hash || null,
       transaction_index: transaction_index || 0,
@@ -89,7 +89,7 @@ async function recordBlockchainTransaction(data) {
       gas_used: gas_used || 0,
       gas_price: gas_price || 0,
       status: status || 'confirmed',
-      metadata: metadata || {}
+      metadata: metadata || {},
     };
     return fallback;
   } catch (error) {
@@ -103,7 +103,7 @@ async function recordBlockchainTransaction(data) {
  */
 router.post('/blockchain-transactions', authMiddleware, async (req, res) => {
   try {
-    let result = await recordBlockchainTransaction(req.body);
+    const result = await recordBlockchainTransaction(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record blockchain transaction API error', { error: error.message, stack: error.stack });
@@ -116,9 +116,9 @@ router.post('/blockchain-transactions', authMiddleware, async (req, res) => {
  */
 async function getBlockchainTransaction(transactionHash) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM blockchain_transactions WHERE transaction_hash = $1',
-      [transactionHash]
+      [transactionHash],
     );
 
     if (result && result.rows && result.rows.length > 0) {
@@ -139,7 +139,7 @@ async function getBlockchainTransaction(transactionHash) {
         const found = all.find(r => {
           if (!r || !r.transaction_hash) return false;
           const candidate = normalize(r.transaction_hash);
-          return candidate === targetNorm || candidate === ('0x'+targetNorm) || ('0x'+candidate) === targetNorm;
+          return candidate === targetNorm || candidate === (`0x${targetNorm}`) || (`0x${candidate}`) === targetNorm;
         });
         if (found) return found;
       }
@@ -158,7 +158,7 @@ async function getBlockchainTransaction(transactionHash) {
  */
 router.get('/blockchain-transactions/:hash', async (req, res) => {
   try {
-    let result = await getBlockchainTransaction(req.params.hash);
+    const result = await getBlockchainTransaction(req.params.hash);
     res.json(result);
   } catch (error) {
     logger.error('Get blockchain transaction API error', { error: error.message, stack: error.stack });
@@ -183,11 +183,11 @@ async function recordTraceabilityEvent(data) {
     actor_type,
     transaction_hash,
     event_data,
-    ipfs_hash
+    ipfs_hash,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO traceability_events 
        (product_id, batch_number, event_type, location_id, actor_id, actor_type, 
         transaction_hash, event_data, ipfs_hash, is_verified)
@@ -202,8 +202,8 @@ async function recordTraceabilityEvent(data) {
         actor_type,
         transaction_hash,
         JSON.stringify(event_data),
-        ipfs_hash
-      ]
+        ipfs_hash,
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -211,7 +211,7 @@ async function recordTraceabilityEvent(data) {
       if (!isTestMode()) {
         throw new Error('Record traceability event failed: database returned no row for INSERT ... RETURNING *');
       }
-      let fallback = {
+      const fallback = {
         id: `te-${Date.now()}`,
         product_id,
         batch_number,
@@ -222,7 +222,7 @@ async function recordTraceabilityEvent(data) {
         transaction_hash,
         event_data,
         ipfs_hash,
-        is_verified: true
+        is_verified: true,
       };
       persistTestFallback('traceability_events', product_id, fallback, true);
       return fallback;
@@ -240,9 +240,9 @@ async function recordTraceabilityEvent(data) {
  */
 router.post('/traceability-events', authMiddleware, async (req, res) => {
   try {
-    let result = await recordTraceabilityEvent({
+    const result = await recordTraceabilityEvent({
       ...req.body,
-      actor_id: req.user.id
+      actor_id: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -272,14 +272,14 @@ async function getTraceabilityEvents(productId, batchNumber = null) {
 
     query += ' ORDER BY te.event_timestamp ASC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     if (result && result.rows && result.rows.length > 0) {
       return result.rows;
     }
 
     // Fallback to test-store
     if (typeof pool.getTestData === 'function') {
-      let stored = pool.getTestData('traceability_events', productId);
+      const stored = pool.getTestData('traceability_events', productId);
       if (stored) {
         // If batch filtering requested, filter locally
         if (batchNumber) {
@@ -302,7 +302,7 @@ async function getTraceabilityEvents(productId, batchNumber = null) {
 router.get('/traceability-events/:productId', async (req, res) => {
   try {
     const { batch_number } = req.query;
-    let result = await getTraceabilityEvents(req.params.productId, batch_number);
+    const result = await getTraceabilityEvents(req.params.productId, batch_number);
     res.json(result);
   } catch (error) {
     logger.error('Get traceability events API error', { error: error.message, stack: error.stack });
@@ -325,11 +325,11 @@ async function recordChainOfCustody(data) {
     holder_type,
     from_holder_id,
     transaction_hash,
-    transfer_document_url
+    transfer_document_url,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO chain_of_custody 
        (product_id, batch_number, current_holder_id, holder_type, from_holder_id, 
         transaction_hash, transfer_document_url, is_verified)
@@ -342,8 +342,8 @@ async function recordChainOfCustody(data) {
         holder_type,
         from_holder_id,
         transaction_hash,
-        transfer_document_url
-      ]
+        transfer_document_url,
+      ],
     );
 
     // Fallback for test-mode mock only — see isTestMode() note above.
@@ -351,7 +351,7 @@ async function recordChainOfCustody(data) {
       if (!isTestMode()) {
         throw new Error('Record chain of custody failed: database returned no row for INSERT ... RETURNING *');
       }
-      let fallback = {
+      const fallback = {
         id: `coc-${Date.now()}`,
         product_id,
         batch_number,
@@ -360,7 +360,7 @@ async function recordChainOfCustody(data) {
         from_holder_id,
         transaction_hash,
         transfer_document_url,
-        is_verified: true
+        is_verified: true,
       };
       persistTestFallback('chain_of_custody', product_id, fallback, true);
       return fallback;
@@ -378,7 +378,7 @@ async function recordChainOfCustody(data) {
  */
 router.post('/chain-of-custody', authMiddleware, async (req, res) => {
   try {
-    let result = await recordChainOfCustody(req.body);
+    const result = await recordChainOfCustody(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record chain of custody API error', { error: error.message, stack: error.stack });
@@ -391,9 +391,9 @@ router.post('/chain-of-custody', authMiddleware, async (req, res) => {
  */
 async function verifyChainOfCustody(productId, batchNumber) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT verify_chain_of_custody($1, $2) as verification',
-      [productId, batchNumber]
+      [productId, batchNumber],
     );
 
     if (result && result.rows && result.rows[0]) return result.rows[0].verification;
@@ -404,13 +404,13 @@ async function verifyChainOfCustody(productId, batchNumber) {
       const custody = pool.getTestData('chain_of_custody', productId) || [];
       const events = pool.getTestData('traceability_events', productId) || [];
       const combined = Array.isArray(custody) ? custody.concat(Array.isArray(events) ? events : [events]) : [custody].concat(Array.isArray(events) ? events : [events]);
-      combined.sort((a,b) => (a.transfer_date || a.event_timestamp || 0) - (b.transfer_date || b.event_timestamp || 0));
+      combined.sort((a, b) => (a.transfer_date || a.event_timestamp || 0) - (b.transfer_date || b.event_timestamp || 0));
       combined.forEach(item => chain.push(item));
     }
 
     return {
       is_complete: chain.length > 0,
-      chain
+      chain,
     };
   } catch (error) {
     logger.error('Verify chain of custody error', { error: error.message, stack: error.stack });
@@ -424,7 +424,7 @@ async function verifyChainOfCustody(productId, batchNumber) {
 router.get('/chain-of-custody/verify/:productId', async (req, res) => {
   try {
     const { batch_number } = req.query;
-    let result = await verifyChainOfCustody(req.params.productId, batch_number);
+    const result = await verifyChainOfCustody(req.params.productId, batch_number);
     res.json(result);
   } catch (error) {
     logger.error('Verify chain of custody API error', { error: error.message, stack: error.stack });
@@ -451,11 +451,11 @@ async function issueBlockchainCertificate(data) {
     expiry_date,
     certificate_data,
     transaction_hash,
-    ipfs_hash
+    ipfs_hash,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO blockchain_certificates 
        (certificate_type, certificate_number, product_id, batch_number, issuer_id, issuer_name, 
         issue_date, expiry_date, certificate_data, transaction_hash, ipfs_hash)
@@ -472,8 +472,8 @@ async function issueBlockchainCertificate(data) {
         expiry_date,
         JSON.stringify(certificate_data),
         transaction_hash,
-        ipfs_hash
-      ]
+        ipfs_hash,
+      ],
     );
 
     // Return the result from pool.query (test-store is handled internally by pool)
@@ -485,7 +485,7 @@ async function issueBlockchainCertificate(data) {
     if (!isTestMode()) {
       throw new Error('Issue blockchain certificate failed: database returned no row for INSERT ... RETURNING *');
     }
-    let fallback = {
+    const fallback = {
       id: `cert-${Date.now()}`,
       certificate_type,
       certificate_number: certificate_number || `CERT-${Date.now()}`,
@@ -498,7 +498,7 @@ async function issueBlockchainCertificate(data) {
       certificate_data,
       transaction_hash,
       ipfs_hash,
-      is_revoked: false
+      is_revoked: false,
     };
     return fallback;
   } catch (error) {
@@ -512,9 +512,9 @@ async function issueBlockchainCertificate(data) {
  */
 router.post('/blockchain-certificates', authMiddleware, async (req, res) => {
   try {
-    let result = await issueBlockchainCertificate({
+    const result = await issueBlockchainCertificate({
       ...req.body,
-      issuer_id: req.user.id
+      issuer_id: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -528,9 +528,9 @@ router.post('/blockchain-certificates', authMiddleware, async (req, res) => {
  */
 async function verifyBlockchainCertificate(certificateNumber) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM blockchain_certificates WHERE certificate_number = $1 AND is_revoked = false',
-      [certificateNumber]
+      [certificateNumber],
     );
 
     if (result && result.rows && result.rows.length > 0) {
@@ -540,15 +540,15 @@ async function verifyBlockchainCertificate(certificateNumber) {
     // Fallback to test-store
     if (typeof pool.getTestData === 'function') {
       // direct lookup
-      let stored = pool.getTestData('blockchain_certificates', certificateNumber);
+      const stored = pool.getTestData('blockchain_certificates', certificateNumber);
       if (stored) return stored;
 
       // scan all certificates with case-insensitive match and trimmed variants
       const norm = (s) => (s || '').toString().trim().toLowerCase();
       const target = norm(certificateNumber);
-      let all = pool.getAllTestData ? pool.getAllTestData('blockchain_certificates') : [];
+      const all = pool.getAllTestData ? pool.getAllTestData('blockchain_certificates') : [];
       if (Array.isArray(all)) {
-        let found = all.find(c => c && norm(c.certificate_number) === target);
+        const found = all.find(c => c && norm(c.certificate_number) === target);
         if (found) return found;
       }
     }
@@ -565,7 +565,7 @@ async function verifyBlockchainCertificate(certificateNumber) {
  */
 router.get('/blockchain-certificates/verify/:certificateNumber', async (req, res) => {
   try {
-    let result = await verifyBlockchainCertificate(req.params.certificateNumber);
+    const result = await verifyBlockchainCertificate(req.params.certificateNumber);
     res.json(result);
   } catch (error) {
     logger.error('Verify blockchain certificate API error', { error: error.message, stack: error.stack });
@@ -585,30 +585,30 @@ async function createVerificationRequest(data) {
     product_id,
     batch_number,
     certificate_id,
-    request_type
+    request_type,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO verification_requests 
        (product_id, batch_number, certificate_id, requested_by, request_type, verification_status)
        VALUES ($1, $2, $3, $4, $5, 'pending')
        RETURNING *`,
-      [product_id, batch_number, certificate_id, data.requested_by, request_type]
+      [product_id, batch_number, certificate_id, data.requested_by, request_type],
     );
 
     if (!result || !result.rows || !result.rows[0]) {
       if (!isTestMode()) {
         throw new Error('Create verification request failed: database returned no row for INSERT ... RETURNING *');
       }
-      let fallback = {
+      const fallback = {
         id: `vr-${Date.now()}`,
         product_id,
         batch_number,
         certificate_id,
         requested_by: data.requested_by,
         request_type,
-        verification_status: 'pending'
+        verification_status: 'pending',
       };
       persistTestFallback('verification_requests', product_id, fallback, true);
       return fallback;
@@ -626,9 +626,9 @@ async function createVerificationRequest(data) {
  */
 router.post('/verification-requests', authMiddleware, async (req, res) => {
   try {
-    let result = await createVerificationRequest({
+    const result = await createVerificationRequest({
       ...req.body,
-      requested_by: req.user.id
+      requested_by: req.user.id,
     });
     res.status(201).json(result);
   } catch (error) {
@@ -646,7 +646,7 @@ router.post('/verification-requests', authMiddleware, async (req, res) => {
  */
 async function recordBlockchainAnalytics(metrics) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO blockchain_analytics 
        (date, total_transactions, confirmed_transactions, failed_transactions, 
         total_gas_used, average_gas_price, total_traceability_events, 
@@ -669,8 +669,8 @@ async function recordBlockchainAnalytics(metrics) {
         metrics.average_gas_price || 0,
         metrics.total_traceability_events || 0,
         metrics.total_certificates_issued || 0,
-        metrics.unique_products_tracked || 0
-      ]
+        metrics.unique_products_tracked || 0,
+      ],
     );
 
     if (result && result.rows && result.rows[0]) return result.rows[0];
@@ -679,7 +679,7 @@ async function recordBlockchainAnalytics(metrics) {
     // outside test mode, per database/pool.js, so this is already inert in
     // production).
     if (typeof pool.getAllTestData === 'function') {
-      let all = pool.getAllTestData('blockchain_analytics');
+      const all = pool.getAllTestData('blockchain_analytics');
       if (Array.isArray(all) && all.length > 0) return all[all.length - 1];
     }
 
@@ -697,7 +697,7 @@ async function recordBlockchainAnalytics(metrics) {
       average_gas_price: metrics.average_gas_price || 0,
       total_traceability_events: metrics.total_traceability_events || 0,
       total_certificates_issued: metrics.total_certificates_issued || 0,
-      unique_products_tracked: metrics.unique_products_tracked || 0
+      unique_products_tracked: metrics.unique_products_tracked || 0,
     };
   } catch (error) {
     logger.error('Record blockchain analytics error', { error: error.message, stack: error.stack });
@@ -708,10 +708,10 @@ async function recordBlockchainAnalytics(metrics) {
 /**
  * API endpoint to record blockchain analytics
  */
-router.post('/blockchain-analytics', authMiddleware,  async (req, res) => {
+router.post('/blockchain-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    let result = await recordBlockchainAnalytics(metrics);
+    const result = await recordBlockchainAnalytics(metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record blockchain analytics API error', { error: error.message, stack: error.stack });
@@ -739,8 +739,6 @@ module.exports = {
   verifyBlockchainCertificate,
   createVerificationRequest,
   recordBlockchainAnalytics,
-  isHealthy
+  isHealthy,
 };
-
-
 

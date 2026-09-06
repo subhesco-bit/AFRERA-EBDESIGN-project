@@ -9,7 +9,7 @@ class MetricsCollector {
       database: { queries: 0, slowQueries: 0, errors: 0 },
       cache: { hits: 0, misses: 0, errors: 0 },
       endpoints: {},
-      errors: {}
+      errors: {},
     };
 
     this.slowQueryThreshold = parseInt(process.env.SLOW_QUERY_THRESHOLD || 100);
@@ -62,7 +62,7 @@ class MetricsCollector {
       ...this.metrics,
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-      cpu: process.cpuUsage()
+      cpu: process.cpuUsage(),
     };
   }
 
@@ -73,7 +73,7 @@ class MetricsCollector {
       database: { queries: 0, slowQueries: 0, errors: 0 },
       cache: { hits: 0, misses: 0, errors: 0 },
       endpoints: {},
-      errors: {}
+      errors: {},
     };
   }
 }
@@ -98,13 +98,13 @@ class HealthChecker {
         await checkFn();
         results.checks[name] = {
           status: 'ok',
-          duration: Date.now() - start
+          duration: Date.now() - start,
         };
       } catch (error) {
         hasError = true;
         results.checks[name] = {
           status: 'error',
-          error: error.message
+          error: error.message,
         };
       }
     }
@@ -118,7 +118,7 @@ class HealthChecker {
 // Metrics middleware
 const metricsMiddleware = (metrics) => {
   return (req, res, next) => {
-    let start = Date.now();
+    const start = Date.now();
 
     const originalJson = res.json;
     res.json = function (data) {
@@ -129,13 +129,13 @@ const metricsMiddleware = (metrics) => {
         logger.warn(`Request failed: ${req.method} ${req.path}`, {
           statusCode: res.statusCode,
           duration,
-          requestId: req.id
+          requestId: req.id,
         });
       } else {
         logger.debug(`Request completed: ${req.method} ${req.path}`, {
           statusCode: res.statusCode,
           duration,
-          requestId: req.id
+          requestId: req.id,
         });
       }
 
@@ -149,5 +149,5 @@ const metricsMiddleware = (metrics) => {
 module.exports = {
   MetricsCollector,
   HealthChecker,
-  metricsMiddleware
+  metricsMiddleware,
 };

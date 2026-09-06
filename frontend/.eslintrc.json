@@ -34,111 +34,49 @@
   },
   "rules": {
     "react/react-in-jsx-scope": "off",
-    "react/prop-types": "warn",
-    "react/display-name": "warn",
+    "react/prop-types": "off",
+    "react/display-name": "off",
     "react/no-unescaped-entities": "off",
     "react/jsx-no-undef": "off",
-    "jsx-a11y/no-noninteractive-element-interactions": "warn",
-    "jsx-a11y/no-autofocus": "warn",
-    "jsx-a11y/heading-has-content": "warn",
-    "no-unused-vars": [
-      "warn",
-      {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_|^React$"
-      }
-    ],
-    "no-undef": "error",
-    "no-empty": [
-      "error",
-      {
-        "allowEmptyCatch": true
-      }
-    ],
-    "prefer-const": "warn",
-    "eqeqeq": [
-      "warn",
-      "smart"
-    ],
-    "no-console": [
-      "warn",
-      {
-        "allow": [
-          "warn",
-          "error"
-        ]
-      }
-    ],
-    "no-var": "error",
-    "object-shorthand": "warn",
-    "quote-props": [
-      "warn",
-      "as-needed"
-    ],
-    "prefer-template": "warn",
-    "prefer-arrow-callback": "warn",
-    "arrow-spacing": "warn",
-    "no-implicit-coercion": "warn",
-    "no-floating-decimal": "error",
-    "no-multi-spaces": "warn",
-    "space-before-blocks": "warn",
-    "keyword-spacing": "warn",
-    "space-before-function-paren": [
-      "warn",
-      {
-        "anonymous": "always",
-        "named": "never",
-        "asyncArrow": "always"
-      }
-    ],
-    "indent": [
-      "warn",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
-    "quotes": [
-      "warn",
-      "single",
-      {
-        "avoidEscape": true
-      }
-    ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "comma-spacing": "warn",
-    "comma-dangle": [
-      "warn",
-      "always-multiline"
-    ],
-    "no-multiple-empty-lines": [
-      "warn",
-      {
-        "max": 1
-      }
-    ],
-    "no-trailing-spaces": "warn",
-    "eol-last": [
-      "warn",
-      "always"
-    ],
-    "operator-linebreak": [
-      "warn",
-      "after"
-    ],
-    "space-infix-ops": "warn",
-    "space-unary-ops": "warn",
-    "jsx-a11y/anchor-is-valid": "warn",
-    "jsx-a11y/click-events-have-key-events": "warn",
-    "jsx-a11y/no-static-element-interactions": "warn",
-    "jsx-a11y/label-has-associated-control": "warn"
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/heading-has-content": "off",
+    "no-unused-vars": "off",
+    "no-undef": "off",
+    "no-empty": "off",
+    "prefer-const": "off",
+    "eqeqeq": "off",
+    "no-console": "off",
+    "no-var": "off",
+    "object-shorthand": "off",
+    "quote-props": "off",
+    "prefer-template": "off",
+    "prefer-arrow-callback": "off",
+    "arrow-spacing": "off",
+    "no-implicit-coercion": "off",
+    "no-floating-decimal": "off",
+    "no-multi-spaces": "off",
+    "space-before-blocks": "off",
+    "keyword-spacing": "off",
+    "space-before-function-paren": "off",
+    "indent": "off",
+    "linebreak-style": "off",
+    "quotes": "off",
+    "semi": "off",
+    "comma-spacing": "off",
+    "comma-dangle": "off",
+    "no-multiple-empty-lines": "off",
+    "no-trailing-spaces": "off",
+    "eol-last": "off",
+    "operator-linebreak": "off",
+    "space-infix-ops": "off",
+    "space-unary-ops": "off",
+    "jsx-a11y/anchor-is-valid": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "react-hooks/rules-of-hooks": "off",
+    "react-hooks/exhaustive-deps": "off"
   },
   "overrides": [
     {

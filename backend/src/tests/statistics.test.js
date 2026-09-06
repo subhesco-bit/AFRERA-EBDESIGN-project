@@ -107,7 +107,7 @@ describe('weightedScore', () => {
   test('computes score and per-component contribution shares', () => {
     const { score, contributions } = stats.weightedScore({
       a: { value: 1, weight: 1 },
-      b: { value: 0, weight: 1 }
+      b: { value: 0, weight: 1 },
     });
     expect(score).toBe(0.5);
     expect(contributions.a.share).toBeCloseTo(1, 10);

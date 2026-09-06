@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Response Formatter Middleware
- * 
+ *
  * Production-ready response formatting with:
  * - Consistent API response structure
  * - Request tracing and correlation IDs
@@ -30,8 +30,8 @@ function successResponse(data = null, message = 'Success', statusCode = 200, met
       requestId: metadata.requestId,
       statusCode,
       version: metadata.version || '1.0.0',
-      ...metadata
-    }
+      ...metadata,
+    },
   };
 }
 
@@ -48,8 +48,8 @@ function errorResponse(message = 'An error occurred', statusCode = 500, details 
       requestId: metadata.requestId,
       statusCode,
       version: metadata.version || '1.0.0',
-      ...metadata
-    }
+      ...metadata,
+    },
   };
 }
 
@@ -71,14 +71,14 @@ function paginatedResponse(data = [], pagination = {}, message = 'Success', meta
       // Cursor-based pagination support
       nextCursor: pagination.nextCursor,
       previousCursor: pagination.previousCursor,
-      hasMore: pagination.hasMore
+      hasMore: pagination.hasMore,
     },
     metadata: {
       timestamp: new Date().toISOString(),
       requestId: metadata.requestId,
       version: metadata.version || '1.0.0',
-      ...metadata
-    }
+      ...metadata,
+    },
   };
 }
 
@@ -102,7 +102,7 @@ function responseFormatter(req, res, next) {
   const originalSend = res.send;
 
   // Override json method to add standard format
-  res.json = function(data) {
+  res.json = function (data) {
     // If response already has success/error format, use as-is
     if (data && typeof data === 'object' && ('success' in data || 'error' in data)) {
       // Add metadata if not present
@@ -110,7 +110,7 @@ function responseFormatter(req, res, next) {
         data.metadata = {
           timestamp: new Date().toISOString(),
           requestId: req.id,
-          duration: Date.now() - startTime
+          duration: Date.now() - startTime,
         };
       }
       return originalJson.call(this, data);
@@ -119,13 +119,13 @@ function responseFormatter(req, res, next) {
     // Otherwise, wrap in success format
     const formatted = successResponse(data, 'Success', res.statusCode, {
       requestId: req.id,
-      duration: Date.now() - startTime
+      duration: Date.now() - startTime,
     });
     return originalJson.call(this, formatted);
   };
 
   // Override send method for consistency
-  res.send = function(data) {
+  res.send = function (data) {
     if (typeof data === 'object' && !Buffer.isBuffer(data)) {
       return res.json(data);
     }
@@ -144,7 +144,7 @@ function responseFormatter(req, res, next) {
     const response = successResponse(data, message, 200, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
 
     // Add ETag header for caching
@@ -157,10 +157,10 @@ function responseFormatter(req, res, next) {
   };
 
   res.created = (data, message, metadata = {}) => {
-    let response = successResponse(data, message || 'Resource created', 201, {
+    const response = successResponse(data, message || 'Resource created', 201, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
 
     if (data && typeof data === 'object') {
@@ -172,10 +172,10 @@ function responseFormatter(req, res, next) {
   };
 
   res.accepted = (data, message, metadata = {}) => {
-    let response = successResponse(data, message || 'Request accepted', 202, {
+    const response = successResponse(data, message || 'Request accepted', 202, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(202);
     return originalJson.call(this, response);
@@ -186,70 +186,70 @@ function responseFormatter(req, res, next) {
   };
 
   res.badRequest = (message, details, metadata = {}) => {
-    let response = errorResponse(message, 400, details, {
+    const response = errorResponse(message, 400, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(400);
     return originalJson.call(this, response);
   };
 
   res.unauthorized = (message, metadata = {}) => {
-    let response = errorResponse(message || 'Unauthorized', 401, null, {
+    const response = errorResponse(message || 'Unauthorized', 401, null, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(401);
     return originalJson.call(this, response);
   };
 
   res.forbidden = (message, metadata = {}) => {
-    let response = errorResponse(message || 'Forbidden', 403, null, {
+    const response = errorResponse(message || 'Forbidden', 403, null, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(403);
     return originalJson.call(this, response);
   };
 
   res.notFound = (message, metadata = {}) => {
-    let response = errorResponse(message || 'Resource not found', 404, null, {
+    const response = errorResponse(message || 'Resource not found', 404, null, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(404);
     return originalJson.call(this, response);
   };
 
   res.conflict = (message, details, metadata = {}) => {
-    let response = errorResponse(message || 'Resource conflict', 409, details, {
+    const response = errorResponse(message || 'Resource conflict', 409, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(409);
     return originalJson.call(this, response);
   };
 
   res.unprocessableEntity = (message, details, metadata = {}) => {
-    let response = errorResponse(message || 'Unprocessable entity', 422, details, {
+    const response = errorResponse(message || 'Unprocessable entity', 422, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(422);
     return originalJson.call(this, response);
   };
 
   res.tooManyRequests = (message, retryAfter, metadata = {}) => {
-    let response = errorResponse(message || 'Too many requests', 429, { retryAfter }, {
+    const response = errorResponse(message || 'Too many requests', 429, { retryAfter }, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     if (retryAfter) {
       res.setHeader('Retry-After', retryAfter);
@@ -259,20 +259,20 @@ function responseFormatter(req, res, next) {
   };
 
   res.serverError = (message, details, metadata = {}) => {
-    let response = errorResponse(message || 'Internal server error', 500, details, {
+    const response = errorResponse(message || 'Internal server error', 500, details, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     res.status(500);
     return originalJson.call(this, response);
   };
 
   res.serviceUnavailable = (message, retryAfter, metadata = {}) => {
-    let response = errorResponse(message || 'Service unavailable', 503, { retryAfter }, {
+    const response = errorResponse(message || 'Service unavailable', 503, { retryAfter }, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
     if (retryAfter) {
       res.setHeader('Retry-After', retryAfter);
@@ -282,17 +282,17 @@ function responseFormatter(req, res, next) {
   };
 
   res.paginated = (data, pagination, message, metadata = {}) => {
-    let response = paginatedResponse(data, pagination, message, {
+    const response = paginatedResponse(data, pagination, message, {
       requestId: req.id,
       duration: Date.now() - startTime,
-      ...metadata
+      ...metadata,
     });
-    
+
     // Add pagination headers
     res.setHeader('X-Total-Count', pagination.total || 0);
     res.setHeader('X-Page-Count', Math.ceil((pagination.total || 0) / (pagination.limit || 10)));
     res.setHeader('X-Current-Page', pagination.page || 1);
-    
+
     return originalJson.call(this, response);
   };
 
@@ -303,7 +303,7 @@ function responseFormatter(req, res, next) {
 
   // Intercept final response to apply transformations
   const originalEnd = res.end;
-  res.end = function(chunk, encoding) {
+  res.end = function (chunk, encoding) {
     if (res._transformFn && chunk) {
       try {
         const transformed = res._transformFn(chunk);
@@ -315,11 +315,11 @@ function responseFormatter(req, res, next) {
         req.logger?.warn('Response transformation failed', { error: error.message });
       }
     }
-    
+
     // Add response timing header
     const duration = Date.now() - startTime;
     res.setHeader('X-Response-Time', `${duration}ms`);
-    
+
     return originalEnd.call(this, chunk, encoding);
   };
 
@@ -336,9 +336,9 @@ function fieldSelector(req, res, next) {
   }
 
   const fieldList = fields.split(',').map(f => f.trim());
-  
-  let originalJson = res.json;
-  res.json = function(data) {
+
+  const originalJson = res.json;
+  res.json = function (data) {
     if (data && data.data && typeof data.data === 'object') {
       const selected = {};
       for (const field of fieldList) {
@@ -360,5 +360,5 @@ module.exports = {
   successResponse,
   errorResponse,
   paginatedResponse,
-  generateETag
+  generateETag,
 };

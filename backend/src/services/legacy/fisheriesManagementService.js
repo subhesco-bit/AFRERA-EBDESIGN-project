@@ -74,5 +74,3 @@ module.exports = {
   fisheriesHarvest, fishProcessing, coldFishChain, aquacultureAnalytics,
 };
 
-
-

@@ -1,6 +1,6 @@
 /**
  * Information Sharing Service
- * 
+ *
  * This service provides comprehensive information sharing capabilities including
  * document sharing, knowledge repositories, collaboration tools, access control,
  * version management, and AI-powered content recommendations.
@@ -10,25 +10,25 @@ class InformationSharingService {
   constructor() {
     // Documents storage
     this.documents = new Map();
-    
+
     // Shared folders
     this.folders = new Map();
-    
+
     // Access permissions
     this.permissions = new Map();
-    
+
     // Sharing links
     this.sharingLinks = new Map();
-    
+
     // Collaboration sessions
     this.collaborationSessions = new Map();
-    
+
     // Content recommendations
     this.aiRecommendations = new Map();
-    
+
     // Activity logs
     this.activityLogs = new Map();
-    
+
     // Initialize default data
     this.initializeDefaultData();
   }
@@ -53,7 +53,7 @@ class InformationSharingService {
       description: 'Comprehensive guide to agricultural best practices',
       createdAt: '2024-01-15T00:00:00Z',
       updatedAt: '2024-01-15T00:00:00Z',
-      accessCount: 45
+      accessCount: 45,
     });
 
     this.documents.set('doc-002', {
@@ -71,7 +71,7 @@ class InformationSharingService {
       description: 'Database of crop diseases and treatments',
       createdAt: '2024-02-01T00:00:00Z',
       updatedAt: '2024-03-15T00:00:00Z',
-      accessCount: 120
+      accessCount: 120,
     });
 
     // Sample folders
@@ -83,7 +83,7 @@ class InformationSharingService {
       type: 'public',
       description: 'Collection of agricultural knowledge documents',
       createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z'
+      updatedAt: '2024-01-01T00:00:00Z',
     });
 
     this.folders.set('folder-002', {
@@ -94,7 +94,7 @@ class InformationSharingService {
       type: 'restricted',
       description: 'Research data and findings',
       createdAt: '2024-01-15T00:00:00Z',
-      updatedAt: '2024-01-15T00:00:00Z'
+      updatedAt: '2024-01-15T00:00:00Z',
     });
   }
 
@@ -103,7 +103,7 @@ class InformationSharingService {
    */
   createDocument(documentData) {
     const documentId = documentData.id || `doc-${Date.now()}`;
-    
+
     const document = {
       id: documentId,
       name: documentData.name,
@@ -120,7 +120,7 @@ class InformationSharingService {
       metadata: documentData.metadata || {},
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      accessCount: 0
+      accessCount: 0,
     };
 
     this.documents.set(documentId, document);
@@ -165,7 +165,7 @@ class InformationSharingService {
    * Get a specific document
    */
   getDocument(documentId) {
-    let document = this.documents.get(documentId);
+    const document = this.documents.get(documentId);
     if (document) {
       document.accessCount = (document.accessCount || 0) + 1;
       this.documents.set(documentId, document);
@@ -177,7 +177,7 @@ class InformationSharingService {
    * Update document
    */
   updateDocument(documentId, updates) {
-    let document = this.documents.get(documentId);
+    const document = this.documents.get(documentId);
     if (!document) {
       throw new Error(`Document ${documentId} not found`);
     }
@@ -186,7 +186,7 @@ class InformationSharingService {
       ...document,
       ...updates,
       version: document.version + 1,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.documents.set(documentId, updatedDocument);
@@ -198,7 +198,7 @@ class InformationSharingService {
    * Delete document
    */
   deleteDocument(documentId) {
-    let document = this.documents.get(documentId);
+    const document = this.documents.get(documentId);
     if (!document) {
       throw new Error(`Document ${documentId} not found`);
     }
@@ -213,7 +213,7 @@ class InformationSharingService {
    */
   createFolder(folderData) {
     const folderId = folderData.id || `folder-${Date.now()}`;
-    
+
     const folder = {
       id: folderId,
       name: folderData.name,
@@ -223,7 +223,7 @@ class InformationSharingService {
       description: folderData.description || '',
       metadata: folderData.metadata || {},
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     this.folders.set(folderId, folder);
@@ -260,7 +260,7 @@ class InformationSharingService {
       const children = this.getFolders({ parentId }).map(folder => ({
         ...folder,
         children: buildTree(folder.id),
-        documentCount: this.getDocuments({ folderId: folder.id }).length
+        documentCount: this.getDocuments({ folderId: folder.id }).length,
       }));
       return children;
     };
@@ -273,7 +273,7 @@ class InformationSharingService {
    */
   setPermission(permissionData) {
     const permissionId = permissionData.id || `perm-${Date.now()}`;
-    
+
     const permission = {
       id: permissionId,
       resourceId: permissionData.resourceId,
@@ -283,7 +283,7 @@ class InformationSharingService {
       permissions: permissionData.permissions || ['read'],
       grantedBy: permissionData.grantedBy,
       expiresAt: permissionData.expiresAt || null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.permissions.set(permissionId, permission);
@@ -296,7 +296,7 @@ class InformationSharingService {
    */
   getPermissions(resourceId, resourceType = 'document') {
     return Array.from(this.permissions.values()).filter(
-      p => p.resourceId === resourceId && p.resourceType === resourceType
+      p => p.resourceId === resourceId && p.resourceType === resourceType,
     );
   }
 
@@ -306,7 +306,7 @@ class InformationSharingService {
   checkPermission(resourceId, userId, requiredPermission = 'read') {
     const permissions = this.getPermissions(resourceId);
     const userPermission = permissions.find(p => p.userId === userId);
-    
+
     if (!userPermission) {
       return false;
     }
@@ -319,7 +319,7 @@ class InformationSharingService {
    */
   createSharingLink(linkData) {
     const linkId = linkData.id || `link-${Date.now()}`;
-    
+
     const link = {
       id: linkId,
       resourceId: linkData.resourceId,
@@ -331,7 +331,7 @@ class InformationSharingService {
       accessCount: 0,
       password: linkData.password || null,
       permissions: linkData.permissions || ['read'],
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.sharingLinks.set(linkId, link);
@@ -343,23 +343,23 @@ class InformationSharingService {
    * Get sharing link by token
    */
   getSharingLinkByToken(token) {
-    let link = Array.from(this.sharingLinks.values()).find(l => l.token === token);
-    
+    const link = Array.from(this.sharingLinks.values()).find(l => l.token === token);
+
     if (link) {
       // Check if expired
       if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
         return null;
       }
-      
+
       // Check if access limit reached
       if (link.accessLimit && link.accessCount >= link.accessLimit) {
         return null;
       }
-      
+
       link.accessCount = link.accessCount + 1;
       this.sharingLinks.set(link.id, link);
     }
-    
+
     return link;
   }
 
@@ -367,7 +367,7 @@ class InformationSharingService {
    * Generate random token
    */
   generateToken() {
-    return Math.random().toString(36).substring(2, 15) + 
+    return Math.random().toString(36).substring(2, 15) +
            Math.random().toString(36).substring(2, 15);
   }
 
@@ -376,7 +376,7 @@ class InformationSharingService {
    */
   createCollaborationSession(sessionData) {
     const sessionId = sessionData.id || `session-${Date.now()}`;
-    
+
     const session = {
       id: sessionId,
       resourceId: sessionData.resourceId,
@@ -387,7 +387,7 @@ class InformationSharingService {
       mode: sessionData.mode || 'edit',
       startedAt: new Date().toISOString(),
       endedAt: null,
-      changes: []
+      changes: [],
     };
 
     this.collaborationSessions.set(sessionId, session);
@@ -416,7 +416,7 @@ class InformationSharingService {
    * Join collaboration session
    */
   joinCollaborationSession(sessionId, userId) {
-    let session = this.collaborationSessions.get(sessionId);
+    const session = this.collaborationSessions.get(sessionId);
     if (!session) {
       throw new Error(`Collaboration session ${sessionId} not found`);
     }
@@ -433,7 +433,7 @@ class InformationSharingService {
    * End collaboration session
    */
   endCollaborationSession(sessionId) {
-    let session = this.collaborationSessions.get(sessionId);
+    const session = this.collaborationSessions.get(sessionId);
     if (!session) {
       throw new Error(`Collaboration session ${sessionId} not found`);
     }
@@ -450,13 +450,13 @@ class InformationSharingService {
    */
   async generateAIRecommendations(userId, context) {
     const recommendations = {
-      userId: userId,
-      context: context,
+      userId,
+      context,
       recommendations: [],
       confidence: null,
       implemented: false,
       reason: 'No real recommendation model is connected — relevance scores below are not yet computed.',
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
 
     if (context.type === 'related_documents') {
@@ -465,7 +465,7 @@ class InformationSharingService {
         documentId: doc.id,
         name: doc.name,
         relevance: null,
-        reason: 'Similar content based on tags and category'
+        reason: 'Similar content based on tags and category',
       }));
     } else if (context.type === 'suggested_folders') {
       const folders = this.getFolders();
@@ -473,20 +473,20 @@ class InformationSharingService {
         folderId: folder.id,
         name: folder.name,
         relevance: null,
-        reason: 'Based on your recent activity'
+        reason: 'Based on your recent activity',
       }));
     } else {
       recommendations.recommendations = [
         {
           action: 'Share with team',
           description: 'Consider sharing this document with your team for collaboration',
-          priority: 'medium'
+          priority: 'medium',
         },
         {
           action: 'Add to knowledge base',
           description: 'This document could be valuable for the knowledge base',
-          priority: 'high'
-        }
+          priority: 'high',
+        },
       ];
     }
 
@@ -499,13 +499,13 @@ class InformationSharingService {
    */
   logActivity(action, resourceId, userId) {
     const logId = `log-${Date.now()}`;
-    
+
     const log = {
       id: logId,
-      action: action,
-      resourceId: resourceId,
-      userId: userId,
-      timestamp: new Date().toISOString()
+      action,
+      resourceId,
+      userId,
+      timestamp: new Date().toISOString(),
     };
 
     if (!this.activityLogs.has(resourceId)) {
@@ -525,8 +525,8 @@ class InformationSharingService {
    * Get sharing analytics
    */
   getAnalytics() {
-    let documents = Array.from(this.documents.values());
-    let folders = Array.from(this.folders.values());
+    const documents = Array.from(this.documents.values());
+    const folders = Array.from(this.folders.values());
     const links = Array.from(this.sharingLinks.values());
     const sessions = Array.from(this.collaborationSessions.values());
 
@@ -537,22 +537,22 @@ class InformationSharingService {
         byType: this.groupByType(documents),
         byCategory: this.groupByCategory(documents),
         totalSize: documents.reduce((sum, d) => sum + d.size, 0),
-        totalAccesses: documents.reduce((sum, d) => sum + (d.accessCount || 0), 0)
+        totalAccesses: documents.reduce((sum, d) => sum + (d.accessCount || 0), 0),
       },
       folders: {
         total: folders.length,
-        byType: this.groupByType(folders)
+        byType: this.groupByType(folders),
       },
       sharing: {
         totalLinks: links.length,
         activeLinks: links.filter(l => !l.expiresAt || new Date(l.expiresAt) > new Date()).length,
-        totalAccesses: links.reduce((sum, l) => sum + l.accessCount, 0)
+        totalAccesses: links.reduce((sum, l) => sum + l.accessCount, 0),
       },
       collaboration: {
         totalSessions: sessions.length,
         activeSessions: sessions.filter(s => s.status === 'active').length,
-        totalParticipants: sessions.reduce((sum, s) => sum + s.participants.length, 0)
-      }
+        totalParticipants: sessions.reduce((sum, s) => sum + s.participants.length, 0),
+      },
     };
   }
 
@@ -572,7 +572,7 @@ class InformationSharingService {
    * Group documents by category
    */
   groupByCategory(documents) {
-    let grouped = {};
+    const grouped = {};
     documents.forEach(doc => {
       const category = doc.category || 'other';
       grouped[category] = (grouped[category] || 0) + 1;
@@ -585,13 +585,13 @@ class InformationSharingService {
    */
   searchDocuments(query, filters = {}) {
     let documents = this.getDocuments(filters);
-    
+
     if (query) {
       const queryLower = query.toLowerCase();
-      documents = documents.filter(d => 
+      documents = documents.filter(d =>
         d.name.toLowerCase().includes(queryLower) ||
         d.description.toLowerCase().includes(queryLower) ||
-        d.tags.some(t => t.toLowerCase().includes(queryLower))
+        d.tags.some(t => t.toLowerCase().includes(queryLower)),
       );
     }
 
@@ -611,7 +611,7 @@ class InformationSharingService {
       sharingLinks: this.sharingLinks.size,
       collaborationSessions: this.collaborationSessions.size,
       aiRecommendations: this.aiRecommendations.size,
-      activityLogs: this.activityLogs.size
+      activityLogs: this.activityLogs.size,
     };
   }
 }
@@ -620,6 +620,4 @@ class InformationSharingService {
 const informationSharingService = new InformationSharingService();
 
 module.exports = informationSharingService;
-
-
 

@@ -1,6 +1,6 @@
 /**
  * Enterprise-Grade Request/Response Logging Middleware
- * 
+ *
  * Production-ready logging with:
  * - Structured logging with correlation IDs
  * - Request tracing across distributed systems
@@ -28,7 +28,7 @@ function generateFingerprint(req) {
     path: req.path,
     ip: req.ip,
     userAgent: req.get('user-agent'),
-    contentType: req.get('content-type')
+    contentType: req.get('content-type'),
   };
   return crypto.createHash('md5').update(JSON.stringify(fingerprintData)).digest('hex');
 }
@@ -45,15 +45,15 @@ function sanitizeHeaders(headers) {
     'x-auth-token',
     'x-csrf-token',
     'proxy-authorization',
-    'www-authenticate'
+    'www-authenticate',
   ];
-  
+
   for (const header of sensitiveHeaders) {
     if (sanitized[header]) {
       sanitized[header] = '[REDACTED]';
     }
   }
-  
+
   return sanitized;
 }
 
@@ -62,7 +62,7 @@ function sanitizeHeaders(headers) {
  */
 function sanitizeBody(body) {
   if (!body) return null;
-  
+
   const sensitiveFields = [
     'password',
     'token',
@@ -75,16 +75,16 @@ function sanitizeBody(body) {
     'access_token',
     'refresh_token',
     'private_key',
-    'auth_code'
+    'auth_code',
   ];
-  let sanitized = { ...body };
-  
+  const sanitized = { ...body };
+
   for (const field of sensitiveFields) {
     if (sanitized[field]) {
       sanitized[field] = '[REDACTED]';
     }
   }
-  
+
   return sanitized;
 }
 
@@ -93,16 +93,16 @@ function sanitizeBody(body) {
  */
 function sanitizeQuery(query) {
   if (!query) return null;
-  
+
   const sensitiveParams = ['token', 'key', 'secret', 'password', 'auth'];
-  let sanitized = { ...query };
-  
+  const sanitized = { ...query };
+
   for (const param of sensitiveParams) {
     if (sanitized[param]) {
       sanitized[param] = '[REDACTED]';
     }
   }
-  
+
   return sanitized;
 }
 
@@ -111,13 +111,13 @@ function sanitizeQuery(query) {
  */
 function extractUserContext(req) {
   if (!req.user) return null;
-  
+
   return {
     id: req.user.id,
     email: req.user.email ? '[REDACTED]' : null,
     role: req.user.role,
     tenantId: req.user.tenantId,
-    sessionId: req.sessionID
+    sessionId: req.sessionID,
   };
 }
 
@@ -137,17 +137,17 @@ function getLogLevel(statusCode) {
 function requestLogger(req, res, next) {
   const startTime = Date.now();
   const requestId = req.id || crypto.randomUUID();
-  
+
   // Attach request ID to request object
   req.id = requestId;
   req.startTime = startTime;
-  
+
   // Set request ID in response header for tracing
   res.setHeader('X-Request-ID', requestId);
-  
+
   // Generate request fingerprint
   const fingerprint = generateFingerprint(req);
-  
+
   // Log incoming request
   logger.info('Incoming request', {
     requestId,
@@ -163,16 +163,16 @@ function requestLogger(req, res, next) {
     headers: sanitizeHeaders(req.headers),
     body: req.body ? sanitizeBody(req.body) : null,
     user: extractUserContext(req),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  
+
   // Capture response
   const originalSend = res.send;
   const originalJson = res.json;
 
   let responseSize = 0;
 
-  res.send = function(data) {
+  res.send = function (data) {
     // Buffer.byteLength() only accepts a string/Buffer/TypedArray - res.send()
     // is also legally called with an object, a number, or no argument at
     // all (Express stringifies/JSON-encodes those itself), all of which
@@ -191,8 +191,8 @@ function requestLogger(req, res, next) {
     }
     return originalSend.call(this, data);
   };
-  
-  res.json = function(data) {
+
+  res.json = function (data) {
     // res.json() with no argument (or undefined) is valid and JSON.stringify
     // returns `undefined` (not a string) for it, which Buffer.byteLength
     // used to throw on.
@@ -200,12 +200,12 @@ function requestLogger(req, res, next) {
     responseSize = typeof serialized === 'string' ? Buffer.byteLength(serialized) : 0;
     return originalJson.call(this, data);
   };
-  
+
   // Log response when finished
   res.on('finish', () => {
     const duration = Date.now() - startTime;
     const logLevel = getLogLevel(res.statusCode);
-    
+
     const logData = {
       requestId,
       fingerprint,
@@ -225,28 +225,28 @@ function requestLogger(req, res, next) {
       performance: {
         slow: duration > 1000,
         verySlow: duration > 5000,
-        timeout: duration > 30000
+        timeout: duration > 30000,
       },
       // Rate limit information
       rateLimit: {
         limit: res.getHeader('X-RateLimit-Limit'),
         remaining: res.getHeader('X-RateLimit-Remaining'),
-        reset: res.getHeader('X-RateLimit-Reset')
-      }
+        reset: res.getHeader('X-RateLimit-Reset'),
+      },
     };
-    
+
     // Add response headers for debugging
     if (process.env.NODE_ENV === 'development') {
       logData.headers = {
         contentType: res.getHeader('content-type'),
         contentEncoding: res.getHeader('content-encoding'),
         cacheControl: res.getHeader('cache-control'),
-        etag: res.getHeader('etag')
+        etag: res.getHeader('etag'),
       };
     }
-    
+
     logger[logLevel]('Request completed', logData);
-    
+
     // Log slow requests as warnings
     if (duration > 1000) {
       logger.warn('Slow request detected', {
@@ -254,11 +254,11 @@ function requestLogger(req, res, next) {
         performance: {
           ...logData.performance,
           threshold: '1000ms',
-          actual: `${duration}ms`
-        }
+          actual: `${duration}ms`,
+        },
       });
     }
-    
+
     // Log very slow requests as errors
     if (duration > 5000) {
       logger.error('Very slow request detected', {
@@ -266,12 +266,12 @@ function requestLogger(req, res, next) {
         performance: {
           ...logData.performance,
           threshold: '5000ms',
-          actual: `${duration}ms`
-        }
+          actual: `${duration}ms`,
+        },
       });
     }
   });
-  
+
   next();
 }
 
@@ -279,9 +279,9 @@ function requestLogger(req, res, next) {
  * Detailed error logging middleware (use after error handler)
  */
 function errorLogger(error, req, res, next) {
-  let requestId = req.id || 'unknown';
-  let duration = Date.now() - (req.startTime || Date.now());
-  
+  const requestId = req.id || 'unknown';
+  const duration = Date.now() - (req.startTime || Date.now());
+
   logger.error('Request error', {
     requestId,
     fingerprint: generateFingerprint(req),
@@ -296,7 +296,7 @@ function errorLogger(error, req, res, next) {
       message: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       code: error.code,
-      statusCode: error.statusCode
+      statusCode: error.statusCode,
     },
     ip: req.ip,
     userAgent: req.get('user-agent'),
@@ -305,9 +305,9 @@ function errorLogger(error, req, res, next) {
     query: sanitizeQuery(req.query),
     params: req.params,
     user: extractUserContext(req),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
-  
+
   next(error);
 }
 
@@ -324,15 +324,15 @@ function requestContext(req, res, next) {
     ip: req.ip,
     method: req.method,
     path: req.path,
-    url: req.url
+    url: req.url,
   };
-  
+
   // Add response context
   res.context = {
     requestId: req.id,
-    startTime: req.startTime
+    startTime: req.startTime,
   };
-  
+
   next();
 }
 
@@ -352,34 +352,34 @@ class LogAggregator {
     this.batchSize = options.batchSize || 100;
     this.batch = [];
     this.flushInterval = options.flushInterval || 5000;
-    
+
     if (this.enabled) {
       this.startFlushInterval();
     }
   }
-  
+
   addLog(logData) {
     if (!this.enabled) return;
-    
+
     this.batch.push(logData);
-    
+
     if (this.batch.length >= this.batchSize) {
       this.flush();
     }
   }
-  
+
   flush() {
     if (this.batch.length === 0) return;
-    
+
     // Send batch to external service
     // This is a placeholder - implement based on your log aggregation service
     this.batch = [];
   }
-  
+
   startFlushInterval() {
     this.flushTimer = setInterval(() => this.flush(), this.flushInterval);
   }
-  
+
   destroy() {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
@@ -391,7 +391,7 @@ class LogAggregator {
 // Global log aggregator instance
 const logAggregator = new LogAggregator({
   enabled: process.env.LOG_AGGREGATION_ENABLED === 'true',
-  endpoint: process.env.LOG_AGGREGATION_ENDPOINT
+  endpoint: process.env.LOG_AGGREGATION_ENDPOINT,
 });
 
 module.exports = {
@@ -404,5 +404,5 @@ module.exports = {
   extractUserContext,
   generateFingerprint,
   LogAggregator,
-  logAggregator
+  logAggregator,
 };

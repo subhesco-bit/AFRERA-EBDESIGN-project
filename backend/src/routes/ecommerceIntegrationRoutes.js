@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce Integration Routes
- * 
+ *
  * Cross-module integration endpoints between E-commerce and:
  * - Nutrition Intelligence
  * - Recipe Intelligence

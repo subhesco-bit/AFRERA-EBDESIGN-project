@@ -16,7 +16,7 @@ router.get('/', authenticate, async (req, res) => {
     const filters = {
       farmer_id: req.query.farmer_id,
       type: req.query.type,
-      status: req.query.status
+      status: req.query.status,
     };
     const forestry = await forestryService.getAllForestry(filters);
     res.json({ success: true, data: forestry });
@@ -28,7 +28,7 @@ router.get('/', authenticate, async (req, res) => {
 // GET /api/v1/forestry/:id - Get forestry by ID
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    let forestry = await forestryService.getForestryById(req.params.id);
+    const forestry = await forestryService.getForestryById(req.params.id);
     res.json({ success: true, data: forestry });
   } catch (error) {
     res.status(404).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/forestry - Create forestry
 router.post('/', authenticate, async (req, res) => {
   try {
-    let forestry = await forestryService.createForestry(req.body);
+    const forestry = await forestryService.createForestry(req.body);
     res.status(201).json({ success: true, data: forestry });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

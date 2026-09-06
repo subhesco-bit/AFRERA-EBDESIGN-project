@@ -36,7 +36,7 @@ function crudRouter(service) {
   });
   router.put('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
     try {
-      let item = await service.update(req.params.id, req.body);
+      const item = await service.update(req.params.id, req.body);
       if (!item) return res.status(404).json({ success: false, error: 'Not found' });
       res.json({ success: true, data: item });
     } catch (e) { res.status(400).json({ success: false, error: e.message }); }
@@ -59,21 +59,21 @@ sessionRouter.get('/', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), asy
 });
 sessionRouter.get('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    let item = await sessionManagement.get(req.params.id);
+    const item = await sessionManagement.get(req.params.id);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: item });
   } catch (e) { res.status(500).json({ success: false, error: e.message }); }
 });
 sessionRouter.put('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    let item = await sessionManagement.update(req.params.id, req.body);
+    const item = await sessionManagement.update(req.params.id, req.body);
     if (!item) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: item });
   } catch (e) { res.status(400).json({ success: false, error: e.message }); }
 });
 sessionRouter.delete('/:id', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    let ok = await sessionManagement.remove(req.params.id);
+    const ok = await sessionManagement.remove(req.params.id);
     if (!ok) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true });
   } catch (e) { res.status(500).json({ success: false, error: e.message }); }

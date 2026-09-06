@@ -13,7 +13,7 @@ describe('Value Commerce Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('Value Commerce Service', () => {
       .send({
         email: 'value-test@example.com',
         password: 'Test123!@#',
-        role: 'consumer'
+        role: 'consumer',
       });
 
     authToken = registerResponse.body.token;
@@ -54,7 +54,7 @@ describe('Value Commerce Service', () => {
           gi_score: 80,
           freshness_score: 88,
           sustainability_score: 82,
-          quality_score: 87
+          quality_score: 87,
         })
         .expect(201);
 
@@ -68,7 +68,7 @@ describe('Value Commerce Service', () => {
         .post('/api/v1/value-commerce/product-value-scores')
         .send({
           product_id: 'test-product-id',
-          nutrition_score: 90
+          nutrition_score: 90,
         })
         .expect(401);
     });
@@ -98,7 +98,7 @@ describe('Value Commerce Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           product_id: testProductId,
-          base_price: 100
+          base_price: 100,
         })
         .expect(200);
 
@@ -123,7 +123,7 @@ describe('Value Commerce Service', () => {
           sustainability_importance: 0.8,
           quality_importance: 1.0,
           min_value_score: 75,
-          preferred_tiers: ['A+', 'A', 'B+']
+          preferred_tiers: ['A+', 'A', 'B+'],
         })
         .expect(200);
 

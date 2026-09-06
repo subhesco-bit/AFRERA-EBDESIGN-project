@@ -10,7 +10,7 @@ class WeatherAdvisoryService {
         humidity: 40 + Math.random() * 50,
         rainfall: Math.random() * 50,
         wind_speed: Math.random() * 30,
-        forecast: '5-day clear skies, optimal for farming'
+        forecast: '5-day clear skies, optimal for farming',
       };
       logger.info(`Advisory generated: ${lat},${lng}`);
       return advisory;
@@ -22,7 +22,7 @@ class WeatherAdvisoryService {
       const advisories = {
         rice: 'Optimal conditions for transplanting',
         wheat: 'Begin irrigation cycle',
-        corn: 'Monitor for pest activity'
+        corn: 'Monitor for pest activity',
       };
       return { crop: cropType, advisory: advisories[cropType] || 'Monitor conditions' };
     } catch (error) { logger.error(`Crop advisory failed: ${error.message}`); throw error; }

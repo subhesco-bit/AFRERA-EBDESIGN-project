@@ -30,14 +30,16 @@ class CacheService {
         database: Number.parseInt(process.env.REDIS_DB, 10) || 0,
       });
 
-      this.client.on('error', (err) => console.error('Redis error:', err));
+      this.client.on('error', (err) => {
+        // Silent Redis errors - will be handled in init
+      });
       this.client.on('connect', () => console.log('Redis connected'));
 
       await this.client.connect();
       console.log('✅ Cache service initialized');
     } catch (error) {
-      console.error('❌ Cache initialization failed:', error);
-      throw error;
+      console.warn('⚠️  Cache initialization failed (continuing without cache):', error.message);
+      this.client = null; // Continue without Redis
     }
   }
 

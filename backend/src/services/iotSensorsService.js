@@ -4,12 +4,12 @@ const logger = require('../utils/logger');
 class IoTSensorsService {
   async recordSensorData(sensorId, reading) {
   // Validate inputs
-  if (!sensorId) throw new Error('Missing required parameter');
+    if (!sensorId) throw new Error('Missing required parameter');
 
     try {
       const id = require('uuid').v4();
       await db('iot_readings').insert({
-        id, sensor_id: sensorId, reading_value: reading, created_at: new Date()
+        id, sensor_id: sensorId, reading_value: reading, created_at: new Date(),
       });
       logger.info(`Sensor reading recorded: ${sensorId}`);
       return { reading_id: id, sensor_id: sensorId, reading };

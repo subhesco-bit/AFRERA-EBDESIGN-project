@@ -14,25 +14,25 @@ class AdvancedConnectionPool {
       max: config.max || 20,
       idleTimeoutMillis: config.idleTimeoutMillis || 30000,
       connectionTimeoutMillis: config.connectionTimeoutMillis || 2000,
-      
+
       // Health check configuration
       healthCheckInterval: config.healthCheckInterval || 60000, // 1 minute
       healthCheckTimeout: config.healthCheckTimeout || 5000,
-      
+
       // Adaptive sizing configuration
       enableAdaptiveSizing: config.enableAdaptiveSizing !== false,
       adaptiveSizingInterval: config.adaptiveSizingInterval || 300000, // 5 minutes
       adaptiveSizingMinThreshold: config.adaptiveSizingMinThreshold || 0.7, // 70% utilization
       adaptiveSizingMaxThreshold: config.adaptiveSizingMaxThreshold || 0.9, // 90% utilization
-      
+
       // Metrics configuration
       enableMetrics: config.enableMetrics !== false,
       metricsInterval: config.metricsInterval || 60000, // 1 minute
-      
+
       // Retry configuration
       maxRetries: config.maxRetries || 3,
       retryDelay: config.retryDelay || 1000,
-      
+
       // Connection string or individual parameters
       connectionString: process.env.DATABASE_URL,
       host: process.env.PG_HOST || 'localhost',
@@ -40,13 +40,13 @@ class AdvancedConnectionPool {
       database: process.env.PG_DATABASE || 'afrera_db',
       user: process.env.PG_USER || 'postgres',
       password: process.env.PG_PASSWORD || 'password',
-      
+
       // SSL configuration
       ssl: process.env.PG_SSL === 'true' ? {
-        rejectUnauthorized: process.env.PG_SSL_STRICT !== 'false'
+        rejectUnauthorized: process.env.PG_SSL_STRICT !== 'false',
       } : undefined,
-      
-      ...config
+
+      ...config,
     };
 
     this.pool = null;
@@ -61,7 +61,7 @@ class AdvancedConnectionPool {
       averageWaitTime: 0,
       healthCheckFailures: 0,
       lastHealthCheck: null,
-      lastHealthCheckStatus: 'unknown'
+      lastHealthCheckStatus: 'unknown',
     };
 
     this.healthCheckTimer = null;
@@ -80,16 +80,16 @@ class AdvancedConnectionPool {
         return this.pool;
       }
 
-      const poolConfig = this.config.connectionString
-        ? { connectionString: this.config.connectionString }
-        : {
-            host: this.config.host,
-            port: this.config.port,
-            database: this.config.database,
-            user: this.config.user,
-            password: this.config.password,
-            ssl: this.config.ssl
-          };
+      const poolConfig = this.config.connectionString ?
+        { connectionString: this.config.connectionString } :
+        {
+          host: this.config.host,
+          port: this.config.port,
+          database: this.config.database,
+          user: this.config.user,
+          password: this.config.password,
+          ssl: this.config.ssl,
+        };
 
       this.pool = new Pool({
         ...poolConfig,
@@ -97,26 +97,26 @@ class AdvancedConnectionPool {
         max: this.config.max,
         idleTimeoutMillis: this.config.idleTimeoutMillis,
         connectionTimeoutMillis: this.config.connectionTimeoutMillis,
-        
+
         // Connection event handlers
         onConnect: (client) => {
           this.metrics.totalConnections++;
-          logger.debug('New connection established', { 
-            total: this.metrics.totalConnections 
+          logger.debug('New connection established', {
+            total: this.metrics.totalConnections,
           });
         },
-        
+
         onRemove: (client) => {
           this.metrics.totalConnections--;
-          logger.debug('Connection removed', { 
-            total: this.metrics.totalConnections 
+          logger.debug('Connection removed', {
+            total: this.metrics.totalConnections,
           });
-        }
+        },
       });
 
       // Test initial connection
       await this.healthCheck();
-      
+
       // Start background tasks
       this.startHealthCheck();
       this.startMetricsCollection();
@@ -127,13 +127,13 @@ class AdvancedConnectionPool {
       logger.info('Advanced connection pool initialized', {
         min: this.config.min,
         max: this.config.max,
-        adaptiveSizing: this.config.enableAdaptiveSizing
+        adaptiveSizing: this.config.enableAdaptiveSizing,
       });
 
       return this.pool;
     } catch (error) {
-      logger.error('Failed to initialize connection pool', { 
-        error: error.message 
+      logger.error('Failed to initialize connection pool', {
+        error: error.message,
       });
       throw error;
     }
@@ -144,30 +144,30 @@ class AdvancedConnectionPool {
    */
   async healthCheck() {
     const startTime = Date.now();
-    
+
     try {
       const client = await this.pool.connect();
       await client.query('SELECT NOW() as current_time, version() as version');
       client.release();
 
       const duration = Date.now() - startTime;
-      
+
       this.metrics.lastHealthCheck = new Date();
       this.metrics.lastHealthCheckStatus = 'healthy';
-      
+
       logger.debug('Database health check passed', { duration });
-      
+
       return { healthy: true, duration };
     } catch (error) {
       this.metrics.healthCheckFailures++;
       this.metrics.lastHealthCheck = new Date();
       this.metrics.lastHealthCheckStatus = 'unhealthy';
-      
-      logger.error('Database health check failed', { 
+
+      logger.error('Database health check failed', {
         error: error.message,
-        failures: this.metrics.healthCheckFailures
+        failures: this.metrics.healthCheckFailures,
       });
-      
+
       return { healthy: false, error: error.message };
     }
   }
@@ -182,12 +182,12 @@ class AdvancedConnectionPool {
 
     this.healthCheckTimer = setInterval(async () => {
       if (this.isShuttingDown) return;
-      
+
       await this.healthCheck();
     }, this.config.healthCheckInterval);
 
-    logger.debug('Health check timer started', { 
-      interval: this.config.healthCheckInterval 
+    logger.debug('Health check timer started', {
+      interval: this.config.healthCheckInterval,
     });
   }
 
@@ -202,7 +202,7 @@ class AdvancedConnectionPool {
     const poolMetrics = {
       totalCount: this.pool.totalCount,
       idleCount: this.pool.idleCount,
-      waitingCount: this.pool.waitingCount
+      waitingCount: this.pool.waitingCount,
     };
 
     this.metrics.totalConnections = poolMetrics.totalCount;
@@ -217,7 +217,7 @@ class AdvancedConnectionPool {
 
     return {
       ...this.metrics,
-      pool: poolMetrics
+      pool: poolMetrics,
     };
   }
 
@@ -235,7 +235,7 @@ class AdvancedConnectionPool {
 
     this.metricsTimer = setInterval(() => {
       if (this.isShuttingDown) return;
-      
+
       const metrics = this.collectMetrics();
       if (metrics) {
         logger.debug('Pool metrics', {
@@ -245,14 +245,14 @@ class AdvancedConnectionPool {
           waiting: metrics.waitingClients,
           queries: metrics.totalQueries,
           failures: metrics.failedQueries,
-          avgWaitTime: metrics.averageWaitTime.toFixed(2) + 'ms',
-          healthStatus: metrics.lastHealthCheckStatus
+          avgWaitTime: `${metrics.averageWaitTime.toFixed(2) }ms`,
+          healthStatus: metrics.lastHealthCheckStatus,
         });
       }
     }, this.config.metricsInterval);
 
-    logger.debug('Metrics collection started', { 
-      interval: this.config.metricsInterval 
+    logger.debug('Metrics collection started', {
+      interval: this.config.metricsInterval,
     });
   }
 
@@ -264,7 +264,7 @@ class AdvancedConnectionPool {
       return;
     }
 
-    let metrics = this.collectMetrics();
+    const metrics = this.collectMetrics();
     if (!metrics) {
       return;
     }
@@ -279,7 +279,7 @@ class AdvancedConnectionPool {
       logger.info('Scaling up connection pool', {
         from: currentSize,
         to: newSize,
-        utilization: (utilization * 100).toFixed(1) + '%'
+        utilization: `${(utilization * 100).toFixed(1) }%`,
       });
     }
     // Scale down if utilization is low
@@ -288,7 +288,7 @@ class AdvancedConnectionPool {
       logger.info('Scaling down connection pool', {
         from: currentSize,
         to: newSize,
-        utilization: (utilization * 100).toFixed(1) + '%'
+        utilization: `${(utilization * 100).toFixed(1) }%`,
       });
     }
 
@@ -314,12 +314,12 @@ class AdvancedConnectionPool {
 
     this.adaptiveSizingTimer = setInterval(() => {
       if (this.isShuttingDown) return;
-      
+
       this.adaptiveSizing();
     }, this.config.adaptiveSizingInterval);
 
-    logger.debug('Adaptive sizing started', { 
-      interval: this.config.adaptiveSizingInterval 
+    logger.debug('Adaptive sizing started', {
+      interval: this.config.adaptiveSizingInterval,
     });
   }
 
@@ -327,38 +327,38 @@ class AdvancedConnectionPool {
    * Execute query with retry logic
    */
   async query(text, params, options = {}) {
-    let startTime = Date.now();
+    const startTime = Date.now();
     let lastError = null;
     let attempt = 0;
 
     while (attempt <= this.config.maxRetries) {
       try {
         const result = await this.pool.query(text, params, options);
-        
-        let duration = Date.now() - startTime;
+
+        const duration = Date.now() - startTime;
         this.metrics.totalQueries++;
         this.metrics.totalWaitTime += duration;
-        
+
         if (duration > 1000) {
-          logger.warn('Slow query detected', { 
-            duration: duration + 'ms',
-            query: text.substring(0, 100) 
+          logger.warn('Slow query detected', {
+            duration: `${duration }ms`,
+            query: text.substring(0, 100),
           });
         }
-        
+
         return result;
       } catch (error) {
         lastError = error;
         attempt++;
         this.metrics.failedQueries++;
-        
+
         if (attempt <= this.config.maxRetries) {
           const delay = this.config.retryDelay * Math.pow(2, attempt - 1);
           logger.warn(`Query failed, retrying (${attempt}/${this.config.maxRetries})`, {
             error: error.message,
-            delay: delay + 'ms'
+            delay: `${delay }ms`,
           });
-          
+
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
@@ -366,9 +366,9 @@ class AdvancedConnectionPool {
 
     logger.error('Query failed after all retries', {
       error: lastError.message,
-      attempts: this.config.maxRetries
+      attempts: this.config.maxRetries,
     });
-    
+
     throw lastError;
   }
 
@@ -377,12 +377,12 @@ class AdvancedConnectionPool {
    */
   async getClient(options = {}) {
     const timeout = options.timeout || this.config.connectionTimeoutMillis;
-    
+
     return Promise.race([
       this.pool.connect(),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), timeout)
-      )
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timeout')), timeout),
+      ),
     ]);
   }
 
@@ -390,15 +390,15 @@ class AdvancedConnectionPool {
    * Execute transaction with automatic retry
    */
   async transaction(callback, options = {}) {
-    let client = await this.getClient();
-    
+    const client = await this.getClient();
+
     try {
       await client.query('BEGIN');
-      
-      let result = await callback(client);
-      
+
+      const result = await callback(client);
+
       await client.query('COMMIT');
-      
+
       return result;
     } catch (error) {
       await client.query('ROLLBACK');
@@ -423,7 +423,7 @@ class AdvancedConnectionPool {
       healthy: this.metrics.lastHealthCheckStatus === 'healthy',
       lastCheck: this.metrics.lastHealthCheck,
       failures: this.metrics.healthCheckFailures,
-      metrics: this.collectMetrics()
+      metrics: this.collectMetrics(),
     };
   }
 
@@ -496,5 +496,5 @@ module.exports = {
   AdvancedConnectionPool,
   getConnectionPool,
   initializeConnectionPool,
-  shutdownConnectionPool
+  shutdownConnectionPool,
 };

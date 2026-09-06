@@ -1,22 +1,22 @@
 /**
  * AI Copilot Service - Claude AI Integration (16gm Framework)
- * 
+ *
  * Claude AI Capability: Domain-specific copilot enhancement with context-aware AI
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, domain-specific knowledge, historical copilot interactions
  * Collaboration Mode: Copilot session tracking, outcome logging, learning feedback
- * 
+ *
  * Original Devin Implementation: 16gm AI Copilot Framework with 7 specialized copilots
  * Conversion Date: 2026-2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware copilot responses using library knowledge
  * - AI-powered copilot explanation and rationale
  * - Historical copilot interaction pattern analysis
  * - Multi-copilot coordination and intelligence sharing
  * - Real-time copilot confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All 7 copilot types preserved (Finance, Logistics, Warehouse, Insurance, Nutrition, Marketplace, Generic)
  * - Original copilot generation logic maintained
@@ -37,16 +37,16 @@ class ClaudeAIEnhancedCopilotService {
     this.serviceName = 'AI Copilot Service';
     this.aiEnabled = process.env.CLAUDE_AI_ENABLED === 'true';
     this.originalService = originalAICopilotService;
-    
+
     // 7 specialized copilot types (16gm framework)
     this.copilotTypes = [
       'finance',
-      'logistics', 
+      'logistics',
       'warehouse',
       'insurance',
       'nutrition',
       'marketplace',
-      'generic'
+      'generic',
     ];
   }
 
@@ -63,46 +63,46 @@ class ClaudeAIEnhancedCopilotService {
         work_type: 'copilot_response',
         service: this.serviceName,
         params: { copilotType, message, context, sessionId: session.id },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'generateCopilotResponse',
-        copilotType: copilotType,
-        message: message,
-        context: context
+        copilotType,
+        message,
+        context,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'copilot',
         query: this.buildCopilotQuery(copilotType, message, context),
-        context: { 
-          copilotType, 
-          message, 
-          context, 
+        context: {
+          copilotType,
+          message,
+          context,
           session,
-          libraryContext
+          libraryContext,
         },
-        agentPreference: this.selectAgentForCopilot(copilotType)
+        agentPreference: this.selectAgentForCopilot(copilotType),
       });
 
       const originalResult = await this.originalService.generateCopilotResponse(copilotType, message, context, session);
-      
+
       const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_response_rationale: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || originalResult.confidence,
         ai_domain_insights: this.extractDomainInsights(aiEnhancement.content, copilotType),
-        ai_followup_questions: this.extractFollowupQuestions(aiEnhancement.content)
+        ai_followup_questions: this.extractFollowupQuestions(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'copilot_response',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -111,9 +111,9 @@ class ClaudeAIEnhancedCopilotService {
         work_type: 'copilot_response',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.generateCopilotResponse(copilotType, message, context, session);
     }
@@ -124,15 +124,15 @@ class ClaudeAIEnhancedCopilotService {
    */
   selectAgentForCopilot(copilotType) {
     const agentMapping = {
-      'finance': 'business-analyst',
-      'logistics': 'operations-manager',
-      'warehouse': 'operations-manager',
-      'insurance': 'governance-agent',
-      'nutrition': 'farmer-advisor',
-      'marketplace': 'business-analyst',
-      'generic': 'farmer-advisor'
+      finance: 'business-analyst',
+      logistics: 'operations-manager',
+      warehouse: 'operations-manager',
+      insurance: 'governance-agent',
+      nutrition: 'farmer-advisor',
+      marketplace: 'business-analyst',
+      generic: 'farmer-advisor',
     };
-    
+
     return agentMapping[copilotType] || 'farmer-advisor';
   }
 
@@ -148,16 +148,16 @@ class ClaudeAIEnhancedCopilotService {
    */
   extractDomainInsights(aiContent, copilotType) {
     if (!aiContent) return null;
-    
+
     const insights = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('insight') || line.includes('consider') || line.includes('note') || line.includes('important')) {
         insights.push(line.trim());
       }
     });
-    
+
     return insights.length > 0 ? insights.join('. ') : null;
   }
 
@@ -166,16 +166,16 @@ class ClaudeAIEnhancedCopilotService {
    */
   extractFollowupQuestions(aiContent) {
     if (!aiContent) return [];
-    
+
     const questions = [];
-    let lines = aiContent.split('\n');
-    
+    const lines = aiContent.split('\n');
+
     lines.forEach(line => {
       if (line.includes('?') && (line.includes('Would') || line.includes('Can you') || line.includes('Have you'))) {
         questions.push(line.trim());
       }
     });
-    
+
     return questions;
   }
 
@@ -197,7 +197,7 @@ class ClaudeAIEnhancedCopilotService {
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
       copilot_types: this.copilotTypes,
-      ai_enhanced_methods: ['generateCopilotResponseAI']
+      ai_enhanced_methods: ['generateCopilotResponseAI'],
     };
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Organization Management Module Service - AI Enhanced
- * 
+ *
  * This service provides AI-powered organization management:
  * - Organizational structure optimization
  * - AI-assisted hierarchy recommendations
@@ -37,7 +37,7 @@ class OrganizationManagementService {
         size: orgData.size,
         businessModel: orgData.businessModel,
         geography: orgData.geography,
-        objectives: orgData.objectives || ['efficiency', 'agility', 'growth']
+        objectives: orgData.objectives || ['efficiency', 'agility', 'growth'],
       });
 
       const organization = await this.db.query(`
@@ -50,7 +50,7 @@ class OrganizationManagementService {
         orgData.industry,
         orgData.size,
         JSON.stringify(structureAnalysis.recommendedStructure || {}),
-        JSON.stringify(orgData.config || {})
+        JSON.stringify(orgData.config || {}),
       ]);
 
       // Initialize organization monitoring
@@ -61,7 +61,7 @@ class OrganizationManagementService {
         organization: organization.rows[0],
         recommendedStructure: structureAnalysis.recommendedStructure,
         implementationPlan: structureAnalysis.implementationPlan || [],
-        expectedBenefits: structureAnalysis.expectedBenefits || {}
+        expectedBenefits: structureAnalysis.expectedBenefits || {},
       };
     } catch (error) {
       logger.error('Error creating organization:', error);
@@ -74,9 +74,9 @@ class OrganizationManagementService {
    */
   async getOrganization(orgId) {
     try {
-      let organization = await this.db.query(
+      const organization = await this.db.query(
         'SELECT * FROM organizations WHERE id = $1',
-        [orgId]
+        [orgId],
       );
 
       if (organization.rows.length === 0) {
@@ -90,10 +90,10 @@ class OrganizationManagementService {
 
       return {
         ...orgData,
-        performanceMetrics: performanceMetrics,
-        structureHealth: structureHealth,
-        aiInsights: aiInsights,
-        recommendations: aiInsights.recommendations || []
+        performanceMetrics,
+        structureHealth,
+        aiInsights,
+        recommendations: aiInsights.recommendations || [],
       };
     } catch (error) {
       logger.error('Error getting organization:', error);
@@ -113,30 +113,30 @@ class OrganizationManagementService {
 
       const optimization = await this.aiGateway.optimize({
         type: 'organization_structure',
-        currentStructure: currentStructure,
-        performanceData: performanceData,
-        communicationPatterns: communicationPatterns,
-        workloadDistribution: workloadDistribution,
+        currentStructure,
+        performanceData,
+        communicationPatterns,
+        workloadDistribution,
         objectives: ['efficiency', 'collaboration', 'agility', 'cost'],
         constraints: {
           maxDepth: 6,
           minSpan: 3,
-          maxSpan: 15
-        }
+          maxSpan: 15,
+        },
       });
 
       return {
-        currentStructure: currentStructure,
+        currentStructure,
         optimizedStructure: optimization.optimizedStructure || currentStructure,
         changes: optimization.changes || [],
         expectedBenefits: {
           efficiency: optimization.efficiencyGain || 0,
           collaboration: optimization.collaborationImprovement || 0,
-          cost: optimization.costSavings || 0
+          cost: optimization.costSavings || 0,
         },
         implementationPlan: optimization.implementationPlan || [],
         riskAssessment: optimization.risks || [],
-        confidence: optimization.confidence || 0.85
+        confidence: optimization.confidence || 0.85,
       };
     } catch (error) {
       logger.error('Error optimizing structure:', error);
@@ -150,27 +150,27 @@ class OrganizationManagementService {
   async recommendHierarchyChanges(orgId) {
     try {
       const currentHierarchy = await this.getCurrentHierarchy(orgId);
-      let performanceMetrics = await this.getUnitPerformance(orgId);
+      const performanceMetrics = await this.getUnitPerformance(orgId);
       const growthTrajectory = await this.getGrowthTrajectory(orgId);
       const industryBenchmarks = await this.getIndustryBenchmarks(orgId);
 
       const recommendations = await this.aiGateway.analyze({
         type: 'hierarchy_recommendation',
-        currentHierarchy: currentHierarchy,
-        performanceMetrics: performanceMetrics,
-        growthTrajectory: growthTrajectory,
-        industryBenchmarks: industryBenchmarks,
-        changeTypes: ['add_unit', 'remove_unit', 'merge_units', 'split_units', 'restructure']
+        currentHierarchy,
+        performanceMetrics,
+        growthTrajectory,
+        industryBenchmarks,
+        changeTypes: ['add_unit', 'remove_unit', 'merge_units', 'split_units', 'restructure'],
       });
 
       return {
-        currentHierarchy: currentHierarchy,
+        currentHierarchy,
         recommendedChanges: recommendations.changes || [],
         priority: recommendations.priority || 'medium',
         expectedImpact: recommendations.impact || {},
         implementationTimeline: recommendations.timeline || {},
         riskFactors: recommendations.risks || [],
-        confidence: recommendations.confidence || 0.85
+        confidence: recommendations.confidence || 0.85,
       };
     } catch (error) {
       logger.error('Error recommending hierarchy changes:', error);
@@ -191,19 +191,19 @@ class OrganizationManagementService {
       const prediction = await this.aiGateway.predict({
         type: 'unit_performance',
         historicalData: historicalPerformance,
-        resources: resources,
-        workload: workload,
-        teamComposition: teamComposition,
-        timeframe: timeframe
+        resources,
+        workload,
+        teamComposition,
+        timeframe,
       });
 
       return {
-        unitId: unitId,
-        timeframe: timeframe,
+        unitId,
+        timeframe,
         predictions: prediction.predictions || [],
         confidence: prediction.confidence || 0.85,
         factors: prediction.influencingFactors || [],
-        recommendations: prediction.recommendations || []
+        recommendations: prediction.recommendations || [],
       };
     } catch (error) {
       logger.error('Error predicting unit performance:', error);
@@ -221,30 +221,30 @@ class OrganizationManagementService {
       const organizationalGoals = await this.getOrganizationalGoals(orgId);
       const budgetConstraints = await this.getBudgetConstraints(orgId);
 
-      let optimization = await this.aiGateway.optimize({
+      const optimization = await this.aiGateway.optimize({
         type: 'resource_allocation',
-        currentAllocation: currentAllocation,
-        unitPerformance: unitPerformance,
-        organizationalGoals: organizationalGoals,
-        budgetConstraints: budgetConstraints,
+        currentAllocation,
+        unitPerformance,
+        organizationalGoals,
+        budgetConstraints,
         objectives: ['performance', 'efficiency', 'goal_alignment'],
         constraints: {
           totalBudget: budgetConstraints.total,
-          minAllocationPerUnit: budgetConstraints.minPerUnit
-        }
+          minAllocationPerUnit: budgetConstraints.minPerUnit,
+        },
       });
 
       return {
-        currentAllocation: currentAllocation,
+        currentAllocation,
         optimizedAllocation: optimization.optimizedAllocation || currentAllocation,
         changes: optimization.changes || [],
         expectedBenefits: {
           overallPerformance: optimization.performanceImprovement || 0,
           goalAlignment: optimization.goalAlignmentImprovement || 0,
-          resourceEfficiency: optimization.efficiencyGain || 0
+          resourceEfficiency: optimization.efficiencyGain || 0,
         },
         implementationPlan: optimization.implementationPlan || [],
-        confidence: optimization.confidence || 0.85
+        confidence: optimization.confidence || 0.85,
       };
     } catch (error) {
       logger.error('Error optimizing resource allocation:', error);
@@ -264,16 +264,16 @@ class OrganizationManagementService {
 
       const impactAnalysis = await this.aiGateway.analyze({
         type: 'change_impact',
-        proposedChange: proposedChange,
-        currentState: currentState,
-        dependencies: dependencies,
-        stakeholders: stakeholders,
-        historicalChanges: historicalChanges,
-        analysisDepth: 'comprehensive'
+        proposedChange,
+        currentState,
+        dependencies,
+        stakeholders,
+        historicalChanges,
+        analysisDepth: 'comprehensive',
       });
 
       return {
-        proposedChange: proposedChange,
+        proposedChange,
         impactAreas: impactAnalysis.impactAreas || [],
         affectedUnits: impactAnalysis.affectedUnits || [],
         affectedProcesses: impactAnalysis.affectedProcesses || [],
@@ -281,7 +281,7 @@ class OrganizationManagementService {
         mitigationStrategies: impactAnalysis.mitigationStrategies || [],
         implementationComplexity: impactAnalysis.complexity || 'medium',
         estimatedDuration: impactAnalysis.duration || {},
-        confidence: impactAnalysis.confidence || 0.85
+        confidence: impactAnalysis.confidence || 0.85,
       };
     } catch (error) {
       logger.error('Error analyzing change impact:', error);
@@ -296,7 +296,7 @@ class OrganizationManagementService {
     try {
       const units = await this.db.query(
         'SELECT * FROM organizational_units WHERE organization_id = $1 ORDER BY hierarchy_level',
-        [orgId]
+        [orgId],
       );
 
       // Enrich with AI insights
@@ -306,16 +306,16 @@ class OrganizationManagementService {
           const healthScore = await this.calculateUnitHealth(unit.id, performance);
           return {
             ...unit,
-            performance: performance,
-            healthScore: healthScore
+            performance,
+            healthScore,
           };
-        })
+        }),
       );
 
       return {
         units: enrichedUnits,
         total: enrichedUnits.length,
-        hierarchyAnalysis: await this.analyzeHierarchy(enrichedUnits)
+        hierarchyAnalysis: await this.analyzeHierarchy(enrichedUnits),
       };
     } catch (error) {
       logger.error('Error getting organization units:', error);
@@ -340,7 +340,7 @@ class OrganizationManagementService {
         updates.name,
         updates.structure ? JSON.stringify(updates.structure) : null,
         updates.config ? JSON.stringify(updates.config) : null,
-        orgId
+        orgId,
       ]);
 
       if (result.rows.length === 0) {
@@ -350,7 +350,7 @@ class OrganizationManagementService {
       return {
         success: true,
         organization: result.rows[0],
-        message: 'Organization updated successfully'
+        message: 'Organization updated successfully',
       };
     } catch (error) {
       logger.error('Error updating organization:', error);
@@ -368,7 +368,7 @@ class OrganizationManagementService {
         type: 'unit_placement',
         organizationStructure: await this.getCurrentStructure(orgId),
         unitProfile: unitData.profile,
-        objectives: ['efficiency', 'collaboration']
+        objectives: ['efficiency', 'collaboration'],
       });
 
       const unit = await this.db.query(`
@@ -381,14 +381,14 @@ class OrganizationManagementService {
         unitData.name,
         placementRecommendation.recommendedParentId || unitData.parentId,
         placementRecommendation.recommendedLevel || unitData.hierarchyLevel,
-        JSON.stringify(unitData.profile || {})
+        JSON.stringify(unitData.profile || {}),
       ]);
 
       return {
         success: true,
         unit: unit.rows[0],
-        placementRecommendation: placementRecommendation,
-        message: 'Unit added successfully'
+        placementRecommendation,
+        message: 'Unit added successfully',
       };
     } catch (error) {
       logger.error('Error adding unit:', error);
@@ -402,7 +402,7 @@ class OrganizationManagementService {
     logger.info(`Initializing monitoring for organization ${orgId}`);
     this.orgMetrics.set(orgId, {
       createdAt: new Date(),
-      metrics: []
+      metrics: [],
     });
   }
 
@@ -411,7 +411,7 @@ class OrganizationManagementService {
       overallEfficiency: 85,
       collaborationScore: 80,
       agilityScore: 75,
-      costEfficiency: 82
+      costEfficiency: 82,
     };
   }
 
@@ -421,7 +421,7 @@ class OrganizationManagementService {
       span: 8,
       balance: 0.85,
       flexibility: 0.78,
-      communicationEfficiency: 0.82
+      communicationEfficiency: 0.82,
     };
   }
 
@@ -430,15 +430,15 @@ class OrganizationManagementService {
       structureOptimal: true,
       recommendations: [
         'Consider flattening hierarchy for faster decision making',
-        'Improve cross-functional collaboration'
-      ]
+        'Improve cross-functional collaboration',
+      ],
     };
   }
 
   async getCurrentStructure(orgId) {
-    let result = await this.db.query(
+    const result = await this.db.query(
       'SELECT structure FROM organizations WHERE id = $1',
-      [orgId]
+      [orgId],
     );
     return result.rows[0]?.structure || {};
   }
@@ -463,7 +463,7 @@ class OrganizationManagementService {
     return {
       current: 100,
       projected: 120,
-      timeframe: '12m'
+      timeframe: '12m',
     };
   }
 
@@ -498,7 +498,7 @@ class OrganizationManagementService {
   async getBudgetConstraints(orgId) {
     return {
       total: 1000000,
-      minPerUnit: 50000
+      minPerUnit: 50000,
     };
   }
 
@@ -506,7 +506,7 @@ class OrganizationManagementService {
     return {
       structure: await this.getCurrentStructure(orgId),
       units: await this.getOrganizationUnits(orgId),
-      performance: await this.getOrganizationPerformance(orgId)
+      performance: await this.getOrganizationPerformance(orgId),
     };
   }
 
@@ -527,7 +527,7 @@ class OrganizationManagementService {
       overall: 85,
       performance: 85,
       collaboration: 80,
-      efficiency: 82
+      efficiency: 82,
     };
   }
 
@@ -535,11 +535,10 @@ class OrganizationManagementService {
     return {
       depth: Math.max(...units.map(u => u.hierarchy_level || 0)),
       balance: 0.85,
-      recommendations: []
+      recommendations: [],
     };
   }
 }
 
 module.exports = new OrganizationManagementService();
-
 

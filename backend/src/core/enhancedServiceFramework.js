@@ -15,7 +15,7 @@ class EnhancedServiceFramework extends ProductionService {
       smartRetry: true,
       adaptiveTimeout: true,
       contextualErrorHandling: true,
-      performanceAdaptation: true
+      performanceAdaptation: true,
     };
     this.performanceProfiles = {};
     this.errorPatterns = {};
@@ -25,7 +25,7 @@ class EnhancedServiceFramework extends ProductionService {
   async executeInParallel(operations) {
     return this.executeWithErrorHandling('executeInParallel', async () => {
       const results = await Promise.allSettled(
-        operations.map(op => this.retry(() => op(), 3, 100))
+        operations.map(op => this.retry(() => op(), 3, 100)),
       );
 
       const successful = results
@@ -38,7 +38,7 @@ class EnhancedServiceFramework extends ProductionService {
 
       if (failed.length > 0) {
         logger.warn(`${failed.length}/${operations.length} parallel operations failed`, {
-          failures: failed.length
+          failures: failed.length,
         });
       }
 
@@ -79,7 +79,7 @@ class EnhancedServiceFramework extends ProductionService {
           const delay = baseDelay + jitter;
 
           logger.debug(`Smart retry ${attempt + 1}/${maxRetries} after ${delay}ms`, {
-            errorCode: error.code
+            errorCode: error.code,
           });
 
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -101,9 +101,9 @@ class EnhancedServiceFramework extends ProductionService {
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new ServerError(`Operation timeout after ${adaptiveTimeout}ms`)),
-          adaptiveTimeout
-        )
-      )
+          adaptiveTimeout,
+        ),
+      ),
     ]);
   }
 
@@ -113,14 +113,14 @@ class EnhancedServiceFramework extends ProductionService {
       let batchSize = initialBatchSize;
       let totalProcessed = 0;
       let totalFailed = 0;
-      let results = [];
+      const results = [];
 
       for (let i = 0; i < items.length; i += batchSize) {
         const batch = items.slice(i, i + batchSize);
 
         try {
           const batchResults = await this.executeInParallel(
-            batch.map(item => () => processor(item))
+            batch.map(item => () => processor(item)),
           );
 
           results.push(...batchResults.successful);
@@ -145,7 +145,7 @@ class EnhancedServiceFramework extends ProductionService {
         successful: totalProcessed,
         failed: totalFailed,
         results,
-        successRate: (totalProcessed / items.length) * 100
+        successRate: (totalProcessed / items.length) * 100,
       };
     }, [items, processor]);
   }
@@ -160,14 +160,14 @@ class EnhancedServiceFramework extends ProductionService {
           this.smartRetry(() => this.db.query(...q)).catch(e => {
             logger.warn('Prefetch query failed', e);
             return null;
-          })
-        )
+          }),
+        ),
       ]);
 
       return {
         data: mainResult.rows,
         related: prefetched.filter(r => r !== null),
-        cached: false
+        cached: false,
       };
     }, [mainQuery, relatedQueries]);
   }
@@ -184,9 +184,9 @@ class EnhancedServiceFramework extends ProductionService {
           .map(([k, v], i) => `${k} = $${i + 1}`)
           .join(' AND ');
 
-        const whereClause = filterConditions
-          ? `WHERE ${filterConditions} AND (name ILIKE $${Object.keys(filters).length + 1} OR description ILIKE $${Object.keys(filters).length + 1})`
-          : `WHERE name ILIKE $1 OR description ILIKE $1`;
+        const whereClause = filterConditions ?
+          `WHERE ${filterConditions} AND (name ILIKE $${Object.keys(filters).length + 1} OR description ILIKE $${Object.keys(filters).length + 1})` :
+          'WHERE name ILIKE $1 OR description ILIKE $1';
 
         const query = `
           SELECT *,
@@ -202,7 +202,7 @@ class EnhancedServiceFramework extends ProductionService {
           ...Object.values(filters),
           validatedQuery,
           limit,
-          offset
+          offset,
         ];
 
         return this.db.query(query, values);
@@ -217,7 +217,7 @@ class EnhancedServiceFramework extends ProductionService {
       let hasMore = true;
 
       while (hasMore) {
-        let results = await this.smartRetry(async () => {
+        const results = await this.smartRetry(async () => {
           const q = `${query} LIMIT $1 OFFSET $2`;
           return this.db.query(q, [batchSize, offset]);
         });
@@ -242,19 +242,19 @@ class EnhancedServiceFramework extends ProductionService {
         profiles: this.performanceProfiles,
         averageResponseTime: this.calculateAverageResponseTime(),
         p99ResponseTime: this.calculatePercentile(99),
-        p95ResponseTime: this.calculatePercentile(95)
+        p95ResponseTime: this.calculatePercentile(95),
       },
       errorAnalytics: {
         patterns: this.errorPatterns,
         mostCommonError: Object.entries(this.errorPatterns)
           .sort(([, a], [, b]) => b - a)[0]?.[0],
-        errorTrends: this.analyzeErrorTrends()
+        errorTrends: this.analyzeErrorTrends(),
       },
       optimization: this.aiOptimizations,
       cacheStats: {
         hitRate: this.calculateCacheHitRate(),
-        avgDuration: this.calculateCacheDuration()
-      }
+        avgDuration: this.calculateCacheDuration(),
+      },
     };
   }
 
@@ -265,7 +265,7 @@ class EnhancedServiceFramework extends ProductionService {
   }
 
   calculatePercentile(percentile) {
-    let times = Object.values(this.performanceProfiles).sort((a, b) => a - b);
+    const times = Object.values(this.performanceProfiles).sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * times.length) - 1;
     return times[Math.max(0, index)] || 0;
   }
@@ -275,7 +275,7 @@ class EnhancedServiceFramework extends ProductionService {
     return Object.entries(this.errorPatterns).map(([code, count]) => ({
       code,
       frequency: count,
-      severity: this.calculateErrorSeverity(code)
+      severity: this.calculateErrorSeverity(code),
     }));
   }
 
@@ -285,7 +285,7 @@ class EnhancedServiceFramework extends ProductionService {
       NOT_FOUND: 'low',
       AUTH_ERROR: 'medium',
       SERVER_ERROR: 'high',
-      TIMEOUT: 'high'
+      TIMEOUT: 'high',
     };
     return severityMap[errorCode] || 'medium';
   }

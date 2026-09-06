@@ -45,5 +45,5 @@ module.exports = {
   createHealthRecord,
   scheduleVaccination,
   monitorHerdHealth,
-  generateHealthReport
+  generateHealthReport,
 };

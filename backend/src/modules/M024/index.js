@@ -9,8 +9,8 @@ router.post('/groups/:groupId/meetings', controller.recordGroupMeeting);
 router.post('/groups/:groupId/transactions', controller.recordGroupTransaction);
 router.get('/groups/:groupId/analytics', controller.getGroupAnalytics);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

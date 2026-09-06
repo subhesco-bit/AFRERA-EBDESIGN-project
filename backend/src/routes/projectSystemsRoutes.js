@@ -14,9 +14,7 @@ const { authMiddleware } = require('../middleware/auth');
 const { adminMiddleware } = require('../middleware/admin');
 
 // Projects
-router.post
-    // Log request
-    logger.debug('router.post request');('/', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const project = await projectSystemsService.createProject(req.body);
     res.json({ success: true, data: project });
@@ -25,9 +23,7 @@ router.post
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const { companyId, ...filters } = req.query;
     const projects = await projectSystemsService.getProjects(companyId, filters);
@@ -37,24 +33,20 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:projectId', authMiddleware, async (req, res) => {
+router.get('/:projectId', authMiddleware, async (req, res) => {
   try {
-    let project = await projectSystemsService.getProject(req.params.projectId);
+    const project = await projectSystemsService.getProject(req.params.projectId);
     res.json({ success: true, data: project });
   } catch (error) {
     res.status(error.message === 'Project not found' ? 404 : 400).json({ success: false, error: error.message });
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/:projectId/status', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/:projectId/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { status, actualStartDate, actualEndDate } = req.body;
-    let project = await projectSystemsService.updateProjectStatus(
-      req.params.projectId, status, { actualStartDate, actualEndDate }
+    const project = await projectSystemsService.updateProjectStatus(
+      req.params.projectId, status, { actualStartDate, actualEndDate },
     );
     res.json({ success: true, data: project });
   } catch (error) {
@@ -63,9 +55,7 @@ router.post
 });
 
 // Work Breakdown Structure
-router.post
-    // Log request
-    logger.debug('router.post request');('/:projectId/wbs', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/:projectId/wbs', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const wbs = await projectSystemsService.createWbsElement(req.params.projectId, req.body);
     res.json({ success: true, data: wbs });
@@ -74,20 +64,16 @@ router.post
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:projectId/wbs', authMiddleware, async (req, res) => {
+router.get('/:projectId/wbs', authMiddleware, async (req, res) => {
   try {
-    let wbs = await projectSystemsService.getProjectWbs(req.params.projectId);
+    const wbs = await projectSystemsService.getProjectWbs(req.params.projectId);
     res.json({ success: true, data: wbs });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:projectId/wbs/rollup', authMiddleware, async (req, res) => {
+router.get('/:projectId/wbs/rollup', authMiddleware, async (req, res) => {
   try {
     const rollup = await projectSystemsService.getWbsCostRollup(req.params.projectId);
     res.json({ success: true, data: rollup });
@@ -96,24 +82,20 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/wbs/:wbsId', authMiddleware, async (req, res) => {
+router.get('/wbs/:wbsId', authMiddleware, async (req, res) => {
   try {
-    let wbs = await projectSystemsService.getWbsElement(req.params.wbsId);
+    const wbs = await projectSystemsService.getWbsElement(req.params.wbsId);
     res.json({ success: true, data: wbs });
   } catch (error) {
     res.status(error.message === 'WBS element not found' ? 404 : 400).json({ success: false, error: error.message });
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/wbs/:wbsId/status', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/wbs/:wbsId/status', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { status, actualStartDate, actualEndDate } = req.body;
-    let wbs = await projectSystemsService.updateWbsStatus(
-      req.params.wbsId, status, { actualStartDate, actualEndDate }
+    const wbs = await projectSystemsService.updateWbsStatus(
+      req.params.wbsId, status, { actualStartDate, actualEndDate },
     );
     res.json({ success: true, data: wbs });
   } catch (error) {
@@ -122,9 +104,7 @@ router.post
 });
 
 // Milestones
-router.post
-    // Log request
-    logger.debug('router.post request');('/:projectId/milestones', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/:projectId/milestones', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const milestone = await projectSystemsService.createMilestone(req.params.projectId, req.body);
     res.json({ success: true, data: milestone });
@@ -133,9 +113,7 @@ router.post
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:projectId/milestones', authMiddleware, async (req, res) => {
+router.get('/:projectId/milestones', authMiddleware, async (req, res) => {
   try {
     const milestones = await projectSystemsService.getProjectMilestones(req.params.projectId, req.query);
     res.json({ success: true, data: milestones });
@@ -144,9 +122,7 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:projectId/milestones/summary', authMiddleware, async (req, res) => {
+router.get('/:projectId/milestones/summary', authMiddleware, async (req, res) => {
   try {
     const summary = await projectSystemsService.getMilestoneStatusSummary(req.params.projectId, req.query.asOfDate);
     res.json({ success: true, data: summary });
@@ -155,12 +131,10 @@ router.get
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/milestones/:milestoneId/complete', authMiddleware, adminMiddleware, async (req, res) => {
+router.post('/milestones/:milestoneId/complete', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { actualCompletionDate } = req.body;
-    let milestone = await projectSystemsService.completeMilestone(req.params.milestoneId, actualCompletionDate);
+    const milestone = await projectSystemsService.completeMilestone(req.params.milestoneId, actualCompletionDate);
     res.json({ success: true, data: milestone });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -168,9 +142,7 @@ router.post
 });
 
 // Budget vs. Actual
-router.get
-    // Log request
-    logger.debug('router.get request');('/:projectId/budget-vs-actual', authMiddleware, async (req, res) => {
+router.get('/:projectId/budget-vs-actual', authMiddleware, async (req, res) => {
   try {
     const report = await projectSystemsService.getProjectBudgetVsActual(req.params.projectId);
     res.json({ success: true, data: report });

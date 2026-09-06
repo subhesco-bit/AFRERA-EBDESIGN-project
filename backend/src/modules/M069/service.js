@@ -27,31 +27,31 @@ async function listItems({ page = 1, limit = 20 } = {}) {
 }
 
 async function getItem(id) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
+  const res = await pg.query(`SELECT * FROM ${tableName} WHERE id = $1`, [id]);
   return flatten(res.rows[0]) || null;
 }
 
 async function createItem(payload = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [payload]);
+  const res = await pg.query(`INSERT INTO ${tableName} (data, created_at) VALUES ($1, NOW()) RETURNING *`, [payload]);
   return flatten(res.rows[0]);
 }
 
 async function updateItem(id, payload = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [payload, id]);
+  const res = await pg.query(`UPDATE ${tableName} SET data = $1, updated_at = NOW() WHERE id = $2 RETURNING *`, [payload, id]);
   return flatten(res.rows[0]) || null;
 }
 
 async function deleteItem(id) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
-  return !!res.rows[0];
+  const res = await pg.query(`DELETE FROM ${tableName} WHERE id = $1 RETURNING id`, [id]);
+  return Boolean(res.rows[0]);
 }
 
 module.exports = { listItems, getItem, createItem, updateItem, deleteItem };

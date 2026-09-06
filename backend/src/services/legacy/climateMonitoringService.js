@@ -43,5 +43,3 @@ const agroMeteorology = createCrudService('agro_meteorology_readings', {
 
 module.exports = { droughtMonitoring, floodMonitoring, diseaseForecasting, climateRisk, agroMeteorology };
 
-
-

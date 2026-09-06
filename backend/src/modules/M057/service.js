@@ -17,19 +17,19 @@ async function createShipment(shipmentData) {
       delivery_method,
       items,
       status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const aiRequest = {
       task: 'route_optimization',
-      parameters: { shipment_data: shipmentData, traffic_data: await getTrafficData(), weather_data: await getWeatherData() }
+      parameters: { shipment_data: shipmentData, traffic_data: await getTrafficData(), weather_data: await getWeatherData() },
     };
     shipment.ai_recommendations = await aiAPI.generateRecommendation(aiRequest);
 
     const result = await pool.query(
       `INSERT INTO shipments (shipment_id, order_id, shipping_address, delivery_method, items, status, ai_recommendations, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [shipment.shipment_id, shipment.order_id, JSON.stringify(shipment.shipping_address), shipment.delivery_method, JSON.stringify(shipment.items), shipment.status, JSON.stringify(shipment.ai_recommendations), shipment.created_at]
+      [shipment.shipment_id, shipment.order_id, JSON.stringify(shipment.shipping_address), shipment.delivery_method, JSON.stringify(shipment.items), shipment.status, JSON.stringify(shipment.ai_recommendations), shipment.created_at],
     );
 
     logger.info(`Shipment created: ${shipment.shipment_id}`);
@@ -52,9 +52,9 @@ async function trackShipment(shipmentId) {
 
 async function updateShipmentStatus(shipmentId, status, location = null) {
   try {
-    let res = await pool.query(
+    const res = await pool.query(
       'UPDATE shipments SET status = $1, current_location = $2, updated_at = NOW() WHERE shipment_id = $3 RETURNING *',
-      [status, location, shipmentId]
+      [status, location, shipmentId],
     );
     return res.rows[0] || null;
   } catch (error) {

@@ -10,9 +10,9 @@ async function createSession(req, res) {
     const deviceInfo = {
       ipAddress: req.ip,
       userAgent: req.headers['user-agent'],
-      ...req.body
+      ...req.body,
     };
-    
+
     const session = await service.createSession(userId, deviceInfo);
     res.status(201).json({ success: true, data: session });
   } catch (error) {
@@ -24,8 +24,8 @@ async function createSession(req, res) {
 async function validateSession(req, res) {
   try {
     const { sessionToken } = req.body;
-    let session = await service.validateSession(sessionToken);
-    
+    const session = await service.validateSession(sessionToken);
+
     if (session) {
       res.json({ success: true, data: session });
     } else {
@@ -50,8 +50,8 @@ async function invalidateSession(req, res) {
 
 async function invalidateAllUserSessions(req, res) {
   try {
-    let userId = req.params.userId || req.user?.id;
-    let result = await service.invalidateAllUserSessions(userId);
+    const userId = req.params.userId || req.user?.id;
+    const result = await service.invalidateAllUserSessions(userId);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('invalidateAllUserSessions error', { error: error.message });
@@ -61,13 +61,13 @@ async function invalidateAllUserSessions(req, res) {
 
 async function recordDeviceFingerprint(req, res) {
   try {
-    let userId = req.user?.id;
+    const userId = req.user?.id;
     const fingerprint = {
       ...req.body,
       ipAddress: req.ip,
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
     };
-    
+
     const recorded = await service.recordDeviceFingerprint(userId, fingerprint);
     res.status(201).json({ success: true, data: recorded });
   } catch (error) {
@@ -78,7 +78,7 @@ async function recordDeviceFingerprint(req, res) {
 
 async function getUserDevices(req, res) {
   try {
-    let userId = req.params.userId || req.user?.id;
+    const userId = req.params.userId || req.user?.id;
     const devices = await service.getUserDevices(userId);
     res.json({ success: true, data: devices });
   } catch (error) {
@@ -89,7 +89,7 @@ async function getUserDevices(req, res) {
 
 async function getUserSecurityEvents(req, res) {
   try {
-    let userId = req.params.userId || req.user?.id;
+    const userId = req.params.userId || req.user?.id;
     const { limit } = req.query;
     const events = await service.getUserSecurityEvents(userId, { limit });
     res.json({ success: true, data: events });
@@ -101,10 +101,10 @@ async function getUserSecurityEvents(req, res) {
 
 async function changePassword(req, res) {
   try {
-    let userId = req.user?.id;
+    const userId = req.user?.id;
     const { currentPassword, newPassword } = req.body;
-    let result = await service.changePassword(userId, currentPassword, newPassword);
-    
+    const result = await service.changePassword(userId, currentPassword, newPassword);
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {

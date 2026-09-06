@@ -23,7 +23,7 @@ class RedisCacheService {
             return null;
           }
           return Math.min(times * 50, 2000);
-        }
+        },
       });
 
       this.redis.on('connect', () => {
@@ -178,8 +178,8 @@ class RedisCacheService {
       }
 
       const values = await this.redis.mget(...keys);
-      let result = {};
-      
+      const result = {};
+
       keys.forEach((key, index) => {
         if (values[index] !== null) {
           try {
@@ -247,24 +247,24 @@ class RedisCacheService {
         return {
           connected: false,
           keys: 0,
-          memory: 0
+          memory: 0,
         };
       }
 
       const info = await this.redis.info('memory');
       const dbsize = await this.redis.dbsize();
-      
+
       return {
         connected: true,
         keys: dbsize,
-        memory: this.parseMemoryInfo(info)
+        memory: this.parseMemoryInfo(info),
       };
     } catch (error) {
       logger.error('Get cache stats failed', error);
       return {
         connected: false,
         keys: 0,
-        memory: 0
+        memory: 0,
       };
     }
   }
@@ -275,7 +275,7 @@ class RedisCacheService {
   parseMemoryInfo(info) {
     const lines = info.split('\n');
     const memoryInfo = {};
-    
+
     for (const line of lines) {
       if (line.includes(':')) {
         const [key, value] = line.split(':');
@@ -298,7 +298,7 @@ class RedisCacheService {
    * Get value with complex key
    */
   async getWithPrefix(prefix, key) {
-    let fullKey = `${prefix}:${key}`;
+    const fullKey = `${prefix}:${key}`;
     return await this.get(fullKey);
   }
 

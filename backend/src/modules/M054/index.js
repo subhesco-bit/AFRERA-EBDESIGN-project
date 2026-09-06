@@ -10,8 +10,8 @@ router.put('/customers/:id', controller.update);
 router.delete('/customers/:id', controller.remove);
 router.get('/customers/:id/insights', controller.getCustomerInsights);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

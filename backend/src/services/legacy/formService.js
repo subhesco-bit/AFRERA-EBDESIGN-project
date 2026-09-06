@@ -21,7 +21,7 @@ function buildId(prefix = 'form') {
 function ensureDefaultStore() {
   return {
     forms: [],
-    submissions: []
+    submissions: [],
   };
 }
 
@@ -41,7 +41,7 @@ async function readStore() {
     const parsed = JSON.parse(raw);
     return {
       forms: Array.isArray(parsed.forms) ? parsed.forms : [],
-      submissions: Array.isArray(parsed.submissions) ? parsed.submissions : []
+      submissions: Array.isArray(parsed.submissions) ? parsed.submissions : [],
     };
   } catch (error) {
     logger.warn('Unable to read form store, resetting it', { error: error.message });
@@ -77,7 +77,7 @@ async function ensureDatabaseSchema() {
 }
 
 async function loadFormsFromDb() {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) {
     return null;
   }
@@ -92,12 +92,12 @@ async function loadFormsFromDb() {
         ...row,
         fields: row.fields || [],
         workflow: row.workflow || {},
-        metadata: row.metadata || {}
+        metadata: row.metadata || {},
       })),
       submissions: submissionResult.rows.map((row) => ({
         ...row,
-        payload: row.payload || {}
-      }))
+        payload: row.payload || {},
+      })),
     };
   } catch (error) {
     logger.warn('Falling back to file-based form storage', { error: error.message });
@@ -107,9 +107,9 @@ async function loadFormsFromDb() {
 
 function buildAiInsights(formData) {
   const fieldCount = Array.isArray(formData.fields) ? formData.fields.length : 0;
-  const requiredCount = Array.isArray(formData.fields)
-    ? formData.fields.filter((field) => field.required).length
-    : 0;
+  const requiredCount = Array.isArray(formData.fields) ?
+    formData.fields.filter((field) => field.required).length :
+    0;
   const workflowStages = Array.isArray(formData.workflow?.stages) ? formData.workflow.stages.length : 0;
   const suggestions = [];
 
@@ -132,31 +132,31 @@ function buildAiInsights(formData) {
   return {
     score: Math.min(98, 72 + fieldCount * 2 + requiredCount + workflowStages * 4),
     summary: suggestions,
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   };
 }
 
 function normalizeForm(formData, existingForm = null) {
-  const fields = Array.isArray(formData.fields)
-    ? formData.fields.map((field, index) => ({
-        id: field.id || `field-${index + 1}`,
-        label: field.label || `Field ${index + 1}`,
-        type: field.type || 'text',
-        required: Boolean(field.required),
-        placeholder: field.placeholder || '',
-        options: Array.isArray(field.options) ? field.options : [],
-        defaultValue: field.defaultValue || '',
-        helpText: field.helpText || ''
-      }))
-    : [];
+  const fields = Array.isArray(formData.fields) ?
+    formData.fields.map((field, index) => ({
+      id: field.id || `field-${index + 1}`,
+      label: field.label || `Field ${index + 1}`,
+      type: field.type || 'text',
+      required: Boolean(field.required),
+      placeholder: field.placeholder || '',
+      options: Array.isArray(field.options) ? field.options : [],
+      defaultValue: field.defaultValue || '',
+      helpText: field.helpText || '',
+    })) :
+    [];
 
   const workflow = formData.workflow || {
     enabled: true,
     stages: [
       { name: 'Draft', role: 'submitter' },
       { name: 'Review', role: 'manager' },
-      { name: 'Approval', role: 'approver' }
-    ]
+      { name: 'Approval', role: 'approver' },
+    ],
   };
 
   const now = new Date().toISOString();
@@ -174,11 +174,11 @@ function normalizeForm(formData, existingForm = null) {
       owner: formData.metadata?.owner || 'system',
       department: formData.metadata?.department || 'operations',
       compliance: formData.metadata?.compliance || 'standard',
-      tags: Array.isArray(formData.metadata?.tags) ? formData.metadata.tags : []
+      tags: Array.isArray(formData.metadata?.tags) ? formData.metadata.tags : [],
     },
     aiInsights: buildAiInsights({ fields, workflow }),
     createdAt: existingForm?.createdAt || now,
-    updatedAt: now
+    updatedAt: now,
   };
 }
 
@@ -210,7 +210,7 @@ async function getFormById(formId) {
 
 async function createForm(formData) {
   const normalized = normalizeForm(formData);
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
 
   if (pg) {
     try {
@@ -218,7 +218,7 @@ async function createForm(formData) {
       await pg.query(
         `INSERT INTO form_definitions (id, title, description, category, status, version, fields, workflow, metadata, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-        [normalized.id, normalized.title, normalized.description, normalized.category, normalized.status, normalized.version, JSON.stringify(normalized.fields), JSON.stringify(normalized.workflow), JSON.stringify(normalized.metadata), normalized.createdAt, normalized.updatedAt]
+        [normalized.id, normalized.title, normalized.description, normalized.category, normalized.status, normalized.version, JSON.stringify(normalized.fields), JSON.stringify(normalized.workflow), JSON.stringify(normalized.metadata), normalized.createdAt, normalized.updatedAt],
       );
       return normalized;
     } catch (error) {
@@ -238,16 +238,16 @@ async function updateForm(formId, formData) {
     throw new Error('Form not found');
   }
 
-  let normalized = normalizeForm({ ...existingForm, ...formData }, existingForm);
+  const normalized = normalizeForm({ ...existingForm, ...formData }, existingForm);
   normalized.version = (existingForm.version || 1) + 1;
 
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
       await pg.query(
-        `UPDATE form_definitions SET title=$2, description=$3, category=$4, status=$5, version=$6, fields=$7, workflow=$8, metadata=$9, updated_at=$10 WHERE id=$1`,
-        [formId, normalized.title, normalized.description, normalized.category, normalized.status, normalized.version, JSON.stringify(normalized.fields), JSON.stringify(normalized.workflow), JSON.stringify(normalized.metadata), normalized.updatedAt]
+        'UPDATE form_definitions SET title=$2, description=$3, category=$4, status=$5, version=$6, fields=$7, workflow=$8, metadata=$9, updated_at=$10 WHERE id=$1',
+        [formId, normalized.title, normalized.description, normalized.category, normalized.status, normalized.version, JSON.stringify(normalized.fields), JSON.stringify(normalized.workflow), JSON.stringify(normalized.metadata), normalized.updatedAt],
       );
       return normalized;
     } catch (error) {
@@ -255,14 +255,14 @@ async function updateForm(formId, formData) {
     }
   }
 
-  let store = await readStore();
+  const store = await readStore();
   store.forms = store.forms.map((form) => (form.id === formId ? normalized : form));
   await writeStore(store);
   return normalized;
 }
 
 async function deleteForm(formId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
@@ -273,7 +273,7 @@ async function deleteForm(formId) {
     }
   }
 
-  let store = await readStore();
+  const store = await readStore();
   store.forms = store.forms.filter((form) => form.id !== formId);
   await writeStore(store);
   return { success: true, id: formId };
@@ -291,16 +291,16 @@ async function submitForm(formId, payload) {
     payload,
     status: 'submitted',
     submittedAt: new Date().toISOString(),
-    reviewState: 'pending'
+    reviewState: 'pending',
   };
 
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
       await pg.query(
-        `INSERT INTO form_submissions (id, form_id, payload, status, created_at) VALUES ($1, $2, $3, $4, $5)`,
-        [submission.id, formId, JSON.stringify(payload), submission.status, submission.submittedAt]
+        'INSERT INTO form_submissions (id, form_id, payload, status, created_at) VALUES ($1, $2, $3, $4, $5)',
+        [submission.id, formId, JSON.stringify(payload), submission.status, submission.submittedAt],
       );
       return submission;
     } catch (error) {
@@ -308,14 +308,14 @@ async function submitForm(formId, payload) {
     }
   }
 
-  let store = await readStore();
+  const store = await readStore();
   store.submissions.unshift(submission);
   await writeStore(store);
   return submission;
 }
 
 async function listSubmissions(formId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (pg) {
     try {
       await ensureDatabaseSchema();
@@ -326,14 +326,14 @@ async function listSubmissions(formId) {
     }
   }
 
-  let store = await readStore();
+  const store = await readStore();
   return store.submissions.filter((submission) => submission.formId === formId).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 }
 
 router.get('/', async (req, res) => {
   try {
     const { search = '', category = '', status = '' } = req.query;
-    let forms = await listForms(search, category, status);
+    const forms = await listForms(search, category, status);
     res.json({ forms });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -347,20 +347,20 @@ router.get('/templates', async (req, res) => {
         id: 'template-packhouse-dpr',
         title: 'Packhouse DPR',
         category: 'operations',
-        description: 'Operational daily reporting for packhouse conditions and approvals.'
+        description: 'Operational daily reporting for packhouse conditions and approvals.',
       },
       {
         id: 'template-inspection',
         title: 'Inspection Checklist',
         category: 'quality',
-        description: 'Structured quality inspection flow with digital signature support.'
+        description: 'Structured quality inspection flow with digital signature support.',
       },
       {
         id: 'template-shipment',
         title: 'Shipment Declaration',
         category: 'logistics',
-        description: 'Shipment declaration and traceability workflow with GIS metadata.'
-      }
+        description: 'Shipment declaration and traceability workflow with GIS metadata.',
+      },
     ];
 
     res.json({ templates });
@@ -371,7 +371,7 @@ router.get('/templates', async (req, res) => {
 
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    let form = await createForm(req.body);
+    const form = await createForm(req.body);
     res.status(201).json(form);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -380,7 +380,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    let form = await getFormById(req.params.id);
+    const form = await getFormById(req.params.id);
     if (!form) {
       return res.status(404).json({ error: 'Form not found' });
     }
@@ -396,7 +396,7 @@ router.get('/:id', async (req, res) => {
 // authenticated user could previously edit or delete any form definition.
 router.put('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
-    let form = await updateForm(req.params.id, req.body);
+    const form = await updateForm(req.params.id, req.body);
     res.json(form);
   } catch (error) {
     res.status(404).json({ error: error.message });
@@ -405,7 +405,7 @@ router.put('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
 
 router.delete('/:id', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
-    let result = await deleteForm(req.params.id);
+    const result = await deleteForm(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -414,7 +414,7 @@ router.delete('/:id', authMiddleware, requireRole('admin'), async (req, res) => 
 
 router.post('/:id/submit', authMiddleware, async (req, res) => {
   try {
-    let submission = await submitForm(req.params.id, req.body);
+    const submission = await submitForm(req.params.id, req.body);
     res.status(201).json(submission);
   } catch (error) {
     res.status(404).json({ error: error.message });
@@ -439,8 +439,6 @@ module.exports = {
   deleteForm,
   submitForm,
   listSubmissions,
-  buildAiInsights
+  buildAiInsights,
 };
-
-
 

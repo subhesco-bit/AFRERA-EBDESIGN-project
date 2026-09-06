@@ -44,32 +44,32 @@ async function listInventory({ page = 1, limit = 100 } = {}) {
   const total = parseInt(totalRes.rows[0].count || '0', 10);
   const res = await pg.query(
     'SELECT * FROM fertilizer_inventory ORDER BY name ASC LIMIT $1 OFFSET $2',
-    [limit, offset]
+    [limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
 
 async function createInventoryItem(payload) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { name, category, unit, quantity, reorder_level, unit_price } = payload || {};
   if (!name || quantity === undefined || quantity === null) {
     throw new Error('name and quantity are required');
   }
-  let res = await pg.query(
+  const res = await pg.query(
     `INSERT INTO fertilizer_inventory (name, category, unit, quantity, reorder_level, unit_price)
      VALUES ($1, COALESCE($2, 'Urea'), COALESCE($3, 'bag (50kg)'), $4, $5, $6)
      RETURNING *`,
-    [name, category || null, unit || null, quantity, reorder_level ?? null, unit_price ?? null]
+    [name, category || null, unit || null, quantity, reorder_level ?? null, unit_price ?? null],
   );
   return res.rows[0];
 }
 
 async function updateInventoryItem(id, payload) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   const { name, category, unit, quantity, reorder_level, unit_price } = payload || {};
-  let res = await pg.query(
+  const res = await pg.query(
     `UPDATE fertilizer_inventory SET
        name = COALESCE($1, name),
        category = COALESCE($2, category),
@@ -80,16 +80,16 @@ async function updateInventoryItem(id, payload) {
        updated_at = NOW()
      WHERE id = $7
      RETURNING *`,
-    [name, category, unit, quantity, reorder_level, unit_price, id]
+    [name, category, unit, quantity, reorder_level, unit_price, id],
   );
   return res.rows[0] || null;
 }
 
 async function deleteInventoryItem(id) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query('DELETE FROM fertilizer_inventory WHERE id = $1 RETURNING id', [id]);
-  return !!res.rows[0];
+  const res = await pg.query('DELETE FROM fertilizer_inventory WHERE id = $1 RETURNING id', [id]);
+  return Boolean(res.rows[0]);
 }
 
 // ---------------------------------------------------------------------
@@ -112,7 +112,7 @@ async function issueStock(id, payload) {
     const updateRes = await client.query(
       `UPDATE fertilizer_inventory SET quantity = quantity - $1, updated_at = NOW()
        WHERE id = $2 RETURNING *`,
-      [quantity, id]
+      [quantity, id],
     );
 
     const costInr = item.unit_price !== null ? Number(item.unit_price) * Number(quantity) : null;
@@ -121,7 +121,7 @@ async function issueStock(id, payload) {
          (input_type, product_name, quantity, unit, issued_on, cost_inr, issued_to, purpose, inventory_item_id)
        VALUES ('fertilizer', $1, $2, $3, CURRENT_DATE, $4, $5, $6, $7)
        RETURNING *`,
-      [item.name, quantity, item.unit, costInr, issued_to || null, purpose || null, id]
+      [item.name, quantity, item.unit, costInr, issued_to || null, purpose || null, id],
     );
 
     return { item: updateRes.rows[0], issue: issueRes.rows[0] };
@@ -129,15 +129,15 @@ async function issueStock(id, payload) {
 }
 
 async function listIssues({ page = 1, limit = 100 } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let offset = (Number(page) - 1) * Number(limit);
-  let totalRes = await pg.query(`SELECT COUNT(*) FROM agri_input_issues WHERE input_type = 'fertilizer'`);
-  let total = parseInt(totalRes.rows[0].count || '0', 10);
-  let res = await pg.query(
+  const offset = (Number(page) - 1) * Number(limit);
+  const totalRes = await pg.query('SELECT COUNT(*) FROM agri_input_issues WHERE input_type = \'fertilizer\'');
+  const total = parseInt(totalRes.rows[0].count || '0', 10);
+  const res = await pg.query(
     `SELECT * FROM agri_input_issues WHERE input_type = 'fertilizer'
      ORDER BY issued_on DESC, created_at DESC LIMIT $1 OFFSET $2`,
-    [limit, offset]
+    [limit, offset],
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.ceil(total / limit) || 1 } };
 }
@@ -148,7 +148,7 @@ async function listIssues({ page = 1, limit = 100 } = {}) {
 // ---------------------------------------------------------------------
 
 async function getReorderAlerts() {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
   try {
     const { rows } = await pg.query(
@@ -165,7 +165,7 @@ async function getReorderAlerts() {
           ON i.inventory_item_id = f.id AND i.input_type = 'fertilizer'
         GROUP BY f.id, f.name, f.category, f.unit, f.quantity, f.reorder_level
         ORDER BY f.name`,
-      [CONSUMPTION_WINDOW_DAYS]
+      [CONSUMPTION_WINDOW_DAYS],
     );
 
     const items = rows.map((r) => {
@@ -173,13 +173,13 @@ async function getReorderAlerts() {
       const issueCount = Number(r.issue_count);
       const hasConsumptionHistory = issueCount > 0;
       const avgDailyConsumption = hasConsumptionHistory ? consumed / CONSUMPTION_WINDOW_DAYS : null;
-      const reorderPoint = hasConsumptionHistory
-        ? Math.round((avgDailyConsumption * ASSUMED_LEAD_TIME_DAYS + avgDailyConsumption * ASSUMED_SAFETY_STOCK_DAYS) * 100) / 100
-        : null;
+      const reorderPoint = hasConsumptionHistory ?
+        Math.round((avgDailyConsumption * ASSUMED_LEAD_TIME_DAYS + avgDailyConsumption * ASSUMED_SAFETY_STOCK_DAYS) * 100) / 100 :
+        null;
       const currentStock = Number(r.quantity);
-      const needsReorder = reorderPoint !== null
-        ? currentStock <= reorderPoint
-        : (r.reorder_level !== null && currentStock <= Number(r.reorder_level)); // fallback: manual reorder_level, no consumption history yet
+      const needsReorder = reorderPoint !== null ?
+        currentStock <= reorderPoint :
+        (r.reorder_level !== null && currentStock <= Number(r.reorder_level)); // fallback: manual reorder_level, no consumption history yet
 
       return {
         id: r.id,
@@ -192,9 +192,9 @@ async function getReorderAlerts() {
         consumptionWindowDays: CONSUMPTION_WINDOW_DAYS,
         computedReorderPoint: reorderPoint,
         needsReorder,
-        basis: hasConsumptionHistory
-          ? 'real avg daily consumption (agri_input_issues) x assumed lead time + assumed safety stock'
-          : 'no issuance history yet — falling back to the manually-set reorder_level (if any)',
+        basis: hasConsumptionHistory ?
+          'real avg daily consumption (agri_input_issues) x assumed lead time + assumed safety stock' :
+          'no issuance history yet — falling back to the manually-set reorder_level (if any)',
         dataQuality: hasConsumptionHistory ? 'real' : 'assumed_fallback',
       };
     });
@@ -228,38 +228,36 @@ module.exports = {
 
 // Merged from backend/src/modules/M042
 {
-  const m042 = require("../../modules/M042/service");
+  const m042 = require('../../modules/M042/service');
   const { ...rest } = m042;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M102
 {
-  const m102 = require("../../modules/M102/service");
+  const m102 = require('../../modules/M102/service');
   const { ...rest } = m102;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M103
 {
-  const m103 = require("../../modules/M103/service");
+  const m103 = require('../../modules/M103/service');
   const { ...rest } = m103;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M108
 {
-  const m108 = require("../../modules/M108/service");
+  const m108 = require('../../modules/M108/service');
   const { ...rest } = m108;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M109 - 1 name(s) collided and were aliased
 {
-  const m109 = require("../../modules/M109/service");
+  const m109 = require('../../modules/M109/service');
   const { generateInventoryReport: generateInventoryReportFromBE109, ...rest } = m109;
   Object.assign(module.exports, rest, { generateInventoryReportFromBE109 });
 }
-
-
 

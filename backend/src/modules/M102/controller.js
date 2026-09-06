@@ -26,7 +26,7 @@ const getImplement = async (req, res) => {
 
 const registerImplement = async (req, res) => {
   try {
-    let implement = await implementService.registerImplement(req.body);
+    const implement = await implementService.registerImplement(req.body);
     res.status(201).json({ success: true, data: implement });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -66,5 +66,5 @@ module.exports = {
   registerImplement,
   updateImplementMaintenance,
   trackImplementUsage,
-  generateImplementReport
+  generateImplementReport,
 };

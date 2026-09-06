@@ -14,12 +14,12 @@ const productMediaAIService = require('./productMediaAIService');
 async function getProducts(filters = {}, pagination = {}) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Validate database connection
     if (!pg) {
       throw new Error('Database connection not available');
     }
-    
+
     const {
       category_id,
       state_id,
@@ -28,23 +28,23 @@ async function getProducts(filters = {}, pagination = {}) {
       search,
       min_price,
       max_price,
-      is_active
+      is_active,
     } = filters;
-    
+
     const {
       page = 1,
       limit = 24,
       sort_by = 'created_at',
-      sort_order = 'DESC'
+      sort_order = 'DESC',
     } = pagination;
-    
+
     // Validate pagination parameters
     if (page < 1 || limit < 1 || limit > 100) {
       throw new Error('Invalid pagination parameters');
     }
-    
+
     const offset = (page - 1) * limit;
-    
+
     // Build query
     let query = `
       SELECT p.*, c.name as category_name, s.name as state_name, u.symbol as unit_symbol
@@ -54,83 +54,83 @@ async function getProducts(filters = {}, pagination = {}) {
       LEFT JOIN units u ON p.unit_id = u.id
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     // Add filters
     if (category_id) {
       paramCount++;
       query += ` AND p.category_id = $${paramCount}`;
       params.push(category_id);
     }
-    
+
     if (state_id) {
       paramCount++;
       query += ` AND p.state_id = $${paramCount}`;
       params.push(state_id);
     }
-    
+
     if (gi_status !== undefined) {
       paramCount++;
       query += ` AND p.gi_status = $${paramCount}`;
       params.push(gi_status);
     }
-    
+
     if (organic !== undefined) {
       paramCount++;
       query += ` AND p.organic = $${paramCount}`;
       params.push(organic);
     }
-    
+
     if (is_active !== undefined) {
       paramCount++;
       query += ` AND p.is_active = $${paramCount}`;
       params.push(is_active);
     }
-    
+
     if (min_price) {
       paramCount++;
       query += ` AND p.base_price >= $${paramCount}`;
       params.push(min_price);
     }
-    
+
     if (max_price) {
       paramCount++;
       query += ` AND p.base_price <= $${paramCount}`;
       params.push(max_price);
     }
-    
+
     if (search) {
       paramCount++;
       query += ` AND (p.name ILIKE $${paramCount} OR p.description ILIKE $${paramCount} OR p.usp ILIKE $${paramCount})`;
       params.push(`%${search}%`);
     }
-    
+
     // Get total count
     const countQuery = query.replace(/SELECT p\.\*, c\.name as category_name, s\.name as state_name, u\.symbol as unit_symbol/, 'SELECT COUNT(*)');
     const countResult = await pg.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
-    
+
     // Add sorting and pagination
     const validSortColumns = ['created_at', 'name', 'base_price', 'gi_status'];
     const sortColumn = validSortColumns.includes(sort_by) ? sort_by : 'created_at';
     const sortOrder = sort_order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-    
+
     query += ` ORDER BY p.${sortColumn} ${sortOrder}`;
     query += ` LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
-    
+
     const result = await pg.query(query, params);
-    
+
     return {
       products: result.rows,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching products', { error: error.message, stack: error.stack });
@@ -143,18 +143,18 @@ async function getProducts(filters = {}, pagination = {}) {
  */
 async function getProductById(productId) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Validate database connection
     if (!pg) {
       throw new Error('Database connection not available');
     }
-    
+
     // Validate product ID
     if (!productId) {
       throw new Error('Product ID is required');
     }
-    
+
     const query = `
       SELECT p.*, c.name as category_name, s.name as state_name, u.symbol as unit_symbol,
              (SELECT json_agg(json_build_object('id', id, 'type', certification_type, 'certificate_number', certificate_number, 'expiry_date', expiry_date))
@@ -165,13 +165,13 @@ async function getProductById(productId) {
       LEFT JOIN units u ON p.unit_id = u.id
       WHERE p.id = $1
     `;
-    
-    let result = await pg.query(query, [productId]);
-    
+
+    const result = await pg.query(query, [productId]);
+
     if (result.rows.length === 0) {
       throw new Error('Product not found');
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error fetching product', { error: error.message, stack: error.stack });
@@ -184,9 +184,9 @@ async function getProductById(productId) {
  */
 async function createProduct(productData) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       INSERT INTO products (name, slug, sku, category_id, state_id, unit_id, description, usp,
                          gi_status, gi_certificate_number, gi_registry_date, organic,
                          organic_certificate_number, nutrition_data, images, base_price,
@@ -195,7 +195,7 @@ async function createProduct(productData) {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)
       RETURNING *
     `;
-    
+
     const values = [
       productData.name,
       generateSlug(productData.name),
@@ -222,10 +222,10 @@ async function createProduct(productData) {
       productData.meta_description || null,
       productData.is_active !== undefined ? productData.is_active : true,
       productData.featured || false,
-      productData.created_by || null
+      productData.created_by || null,
     ];
-    
-    let result = await pg.query(query, values);
+
+    const result = await pg.query(query, values);
     const product = result.rows[0];
 
     logger.info(`Product created: ${product.name} (${product.id})`);
@@ -236,7 +236,7 @@ async function createProduct(productData) {
     // honestly on the row by requestProductImageGeneration itself.
     if (!productData.images || productData.images.length === 0) {
       productMediaAIService
-        .requestProductImageGeneration(product.id, `${product.name}${productData.description ? ' — ' + productData.description : ''}`)
+        .requestProductImageGeneration(product.id, `${product.name}${productData.description ? ` — ${ productData.description}` : ''}`)
         .catch((error) => logger.warn('Product image generation request failed', { productId: product.id, error: error.message }));
     }
 
@@ -252,7 +252,7 @@ async function createProduct(productData) {
  */
 async function updateProduct(productId, productData, ownerUserId = null) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
 
     if (ownerUserId) {
       const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
@@ -263,7 +263,7 @@ async function updateProduct(productId, productData, ownerUserId = null) {
       }
     }
 
-    let query = `
+    const query = `
       UPDATE products
       SET name = COALESCE($1, name),
           slug = COALESCE($2, slug),
@@ -294,8 +294,8 @@ async function updateProduct(productId, productData, ownerUserId = null) {
       WHERE id = $26
       RETURNING *
     `;
-    
-    let values = [
+
+    const values = [
       productData.name,
       productData.slug,
       productData.sku,
@@ -321,17 +321,17 @@ async function updateProduct(productId, productData, ownerUserId = null) {
       productData.meta_description,
       productData.is_active,
       productData.featured,
-      productId
+      productId,
     ];
-    
-    let result = await pg.query(query, values);
-    
+
+    const result = await pg.query(query, values);
+
     if (result.rows.length === 0) {
       throw new Error('Product not found');
     }
-    
+
     logger.info(`Product updated: ${result.rows[0].name} (${productId})`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error updating product', { error: error.message, stack: error.stack });
@@ -344,30 +344,30 @@ async function updateProduct(productId, productData, ownerUserId = null) {
  */
 async function deleteProduct(productId, ownerUserId = null) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
 
     if (ownerUserId) {
-      let owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
+      const owned = await pg.query('SELECT 1 FROM products WHERE id = $1 AND created_by = $2', [productId, ownerUserId]);
       if (owned.rows.length === 0) {
         throw new Error('Product not found');
       }
     }
 
-    let query = `
+    const query = `
       UPDATE products
       SET is_active = FALSE, updated_at = NOW()
       WHERE id = $1
       RETURNING *
     `;
 
-    let result = await pg.query(query, [productId]);
-    
+    const result = await pg.query(query, [productId]);
+
     if (result.rows.length === 0) {
       throw new Error('Product not found');
     }
-    
+
     logger.info(`Product deleted: ${result.rows[0].name} (${productId})`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error deleting product', { error: error.message, stack: error.stack });
@@ -380,18 +380,18 @@ async function deleteProduct(productId, ownerUserId = null) {
  */
 async function getCategories() {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       SELECT c.*, 
              (SELECT COUNT(*) FROM products WHERE category_id = c.id AND is_active = TRUE) as product_count
       FROM categories c
       WHERE c.is_active = TRUE
       ORDER BY c.sort_order, c.name
     `;
-    
-    let result = await pg.query(query);
-    
+
+    const result = await pg.query(query);
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching categories', { error: error.message, stack: error.stack });
@@ -404,18 +404,18 @@ async function getCategories() {
  */
 async function getStates() {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       SELECT s.*,
              (SELECT COUNT(*) FROM products WHERE state_id = s.id AND is_active = TRUE) as product_count
       FROM states s
       WHERE s.is_active = TRUE
       ORDER BY s.name
     `;
-    
-    let result = await pg.query(query);
-    
+
+    const result = await pg.query(query);
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching states', { error: error.message, stack: error.stack });
@@ -428,9 +428,9 @@ async function getStates() {
  */
 async function searchProducts(searchTerm, filters = {}) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       SELECT p.*, c.name as category_name, s.name as state_name,
              ts_rank(to_tsvector('english', p.name || ' ' || COALESCE(p.description, '')), 
                     plainto_tsquery('english', $1)) as rank
@@ -442,9 +442,9 @@ async function searchProducts(searchTerm, filters = {}) {
       ORDER BY rank DESC, p.name
       LIMIT 50
     `;
-    
-    let result = await pg.query(query, [searchTerm]);
-    
+
+    const result = await pg.query(query, [searchTerm]);
+
     return result.rows;
   } catch (error) {
     logger.error('Error searching products', { error: error.message, stack: error.stack });
@@ -479,17 +479,17 @@ router.get('/', async (req, res) => {
       search: req.query.search,
       min_price: req.query.min_price,
       max_price: req.query.max_price,
-      is_active: req.query.is_active === 'true' ? true : req.query.is_active === 'false' ? false : undefined
+      is_active: req.query.is_active === 'true' ? true : req.query.is_active === 'false' ? false : undefined,
     };
-    
+
     const pagination = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 24,
       sort_by: req.query.sort_by,
-      sort_order: req.query.sort_order
+      sort_order: req.query.sort_order,
     };
-    
-    let result = await getProducts(filters, pagination);
+
+    const result = await getProducts(filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -499,7 +499,7 @@ router.get('/', async (req, res) => {
 // Get product by ID
 router.get('/:id', async (req, res) => {
   try {
-    let product = await getProductById(req.params.id);
+    const product = await getProductById(req.params.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -513,7 +513,7 @@ router.get('/:id', async (req, res) => {
 // Create product
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    let product = await createProduct(req.body);
+    const product = await createProduct(req.body);
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -525,7 +525,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const isAdmin = req.user.role === 'admin';
-    let product = await updateProduct(req.params.id, req.body, isAdmin ? null : req.user.id);
+    const product = await updateProduct(req.params.id, req.body, isAdmin ? null : req.user.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -539,8 +539,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
 // Delete product — same ownership rule as update.
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    let isAdmin = req.user.role === 'admin';
-    let product = await deleteProduct(req.params.id, isAdmin ? null : req.user.id);
+    const isAdmin = req.user.role === 'admin';
+    const product = await deleteProduct(req.params.id, isAdmin ? null : req.user.id);
     res.json(product);
   } catch (error) {
     if (error.message === 'Product not found') {
@@ -589,11 +589,11 @@ router.get('/search', async (req, res) => {
 // Trigger (or retry) AI image generation for a product
 router.post('/:id/generate-image', authMiddleware, async (req, res) => {
   try {
-    let product = await getProductById(req.params.id);
+    const product = await getProductById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    let result = await productMediaAIService.requestProductImageGeneration(
+    const result = await productMediaAIService.requestProductImageGeneration(
       req.params.id,
-      `${product.name}${product.description ? ' — ' + product.description : ''}`
+      `${product.name}${product.description ? ` — ${ product.description}` : ''}`,
     );
     res.json(result);
   } catch (error) {
@@ -614,7 +614,7 @@ router.get('/:id/video-script', async (req, res) => {
 // Trigger (or retry) AI video rendering from the real script above
 router.post('/:id/generate-video', authMiddleware, async (req, res) => {
   try {
-    let result = await productMediaAIService.requestProductVideoGeneration(req.params.id);
+    const result = await productMediaAIService.requestProductVideoGeneration(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -630,8 +630,6 @@ module.exports = {
   deleteProduct,
   getCategories,
   getStates,
-  searchProducts
+  searchProducts,
 };
-
-
 

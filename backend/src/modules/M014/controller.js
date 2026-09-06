@@ -7,7 +7,7 @@ async function initiateOAuthFlow(req, res) {
   try {
     const { provider, redirectUri } = req.body;
     const result = await service.initiateOAuthFlow(provider, redirectUri);
-    
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -22,8 +22,8 @@ async function initiateOAuthFlow(req, res) {
 async function handleOAuthCallback(req, res) {
   try {
     const { provider, code, state } = req.body;
-    let result = await service.handleOAuthCallback(provider, code, state);
-    
+    const result = await service.handleOAuthCallback(provider, code, state);
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -39,8 +39,8 @@ async function handleOAuthCallback(req, res) {
 async function initiateSAMLFlow(req, res) {
   try {
     const { provider, redirectUri } = req.body;
-    let result = await service.initiateSAMLFlow(provider, redirectUri);
-    
+    const result = await service.initiateSAMLFlow(provider, redirectUri);
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -55,8 +55,8 @@ async function initiateSAMLFlow(req, res) {
 async function handleSAMLResponse(req, res) {
   try {
     const { provider, samlResponse } = req.body;
-    let result = await service.handleSAMLResponse(provider, samlResponse);
-    
+    const result = await service.handleSAMLResponse(provider, samlResponse);
+
     if (result.success) {
       res.json({ success: true, data: result });
     } else {
@@ -71,7 +71,7 @@ async function handleSAMLResponse(req, res) {
 // Provider management
 async function createProviderConfig(req, res) {
   try {
-    let result = await service.createProviderConfig(req.body);
+    const result = await service.createProviderConfig(req.body);
     res.status(201).json({ success: true, data: result });
   } catch (error) {
     logger.error('createProviderConfig error', { error: error.message });
@@ -115,15 +115,15 @@ module.exports = {
   // OAuth2/OIDC
   initiateOAuthFlow,
   handleOAuthCallback,
-  
+
   // SAML
   initiateSAMLFlow,
   handleSAMLResponse,
-  
+
   // Provider management
   createProviderConfig,
   listProviders,
-  
+
   // AI-powered analytics
   getSSOAnalytics,
   detectSSOAnomalies,

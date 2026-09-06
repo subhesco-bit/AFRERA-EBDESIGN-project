@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce ERP Routes
- * 
+ *
  * ERP integration endpoints:
  * - Financial ERP (GL posting, GST invoicing)
  * - Supply Chain ERP (inventory sync, purchase orders)

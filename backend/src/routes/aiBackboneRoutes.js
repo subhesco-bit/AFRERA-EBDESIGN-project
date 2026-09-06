@@ -1,6 +1,6 @@
 /**
  * AI Backbone Routes - Real AI Integration
- * 
+ *
  * REST API routes for AI backbone with real AI provider integrations
  * Following RESTful API design conventions
  */

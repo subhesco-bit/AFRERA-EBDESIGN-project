@@ -34,7 +34,7 @@ class DynamicServiceLoader {
 
       if (files.length > maxFiles) {
         logger.warn(
-          `Service discovery: Found ${files.length} files (limit: ${maxFiles})`
+          `Service discovery: Found ${files.length} files (limit: ${maxFiles})`,
         );
       }
 
@@ -45,12 +45,12 @@ class DynamicServiceLoader {
       }
 
       const elapsed = Date.now() - startTime;
-      logger.info(`✅ Service Discovery Complete`, {
+      logger.info('✅ Service Discovery Complete', {
         discovered: this.discoveredCount,
         failed: this.failedCount,
         elapsed: `${elapsed}ms`,
         categories: this.byCategory.size,
-        subfolders: this.bySubfolder.size
+        subfolders: this.bySubfolder.size,
       });
 
       return {
@@ -58,7 +58,7 @@ class DynamicServiceLoader {
         failed: this.failedCount,
         categories: this.byCategory.size,
         subfolders: this.bySubfolder.size,
-        elapsed
+        elapsed,
       };
     } catch (error) {
       logger.error('Service discovery failed', error);
@@ -96,7 +96,7 @@ class DynamicServiceLoader {
         loadError: null,
         loadTime: 0,
         callCount: 0,
-        avgCallTime: 0
+        avgCallTime: 0,
       });
 
       // Index for fuzzy lookup
@@ -120,7 +120,7 @@ class DynamicServiceLoader {
       this.failedCount++;
       this.errors.push({
         file: filePath,
-        error: error.message
+        error: error.message,
       });
     }
   }
@@ -143,7 +143,7 @@ class DynamicServiceLoader {
     }
 
     try {
-      let startTime = Date.now();
+      const startTime = Date.now();
 
       const ServiceClass = require(entry.path);
       const exported = ServiceClass.default || ServiceClass;
@@ -152,9 +152,9 @@ class DynamicServiceLoader {
         entry.instance = exported;
       } else if (typeof exported === 'function') {
         try {
-          entry.instance = exported.prototype && exported.prototype.constructor === exported
-            ? new exported(this.db)
-            : exported;
+          entry.instance = exported.prototype && exported.prototype.constructor === exported ?
+            new exported(this.db) :
+            exported;
         } catch (_error) {
           entry.instance = exported;
         }
@@ -182,7 +182,7 @@ class DynamicServiceLoader {
    */
   async loadMultiple(...serviceNames) {
     return Promise.all(
-      serviceNames.map(name => this.loadService(name))
+      serviceNames.map(name => this.loadService(name)),
     );
   }
 
@@ -199,7 +199,7 @@ class DynamicServiceLoader {
    * Load all services in a subfolder
    */
   async loadSubfolder(subfolder) {
-    let services = this.bySubfolder.get(subfolder) || [];
+    const services = this.bySubfolder.get(subfolder) || [];
     logger.info(`Loading ${services.length} services from subfolder: ${subfolder}`);
     return this.loadMultiple(...services);
   }
@@ -217,11 +217,11 @@ class DynamicServiceLoader {
         'DatabaseService',
         'CacheService',
         'ErrorHandlerService',
-        'MonitoringService'
+        'MonitoringService',
       ];
     }
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     const loaded = [];
     const failed = [];
 
@@ -234,11 +234,11 @@ class DynamicServiceLoader {
       }
     }
 
-    let elapsed = Date.now() - startTime;
-    logger.info(`Critical services loaded`, {
+    const elapsed = Date.now() - startTime;
+    logger.info('Critical services loaded', {
       loaded: loaded.length,
       failed: failed.length,
-      elapsed: `${elapsed}ms`
+      elapsed: `${elapsed}ms`,
     });
 
     return { loaded, failed, elapsed };
@@ -270,7 +270,7 @@ class DynamicServiceLoader {
    * Get service metadata without loading
    */
   getMetadata(serviceName) {
-    let entry = this.services.get(serviceName);
+    const entry = this.services.get(serviceName);
     if (!entry) return null;
 
     return {
@@ -281,7 +281,7 @@ class DynamicServiceLoader {
       loadTime: entry.loadTime,
       callCount: entry.callCount,
       avgCallTime: entry.avgCallTime,
-      error: entry.loadError
+      error: entry.loadError,
     };
   }
 
@@ -304,9 +304,9 @@ class DynamicServiceLoader {
    */
   getStats() {
     const loadedServices = Array.from(this.services.values()).filter(s => s.loaded);
-    const avgLoadTime = loadedServices.length > 0
-      ? loadedServices.reduce((sum, s) => sum + s.loadTime, 0) / loadedServices.length
-      : 0;
+    const avgLoadTime = loadedServices.length > 0 ?
+      loadedServices.reduce((sum, s) => sum + s.loadTime, 0) / loadedServices.length :
+      0;
 
     return {
       discovered: this.discoveredCount,
@@ -317,7 +317,7 @@ class DynamicServiceLoader {
       subfolders: this.bySubfolder.size,
       avgLoadTime: avgLoadTime.toFixed(2),
       totalServices: this.services.size,
-      errors: this.errors.slice(0, 10) // Last 10 errors
+      errors: this.errors.slice(0, 10), // Last 10 errors
     };
   }
 
@@ -330,7 +330,7 @@ class DynamicServiceLoader {
       subfolder = null,
       loaded = null,
       limit = 100,
-      offset = 0
+      offset = 0,
     } = options;
 
     let services = Array.from(this.services.values());
@@ -354,7 +354,7 @@ class DynamicServiceLoader {
     return {
       total: services.length,
       items: services.slice(offset, offset + limit),
-      hasMore: offset + limit < services.length
+      hasMore: offset + limit < services.length,
     };
   }
 
@@ -362,7 +362,7 @@ class DynamicServiceLoader {
    * Unload a service (free memory)
    */
   unloadService(serviceName) {
-    let entry = this.services.get(serviceName);
+    const entry = this.services.get(serviceName);
     if (entry && entry.loaded) {
       entry.instance = null;
       entry.loaded = false;
@@ -445,10 +445,10 @@ class DynamicServiceLoader {
   async mountServiceRoutes(app) {
     let mounted = 0;
     let withSetupRoutes = 0;
-    let totalServices = this.services.size;
-    
+    const totalServices = this.services.size;
+
     logger.info(`🔍 Starting service route mounting for ${totalServices} discovered services...`);
-    
+
     for (const [serviceName, entry] of this.services.entries()) {
       let source = '';
       try {
@@ -457,13 +457,13 @@ class DynamicServiceLoader {
         logger.warn(`Could not read service file: ${serviceName}`, { error: error.message });
         continue;
       }
-      
+
       if (!source.includes('setupRoutes')) {
         continue;
       }
-      
+
       withSetupRoutes++;
-      
+
       try {
         const instance = await this.loadService(serviceName);
         const fn = instance?.setupRoutes || instance?.default?.setupRoutes;
@@ -478,7 +478,7 @@ class DynamicServiceLoader {
         logger.warn(`❌ Could not mount setupRoutes for ${serviceName}`, { error: error.message });
       }
     }
-    
+
     logger.info(`📊 Service route mounting complete: ${mounted}/${withSetupRoutes} mounted, ${withSetupRoutes}/${totalServices} had setupRoutes`);
     return { mounted, withSetupRoutes, totalServices };
   }
@@ -503,7 +503,7 @@ class DynamicServiceLoader {
    */
   async reload() {
     this.loadedCount = 0;
-    let services = Array.from(this.services.values());
+    const services = Array.from(this.services.values());
 
     for (const service of services) {
       service.loaded = false;
@@ -511,7 +511,7 @@ class DynamicServiceLoader {
       service.loadError = null;
     }
 
-    logger.info(`Service loader cache cleared. Ready for reload.`);
+    logger.info('Service loader cache cleared. Ready for reload.');
   }
 }
 

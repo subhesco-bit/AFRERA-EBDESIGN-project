@@ -29,7 +29,7 @@ async function registerOrganicFarm(data) {
     total_area_hectares,
     organic_area_hectares,
     location_id,
-    gps_coordinates
+    gps_coordinates,
   } = data;
 
   try {
@@ -47,8 +47,8 @@ async function registerOrganicFarm(data) {
         total_area_hectares,
         organic_area_hectares,
         location_id,
-        JSON.stringify(gps_coordinates)
-      ]
+        JSON.stringify(gps_coordinates),
+      ],
     );
 
     return result.rows[0];
@@ -63,7 +63,7 @@ async function registerOrganicFarm(data) {
  */
 router.post('/farms', authMiddleware, async (req, res) => {
   try {
-    let result = await registerOrganicFarm(req.body);
+    const result = await registerOrganicFarm(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register farm API error', { error: error.message, stack: error.stack });
@@ -76,7 +76,7 @@ router.post('/farms', authMiddleware, async (req, res) => {
  */
 async function getOrganicFarms(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT of.*, os.name as standard_name, os.code as standard_code,
        a.city, a.state, a.pincode
        FROM organic_farms of
@@ -84,7 +84,7 @@ async function getOrganicFarms(farmerId) {
        LEFT JOIN addresses a ON of.location_id = a.id
        WHERE of.farmer_id = $1
        ORDER BY of.created_at DESC`,
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -98,7 +98,7 @@ async function getOrganicFarms(farmerId) {
  */
 router.get('/farms', authMiddleware, async (req, res) => {
   try {
-    let result = await getOrganicFarms(req.user.id);
+    const result = await getOrganicFarms(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get farms API error', { error: error.message, stack: error.stack });
@@ -122,11 +122,11 @@ async function addOrganicPlot(data) {
     certification_status,
     gps_boundary,
     soil_type,
-    irrigation_type
+    irrigation_type,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO organic_plots 
        (organic_farm_id, plot_number, plot_name, area_hectares, certification_status, 
         gps_boundary, soil_type, irrigation_type)
@@ -140,8 +140,8 @@ async function addOrganicPlot(data) {
         certification_status,
         JSON.stringify(gps_boundary),
         soil_type,
-        irrigation_type
-      ]
+        irrigation_type,
+      ],
     );
 
     return result.rows[0];
@@ -156,7 +156,7 @@ async function addOrganicPlot(data) {
  */
 router.post('/plots', authMiddleware, async (req, res) => {
   try {
-    let result = await addOrganicPlot(req.body);
+    const result = await addOrganicPlot(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add plot API error', { error: error.message, stack: error.stack });
@@ -169,9 +169,9 @@ router.post('/plots', authMiddleware, async (req, res) => {
  */
 async function getOrganicPlots(farmId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM organic_plots WHERE organic_farm_id = $1 ORDER BY plot_number',
-      [farmId]
+      [farmId],
     );
     return result.rows;
   } catch (error) {
@@ -185,7 +185,7 @@ async function getOrganicPlots(farmId) {
  */
 router.get('/farms/:farmId/plots', authMiddleware, async (req, res) => {
   try {
-    let result = await getOrganicPlots(req.params.farmId);
+    const result = await getOrganicPlots(req.params.farmId);
     res.json(result);
   } catch (error) {
     logger.error('Get plots API error', { error: error.message, stack: error.stack });
@@ -214,11 +214,11 @@ async function recordOrganicCrop(data) {
     cultivation_practices,
     pest_management_practices,
     soil_management_practices,
-    water_management_practices
+    water_management_practices,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO organic_crops 
        (organic_plot_id, crop_name, variety, planting_date, expected_harvest_date, 
         area_hectares, expected_yield_kg_per_hectare, seed_source, seed_lot_number,
@@ -239,8 +239,8 @@ async function recordOrganicCrop(data) {
         JSON.stringify(cultivation_practices),
         JSON.stringify(pest_management_practices),
         JSON.stringify(soil_management_practices),
-        JSON.stringify(water_management_practices)
-      ]
+        JSON.stringify(water_management_practices),
+      ],
     );
 
     return result.rows[0];
@@ -255,7 +255,7 @@ async function recordOrganicCrop(data) {
  */
 router.post('/crops', authMiddleware, async (req, res) => {
   try {
-    let result = await recordOrganicCrop(req.body);
+    const result = await recordOrganicCrop(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record crop API error', { error: error.message, stack: error.stack });
@@ -275,11 +275,11 @@ async function recordHarvest(data) {
     moisture_content,
     quality_parameters,
     harvested_by,
-    storage_location
+    storage_location,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO organic_harvests 
        (organic_crop_id, harvest_number, harvest_date, total_quantity_kg, grade,
         moisture_content, quality_parameters, harvested_by, storage_location, batch_number)
@@ -295,14 +295,14 @@ async function recordHarvest(data) {
         JSON.stringify(quality_parameters),
         harvested_by,
         storage_location,
-        `BATCH-${Date.now()}`
-      ]
+        `BATCH-${Date.now()}`,
+      ],
     );
 
     // Update crop status
     await pool.query(
       'UPDATE organic_crops SET actual_harvest_date = $1, actual_yield_kg = $2, status = $3 WHERE id = $4',
-      [harvest_date, total_quantity_kg, 'harvested', organic_crop_id]
+      [harvest_date, total_quantity_kg, 'harvested', organic_crop_id],
     );
 
     return result.rows[0];
@@ -317,7 +317,7 @@ async function recordHarvest(data) {
  */
 router.post('/harvests', authMiddleware, async (req, res) => {
   try {
-    let result = await recordHarvest(req.body);
+    const result = await recordHarvest(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record harvest API error', { error: error.message, stack: error.stack });
@@ -342,11 +342,11 @@ async function recordChainOfCustody(data) {
     transfer_from_type,
     transfer_from_id,
     quantity_kg,
-    document_reference
+    document_reference,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO organic_chain_of_custody 
        (product_id, lot_number, current_holder_type, current_holder_id, 
         custody_transfer_date, transfer_from_type, transfer_from_id, quantity_kg, document_reference)
@@ -361,8 +361,8 @@ async function recordChainOfCustody(data) {
         transfer_from_type,
         transfer_from_id,
         quantity_kg,
-        document_reference
-      ]
+        document_reference,
+      ],
     );
 
     return result.rows[0];
@@ -377,7 +377,7 @@ async function recordChainOfCustody(data) {
  */
 router.post('/chain-of-custody', authMiddleware, async (req, res) => {
   try {
-    let result = await recordChainOfCustody(req.body);
+    const result = await recordChainOfCustody(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Record chain of custody API error', { error: error.message, stack: error.stack });
@@ -390,11 +390,11 @@ router.post('/chain-of-custody', authMiddleware, async (req, res) => {
  */
 async function getChainOfCustody(productId, lotNumber) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM organic_chain_of_custody 
        WHERE product_id = $1 OR lot_number = $2
        ORDER BY custody_transfer_date ASC`,
-      [productId, lotNumber]
+      [productId, lotNumber],
     );
     return result.rows;
   } catch (error) {
@@ -410,7 +410,7 @@ router.get('/chain-of-custody/:productId', authMiddleware, async (req, res) => {
   try {
     const { productId } = req.params;
     const { lot_number } = req.query;
-    let result = await getChainOfCustody(productId, lot_number);
+    const result = await getChainOfCustody(productId, lot_number);
     res.json(result);
   } catch (error) {
     logger.error('Get chain of custody API error', { error: error.message, stack: error.stack });
@@ -427,9 +427,9 @@ router.get('/chain-of-custody/:productId', authMiddleware, async (req, res) => {
  */
 async function generateQRCodeData(productId, lotNumber) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT generate_organic_qr_data($1, $2) as qr_data',
-      [productId, lotNumber]
+      [productId, lotNumber],
     );
 
     if (result.rows.length === 0 || !result.rows[0].qr_data) {
@@ -450,7 +450,7 @@ router.get('/qr-data/:productId', authMiddleware, async (req, res) => {
   try {
     const { productId } = req.params;
     const { lot_number } = req.query;
-    let result = await generateQRCodeData(productId, lot_number);
+    const result = await generateQRCodeData(productId, lot_number);
     res.json(result);
   } catch (error) {
     logger.error('Generate QR data API error', { error: error.message, stack: error.stack });
@@ -477,11 +477,11 @@ async function saveConsumerTransparency(data) {
     nutritional_info,
     organic_certification_details,
     chain_of_custody_summary,
-    quality_test_results
+    quality_test_results,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO organic_consumer_transparency 
        (product_id, lot_number, qr_code, farmer_name, farm_location, 
         farm_certification_number, harvest_date, processing_facility, processing_date,
@@ -504,8 +504,8 @@ async function saveConsumerTransparency(data) {
         JSON.stringify(nutritional_info),
         JSON.stringify(organic_certification_details),
         JSON.stringify(chain_of_custody_summary),
-        JSON.stringify(quality_test_results)
-      ]
+        JSON.stringify(quality_test_results),
+      ],
     );
 
     return result.rows[0];
@@ -520,7 +520,7 @@ async function saveConsumerTransparency(data) {
  */
 router.post('/consumer-transparency', authMiddleware, async (req, res) => {
   try {
-    let result = await saveConsumerTransparency(req.body);
+    const result = await saveConsumerTransparency(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Save consumer transparency API error', { error: error.message, stack: error.stack });
@@ -533,9 +533,9 @@ router.post('/consumer-transparency', authMiddleware, async (req, res) => {
  */
 async function getConsumerTransparencyByQR(qrCode) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM organic_consumer_transparency WHERE qr_code = $1',
-      [qrCode]
+      [qrCode],
     );
 
     if (result.rows.length === 0) {
@@ -554,7 +554,7 @@ async function getConsumerTransparencyByQR(qrCode) {
  */
 router.get('/consumer-transparency/qr/:qrCode', async (req, res) => {
   try {
-    let result = await getConsumerTransparencyByQR(req.params.qrCode);
+    const result = await getConsumerTransparencyByQR(req.params.qrCode);
     res.json(result);
   } catch (error) {
     logger.error('Get consumer transparency API error', { error: error.message, stack: error.stack });
@@ -571,8 +571,8 @@ router.get('/consumer-transparency/qr/:qrCode', async (req, res) => {
  */
 async function getOrganicStandards() {
   try {
-    let result = await pool.query(
-      'SELECT * FROM organic_standards WHERE is_active = true ORDER BY name'
+    const result = await pool.query(
+      'SELECT * FROM organic_standards WHERE is_active = true ORDER BY name',
     );
     return result.rows;
   } catch (error) {
@@ -586,7 +586,7 @@ async function getOrganicStandards() {
  */
 router.get('/standards', async (req, res) => {
   try {
-    let result = await getOrganicStandards();
+    const result = await getOrganicStandards();
     res.json(result);
   } catch (error) {
     logger.error('Get standards API error', { error: error.message, stack: error.stack });
@@ -608,11 +608,11 @@ async function reportFraud(data) {
     entity_type,
     entity_id,
     description,
-    evidence
+    evidence,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO organic_fraud_alerts 
        (alert_type, severity, entity_type, entity_id, description, evidence)
        VALUES ($1, $2, $3, $4, $5, $6)
@@ -623,8 +623,8 @@ async function reportFraud(data) {
         entity_type,
         entity_id,
         description,
-        JSON.stringify(evidence)
-      ]
+        JSON.stringify(evidence),
+      ],
     );
 
     return result.rows[0];
@@ -639,7 +639,7 @@ async function reportFraud(data) {
  */
 router.post('/fraud-alerts', authMiddleware, async (req, res) => {
   try {
-    let result = await reportFraud(req.body);
+    const result = await reportFraud(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Report fraud API error', { error: error.message, stack: error.stack });
@@ -654,7 +654,6 @@ router.post('/fraud-alerts', authMiddleware, async (req, res) => {
 function isHealthy() {
   return pool.connect().then(() => true).catch(() => false);
 }
-
 
 // ===========================================================================
 // FOLU (Forest, Land and Use) + NE organic schemes — migration 991.
@@ -689,7 +688,7 @@ async function registerLandParcel(p) {
      RETURNING *`,
     [p.parcelCode, p.farmerId ?? null, p.village ?? null, p.district ?? null,
       p.state ?? null, p.areaHectares, p.landUseClass, p.jhumCycleYears ?? null,
-      p.forestCoverPct ?? null, p.slopePct ?? null, p.dataProvenance ?? 'estimated']
+      p.forestCoverPct ?? null, p.slopePct ?? null, p.dataProvenance ?? 'estimated'],
   );
   return rows[0];
 }
@@ -709,7 +708,7 @@ async function recordLandUseChange(c) {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
     [c.parcelId, c.fromClass, c.toClass, c.changedOn ?? new Date(),
       c.areaAffectedHa, c.driver ?? null, c.evidenceSource ?? null,
-      c.dataProvenance ?? 'estimated']
+      c.dataProvenance ?? 'estimated'],
   );
   return rows[0];
 }
@@ -732,15 +731,15 @@ async function estimateCarbon(e) {
     [e.parcelId, e.assessmentYear, e.aboveGroundTco2e ?? null,
       e.belowGroundTco2e ?? null, e.soilCarbonTco2e ?? null,
       e.ipccTier, e.method ?? null, e.uncertaintyPct ?? null,
-      e.dataProvenance ?? 'assumed']
+      e.dataProvenance ?? 'assumed'],
   );
   return {
     ...rows[0],
-    caveat: Number(e.ipccTier) === 1
-      ? 'IPCC Tier 1 uses global default factors. For a specific North East hill '
-      + 'soil these can be wrong by a factor of two. Not sufficient evidence for a '
-      + 'carbon credit claim.'
-      : null,
+    caveat: Number(e.ipccTier) === 1 ?
+      'IPCC Tier 1 uses global default factors. For a specific North East hill ' +
+      'soil these can be wrong by a factor of two. Not sufficient evidence for a ' +
+      'carbon credit claim.' :
+      null,
   };
 }
 
@@ -756,7 +755,7 @@ async function landUseSummary({ state, district }) {
       WHERE ($1::text IS NULL OR state = $1)
         AND ($2::text IS NULL OR district = $2)
       GROUP BY land_use_class`,
-    [state ?? null, district ?? null]
+    [state ?? null, district ?? null],
   );
   const { rows: changes } = await pool.query(
     `SELECT COUNT(*) FILTER (WHERE is_deforestation) AS deforestation_events,
@@ -766,24 +765,24 @@ async function landUseSummary({ state, district }) {
        JOIN folu_land_parcels p ON p.id = c.parcel_id
       WHERE ($1::text IS NULL OR p.state = $1)
         AND ($2::text IS NULL OR p.district = $2)`,
-    [state ?? null, district ?? null]
+    [state ?? null, district ?? null],
   );
   const jhum = rows.filter((r) => /jhum|shifting/i.test(r.land_use_class || ''));
-  const shortCycle = jhum.some((r) => r.mean_jhum_cycle_years !== null
-                                   && Number(r.mean_jhum_cycle_years) < 7);
+  const shortCycle = jhum.some((r) => r.mean_jhum_cycle_years !== null &&
+                                   Number(r.mean_jhum_cycle_years) < 7);
   return {
     state: state ?? null,
     district: district ?? null,
     byLandUse: rows,
     changes: changes[0],
-    jhumNote: jhum.length
-      ? (shortCycle
-        ? 'Mean jhum cycle is under 7 years. A SHORTENING cycle is genuine degradation — '
-        + 'the fallow no longer restores what the clearing removed. This is the signal '
-        + 'worth acting on, not the clearing itself.'
-        : 'Jhum parcels present with a cycle length that allows fallow recovery. Counting '
-        + 'these clearings as deforestation would misreport a rotation as permanent loss.')
-      : null,
+    jhumNote: jhum.length ?
+      (shortCycle ?
+        'Mean jhum cycle is under 7 years. A SHORTENING cycle is genuine degradation — ' +
+        'the fallow no longer restores what the clearing removed. This is the signal ' +
+        'worth acting on, not the clearing itself.' :
+        'Jhum parcels present with a cycle length that allows fallow recovery. Counting ' +
+        'these clearings as deforestation would misreport a rotation as permanent loss.') :
+      null,
   };
 }
 
@@ -796,7 +795,7 @@ async function organicSchemeStatus(farmerId) {
        JOIN ne_organic_schemes s ON s.id = e.scheme_id
       WHERE e.farmer_id = $1
       ORDER BY e.enrolled_on DESC`,
-    [farmerId]
+    [farmerId],
   );
   return {
     farmerId,
@@ -810,11 +809,11 @@ async function organicSchemeStatus(farmerId) {
         conversionComplete: yearsIn !== null && yearsIn >= required,
         // The conversion period is the whole point of organic certification and
         // the hardest part for a farmer: reduced yield without the price premium.
-        note: yearsIn !== null && yearsIn < required
-          ? `${Math.round((required - yearsIn) * 10) / 10} years of conversion remaining. `
-          + 'Produce cannot be sold as certified organic until then — this is the period '
-          + 'where a farmer carries the cost without the premium.'
-          : null,
+        note: yearsIn !== null && yearsIn < required ?
+          `${Math.round((required - yearsIn) * 10) / 10} years of conversion remaining. ` +
+          'Produce cannot be sold as certified organic until then — this is the period ' +
+          'where a farmer carries the cost without the premium.' :
+          null,
       };
     }),
     count: rows.length,
@@ -843,8 +842,6 @@ module.exports = {
   recordLandUseChange,
   estimateCarbon,
   landUseSummary,
-  organicSchemeStatus
+  organicSchemeStatus,
 };
-
-
 

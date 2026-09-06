@@ -37,5 +37,5 @@ module.exports = {
   fail,
   requestId,
   validateOperationsBody,
-  emitMutation
+  emitMutation,
 };

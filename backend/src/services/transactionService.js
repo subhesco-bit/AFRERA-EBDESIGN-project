@@ -25,7 +25,7 @@ class TransactionService {
    */
   async createTransaction(transactionData) {
   // Validate inputs
-  if (!transactionData) throw new Error('Missing required parameter');
+    if (!transactionData) throw new Error('Missing required parameter');
 
     const {
       userId,
@@ -35,7 +35,7 @@ class TransactionService {
       description,
       category,
       referenceId,
-      metadata = {}
+      metadata = {},
     } = transactionData;
 
     try {
@@ -54,9 +54,9 @@ class TransactionService {
         description,
         category,
         referenceId,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ];
-      
+
       const result = await this.db.query(query, values);
       logger.info(`Transaction created: ${result.rows[0].transaction_id}`);
       return result.rows[0];
@@ -71,7 +71,7 @@ class TransactionService {
    */
   async getTransaction(transactionId) {
     try {
-      let query = `
+      const query = `
         SELECT 
           t.transaction_id,
           t.user_id,
@@ -91,8 +91,8 @@ class TransactionService {
         LEFT JOIN users u ON t.user_id = u.user_id
         WHERE t.transaction_id = $1
       `;
-      let result = await this.db.query(query, [transactionId]);
-      
+      const result = await this.db.query(query, [transactionId]);
+
       if (result.rows.length === 0) {
         throw new Error('Transaction not found');
       }
@@ -163,10 +163,10 @@ class TransactionService {
       query += ` ORDER BY t.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      let result = await this.db.query(query, params);
-      
+      const result = await this.db.query(query, params);
+
       // Get total count
-      let countQuery = `SELECT COUNT(*) as total FROM transactions WHERE user_id = $1`;
+      let countQuery = 'SELECT COUNT(*) as total FROM transactions WHERE user_id = $1';
       const countParams = [userId];
       let countParamCount = 1;
 
@@ -194,7 +194,7 @@ class TransactionService {
         transactions: result.rows,
         total: parseInt(countResult.rows[0].total),
         limit,
-        offset
+        offset,
       };
     } catch (error) {
       logger.error('Get user transactions failed', error);
@@ -209,7 +209,7 @@ class TransactionService {
     const { status, metadata, notes } = statusData;
 
     try {
-      let query = `
+      const query = `
         UPDATE transactions 
         SET status = $1,
             metadata = COALESCE($2, metadata),
@@ -218,13 +218,13 @@ class TransactionService {
         WHERE transaction_id = $4
         RETURNING *
       `;
-      let result = await this.db.query(query, [
+      const result = await this.db.query(query, [
         status,
         metadata ? JSON.stringify(metadata) : null,
         notes,
-        transactionId
+        transactionId,
       ]);
-      
+
       if (result.rows.length === 0) {
         throw new Error('Transaction not found');
       }
@@ -255,7 +255,7 @@ class TransactionService {
         FROM transactions
         WHERE user_id = $1
       `;
-      let params = [userId];
+      const params = [userId];
       let paramCount = 1;
 
       if (startDate) {
@@ -276,7 +276,7 @@ class TransactionService {
         params.push(category);
       }
 
-      let result = await this.db.query(query, params);
+      const result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get user transaction statistics failed', error);
@@ -291,7 +291,7 @@ class TransactionService {
     try {
       // Get transaction details
       const transaction = await this.getTransaction(transactionId);
-      
+
       if (transaction.status !== 'pending') {
         throw new Error('Transaction can only be processed from pending status');
       }
@@ -319,9 +319,9 @@ class TransactionService {
       }
 
       // Update final status
-      await this.updateStatus(transactionId, { 
+      await this.updateStatus(transactionId, {
         status: processResult.success ? 'completed' : 'failed',
-        metadata: processResult.metadata
+        metadata: processResult.metadata,
       });
 
       await this.db.query('COMMIT');
@@ -342,19 +342,19 @@ class TransactionService {
   async processPaymentTransaction(transaction) {
     // Integrate with payment gateway service
     const paymentGatewayService = require('./paymentGatewayService');
-    
+
     try {
-      let result = await paymentGatewayService.processPayment({
+      const result = await paymentGatewayService.processPayment({
         userId: transaction.user_id,
         amount: transaction.amount,
         currency: transaction.currency,
         description: transaction.description,
-        metadata: transaction.metadata
+        metadata: transaction.metadata,
       });
 
       return {
         success: result.status === 'completed',
-        metadata: { gatewayResponse: result }
+        metadata: { gatewayResponse: result },
       };
     } catch (error) {
       logger.error('Process payment transaction failed', error);
@@ -367,17 +367,17 @@ class TransactionService {
    */
   async processRefundTransaction(transaction) {
     // Integrate with payment gateway service
-    let paymentGatewayService = require('./paymentGatewayService');
-    
+    const paymentGatewayService = require('./paymentGatewayService');
+
     try {
-      let result = await paymentGatewayService.refundPayment(
+      const result = await paymentGatewayService.refundPayment(
         transaction.reference_id,
-        { amount: transaction.amount, reason: transaction.description }
+        { amount: transaction.amount, reason: transaction.description },
       );
 
       return {
         success: result.status === 'completed',
-        metadata: { gatewayResponse: result }
+        metadata: { gatewayResponse: result },
       };
     } catch (error) {
       logger.error('Process refund transaction failed', error);
@@ -391,19 +391,19 @@ class TransactionService {
   async processTransferTransaction(transaction) {
     // Integrate with wallet service
     const walletService = require('./walletService');
-    
+
     try {
       const metadata = transaction.metadata || {};
-      let result = await walletService.transferFunds(
+      const result = await walletService.transferFunds(
         metadata.fromWalletId,
         metadata.toWalletId,
         transaction.amount,
-        transaction.description
+        transaction.description,
       );
 
       return {
         success: true,
-        metadata: { transferResult: result }
+        metadata: { transferResult: result },
       };
     } catch (error) {
       logger.error('Process transfer transaction failed', error);
@@ -416,15 +416,15 @@ class TransactionService {
    */
   async cancelTransaction(transactionId, reason) {
     try {
-      let transaction = await this.getTransaction(transactionId);
-      
+      const transaction = await this.getTransaction(transactionId);
+
       if (transaction.status !== 'pending' && transaction.status !== 'processing') {
         throw new Error('Cannot cancel transaction in current status');
       }
 
-      let result = await this.updateStatus(transactionId, {
+      const result = await this.updateStatus(transactionId, {
         status: 'cancelled',
-        notes: reason
+        notes: reason,
       });
 
       logger.info(`Transaction ${transactionId} cancelled`);

@@ -6,7 +6,116 @@ findings: 6
 
 > Current read-only completeness audit. The historical code-quality findings below are superseded by the evidence in this report.
 
-# Code Completeness Audit
+# Domain Connectivity Audit: Accounting, GST, Logistics, Storage, Livestock, and Northeast Supply
+
+## Scope and method
+
+Read-only audit of the actual `backend/src`, `frontend/src`, and SQL migration files. Existing reports and indexes were not treated as evidence. The local `.vibecheck/truthpack` directory is absent, so no truthpack claims could be cross-checked. Source files were not modified; this audit file is the only intended output.
+
+Status labels:
+
+- **Reachable**: route is imported and mounted by `backend/src/index.js`; service import and endpoint symbols were inspected.
+- **Mismatch**: source contains both sides, but frontend URL or resource shape does not match the mounted backend route.
+- **Candidate orphan**: file exists and may be substantial, but no controlling import/mount or caller was found in the inspected source path.
+- **Duplicate candidate**: a legacy and a top-level service/route surface coexist; the route's actual import is the authority until deliberately consolidated.
+
+## Executive findings
+
+1. **High: Asset accounting frontend calls an unmounted prefix.** `assetAccountingAPI` calls `/erp/assets/...` in `frontend/src/services/api.js`, while `backend/src/index.js` mounts `assetAccountingRoutes` only at `/api/assetaccounting`. `AssetAccountingPage.jsx` therefore has a real route module and service behind it, but its requests do not reach that module unless an unseen proxy rewrites the path.
+2. **High: Fisheries frontend calls nine resource prefixes that are not mounted.** `fisheriesManagementRoutes.js` is mounted at `/api/fisheriesmanagement` and exposes one generic router with `/` and `/:id`; `FisheriesManagementPage.jsx` calls `/biofloc-farms`, `/hatchery-management`, `/fish-feed`, etc. The page itself says these endpoints are not built, but the backend route is present under a different shape. This is a concrete integration mismatch, not an absent schema.
+3. **High: Duplicate route registration exists for freight pooling.** `backend/src/index.js` mounts both `freightPoolingRoutes` and `freightPooling` at `/api/freightpooling`. Express will evaluate both stacks in order; overlapping methods/paths can shadow or double-handle behavior. `freightPoolingRoutes.js` and `freightPooling.js` need one declared owner before further frontend integration.
+4. **Medium: Legacy service directories are load-bearing for most requested domains.** Accounting, GST, return-load, cold storage, fisheries, poultry, and logistics enhancement routes import `backend/src/services/legacy/*`, while same-named top-level services also exist for several domains. These top-level files are orphan/duplicate candidates, not safe replacement targets.
+5. **Medium: Database coverage is broader than reachable behavior.** Migrations define reverse logistics, backhaul, freight pools, warehouses, cold storage, GST, fisheries, poultry, and Northeast variety/export-corridor tables. Table existence does not establish that a route reads/writes the table; several frontend screens are explicitly conventional REST shells over route shapes that do not exist.
+
+## Domain map
+
+### Accounting and ledger
+
+| Surface | Actual evidence | Reachability / risk | Safest integration point |
+|---|---|---|---|
+| Fixed assets | `backend/src/routes/assetAccountingRoutes.js`, symbol `assetAccountingService`, methods `createAsset`, `getAssets`, `getAssetRegisterSummary`, `generateDepreciationSchedule`, `postDepreciationPeriod`, `runDepreciationForPeriod`, `disposeAsset`; service is `backend/src/services/legacy/assetAccountingService.js` | **Mounted** at `/api/assetaccounting`; frontend `assetAccountingAPI` uses `/erp/assets/...`, so **mismatch** | Add a compatibility mount only after confirming the global API base convention, or change the frontend wrapper to the existing `/assetaccounting/...` prefix. Do not switch the route to top-level `services/assetAccountingService.js` without comparing exports and schema behavior. |
+| General ledger | `frontend/src/pages/LedgerPage.jsx` calls `financeAPI.trialBalance` and `verifyLedger`; `frontend/src/services/api.js` calls `/finance/ledger/trial-balance` and `/finance/ledger/verify` | Backend owner was not identified in the requested route slice; `UnifiedLedgerPage.jsx` explicitly says the old unified-ledger API was removed | Trace the actual finance route/service before adding UI. Treat `9999_zzzzzzzzzz_unified_ledger_schema.sql` tables (`unified_ledger`, `economy_balances`, `unified_balances`, `cross_economy_transfers`) as persistence candidates only, not proof of a live API. |
+| Unified ledger duplicate | `frontend/src/pages/UnifiedLedgerPage.jsx` states the segmented backend was deleted and points users to `/ledger` | **Intentional non-caller/redirect-style page**, not an orphan backend integration | Keep canonical journal/finance ownership explicit; do not revive the deleted segmented API merely because `unified_ledger` migration files remain. |
+
+### GST
+
+| Surface | Actual evidence | Reachability / risk | Safest integration point |
+|---|---|---|---|
+| GST routes | `backend/src/routes/gstRoutes.js` imports `GSTService` from `../services/legacy/gstService`; symbols include `calculateOrderGST`, `calculateProductGST`, `getGSTSummary`, `generateGSTInvoice`, `updateOrderGST`, `validateGSTNumber`, `getGSTRate`, rate CRUD, and return endpoints | **Mounted** at `/api/gst` | Use the existing route/service for GST operations; preserve its `gstService.pool` contract until migration/schema cleanup is complete. |
+| Marketplace GST wrapper | `frontend/src/services/api.js` `marketplaceAPI.calculateProductGST`, `calculateOrderGST`, `generateGstInvoice` call `/marketplace/gst/...` | Potential **second route owner**; this is not the `/api/gst` mount shown in `index.js` | Verify `marketplaceRoutes` ownership and route mounting before changing either side. The API comments identify `gstService.resolveGSTRate()` as canonical, but source route naming must win over comments. |
+| GST schema | `028_gst_schema.sql`: `gst_rates`, `gst_calculations`, `gst_invoices`, `gst_invoice_items`, `gst_returns`, `gst_payments`, `gst_notifications`, `gst_compliance_records`, `gst_audit_logs`; `047_gst_tables.sql`: HSN mapping, e-way bills, ITC ledger, compliance tracking, returns history | **Schema present**, migration execution not proven by filesystem | Use the existing GST service as the integration boundary; do not add another invoice/ledger implementation against the same tables. |
+
+### Logistics, reverse logistics, and return loads
+
+| Surface | Actual evidence | Reachability / risk | Safest integration point |
+|---|---|---|---|
+| Logistics enhancement | `backend/src/routes/logisticsEnhancementRoutes.js` imports `../services/legacy/logisticsEnhancementService`; route symbols cover fleet vehicles, tracking, geofences, temperature readings/alerts, warehouses, inventory, and driver location | **Mounted** at `/api/logisticsenhancement`; a sibling `logisticsEnhancements.js` is also mounted at `/api/logisticsenhancements` | Keep the existing route/service pair as the integration owner. Compare the sibling route before adding endpoints because the two prefixes differ only by pluralization. |
+| Warehouse management | `backend/src/routes/warehouseManagement.js` imports top-level `../services/warehouseManagementService`; symbols `createWarehouse`, `updateStock`, `getWarehouseInventory` | **Mounted** at `/api/warehousemanagement`; separate warehouse CRUD also exists inside logistics enhancement | Treat this as a duplicate domain owner. Safest next step is a route/service manifest documenting ownership and table contract, not merging code blindly. |
+| Return-load board | `backend/src/routes/returnLoadBoardRoutes.js` imports `../services/legacy/returnLoadBoardService`; symbols `postCapacity`, `searchAvailable`, `bookPosting`, `cancelPosting` | **Mounted** at `/api/returnloadboard`; frontend `LogisticsMatchingPage.jsx` comments claim `/api/v1/return-load-board`, which is a **prefix mismatch** against the entrypoint | Align the frontend wrapper to `/returnloadboard` or add a deliberate compatibility mount. The migration `9999_zzzzzzzz_return_load_board_schema.sql` defines `return_load_postings`, including `booked_shipment_id`. |
+| Freight pooling | `backend/src/routes/freightPoolingRoutes.js`, `backend/src/routes/freightPooling.js`, services `backend/src/services/freightPoolingService.js` and `backend/src/services/legacy/freightPoolingService.js` | **Duplicate mount** at `/api/freightpooling`; duplicate service candidates | Choose one route/service owner after comparing endpoint sets and migrations `3012_phase3_freight_pooling.sql` (`freight_pools`, `freight_shipments`) versus `9999_zzzzzz_freight_pooling_schema.sql` (`freight_pool_windows`, `freight_pool_shipments`). |
+| Reverse logistics schema | `042_rural_procurement_logistics_mobility_schema.sql` defines `reverse_logistics` and `backhaul_opportunities`; return-load migration defines a separate `return_load_postings` model | **Schema-only / ownership unclear** from requested source slice | Consolidate terminology and map return-load postings to shipment/backhaul concepts through an explicit service contract. Do not create a third table. |
+
+### Cold storage, storage, and warehouse
+
+| Surface | Actual evidence | Reachability / risk | Safest integration point |
+|---|---|---|---|
+| Cold storage | `backend/src/routes/coldStorageRoutes.js` imports `../services/legacy/coldStorageService`; symbols cover facility CRUD, utilization, booking CRUD/status | **Mounted** at `/api/coldstorage`; `ColdStoragePage.jsx` calls `coldStorageAPI` and documents this exact route/service pair | This is the strongest existing integration path. Keep capacity validation in `coldStorageService.createBooking`; avoid routing cold storage through the broader warehouse service. |
+| Cold chain monitoring | `backend/src/routes/coldChainMonitoring.js` mounted at `/api/coldchainmonitoring`; top-level `backend/src/services/coldChainMonitoringService.js` exists | **Mounted**, but route/service symbol contract was not fully inspected here; separate from cold-storage booking | Use cold-chain monitoring for sensor/alert events and cold-storage routes for facility capacity/bookings. Join through shipment/facility IDs, not duplicate booking tables. |
+| Warehouse schemas | `013_logistics_enhancements.sql` defines `warehouses`, `warehouse_inventory`, `warehouse_shipments`; `034_logistics_enhancement_schema.sql` defines `warehouse_locations`, `warehouse_inventory`, `inventory_movements`, `warehouse_performance`, `route_optimization`, `delivery_schedules`; `3009_phase3_warehouse.sql` defines another `warehouses` and `warehouse_stock` | **High schema duplication risk**; filenames do not prove migration order or live table selection | Establish one canonical warehouse repository/service and add compatibility adapters around it. First check migration runner ordering and actual database state before changing schema. |
+
+### Fish, meat, and egg
+
+| Surface | Actual evidence | Reachability / risk | Safest integration point |
+|---|---|---|---|
+| Fisheries backend | `backend/src/routes/fisheriesManagementRoutes.js` imports nine service objects from `../services/legacy/fisheriesManagementService`: `biofloccFarm`, `hatcheryManagement`, `fishFeed`, `fisheriesWaterQuality`, `fishHealth`, `fisheriesHarvest`, `fishProcessing`, `coldFishChain`, `aquacultureAnalytics` | **Mounted** at `/api/fisheriesmanagement`, but the route exposes generic `/` and `/:id` routers rather than named resource prefixes | Either update frontend API wrappers to target explicit subrouters, or split this router into named mounts. The latter is safer for stable URLs but should be done once, with tests against all nine service objects. |
+| Fisheries frontend | `frontend/src/pages/FisheriesManagementPage.jsx` imports nine API objects and calls conventional paths such as `/biofloc-farms`; it explicitly sets `backendNote` that endpoints “have not been built yet” | **Frontend mismatch / likely 404** despite backend service and migration files existing | Replace the placeholder route shapes only after defining the named route mapping. The schema `9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzz_fisheries_management_schema.sql` already defines tables matching the page fields. |
+| Poultry and eggs | `backend/src/routes/poultryRoutes.js` imports functions from `../services/legacy/poultryService`; `backend/src/index.js` mounts `/api/poultry`; frontend `poultryAPI` uses `/poultry/flocks`, egg production, feed, mortality, vaccinations, performance | **Reachable and coherent**; `PoultryManagementPage.jsx` uses the wrapper and documents actual field names | Preserve this route/service pair. Migration `067_poultry_management_schema.sql` defines `poultry_flocks`, `poultry_egg_production`, `poultry_feed_consumption`, `poultry_mortality`, `poultry_vaccination_records`. |
+| Meat | No dedicated `meatRoutes.js`, `meatService.js`, or meat-specific migration was found in the requested source inventory. Northeast variety migration classifies “Animal Products” including meat, dairy, and fish, but that is catalog data, not meat operations | **Candidate missing/orphan domain**, not proven implementation | Integrate meat through an existing product/order/cold-chain contract first; do not invent a meat operations route based only on catalog classification. |
+
+### Northeast supply routes and regional inventory
+
+| Surface | Actual evidence | Reachability / risk | Safest integration point |
+|---|---|---|---|
+| Northeast varieties | `backend/src/routes/neVarietiesRoutes.js` imported and mounted at `/api/v1/varieties`; migration `9001_north_east_varieties_comprehensive.sql` defines `product_categories`, `gi_tags`, `ne_variety_products`, `animal_genetic_resources`, `elite_crop_varieties`, `export_corridors`, `fpo_product_mapping`, `ne_variety_media` | **Reachable candidate**; exact route symbols were not needed to establish import/mount, but frontend has a `VarietyDirectoryPage` and API comments referencing this catalog | Use this as the regional product/catalog anchor. Join logistics via product/FPO/export-corridor IDs rather than adding state-specific logistics tables. |
+| Supply-chain routes | `supplyChainTracking`, `supplyChainAnalytics`, `supplyChainDecisionRoutes` are imported and mounted at `/api/supplychaintracking`, `/api/supplychainanalytics`, `/api/supply-chain`, and `/api/v1/supply-chain` | **Reachable**, with a deliberate duplicate versioned/unversioned mount for decision routes | Safest integration point for Northeast corridors is supply-chain nodes/tracking plus `export_corridors`; keep accounting/GST downstream of shipment/order events. |
+| Regional route data | `9001...` includes `export_corridors`, but no source evidence in this audit proved a route reads it | **Schema-only until route/service call is confirmed** | Find the owner by searching for `export_corridors` table references before exposing UI claims or adding route mounts. |
+
+## Orphan and duplicate candidate inventory
+
+These are candidates, not deletion recommendations:
+
+- `backend/src/services/legacy/assetAccountingService.js` is the route owner; any top-level `backend/src/services/assetAccountingService.js` should be treated as duplicate until reference analysis proves otherwise.
+- `backend/src/services/legacy/gstService.js` is the `/api/gst` route owner; any top-level GST service candidate must not replace it without comparing the pool and exported methods.
+- `backend/src/services/legacy/coldStorageService.js` is the cold-storage route owner; `backend/src/services/coldChainMonitoringService.js` is a separate monitoring service, not an equivalent replacement.
+- `backend/src/services/legacy/returnLoadBoardService.js` is the return-load route owner; a top-level same-named service, if retained, is a duplicate candidate.
+- `backend/src/services/legacy/fisheriesService.js` and `backend/src/routes/legacy/fisheriesRoutes.js` are legacy fisheries candidates distinct from the mounted `fisheriesManagementRoutes.js` / `fisheriesManagementService.js` pair.
+- `backend/src/services/legacy/logisticsService.js` and `backend/src/services/claude/logisticsAIService.js` are not proven mounted owners for the core logistics enhancement endpoints; do not wire them by filename similarity.
+- `backend/src/routes/logisticsEnhancements.js` and `backend/src/routes/logisticsEnhancementRoutes.js` are both mounted under near-identical prefixes and require endpoint overlap review.
+- `frontend/src/pages/UnifiedLedgerPage.jsx` is an intentional compatibility/explanation page after removal of its prior API, not evidence that the unified-ledger backend should be revived.
+- `frontend/src/pages/FisheriesManagementPage.jsx` is a live UI route but its resource calls are frontend-only shapes until they are aligned with the mounted generic backend router.
+
+## Safest integration order
+
+1. Fix path contracts first: asset accounting (`/erp/assets` vs `/assetaccounting`), return-load (`/api/v1/return-load-board` vs `/api/returnloadboard`), and fisheries named-resource URLs.
+2. Remove the freight pooling double mount after comparing route symbols and service exports; add one route-level test per overlapping endpoint.
+3. Declare canonical ownership for warehouse versus logistics-enhancement warehouse operations and for legacy versus top-level services.
+4. Verify migration runner/database state for duplicated warehouse, cold-chain, freight, GST, and ledger tables before schema edits.
+5. Only then connect Northeast `export_corridors` and perishable fish/meat flows to shipment/cold-chain events; catalog presence alone is insufficient.
+
+## Metrics from this audit
+
+| Item | Observed |
+|---|---:|
+| Requested domain route modules explicitly imported in `backend/src/index.js` | 13+ |
+| Requested domain mount duplicates identified | Freight pooling; logistics enhancement sibling; multiple warehouse surface |
+| Requested legacy service files used directly by inspected routes | 7+ |
+| Requested frontend pages routed in `frontend/src/config/routes.js` | Asset accounting, cold storage, fisheries, poultry, logistics, logistics matching, ledger |
+| Relevant migration families found | GST, logistics, reverse logistics/backhaul, warehouse, cold chain/storage, freight, poultry, fisheries, Northeast varieties |
+| Meat-specific route/service/migration found | None |
+
+## Limitations
+
+This is static source tracing. It does not claim that migrations have executed, that PostgreSQL tables exist, or that dynamic middleware/proxy rewrites do not alter URLs. Runtime route discovery and database introspection were not run, consistent with the read-only request and the repository’s documented external-service prerequisites.
 
 ## Summary
 

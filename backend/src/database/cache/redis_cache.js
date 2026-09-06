@@ -15,28 +15,28 @@ class RedisCache {
       port: config.port || parseInt(process.env.REDIS_PORT, 10) || 6379,
       password: config.password || process.env.REDIS_PASSWORD,
       db: config.db || parseInt(process.env.REDIS_DB, 10) || 0,
-      
+
       // Cache configuration
       defaultTTL: config.defaultTTL || 3600, // 1 hour default
       enableCacheWarming: config.enableCacheWarming !== false,
       enableAutomaticInvalidation: config.enableAutomaticInvalidation !== false,
-      
+
       // Cache key configuration
       keyPrefix: config.keyPrefix || 'afrera:',
       keyVersion: config.keyVersion || 'v1',
-      
+
       // Cache size limits
       maxMemoryPolicy: config.maxMemoryPolicy || 'allkeys-lru',
       maxMemory: config.maxMemory || '256mb',
-      
+
       // Performance configuration
       enableCompression: config.enableCompression !== false,
       enableSerialization: config.enableSerialization !== false,
-      
+
       // Statistics
       enableStatistics: config.enableStatistics !== false,
-      
-      ...config
+
+      ...config,
     };
 
     this.client = null;
@@ -46,7 +46,7 @@ class RedisCache {
       misses: 0,
       sets: 0,
       deletes: 0,
-      errors: 0
+      errors: 0,
     };
   }
 
@@ -65,7 +65,7 @@ class RedisCache {
           return delay;
         },
         enableReadyCheck: true,
-        maxRetriesPerRequest: 3
+        maxRetriesPerRequest: 3,
       });
 
       // Configure Redis memory policy
@@ -79,7 +79,7 @@ class RedisCache {
       logger.info('Redis cache initialized', {
         host: this.config.host,
         port: this.config.port,
-        db: this.config.db
+        db: this.config.db,
       });
     } catch (error) {
       logger.error('Failed to initialize Redis cache', { error: error.message });
@@ -95,7 +95,7 @@ class RedisCache {
       .createHash('md5')
       .update(query + JSON.stringify(params))
       .digest('hex');
-    
+
     return `${this.config.keyPrefix}${this.config.keyVersion}:${queryHash}`;
   }
 
@@ -143,7 +143,7 @@ class RedisCache {
 
     try {
       const value = await this.client.get(key);
-      
+
       if (value !== null) {
         this.statistics.hits++;
         return this.deserialize(value);
@@ -166,7 +166,7 @@ class RedisCache {
       return false;
     }
 
-    let key = this.generateCacheKey(query, params);
+    const key = this.generateCacheKey(query, params);
     const serializedValue = this.serialize(value);
     const cacheTTL = ttl || this.config.defaultTTL;
 
@@ -189,7 +189,7 @@ class RedisCache {
       return false;
     }
 
-    let key = this.generateCacheKey(query, params);
+    const key = this.generateCacheKey(query, params);
 
     try {
       await this.client.del(key);
@@ -214,7 +214,7 @@ class RedisCache {
 
     try {
       const keys = await this.client.keys(fullPattern);
-      
+
       if (keys.length > 0) {
         await this.client.del(...keys);
         logger.info('Cache pattern invalidated', { pattern, count: keys.length });
@@ -252,7 +252,7 @@ class RedisCache {
     }
 
     // Execute callback to get value
-    let value = await callback();
+    const value = await callback();
 
     // Set in cache
     await this.set(query, params, value, ttl);
@@ -268,11 +268,11 @@ class RedisCache {
       return queries.map(() => null);
     }
 
-    let keys = queries.map(q => this.generateCacheKey(q.query, q.params));
+    const keys = queries.map(q => this.generateCacheKey(q.query, q.params));
 
     try {
       const values = await this.client.mget(...keys);
-      
+
       return values.map((value, index) => {
         if (value !== null) {
           this.statistics.hits++;
@@ -296,14 +296,14 @@ class RedisCache {
       return false;
     }
 
-    let cacheTTL = ttl || this.config.defaultTTL;
+    const cacheTTL = ttl || this.config.defaultTTL;
 
     try {
       const pipeline = this.client.pipeline();
 
       for (const item of items) {
-        let key = this.generateCacheKey(item.query, item.params);
-        let serializedValue = this.serialize(item.value);
+        const key = this.generateCacheKey(item.query, item.params);
+        const serializedValue = this.serialize(item.value);
         pipeline.setex(key, cacheTTL, serializedValue);
       }
 
@@ -333,14 +333,14 @@ class RedisCache {
 
     for (const warmupQuery of warmupQueries) {
       try {
-        let value = await warmupQuery.callback();
+        const value = await warmupQuery.callback();
         await this.set(warmupQuery.query, warmupQuery.params, value, warmupQuery.ttl);
         warmed++;
       } catch (error) {
         failed++;
         logger.error('Cache warming failed for query', {
           query: warmupQuery.query,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -357,8 +357,8 @@ class RedisCache {
 
     return {
       ...this.statistics,
-      hitRate: hitRate.toFixed(2) + '%',
-      total
+      hitRate: `${hitRate.toFixed(2) }%`,
+      total,
     };
   }
 
@@ -371,7 +371,7 @@ class RedisCache {
       misses: 0,
       sets: 0,
       deletes: 0,
-      errors: 0
+      errors: 0,
     };
   }
 
@@ -420,7 +420,7 @@ class RedisCache {
     }
 
     try {
-      let info = await this.client.info();
+      const info = await this.client.info();
       return info;
     } catch (error) {
       logger.error('Failed to get cache info', { error: error.message });
@@ -477,5 +477,5 @@ module.exports = {
   RedisCache,
   getRedisCache,
   initializeRedisCache,
-  shutdownRedisCache
+  shutdownRedisCache,
 };

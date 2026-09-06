@@ -1,6 +1,6 @@
 /**
  * Procurement Subscription Service
- * 
+ *
  * Wires the existing `procurement_subscriptions` table (migration 042) to application logic
  * Implements REOS Missing Layer 1.9: Subscription Commerce / Subscription Farming
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getSubscription(subscriptionId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM procurement_subscriptions WHERE subscription_id = $1`,
-      [subscriptionId]
+      'SELECT * FROM procurement_subscriptions WHERE subscription_id = $1',
+      [subscriptionId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Subscription not found: ${subscriptionId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get subscription: ${error.message}`);
@@ -46,9 +46,9 @@ async function getSubscriptionsBySubscriber(subscriberId) {
       `SELECT * FROM procurement_subscriptions 
        WHERE subscriber_id = $1 
        ORDER BY created_at DESC`,
-      [subscriberId]
+      [subscriberId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get subscriptions by subscriber: ${error.message}`);
@@ -67,9 +67,9 @@ async function getSubscriptionsByProduct(productId) {
       `SELECT * FROM procurement_subscriptions 
        WHERE product_id = $1 
        ORDER BY created_at DESC`,
-      [productId]
+      [productId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get subscriptions by product: ${error.message}`);
@@ -97,7 +97,7 @@ async function createSubscription(subscription) {
       end_date,
       auto_renew,
       payment_method,
-      notes
+      notes,
     } = subscription;
 
     const { rows } = await pool.query(
@@ -108,8 +108,8 @@ async function createSubscription(subscription) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'active', NOW(), $13)
        RETURNING *`,
       [subscription_id, subscriber_id, subscriber_type, product_id, subscription_type,
-       frequency, quantity_per_cycle, delivery_address, start_date, end_date,
-       auto_renew, payment_method, notes]
+        frequency, quantity_per_cycle, delivery_address, start_date, end_date,
+        auto_renew, payment_method, notes],
     );
 
     logger.info(`Subscription created: ${subscription_id}`);
@@ -129,10 +129,10 @@ async function createSubscription(subscription) {
 async function updateSubscription(subscriptionId, updates) {
   try {
     const allowedFields = [
-      'quantity_per_cycle', 'delivery_address', 'end_date', 
-      'auto_renew', 'payment_method', 'status', 'notes'
+      'quantity_per_cycle', 'delivery_address', 'end_date',
+      'auto_renew', 'payment_method', 'status', 'notes',
     ];
-    
+
     const setClauses = [];
     const values = [];
     let paramIndex = 1;
@@ -159,7 +159,7 @@ async function updateSubscription(subscriptionId, updates) {
     `;
 
     const { rows } = await pool.query(query, values);
-    
+
     if (!rows.length) {
       throw new Error(`Subscription not found: ${subscriptionId}`);
     }
@@ -188,9 +188,9 @@ async function cancelSubscription(subscriptionId, reason) {
            updated_at = NOW()
        WHERE subscription_id = $2
        RETURNING *`,
-      [reason, subscriptionId]
+      [reason, subscriptionId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Subscription not found: ${subscriptionId}`);
     }
@@ -216,9 +216,9 @@ async function getSubscriptionsDueForDelivery(date = new Date().toISOString().sp
          AND start_date <= $1
          AND (end_date IS NULL OR end_date >= $1)
        ORDER BY subscriber_id, product_id`,
-      [date]
+      [date],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get subscriptions due for delivery: ${error.message}`);
@@ -234,7 +234,7 @@ async function getSubscriptionsDueForDelivery(date = new Date().toISOString().sp
 async function getSubscriptionStatistics(filters = {}) {
   try {
     const { subscriber_id, product_id, status } = filters;
-    
+
     let query = `
       SELECT 
         COUNT(*) as total_subscriptions,
@@ -246,7 +246,7 @@ async function getSubscriptionStatistics(filters = {}) {
       FROM procurement_subscriptions
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramIndex = 1;
 
@@ -277,7 +277,7 @@ async function getSubscriptionStatistics(filters = {}) {
       pausedSubscriptions: parseInt(stats.paused_subscriptions),
       cancelledSubscriptions: parseInt(stats.cancelled_subscriptions),
       totalQuantityPerCycle: stats.total_quantity_per_cycle ? parseInt(stats.total_quantity_per_cycle) : 0,
-      avgQuantityPerCycle: stats.avg_quantity_per_cycle ? r2(stats.avg_quantity_per_cycle) : 0
+      avgQuantityPerCycle: stats.avg_quantity_per_cycle ? r2(stats.avg_quantity_per_cycle) : 0,
     };
   } catch (error) {
     logger.error(`Failed to get subscription statistics: ${error.message}`);
@@ -312,7 +312,7 @@ function setupRoutes(app) {
 
   router.get('/subscriptions/product/:productId', async (req, res) => {
     try {
-      let subscriptions = await getSubscriptionsByProduct(req.params.productId);
+      const subscriptions = await getSubscriptionsByProduct(req.params.productId);
       res.json({ success: true, data: subscriptions });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -321,7 +321,7 @@ function setupRoutes(app) {
 
   router.post('/subscriptions', async (req, res) => {
     try {
-      let subscription = await createSubscription(req.body);
+      const subscription = await createSubscription(req.body);
       res.status(201).json({ success: true, data: subscription });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -330,7 +330,7 @@ function setupRoutes(app) {
 
   router.put('/subscriptions/:subscriptionId', async (req, res) => {
     try {
-      let subscription = await updateSubscription(req.params.subscriptionId, req.body);
+      const subscription = await updateSubscription(req.params.subscriptionId, req.body);
       res.json({ success: true, data: subscription });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -340,7 +340,7 @@ function setupRoutes(app) {
   router.post('/subscriptions/:subscriptionId/cancel', async (req, res) => {
     try {
       const { reason } = req.body;
-      let subscription = await cancelSubscription(req.params.subscriptionId, reason);
+      const subscription = await cancelSubscription(req.params.subscriptionId, reason);
       res.json({ success: true, data: subscription });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -349,7 +349,7 @@ function setupRoutes(app) {
 
   router.get('/subscriptions/due/:date', async (req, res) => {
     try {
-      let subscriptions = await getSubscriptionsDueForDelivery(req.params.date);
+      const subscriptions = await getSubscriptionsDueForDelivery(req.params.date);
       res.json({ success: true, data: subscriptions });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -358,7 +358,7 @@ function setupRoutes(app) {
 
   router.get('/subscriptions/statistics', async (req, res) => {
     try {
-      let stats = await getSubscriptionStatistics(req.query);
+      const stats = await getSubscriptionStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -378,8 +378,6 @@ module.exports = {
   cancelSubscription,
   getSubscriptionsDueForDelivery,
   getSubscriptionStatistics,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

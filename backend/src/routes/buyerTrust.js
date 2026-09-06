@@ -20,7 +20,7 @@ router.get('/buyers/:id/trust', authenticateToken, async (req, res, next) => {
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error(`Get buyer trust score error: ${error.message}`);
@@ -34,11 +34,11 @@ router.get('/buyers/:id/trust', authenticateToken, async (req, res, next) => {
  */
 router.get('/buyers/:id/reputation', async (req, res, next) => {
   try {
-    let result = await buyerTrustService.getBuyerReputation(req.params.id);
+    const result = await buyerTrustService.getBuyerReputation(req.params.id);
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error(`Get buyer reputation error: ${error.message}`);
@@ -52,11 +52,11 @@ router.get('/buyers/:id/reputation', async (req, res, next) => {
  */
 router.get('/buyers/:id/payment-history', authenticateToken, async (req, res, next) => {
   try {
-    let result = await buyerTrustService.getBuyerPaymentHistory(req.params.id);
+    const result = await buyerTrustService.getBuyerPaymentHistory(req.params.id);
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error(`Get payment history error: ${error.message}`);
@@ -72,28 +72,27 @@ router.post('/buyers/:id/fraud-report',
   authenticateToken,
   validateRequest({
     body: {
-      reason: 'string|required'
-    }
+      reason: 'string|required',
+    },
   }),
   async (req, res, next) => {
     try {
-      let result = await buyerTrustService.reportFraudSuspicion(
+      const result = await buyerTrustService.reportFraudSuspicion(
         req.params.id,
-        req.body.reason
+        req.body.reason,
       );
 
       res.status(201).json({
         success: true,
         data: result,
-        message: 'Fraud report submitted'
+        message: 'Fraud report submitted',
       });
     } catch (error) {
       logger.error(`Report fraud error: ${error.message}`);
       next(error);
     }
-  }
+  },
 );
 
 module.exports = router;
-
 

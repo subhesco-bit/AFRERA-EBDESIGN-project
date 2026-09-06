@@ -52,17 +52,15 @@ module.exports = {
 
 // Merged from backend/src/modules/M043
 {
-  const m043 = require("../../modules/M043/service");
+  const m043 = require('../../modules/M043/service');
   const { ...rest } = m043;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M044
 {
-  const m044 = require("../../modules/M044/service");
+  const m044 = require('../../modules/M044/service');
   const { ...rest } = m044;
   Object.assign(module.exports, rest);
 }
-
-
 

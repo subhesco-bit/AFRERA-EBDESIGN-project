@@ -77,7 +77,7 @@ async function ingestMandiPrices(records, source = 'agmarknet') {
         [r.market ?? r.market_name, r.state ?? null, r.district ?? null,
           r.commodity, r.variety ?? null, r.grade ?? null,
           min, modal, max, num(r.arrivals ?? r.arrivals_tonnes),
-          r.date ?? r.price_date, source]
+          r.date ?? r.price_date, source],
       );
       if (res.rows.length) out.inserted += 1; else out.skipped += 1;
     } catch (err) {
@@ -90,10 +90,10 @@ async function ingestMandiPrices(records, source = 'agmarknet') {
   });
   return {
     ...out,
-    note: out.rejected.length
-      ? `${out.rejected.length} record(s) rejected rather than corrected. An inverted or `
-      + 'out-of-band price is a broken feed, and silently repairing it hides that.'
-      : null,
+    note: out.rejected.length ?
+      `${out.rejected.length} record(s) rejected rather than corrected. An inverted or ` +
+      'out-of-band price is a broken feed, and silently repairing it hides that.' :
+      null,
   };
 }
 
@@ -120,7 +120,7 @@ async function priceTrend({ commodity, state, days = 60 }) {
         AND ($2::text IS NULL OR state = $2)
         AND price_date >= CURRENT_DATE - ($3 || ' days')::interval
       ORDER BY market_name, price_date`,
-    [`%${commodity}%`, state ?? null, Number(days)]
+    [`%${commodity}%`, state ?? null, Number(days)],
   );
 
   const byMarket = {};
@@ -132,10 +132,10 @@ async function priceTrend({ commodity, state, days = 60 }) {
     markets: Object.entries(byMarket).map(([market, series]) => {
       const priced = series.filter((s) => s.modal_price_inr_per_qtl !== null);
       const first = priced[0]; const last = priced[priced.length - 1];
-      const changePct = first && last && Number(first.modal_price_inr_per_qtl)
-        ? ((Number(last.modal_price_inr_per_qtl) - Number(first.modal_price_inr_per_qtl))
-           / Number(first.modal_price_inr_per_qtl)) * 100
-        : null;
+      const changePct = first && last && Number(first.modal_price_inr_per_qtl) ?
+        ((Number(last.modal_price_inr_per_qtl) - Number(first.modal_price_inr_per_qtl)) /
+           Number(first.modal_price_inr_per_qtl)) * 100 :
+        null;
       return {
         market,
         district: series[0].district,
@@ -146,11 +146,11 @@ async function priceTrend({ commodity, state, days = 60 }) {
         series,
       };
     }),
-    note: rows.length === 0
-      ? 'No price records. The Agmarknet/e-NAM feed has not been ingested for this '
-      + 'commodity — this is missing data, not a flat market.'
-      : 'Reported per market, not averaged. Thin NE hill markets and Azadpur are not '
-      + 'the same market and their mean describes neither.',
+    note: rows.length === 0 ?
+      'No price records. The Agmarknet/e-NAM feed has not been ingested for this ' +
+      'commodity — this is missing data, not a flat market.' :
+      'Reported per market, not averaged. Thin NE hill markets and Azadpur are not ' +
+      'the same market and their mean describes neither.',
   };
 }
 
@@ -167,8 +167,8 @@ async function priceTrend({ commodity, state, days = 60 }) {
  */
 async function reconcileDbt({ schemeCode, farmerId, claimedAmountInr, creditedAmountInr, creditedOn, failureReason }) {
   const claimed = Number(claimedAmountInr || 0);
-  const credited = creditedAmountInr === null || creditedAmountInr === undefined
-    ? null : Number(creditedAmountInr);
+  const credited = creditedAmountInr === null || creditedAmountInr === undefined ?
+    null : Number(creditedAmountInr);
   const gap = credited === null ? null : Math.round((claimed - credited) * 100) / 100;
 
   let status;
@@ -180,11 +180,11 @@ async function reconcileDbt({ schemeCode, farmerId, claimedAmountInr, creditedAm
   const guidance = {
     pending: 'Sanctioned but not yet credited. Nothing to act on until the scheme cycle closes.',
     reconciled: null,
-    not_received: 'Sanctioned and nothing arrived. The usual cause is an Aadhaar-to-bank '
-                + 'seeding mismatch, which the scheme records as PAID. The farmer will not '
-                + 'be told — someone has to check.',
-    short_credited: `Short by Rs ${gap}. Check for a deduction at the scheme end or a `
-                  + 'partial-instalment release before treating this as an error.',
+    not_received: 'Sanctioned and nothing arrived. The usual cause is an Aadhaar-to-bank ' +
+                'seeding mismatch, which the scheme records as PAID. The farmer will not ' +
+                'be told — someone has to check.',
+    short_credited: `Short by Rs ${gap}. Check for a deduction at the scheme end or a ` +
+                  'partial-instalment release before treating this as an error.',
   }[status];
 
   return {
@@ -216,25 +216,24 @@ async function unclaimedEntitlements({ state, limit = 100 } = {}) {
           AND ($1::text IS NULL OR s.applicable_states IS NULL OR $1 = ANY(s.applicable_states))
         ORDER BY (COALESCE(s.subsidy_per_ha_inr,0) * COALESCE(e.area_enrolled_ha,0)) DESC
         LIMIT $2`,
-      [state ?? null, Number(limit)]
+      [state ?? null, Number(limit)],
     );
     return {
       candidates: rows.map((r) => ({
         ...r,
-        estimatedEntitlementInr: r.subsidy_per_ha_inr && r.area_enrolled_ha
-          ? Math.round(Number(r.subsidy_per_ha_inr) * Number(r.area_enrolled_ha))
-          : null,
+        estimatedEntitlementInr: r.subsidy_per_ha_inr && r.area_enrolled_ha ?
+          Math.round(Number(r.subsidy_per_ha_inr) * Number(r.area_enrolled_ha)) :
+          null,
       })),
       count: rows.length,
-      caveat: 'Estimated entitlement uses the scheme rate on record, which is unverified '
-            + 'against a live portal. Treat as a shortlist to check, not an amount to promise.',
+      caveat: 'Estimated entitlement uses the scheme rate on record, which is unverified ' +
+            'against a live portal. Treat as a shortlist to check, not an amount to promise.',
     };
   } catch (err) {
     logger.warn('unclaimedEntitlements: enrolment tables unavailable', { error: err.message });
     return { candidates: [], count: 0, error: err.message };
   }
 }
-
 
 // ---------------------------------------------------------------------------
 // COMPETITOR PRICE INTELLIGENCE  (migration 059 + the orphaned 042 table)
@@ -283,9 +282,9 @@ async function recordCompetitorPrice(obs) {
   }
   if (obs.collectionMethod === 'automated_collection' && (!obs.termsReviewed || !obs.sourceUrl)) {
     throw new Error(
-      'Automated collection requires termsReviewed=true and a sourceUrl. This is not a '
-      + 'legal opinion — it is a prompt to have the conversation before the platform is '
-      + 'collecting at volume and nobody remembers deciding to.'
+      'Automated collection requires termsReviewed=true and a sourceUrl. This is not a ' +
+      'legal opinion — it is a prompt to have the conversation before the platform is ' +
+      'collecting at volume and nobody remembers deciding to.',
     );
   }
 
@@ -294,9 +293,9 @@ async function recordCompetitorPrice(obs) {
   // Per-kg is computed here rather than as a generated column: rows written
   // before migration 059 have no pack size, and a generated column would make
   // those permanently NULL with no way to backfill them.
-  const perKg = packG && packG > 0
-    ? Math.round((price / (packG / 1000)) * 100) / 100
-    : ((obs.unit ?? 'kg') === 'kg' ? price : null);
+  const perKg = packG && packG > 0 ?
+    Math.round((price / (packG / 1000)) * 100) / 100 :
+    ((obs.unit ?? 'kg') === 'kg' ? price : null);
 
   const { rows } = await pool.query(
     `INSERT INTO price_intelligence
@@ -310,15 +309,15 @@ async function recordCompetitorPrice(obs) {
       price, price, packG, obs.unit ?? 'kg', perKg, obs.matchConfidence ?? null,
       obs.collectionMethod, obs.sourceUrl ?? null, Boolean(obs.termsReviewed),
       obs.collectionNote ?? null, obs.observedBy ?? null,
-      obs.isOrganic ?? null, obs.isGiTagged ?? null, obs.inStock ?? null]
+      obs.isOrganic ?? null, obs.isGiTagged ?? null, obs.inStock ?? null],
   );
   return {
     ...rows[0],
     pricePerKgInr: perKg,
-    note: packG
-      ? `Rs ${price} for ${packG}g normalises to Rs ${perKg}/kg. Comparing pack prices `
-      + 'directly is the most common error in retail price comparison.'
-      : null,
+    note: packG ?
+      `Rs ${price} for ${packG}g normalises to Rs ${perKg}/kg. Comparing pack prices ` +
+      'directly is the most common error in retail price comparison.' :
+      null,
   };
 }
 
@@ -334,28 +333,28 @@ async function competitivePosition({ productId, productName, ourPricePerKg }) {
     `SELECT * FROM v_competitive_position
       WHERE ($1::text IS NULL OR product_id::text = $1)
         AND ($2::text IS NULL OR product_name ILIKE $2)`,
-    [productId ?? null, productName ? `%${productName}%` : null]
+    [productId ?? null, productName ? `%${productName}%` : null],
   );
   if (!rows.length) {
     return {
       observations: 0,
       recommendation: null,
-      note: 'No competitor observations. This is missing data, not evidence that the '
-          + 'platform is priced competitively.',
+      note: 'No competitor observations. This is missing data, not evidence that the ' +
+          'platform is priced competitively.',
     };
   }
 
   const p = rows[0];
   if (p.stale) {
     return { ...p, recommendation: null,
-      note: 'Latest observation is over a week old. Declining to recommend a reprice — '
-          + 'acting on stale competitor data feels informed and is not.' };
+      note: 'Latest observation is over a week old. Declining to recommend a reprice — ' +
+          'acting on stale competitor data feels informed and is not.' };
   }
   if (p.mean_match_confidence !== null && Number(p.mean_match_confidence) < 0.6) {
     return { ...p, recommendation: null,
-      note: `Mean product-match confidence is ${p.mean_match_confidence}. These may not be `
-          + 'the same product. Fuzzy name matching across retailers is unreliable, and a '
-          + 'reprice against the wrong basket is a self-inflicted margin cut.' };
+      note: `Mean product-match confidence is ${p.mean_match_confidence}. These may not be ` +
+          'the same product. Fuzzy name matching across retailers is unreliable, and a ' +
+          'reprice against the wrong basket is a self-inflicted margin cut.' };
   }
 
   const ours = Number(ourPricePerKg);
@@ -366,21 +365,21 @@ async function competitivePosition({ productId, productName, ourPricePerKg }) {
     ...p,
     ourPricePerKg: ours,
     gapVsMeanPct: gapPct === null ? null : Math.round(gapPct * 100) / 100,
-    position: gapPct === null ? 'unknown'
-      : gapPct > 15 ? 'priced well above the observed market'
-        : gapPct < -15 ? 'priced well below the observed market'
-          : 'within the observed market range',
-    recommendation: gapPct === null ? null
-      : gapPct < -15
-        ? 'Priced below comparable products. Before matching the market upward, check '
-        + 'whether the gap is quality or certification the competitors do not have — '
-        + 'lab-certified GI produce is not the same product as a generic listing.'
-        : gapPct > 15
-          ? 'Priced above the observed market. That may be correct for certified GI '
-          + 'produce; it is only a problem if buyers cannot see what the premium buys.'
-          : 'No repricing indicated.',
-    caveat: 'Competitor prices are observations of a LISTING, not of a transaction. '
-          + 'Listed and realised prices diverge, especially where discounting is heavy.',
+    position: gapPct === null ? 'unknown' :
+      gapPct > 15 ? 'priced well above the observed market' :
+        gapPct < -15 ? 'priced well below the observed market' :
+          'within the observed market range',
+    recommendation: gapPct === null ? null :
+      gapPct < -15 ?
+        'Priced below comparable products. Before matching the market upward, check ' +
+        'whether the gap is quality or certification the competitors do not have — ' +
+        'lab-certified GI produce is not the same product as a generic listing.' :
+        gapPct > 15 ?
+          'Priced above the observed market. That may be correct for certified GI ' +
+          'produce; it is only a problem if buyers cannot see what the premium buys.' :
+          'No repricing indicated.',
+    caveat: 'Competitor prices are observations of a LISTING, not of a transaction. ' +
+          'Listed and realised prices diverge, especially where discounting is heavy.',
   };
 }
 
@@ -390,6 +389,4 @@ module.exports = {
   recordCompetitorPrice, competitivePosition,
   reconcileDbt, unclaimedEntitlements,
 };
-
-
 

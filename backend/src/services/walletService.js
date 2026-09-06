@@ -38,7 +38,7 @@ class WalletService {
         WHERE w.user_id = $1 AND w.status = 'active'
       `;
       const result = await this.db.query(query, [userId]);
-      
+
       if (result.rows.length === 0) {
         // Create wallet if it doesn't exist
         return await this.createWallet({ userId });
@@ -58,14 +58,14 @@ class WalletService {
     const { userId, currency = 'INR', initialBalance = 0 } = walletData;
 
     try {
-      let query = `
+      const query = `
         INSERT INTO wallets (
           user_id, balance, currency, status, created_at, updated_at
         ) VALUES ($1, $2, $3, 'active', NOW(), NOW())
         RETURNING *
       `;
-      let result = await this.db.query(query, [userId, initialBalance, currency]);
-      
+      const result = await this.db.query(query, [userId, initialBalance, currency]);
+
       logger.info(`Wallet created for user ${userId}`);
       return result.rows[0];
     } catch (error) {
@@ -93,7 +93,7 @@ class WalletService {
         RETURNING *
       `;
       const walletResult = await this.db.query(updateQuery, [amount, walletId]);
-      
+
       if (walletResult.rows.length === 0) {
         throw new Error('Wallet not found');
       }
@@ -111,7 +111,7 @@ class WalletService {
         amount,
         source,
         referenceId,
-        description || 'Funds added'
+        description || 'Funds added',
       ]);
 
       await this.db.query('COMMIT');
@@ -119,7 +119,7 @@ class WalletService {
       logger.info(`Added ${amount} to wallet ${walletId}`);
       return {
         wallet: walletResult.rows[0],
-        transaction: transactionResult.rows[0]
+        transaction: transactionResult.rows[0],
       };
     } catch (error) {
       await this.db.query('ROLLBACK');
@@ -141,7 +141,7 @@ class WalletService {
         SELECT balance FROM wallets WHERE wallet_id = $1 FOR UPDATE
       `;
       const balanceResult = await this.db.query(balanceQuery, [walletId]);
-      
+
       if (balanceResult.rows.length === 0) {
         throw new Error('Wallet not found');
       }
@@ -151,26 +151,26 @@ class WalletService {
       }
 
       // Update wallet balance
-      let updateQuery = `
+      const updateQuery = `
         UPDATE wallets 
         SET balance = balance - $1,
             updated_at = NOW()
         WHERE wallet_id = $2
         RETURNING *
       `;
-      let walletResult = await this.db.query(updateQuery, [amount, walletId]);
+      const walletResult = await this.db.query(updateQuery, [amount, walletId]);
 
       // Create transaction record
-      let transactionQuery = `
+      const transactionQuery = `
         INSERT INTO wallet_transactions (
           wallet_id, type, amount, description, status, created_at
         ) VALUES ($1, 'debit', $2, $3, 'completed', NOW())
         RETURNING *
       `;
-      let transactionResult = await this.db.query(transactionQuery, [
+      const transactionResult = await this.db.query(transactionQuery, [
         walletId,
         amount,
-        reason
+        reason,
       ]);
 
       await this.db.query('COMMIT');
@@ -178,7 +178,7 @@ class WalletService {
       logger.info(`Deducted ${amount} from wallet ${walletId}`);
       return {
         wallet: walletResult.rows[0],
-        transaction: transactionResult.rows[0]
+        transaction: transactionResult.rows[0],
       };
     } catch (error) {
       await this.db.query('ROLLBACK');
@@ -232,8 +232,8 @@ class WalletService {
       query += ` ORDER BY wt.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      let result = await this.db.query(query, params);
-      
+      const result = await this.db.query(query, params);
+
       // Get total count
       const countQuery = `
         SELECT COUNT(*) as total FROM wallet_transactions 
@@ -245,7 +245,7 @@ class WalletService {
         transactions: result.rows,
         total: parseInt(countResult.rows[0].total),
         limit,
-        offset
+        offset,
       };
     } catch (error) {
       logger.error('Get transaction history failed', error);
@@ -269,7 +269,7 @@ class WalletService {
         amount,
         source: 'transfer',
         referenceId: deductResult.transaction.transaction_id,
-        description: description || 'Fund transfer'
+        description: description || 'Fund transfer',
       });
 
       await this.db.query('COMMIT');
@@ -277,7 +277,7 @@ class WalletService {
       logger.info(`Transferred ${amount} from wallet ${fromWalletId} to ${toWalletId}`);
       return {
         fromTransaction: deductResult.transaction,
-        toTransaction: addResult.transaction
+        toTransaction: addResult.transaction,
       };
     } catch (error) {
       await this.db.query('ROLLBACK');
@@ -291,7 +291,7 @@ class WalletService {
    */
   async getWalletStatistics(userId) {
     try {
-      let query = `
+      const query = `
         SELECT 
           w.wallet_id,
           w.balance,
@@ -304,8 +304,8 @@ class WalletService {
         WHERE w.user_id = $1 AND w.status = 'active'
         GROUP BY w.wallet_id, w.balance, w.currency
       `;
-      let result = await this.db.query(query, [userId]);
-      
+      const result = await this.db.query(query, [userId]);
+
       if (result.rows.length === 0) {
         throw new Error('Wallet not found');
       }

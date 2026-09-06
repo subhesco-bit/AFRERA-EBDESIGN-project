@@ -39,7 +39,7 @@ const getPlatformMetrics = async (req, res) => {
 
 const updatePlatformConfiguration = async (req, res) => {
   try {
-    let config = await platformCoreService.updatePlatformConfiguration(req.params.id, req.body);
+    const config = await platformCoreService.updatePlatformConfiguration(req.params.id, req.body);
     res.status(200).json({ success: true, data: config });
   } catch (error) {
     sendError(res, error);
@@ -50,5 +50,5 @@ module.exports = {
   initializePlatform,
   getPlatformHealth,
   getPlatformMetrics,
-  updatePlatformConfiguration
+  updatePlatformConfiguration,
 };

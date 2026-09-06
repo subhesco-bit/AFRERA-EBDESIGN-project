@@ -30,7 +30,7 @@ class LandRecordsService {
       khasraNumber,
       boundaryDetails,
       gpsCoordinates,
-      documents
+      documents,
     } = landData;
 
     try {
@@ -58,7 +58,7 @@ class LandRecordsService {
         khasraNumber,
         JSON.stringify(boundaryDetails),
         JSON.stringify(gpsCoordinates),
-        JSON.stringify(documents || [])
+        JSON.stringify(documents || []),
       ]);
 
       logger.info(`Land record added for farmer ${farmerId}`);
@@ -108,7 +108,7 @@ class LandRecordsService {
       query += ` OFFSET $${paramCount}`;
       params.push(offset);
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       // Calculate total land area
       const totalQuery = `
@@ -125,7 +125,7 @@ class LandRecordsService {
       return {
         records: result.rows,
         totals: totalResult.rows[0],
-        pagination: { page, limit }
+        pagination: { page, limit },
       };
     } catch (error) {
       logger.error('Error getting farmer land records', { error: error.message, stack: error.stack });
@@ -148,14 +148,14 @@ class LandRecordsService {
         WHERE lr.id = $1
       `;
 
-      let params = [recordId];
+      const params = [recordId];
 
       if (!isAdmin) {
         query += ' AND lr.farmer_id = $2';
         params.push(farmerId);
       }
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       if (result.rows.length === 0) {
         throw new Error('Land record not found');
@@ -175,7 +175,7 @@ class LandRecordsService {
     try {
       const currentRecord = await this.getLandRecord(recordId, farmerId);
 
-      let query = `
+      const query = `
         UPDATE land_records
         SET 
           survey_number = COALESCE($1, survey_number),
@@ -198,7 +198,7 @@ class LandRecordsService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         updateData.surveyNumber,
         updateData.village,
         updateData.district,
@@ -214,7 +214,7 @@ class LandRecordsService {
         updateData.gpsCoordinates ? JSON.stringify(updateData.gpsCoordinates) : null,
         updateData.documents ? JSON.stringify(updateData.documents) : null,
         recordId,
-        farmerId
+        farmerId,
       ]);
 
       if (result.rows.length === 0) {
@@ -236,7 +236,7 @@ class LandRecordsService {
     const { verified, governmentReference, notes } = verificationData;
 
     try {
-      let query = `
+      const query = `
         UPDATE land_records
         SET 
           verification_status = $1,
@@ -248,12 +248,12 @@ class LandRecordsService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         verified ? 'verified' : 'rejected',
         adminId,
         governmentReference,
         notes,
-        recordId
+        recordId,
       ]);
 
       if (result.rows.length === 0) {
@@ -326,14 +326,14 @@ class LandRecordsService {
             khasraNumber: govRecord.khasraNumber,
             boundaryDetails: govRecord.boundaryDetails,
             gpsCoordinates: govRecord.gpsCoordinates,
-            documents: []
+            documents: [],
           });
 
           // Auto-verify government records
           await this.verifyLandRecord(newRecord.id, null, {
             verified: true,
             governmentReference: govRecord.referenceNumber,
-            notes: 'Auto-verified from government records'
+            notes: 'Auto-verified from government records',
           });
 
           syncedCount++;
@@ -345,7 +345,7 @@ class LandRecordsService {
         farmerId,
         syncedCount,
         newRecords,
-        syncedAt: new Date()
+        syncedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error syncing with government land records', { error: error.message, stack: error.stack });
@@ -369,8 +369,8 @@ class LandRecordsService {
     return {
       configured: false,
       records: [],
-      reason: 'No government land-records API (e.g. DILRMP) is configured in this deployment. '
-        + 'No live call was attempted.',
+      reason: 'No government land-records API (e.g. DILRMP) is configured in this deployment. ' +
+        'No live call was attempted.',
     };
   }
 
@@ -379,7 +379,7 @@ class LandRecordsService {
    */
   async updateFarmerFDIForLand(farmerId) {
     try {
-      let query = `
+      const query = `
         UPDATE farmers
         SET 
           fdi_score = fdi_score + 5,
@@ -388,7 +388,7 @@ class LandRecordsService {
         RETURNING fdi_score
       `;
 
-      let result = await this.pool.query(query, [farmerId]);
+      const result = await this.pool.query(query, [farmerId]);
       return result.rows[0].fdi_score;
     } catch (error) {
       logger.error('Error updating farmer FDI', { error: error.message, stack: error.stack });
@@ -421,7 +421,7 @@ class LandRecordsService {
         WHERE verification_status = 'verified'
       `;
 
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (state) {
@@ -444,7 +444,7 @@ class LandRecordsService {
 
       query += ' GROUP BY state, district, village ORDER BY total_hectares DESC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       return result.rows;
     } catch (error) {
@@ -458,13 +458,13 @@ class LandRecordsService {
    */
   async deleteLandRecord(recordId, farmerId) {
     try {
-      let query = `
+      const query = `
         DELETE FROM land_records
         WHERE id = $1 AND farmer_id = $2 AND verification_status = 'pending'
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [recordId, farmerId]);
+      const result = await this.pool.query(query, [recordId, farmerId]);
 
       if (result.rows.length === 0) {
         throw new Error('Land record not found or cannot be deleted');
@@ -483,10 +483,8 @@ module.exports = new LandRecordsService();
 
 // Merged from backend/src/modules/M031
 {
-  const m031 = require("../../modules/M031/service");
+  const m031 = require('../../modules/M031/service');
   const { ...rest } = m031;
   Object.assign(module.exports, rest);
 }
-
-
 

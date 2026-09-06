@@ -41,9 +41,9 @@ const router = express.Router();
 
 /** Curcumin content by turmeric origin (% w/w). Source: ne_harvest_v9_os. */
 const TURMERIC_CURCUMIN_PCT = Object.freeze({
-  ne_lakadong: 9.2,   // Meghalaya Lakadong — the platform's headline differentiator
-  salem: 3.5,         // common Indian commercial benchmark
-  grocery: 2.5        // generic retail turmeric
+  ne_lakadong: 9.2, // Meghalaya Lakadong — the platform's headline differentiator
+  salem: 3.5, // common Indian commercial benchmark
+  grocery: 2.5, // generic retail turmeric
 });
 
 /** Therapeutic anti-inflammatory threshold in mg of curcumin. */
@@ -58,13 +58,13 @@ const CURCUMIN_THERAPEUTIC_MG = 500;
  * Source: ao_system_v2 COSTS table.
  */
 const LANDED_COSTS = Object.freeze({
-  honey:     { proc: 190, apmc: 0.02, sort: 0,    pack: 32, road: 1.5, rail: 4.05, ndls: 2.5, transit: 0,  admin: 2.5, sellC: 450, sellO: 699,  bb: 920,  bl: 1358 },
-  lemon:     { proc: 25,  apmc: 0.02, sort: 0.03, pack: 3,  road: 1.5, rail: 4.05, ndls: 2.5, transit: 0,  admin: 2.5, sellC: 160, sellO: 220,  bb: 306,  bl: 390 },
-  bamboo:    { proc: 18,  apmc: 0.02, sort: 0.04, pack: 4,  road: 1.5, rail: 4.05, ndls: 3,   transit: 3,  admin: 2.5, sellC: 99,  sellO: 140,  bb: 300,  bl: 350 },
-  kiwi:      { proc: 150, apmc: 0.02, sort: 0.05, pack: 3,  road: 1.5, rail: 4.05, ndls: 3,   transit: 5,  admin: 2.5, sellC: 299, sellO: 440,  bb: 683,  bl: 838 },
-  passion:   { proc: 90,  apmc: 0.02, sort: 0.08, pack: 3,  road: 1.5, rail: 4.05, ndls: 3,   transit: 10, admin: 2.5, sellC: 320, sellO: 480,  bb: 348,  bl: 600 },
-  jackfruit: { proc: 18,  apmc: 0.02, sort: 0.05, pack: 3,  road: 1.5, rail: 4.05, ndls: 3,   transit: 4,  admin: 2.5, sellC: 79,  sellO: 99,   bb: 144,  bl: 180 },
-  bhut:      { proc: 250, apmc: 0.02, sort: 0,    pack: 8,  road: 1.5, rail: 4.05, ndls: 1,   transit: 0,  admin: 2.5, sellC: 700, sellO: 1100, bb: 1500, bl: 2000 }
+  honey:     { proc: 190, apmc: 0.02, sort: 0, pack: 32, road: 1.5, rail: 4.05, ndls: 2.5, transit: 0, admin: 2.5, sellC: 450, sellO: 699, bb: 920, bl: 1358 },
+  lemon:     { proc: 25, apmc: 0.02, sort: 0.03, pack: 3, road: 1.5, rail: 4.05, ndls: 2.5, transit: 0, admin: 2.5, sellC: 160, sellO: 220, bb: 306, bl: 390 },
+  bamboo:    { proc: 18, apmc: 0.02, sort: 0.04, pack: 4, road: 1.5, rail: 4.05, ndls: 3, transit: 3, admin: 2.5, sellC: 99, sellO: 140, bb: 300, bl: 350 },
+  kiwi:      { proc: 150, apmc: 0.02, sort: 0.05, pack: 3, road: 1.5, rail: 4.05, ndls: 3, transit: 5, admin: 2.5, sellC: 299, sellO: 440, bb: 683, bl: 838 },
+  passion:   { proc: 90, apmc: 0.02, sort: 0.08, pack: 3, road: 1.5, rail: 4.05, ndls: 3, transit: 10, admin: 2.5, sellC: 320, sellO: 480, bb: 348, bl: 600 },
+  jackfruit: { proc: 18, apmc: 0.02, sort: 0.05, pack: 3, road: 1.5, rail: 4.05, ndls: 3, transit: 4, admin: 2.5, sellC: 79, sellO: 99, bb: 144, bl: 180 },
+  bhut:      { proc: 250, apmc: 0.02, sort: 0, pack: 8, road: 1.5, rail: 4.05, ndls: 1, transit: 0, admin: 2.5, sellC: 700, sellO: 1100, bb: 1500, bl: 2000 },
 });
 
 /** Scoville guidance for Northeast chillies. Source: ne_harvest_v9_os calcSHU. */
@@ -72,18 +72,18 @@ const CHILLI_HEAT_GUIDANCE = Object.freeze({
   mild: {
     safe: ['Dalle Khursani in small amounts (~100K SHU)', 'Sirarakhong Hathei (medium-high)'],
     avoid: ['Bhut Jolokia', 'Naga King Chilli'],
-    technique: 'Dalle Khursani as pickle — oil and acid reduce effective heat. Micro-dose Bhut Jolokia at 30mg per litre of liquid for aroma without discomfort.'
+    technique: 'Dalle Khursani as pickle — oil and acid reduce effective heat. Micro-dose Bhut Jolokia at 30mg per litre of liquid for aroma without discomfort.',
   },
   medium: {
     safe: ['Dalle Khursani freely', 'Bhut Jolokia in micro-doses (max 50mg per dish)'],
     avoid: ['Undiluted Bhut Jolokia'],
-    technique: 'Bhut Jolokia carries fruit and smoke notes that survive dilution — use for aroma, not heat.'
+    technique: 'Bhut Jolokia carries fruit and smoke notes that survive dilution — use for aroma, not heat.',
   },
   high: {
     safe: ['Bhut Jolokia', 'Naga King Chilli', 'Dalle Khursani'],
     avoid: [],
-    technique: 'Full-strength use acceptable. Handle with gloves; capsaicin transfers to skin and eyes.'
-  }
+    technique: 'Full-strength use acceptable. Handle with gloves; capsaicin transfers to skin and eyes.',
+  },
 });
 
 // ---------------------------------------------------------------------------
@@ -118,17 +118,17 @@ function curcuminAnalysis({ doseGrams = 3, curcuminPct = TURMERIC_CURCUMIN_PCT.n
     meetsTherapeuticThreshold: meetsThreshold,
     // If below threshold, say exactly what dose would reach it rather than
     // leaving the buyer to work it out.
-    doseNeededForThresholdGrams: meetsThreshold
-      ? null
-      : Math.ceil((CURCUMIN_THERAPEUTIC_MG / (pct * 10)) * 10) / 10,
+    doseNeededForThresholdGrams: meetsThreshold ?
+      null :
+      Math.ceil((CURCUMIN_THERAPEUTIC_MG / (pct * 10)) * 10) / 10,
     equivalentDose: {
       salemGrams: Math.round(equivalentGrams(TURMERIC_CURCUMIN_PCT.salem) * 10) / 10,
-      groceryGrams: Math.round(equivalentGrams(TURMERIC_CURCUMIN_PCT.grocery) * 10) / 10
+      groceryGrams: Math.round(equivalentGrams(TURMERIC_CURCUMIN_PCT.grocery) * 10) / 10,
     },
     potencyMultiple: {
       vsSalem: Math.round((pct / TURMERIC_CURCUMIN_PCT.salem) * 100) / 100,
-      vsGrocery: Math.round((pct / TURMERIC_CURCUMIN_PCT.grocery) * 100) / 100
-    }
+      vsGrocery: Math.round((pct / TURMERIC_CURCUMIN_PCT.grocery) * 100) / 100,
+    },
   };
 }
 
@@ -152,7 +152,7 @@ function chilliHeatGuidance({ tolerance = 'medium' } = {}) {
 // Special-category states attract enhanced central assistance.
 const NE_SPECIAL_CATEGORY_STATES = Object.freeze([
   'Nagaland', 'Manipur', 'Meghalaya', 'Mizoram', 'Arunachal Pradesh',
-  'Assam', 'Tripura', 'Sikkim'
+  'Assam', 'Tripura', 'Sikkim',
 ]);
 
 /**
@@ -167,7 +167,7 @@ function schemeEligibility({ applicantType, annualTurnover = 0, state = '' } = {
   const type = String(applicantType || '').toLowerCase();
   const turnover = Number(annualTurnover) || 0;
   const isNE = NE_SPECIAL_CATEGORY_STATES.some(
-    (s) => s.toLowerCase() === String(state).toLowerCase()
+    (s) => s.toLowerCase() === String(state).toLowerCase(),
   );
 
   const schemes = [];
@@ -200,7 +200,7 @@ function schemeEligibility({ applicantType, annualTurnover = 0, state = '' } = {
     schemes,
     // Never presented as a determination.
     indicative: true,
-    caveat: 'Indicative only. Eligibility is determined by the administering agency against current scheme guidelines, which change. Confirm before relying on this.'
+    caveat: 'Indicative only. Eligibility is determined by the administering agency against current scheme guidelines, which change. Confirm before relying on this.',
   };
 }
 
@@ -219,9 +219,9 @@ function emiSchedule({ principal, annualRatePct, tenureMonths } = {}) {
 
   const r = annual / 12 / 100;
   // Zero-interest is a real case (some subsidy schemes) and must not divide by zero.
-  const emi = r === 0
-    ? P / N
-    : (P * r * Math.pow(1 + r, N)) / (Math.pow(1 + r, N) - 1);
+  const emi = r === 0 ?
+    P / N :
+    (P * r * Math.pow(1 + r, N)) / (Math.pow(1 + r, N) - 1);
 
   const total = emi * N;
 
@@ -232,7 +232,7 @@ function emiSchedule({ principal, annualRatePct, tenureMonths } = {}) {
     emi: Math.round(emi),
     totalPayable: Math.round(total),
     totalInterest: Math.round(total - P),
-    interestAsPctOfPrincipal: Math.round(((total - P) / P) * 1000) / 10
+    interestAsPctOfPrincipal: Math.round(((total - P) / P) * 1000) / 10,
   };
 }
 
@@ -248,7 +248,7 @@ function emiSchedule({ principal, annualRatePct, tenureMonths } = {}) {
  * — the single most commercially load-bearing calculation recovered.
  */
 function landedCostModel({ product, volumeKg = 1 } = {}) {
-  let key = String(product || '').toLowerCase();
+  const key = String(product || '').toLowerCase();
   const c = LANDED_COSTS[key];
   if (!c) {
     throw new Error(`Unknown product "${product}". Known: ${Object.keys(LANDED_COSTS).join(', ')}`);
@@ -268,11 +268,11 @@ function landedCostModel({ product, volumeKg = 1 } = {}) {
     railFreight: c.rail,
     delhiHandling: c.ndls,
     transitLoss: c.transit,
-    admin: c.admin
+    admin: c.admin,
   };
 
   const totalCost = Object.values(breakdown).reduce((s, v) => s + v, 0);
-  let pct = (num, den) => (den === 0 ? 0 : Math.round((1 - num / den) * 100));
+  const pct = (num, den) => (den === 0 ? 0 : Math.round((1 - num / den) * 100));
 
   return {
     product: key,
@@ -281,23 +281,23 @@ function landedCostModel({ product, volumeKg = 1 } = {}) {
     breakdown,
     pricing: {
       conventional: c.sellC,
-      organic: c.sellO
+      organic: c.sellO,
     },
     margin: {
       conventionalPct: pct(totalCost, c.sellC),
-      organicPct: pct(totalCost, c.sellO)
+      organicPct: pct(totalCost, c.sellO),
     },
     // Consumer-facing saving vs quick commerce — the demand-side argument.
     consumerSavingVs: {
       bigBasketPct: pct(c.sellC, c.bb),
-      blinkitPct: pct(c.sellC, c.bl)
+      blinkitPct: pct(c.sellC, c.bl),
     },
     benchmarks: { bigBasket: c.bb, blinkit: c.bl },
     projection: {
       revenue: Math.round(volume * c.sellC * 100) / 100,
-      profit: Math.round(volume * (c.sellC - totalCost) * 100) / 100
+      profit: Math.round(volume * (c.sellC - totalCost) * 100) / 100,
     },
-    viable: c.sellC > totalCost
+    viable: c.sellC > totalCost,
   };
 }
 
@@ -342,8 +342,6 @@ module.exports = {
   landedCostModel,
   listCostedProducts,
   TURMERIC_CURCUMIN_PCT,
-  LANDED_COSTS
+  LANDED_COSTS,
 };
-
-
 

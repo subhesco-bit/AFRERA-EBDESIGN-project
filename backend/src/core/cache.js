@@ -7,10 +7,10 @@ class CacheManager {
     this.client = null;
     this.enabled = process.env.REDIS_ENABLED !== 'false';
     this.ttl = {
-      short: 300,      // 5 minutes
-      medium: 3600,    // 1 hour
-      long: 86400,     // 24 hours
-      analytics: 604800 // 7 days
+      short: 300, // 5 minutes
+      medium: 3600, // 1 hour
+      long: 86400, // 24 hours
+      analytics: 604800, // 7 days
     };
     this.init();
   }
@@ -25,7 +25,7 @@ class CacheManager {
       this.client = redis.createClient({
         host: process.env.REDIS_HOST || 'localhost',
         port: process.env.REDIS_PORT || 6379,
-        socket: { reconnectStrategy: (retries) => Math.min(retries * 50, 500) }
+        socket: { reconnectStrategy: (retries) => Math.min(retries * 50, 500) },
       });
 
       this.client.on('error', (err) => logger.error('Redis error', err));

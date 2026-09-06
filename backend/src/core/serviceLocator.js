@@ -15,7 +15,7 @@ class ServiceLocator {
       misses: 0,
       errors: 0,
       avgLoadTime: 0,
-      uniqueServices: new Set()
+      uniqueServices: new Set(),
     };
   }
 
@@ -55,7 +55,7 @@ class ServiceLocator {
    * Get service or throw user-friendly error
    */
   async getOrThrow(serviceName) {
-    let service = await this.get(serviceName);
+    const service = await this.get(serviceName);
     if (!service) {
       throw new Error(`Service '${serviceName}' could not be loaded`);
     }
@@ -68,7 +68,7 @@ class ServiceLocator {
    */
   async getMultiple(...serviceNames) {
     return Promise.all(
-      serviceNames.map(name => this.get(name))
+      serviceNames.map(name => this.get(name)),
     );
   }
 
@@ -103,7 +103,7 @@ class ServiceLocator {
    * Get all services in a subfolder
    */
   async getSubfolder(subfolder) {
-    let serviceNames = this.serviceLoader.getServicesInSubfolder(subfolder);
+    const serviceNames = this.serviceLoader.getServicesInSubfolder(subfolder);
     return this.getMultiple(...serviceNames);
   }
 
@@ -141,10 +141,10 @@ class ServiceLocator {
 
     const elapsed = Date.now() - startTime;
 
-    logger.info(`Preloaded services`, {
+    logger.info('Preloaded services', {
       loaded: loaded.length,
       failed: failed.length,
-      elapsed: `${elapsed}ms`
+      elapsed: `${elapsed}ms`,
     });
 
     return { loaded, failed, elapsed };
@@ -161,7 +161,7 @@ class ServiceLocator {
       interfaceName,
       `${interfaceName}Service`,
       `${interfaceName}Impl`,
-      interfaceName.replace(/Interface$/, 'Service')
+      interfaceName.replace(/Interface$/, 'Service'),
     ];
 
     for (const pattern of patterns) {
@@ -195,9 +195,9 @@ class ServiceLocator {
    * Get access statistics
    */
   getStats() {
-    const hitRate = this.stats.hits + this.stats.misses > 0
-      ? ((this.stats.hits / (this.stats.hits + this.stats.misses)) * 100).toFixed(2)
-      : 0;
+    const hitRate = this.stats.hits + this.stats.misses > 0 ?
+      ((this.stats.hits / (this.stats.hits + this.stats.misses)) * 100).toFixed(2) :
+      0;
 
     return {
       ...this.stats,
@@ -205,7 +205,7 @@ class ServiceLocator {
       cachedServices: this.cache.size,
       discoveredServices: this.serviceLoader.discoveredCount,
       loadedServices: this.serviceLoader.loadedCount,
-      uniqueServicesAccessed: this.stats.uniqueServices.size
+      uniqueServicesAccessed: this.stats.uniqueServices.size,
     };
   }
 
@@ -223,7 +223,7 @@ class ServiceLocator {
     this.accessLog.push({
       service: serviceName,
       timestamp: Date.now(),
-      cached: this.cache.has(serviceName)
+      cached: this.cache.has(serviceName),
     });
 
     // Keep last 10K accesses
@@ -236,7 +236,7 @@ class ServiceLocator {
    * Get access patterns (for optimization)
    */
   getAccessPatterns() {
-    let patterns = {};
+    const patterns = {};
 
     for (const access of this.accessLog) {
       patterns[access.service] = (patterns[access.service] || 0) + 1;
@@ -254,7 +254,7 @@ class ServiceLocator {
   async healthCheck() {
     const results = {
       healthy: [],
-      unhealthy: []
+      unhealthy: [],
     };
 
     for (const [name, service] of this.cache.entries()) {
@@ -280,7 +280,7 @@ class ServiceLocator {
       get: (serviceName) => this.get(serviceName),
       find: (partialName) => this.find(partialName),
       has: (serviceName) => this.has(serviceName),
-      getMetadata: (serviceName) => this.getMetadata(serviceName)
+      getMetadata: (serviceName) => this.getMetadata(serviceName),
     };
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Market Access Service
- * 
+ *
  * Wires the existing `market_access` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for market access and distribution channels
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getMarketAccess(accessId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM market_access WHERE access_id = $1`,
-      [accessId]
+      'SELECT * FROM market_access WHERE access_id = $1',
+      [accessId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Market access not found: ${accessId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get market access: ${error.message}`);
@@ -43,10 +43,10 @@ async function getMarketAccess(accessId) {
 async function getMarketAccessByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM market_access WHERE village_id = $1 ORDER BY market_type`,
-      [villageId]
+      'SELECT * FROM market_access WHERE village_id = $1 ORDER BY market_type',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get market access by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getMarketAccessByVillage(villageId) {
 async function getMarketAccessByType(marketType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM market_access WHERE market_type = $1 ORDER BY village_id`,
-      [marketType]
+      'SELECT * FROM market_access WHERE market_type = $1 ORDER BY village_id',
+      [marketType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get market access by type: ${error.message}`);
@@ -93,7 +93,7 @@ async function upsertMarketAccess(access) {
       average_selling_price,
       commission_rate,
       payment_terms,
-      last_updated
+      last_updated,
     } = access;
 
     const { rows } = await pool.query(
@@ -118,8 +118,8 @@ async function upsertMarketAccess(access) {
          last_updated = NOW()
        RETURNING *`,
       [access_id, village_id, district, market_type, market_id,
-       market_name, distance_km, transport_mode, frequency,
-       average_selling_price, commission_rate, payment_terms]
+        market_name, distance_km, transport_mode, frequency,
+        average_selling_price, commission_rate, payment_terms],
     );
 
     logger.info(`Market access upserted: ${access_id}`);
@@ -147,7 +147,7 @@ async function getVillageMarketSummary(villageId) {
        FROM market_access
        WHERE village_id = $1
        GROUP BY market_type`,
-      [villageId]
+      [villageId],
     );
 
     return {
@@ -157,8 +157,8 @@ async function getVillageMarketSummary(villageId) {
         marketCount: parseInt(row.market_count),
         avgDistanceKm: row.avg_distance_km ? r2(row.avg_distance_km) : 0,
         avgSellingPrice: row.avg_selling_price ? r2(row.avg_selling_price) : 0,
-        avgCommissionRate: row.avg_commission_rate ? r2(row.avg_commission_rate) : 0
-      }))
+        avgCommissionRate: row.avg_commission_rate ? r2(row.avg_commission_rate) : 0,
+      })),
     };
   } catch (error) {
     logger.error(`Failed to get village market summary: ${error.message}`);
@@ -193,7 +193,7 @@ function setupRoutes(app) {
 
   router.get('/access/type/:marketType', async (req, res) => {
     try {
-      let accessRecords = await getMarketAccessByType(req.params.marketType);
+      const accessRecords = await getMarketAccessByType(req.params.marketType);
       res.json({ success: true, data: accessRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -211,7 +211,7 @@ function setupRoutes(app) {
 
   router.post('/access', async (req, res) => {
     try {
-      let access = await upsertMarketAccess(req.body);
+      const access = await upsertMarketAccess(req.body);
       res.status(201).json({ success: true, data: access });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -228,8 +228,6 @@ module.exports = {
   getMarketAccessByType,
   upsertMarketAccess,
   getVillageMarketSummary,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

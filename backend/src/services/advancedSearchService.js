@@ -31,7 +31,7 @@ class AdvancedSearchService {
         rating,
         sortBy,
         page = 1,
-        limit = 20
+        limit = 20,
       } = searchParams;
 
       if (!query || typeof query !== 'string' || query.length > 200) throw new Error('query is required and must be at most 200 characters');
@@ -127,7 +127,7 @@ class AdvancedSearchService {
           page,
           limit,
           total,
-          totalPages: Math.ceil(total / limit)
+          totalPages: Math.ceil(total / limit),
         },
         filters: {
           query,
@@ -135,8 +135,8 @@ class AdvancedSearchService {
           priceRange,
           location,
           rating,
-          sortBy
-        }
+          sortBy,
+        },
       };
     } catch (error) {
       console.error('Error in advanced search:', error);
@@ -149,8 +149,8 @@ class AdvancedSearchService {
    */
   async getSearchSuggestions(query, limit = 10) {
     try {
-      let pool = await this.getPool();
-      
+      const pool = await this.getPool();
+
       const searchQuery = `
         SELECT DISTINCT name, category
         FROM products
@@ -167,22 +167,22 @@ class AdvancedSearchService {
         LIMIT $4
       `;
 
-      let result = await pool.query(searchQuery, [
+      const result = await pool.query(searchQuery, [
         `%${query}%`,
         `${query}%`,
         `%${query}%`,
-        limit
+        limit,
       ]);
 
       return {
         success: true,
-        suggestions: result.rows
+        suggestions: result.rows,
       };
     } catch (error) {
       console.error('Error getting search suggestions:', error);
       return {
         success: true,
-        suggestions: []
+        suggestions: [],
       };
     }
   }
@@ -192,8 +192,8 @@ class AdvancedSearchService {
    */
   async getPopularSearchTerms(limit = 10) {
     try {
-      let pool = await this.getPool();
-      
+      const pool = await this.getPool();
+
       const query = `
         SELECT 
           search_term,
@@ -205,17 +205,17 @@ class AdvancedSearchService {
         LIMIT $1
       `;
 
-      let result = await pool.query(query, [limit]);
+      const result = await pool.query(query, [limit]);
 
       return {
         success: true,
-        popularTerms: result.rows
+        popularTerms: result.rows,
       };
     } catch (error) {
       console.error('Error getting popular search terms:', error);
       return {
         success: true,
-        popularTerms: []
+        popularTerms: [],
       };
     }
   }
@@ -225,7 +225,7 @@ class AdvancedSearchService {
    */
   async logSearch(searchData) {
     try {
-      let pool = await this.getPool();
+      const pool = await this.getPool();
       const { userId, query, resultsCount, filters } = searchData;
 
       const logQuery = `
@@ -237,7 +237,7 @@ class AdvancedSearchService {
         userId || null,
         query,
         resultsCount,
-        JSON.stringify(filters || {})
+        JSON.stringify(filters || {}),
       ]);
     } catch (error) {
       console.error('Error logging search:', error);
@@ -249,7 +249,7 @@ class AdvancedSearchService {
    */
   async getAvailableFilters() {
     try {
-      let pool = await this.getPool();
+      const pool = await this.getPool();
 
       // Get categories
       const categoriesQuery = `
@@ -290,23 +290,23 @@ class AdvancedSearchService {
           priceRange: {
             min: parseFloat(priceResult.rows[0].min_price),
             max: parseFloat(priceResult.rows[0].max_price),
-            median: parseFloat(priceResult.rows[0].median_price)
+            median: parseFloat(priceResult.rows[0].median_price),
           },
           locations: locationsResult.rows,
           ratingOptions: [
             { value: 4, label: '4+ Stars' },
             { value: 3, label: '3+ Stars' },
             { value: 2, label: '2+ Stars' },
-            { value: 1, label: '1+ Stars' }
+            { value: 1, label: '1+ Stars' },
           ],
           sortOptions: [
             { value: 'relevance', label: 'Relevance' },
             { value: 'price_low', label: 'Price: Low to High' },
             { value: 'price_high', label: 'Price: High to Low' },
             { value: 'rating', label: 'Highest Rated' },
-            { value: 'newest', label: 'Newest' }
-          ]
-        }
+            { value: 'newest', label: 'Newest' },
+          ],
+        },
       };
     } catch (error) {
       console.error('Error getting available filters:', error);

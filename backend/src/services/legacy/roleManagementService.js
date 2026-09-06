@@ -21,20 +21,20 @@ class RoleManagementService {
   async createRole(roleData) {
     try {
       const pg = getPostgreSQL();
-      
+
       const query = `
         INSERT INTO roles (name, description, permissions, is_system_role, created_at)
         VALUES ($1, $2, $3, $4, NOW())
         RETURNING *
       `;
-      
+
       const result = await pg.query(query, [
         roleData.name,
         roleData.description,
         JSON.stringify(roleData.permissions || []),
-        roleData.is_system_role || false
+        roleData.is_system_role || false,
       ]);
-      
+
       logger.info(`Role created: ${result.rows[0].id}`);
       return result.rows[0];
     } catch (error) {
@@ -48,9 +48,9 @@ class RoleManagementService {
    */
   async getRoleById(roleId) {
     try {
-      let pg = getPostgreSQL();
-      
-      let query = `
+      const pg = getPostgreSQL();
+
+      const query = `
         SELECT r.*,
                COALESCE(json_agg(DISTINCT u.id) FILTER (WHERE u.id IS NOT NULL), '[]') as user_ids,
                COALESCE(json_agg(DISTINCT p.name) FILTER (WHERE p.name IS NOT NULL), '[]') as permissions
@@ -62,13 +62,13 @@ class RoleManagementService {
         WHERE r.id = $1
         GROUP BY r.id
       `;
-      
-      let result = await pg.query(query, [roleId]);
-      
+
+      const result = await pg.query(query, [roleId]);
+
       if (result.rows.length === 0) {
         throw new Error('Role not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       logger.error('Error getting role:', error);
@@ -81,10 +81,10 @@ class RoleManagementService {
    */
   async getRoles(filters = {}) {
     try {
-      let pg = getPostgreSQL();
-      
+      const pg = getPostgreSQL();
+
       const { is_system_role } = filters;
-      
+
       let query = `
         SELECT r.*,
                COUNT(DISTINCT ur.user_id) as user_count
@@ -92,23 +92,23 @@ class RoleManagementService {
         LEFT JOIN user_roles ur ON r.id = ur.role_id
         WHERE 1=1
       `;
-      
+
       const params = [];
       let paramCount = 0;
-      
+
       if (is_system_role !== undefined) {
         paramCount++;
         query += ` AND r.is_system_role = $${paramCount}`;
         params.push(is_system_role);
       }
-      
-      query += ` GROUP BY r.id ORDER BY r.name`;
-      
-      let result = await pg.query(query, params);
-      
+
+      query += ' GROUP BY r.id ORDER BY r.name';
+
+      const result = await pg.query(query, params);
+
       return {
         roles: result.rows,
-        total: result.rows.length
+        total: result.rows.length,
       };
     } catch (error) {
       logger.error('Error getting roles:', error);
@@ -121,13 +121,13 @@ class RoleManagementService {
    */
   async updateRole(roleId, updates) {
     try {
-      let pg = getPostgreSQL();
-      
+      const pg = getPostgreSQL();
+
       const allowedFields = ['name', 'description', 'permissions'];
       const updateFields = [];
       const values = [];
       let paramCount = 0;
-      
+
       for (const field of allowedFields) {
         if (updates[field] !== undefined) {
           paramCount++;
@@ -140,28 +140,28 @@ class RoleManagementService {
           }
         }
       }
-      
+
       if (updateFields.length === 0) {
         throw new Error('No valid fields to update');
       }
-      
+
       updateFields.push('updated_at = NOW()');
       paramCount++;
       values.push(roleId);
-      
-      let query = `
+
+      const query = `
         UPDATE roles
         SET ${updateFields.join(', ')}
         WHERE id = $${paramCount}
         RETURNING *
       `;
-      
-      let result = await pg.query(query, values);
-      
+
+      const result = await pg.query(query, values);
+
       if (result.rows.length === 0) {
         throw new Error('Role not found');
       }
-      
+
       logger.info(`Role updated: ${roleId}`);
       return result.rows[0];
     } catch (error) {
@@ -175,26 +175,26 @@ class RoleManagementService {
    */
   async deleteRole(roleId) {
     try {
-      let pg = getPostgreSQL();
-      
+      const pg = getPostgreSQL();
+
       // Check if role is system role
       const role = await this.getRoleById(roleId);
       if (role.is_system_role) {
         throw new Error('Cannot delete system role');
       }
-      
-      let query = `
+
+      const query = `
         DELETE FROM roles
         WHERE id = $1
         RETURNING *
       `;
-      
-      let result = await pg.query(query, [roleId]);
-      
+
+      const result = await pg.query(query, [roleId]);
+
       if (result.rows.length === 0) {
         throw new Error('Role not found');
       }
-      
+
       logger.info(`Role deleted: ${roleId}`);
       return result.rows[0];
     } catch (error) {
@@ -208,17 +208,17 @@ class RoleManagementService {
    */
   async assignPermission(roleId, permissionId) {
     try {
-      let pg = getPostgreSQL();
-      
-      let query = `
+      const pg = getPostgreSQL();
+
+      const query = `
         INSERT INTO role_permissions (role_id, permission_id, assigned_at)
         VALUES ($1, $2, NOW())
         ON CONFLICT (role_id, permission_id) DO NOTHING
         RETURNING *
       `;
-      
-      let result = await pg.query(query, [roleId, permissionId]);
-      
+
+      const result = await pg.query(query, [roleId, permissionId]);
+
       logger.info(`Permission ${permissionId} assigned to role ${roleId}`);
       return result.rows[0];
     } catch (error) {
@@ -232,16 +232,16 @@ class RoleManagementService {
    */
   async removePermission(roleId, permissionId) {
     try {
-      let pg = getPostgreSQL();
-      
-      let query = `
+      const pg = getPostgreSQL();
+
+      const query = `
         DELETE FROM role_permissions
         WHERE role_id = $1 AND permission_id = $2
         RETURNING *
       `;
-      
-      let result = await pg.query(query, [roleId, permissionId]);
-      
+
+      const result = await pg.query(query, [roleId, permissionId]);
+
       logger.info(`Permission ${permissionId} removed from role ${roleId}`);
       return result.rows[0];
     } catch (error) {
@@ -257,18 +257,18 @@ class RoleManagementService {
     try {
       const users = await this.getUsersWithRoles();
       const roles = await this.getRoles();
-      
+
       const optimization = await this.aiGateway.optimize('role_assignment', {
-        users: users,
-        roles: roles.roles
+        users,
+        roles: roles.roles,
       });
-      
+
       return {
         current_assignments: users,
         optimization_recommendations: optimization,
         potential_improvements: optimization.improvements || [],
         security_gains: optimization.security_gains || {},
-        efficiency_gains: optimization.efficiency_gains || {}
+        efficiency_gains: optimization.efficiency_gains || {},
       };
     } catch (error) {
       logger.error('Error optimizing role assignments:', error);
@@ -281,20 +281,20 @@ class RoleManagementService {
    */
   async analyzePermissionUsage() {
     try {
-      let roles = await this.getRoles();
+      const roles = await this.getRoles();
       const permissionUsage = await this.getPermissionUsage();
-      
+
       const analysis = await this.aiGateway.analyze('permission_usage', {
         roles: roles.roles,
-        usage: permissionUsage
+        usage: permissionUsage,
       });
-      
+
       return {
         analysis_result: analysis,
         overprivileged_roles: analysis.overprivileged || [],
         underprivileged_roles: analysis.underprivileged || [],
         unused_permissions: analysis.unused || [],
-        recommendations: analysis.recommendations || []
+        recommendations: analysis.recommendations || [],
       };
     } catch (error) {
       logger.error('Error analyzing permission usage:', error);
@@ -307,9 +307,9 @@ class RoleManagementService {
    */
   async getUsersWithRoles() {
     try {
-      let pg = getPostgreSQL();
-      
-      let query = `
+      const pg = getPostgreSQL();
+
+      const query = `
         SELECT u.id, u.name, u.email, u.role as primary_role,
                COALESCE(json_agg(DISTINCT r.name) FILTER (WHERE r.name IS NOT NULL), '[]') as roles
         FROM users u
@@ -318,9 +318,9 @@ class RoleManagementService {
         WHERE u.status = 'active'
         GROUP BY u.id
       `;
-      
-      let result = await pg.query(query);
-      
+
+      const result = await pg.query(query);
+
       return result.rows;
     } catch (error) {
       logger.error('Error getting users with roles:', error);
@@ -333,18 +333,18 @@ class RoleManagementService {
    */
   async getPermissionUsage() {
     try {
-      let pg = getPostgreSQL();
-      
-      let query = `
+      const pg = getPostgreSQL();
+
+      const query = `
         SELECT p.name, p.category, COUNT(rp.role_id) as role_count
         FROM permissions p
         LEFT JOIN role_permissions rp ON p.id = rp.permission_id
         GROUP BY p.id, p.name, p.category
         ORDER BY role_count DESC
       `;
-      
-      let result = await pg.query(query);
-      
+
+      const result = await pg.query(query);
+
       return result.rows;
     } catch (error) {
       logger.error('Error getting permission usage:', error);
@@ -357,24 +357,23 @@ class RoleManagementService {
    */
   async healthCheck() {
     try {
-      let pg = getPostgreSQL();
+      const pg = getPostgreSQL();
       await pg.query('SELECT 1 FROM roles LIMIT 1');
-      
+
       return {
         status: 'healthy',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Role management health check failed:', error);
       return {
         status: 'unhealthy',
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
 }
 
 module.exports = new RoleManagementService();
-
 

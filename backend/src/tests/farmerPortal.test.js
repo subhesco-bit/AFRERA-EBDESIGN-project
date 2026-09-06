@@ -19,13 +19,13 @@ describe.skip('Farmer Portal Enhancements', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const userResult = await pool.query(
       `INSERT INTO users (name, email, password, role) 
        VALUES ('Farmer Test', 'farmer@example.com', '$2a$10$test', 'farmer')
-       RETURNING id`
+       RETURNING id`,
     );
     testUserId = userResult.rows[0].id;
 
@@ -33,7 +33,7 @@ describe.skip('Farmer Portal Enhancements', () => {
     await pool.query(
       `INSERT INTO farmers (user_id, fdi_score) 
        VALUES ($1, 75)`,
-      [testUserId]
+      [testUserId],
     );
 
     const loginResponse = await request('http://localhost:3001')
@@ -63,7 +63,7 @@ describe.skip('Farmer Portal Enhancements', () => {
           soilType: 'alluvial',
           irrigationType: 'canal',
           ownershipType: 'own',
-          landUseType: 'cultivation'
+          landUseType: 'cultivation',
         });
 
       expect(response.status).toBe(200);
@@ -88,7 +88,7 @@ describe.skip('Farmer Portal Enhancements', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           areaInHectares: 3.0,
-          areaInAcres: 7.41
+          areaInAcres: 7.41,
         });
 
       expect(response.status).toBe(200);
@@ -109,7 +109,7 @@ describe.skip('Farmer Portal Enhancements', () => {
           plantingDate: '2026-06-15',
           expectedHarvestDate: '2026-11-15',
           estimatedYield: 4.5,
-          seedSource: 'local'
+          seedSource: 'local',
         });
 
       expect(response.status).toBe(200);
@@ -133,7 +133,7 @@ describe.skip('Farmer Portal Enhancements', () => {
         .put(`/api/v1/farmer-portal/crop-plans/${testCropPlanId}/status`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          status: 'in_progress'
+          status: 'in_progress',
         });
 
       expect(response.status).toBe(200);
@@ -159,7 +159,7 @@ describe.skip('Farmer Portal Enhancements', () => {
         .send({
           amount: 5000,
           paymentMethod: 'bank_transfer',
-          reference: 'DEP123'
+          reference: 'DEP123',
         });
 
       expect(response.status).toBe(200);

@@ -26,8 +26,8 @@ function buildModuleContract(moduleId, moduleExports, metadata = {}) {
     safety: {
       executes_commands: false,
       requires_human_approval_for_commands: true,
-      provenance_required: true
-    }
+      provenance_required: true,
+    },
   };
 }
 

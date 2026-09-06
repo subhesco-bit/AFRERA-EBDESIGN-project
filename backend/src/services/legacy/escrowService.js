@@ -23,7 +23,7 @@ async function createEscrowTransaction(escrowData) {
       amount,
       currency = 'INR',
       payment_reference,
-      release_conditions
+      release_conditions,
     } = escrowData;
 
     // Validate amount
@@ -37,7 +37,7 @@ async function createEscrowTransaction(escrowData) {
        (order_id, buyer_id, farmer_id, amount, currency, payment_reference, release_conditions, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
        RETURNING *`,
-      [order_id, buyer_id, farmer_id, amount, currency, payment_reference, JSON.stringify(release_conditions)]
+      [order_id, buyer_id, farmer_id, amount, currency, payment_reference, JSON.stringify(release_conditions)],
     );
 
     const escrow = result.rows[0];
@@ -46,7 +46,7 @@ async function createEscrowTransaction(escrowData) {
       order_id,
       amount,
       buyer_id,
-      farmer_id
+      farmer_id,
     });
 
     await client.query('COMMIT');
@@ -65,21 +65,21 @@ async function createEscrowTransaction(escrowData) {
  * Called when delivery is confirmed and conditions are met
  */
 async function releaseEscrowFunds(escrowId, releaseData) {
-  let client = await pool.connect();
+  const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
     // Get escrow transaction
     const escrowResult = await client.query(
       'SELECT * FROM escrow_transactions WHERE escrow_id = $1 FOR UPDATE',
-      [escrowId]
+      [escrowId],
     );
 
     if (escrowResult.rows.length === 0) {
       throw new Error('Escrow transaction not found');
     }
 
-    let escrow = escrowResult.rows[0];
+    const escrow = escrowResult.rows[0];
 
     // Validate status
     if (escrow.status !== 'pending') {
@@ -103,13 +103,13 @@ async function releaseEscrowFunds(escrowId, releaseData) {
            released_at = CURRENT_TIMESTAMP,
            release_data = $1
        WHERE escrow_id = $2`,
-      [JSON.stringify(releaseData), escrowId]
+      [JSON.stringify(releaseData), escrowId],
     );
 
     logger.info(`Escrow funds released: ${escrowId}`, {
       order_id: escrow.order_id,
       amount: escrow.amount,
-      farmer_id: escrow.farmer_id
+      farmer_id: escrow.farmer_id,
     });
 
     await client.query('COMMIT');
@@ -128,21 +128,21 @@ async function releaseEscrowFunds(escrowId, releaseData) {
  * Called when delivery fails or conditions are not met
  */
 async function refundEscrowFunds(escrowId, refundReason) {
-  let client = await pool.connect();
+  const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
     // Get escrow transaction
-    let escrowResult = await client.query(
+    const escrowResult = await client.query(
       'SELECT * FROM escrow_transactions WHERE escrow_id = $1 FOR UPDATE',
-      [escrowId]
+      [escrowId],
     );
 
     if (escrowResult.rows.length === 0) {
       throw new Error('Escrow transaction not found');
     }
 
-    let escrow = escrowResult.rows[0];
+    const escrow = escrowResult.rows[0];
 
     // Validate status
     if (escrow.status !== 'pending') {
@@ -156,14 +156,14 @@ async function refundEscrowFunds(escrowId, refundReason) {
            refunded_at = CURRENT_TIMESTAMP,
            refund_reason = $1
        WHERE escrow_id = $2`,
-      [refundReason, escrowId]
+      [refundReason, escrowId],
     );
 
     logger.info(`Escrow funds refunded: ${escrowId}`, {
       order_id: escrow.order_id,
       amount: escrow.amount,
       buyer_id: escrow.buyer_id,
-      reason: refundReason
+      reason: refundReason,
     });
 
     await client.query('COMMIT');
@@ -182,9 +182,9 @@ async function refundEscrowFunds(escrowId, refundReason) {
  */
 async function getEscrowTransaction(escrowId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM escrow_transactions WHERE escrow_id = $1',
-      [escrowId]
+      [escrowId],
     );
 
     if (result.rows.length === 0) {
@@ -203,9 +203,9 @@ async function getEscrowTransaction(escrowId) {
  */
 async function getEscrowByOrder(orderId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM escrow_transactions WHERE order_id = $1 ORDER BY created_at DESC',
-      [orderId]
+      [orderId],
     );
 
     return result.rows;
@@ -236,7 +236,7 @@ async function getUserEscrowTransactions(userId, role = 'all') {
 
     query += ' ORDER BY created_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting user escrow transactions', { error: error.message, userId });
@@ -268,7 +268,7 @@ function setupRoutes(app) {
   // Create escrow transaction
   app.post('/api/v1/escrow', async (req, res) => {
     try {
-      let escrow = await createEscrowTransaction(req.body);
+      const escrow = await createEscrowTransaction(req.body);
       res.json({ success: true, data: escrow });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -278,7 +278,7 @@ function setupRoutes(app) {
   // Release escrow funds
   app.post('/api/v1/escrow/:escrowId/release', async (req, res) => {
     try {
-      let result = await releaseEscrowFunds(req.params.escrowId, req.body);
+      const result = await releaseEscrowFunds(req.params.escrowId, req.body);
       res.json(result);
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -288,7 +288,7 @@ function setupRoutes(app) {
   // Refund escrow funds
   app.post('/api/v1/escrow/:escrowId/refund', async (req, res) => {
     try {
-      let result = await refundEscrowFunds(req.params.escrowId, req.body.reason);
+      const result = await refundEscrowFunds(req.params.escrowId, req.body.reason);
       res.json(result);
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -298,7 +298,7 @@ function setupRoutes(app) {
   // Get escrow transaction
   app.get('/api/v1/escrow/:escrowId', async (req, res) => {
     try {
-      let escrow = await getEscrowTransaction(req.params.escrowId);
+      const escrow = await getEscrowTransaction(req.params.escrowId);
       res.json({ success: true, data: escrow });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -319,7 +319,7 @@ function setupRoutes(app) {
   app.get('/api/v1/escrow/user/:userId', async (req, res) => {
     try {
       const role = req.query.role || 'all';
-      let escrows = await getUserEscrowTransactions(req.params.userId, role);
+      const escrows = await getUserEscrowTransactions(req.params.userId, role);
       res.json({ success: true, data: escrows });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -334,8 +334,6 @@ module.exports = {
   getEscrowTransaction,
   getEscrowByOrder,
   getUserEscrowTransactions,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

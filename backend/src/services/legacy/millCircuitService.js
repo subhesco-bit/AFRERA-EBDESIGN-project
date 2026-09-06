@@ -45,7 +45,7 @@ router.get('/mill-circuit/slots', async (req, res) => {
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const result = await pool.query(
       `SELECT * FROM mill_circuit_slots ${where} ORDER BY week_label, cluster`,
-      params
+      params,
     );
     res.json({ success: true, data: result.rows, total: result.rows.length });
   } catch (error) {
@@ -62,11 +62,11 @@ router.post('/mill-circuit/slots', authMiddleware, async (req, res) => {
       return res.status(400).json({ success: false, error: 'week_label, cluster and days are required' });
     }
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO mill_circuit_slots (week_label, cluster, days, capacity_kg, status, slot_date)
        VALUES ($1, $2, $3, $4, COALESCE($5, 'open'), $6)
        RETURNING *`,
-      [week_label, cluster, days, capacity_kg || null, status || null, slot_date || null]
+      [week_label, cluster, days, capacity_kg || null, status || null, slot_date || null],
     );
 
     res.status(201).json({ success: true, data: result.rows[0] });
@@ -92,7 +92,7 @@ router.post('/mill-circuit/bookings', authMiddleware, async (req, res) => {
 
     const slotResult = await client.query(
       'SELECT * FROM mill_circuit_slots WHERE id = $1 FOR UPDATE',
-      [slot_id]
+      [slot_id],
     );
     if (slotResult.rows.length === 0) {
       await client.query('ROLLBACK');
@@ -102,9 +102,9 @@ router.post('/mill-circuit/bookings', authMiddleware, async (req, res) => {
     const slot = slotResult.rows[0];
     const wouldExceedCapacity = slot.capacity_kg !== null &&
       Number(slot.booked_kg) + Number(quantity_kg) > Number(slot.capacity_kg);
-    const bookingStatus = (slot.status === 'closed') ? null
-      : (slot.status === 'waitlist' || wouldExceedCapacity) ? 'waitlisted'
-      : 'confirmed';
+    const bookingStatus = (slot.status === 'closed') ? null :
+      (slot.status === 'waitlist' || wouldExceedCapacity) ? 'waitlisted' :
+        'confirmed';
 
     if (bookingStatus === null) {
       await client.query('ROLLBACK');
@@ -115,13 +115,13 @@ router.post('/mill-circuit/bookings', authMiddleware, async (req, res) => {
       `INSERT INTO mill_circuit_bookings (slot_id, farmer_id, quantity_kg, status)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [slot_id, farmer_id, quantity_kg, bookingStatus]
+      [slot_id, farmer_id, quantity_kg, bookingStatus],
     );
 
     if (bookingStatus === 'confirmed') {
       await client.query(
         'UPDATE mill_circuit_slots SET booked_kg = booked_kg + $1, updated_at = NOW() WHERE id = $2',
-        [quantity_kg, slot_id]
+        [quantity_kg, slot_id],
       );
     }
 
@@ -139,19 +139,19 @@ router.post('/mill-circuit/bookings', authMiddleware, async (req, res) => {
 router.get('/mill-circuit/bookings', authMiddleware, async (req, res) => {
   try {
     const { farmer_id, slot_id } = req.query;
-    let conditions = [];
-    let params = [];
+    const conditions = [];
+    const params = [];
     if (farmer_id) { params.push(farmer_id); conditions.push(`b.farmer_id = $${params.length}`); }
     if (slot_id) { params.push(slot_id); conditions.push(`b.slot_id = $${params.length}`); }
 
-    let where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    let result = await pool.query(
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const result = await pool.query(
       `SELECT b.*, s.week_label, s.cluster, s.days
        FROM mill_circuit_bookings b
        JOIN mill_circuit_slots s ON s.id = b.slot_id
        ${where}
        ORDER BY b.created_at DESC`,
-      params
+      params,
     );
     res.json({ success: true, data: result.rows, total: result.rows.length });
   } catch (error) {
@@ -167,15 +167,15 @@ router.get('/mill-circuit/bookings', authMiddleware, async (req, res) => {
 router.get('/fpo-ledger/entries', authMiddleware, async (req, res) => {
   try {
     const { fpo_id, farmer_id } = req.query;
-    let conditions = [];
-    let params = [];
+    const conditions = [];
+    const params = [];
     if (fpo_id) { params.push(fpo_id); conditions.push(`fpo_id = $${params.length}`); }
     if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
 
-    let where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    let result = await pool.query(
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const result = await pool.query(
       `SELECT * FROM fpo_ledger_entries ${where} ORDER BY entry_date DESC, created_at DESC`,
-      params
+      params,
     );
     res.json({ success: true, data: result.rows, total: result.rows.length });
   } catch (error) {
@@ -191,12 +191,12 @@ router.post('/fpo-ledger/entries', authMiddleware, async (req, res) => {
       return res.status(400).json({ success: false, error: 'fpo_id, farmer_id and description are required' });
     }
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO fpo_ledger_entries
         (fpo_id, farmer_id, entry_date, description, quantity_kg, amount_inr, entry_type)
        VALUES ($1, $2, COALESCE($3, CURRENT_DATE), $4, $5, $6, COALESCE($7, 'credit'))
        RETURNING *`,
-      [fpo_id, farmer_id, entry_date || null, description, quantity_kg || null, amount_inr || null, entry_type || null]
+      [fpo_id, farmer_id, entry_date || null, description, quantity_kg || null, amount_inr || null, entry_type || null],
     );
 
     res.status(201).json({ success: true, data: result.rows[0] });
@@ -212,8 +212,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
-
-
 

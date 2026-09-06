@@ -12,26 +12,26 @@ const validate = (schema) => {
     const { error, value } = schema.validate(req.body, {
       abortEarly: false, // Return all errors
       stripUnknown: true, // Remove unknown fields
-      allowUnknown: false
+      allowUnknown: false,
     });
 
     if (error) {
       const errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message,
-        type: detail.type
+        type: detail.type,
       }));
 
       logger.warn('Request validation failed', {
         path: req.path,
         method: req.method,
-        errors
+        errors,
       });
 
       return res.status(400).json({
         success: false,
         error: 'Validation failed',
-        details: errors
+        details: errors,
       });
     }
 
@@ -47,26 +47,26 @@ const validateQuery = (schema) => {
     const { error, value } = schema.validate(req.query, {
       abortEarly: false,
       stripUnknown: true,
-      allowUnknown: false
+      allowUnknown: false,
     });
 
     if (error) {
-      let errors = error.details.map(detail => ({
+      const errors = error.details.map(detail => ({
         field: detail.path.join('.'),
         message: detail.message,
-        type: detail.type
+        type: detail.type,
       }));
 
       logger.warn('Query validation failed', {
         path: req.path,
         method: req.method,
-        errors
+        errors,
       });
 
       return res.status(400).json({
         success: false,
         error: 'Query validation failed',
-        details: errors
+        details: errors,
       });
     }
 
@@ -85,21 +85,21 @@ const schemas = {
     gateway: Joi.string().valid('stripe', 'razorpay', 'paytm', 'phonepe').required(),
     paymentMethod: Joi.string().valid('card', 'upi', 'netbanking', 'wallet').required(),
     description: Joi.string().max(500),
-    metadata: Joi.object()
+    metadata: Joi.object(),
   }),
 
   // Wallet validation
   wallet: Joi.object({
     userId: Joi.string().required(),
     currency: Joi.string().valid('INR', 'USD', 'EUR').default('INR'),
-    initialBalance: Joi.number().min(0).default(0)
+    initialBalance: Joi.number().min(0).default(0),
   }),
 
   addFunds: Joi.object({
     amount: Joi.number().positive().required(),
     source: Joi.string().required(),
     referenceId: Joi.string(),
-    description: Joi.string().max(500)
+    description: Joi.string().max(500),
   }),
 
   // Transaction validation
@@ -111,7 +111,7 @@ const schemas = {
     description: Joi.string().max(500),
     category: Joi.string(),
     referenceId: Joi.string(),
-    metadata: Joi.object()
+    metadata: Joi.object(),
   }),
 
   // User validation
@@ -121,13 +121,13 @@ const schemas = {
     password: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/).required(),
     phone: Joi.string().pattern(/^[+]?[\d\s-()]{10,}$/),
     firstName: Joi.string().max(50),
-    lastName: Joi.string().max(50)
+    lastName: Joi.string().max(50),
   }),
 
   // Login validation
   login: Joi.object({
     email: Joi.string().email().required(),
-    password: Joi.string().required()
+    password: Joi.string().required(),
   }),
 
   // Pagination validation
@@ -135,26 +135,26 @@ const schemas = {
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     sortBy: Joi.string(),
-    sortOrder: Joi.string().valid('asc', 'desc').default('desc')
+    sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
   }),
 
   // ID validation
   id: Joi.object({
-    id: Joi.string().required()
+    id: Joi.string().required(),
   }),
 
   // Date range validation
   dateRange: Joi.object({
     startDate: Joi.date().iso(),
-    endDate: Joi.date().iso().greater(Joi.ref('startDate'))
+    endDate: Joi.date().iso().greater(Joi.ref('startDate')),
   }),
 
   // Search validation
   search: Joi.object({
     query: Joi.string().min(2).max(100).required(),
     page: Joi.number().integer().min(1).default(1),
-    limit: Joi.number().integer().min(1).max(50).default(20)
-  })
+    limit: Joi.number().integer().min(1).max(50).default(20),
+  }),
 };
 
 // Response formatter
@@ -163,7 +163,7 @@ const formatResponse = (data, message = 'Success', statusCode = 200) => {
     success: true,
     message,
     data,
-    statusCode
+    statusCode,
   };
 };
 
@@ -172,7 +172,7 @@ const formatErrorResponse = (message, details = null, statusCode = 400) => {
   const response = {
     success: false,
     error: message,
-    statusCode
+    statusCode,
   };
 
   if (details) {
@@ -230,5 +230,5 @@ module.exports = {
   formatResponse,
   formatErrorResponse,
   sanitize,
-  sanitizeInput
+  sanitizeInput,
 };

@@ -28,14 +28,14 @@ router.post('/zones', authMiddleware, async (req, res) => {
 
 router.get('/zones', authMiddleware, async (req, res) => {
   try {
-    let data = await geofencingService.listGeofences(req.query);
+    const data = await geofencingService.listGeofences(req.query);
     res.json({ success: true, data });
   } catch (e) { fail(res, e); }
 });
 
 router.get('/zones/:id', authMiddleware, async (req, res) => {
   try {
-    let data = await geofencingService.getGeofence(req.params.id);
+    const data = await geofencingService.getGeofence(req.params.id);
     res.json({ success: true, data });
   } catch (e) { fail(res, e); }
 });
@@ -47,7 +47,7 @@ router.get('/zones/:id', authMiddleware, async (req, res) => {
 router.post('/checkins', authMiddleware, async (req, res) => {
   try {
     const { geofenceId, latitude, longitude, accuracyM } = req.body;
-    let data = await geofencingService.checkIn({
+    const data = await geofencingService.checkIn({
       geofenceId,
       userId: req.user?.id,
       userRole: req.user?.role,
@@ -61,7 +61,7 @@ router.post('/checkins', authMiddleware, async (req, res) => {
 
 router.get('/checkins', authMiddleware, async (req, res) => {
   try {
-    let data = await geofencingService.checkInHistory({
+    const data = await geofencingService.checkInHistory({
       userId: req.query.userId || req.user?.id,
       geofenceId: req.query.geofenceId,
       limit: req.query.limit,
@@ -77,7 +77,7 @@ router.get('/checkins', authMiddleware, async (req, res) => {
 router.post('/driver-zone-check', authMiddleware, async (req, res) => {
   try {
     const { geofenceId, driverId, shipmentId } = req.body;
-    let data = await geofencingService.checkDriverZoneArrival({ geofenceId, driverId, shipmentId });
+    const data = await geofencingService.checkDriverZoneArrival({ geofenceId, driverId, shipmentId });
     res.json({ success: true, data });
   } catch (e) { fail(res, e); }
 });

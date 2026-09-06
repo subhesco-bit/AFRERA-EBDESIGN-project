@@ -67,7 +67,7 @@ const errorHandler = (err, req, res, next) => {
       code: err.code,
       message: err.message,
       statusCode: err.statusCode,
-      requestId: req.id
+      requestId: req.id,
     });
 
     return res.status(err.statusCode).json({
@@ -77,8 +77,8 @@ const errorHandler = (err, req, res, next) => {
         message: err.message,
         details: err.details,
         requestId: req.id,
-        timestamp: err.timestamp
-      }
+        timestamp: err.timestamp,
+      },
     });
   }
 
@@ -86,7 +86,7 @@ const errorHandler = (err, req, res, next) => {
   logger.error('Unexpected Error', {
     error: err.message,
     stack: err.stack,
-    requestId: req.id
+    requestId: req.id,
   });
 
   res.status(500).json({
@@ -95,8 +95,8 @@ const errorHandler = (err, req, res, next) => {
       code: 'INTERNAL_SERVER_ERROR',
       message: 'An unexpected error occurred',
       requestId: req.id,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
 };
 
@@ -109,5 +109,5 @@ module.exports = {
   ConflictError,
   RateLimitError,
   ServerError,
-  errorHandler
+  errorHandler,
 };

@@ -16,19 +16,19 @@ async function createPayment(paymentData) {
       amount,
       payment_method,
       payment_status: 'processing',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const aiRequest = {
       task: 'payment_risk_assessment',
-      parameters: { payment_data: paymentData, order_data: await getOrderData(order_id) }
+      parameters: { payment_data: paymentData, order_data: await getOrderData(order_id) },
     };
     payment.risk_assessment = await aiAPI.generateRecommendation(aiRequest);
 
     const result = await pool.query(
       `INSERT INTO payments (payment_id, order_id, amount, payment_method, payment_status, payment_details, risk_assessment, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [payment.payment_id, payment.order_id, payment.amount, payment.payment_method, payment.payment_status, JSON.stringify(payment_details), JSON.stringify(payment.risk_assessment), payment.created_at]
+      [payment.payment_id, payment.order_id, payment.amount, payment.payment_method, payment.payment_status, JSON.stringify(payment_details), JSON.stringify(payment.risk_assessment), payment.created_at],
     );
 
     logger.info(`Payment created: ${payment.payment_id}`);
@@ -51,7 +51,7 @@ async function getPayment(paymentId) {
 
 async function updatePaymentStatus(paymentId, status) {
   try {
-    let res = await pool.query('UPDATE payments SET payment_status = $1, updated_at = NOW() WHERE payment_id = $2 RETURNING *', [status, paymentId]);
+    const res = await pool.query('UPDATE payments SET payment_status = $1, updated_at = NOW() WHERE payment_id = $2 RETURNING *', [status, paymentId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error updating payment status', { error: error.message });
@@ -74,7 +74,7 @@ async function updatePaymentStatus(paymentId, status) {
 async function updatePayment(paymentId, updates) {
   try {
     const { amount, payment_method, payment_details } = updates || {};
-    let res = await pool.query(
+    const res = await pool.query(
       `UPDATE payments SET
          amount = COALESCE($1, amount),
          payment_method = COALESCE($2, payment_method),
@@ -82,7 +82,7 @@ async function updatePayment(paymentId, updates) {
          updated_at = NOW()
        WHERE payment_id = $4
        RETURNING *`,
-      [amount, payment_method, payment_details ? JSON.stringify(payment_details) : null, paymentId]
+      [amount, payment_method, payment_details ? JSON.stringify(payment_details) : null, paymentId],
     );
     return res.rows[0] || null;
   } catch (error) {
@@ -93,7 +93,7 @@ async function updatePayment(paymentId, updates) {
 
 async function deletePayment(paymentId) {
   try {
-    let res = await pool.query('DELETE FROM payments WHERE payment_id = $1 RETURNING payment_id', [paymentId]);
+    const res = await pool.query('DELETE FROM payments WHERE payment_id = $1 RETURNING payment_id', [paymentId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error deleting payment', { error: error.message });
@@ -109,12 +109,12 @@ async function refundPayment(paymentId, amount, reason) {
       amount,
       reason,
       status: 'processing',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
-      `INSERT INTO refunds (refund_id, payment_id, amount, reason, status, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [refund.refund_id, refund.payment_id, refund.amount, refund.reason, refund.status, refund.created_at]
+    const result = await pool.query(
+      'INSERT INTO refunds (refund_id, payment_id, amount, reason, status, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [refund.refund_id, refund.payment_id, refund.amount, refund.reason, refund.status, refund.created_at],
     );
 
     await updatePaymentStatus(paymentId, 'refunded');
@@ -130,7 +130,7 @@ function generateId() {
 }
 
 async function getOrderData(orderId) {
-  let res = await pool.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
+  const res = await pool.query('SELECT * FROM orders WHERE order_id = $1', [orderId]);
   return res.rows[0] || {};
 }
 

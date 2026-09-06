@@ -20,12 +20,12 @@ class MFAService {
     const secret = speakeasy.generateSecret({
       length: this.secretLength,
       name: `AFRERA-${userId}`,
-      issuer: 'AFRERA Platform'
+      issuer: 'AFRERA Platform',
     });
-    
+
     return {
       secret: secret.base32,
-      otpauth_url: secret.otpauth_url
+      otpauth_url: secret.otpauth_url,
     };
   }
 
@@ -47,11 +47,11 @@ class MFAService {
   verifyToken(secret, token) {
     try {
       const verified = speakeasy.totp.verify({
-        secret: secret,
+        secret,
         encoding: 'base32',
-        token: token
+        token,
       });
-      
+
       return verified;
     } catch (error) {
       console.error('Error verifying TOTP:', error);
@@ -67,7 +67,7 @@ class MFAService {
     for (let i = 0; i < 10; i++) {
       codes.push(this.generateBackupCode());
     }
-    
+
     return codes;
   }
 
@@ -90,17 +90,17 @@ class MFAService {
     try {
       const client = new twilio(
         process.env.TWILIO_ACCOUNT_SID,
-        process.env.TWILIO_AUTH_TOKEN
+        process.env.TWILIO_AUTH_TOKEN,
       );
-      
+
       const message = `Your AFRERA backup code is: ${code}. Do not share this code with anyone.`;
-      
+
       await client.messages.create({
         body: message,
         from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber
+        to: phoneNumber,
       });
-      
+
       return true;
     } catch (error) {
       console.error('Error sending SMS:', error);
@@ -120,7 +120,7 @@ class MFAService {
       phoneNumber,
       backupCodes,
       enabled: true,
-      enabledAt: new Date()
+      enabledAt: new Date(),
     };
   }
 
@@ -132,7 +132,7 @@ class MFAService {
     return {
       userId,
       enabled: false,
-      disabledAt: new Date()
+      disabledAt: new Date(),
     };
   }
 

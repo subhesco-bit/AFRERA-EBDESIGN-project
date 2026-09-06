@@ -48,7 +48,7 @@ router.post('/tenders', authLimiter, authMiddleware, async (req, res) => {
       evaluation_criteria,
       documents_required,
       status,
-      created_by
+      created_by,
     } = req.body;
 
     const result = await pool.query(
@@ -68,8 +68,8 @@ router.post('/tenders', authLimiter, authMiddleware, async (req, res) => {
         financial_evaluation_date, award_date, contract_duration,
         JSON.stringify(delivery_schedule), JSON.stringify(payment_terms),
         JSON.stringify(eligibility_criteria), JSON.stringify(evaluation_criteria),
-        JSON.stringify(documents_required), status, created_by
-      ]
+        JSON.stringify(documents_required), status, created_by,
+      ],
     );
 
     logger.info(`Tender created: ${result.rows[0].id}`);
@@ -86,7 +86,7 @@ router.post('/tenders', authLimiter, authMiddleware, async (req, res) => {
 router.get('/tenders', authMiddleware, async (req, res) => {
   try {
     const { institution_id, tender_type, status, procurement_category } = req.query;
-    
+
     let query = 'SELECT * FROM procurement_tenders WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -115,7 +115,7 @@ router.get('/tenders', authMiddleware, async (req, res) => {
       params.push(procurement_category);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get tenders error', { error: error.message, stack: error.stack });
@@ -136,10 +136,10 @@ router.post('/tenders/:id/bids', authLimiter, authMiddleware, async (req, res) =
       documents_submitted,
       bid_security_provided,
       proposed_delivery_schedule,
-      proposed_payment_terms
+      proposed_payment_terms,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO tender_bids 
        (tender_id, supplier_id, bid_amount, technical_proposal, financial_proposal, 
         documents_submitted, bid_security_provided, proposed_delivery_schedule, 
@@ -150,8 +150,8 @@ router.post('/tenders/:id/bids', authLimiter, authMiddleware, async (req, res) =
         req.params.id, req.user.id, bid_amount, JSON.stringify(technical_proposal),
         JSON.stringify(financial_proposal), JSON.stringify(documents_submitted),
         bid_security_provided, JSON.stringify(proposed_delivery_schedule),
-        JSON.stringify(proposed_payment_terms)
-      ]
+        JSON.stringify(proposed_payment_terms),
+      ],
     );
 
     logger.info(`Bid submitted for tender ${req.params.id}`);
@@ -184,10 +184,10 @@ router.post('/demand-forecast', authLimiter, authMiddleware, async (req, res) =>
       budget_constraints,
       forecast_method,
       confidence_level,
-      generated_by
+      generated_by,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO demand_forecasts 
        (institution_id, forecast_period, forecast_type, product_category, 
         historical_data, seasonal_factors, special_events, enrollment_data, 
@@ -200,8 +200,8 @@ router.post('/demand-forecast', authLimiter, authMiddleware, async (req, res) =>
         JSON.stringify(historical_data), JSON.stringify(seasonal_factors),
         JSON.stringify(special_events), JSON.stringify(enrollment_data),
         JSON.stringify(menu_requirements), JSON.stringify(budget_constraints),
-        forecast_method, confidence_level, generated_by
-      ]
+        forecast_method, confidence_level, generated_by,
+      ],
     );
 
     logger.info(`Demand forecast created: ${result.rows[0].id}`);
@@ -218,9 +218,9 @@ router.post('/demand-forecast', authLimiter, authMiddleware, async (req, res) =>
 router.get('/demand-forecast', authMiddleware, async (req, res) => {
   try {
     const { institution_id, forecast_type, product_category } = req.query;
-    
+
     let query = 'SELECT * FROM demand_forecasts WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (institution_id) {
@@ -241,7 +241,7 @@ router.get('/demand-forecast', authMiddleware, async (req, res) => {
       params.push(product_category);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get demand forecasts error', { error: error.message, stack: error.stack });
@@ -277,10 +277,10 @@ router.post('/menu-plans', authLimiter, authMiddleware, async (req, res) => {
       preparation_instructions,
       allergen_information,
       approved_by,
-      status
+      status,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO menu_plans 
        (institution_id, plan_name, plan_type, start_date, end_date, meal_types, 
         target_demographics, nutritional_requirements, budget_per_meal, 
@@ -297,8 +297,8 @@ router.post('/menu-plans', authLimiter, authMiddleware, async (req, res) => {
         JSON.stringify(local_sourcing_requirements), JSON.stringify(menu_items),
         JSON.stringify(ingredients_list), JSON.stringify(portion_sizes),
         JSON.stringify(preparation_instructions), JSON.stringify(allergen_information),
-        approved_by, status
-      ]
+        approved_by, status,
+      ],
     );
 
     logger.info(`Menu plan created: ${result.rows[0].id}`);
@@ -315,9 +315,9 @@ router.post('/menu-plans', authLimiter, authMiddleware, async (req, res) => {
 router.get('/menu-plans', authMiddleware, async (req, res) => {
   try {
     const { institution_id, plan_type, status, start_date, end_date } = req.query;
-    
+
     let query = 'SELECT * FROM menu_plans WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (institution_id) {
@@ -350,7 +350,7 @@ router.get('/menu-plans', authMiddleware, async (req, res) => {
       params.push(end_date);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get menu plans error', { error: error.message, stack: error.stack });
@@ -378,10 +378,10 @@ router.post('/nutrition-compliance', authLimiter, authMiddleware, async (req, re
       compliance_score,
       assessed_by,
       assessment_date,
-      next_assessment_date
+      next_assessment_date,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO nutrition_compliance 
        (institution_id, compliance_type, compliance_period, nutritional_standards, 
         actual_achievement, deficiencies, corrective_actions, compliance_score, 
@@ -392,8 +392,8 @@ router.post('/nutrition-compliance', authLimiter, authMiddleware, async (req, re
         institution_id, compliance_type, compliance_period,
         JSON.stringify(nutritional_standards), JSON.stringify(actual_achievement),
         JSON.stringify(deficiencies), JSON.stringify(corrective_actions),
-        compliance_score, assessed_by, assessment_date, next_assessment_date
-      ]
+        compliance_score, assessed_by, assessment_date, next_assessment_date,
+      ],
     );
 
     logger.info(`Nutrition compliance record created: ${result.rows[0].id}`);
@@ -410,9 +410,9 @@ router.post('/nutrition-compliance', authLimiter, authMiddleware, async (req, re
 router.get('/nutrition-compliance', authMiddleware, async (req, res) => {
   try {
     const { institution_id, compliance_type, assessment_date } = req.query;
-    
+
     let query = 'SELECT * FROM nutrition_compliance WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (institution_id) {
@@ -433,7 +433,7 @@ router.get('/nutrition-compliance', authMiddleware, async (req, res) => {
       params.push(assessment_date);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get nutrition compliance records error', { error: error.message, stack: error.stack });
@@ -469,10 +469,10 @@ router.post('/contracts', authLimiter, authMiddleware, async (req, res) => {
       termination_conditions,
       special_conditions,
       status,
-      signed_by
+      signed_by,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO supply_contracts 
        (contract_number, institution_id, supplier_id, contract_type, tender_id, 
         start_date, end_date, contract_value, products_supplied, delivery_schedule, 
@@ -487,8 +487,8 @@ router.post('/contracts', authLimiter, authMiddleware, async (req, res) => {
         JSON.stringify(delivery_schedule), JSON.stringify(quality_standards),
         JSON.stringify(payment_terms), JSON.stringify(penalty_clauses),
         force_majeure, JSON.stringify(renewal_terms), JSON.stringify(termination_conditions),
-        JSON.stringify(special_conditions), status, signed_by
-      ]
+        JSON.stringify(special_conditions), status, signed_by,
+      ],
     );
 
     logger.info(`Supply contract created: ${result.rows[0].id}`);
@@ -505,9 +505,9 @@ router.post('/contracts', authLimiter, authMiddleware, async (req, res) => {
 router.get('/contracts', authMiddleware, async (req, res) => {
   try {
     const { institution_id, supplier_id, contract_type, status } = req.query;
-    
+
     let query = 'SELECT * FROM supply_contracts WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (institution_id) {
@@ -534,7 +534,7 @@ router.get('/contracts', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get supply contracts error', { error: error.message, stack: error.stack });
@@ -568,10 +568,10 @@ router.post('/quality-inspections', authLimiter, authMiddleware, async (req, res
       non_conformities,
       corrective_actions_required,
       approval_status,
-      notes
+      notes,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO quality_inspections 
        (inspection_number, contract_id, shipment_id, inspection_type, inspection_date, 
         inspector_id, inspection_location, sample_size, inspection_criteria, test_results, 
@@ -584,8 +584,8 @@ router.post('/quality-inspections', authLimiter, authMiddleware, async (req, res
         inspector_id, inspection_location, sample_size, JSON.stringify(inspection_criteria),
         JSON.stringify(test_results), quality_score, pass_fail, JSON.stringify(defects_found),
         JSON.stringify(non_conformities), JSON.stringify(corrective_actions_required),
-        approval_status, notes
-      ]
+        approval_status, notes,
+      ],
     );
 
     logger.info(`Quality inspection created: ${result.rows[0].id}`);
@@ -602,9 +602,9 @@ router.post('/quality-inspections', authLimiter, authMiddleware, async (req, res
 router.get('/quality-inspections', authMiddleware, async (req, res) => {
   try {
     const { contract_id, shipment_id, inspection_type, approval_status } = req.query;
-    
+
     let query = 'SELECT * FROM quality_inspections WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (contract_id) {
@@ -631,7 +631,7 @@ router.get('/quality-inspections', authMiddleware, async (req, res) => {
       params.push(approval_status);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get quality inspections error', { error: error.message, stack: error.stack });
@@ -663,10 +663,10 @@ router.post('/settlements', authLimiter, authMiddleware, async (req, res) => {
       payment_reference,
       settled_by,
       approved_by,
-      notes
+      notes,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO settlement_records 
        (settlement_number, contract_id, invoice_id, settlement_type, settlement_date, 
         amount_due, amount_paid, deductions, penalties, bonuses, payment_method, 
@@ -676,8 +676,8 @@ router.post('/settlements', authLimiter, authMiddleware, async (req, res) => {
       [
         settlement_number, contract_id, invoice_id, settlement_type, settlement_date,
         amount_due, amount_paid, JSON.stringify(deductions), JSON.stringify(penalties),
-        JSON.stringify(bonuses), payment_method, payment_reference, settled_by, approved_by, notes
-      ]
+        JSON.stringify(bonuses), payment_method, payment_reference, settled_by, approved_by, notes,
+      ],
     );
 
     logger.info(`Settlement record created: ${result.rows[0].id}`);
@@ -694,9 +694,9 @@ router.post('/settlements', authLimiter, authMiddleware, async (req, res) => {
 router.get('/settlements', authMiddleware, async (req, res) => {
   try {
     const { contract_id, invoice_id, settlement_type, status } = req.query;
-    
+
     let query = 'SELECT * FROM settlement_records WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (contract_id) {
@@ -723,7 +723,7 @@ router.get('/settlements', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get settlement records error', { error: error.message, stack: error.stack });
@@ -802,7 +802,7 @@ router.post('/contract-offers', authLimiter, authMiddleware, async (req, res) =>
   try {
     const {
       farmer_id, crop, institution_id, offered_price_inr_per_kg, quantity_kg,
-      delivery_schedule, payment_terms, special_conditions
+      delivery_schedule, payment_terms, special_conditions,
     } = req.body;
 
     if (!farmer_id || !crop || !offered_price_inr_per_kg || !quantity_kg) {
@@ -812,7 +812,7 @@ router.post('/contract-offers', authLimiter, authMiddleware, async (req, res) =>
     const readiness = await pool.query(
       `SELECT map_price_inr_per_kg FROM farmer_contract_readiness
        WHERE farmer_id = $1 AND crop = $2`,
-      [farmer_id, crop]
+      [farmer_id, crop],
     );
 
     const mapPrice = readiness.rows[0] ? readiness.rows[0].map_price_inr_per_kg : null;
@@ -824,11 +824,11 @@ router.post('/contract-offers', authLimiter, authMiddleware, async (req, res) =>
       logger.info(`Contract offer below MAP rejected for farmer ${farmer_id}/${crop}`);
       return res.status(422).json({
         error: 'Offer rejected: below the farmer\'s protected floor price. It was not delivered to the farmer.',
-        status: 'rejected_below_map'
+        status: 'rejected_below_map',
       });
     }
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO contract_offers
         (offer_number, farmer_id, crop, institution_id, offered_price_inr_per_kg,
          quantity_kg, delivery_schedule, payment_terms, special_conditions, status)
@@ -839,8 +839,8 @@ router.post('/contract-offers', authLimiter, authMiddleware, async (req, res) =>
         generateOfferNumber(), farmer_id, crop, institution_id || null,
         offered_price_inr_per_kg, quantity_kg,
         JSON.stringify(delivery_schedule || null), JSON.stringify(payment_terms || null),
-        JSON.stringify(special_conditions || null)
-      ]
+        JSON.stringify(special_conditions || null),
+      ],
     );
 
     logger.info(`Contract offer created: ${result.rows[0].offer_number}`);
@@ -859,20 +859,20 @@ router.get('/contract-offers', authMiddleware, async (req, res) => {
   try {
     const { farmer_id, crop, status } = req.query;
     const conditions = [];
-    let params = [];
+    const params = [];
 
     if (farmer_id) { params.push(farmer_id); conditions.push(`farmer_id = $${params.length}`); }
     if (crop) { params.push(crop); conditions.push(`crop = $${params.length}`); }
     if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT id, offer_number, farmer_id, crop, institution_id, offered_price_inr_per_kg,
               quantity_kg, delivery_schedule, payment_terms, special_conditions, status,
               created_at, updated_at
        FROM contract_offers ${where}
        ORDER BY created_at DESC`,
-      params
+      params,
     );
     res.json(result.rows);
   } catch (error) {
@@ -891,11 +891,11 @@ router.put('/contract-offers/:id', authMiddleware, requireRole(...PROCUREMENT_RO
       return res.status(400).json({ error: 'status must be one of accepted, declined, withdrawn' });
     }
 
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE contract_offers SET status = $1, updated_at = NOW()
        WHERE id = $2
        RETURNING id, offer_number, farmer_id, crop, status, updated_at`,
-      [status, req.params.id]
+      [status, req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -916,9 +916,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
-
-
-
 

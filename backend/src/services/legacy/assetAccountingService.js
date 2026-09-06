@@ -66,7 +66,7 @@ class AssetAccountingService {
         companyId, assetCode, assetName, assetClass,
         acquisitionDate, acquisitionCost, salvageValue = 0,
         usefulLifeMonths, depreciationMethod = 'straight_line',
-        costCenterId, branchId
+        costCenterId, branchId,
       } = assetData;
 
       if (!companyId) throw new Error('companyId is required');
@@ -94,7 +94,7 @@ class AssetAccountingService {
       const result = await this.pool.query(query, [
         companyId, assetCode, assetName, assetClass || null, acquisitionDate,
         acquisitionCost, salvageValue, usefulLifeMonths, depreciationMethod,
-        costCenterId || null, branchId || null
+        costCenterId || null, branchId || null,
       ]);
 
       logger.info(`Fixed asset created: ${result.rows[0].id} (${assetCode})`);
@@ -133,7 +133,7 @@ class AssetAccountingService {
 
       query += ' ORDER BY asset_code ASC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting fixed assets', { error: error.message, stack: error.stack });
@@ -143,7 +143,7 @@ class AssetAccountingService {
 
   async getAsset(assetId) {
     try {
-      let result = await this.pool.query('SELECT * FROM fixed_assets WHERE id = $1', [assetId]);
+      const result = await this.pool.query('SELECT * FROM fixed_assets WHERE id = $1', [assetId]);
       if (result.rows.length === 0) throw new Error('Fixed asset not found');
       return result.rows[0];
     } catch (error) {
@@ -171,18 +171,18 @@ class AssetAccountingService {
         throw new Error(
           `generateDepreciationSchedule does not yet compute "${asset.depreciation_method}" — ` +
           `only ${SUPPORTED_METHODS.join(', ')} is implemented. Declining-balance and ` +
-          'units-of-production need a rate/usage input this schema does not yet carry.'
+          'units-of-production need a rate/usage input this schema does not yet carry.',
         );
       }
 
       const existing = await this.pool.query(
         'SELECT COUNT(*)::int AS n FROM depreciation_schedule WHERE fixed_asset_id = $1',
-        [assetId]
+        [assetId],
       );
       if ((existing.rows[0]?.n || 0) > 0) {
         throw new Error(
           `Asset ${assetId} already has a depreciation schedule (${existing.rows[0].n} period(s)). ` +
-          'Use getDepreciationSchedule to view it.'
+          'Use getDepreciationSchedule to view it.',
         );
       }
 
@@ -206,7 +206,7 @@ class AssetAccountingService {
              VALUES ($1, $2, $3, $4)
              ON CONFLICT (fixed_asset_id, period_date) DO NOTHING
              RETURNING *`,
-            [assetId, periodDate, amount, accumulated]
+            [assetId, periodDate, amount, accumulated],
           );
           if (insertedRows[0]) inserted.push(insertedRows[0]);
         }
@@ -223,9 +223,9 @@ class AssetAccountingService {
 
   async getDepreciationSchedule(assetId) {
     try {
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         'SELECT * FROM depreciation_schedule WHERE fixed_asset_id = $1 ORDER BY period_date ASC',
-        [assetId]
+        [assetId],
       );
       return result.rows;
     } catch (error) {
@@ -242,12 +242,12 @@ class AssetAccountingService {
    */
   async postDepreciationPeriod(assetId, periodDate) {
     try {
-      let result = await withTransaction(async (client) => {
+      const result = await withTransaction(async (client) => {
         const { rows: due } = await client.query(
           `SELECT * FROM depreciation_schedule
            WHERE fixed_asset_id = $1 AND period_date = $2 AND is_posted = FALSE
            FOR UPDATE`,
-          [assetId, periodDate]
+          [assetId, periodDate],
         );
         if (due.length === 0) {
           throw new Error(`No unposted depreciation period ${periodDate} for asset ${assetId}`);
@@ -256,12 +256,12 @@ class AssetAccountingService {
 
         const { rows: postedRows } = await client.query(
           'UPDATE depreciation_schedule SET is_posted = TRUE WHERE id = $1 RETURNING *',
-          [period.id]
+          [period.id],
         );
 
         const { rows: assetRows } = await client.query(
-          `UPDATE fixed_assets SET accumulated_depreciation = $1 WHERE id = $2 RETURNING *`,
-          [period.accumulated_after, assetId]
+          'UPDATE fixed_assets SET accumulated_depreciation = $1 WHERE id = $2 RETURNING *',
+          [period.accumulated_after, assetId],
         );
         if (assetRows.length === 0) throw new Error('Fixed asset not found during posting');
 
@@ -294,7 +294,7 @@ class AssetAccountingService {
          WHERE fa.company_id = $1 AND fa.status = 'active'
            AND ds.is_posted = FALSE AND ds.period_date <= $2
          ORDER BY ds.fixed_asset_id, ds.period_date ASC`,
-        [companyId, asOfDate]
+        [companyId, asOfDate],
       );
 
       const results = [];
@@ -329,24 +329,24 @@ class AssetAccountingService {
       if (!disposalDate) throw new Error('disposalDate is required');
       if (!(Number(disposalAmount) >= 0)) throw new Error('disposalAmount must be >= 0');
 
-      let asset = await this.getAsset(assetId);
+      const asset = await this.getAsset(assetId);
       if (asset.status === 'disposed') throw new Error('Asset is already disposed');
 
       // net_book_value is a GENERATED column (acquisition_cost -
       // accumulated_depreciation); computed here too rather than trusted
       // blindly, so this is correct even against a row fetched from
       // somewhere that does not evaluate generated columns.
-      const netBookValue = asset.net_book_value !== undefined && asset.net_book_value !== null
-        ? Number(asset.net_book_value)
-        : r4(Number(asset.acquisition_cost) - Number(asset.accumulated_depreciation || 0));
+      const netBookValue = asset.net_book_value !== undefined && asset.net_book_value !== null ?
+        Number(asset.net_book_value) :
+        r4(Number(asset.acquisition_cost) - Number(asset.accumulated_depreciation || 0));
       const gainLoss = r4(Number(disposalAmount) - netBookValue);
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `UPDATE fixed_assets
          SET status = 'disposed', disposal_date = $1, disposal_amount = $2
          WHERE id = $3
          RETURNING *`,
-        [disposalDate, disposalAmount, assetId]
+        [disposalDate, disposalAmount, assetId],
       );
 
       logger.info(`Asset ${assetId} disposed: NBV ${netBookValue}, proceeds ${disposalAmount}, ${gainLoss >= 0 ? 'gain' : 'loss'} ${Math.abs(gainLoss)}`);
@@ -364,7 +364,7 @@ class AssetAccountingService {
   async getAssetRegisterSummary(companyId) {
     try {
       if (!companyId) throw new Error('companyId is required');
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `SELECT
            asset_class,
            status,
@@ -376,7 +376,7 @@ class AssetAccountingService {
          WHERE company_id = $1
          GROUP BY asset_class, status
          ORDER BY asset_class, status`,
-        [companyId]
+        [companyId],
       );
       return result.rows;
     } catch (error) {
@@ -390,10 +390,8 @@ module.exports = new AssetAccountingService();
 
 // Merged from backend/src/modules/M110 - 1 name(s) collided and were aliased
 {
-  const m110 = require("../../modules/M110/service");
+  const m110 = require('../../modules/M110/service');
   const { getAsset: getAssetFromBE110, ...rest } = m110;
   Object.assign(module.exports, rest, { getAssetFromBE110 });
 }
-
-
 

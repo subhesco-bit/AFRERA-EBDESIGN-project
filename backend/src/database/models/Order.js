@@ -116,7 +116,7 @@ Order.init({
     },
     {
       fields: ['user_id'],
- },
+    },
     {
       fields: ['status'],
     },

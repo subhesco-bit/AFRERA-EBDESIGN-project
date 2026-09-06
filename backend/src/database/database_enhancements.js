@@ -23,10 +23,10 @@ class DatabaseEnhancements {
       enableSecurity: config.enableSecurity !== false,
       enableBackup: config.enableBackup !== false,
       enableOptimization: config.enableOptimization !== false,
-      
+
       // Global configuration
       environment: config.environment || process.env.NODE_ENV || 'development',
-      
+
       // Individual configurations
       poolConfig: config.poolConfig || {},
       cacheConfig: config.cacheConfig || {},
@@ -35,8 +35,8 @@ class DatabaseEnhancements {
       securityConfig: config.securityConfig || {},
       backupConfig: config.backupConfig || {},
       optimizationConfig: config.optimizationConfig || {},
-      
-      ...config
+
+      ...config,
     };
 
     this.components = {
@@ -46,7 +46,7 @@ class DatabaseEnhancements {
       monitor: null,
       security: null,
       backupManager: null,
-      optimizer: null
+      optimizer: null,
     };
 
     this.isInitialized = false;
@@ -65,7 +65,7 @@ class DatabaseEnhancements {
     logger.info('Initializing database enhancements...', {
       environment: this.config.environment,
       components: Object.keys(this.config)
-        .filter(key => key.startsWith('enable') && this.config[key])
+        .filter(key => key.startsWith('enable') && this.config[key]),
     });
 
     try {
@@ -112,12 +112,12 @@ class DatabaseEnhancements {
         logger.info('Initializing backup manager...');
         this.components.backupManager = new BackupManager(this.config.backupConfig);
         await this.components.backupManager.initialize();
-        
+
         // Start scheduled backups in production
         if (this.config.environment === 'production') {
           this.components.backupManager.startScheduledBackups();
         }
-        
+
         logger.info('Backup manager initialized');
       }
 
@@ -220,9 +220,9 @@ class DatabaseEnhancements {
         const validation = this.components.security.validateQuery(
           query,
           options.userId,
-          options.ipAddress
+          options.ipAddress,
         );
-        
+
         if (!validation.valid) {
           throw new Error(`Query validation failed: ${validation.reason}`);
         }
@@ -263,7 +263,7 @@ class DatabaseEnhancements {
           Date.now() - startTime,
           true,
           null,
-          { userId: options.userId, sessionId: options.sessionId }
+          { userId: options.userId, sessionId: options.sessionId },
         );
       }
 
@@ -276,7 +276,7 @@ class DatabaseEnhancements {
           Date.now() - startTime,
           false,
           error,
-          { userId: options.userId, sessionId: options.sessionId }
+          { userId: options.userId, sessionId: options.sessionId },
         );
       }
 
@@ -289,7 +289,7 @@ class DatabaseEnhancements {
    */
   async executeTransaction(callback, options = {}) {
     const transactionManager = this.getTransactionManager();
-    
+
     return transactionManager.executeInTransactionWithRetry(async (transaction) => {
       // Set user context for RLS
       if (this.components.security && options.userId) {
@@ -297,7 +297,7 @@ class DatabaseEnhancements {
       }
 
       try {
-        let result = await callback(transaction);
+        const result = await callback(transaction);
         return result;
       } finally {
         // Clear user context
@@ -315,7 +315,7 @@ class DatabaseEnhancements {
     const status = {
       healthy: true,
       components: {},
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     // Check pool health
@@ -341,14 +341,14 @@ class DatabaseEnhancements {
     // Check monitor status
     if (this.components.monitor) {
       status.components.monitor = {
-        metrics: this.components.monitor.getMetrics()
+        metrics: this.components.monitor.getMetrics(),
       };
     }
 
     // Check security status
     if (this.components.security) {
       status.components.security = {
-        initialized: this.components.security.isInitialized
+        initialized: this.components.security.isInitialized,
       };
     }
 
@@ -357,7 +357,7 @@ class DatabaseEnhancements {
       const backups = await this.components.backupManager.listBackups();
       status.components.backup = {
         totalBackups: backups.length,
-        lastBackup: backups.length > 0 ? backups[0].created : null
+        lastBackup: backups.length > 0 ? backups[0].created : null,
       };
     }
 
@@ -370,7 +370,7 @@ class DatabaseEnhancements {
   async getMetrics() {
     const metrics = {
       timestamp: new Date(),
-      components: {}
+      components: {},
     };
 
     if (this.components.pool) {
@@ -391,7 +391,7 @@ class DatabaseEnhancements {
 
     if (this.components.optimizer) {
       metrics.components.optimizer = {
-        slowQueries: await this.components.optimizer.getSlowQueries(10)
+        slowQueries: await this.components.optimizer.getSlowQueries(10),
       };
     }
 
@@ -440,7 +440,7 @@ class DatabaseEnhancements {
       }},
       { name: 'pool', shutdown: async () => {
         await shutdownConnectionPool();
-      }}
+      }},
     ];
 
     for (const component of shutdownOrder) {
@@ -487,7 +487,7 @@ class DatabaseEnhancements {
     }
 
     const results = await Promise.allSettled(tasks);
-    
+
     const successful = results.filter(r => r.status === 'fulfilled').length;
     const failed = results.filter(r => r.status === 'rejected').length;
 
@@ -532,5 +532,5 @@ module.exports = {
   DatabaseEnhancements,
   getDatabaseEnhancements,
   initializeDatabaseEnhancements,
-  shutdownDatabaseEnhancements
+  shutdownDatabaseEnhancements,
 };

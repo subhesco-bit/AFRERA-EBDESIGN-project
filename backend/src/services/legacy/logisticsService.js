@@ -15,9 +15,9 @@ const decisionSupportService = require('./decisionSupportService');
 async function createShipment(shipmentData) {
   try {
     const pg = getPostgreSQL();
-    
+
     const shipmentNumber = generateShipmentNumber();
-    
+
     const query = `
       INSERT INTO shipments (shipment_number, order_id, mode_id, origin_address, destination_address,
                            origin_lat, origin_lng, dest_lat, dest_lng, weight_kg, volume_cbm,
@@ -25,7 +25,7 @@ async function createShipment(shipmentData) {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       RETURNING *
     `;
-    
+
     const result = await pg.query(query, [
       shipmentNumber,
       shipmentData.order_id,
@@ -41,11 +41,11 @@ async function createShipment(shipmentData) {
       shipmentData.is_perishable || false,
       shipmentData.temperature_requirement || null,
       shipmentData.estimated_cost || null,
-      shipmentData.estimated_transit_days || null
+      shipmentData.estimated_transit_days || null,
     ]);
-    
+
     logger.info(`Shipment created: ${shipmentNumber}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error creating shipment', { error: error.message, stack: error.stack });
@@ -58,9 +58,9 @@ async function createShipment(shipmentData) {
  */
 async function getShipmentById(shipmentId) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       SELECT s.*, sm.name as mode_name, sm.code as mode_code, sm.transit_days as base_transit_days,
              o.order_number
       FROM shipments s
@@ -68,13 +68,13 @@ async function getShipmentById(shipmentId) {
       LEFT JOIN orders o ON s.order_id = o.id
       WHERE s.id = $1
     `;
-    
-    let result = await pg.query(query, [shipmentId]);
-    
+
+    const result = await pg.query(query, [shipmentId]);
+
     if (result.rows.length === 0) {
       throw new Error('Shipment not found');
     }
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error fetching shipment', { error: error.message, stack: error.stack });
@@ -87,13 +87,13 @@ async function getShipmentById(shipmentId) {
  */
 async function getShipments(filters = {}, pagination = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     const { order_id, status, mode_id } = filters;
     const { page = 1, limit = 20, sort_by = 'created_at', sort_order = 'DESC' } = pagination;
-    
+
     const offset = (page - 1) * limit;
-    
+
     let query = `
       SELECT s.*, sm.name as mode_name, o.order_number
       FROM shipments s
@@ -101,45 +101,45 @@ async function getShipments(filters = {}, pagination = {}) {
       LEFT JOIN orders o ON s.order_id = o.id
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramCount = 0;
-    
+
     if (order_id) {
       paramCount++;
       query += ` AND s.order_id = $${paramCount}`;
       params.push(order_id);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND s.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     if (mode_id) {
       paramCount++;
       query += ` AND s.mode_id = $${paramCount}`;
       params.push(mode_id);
     }
-    
+
     const countQuery = query.replace(/SELECT s\.\*, sm\.name as mode_name, o\.order_number/, 'SELECT COUNT(*)');
     const countResult = await pg.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count);
-    
+
     query += ` ORDER BY s.${sort_by} ${sort_order} LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
-    
-    let result = await pg.query(query, params);
-    
+
+    const result = await pg.query(query, params);
+
     return {
       shipments: result.rows,
       pagination: {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     };
   } catch (error) {
     logger.error('Error fetching shipments', { error: error.message, stack: error.stack });
@@ -152,35 +152,35 @@ async function getShipments(filters = {}, pagination = {}) {
  */
 async function updateShipmentStatus(shipmentId, status, notes = null) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       UPDATE shipments
       SET status = $1, notes = COALESCE($2, notes), updated_at = NOW()
       WHERE id = $3
       RETURNING *
     `;
-    
-    let result = await pg.query(query, [status, notes, shipmentId]);
-    
+
+    const result = await pg.query(query, [status, notes, shipmentId]);
+
     if (result.rows.length === 0) {
       throw new Error('Shipment not found');
     }
-    
+
     const shipment = result.rows[0];
-    
+
     // Emit WebSocket event
     const io = require('../../../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('shipment_status_updated', {
         shipment_id: shipmentId,
-        status: status,
-        notes: notes
+        status,
+        notes,
       });
     }
-    
+
     logger.info(`Shipment status updated: ${shipmentId} to ${status}`);
-    
+
     return shipment;
   } catch (error) {
     logger.error('Error updating shipment status', { error: error.message, stack: error.stack });
@@ -193,37 +193,37 @@ async function updateShipmentStatus(shipmentId, status, notes = null) {
  */
 async function addTrackingUpdate(shipmentId, trackingData) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       INSERT INTO shipment_tracking (shipment_id, location, latitude, longitude, status, notes)
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
-    
-    let result = await pg.query(query, [
+
+    const result = await pg.query(query, [
       shipmentId,
       trackingData.location,
       trackingData.latitude || null,
       trackingData.longitude || null,
       trackingData.status || 'in_transit',
-      trackingData.notes || null
+      trackingData.notes || null,
     ]);
-    
+
     // Emit WebSocket event
-    let io = require('../../../index').app.get('io');
+    const io = require('../../../index').app.get('io');
     if (io) {
       io.to(`shipment:${shipmentId}`).emit('tracking_update', {
         shipment_id: shipmentId,
         location: trackingData.location,
         latitude: trackingData.latitude,
         longitude: trackingData.longitude,
-        status: trackingData.status
+        status: trackingData.status,
       });
     }
-    
+
     logger.info(`Tracking update added for shipment ${shipmentId}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error adding tracking update', { error: error.message, stack: error.stack });
@@ -236,16 +236,16 @@ async function addTrackingUpdate(shipmentId, trackingData) {
  */
 async function getShipmentTracking(shipmentId) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       SELECT * FROM shipment_tracking
       WHERE shipment_id = $1
       ORDER BY timestamp ASC
     `;
-    
-    let result = await pg.query(query, [shipmentId]);
-    
+
+    const result = await pg.query(query, [shipmentId]);
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching tracking history', { error: error.message, stack: error.stack });
@@ -258,16 +258,16 @@ async function getShipmentTracking(shipmentId) {
  */
 async function registerVehicle(vehicleData) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       INSERT INTO vehicles (registration_number, type, capacity_kg, reefer_equipped, temperature_range,
                           owner_type, owner_id, current_location)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *
     `;
-    
-    let result = await pg.query(query, [
+
+    const result = await pg.query(query, [
       vehicleData.registration_number,
       vehicleData.type,
       vehicleData.capacity_kg,
@@ -275,11 +275,11 @@ async function registerVehicle(vehicleData) {
       vehicleData.temperature_range || null,
       vehicleData.owner_type || 'platform',
       vehicleData.owner_id || null,
-      vehicleData.current_location || null
+      vehicleData.current_location || null,
     ]);
-    
+
     logger.info(`Vehicle registered: ${vehicleData.registration_number}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error registering vehicle', { error: error.message, stack: error.stack });
@@ -292,42 +292,42 @@ async function registerVehicle(vehicleData) {
  */
 async function getVehicles(filters = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     const { type, status, reefer_equipped } = filters;
-    
+
     let query = `
       SELECT v.*, d.name as driver_name, d.phone as driver_phone
       FROM vehicles v
       LEFT JOIN drivers d ON v.driver_id = d.id
       WHERE 1=1
     `;
-    
-    let params = [];
+
+    const params = [];
     let paramCount = 0;
-    
+
     if (type) {
       paramCount++;
       query += ` AND v.type = $${paramCount}`;
       params.push(type);
     }
-    
+
     if (status) {
       paramCount++;
       query += ` AND v.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     if (reefer_equipped !== undefined) {
       paramCount++;
       query += ` AND v.reefer_equipped = $${paramCount}`;
       params.push(reefer_equipped);
     }
-    
+
     query += ' ORDER BY v.registration_number';
-    
-    let result = await pg.query(query, params);
-    
+
+    const result = await pg.query(query, params);
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching vehicles', { error: error.message, stack: error.stack });
@@ -340,32 +340,32 @@ async function getVehicles(filters = {}) {
  */
 async function registerDriver(driverData) {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = `
+    const pg = getPostgreSQL();
+
+    const query = `
       INSERT INTO drivers (name, phone, license_number, license_expiry_date, assigned_vehicle_id)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
     `;
-    
-    let result = await pg.query(query, [
+
+    const result = await pg.query(query, [
       driverData.name,
       driverData.phone,
       driverData.license_number,
       driverData.license_expiry_date,
-      driverData.assigned_vehicle_id || null
+      driverData.assigned_vehicle_id || null,
     ]);
-    
+
     // Update vehicle if assigned
     if (driverData.assigned_vehicle_id) {
       await pg.query(
         'UPDATE vehicles SET driver_id = $1 WHERE id = $2',
-        [result.rows[0].id, driverData.assigned_vehicle_id]
+        [result.rows[0].id, driverData.assigned_vehicle_id],
       );
     }
-    
+
     logger.info(`Driver registered: ${driverData.name}`);
-    
+
     return result.rows[0];
   } catch (error) {
     logger.error('Error registering driver', { error: error.message, stack: error.stack });
@@ -378,36 +378,36 @@ async function registerDriver(driverData) {
  */
 async function getDrivers(filters = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     const { status, verification_status } = filters;
-    
+
     let query = `
       SELECT d.*, v.registration_number as assigned_vehicle
       FROM drivers d
       LEFT JOIN vehicles v ON d.assigned_vehicle_id = v.id
       WHERE 1=1
     `;
-    
-    let params = [];
+
+    const params = [];
     let paramCount = 0;
-    
+
     if (status) {
       paramCount++;
       query += ` AND d.status = $${paramCount}`;
       params.push(status);
     }
-    
+
     if (verification_status) {
       paramCount++;
       query += ` AND d.verification_status = $${paramCount}`;
       params.push(verification_status);
     }
-    
+
     query += ' ORDER BY d.name';
-    
-    let result = await pg.query(query, params);
-    
+
+    const result = await pg.query(query, params);
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching drivers', { error: error.message, stack: error.stack });
@@ -420,12 +420,12 @@ async function getDrivers(filters = {}) {
  */
 async function getShipmentModes() {
   try {
-    let pg = getPostgreSQL();
-    
-    let query = 'SELECT * FROM shipment_modes WHERE is_active = TRUE ORDER BY name';
-    
-    let result = await pg.query(query);
-    
+    const pg = getPostgreSQL();
+
+    const query = 'SELECT * FROM shipment_modes WHERE is_active = TRUE ORDER BY name';
+
+    const result = await pg.query(query);
+
     return result.rows;
   } catch (error) {
     logger.error('Error fetching shipment modes', { error: error.message, stack: error.stack });
@@ -458,19 +458,19 @@ async function getShipmentModes() {
  * TM_LANES[0] behaviour exactly.
  */
 async function getEcoLogisticsScore({ laneCode, shipmentId } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
 
   const { rows: laneRows } = await pg.query(
     `SELECT lane_code, origin, destination, distance_km
        FROM freight_lanes
       WHERE is_active = TRUE
-      ORDER BY lane_code`
+      ORDER BY lane_code`,
   );
   const lanes = laneRows.map((r) => ({
     k: r.lane_code,
     o: r.origin,
     d: r.destination,
-    km: Number(r.distance_km)
+    km: Number(r.distance_km),
   }));
 
   let resolvedLaneCode = laneCode || null;
@@ -478,12 +478,12 @@ async function getEcoLogisticsScore({ laneCode, shipmentId } = {}) {
   if (!resolvedLaneCode && shipmentId) {
     const { rows: shipmentRows } = await pg.query(
       'SELECT origin_address, destination_address FROM shipments WHERE id = $1',
-      [shipmentId]
+      [shipmentId],
     );
     if (!shipmentRows.length) {
       throw new Error('Shipment not found');
     }
-    let shipment = shipmentRows[0];
+    const shipment = shipmentRows[0];
 
     const { rows: matchRows } = await pg.query(
       `SELECT lane_code FROM freight_lanes
@@ -491,20 +491,20 @@ async function getEcoLogisticsScore({ laneCode, shipmentId } = {}) {
           AND (origin ILIKE '%' || $1 || '%' OR $1 ILIKE '%' || origin || '%')
           AND (destination ILIKE '%' || $2 || '%' OR $2 ILIKE '%' || destination || '%')
         LIMIT 1`,
-      [shipment.origin_address, shipment.destination_address]
+      [shipment.origin_address, shipment.destination_address],
     );
     resolvedLaneCode = matchRows.length ? matchRows[0].lane_code : null;
   }
 
   const ctx = { kind: 'booking', lane: resolvedLaneCode };
-  let result = decisionSupportService.ecoLogisticsMiles(ctx, lanes);
+  const result = decisionSupportService.ecoLogisticsMiles(ctx, lanes);
 
   return {
     ...result,
     laneCode: resolvedLaneCode,
     shipmentId: shipmentId || null,
-    laneMatched: !!resolvedLaneCode,
-    availableLanes: lanes.length
+    laneMatched: Boolean(resolvedLaneCode),
+    availableLanes: lanes.length,
   };
 }
 
@@ -526,7 +526,7 @@ const router = express.Router();
 // Create shipment
 router.post('/shipments', authMiddleware, async (req, res) => {
   try {
-    let shipment = await createShipment(req.body);
+    const shipment = await createShipment(req.body);
     res.status(201).json(shipment);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -536,7 +536,7 @@ router.post('/shipments', authMiddleware, async (req, res) => {
 // Get shipment by ID
 router.get('/shipments/:id', async (req, res) => {
   try {
-    let shipment = await getShipmentById(req.params.id);
+    const shipment = await getShipmentById(req.params.id);
     res.json(shipment);
   } catch (error) {
     if (error.message === 'Shipment not found') {
@@ -553,15 +553,15 @@ router.get('/shipments', async (req, res) => {
     const filters = {
       order_id: req.query.order_id,
       status: req.query.status,
-      mode_id: req.query.mode_id
+      mode_id: req.query.mode_id,
     };
     const pagination = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
       sort_by: req.query.sort_by,
-      sort_order: req.query.sort_order
+      sort_order: req.query.sort_order,
     };
-    let result = await getShipments(filters, pagination);
+    const result = await getShipments(filters, pagination);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -572,7 +572,7 @@ router.get('/shipments', async (req, res) => {
 router.put('/shipments/:id/status', authMiddleware, requireRole(...LOGISTICS_ROLES), async (req, res) => {
   try {
     const { status, notes } = req.body;
-    let shipment = await updateShipmentStatus(req.params.id, status, notes);
+    const shipment = await updateShipmentStatus(req.params.id, status, notes);
     res.json(shipment);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -592,7 +592,7 @@ router.post('/shipments/:id/tracking', authMiddleware, async (req, res) => {
 // Get shipment tracking
 router.get('/shipments/:id/tracking', async (req, res) => {
   try {
-    let tracking = await getShipmentTracking(req.params.id);
+    const tracking = await getShipmentTracking(req.params.id);
     res.json(tracking);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -612,10 +612,10 @@ router.post('/vehicles', authMiddleware, async (req, res) => {
 // Get vehicles
 router.get('/vehicles', async (req, res) => {
   try {
-    let filters = {
+    const filters = {
       type: req.query.type,
       status: req.query.status,
-      reefer_equipped: req.query.reefer_equipped
+      reefer_equipped: req.query.reefer_equipped,
     };
     const vehicles = await getVehicles(filters);
     res.json(vehicles);
@@ -637,9 +637,9 @@ router.post('/drivers', authMiddleware, async (req, res) => {
 // Get drivers
 router.get('/drivers', async (req, res) => {
   try {
-    let filters = {
+    const filters = {
       status: req.query.status,
-      verification_status: req.query.verification_status
+      verification_status: req.query.verification_status,
     };
     const drivers = await getDrivers(filters);
     res.json(drivers);
@@ -661,7 +661,7 @@ router.get('/modes', async (req, res) => {
 // ESG/logistics lane score for a real freight lane (see getEcoLogisticsScore above)
 router.get('/lanes/:laneCode/eco-score', async (req, res) => {
   try {
-    let result = await getEcoLogisticsScore({ laneCode: req.params.laneCode });
+    const result = await getEcoLogisticsScore({ laneCode: req.params.laneCode });
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -671,7 +671,7 @@ router.get('/lanes/:laneCode/eco-score', async (req, res) => {
 // ESG/logistics lane score for a real shipment, matched to its freight lane
 router.get('/shipments/:id/eco-score', async (req, res) => {
   try {
-    let result = await getEcoLogisticsScore({ shipmentId: req.params.id });
+    const result = await getEcoLogisticsScore({ shipmentId: req.params.id });
     res.json(result);
   } catch (error) {
     if (error.message === 'Shipment not found') {
@@ -695,8 +695,6 @@ module.exports = {
   registerDriver,
   getDrivers,
   getShipmentModes,
-  getEcoLogisticsScore
+  getEcoLogisticsScore,
 };
-
-
 

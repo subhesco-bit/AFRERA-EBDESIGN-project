@@ -88,7 +88,7 @@ describe('LibraryKnowledgeService', () => {
       expect.arrayContaining([
         expect.objectContaining({ moduleId: 'M900_TEST', backend: true }),
         expect.objectContaining({ moduleId: 'M026', backend: true }),
-      ])
+      ]),
     );
     expect(result.searchResults[0]).toEqual(expect.objectContaining({ key: 'M900_TEST' }));
     expect(result.verification.verified).toBe(true);
@@ -105,7 +105,7 @@ describe('LibraryKnowledgeService', () => {
     expect(result.verification.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ key: 'BROKEN', type: 'invalid_json' }),
-      ])
+      ]),
     );
   });
 
@@ -119,7 +119,7 @@ describe('LibraryKnowledgeService', () => {
     expect(result.init.contentHashes).toBe(6);
     expect(result.statistics.byType['library-file']).toBe(1);
     expect(result.searchResults).toEqual(
-      expect.arrayContaining([expect.objectContaining({ key: 'LIBRARY:02_REFERENCE/workflow.md' })])
+      expect.arrayContaining([expect.objectContaining({ key: 'LIBRARY:02_REFERENCE/workflow.md' })]),
     );
   });
 });

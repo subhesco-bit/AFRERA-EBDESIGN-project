@@ -4,12 +4,12 @@ const logger = require('../utils/logger');
 class YieldManagementService {
   async recordYield(farmId, cropId, quantity, unit) {
   // Validate inputs
-  if (!farmId) throw new Error('Missing required parameter');
+    if (!farmId) throw new Error('Missing required parameter');
 
     try {
       const id = require('uuid').v4();
       await db('yields').insert({
-        id, farm_id: farmId, crop_id: cropId, quantity, unit, recorded_at: new Date()
+        id, farm_id: farmId, crop_id: cropId, quantity, unit, recorded_at: new Date(),
       });
       logger.info(`Yield recorded: ${id}`);
       return { yield_id: id, quantity, unit };

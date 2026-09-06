@@ -45,5 +45,5 @@ module.exports = {
   registerFleetVehicle,
   createDispatchSchedule,
   trackFleetPerformance,
-  generateFleetReport
+  generateFleetReport,
 };

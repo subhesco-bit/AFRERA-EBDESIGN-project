@@ -26,7 +26,7 @@ const getFuelPurchase = async (req, res) => {
 
 const recordFuelPurchase = async (req, res) => {
   try {
-    let purchase = await fuelService.recordFuelPurchase(req.body);
+    const purchase = await fuelService.recordFuelPurchase(req.body);
     res.status(201).json({ success: true, data: purchase });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -66,5 +66,5 @@ module.exports = {
   recordFuelPurchase,
   recordFuelConsumption,
   trackFuelEfficiency,
-  generateFuelReport
+  generateFuelReport,
 };

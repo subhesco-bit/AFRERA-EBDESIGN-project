@@ -45,7 +45,7 @@ const WHATSAPP_CONFIG = {
   // WhatsApp-enabled Twilio sender, e.g. "+14155238886" (Twilio Sandbox) or an
   // approved WhatsApp Business number. Distinct from TWILIO_PHONE_NUMBER (the
   // SMS sender) — see file header.
-  fromNumber: process.env.TWILIO_WHATSAPP_NUMBER
+  fromNumber: process.env.TWILIO_WHATSAPP_NUMBER,
 };
 
 // Same reasoning as smsAuthService.js: the `require('twilio')` sits inside
@@ -94,11 +94,11 @@ async function sendWhatsAppMessage(to, body) {
     return {
       success: false,
       status: 'not_configured',
-      reason: !twilioClient
-        ? 'Twilio credentials (TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN) are not configured.'
-        : 'TWILIO_WHATSAPP_NUMBER is not configured (a WhatsApp-enabled Twilio sender is '
-          + 'required — the plain SMS TWILIO_PHONE_NUMBER is not WhatsApp-enabled).',
-      to: toNormalized
+      reason: !twilioClient ?
+        'Twilio credentials (TWILIO_ACCOUNT_SID/TWILIO_AUTH_TOKEN) are not configured.' :
+        'TWILIO_WHATSAPP_NUMBER is not configured (a WhatsApp-enabled Twilio sender is ' +
+          'required — the plain SMS TWILIO_PHONE_NUMBER is not WhatsApp-enabled).',
+      to: toNormalized,
     };
   }
 
@@ -106,7 +106,7 @@ async function sendWhatsAppMessage(to, body) {
     const message = await twilioClient.messages.create({
       body,
       from: `whatsapp:${WHATSAPP_CONFIG.fromNumber}`,
-      to: `whatsapp:${toNormalized}`
+      to: `whatsapp:${toNormalized}`,
     });
     logger.info(`WhatsApp message sent to ${toNormalized}`, { sid: message.sid });
     return { success: true, status: message.status || 'queued', sid: message.sid, to: toNormalized };
@@ -141,7 +141,7 @@ async function lookupFarmerByPhone(phone) {
          LEFT JOIN farmers f ON f.user_id = u.id
         WHERE u.phone = $1
         LIMIT 1`,
-      [phone]
+      [phone],
     );
     return rows[0] || null;
   } catch (error) {
@@ -184,9 +184,9 @@ async function handleSubsidyQuery() {
     const statuses = await governmentSchemeService.schemeExpiryStatus();
 
     if (!statuses.length) {
-      return 'No government schemes with a tracked expiry date are currently in the '
-        + 'verified registry. Please check with your local agriculture office for the '
-        + 'latest subsidy information.';
+      return 'No government schemes with a tracked expiry date are currently in the ' +
+        'verified registry. Please check with your local agriculture office for the ' +
+        'latest subsidy information.';
     }
 
     const top = statuses.slice(0, 5);
@@ -195,9 +195,9 @@ async function handleSubsidyQuery() {
       return `- ${s.label} (${s.id}): ${s.state}, ${timing}`;
     });
 
-    return `Government scheme status (verified registry):\n${lines.join('\n')}\n\n`
-      + 'Reply with a scheme name for more detail, or confirm with your local '
-      + 'agriculture office before applying.';
+    return `Government scheme status (verified registry):\n${lines.join('\n')}\n\n` +
+      'Reply with a scheme name for more detail, or confirm with your local ' +
+      'agriculture office before applying.';
   } catch (error) {
     logger.error('WhatsApp subsidy query failed', { error: error.message, stack: error.stack });
     return 'Sorry, I could not fetch subsidy/scheme status right now. Please try again later.';
@@ -215,8 +215,8 @@ async function handleSubsidyQuery() {
 async function handleShipmentQuery(messageText) {
   const match = String(messageText || '').match(SHIPMENT_ID_PATTERN);
   if (!match) {
-    return 'To track a shipment, please reply with your shipment number, e.g. '
-      + '"track SHP-ABC123-XYZ9".';
+    return 'To track a shipment, please reply with your shipment number, e.g. ' +
+      '"track SHP-ABC123-XYZ9".';
   }
 
   const shipmentNumber = match[0].toUpperCase();
@@ -226,12 +226,12 @@ async function handleShipmentQuery(messageText) {
          FROM shipments
         WHERE shipment_number = $1
         LIMIT 1`,
-      [shipmentNumber]
+      [shipmentNumber],
     );
 
     if (!shipmentRows.length) {
-      return `I could not find a shipment with number ${shipmentNumber}. Please double-check `
-        + 'the number and try again.';
+      return `I could not find a shipment with number ${shipmentNumber}. Please double-check ` +
+        'the number and try again.';
     }
 
     const shipment = shipmentRows[0];
@@ -241,19 +241,19 @@ async function handleShipmentQuery(messageText) {
         WHERE shipment_id = $1
         ORDER BY timestamp DESC
         LIMIT 1`,
-      [shipment.id]
+      [shipment.id],
     );
     const latest = trackingRows[0];
 
-    let lines = [
+    const lines = [
       `Shipment ${shipment.shipment_number}: status ${shipment.status}`,
-      `From ${shipment.origin_address} to ${shipment.destination_address}`
+      `From ${shipment.origin_address} to ${shipment.destination_address}`,
     ];
     if (latest) {
       lines.push(
-        `Last update: ${latest.status || shipment.status} at `
-        + `${latest.location || 'an unrecorded location'} `
-        + `(${new Date(latest.timestamp).toLocaleString('en-IN')})`
+        `Last update: ${latest.status || shipment.status} at ` +
+        `${latest.location || 'an unrecorded location'} ` +
+        `(${new Date(latest.timestamp).toLocaleString('en-IN')})`,
       );
     }
     if (shipment.estimated_transit_days) {
@@ -286,9 +286,9 @@ async function handleFarmerQuery(messageText, farmer) {
     return `${greeting}${response.content}`;
   } catch (error) {
     logger.error('WhatsApp farmer query fallback failed', { error: error.message, stack: error.stack });
-    return "I'm here to help with AFRERA services. Mention 'scheme' or 'subsidy' for "
-      + "government scheme status, or 'track' plus your shipment number for shipment "
-      + 'tracking.';
+    return 'I\'m here to help with AFRERA services. Mention \'scheme\' or \'subsidy\' for ' +
+      'government scheme status, or \'track\' plus your shipment number for shipment ' +
+      'tracking.';
   }
 }
 
@@ -326,9 +326,9 @@ function verifyTwilioSignature(req) {
     return {
       verified: false,
       skipped: true,
-      reason: 'TWILIO_AUTH_TOKEN is not configured, so the inbound webhook signature cannot '
-        + 'be validated against it. Requests are accepted unverified until a real auth token '
-        + 'is configured.'
+      reason: 'TWILIO_AUTH_TOKEN is not configured, so the inbound webhook signature cannot ' +
+        'be validated against it. Requests are accepted unverified until a real auth token ' +
+        'is configured.',
     };
   }
 
@@ -366,7 +366,7 @@ router.post('/webhook', async (req, res) => {
     const sigResult = verifyTwilioSignature(req);
     if (!sigResult.skipped && !sigResult.verified) {
       logger.warn('WhatsApp webhook rejected: signature verification failed', {
-        from: req.body && req.body.From
+        from: req.body && req.body.From,
       });
       return res.status(403).send('Signature verification failed');
     }
@@ -408,7 +408,7 @@ router.post('/webhook', async (req, res) => {
 function isHealthy() {
   return {
     outboundConfigured: Boolean(twilioClient && WHATSAPP_CONFIG.fromNumber),
-    signatureValidationConfigured: Boolean(twilioModule && WHATSAPP_CONFIG.authToken)
+    signatureValidationConfigured: Boolean(twilioModule && WHATSAPP_CONFIG.authToken),
   };
 }
 
@@ -418,8 +418,6 @@ module.exports = {
   lookupFarmerByPhone,
   classifyIntent,
   routeInboundMessage,
-  isHealthy
+  isHealthy,
 };
-
-
 

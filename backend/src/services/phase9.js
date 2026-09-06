@@ -3,8 +3,8 @@ const db = require('../database/dbConnection');
 class Phase9Services {
   async specialization(type) {
   // Validate inputs
-  if (!type) throw new Error('Missing required parameter');
- try { await db('specialization_services').insert({ id: require('uuid').v4(), service_type: type, created_at: new Date() }); return { type, status: 'active' }; } catch (e) { throw e; } }
+    if (!type) throw new Error('Missing required parameter');
+    try { await db('specialization_services').insert({ id: require('uuid').v4(), service_type: type, created_at: new Date() }); return { type, status: 'active' }; } catch (e) { throw e; } }
   async integration(integrationId) { try { await db('advanced_integrations').insert({ id: require('uuid').v4(), integration_id: integrationId, created_at: new Date() }); return { integration_id: integrationId, status: 'active' }; } catch (e) { throw e; } }
   async analytics(analyticsId) { try { await db('custom_analytics').insert({ id: require('uuid').v4(), analytics_id: analyticsId, created_at: new Date() }); return { analytics_id: analyticsId, status: 'active' }; } catch (e) { throw e; } }
   async thirdParty(providerId) { try { await db('third_party_integration').insert({ id: require('uuid').v4(), provider_id: providerId, created_at: new Date() }); return { provider_id: providerId, status: 'active' }; } catch (e) { throw e; } }

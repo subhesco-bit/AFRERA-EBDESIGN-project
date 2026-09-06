@@ -23,7 +23,7 @@ describe('critical module validation', () => {
   test('M084 rejects invalid alert windows without creating an alert', async () => {
     await expect(m084.createDisasterAlert({
       alert_code: 'A-1', alert_type: 'flood', severity: 'warning', headline: 'Flood',
-      recommended_action: 'Hold dispatch', effective_from: '2026-09-02T10:00:00Z', effective_until: '2026-09-02T09:00:00Z'
+      recommended_action: 'Hold dispatch', effective_from: '2026-09-02T10:00:00Z', effective_until: '2026-09-02T09:00:00Z',
     })).rejects.toMatchObject({ code: 'VALIDATION_ERROR', statusCode: 400 });
     expect(pool.query).not.toHaveBeenCalled();
   });
@@ -32,7 +32,7 @@ describe('critical module validation', () => {
     pool.query.mockResolvedValue({ rows: [{ id: 7, alert_code: 'A-7', severity: 'watch' }] });
     const result = await m084.createDisasterAlert({
       alert_code: 'A-7', alert_type: 'heavy_rain', severity: 'watch', headline: 'Heavy rain',
-      recommended_action: 'Review route', effective_from: '2026-09-02T10:00:00Z', effective_until: '2026-09-03T10:00:00Z'
+      recommended_action: 'Review route', effective_from: '2026-09-02T10:00:00Z', effective_until: '2026-09-03T10:00:00Z',
     });
     expect(result.ai_advisory_metadata).toEqual({ status: 'not_generated', source: 'operator_authored' });
     expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO climate_alerts'), expect.any(Array));

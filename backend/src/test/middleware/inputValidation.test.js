@@ -40,8 +40,8 @@ describe('Input Validation Middleware', () => {
         name: '<script>alert(1)</script>',
         age: 25,
         nested: {
-          value: 'javascript:alert(2)'
-        }
+          value: 'javascript:alert(2)',
+        },
       };
 
       const result = sanitizeObject(obj);
@@ -52,7 +52,7 @@ describe('Input Validation Middleware', () => {
 
     it('handles arrays', () => {
       const obj = {
-        items: ['<script>alert(1)</script>', 'normal text']
+        items: ['<script>alert(1)</script>', 'normal text'],
       };
 
       const result = sanitizeObject(obj);
@@ -64,7 +64,7 @@ describe('Input Validation Middleware', () => {
   describe('validateSchema', () => {
     it('validates required fields', () => {
       const schema = {
-        name: { required: true, type: 'string' }
+        name: { required: true, type: 'string' },
       };
 
       const result = validateSchema({}, schema);
@@ -74,7 +74,7 @@ describe('Input Validation Middleware', () => {
 
     it('validates field types', () => {
       const schema = {
-        age: { required: true, type: 'number' }
+        age: { required: true, type: 'number' },
       };
 
       const result = validateSchema({ age: '25' }, schema);
@@ -84,7 +84,7 @@ describe('Input Validation Middleware', () => {
 
     it('validates string length', () => {
       const schema = {
-        name: { required: true, type: 'string', minLength: 3, maxLength: 10 }
+        name: { required: true, type: 'string', minLength: 3, maxLength: 10 },
       };
 
       const result1 = validateSchema({ name: 'ab' }, schema);
@@ -96,7 +96,7 @@ describe('Input Validation Middleware', () => {
 
     it('validates email format', () => {
       const schema = {
-        email: { required: true, email: true }
+        email: { required: true, email: true },
       };
 
       const result1 = validateSchema({ email: 'invalid' }, schema);
@@ -108,7 +108,7 @@ describe('Input Validation Middleware', () => {
 
     it('validates URL format', () => {
       const schema = {
-        website: { required: true, url: true }
+        website: { required: true, url: true },
       };
 
       const result1 = validateSchema({ website: 'not-a-url' }, schema);
@@ -120,7 +120,7 @@ describe('Input Validation Middleware', () => {
 
     it('validates enum values', () => {
       const schema = {
-        status: { required: true, enum: ['active', 'inactive', 'pending'] }
+        status: { required: true, enum: ['active', 'inactive', 'pending'] },
       };
 
       const result1 = validateSchema({ status: 'invalid' }, schema);

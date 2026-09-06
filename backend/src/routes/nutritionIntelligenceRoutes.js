@@ -1,6 +1,6 @@
 /**
  * Nutrition Intelligence Routes
- * 
+ *
  * Routes for nutrition data, scoring, wellness practices, and value-based pricing
  * Connects frontend nutritionAPI to backend nutritionIntelligenceService
  */
@@ -122,7 +122,7 @@ router.post('/product-nutrition/:productId/score', async (req, res) => {
 router.get('/product-nutrition/:productId/score', async (req, res) => {
   try {
     const { productId } = req.params;
-    let score = await nutritionIntelligenceService.getProductNutritionScore(productId);
+    const score = await nutritionIntelligenceService.getProductNutritionScore(productId);
     res.json({ success: true, data: score });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -222,10 +222,10 @@ router.get('/recommendations', async (req, res) => {
 router.post('/recommendations', async (req, res) => {
   try {
     const { dietary_profile_id, target_calories, limit } = req.body;
-    let recommendations = await nutritionIntelligenceService.generateRecommendations(
-      dietary_profile_id, 
-      target_calories, 
-      limit
+    const recommendations = await nutritionIntelligenceService.generateRecommendations(
+      dietary_profile_id,
+      target_calories,
+      limit,
     );
     res.json({ success: true, data: recommendations });
   } catch (error) {
@@ -267,14 +267,14 @@ router.post('/recipes', authMiddleware, async (req, res) => {
     if (!dietary_profile_id) {
       return res.status(400).json({
         error: 'dietary_profile_id is required',
-        disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
       });
     }
 
     const recipe = await nutritionIntelligenceService.generateDietBasedRecipe(
       req.user.id,
-      dietary_profile_id, 
-      { targetCalories: target_calories, provider }
+      dietary_profile_id,
+      { targetCalories: target_calories, provider },
     );
     res.json(recipe);
   } catch (error) {

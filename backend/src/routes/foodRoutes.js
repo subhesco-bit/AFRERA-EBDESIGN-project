@@ -25,8 +25,8 @@ router.post('/processing/start-batch', async (req, res) => {
     } = req.body;
 
     if (!product_id || !product_name || !quantity_kg) {
-      return res.status(400).json({ 
-        error: 'product_id, product_name, and quantity_kg are required' 
+      return res.status(400).json({
+        error: 'product_id, product_name, and quantity_kg are required',
       });
     }
 
@@ -65,8 +65,8 @@ router.post('/nutrition/analyze', async (req, res) => {
     } = req.body;
 
     if (!product_name || !product_type || !raw_quantity_g) {
-      return res.status(400).json({ 
-        error: 'product_name, product_type, and raw_quantity_g are required' 
+      return res.status(400).json({
+        error: 'product_name, product_type, and raw_quantity_g are required',
       });
     }
 
@@ -105,8 +105,8 @@ router.post('/traceability/record-movement', async (req, res) => {
     } = req.body;
 
     if (!batch_id || !location || !operation) {
-      return res.status(400).json({ 
-        error: 'batch_id, location, and operation are required' 
+      return res.status(400).json({
+        error: 'batch_id, location, and operation are required',
       });
     }
 
@@ -146,8 +146,8 @@ router.post('/shelf-life/predict', async (req, res) => {
     } = req.body;
 
     if (!product_type || storage_temperature === undefined) {
-      return res.status(400).json({ 
-        error: 'product_type and storage_temperature are required' 
+      return res.status(400).json({
+        error: 'product_type and storage_temperature are required',
       });
     }
 
@@ -185,8 +185,8 @@ router.post('/safety/compliance-check', async (req, res) => {
     } = req.body;
 
     if (!batch_id || !product_type) {
-      return res.status(400).json({ 
-        error: 'batch_id and product_type are required' 
+      return res.status(400).json({
+        error: 'batch_id and product_type are required',
       });
     }
 
@@ -217,7 +217,7 @@ router.get('/batch/:batch_id', async (req, res) => {
     const { batch_id } = req.params;
 
     // Placeholder for actual database lookup
-    let batch = {
+    const batch = {
       batch_id,
       product_name: 'Sample Product',
       quantity_kg: 1000,
@@ -265,8 +265,8 @@ router.post('/certification/organic-recommend', async (req, res) => {
     } = req.body;
 
     if (!batch_id || !farm_id) {
-      return res.status(400).json({ 
-        error: 'batch_id and farm_id are required' 
+      return res.status(400).json({
+        error: 'batch_id and farm_id are required',
       });
     }
 

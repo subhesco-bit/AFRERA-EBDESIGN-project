@@ -14,25 +14,24 @@ router.post('/subscriptions', authenticateToken, validateRequest({ body: { plan_
 
 router.get('/users/:id/subscription', authenticateToken, async (req, res, next) => {
   try {
-    let result = await subscriptionService.getActiveSubscription(req.params.id);
+    const result = await subscriptionService.getActiveSubscription(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });
 
 router.put('/subscriptions/:id/upgrade', authenticateToken, validateRequest({ body: { new_plan_id: 'string|required' } }), async (req, res, next) => {
   try {
-    let result = await subscriptionService.upgradeSubscription(req.params.id, req.body.new_plan_id);
+    const result = await subscriptionService.upgradeSubscription(req.params.id, req.body.new_plan_id);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });
 
 router.delete('/subscriptions/:id', authenticateToken, async (req, res, next) => {
   try {
-    let result = await subscriptionService.cancelSubscription(req.params.id);
+    const result = await subscriptionService.cancelSubscription(req.params.id);
     res.json({ success: true, data: result });
   } catch (error) { logger.error(`Error: ${error.message}`); next(error); }
 });
 
 module.exports = router;
-
 

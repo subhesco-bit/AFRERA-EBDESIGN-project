@@ -20,13 +20,13 @@ class IoTIntegrationService {
    */
   async registerDevice(deviceData) {
     try {
-      const { 
-        deviceId, 
-        deviceType, 
-        farmerId, 
-        location, 
+      const {
+        deviceId,
+        deviceType,
+        farmerId,
+        location,
         specifications,
-        firmwareVersion 
+        firmwareVersion,
       } = deviceData;
 
       const query = `
@@ -39,8 +39,8 @@ class IoTIntegrationService {
       `;
 
       const result = await db.query(query, [
-        deviceId, deviceType, farmerId, location, 
-        JSON.stringify(specifications), firmwareVersion
+        deviceId, deviceType, farmerId, location,
+        JSON.stringify(specifications), firmwareVersion,
       ]);
 
       // Add to connected devices
@@ -49,7 +49,7 @@ class IoTIntegrationService {
         deviceType,
         farmerId,
         connectedAt: new Date(),
-        specifications
+        specifications,
       });
 
       return {
@@ -57,15 +57,15 @@ class IoTIntegrationService {
         data: {
           deviceId: result.rows[0].device_id,
           status: result.rows[0].status,
-          registeredAt: new Date().toISOString()
-        }
+          registeredAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - registerDevice error:`, error);
       return {
         success: false,
         error: 'Failed to register IoT device',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -81,18 +81,18 @@ class IoTIntegrationService {
         return {
           success: false,
           error: 'Device not registered',
-          deviceId
+          deviceId,
         };
       }
 
       // Process sensor data
       const processedData = this.processSensorData(sensorData, device);
-      
+
       // Store in buffer for batch processing
       this.dataBuffer.push({
         deviceId,
         data: processedData,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
       // Process buffer if full
@@ -111,15 +111,15 @@ class IoTIntegrationService {
         data: {
           receivedAt: new Date().toISOString(),
           dataPoints: processedData.length,
-          alerts: alerts
-        }
+          alerts,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - receiveDeviceData error:`, error);
       return {
         success: false,
         error: 'Failed to receive device data',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -128,14 +128,14 @@ class IoTIntegrationService {
    * Get device by device ID
    */
   async getDeviceByDeviceId(deviceId) {
-    let query = `
+    const query = `
       SELECT id, device_id, device_type, farmer_id, 
              specifications, status, last_active
       FROM iot_devices
       WHERE device_id = $1 AND status = 'active'
     `;
 
-    let result = await db.query(query, [deviceId]);
+    const result = await db.query(query, [deviceId]);
     return result.rows[0];
   }
 
@@ -144,7 +144,7 @@ class IoTIntegrationService {
    */
   processSensorData(sensorData, device) {
     const processed = [];
-    
+
     for (const reading of sensorData) {
       processed.push({
         sensorType: reading.sensorType,
@@ -152,10 +152,10 @@ class IoTIntegrationService {
         unit: reading.unit,
         timestamp: reading.timestamp || new Date(),
         quality: this.assessDataQuality(reading),
-        metadata: reading.metadata || {}
+        metadata: reading.metadata || {},
       });
     }
-    
+
     return processed;
   }
 
@@ -164,25 +164,25 @@ class IoTIntegrationService {
    */
   assessDataQuality(reading) {
     const { value, sensorType } = reading;
-    
+
     // Basic quality checks
     if (value === null || value === undefined) return 'invalid';
     if (typeof value !== 'number') return 'invalid';
-    
+
     // Range checks based on sensor type
     const ranges = {
-      'temperature': { min: -20, max: 50 },
-      'humidity': { min: 0, max: 100 },
-      'soil_moisture': { min: 0, max: 100 },
-      'ph_level': { min: 0, max: 14 },
-      'light_intensity': { min: 0, max: 100000 }
+      temperature: { min: -20, max: 50 },
+      humidity: { min: 0, max: 100 },
+      soil_moisture: { min: 0, max: 100 },
+      ph_level: { min: 0, max: 14 },
+      light_intensity: { min: 0, max: 100000 },
     };
-    
+
     const range = ranges[sensorType];
     if (range && (value < range.min || value > range.max)) {
       return 'out_of_range';
     }
-    
+
     return 'good';
   }
 
@@ -190,16 +190,16 @@ class IoTIntegrationService {
    * Check thresholds and generate alerts
    */
   checkThresholds(processedData, specifications) {
-    let alerts = [];
-    
+    const alerts = [];
+
     if (!specifications || !specifications.thresholds) {
       return alerts;
     }
-    
+
     for (const reading of processedData) {
       const threshold = specifications.thresholds[reading.sensorType];
       if (!threshold) continue;
-      
+
       if (threshold.min !== undefined && threshold.min !== null && reading.value < threshold.min) {
         alerts.push({
           type: 'threshold_low',
@@ -207,10 +207,10 @@ class IoTIntegrationService {
           value: reading.value,
           threshold: threshold.min,
           severity: 'warning',
-          message: `${reading.sensorType} below minimum threshold`
+          message: `${reading.sensorType} below minimum threshold`,
         });
       }
-      
+
       if (threshold.max !== undefined && threshold.max !== null && reading.value > threshold.max) {
         alerts.push({
           type: 'threshold_high',
@@ -218,11 +218,11 @@ class IoTIntegrationService {
           value: reading.value,
           threshold: threshold.max,
           severity: 'warning',
-          message: `${reading.sensorType} above maximum threshold`
+          message: `${reading.sensorType} above maximum threshold`,
         });
       }
     }
-    
+
     return alerts;
   }
 
@@ -231,15 +231,15 @@ class IoTIntegrationService {
    */
   async processDataBuffer() {
     if (this.dataBuffer.length === 0) return;
-    
+
     try {
-      let query = `
+      const query = `
         INSERT INTO iot_sensor_data (
           device_id, sensor_type, value, unit, 
           quality, metadata, timestamp
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)
       `;
-      
+
       for (const entry of this.dataBuffer) {
         for (const reading of entry.data) {
           await db.query(query, [
@@ -249,11 +249,11 @@ class IoTIntegrationService {
             reading.unit,
             reading.quality,
             JSON.stringify(reading.metadata),
-            reading.timestamp
+            reading.timestamp,
           ]);
         }
       }
-      
+
       const processedCount = this.dataBuffer.length;
       this.dataBuffer = [];
       logger.info(`Processed ${processedCount} IoT data entries`);
@@ -266,12 +266,12 @@ class IoTIntegrationService {
    * Update device activity
    */
   async updateDeviceActivity(deviceId) {
-    let query = `
+    const query = `
       UPDATE iot_devices 
       SET last_active = NOW()
       WHERE device_id = $1
     `;
-    
+
     await db.query(query, [deviceId]);
   }
 
@@ -280,12 +280,12 @@ class IoTIntegrationService {
    */
   async getDeviceStatus(deviceId) {
     try {
-      let device = await this.getDeviceByDeviceId(deviceId);
+      const device = await this.getDeviceByDeviceId(deviceId);
       if (!device) {
         return {
           success: false,
           error: 'Device not found',
-          deviceId
+          deviceId,
         };
       }
 
@@ -301,15 +301,15 @@ class IoTIntegrationService {
           lastActive: device.last_active,
           healthStatus,
           recentDataPoints: recentData.length,
-          connectedAt: device.registered_at
-        }
+          connectedAt: device.registered_at,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - getDeviceStatus error:`, error);
       return {
         success: false,
         error: 'Failed to get device status',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -318,7 +318,7 @@ class IoTIntegrationService {
    * Get recent device data
    */
   async getRecentDeviceData(deviceId, hours) {
-    let query = `
+    const query = `
       SELECT sensor_type, value, unit, quality, timestamp
       FROM iot_sensor_data
       WHERE device_id = $1
@@ -327,7 +327,7 @@ class IoTIntegrationService {
       LIMIT 1000
     `;
 
-    let result = await db.query(query, [deviceId]);
+    const result = await db.query(query, [deviceId]);
     return result.rows;
   }
 
@@ -337,19 +337,19 @@ class IoTIntegrationService {
   assessDeviceHealth(device, recentData) {
     const lastActive = new Date(device.last_active);
     const timeSinceActive = Date.now() - lastActive.getTime();
-    
+
     let health = 'healthy';
     if (timeSinceActive > 24 * 60 * 60 * 1000) health = 'inactive';
     if (timeSinceActive > 7 * 24 * 60 * 60 * 1000) health = 'offline';
-    
+
     // Check data quality
     if (recentData.length > 0) {
       const goodQualityCount = recentData.filter(d => d.quality === 'good').length;
       const qualityRatio = goodQualityCount / recentData.length;
-      
+
       if (qualityRatio < 0.7) health = 'degraded';
     }
-    
+
     return health;
   }
 
@@ -358,7 +358,7 @@ class IoTIntegrationService {
    */
   async getFarmerDevices(farmerId) {
     try {
-      let query = `
+      const query = `
         SELECT id, device_id, device_type, location, 
                specifications, status, last_active, registered_at
         FROM iot_devices
@@ -366,17 +366,17 @@ class IoTIntegrationService {
         ORDER BY registered_at DESC
       `;
 
-      let result = await db.query(query, [farmerId]);
-      
+      const result = await db.query(query, [farmerId]);
+
       const devices = await Promise.all(
         result.rows.map(async (device) => {
-          let recentData = await this.getRecentDeviceData(device.device_id, 24);
+          const recentData = await this.getRecentDeviceData(device.device_id, 24);
           return {
             ...device,
             recentDataPoints: recentData.length,
-            healthStatus: this.assessDeviceHealth(device, recentData)
+            healthStatus: this.assessDeviceHealth(device, recentData),
           };
-        })
+        }),
       );
 
       return {
@@ -384,15 +384,15 @@ class IoTIntegrationService {
         data: {
           farmerId,
           deviceCount: devices.length,
-          devices
-        }
+          devices,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - getFarmerDevices error:`, error);
       return {
         success: false,
         error: 'Failed to get farmer devices',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -402,16 +402,16 @@ class IoTIntegrationService {
    */
   async configureDevice(deviceId, configuration) {
     try {
-      let device = await this.getDeviceByDeviceId(deviceId);
+      const device = await this.getDeviceByDeviceId(deviceId);
       if (!device) {
         return {
           success: false,
           error: 'Device not found',
-          deviceId
+          deviceId,
         };
       }
 
-      let query = `
+      const query = `
         UPDATE iot_devices
         SET specifications = $1,
             updated_at = NOW()
@@ -419,16 +419,16 @@ class IoTIntegrationService {
         RETURNING device_id, specifications
       `;
 
-      let result = await db.query(query, [
+      const result = await db.query(query, [
         JSON.stringify({ ...device.specifications, ...configuration }),
-        deviceId
+        deviceId,
       ]);
 
       // Update connected device cache
       if (this.connectedDevices.has(deviceId)) {
         this.connectedDevices.set(deviceId, {
           ...this.connectedDevices.get(deviceId),
-          specifications: { ...device.specifications, ...configuration }
+          specifications: { ...device.specifications, ...configuration },
         });
       }
 
@@ -437,15 +437,15 @@ class IoTIntegrationService {
         data: {
           deviceId: result.rows[0].device_id,
           configuration: result.rows[0].specifications,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - configureDevice error:`, error);
       return {
         success: false,
         error: 'Failed to configure device',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -455,7 +455,7 @@ class IoTIntegrationService {
    */
   async getAggregatedData(farmerId, sensorType, timeRange = '24h') {
     try {
-      let query = `
+      const query = `
         SELECT 
           DATE_TRUNC('hour', timestamp) as hour,
           AVG(value) as avg_value,
@@ -471,7 +471,7 @@ class IoTIntegrationService {
         ORDER BY hour ASC
       `;
 
-      let result = await db.query(query, [farmerId, sensorType]);
+      const result = await db.query(query, [farmerId, sensorType]);
 
       return {
         success: true,
@@ -484,16 +484,16 @@ class IoTIntegrationService {
             averageValue: parseFloat(row.avg_value),
             minValue: parseFloat(row.min_value),
             maxValue: parseFloat(row.max_value),
-            readingCount: row.reading_count
-          }))
-        }
+            readingCount: row.reading_count,
+          })),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - getAggregatedData error:`, error);
       return {
         success: false,
         error: 'Failed to get aggregated data',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -506,12 +506,12 @@ class IoTIntegrationService {
       await this.processDataBuffer();
       return {
         success: true,
-        message: `Processed ${this.dataBuffer.length} buffered entries`
+        message: `Processed ${this.dataBuffer.length} buffered entries`,
       };
     }
     return {
       success: true,
-      message: 'No buffered data to process'
+      message: 'No buffered data to process',
     };
   }
 
@@ -529,7 +529,7 @@ class IoTIntegrationService {
     return {
       bufferSize: this.dataBuffer.length,
       maxBufferSize: this.maxBufferSize,
-      utilizationPercent: (this.dataBuffer.length / this.maxBufferSize) * 100
+      utilizationPercent: (this.dataBuffer.length / this.maxBufferSize) * 100,
     };
   }
 }

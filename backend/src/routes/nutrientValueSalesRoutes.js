@@ -1,6 +1,6 @@
 /**
  * AFRERA Nutrient Value Sales Routes
- * 
+ *
  * Nutrient-value-based sales endpoints:
  * - Nutrient-Value Pricing
  * - Nutrient Content Verification

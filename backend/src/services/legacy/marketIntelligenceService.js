@@ -1,6 +1,6 @@
 /**
  * Market Intelligence Service
- * 
+ *
  * Wires the existing `market_intelligence` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for market intelligence and price signals
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getMarketIntelligence(intelligenceId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM market_intelligence WHERE intelligence_id = $1`,
-      [intelligenceId]
+      'SELECT * FROM market_intelligence WHERE intelligence_id = $1',
+      [intelligenceId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Market intelligence not found: ${intelligenceId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get market intelligence: ${error.message}`);
@@ -43,10 +43,10 @@ async function getMarketIntelligence(intelligenceId) {
 async function getMarketIntelligenceByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM market_intelligence WHERE village_id = $1 ORDER BY recorded_at DESC`,
-      [villageId]
+      'SELECT * FROM market_intelligence WHERE village_id = $1 ORDER BY recorded_at DESC',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get market intelligence by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getMarketIntelligenceByVillage(villageId) {
 async function getMarketIntelligenceByCrop(cropId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM market_intelligence WHERE crop_id = $1 ORDER BY recorded_at DESC`,
-      [cropId]
+      'SELECT * FROM market_intelligence WHERE crop_id = $1 ORDER BY recorded_at DESC',
+      [cropId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get market intelligence by crop: ${error.message}`);
@@ -94,7 +94,7 @@ async function createMarketIntelligence(intelligence) {
       confidence_level,
       data_sources,
       valid_until,
-      recorded_at
+      recorded_at,
     } = intelligence;
 
     const { rows } = await pool.query(
@@ -105,8 +105,8 @@ async function createMarketIntelligence(intelligence) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
        RETURNING *`,
       [intelligence_id, village_id, district, crop_id, crop_name,
-       market_trend, price_signal, demand_forecast, supply_forecast,
-       recommended_action, confidence_level, data_sources, valid_until]
+        market_trend, price_signal, demand_forecast, supply_forecast,
+        recommended_action, confidence_level, data_sources, valid_until],
     );
 
     logger.info(`Market intelligence created: ${intelligence_id}`);
@@ -128,7 +128,7 @@ async function getLatestMarketIntelligence(villageId) {
       `SELECT DISTINCT ON (crop_id) * FROM market_intelligence
        WHERE village_id = $1 AND valid_until > NOW()
        ORDER BY crop_id, recorded_at DESC`,
-      [villageId]
+      [villageId],
     );
 
     return rows;
@@ -165,7 +165,7 @@ function setupRoutes(app) {
 
   router.get('/intelligence/crop/:cropId', async (req, res) => {
     try {
-      let intelligenceRecords = await getMarketIntelligenceByCrop(req.params.cropId);
+      const intelligenceRecords = await getMarketIntelligenceByCrop(req.params.cropId);
       res.json({ success: true, data: intelligenceRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -174,7 +174,7 @@ function setupRoutes(app) {
 
   router.get('/intelligence/village/:villageId/latest', async (req, res) => {
     try {
-      let intelligence = await getLatestMarketIntelligence(req.params.villageId);
+      const intelligence = await getLatestMarketIntelligence(req.params.villageId);
       res.json({ success: true, data: intelligence });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -183,7 +183,7 @@ function setupRoutes(app) {
 
   router.post('/intelligence', async (req, res) => {
     try {
-      let intelligence = await createMarketIntelligence(req.body);
+      const intelligence = await createMarketIntelligence(req.body);
       res.status(201).json({ success: true, data: intelligence });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -200,8 +200,6 @@ module.exports = {
   getMarketIntelligenceByCrop,
   createMarketIntelligence,
   getLatestMarketIntelligence,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

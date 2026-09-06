@@ -9,8 +9,8 @@ router.get('/products/:id/dynamic-price', controller.get);
 router.put('/pricing-rules/:id', controller.update);
 router.delete('/pricing-rules/:id', controller.remove);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

@@ -30,7 +30,7 @@ class ETLService {
    */
   async extract(sourceConfig) {
   // Validate inputs
-  if (!sourceConfig) throw new Error('Missing required parameter');
+    if (!sourceConfig) throw new Error('Missing required parameter');
 
     const { type, config } = sourceConfig;
 
@@ -128,7 +128,7 @@ class ETLService {
       const rawData = await this.extract(source);
 
       // Transform
-      let transformedData = await this.transform(rawData, transform);
+      const transformedData = await this.transform(rawData, transform);
 
       // Load
       const loadResult = await this.load(transformedData, destination);
@@ -138,14 +138,14 @@ class ETLService {
         name,
         recordsProcessed: transformedData.length,
         status: 'completed',
-        config: pipelineConfig
+        config: pipelineConfig,
       });
 
       logger.info(`ETL pipeline ${name} completed successfully`);
       return {
         success: true,
         recordsProcessed: transformedData.length,
-        loadResult
+        loadResult,
       };
     } catch (error) {
       // Save pipeline execution record with error
@@ -154,7 +154,7 @@ class ETLService {
         recordsProcessed: 0,
         status: 'failed',
         error: error.message,
-        config: pipelineConfig
+        config: pipelineConfig,
       });
 
       logger.error(`ETL pipeline ${name} failed`, error);
@@ -176,14 +176,14 @@ class ETLService {
    */
   async extractFromAPI(config) {
     const { url, method = 'GET', headers = {}, body } = config;
-    
+
     const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...headers
+        ...headers,
       },
-      body: body ? JSON.stringify(body) : undefined
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
@@ -214,13 +214,13 @@ class ETLService {
    */
   async extractFromCSV(config) {
     const { filePath } = config;
-    let fullPath = path.join(this.dataDir, filePath);
-    let content = await fs.readFile(fullPath, 'utf8');
-    
+    const fullPath = path.join(this.dataDir, filePath);
+    const content = await fs.readFile(fullPath, 'utf8');
+
     // Simple CSV parsing (in production, use a proper CSV library)
     const lines = content.split('\n');
     const headers = lines[0].split(',');
-    
+
     return lines.slice(1).map(line => {
       const values = line.split(',');
       const record = {};
@@ -339,12 +339,12 @@ class ETLService {
         INSERT INTO ${table} (${columnNames})
         VALUES (${placeholders})
       `;
-      
+
       if (onConflict === 'update') {
         const updates = columns.map(col => `${col} = EXCLUDED.${col}`).join(', ');
         query += ` ON CONFLICT DO UPDATE SET ${updates}`;
       } else if (onConflict === 'ignore') {
-        query += ` ON CONFLICT DO NOTHING`;
+        query += ' ON CONFLICT DO NOTHING';
       }
     }
 
@@ -353,7 +353,7 @@ class ETLService {
 
     for (const record of data) {
       try {
-        let values = columns.map(col => record[col]);
+        const values = columns.map(col => record[col]);
         await this.db.query(query, values);
         inserted++;
       } catch (error) {
@@ -371,7 +371,7 @@ class ETLService {
    */
   async loadToFile(data, config) {
     const { filePath, format = 'json' } = config;
-    let fullPath = path.join(this.dataDir, filePath);
+    const fullPath = path.join(this.dataDir, filePath);
 
     let content;
     switch (format) {
@@ -382,7 +382,7 @@ class ETLService {
         if (data.length === 0) {
           content = '';
         } else {
-          let headers = Object.keys(data[0]).join(',');
+          const headers = Object.keys(data[0]).join(',');
           const rows = data.map(row => Object.values(row).join(','));
           content = [headers, ...rows].join('\n');
         }
@@ -401,17 +401,17 @@ class ETLService {
   async loadToAPI(data, config) {
     const { url, method = 'POST', headers = {}, batchSize = 100 } = config;
 
-    let results = [];
+    const results = [];
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
-      
-      let response = await fetch(url, {
+
+      const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          ...headers
+          ...headers,
         },
-        body: JSON.stringify(batch)
+        body: JSON.stringify(batch),
       });
 
       if (!response.ok) {
@@ -440,7 +440,7 @@ class ETLService {
         executionData.recordsProcessed,
         executionData.status,
         executionData.error,
-        JSON.stringify(executionData.config)
+        JSON.stringify(executionData.config),
       ]);
     } catch (error) {
       logger.error('Save pipeline execution failed', error);
@@ -452,13 +452,13 @@ class ETLService {
    */
   async getPipelineHistory(pipelineName, limit = 10) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM etl_pipeline_executions
         WHERE name = $1
         ORDER BY created_at DESC
         LIMIT $2
       `;
-      let result = await this.db.query(query, [pipelineName, limit]);
+      const result = await this.db.query(query, [pipelineName, limit]);
       return result.rows;
     } catch (error) {
       logger.error('Get pipeline history failed', error);

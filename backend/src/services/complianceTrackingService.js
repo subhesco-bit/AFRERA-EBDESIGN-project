@@ -6,7 +6,7 @@ class ComplianceTrackingService {
     try {
       const id = require('uuid').v4();
       await db('compliance_records').insert({
-        id, entity_id: entityId, regulation_id: regulationId, status: 'active', created_at: new Date()
+        id, entity_id: entityId, regulation_id: regulationId, status: 'active', created_at: new Date(),
       });
       logger.info(`Compliance tracked: ${entityId}`);
       return { compliance_id: id, entity_id: entityId, status: 'active' };

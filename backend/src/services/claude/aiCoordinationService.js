@@ -1,22 +1,22 @@
 /**
  * AI Coordination Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: AI orchestration and coordination with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, model registry data, intent patterns, routing policies
  * Collaboration Mode: Orchestration tracking, decision logging, learning feedback
- * 
+ *
  * Original Devin Implementation: AI orchestration with model slot management, intent routing, DPDP compliance
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware orchestration using library knowledge
  * - AI-powered model selection optimization
  * - Historical orchestration pattern analysis
  * - Multi-factor routing optimization
  * - Real-time orchestration confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All model slot management preserved
  * - Original orchestration logic maintained
@@ -38,7 +38,7 @@ class ClaudeAIEnhancedCoordinationService {
     this.serviceName = 'AI Coordination Service';
     this.aiEnabled = process.env.CLAUDE_AI_ENABLED === 'true';
     this.originalService = originalAIOperationService;
-    
+
     // Fallback model slots (preserved from original)
     this.FALLBACK_SLOTS = originalAIOperationService.FALLBACK_SLOTS || [
       {
@@ -49,7 +49,7 @@ class ClaudeAIEnhancedCoordinationService {
         data_residency: 'DPDP-compliant',
         enabled: false,
         priority: 0,
-        notes: 'Placeholder slot for model assignment and DPDP residency review.'
+        notes: 'Placeholder slot for model assignment and DPDP residency review.',
       },
       {
         model_key: 'gemini-1.5-flash',
@@ -59,8 +59,8 @@ class ClaudeAIEnhancedCoordinationService {
         data_residency: 'DPDP-compliant',
         enabled: false,
         priority: 0,
-        notes: 'Reserved for low-latency routing until a residency/llm-cost decision is confirmed.'
-      }
+        notes: 'Reserved for low-latency routing until a residency/llm-cost decision is confirmed.',
+      },
     ];
   }
 
@@ -77,44 +77,44 @@ class ClaudeAIEnhancedCoordinationService {
         work_type: 'model_orchestration',
         service: this.serviceName,
         params: { intent, domain, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'orchestrateModelSlot',
-        intent: intent,
-        domain: domain
+        intent,
+        domain,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'decision',
         query: this.buildOrchestrationQuery(intent, domain, options),
-        context: { 
-          intent, 
-          domain, 
+        context: {
+          intent,
+          domain,
           options,
           libraryContext,
-          availableSlots: await this.originalService.listModelSlots()
+          availableSlots: await this.originalService.listModelSlots(),
         },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
       const originalResult = await this.originalService.listModelSlots();
-      
+
       const enhancedResult = {
         slots: originalResult,
         ai_enhanced: true,
         ai_orchestration_rationale: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_routing_recommendations: this.extractRoutingRecommendations(aiEnhancement.content)
+        ai_routing_recommendations: this.extractRoutingRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'model_orchestration',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -123,9 +123,9 @@ class ClaudeAIEnhancedCoordinationService {
         work_type: 'model_orchestration',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.listModelSlots();
     }
@@ -144,46 +144,46 @@ class ClaudeAIEnhancedCoordinationService {
         work_type: 'intent_routing',
         service: this.serviceName,
         params: { intent, domain, context, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
-      let libraryContext = await libraryKnowledgeService.buildAIContext({
+      const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'routeIntent',
-        intent: intent,
-        domain: domain,
-        context: context
+        intent,
+        domain,
+        context,
       });
 
-      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: this.buildIntentRoutingQuery(intent, domain, context, options),
-        context: { 
-          intent, 
-          domain, 
-          context, 
+        context: {
+          intent,
+          domain,
+          context,
           options,
           libraryContext,
-          unservedIntents: await this.originalService.listUnservedIntents()
+          unservedIntents: await this.originalService.listUnservedIntents(),
         },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
-      let originalResult = await this.originalService.listUnservedIntents();
-      
-      let enhancedResult = {
+      const originalResult = await this.originalService.listUnservedIntents();
+
+      const enhancedResult = {
         intents: originalResult,
         ai_enhanced: true,
         ai_routing_strategy: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_optimization_insights: this.extractOptimizationInsights(aiEnhancement.content)
+        ai_optimization_insights: this.extractOptimizationInsights(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'intent_routing',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -192,9 +192,9 @@ class ClaudeAIEnhancedCoordinationService {
         work_type: 'intent_routing',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.listUnservedIntents();
     }
@@ -219,16 +219,16 @@ class ClaudeAIEnhancedCoordinationService {
    */
   extractRoutingRecommendations(aiContent) {
     if (!aiContent) return [];
-    
+
     const recommendations = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('recommend') || line.includes('route') || line.includes('assign')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -237,16 +237,16 @@ class ClaudeAIEnhancedCoordinationService {
    */
   extractOptimizationInsights(aiContent) {
     if (!aiContent) return null;
-    
+
     const insights = [];
-    let lines = aiContent.split('\n');
-    
+    const lines = aiContent.split('\n');
+
     lines.forEach(line => {
       if (line.includes('optimize') || line.includes('improve') || line.includes('enhance')) {
         insights.push(line.trim());
       }
     });
-    
+
     return insights.length > 0 ? insights.join('. ') : null;
   }
 
@@ -284,7 +284,7 @@ class ClaudeAIEnhancedCoordinationService {
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
       fallback_slots: this.FALLBACK_SLOTS.length,
-      ai_enhanced_methods: ['orchestrateModelSlotAI', 'routeIntentAI']
+      ai_enhanced_methods: ['orchestrateModelSlotAI', 'routeIntentAI'],
     };
   }
 }

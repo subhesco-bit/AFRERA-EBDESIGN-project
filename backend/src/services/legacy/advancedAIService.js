@@ -35,7 +35,7 @@ const ADVANCED_AI_MODELS = {
     target: 'demand_quantity',
     accuracy: 0.94,
     retraining_interval: 'daily',
-    model_version: '2.1.0'
+    model_version: '2.1.0',
   },
   price_optimization: {
     type: 'reinforcement_learning',
@@ -44,7 +44,7 @@ const ADVANCED_AI_MODELS = {
     constraints: ['min_price', 'max_price', 'market_conditions', 'regulatory_limits'],
     accuracy: 0.91,
     retraining_interval: 'hourly',
-    model_version: '3.0.1'
+    model_version: '3.0.1',
   },
   credit_scoring: {
     type: 'ensemble_method',
@@ -53,7 +53,7 @@ const ADVANCED_AI_MODELS = {
     target: 'credit_risk_level',
     accuracy: 0.96,
     retraining_interval: 'weekly',
-    model_version: '4.2.0'
+    model_version: '4.2.0',
   },
   fraud_detection: {
     type: 'anomaly_detection',
@@ -62,7 +62,7 @@ const ADVANCED_AI_MODELS = {
     threshold: 0.98,
     accuracy: 0.97,
     retraining_interval: 'daily',
-    model_version: '5.1.0'
+    model_version: '5.1.0',
   },
   recommendation: {
     type: 'hybrid_recommender',
@@ -70,7 +70,7 @@ const ADVANCED_AI_MODELS = {
     features: ['user_history', 'similar_users', 'item_attributes', 'context', 'real_time_behavior', 'seasonal_preferences'],
     accuracy: 0.89,
     retraining_interval: 'daily',
-    model_version: '6.0.0'
+    model_version: '6.0.0',
   },
   crop_disease_detection: {
     type: 'computer_vision',
@@ -79,22 +79,22 @@ const ADVANCED_AI_MODELS = {
     accuracy: 0.92,
     input_types: ['image', 'spectral_data'],
     retraining_interval: 'monthly',
-    model_version: '7.0.0'
+    model_version: '7.0.0',
   },
   yield_prediction: {
     type: 'multimodal_learning',
     inputs: ['satellite_imagery', 'weather_data', 'soil_sensors', 'historical_yields', 'crop_health'],
     accuracy: 0.88,
     retraining_interval: 'weekly',
-    model_version: '8.1.0'
+    model_version: '8.1.0',
   },
   supply_chain_optimization: {
     type: 'graph_neural_network',
     architecture: 'temporal_gnn',
     accuracy: 0.85,
     retraining_interval: 'daily',
-    model_version: '9.0.0'
-  }
+    model_version: '9.0.0',
+  },
 };
 
 /**
@@ -103,7 +103,7 @@ const ADVANCED_AI_MODELS = {
 async function advancedPredictDemand(productId, timeHorizon = 30, includeExplanations = true) {
   try {
     const pg = getPostgreSQL();
-    
+
     // Get comprehensive historical data
     const historicalQuery = `
       WITH time_series AS (
@@ -132,36 +132,36 @@ async function advancedPredictDemand(productId, timeHorizon = 30, includeExplana
         AVG(demand) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as moving_avg_7
       FROM time_series
     `;
-    
+
     const historicalData = await pg.query(historicalQuery, [productId]);
-    
+
     // Get external factors
     const externalFactors = await getExternalFactors(productId);
-    
+
     // Load and use LSTM model
     const model = await loadOrCreateLSTMModel('demand_forecasting');
-    
+
     // Prepare time series data
     const timeSeriesData = prepareTimeSeriesData(historicalData.rows, externalFactors);
-    
+
     // Make predictions
     const predictions = await model.predict(timeSeriesData);
-    
+
     // Calculate confidence intervals
     const confidenceIntervals = calculateConfidenceIntervals(predictions, historicalData.rows);
-    
+
     // Generate explanations if requested
     let explanations = {};
     if (includeExplanations) {
       explanations = await generateDemandExplanations(predictions, externalFactors, historicalData.rows);
     }
-    
+
     // Feature importance analysis
     const featureImportance = await analyzeFeatureImportance(model, timeSeriesData);
-    
+
     logger.info(
       `Advanced demand prediction for product ${productId} ` +
-      `(accuracy ${(predictions.accuracy ?? 0).toFixed(2)})`
+      `(accuracy ${(predictions.accuracy ?? 0).toFixed(2)})`,
     );
 
     // Afferent signal: let the decision engine decide whether this forecast is
@@ -172,11 +172,10 @@ async function advancedPredictDemand(productId, timeHorizon = 30, includeExplana
         accuracy: predictions.accuracy ?? 0,
         trend: predictions.trend ?? 0,
         forecast: predictions.values ?? [],
-        insufficientData: predictions.insufficientData ?? false
+        insufficientData: predictions.insufficientData ?? false,
       },
-      { severity: SEVERITY.INFO, source: 'advancedAIService', entityId: productId }
+      { severity: SEVERITY.INFO, source: 'advancedAIService', entityId: productId },
     );
-
 
     return {
       product_id: productId,
@@ -188,18 +187,18 @@ async function advancedPredictDemand(productId, timeHorizon = 30, includeExplana
         historical: {
           trend: calculateTrend(historicalData.rows),
           seasonality: calculateAdvancedSeasonality(historicalData.rows),
-          volatility: calculateVolatility(historicalData.rows)
+          volatility: calculateVolatility(historicalData.rows),
         },
-        external: externalFactors
+        external: externalFactors,
       },
-      explanations: explanations,
+      explanations,
       feature_importance: featureImportance,
       model_info: {
         type: ADVANCED_AI_MODELS.demand_forecasting.type,
         version: ADVANCED_AI_MODELS.demand_forecasting.model_version,
-        last_trained: await getModelLastTrained('demand_forecasting')
+        last_trained: await getModelLastTrained('demand_forecasting'),
       },
-      recommendations: generateAdvancedDemandRecommendations(predictions, confidenceIntervals, externalFactors)
+      recommendations: generateAdvancedDemandRecommendations(predictions, confidenceIntervals, externalFactors),
     };
   } catch (error) {
     logger.error('Advanced demand prediction failed', { error: error.message, stack: error.stack });
@@ -212,8 +211,8 @@ async function advancedPredictDemand(productId, timeHorizon = 30, includeExplana
  */
 async function advancedOptimizePrice(productId, currentPrice, context = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get comprehensive market data
     const marketQuery = `
       WITH market_analysis AS (
@@ -250,7 +249,7 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
       LEFT JOIN competitor_analysis ca ON true
       GROUP BY ma.*
     `;
-    
+
     const marketData = await pg.query(marketQuery, [productId]);
 
     // Daily price/demand series so the RL model can actually estimate real
@@ -290,7 +289,7 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
       inventory_level: context.inventory_level || await getInventoryLevel(productId),
       time_of_day: new Date().getHours(),
       day_of_week: new Date().getDay(),
-      season: getCurrentSeason()
+      season: getCurrentSeason(),
     };
 
     // Get optimal action from RL model
@@ -308,21 +307,21 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
     // Real recent demand: prefer the actual daily series just fetched (more
     // representative than a single 3-month count) and fall back to
     // transaction_count if the series is empty.
-    const baselineDemand = demandHistory.length
-      ? stats.mean(demandHistory)
-      : Number(marketData.rows[0]?.transaction_count) || 0;
+    const baselineDemand = demandHistory.length ?
+      stats.mean(demandHistory) :
+      Number(marketData.rows[0]?.transaction_count) || 0;
     const expectedOutcomes = simulatePriceOutcomes(currentPrice, optimalAction.price, elasticity, baselineDemand);
 
     // Price volatility level for risk analysis, derived from the same real
     // daily series (falls back to the single-query estimate when history is
     // too thin for calculateVolatility() to use).
-    const priceVolatility = priceHistoryData.rows.length
-      ? calculateVolatility(priceHistoryData.rows)
-      : (() => {
-          const avgMarketPrice = Number(marketData.rows[0]?.avg_market_price) || 0;
-          const priceCV = avgMarketPrice ? (Number(marketData.rows[0].price_stddev) || 0) / avgMarketPrice : 0;
-          return { coefficient_of_variation: priceCV, level: priceCV > 0.5 ? 'high' : priceCV > 0.2 ? 'moderate' : 'low' };
-        })();
+    const priceVolatility = priceHistoryData.rows.length ?
+      calculateVolatility(priceHistoryData.rows) :
+      (() => {
+        const avgMarketPrice = Number(marketData.rows[0]?.avg_market_price) || 0;
+        const priceCV = avgMarketPrice ? (Number(marketData.rows[0].price_stddev) || 0) / avgMarketPrice : 0;
+        return { coefficient_of_variation: priceCV, level: priceCV > 0.5 ? 'high' : priceCV > 0.2 ? 'moderate' : 'low' };
+      })();
 
     // Risk analysis (must be computed before pricing strategy, which reads it -
     // previously risk was computed after strategy and passed marketData.rows[0]
@@ -352,7 +351,7 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
       market_analysis: {
         current: marketData.rows[0],
         competitor_data: marketData.rows[0].competitor_data,
-        real_time_factors: realTimeFactors
+        real_time_factors: realTimeFactors,
       },
       expected_outcomes: expectedOutcomes,
       risk_analysis: riskAnalysis,
@@ -360,9 +359,9 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
         type: ADVANCED_AI_MODELS.price_optimization.type,
         algorithm: ADVANCED_AI_MODELS.price_optimization.algorithm,
         version: ADVANCED_AI_MODELS.price_optimization.model_version,
-        last_trained: await getModelLastTrained('price_optimization')
+        last_trained: await getModelLastTrained('price_optimization'),
       },
-      recommendations: generateAdvancedPricingRecommendations(optimalAction, expectedOutcomes, riskAnalysis)
+      recommendations: generateAdvancedPricingRecommendations(optimalAction, expectedOutcomes, riskAnalysis),
     };
   } catch (error) {
     logger.error('Advanced price optimization failed', { error: error.message, stack: error.stack });
@@ -375,8 +374,8 @@ async function advancedOptimizePrice(productId, currentPrice, context = {}) {
  */
 async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get comprehensive farmer data
     const farmerQuery = `
       WITH farmer_data AS (
@@ -433,46 +432,46 @@ async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
       LEFT JOIN operational_data od ON true
       LEFT JOIN market_performance mp ON true
     `;
-    
+
     const farmerResult = await pg.query(farmerQuery, [farmerId]);
     const farmerData = farmerResult.rows[0];
-    
+
     // Get external risk factors
     const externalRiskFactors = await getExternalRiskFactors(farmerId);
-    
+
     // Load ensemble models
     const models = await loadEnsembleModels('credit_scoring');
-    
+
     // Get predictions from each model
-    let predictions = {};
+    const predictions = {};
     for (const [modelName, model] of Object.entries(models)) {
       predictions[modelName] = await model.predict(farmerData, externalRiskFactors);
     }
-    
+
     // Ensemble predictions using weighted averaging
     const ensemblePrediction = ensemblePredictions(predictions, {
       random_forest: 0.3,
       gradient_boosting: 0.4,
-      neural_network: 0.3
+      neural_network: 0.3,
     });
-    
+
     // Calculate advanced credit score
     const creditScore = calculateAdvancedCreditScore(ensemblePrediction, farmerData, externalRiskFactors);
-    
+
     // Determine risk level with confidence
     const riskAssessment = assessRiskLevel(creditScore, ensemblePrediction.confidence);
-    
+
     // Generate explanations if requested
     let explanations = {};
     if (includeExplanations) {
       explanations = await generateCreditExplanations(ensemblePrediction, farmerData, externalRiskFactors);
     }
-    
+
     // SHAP values for explainability
     const shapValues = await calculateSHAPValues(models, farmerData);
-    
+
     logger.info(`Advanced credit risk assessment for farmer ${farmerId}: ${riskAssessment.level} (score: ${creditScore})`);
-    
+
     return {
       farmer_id: farmerId,
       credit_score: creditScore,
@@ -483,38 +482,38 @@ async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
       farmer_profile: {
         financial: {
           total_loans: farmerData.total_loans,
-          repayment_rate: farmerData.total_loans > 0 
-            ? (farmerData.paid_loans / farmerData.total_loans * 100).toFixed(1) 
-            : 0,
-          default_rate: farmerData.total_loans > 0 
-            ? (farmerData.defaulted_loans / farmerData.total_loans * 100).toFixed(1) 
-            : 0,
+          repayment_rate: farmerData.total_loans > 0 ?
+            (farmerData.paid_loans / farmerData.total_loans * 100).toFixed(1) :
+            0,
+          default_rate: farmerData.total_loans > 0 ?
+            (farmerData.defaulted_loans / farmerData.total_loans * 100).toFixed(1) :
+            0,
           avg_days_late: farmerData.avg_days_late || 0,
-          active_outstanding: farmerData.active_loans_outstanding || 0
+          active_outstanding: farmerData.active_loans_outstanding || 0,
         },
         operational: {
           crop_diversity: farmerData.crop_diversity || 0,
           total_area: farmerData.total_area || 0,
           avg_yield: farmerData.avg_yield || 0,
-          avg_quality: farmerData.avg_quality_score || 0
+          avg_quality: farmerData.avg_quality_score || 0,
         },
         market: {
           total_sales: farmerData.total_sales || 0,
           total_revenue: farmerData.total_revenue || 0,
           avg_price_realized: farmerData.avg_price_realized || 0,
-          price_volatility: farmerData.price_volatility || 0
-        }
+          price_volatility: farmerData.price_volatility || 0,
+        },
       },
       external_risk_factors: externalRiskFactors,
-      explanations: explanations,
+      explanations,
       shap_values: shapValues,
       loan_recommendations: generateLoanRecommendations(creditScore, riskAssessment),
       model_info: {
         type: ADVANCED_AI_MODELS.credit_scoring.type,
         algorithms: ADVANCED_AI_MODELS.credit_scoring.algorithms,
         version: ADVANCED_AI_MODELS.credit_scoring.model_version,
-        last_trained: await getModelLastTrained('credit_scoring')
-      }
+        last_trained: await getModelLastTrained('credit_scoring'),
+      },
     };
   } catch (error) {
     logger.error('Advanced credit risk assessment failed', { error: error.message, stack: error.stack });
@@ -527,38 +526,38 @@ async function advancedAssessCreditRisk(farmerId, includeExplanations = true) {
  */
 async function advancedDetectFraud(transactionData, userId) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get user behavior patterns
     const behaviorPatterns = await getUserBehaviorPatterns(userId);
-    
+
     // Get transaction context
     const transactionContext = await getTransactionContext(transactionData);
-    
+
     // Load fraud detection models
-    let models = await loadFraudDetectionModels();
-    
+    const models = await loadFraudDetectionModels();
+
     // Run anomaly detection
     const anomalyScores = {};
     for (const [modelName, model] of Object.entries(models)) {
       anomalyScores[modelName] = await model.detectAnomaly(transactionData, behaviorPatterns, transactionContext);
     }
-    
+
     // Ensemble anomaly scores
     const ensembleScore = ensembleAnomalyScores(anomalyScores);
-    
+
     // Get detailed analysis
     const detailedAnalysis = await analyzeAnomalyDetails(transactionData, behaviorPatterns, ensembleScore);
-    
+
     // Determine fraud probability
     const fraudProbability = calculateFraudProbability(ensembleScore, detailedAnalysis);
-    
+
     // Generate fraud report
     const fraudReport = generateFraudReport(transactionData, ensembleScore, detailedAnalysis, fraudProbability);
-    
+
     // Store fraud detection results
     await storeFraudDetectionResults(transactionData.transaction_id, fraudReport);
-    
+
     logger.info(`Advanced fraud detection for transaction ${transactionData.transaction_id}: ${fraudProbability}`);
 
     // Afferent signal: publish the finding so the decision engine can correlate
@@ -570,8 +569,8 @@ async function advancedDetectFraud(transactionData, userId) {
       {
         severity: fraudProbability >= 0.8 ? SEVERITY.CRITICAL : SEVERITY.WARNING,
         source: 'advancedAIService',
-        entityId: userId
-      }
+        entityId: userId,
+      },
     );
 
     return {
@@ -586,8 +585,8 @@ async function advancedDetectFraud(transactionData, userId) {
       model_info: {
         algorithms: ADVANCED_AI_MODELS.fraud_detection.algorithms,
         version: ADVANCED_AI_MODELS.fraud_detection.model_version,
-        threshold: ADVANCED_AI_MODELS.fraud_detection.threshold
-      }
+        threshold: ADVANCED_AI_MODELS.fraud_detection.threshold,
+      },
     };
   } catch (error) {
     logger.error('Advanced fraud detection failed', { error: error.message, stack: error.stack });
@@ -600,64 +599,64 @@ async function advancedDetectFraud(transactionData, userId) {
  */
 async function advancedGenerateRecommendations(userId, context = {}) {
   try {
-    let pg = getPostgreSQL();
-    
+    const pg = getPostgreSQL();
+
     // Get user profile and preferences
     const userProfile = await getUserProfile(userId);
-    
+
     // Get user history
     const userHistory = await getUserHistory(userId);
-    
+
     // Get real-time context
     const realTimeContext = await getRealTimeContext(userId, context);
-    
+
     // Load recommendation models
-    let models = await loadRecommendationModels();
-    
+    const models = await loadRecommendationModels();
+
     // Generate recommendations from each approach
     const collaborativeRecommendations = await models.collaborative_filtering.generate(userHistory);
     const contentBasedRecommendations = await models.content_based.generate(userProfile);
     const knowledgeBasedRecommendations = await models.knowledge_based.generate(context);
     const contextAwareRecommendations = await models.context_aware.generate(realTimeContext);
-    
+
     // Hybrid recommendations with weighted scoring
     const hybridRecommendations = hybridRecommendationScoring({
       collaborative: collaborativeRecommendations,
       content_based: contentBasedRecommendations,
       knowledge_based: knowledgeBasedRecommendations,
-      context_aware: contextAwareRecommendations
+      context_aware: contextAwareRecommendations,
     }, {
       collaborative: 0.3,
       content_based: 0.25,
       knowledge_based: 0.2,
-      context_aware: 0.25
+      context_aware: 0.25,
     });
-    
+
     // Apply diversity and novelty
     const diversifiedRecommendations = applyDiversityFiltering(hybridRecommendations, userHistory);
     const finalRecommendations = applyNoveltyFiltering(diversifiedRecommendations, userHistory);
-    
+
     // Generate explanations
     const explanations = await generateRecommendationExplanations(finalRecommendations, userProfile, userHistory);
-    
+
     logger.info(`Advanced recommendations generated for user ${userId}: ${finalRecommendations.length} items`);
-    
+
     return {
       user_id: userId,
       recommendations: finalRecommendations,
-      explanations: explanations,
+      explanations,
       context: realTimeContext,
       algorithm_weights: {
         collaborative: 0.3,
         content_based: 0.25,
         knowledge_based: 0.2,
-        context_aware: 0.25
+        context_aware: 0.25,
       },
       model_info: {
         type: ADVANCED_AI_MODELS.recommendation.type,
         algorithms: ADVANCED_AI_MODELS.recommendation.algorithms,
-        version: ADVANCED_AI_MODELS.recommendation.model_version
-      }
+        version: ADVANCED_AI_MODELS.recommendation.model_version,
+      },
     };
   } catch (error) {
     logger.error('Advanced recommendation generation failed', { error: error.message, stack: error.stack });
@@ -672,31 +671,31 @@ async function detectCropDisease(imageData, additionalData = {}) {
   try {
     // Load computer vision model
     const cvModel = await loadComputerVisionModel('crop_disease_detection');
-    
+
     // Preprocess image
     const preprocessedImage = preprocessImage(imageData);
-    
+
     // Run disease detection
     const detectionResults = await cvModel.detect(preprocessedImage);
-    
+
     // Get disease information
     const diseaseInfo = await getDiseaseInformation(detectionResults.detected_diseases);
-    
+
     // Generate treatment recommendations
     const treatmentRecommendations = await generateTreatmentRecommendations(detectionResults, diseaseInfo);
-    
+
     // Calculate confidence intervals
-    let confidenceIntervals = calculateDetectionConfidence(detectionResults);
-    
+    const confidenceIntervals = calculateDetectionConfidence(detectionResults);
+
     logger.info(`Crop disease detection completed: ${detectionResults.primary_disease}`);
-    
+
     return {
       image_analysis: {
         primary_disease: detectionResults.primary_disease,
         confidence: detectionResults.confidence,
         detected_diseases: detectionResults.detected_diseases,
         affected_areas: detectionResults.affected_areas,
-        severity: detectionResults.severity
+        severity: detectionResults.severity,
       },
       disease_information: diseaseInfo,
       treatment_recommendations: treatmentRecommendations,
@@ -704,13 +703,13 @@ async function detectCropDisease(imageData, additionalData = {}) {
       additional_insights: {
         spread_prediction: await predictDiseaseSpread(detectionResults, additionalData),
         economic_impact: await calculateEconomicImpact(detectionResults, additionalData),
-        prevention_measures: await generatePreventionMeasures(detectionResults)
+        prevention_measures: await generatePreventionMeasures(detectionResults),
       },
       model_info: {
         architecture: ADVANCED_AI_MODELS.crop_disease_detection.architecture,
         model: ADVANCED_AI_MODELS.crop_disease_detection.model,
-        version: ADVANCED_AI_MODELS.crop_disease_detection.model_version
-      }
+        version: ADVANCED_AI_MODELS.crop_disease_detection.model_version,
+      },
     };
   } catch (error) {
     logger.error('Crop disease detection failed', { error: error.message, stack: error.stack });
@@ -754,7 +753,7 @@ async function loadOrCreateLSTMModel(modelName) {
       // Apply the seasonal multiplier for each future phase
       const startPhase = series.length % period;
       const values = forecast.map((v, i) =>
-        Math.max(0, v * indices[(startPhase + i) % period])
+        Math.max(0, v * indices[(startPhase + i) % period]),
       );
 
       // Real in-sample accuracy, not an assumed constant
@@ -768,9 +767,9 @@ async function loadOrCreateLSTMModel(modelName) {
         trend,
         seasonalIndices: indices,
         residualStdDev: stats.stdDev(series.map((v, i) => v - (fitted[i] ?? v))),
-        insufficientData: series.length < period * 2
+        insufficientData: series.length < period * 2,
       };
-    }
+    },
   };
 }
 
@@ -786,8 +785,8 @@ async function loadRLModel(modelName) {
     modelType: 'elasticity_optimiser',
     getAction: async (state = {}) => {
       const currentPrice = Number(state.current_price) || 0;
-      let priceHistory = Array.isArray(state.price_history) ? state.price_history : [];
-      let demandHistory = Array.isArray(state.demand_history) ? state.demand_history : [];
+      const priceHistory = Array.isArray(state.price_history) ? state.price_history : [];
+      const demandHistory = Array.isArray(state.demand_history) ? state.demand_history : [];
 
       const minPrice = Number.isFinite(state.min_price) ? state.min_price : currentPrice * 0.7;
       const maxPrice = Number.isFinite(state.max_price) ? state.max_price : currentPrice * 1.3;
@@ -798,12 +797,12 @@ async function loadRLModel(modelName) {
           price: currentPrice,
           confidence: 0,
           rationale: 'Insufficient paired price/demand history to estimate elasticity; holding current price.',
-          insufficientData: true
+          insufficientData: true,
         };
       }
 
       // Negative correlation = demand falls as price rises (normal good).
-      let elasticity = stats.correlation(priceHistory, demandHistory);
+      const elasticity = stats.correlation(priceHistory, demandHistory);
       const demandTrend = stats.linearRegression(demandHistory);
 
       // Move price against demand pressure, scaled by how strong the
@@ -828,13 +827,13 @@ async function loadRLModel(modelName) {
         constrainedBy:
           price === minPrice ? 'min_price' : price === maxPrice ? 'max_price' : null,
         rationale:
-          cappedAdjustment > 0
-            ? 'Demand trending up relative to price sensitivity; modest increase indicated.'
-            : cappedAdjustment < 0
-              ? 'Demand trending down; discount indicated to defend volume.'
-              : 'No material demand trend; holding price.'
+          cappedAdjustment > 0 ?
+            'Demand trending up relative to price sensitivity; modest increase indicated.' :
+            cappedAdjustment < 0 ?
+              'Demand trending down; discount indicated to defend volume.' :
+              'No material demand trend; holding price.',
       };
-    }
+    },
   };
 }
 
@@ -868,8 +867,8 @@ async function loadEnsembleModels(modelName) {
           farm_size: 1,
           crop_diversity: 1,
           certifications: 1,
-          weather_risk: 1
-        })
+          weather_risk: 1,
+        }),
     },
     // History-dominant view
     gradient_boosting: {
@@ -878,8 +877,8 @@ async function loadEnsembleModels(modelName) {
           repayment_history: 5,
           fdi_score: 2,
           market_volatility: 1,
-          weather_risk: 1
-        })
+          weather_risk: 1,
+        }),
     },
     // Capacity/resilience-dominant view
     neural_network: {
@@ -889,9 +888,9 @@ async function loadEnsembleModels(modelName) {
           farm_size: 2,
           crop_diversity: 2,
           certifications: 2,
-          repayment_history: 1
-        })
-    }
+          repayment_history: 1,
+        }),
+    },
   };
 }
 
@@ -907,7 +906,7 @@ function ensemblePredictions(predictions, weights) {
 
   return {
     score: weightedSum / totalWeight,
-    confidence: Math.min(...Object.values(predictions).map(p => p.confidence))
+    confidence: Math.min(...Object.values(predictions).map(p => p.confidence)),
   };
 }
 
@@ -955,7 +954,7 @@ async function getExternalFactors(productId) {
     competitor_pricing: { available: false, note: 'No competitor price feed integrated' },
     economic_indicators: { available: false, note: 'No economic data feed integrated' },
     social_sentiment: { available: false, note: 'No social listening integrated' },
-    product_id: productId
+    product_id: productId,
   };
 }
 
@@ -968,14 +967,14 @@ function prepareTimeSeriesData(rows, externalFactors = {}) {
     horizon: 30,
     seasonalPeriod: 7,
     season: externalFactors.season || getCurrentSeason(),
-    points: demand.length
+    points: demand.length,
   };
 }
 
 /** 95% intervals around each forecast point, widening with horizon. */
 function calculateConfidenceIntervals(predictions, rows) {
-  let values = Array.isArray(predictions?.values) ? predictions.values
-    : (Array.isArray(predictions) ? predictions : []);
+  const values = Array.isArray(predictions?.values) ? predictions.values :
+    (Array.isArray(predictions) ? predictions : []);
   const history = column(rows, 'demand');
   const sd = predictions?.residualStdDev ?? stats.stdDev(history);
 
@@ -987,20 +986,20 @@ function calculateConfidenceIntervals(predictions, rows) {
 }
 
 function calculateTrend(rows) {
-  let series = column(rows, 'demand');
+  const series = column(rows, 'demand');
   const { slope, r2 } = stats.linearRegression(series);
   const avg = stats.mean(series);
   return {
     slope,
     r2,
     direction: slope > 0.01 ? 'increasing' : slope < -0.01 ? 'decreasing' : 'stable',
-    percent_change_per_period: avg === 0 ? 0 : (slope / avg) * 100
+    percent_change_per_period: avg === 0 ? 0 : (slope / avg) * 100,
   };
 }
 
 function calculateAdvancedSeasonality(rows, period = 7) {
-  let series = column(rows, 'demand');
-  let indices = stats.seasonalIndices(series, period);
+  const series = column(rows, 'demand');
+  const indices = stats.seasonalIndices(series, period);
   const strength = stats.stdDev(indices);
   return {
     period,
@@ -1008,17 +1007,17 @@ function calculateAdvancedSeasonality(rows, period = 7) {
     strength,
     detected: strength > 0.05,
     peak_phase: indices.indexOf(Math.max(...indices)),
-    trough_phase: indices.indexOf(Math.min(...indices))
+    trough_phase: indices.indexOf(Math.min(...indices)),
   };
 }
 
 function calculateVolatility(rows) {
-  let series = column(rows, 'demand');
+  const series = column(rows, 'demand');
   const cv = stats.coefficientOfVariation(series);
   return {
     std_dev: stats.stdDev(series),
     coefficient_of_variation: cv,
-    level: cv > 0.5 ? 'high' : cv > 0.2 ? 'moderate' : 'low'
+    level: cv > 0.5 ? 'high' : cv > 0.2 ? 'moderate' : 'low',
   };
 }
 
@@ -1051,9 +1050,9 @@ async function generateDemandExplanations(predictions, externalFactors, rows) {
   const notes = [
     `Demand is ${trend.direction} (${trend.percent_change_per_period.toFixed(1)}% per period, fit r²=${trend.r2.toFixed(2)}).`,
     `Volatility is ${vol.level} (CV=${vol.coefficient_of_variation.toFixed(2)}).`,
-    season.detected
-      ? `Weekly seasonality detected; peak on phase ${season.peak_phase}.`
-      : 'No material weekly seasonality detected.'
+    season.detected ?
+      `Weekly seasonality detected; peak on phase ${season.peak_phase}.` :
+      'No material weekly seasonality detected.',
   ];
   if (predictions?.insufficientData) {
     notes.push('WARNING: history is shorter than two seasonal cycles; forecast is low-confidence.');
@@ -1062,17 +1061,17 @@ async function generateDemandExplanations(predictions, externalFactors, rows) {
 }
 
 function generateAdvancedDemandRecommendations(predictions, intervals, externalFactors) {
-  let values = predictions?.values || [];
+  const values = predictions?.values || [];
   const recs = [];
   if (values.length === 0) return recs;
 
-  let total = values.reduce((a, b) => a + b, 0);
+  const total = values.reduce((a, b) => a + b, 0);
   const peak = Math.max(...values);
   const upper = intervals?.length ? Math.max(...intervals.map((i) => i.upper)) : peak;
 
   recs.push({
     action: 'stock_planning',
-    detail: `Plan for ~${Math.round(total)} units over the horizon; hold buffer to ${Math.round(upper)} to cover the 95% upper bound.`
+    detail: `Plan for ~${Math.round(total)} units over the horizon; hold buffer to ${Math.round(upper)} to cover the 95% upper bound.`,
   });
   if (predictions?.trend > 0) {
     recs.push({ action: 'scale_up', detail: 'Trend is positive - secure additional supply early.' });
@@ -1092,17 +1091,17 @@ async function getRealTimePricingFactors(productId) {
     product_id: productId,
     inventory_pressure: { available: false },
     competitor_prices: { available: false, note: 'No competitor price feed integrated' },
-    logistics_cost_index: { available: false }
+    logistics_cost_index: { available: false },
   };
 }
 
 async function getInventoryLevel(productId) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
     if (!pg) return { available: false };
     const r = await pg.query(
       'SELECT COALESCE(SUM(quantity), 0) AS qty FROM inventory WHERE product_id = $1',
-      [productId]
+      [productId],
     );
     return { available: true, quantity: parseFloat(r.rows[0]?.qty) || 0 };
   } catch (error) {
@@ -1121,16 +1120,16 @@ function simulatePriceOutcomes(currentPrice, proposedPrice, elasticity, baseline
     projected_demand_change_pct: demandChange * 100,
     projected_demand: projectedDemand,
     projected_revenue: projectedDemand * proposedPrice,
-    baseline_revenue: baselineDemand * currentPrice
+    baseline_revenue: baselineDemand * currentPrice,
   };
 }
 
 function analyzePricingRisk(outcome, volatility) {
-  const revenueDelta = outcome.baseline_revenue === 0
-    ? 0
-    : (outcome.projected_revenue - outcome.baseline_revenue) / outcome.baseline_revenue;
-  const level = Math.abs(revenueDelta) > 0.2 || volatility?.level === 'high' ? 'high'
-    : Math.abs(revenueDelta) > 0.08 ? 'moderate' : 'low';
+  const revenueDelta = outcome.baseline_revenue === 0 ?
+    0 :
+    (outcome.projected_revenue - outcome.baseline_revenue) / outcome.baseline_revenue;
+  const level = Math.abs(revenueDelta) > 0.2 || volatility?.level === 'high' ? 'high' :
+    Math.abs(revenueDelta) > 0.08 ? 'moderate' : 'low';
   return { level, projected_revenue_change_pct: revenueDelta * 100, demand_volatility: volatility?.level };
 }
 
@@ -1143,12 +1142,12 @@ function generatePricingStrategy(action, outcome, risk) {
   }
   return {
     strategy: outcome.price_change_pct > 0 ? 'increase' : outcome.price_change_pct < 0 ? 'discount' : 'hold',
-    reason: action?.rationale || 'Within normal tolerance.'
+    reason: action?.rationale || 'Within normal tolerance.',
   };
 }
 
 function generateAdvancedPricingRecommendations(action, outcome, risk) {
-  let recs = [{ action: 'set_price', detail: `Recommended price: ${action.price?.toFixed(2)}` }];
+  const recs = [{ action: 'set_price', detail: `Recommended price: ${action.price?.toFixed(2)}` }];
   if (action.constrainedBy) {
     recs.push({ action: 'review_bounds', detail: `Price clamped by ${action.constrainedBy}.` });
   }
@@ -1161,11 +1160,11 @@ function generateAdvancedPricingRecommendations(action, outcome, risk) {
 // --- credit helpers ----------------------------------------------------------
 
 function calculateAdvancedCreditScore(ensembleResult) {
-  let score = Math.round(ensembleResult?.score ?? 0);
+  const score = Math.round(ensembleResult?.score ?? 0);
   return {
     score,
     band: score >= 75 ? 'A' : score >= 60 ? 'B' : score >= 45 ? 'C' : 'D',
-    scale: '0-100'
+    scale: '0-100',
   };
 }
 
@@ -1181,7 +1180,7 @@ async function getExternalRiskFactors(farmerId) {
   return {
     farmer_id: farmerId,
     weather_risk: { available: false, note: 'No weather feed integrated' },
-    market_volatility: { available: false, note: 'No market index integrated' }
+    market_volatility: { available: false, note: 'No market index integrated' },
   };
 }
 
@@ -1192,7 +1191,7 @@ function calculateSHAPValues(contributions) {
   return {
     method: 'additive_weight_contribution',
     note: 'Exact contributions from a linear weighted scorer, not sampled SHAP.',
-    values: contributions || {}
+    values: contributions || {},
   };
 }
 
@@ -1200,18 +1199,18 @@ async function generateCreditExplanations(scoreObj, contributions) {
   const entries = Object.entries(contributions || {})
     .sort((a, b) => (b[1].share || 0) - (a[1].share || 0));
   const top = entries.slice(0, 3).map(
-    ([k, v]) => `${k} (${((v.share || 0) * 100).toFixed(0)}% of score)`
+    ([k, v]) => `${k} (${((v.share || 0) * 100).toFixed(0)}% of score)`,
   );
   return {
-    summary: top.length
-      ? `Score ${scoreObj.score}/100 (band ${scoreObj.band}). Largest drivers: ${top.join(', ')}.`
-      : `Score ${scoreObj.score}/100 (band ${scoreObj.band}).`,
-    drivers: entries.map(([k, v]) => ({ feature: k, share: v.share, value: v.value }))
+    summary: top.length ?
+      `Score ${scoreObj.score}/100 (band ${scoreObj.band}). Largest drivers: ${top.join(', ')}.` :
+      `Score ${scoreObj.score}/100 (band ${scoreObj.band}).`,
+    drivers: entries.map(([k, v]) => ({ feature: k, share: v.share, value: v.value })),
   };
 }
 
 function generateLoanRecommendations(scoreObj, riskLevel) {
-  let recs = [];
+  const recs = [];
   if (riskLevel === 'low') {
     recs.push({ action: 'approve', detail: 'Strong profile; standard terms appropriate.' });
   } else if (riskLevel === 'moderate') {
@@ -1230,24 +1229,24 @@ async function loadFraudDetectionModels() {
   return {
     modelType: 'statistical_anomaly',
     detect: (series, value) => {
-      const z = stats.stdDev(series) === 0
-        ? 0
-        : Math.abs((value - stats.mean(series)) / stats.stdDev(series));
+      const z = stats.stdDev(series) === 0 ?
+        0 :
+        Math.abs((value - stats.mean(series)) / stats.stdDev(series));
       const outliers = stats.iqrOutliers([...series, value]);
       const isIqrOutlier = outliers.some((o) => o.value === value);
       return { z_score: z, iqr_outlier: isIqrOutlier };
-    }
+    },
   };
 }
 
 async function getUserBehaviorPatterns(userId) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
     if (!pg) return { available: false, amounts: [] };
-    let r = await pg.query(
+    const r = await pg.query(
       `SELECT total_amount FROM orders WHERE buyer_id = $1
        ORDER BY created_at DESC LIMIT 100`,
-      [userId]
+      [userId],
     );
     return { available: true, amounts: column(r.rows, 'total_amount').filter(Number.isFinite) };
   } catch (error) {
@@ -1260,7 +1259,7 @@ async function getTransactionContext(transactionData) {
   return {
     amount: parseFloat(transactionData?.amount) || 0,
     hour: new Date().getHours(),
-    is_unusual_hour: new Date().getHours() < 5 || new Date().getHours() > 23
+    is_unusual_hour: new Date().getHours() < 5 || new Date().getHours() > 23,
   };
 }
 
@@ -1292,8 +1291,8 @@ function analyzeAnomalyDetails(zScore, isOutlier, context, history) {
     baseline_mean: stats.mean(history),
     baseline_std_dev: stats.stdDev(history),
     sample_size: history.length,
-    unusual_hour: !!context?.is_unusual_hour,
-    sufficient_history: history.length >= 10
+    unusual_hour: Boolean(context?.is_unusual_hour),
+    sufficient_history: history.length >= 10,
   };
 }
 
@@ -1316,18 +1315,18 @@ async function generateFraudReport(transactionData, details, probability, riskLe
     probability,
     risk_level: riskLevel,
     details,
-    generated_at: new Date().toISOString()
+    generated_at: new Date().toISOString(),
   };
 }
 
 async function storeFraudDetectionResults(userId, report) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
     if (!pg) return { stored: false, reason: 'no_database' };
     await pg.query(
       `INSERT INTO fraud_detection_results (user_id, risk_level, probability, details, created_at)
        VALUES ($1, $2, $3, $4, NOW())`,
-      [userId, report.risk_level, report.probability, JSON.stringify(report.details)]
+      [userId, report.risk_level, report.probability, JSON.stringify(report.details)],
     );
     return { stored: true };
   } catch (error) {
@@ -1345,9 +1344,9 @@ async function loadRecommendationModels() {
 
 async function getUserProfile(userId) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
     if (!pg) return { available: false };
-    let r = await pg.query('SELECT id, role FROM users WHERE id = $1', [userId]);
+    const r = await pg.query('SELECT id, role FROM users WHERE id = $1', [userId]);
     return { available: r.rows.length > 0, ...(r.rows[0] || {}) };
   } catch (error) {
     logger.warn('getUserProfile unavailable', { error: error.message });
@@ -1357,13 +1356,13 @@ async function getUserProfile(userId) {
 
 async function getUserHistory(userId) {
   try {
-    let pg = getPostgreSQL();
+    const pg = getPostgreSQL();
     if (!pg) return { available: false, product_ids: [] };
-    let r = await pg.query(
+    const r = await pg.query(
       `SELECT DISTINCT oi.product_id FROM order_items oi
        JOIN orders o ON oi.order_id = o.id
        WHERE o.buyer_id = $1 LIMIT 200`,
-      [userId]
+      [userId],
     );
     return { available: true, product_ids: r.rows.map((x) => x.product_id) };
   } catch (error) {
@@ -1385,7 +1384,7 @@ function hybridRecommendationScoring(candidates, history, context) {
       return {
         ...c,
         score: (Math.log1p(popularity) || 0) * (alreadyBought ? 0.3 : 1),
-        already_purchased: alreadyBought
+        already_purchased: alreadyBought,
       };
     })
     .sort((a, b) => b.score - a.score);
@@ -1407,9 +1406,9 @@ function applyNoveltyFiltering(scored) {
 async function generateRecommendationExplanations(items) {
   return (items || []).map((i) => ({
     product_id: i.id,
-    reason: i.already_purchased
-      ? 'Previously purchased - suggested for repeat order'
-      : 'Popular with buyers in your segment'
+    reason: i.already_purchased ?
+      'Previously purchased - suggested for repeat order' :
+      'Popular with buyers in your segment',
   }));
 }
 
@@ -1423,13 +1422,13 @@ async function loadComputerVisionModel() {
     available: false,
     classify: async () => ({
       available: false,
-      note: 'No crop-disease vision model is deployed. Integrate a trained model before relying on this endpoint.'
-    })
+      note: 'No crop-disease vision model is deployed. Integrate a trained model before relying on this endpoint.',
+    }),
   };
 }
 
 function preprocessImage(imageData) {
-  return { received: !!imageData, bytes: imageData?.length ?? 0 };
+  return { received: Boolean(imageData), bytes: imageData?.length ?? 0 };
 }
 
 function calculateDetectionConfidence(result) {
@@ -1441,9 +1440,9 @@ async function getDiseaseInformation(label) {
 }
 
 function generateTreatmentRecommendations(label) {
-  return label
-    ? [{ action: 'consult_agronomist', detail: `Automated identification unavailable for "${label}"; refer to an agronomist.` }]
-    : [{ action: 'consult_agronomist', detail: 'Automated crop-disease detection is not available.' }];
+  return label ?
+    [{ action: 'consult_agronomist', detail: `Automated identification unavailable for "${label}"; refer to an agronomist.` }] :
+    [{ action: 'consult_agronomist', detail: 'Automated crop-disease detection is not available.' }];
 }
 
 function predictDiseaseSpread() {
@@ -1458,7 +1457,7 @@ function generatePreventionMeasures() {
   return [
     { measure: 'field_sanitation', detail: 'Remove and destroy infected plant material.' },
     { measure: 'crop_rotation', detail: 'Rotate with a non-host crop next season.' },
-    { measure: 'monitoring', detail: 'Scout fields weekly and record observations.' }
+    { measure: 'monitoring', detail: 'Scout fields weekly and record observations.' },
   ];
 }
 
@@ -1490,7 +1489,7 @@ router.post('/predict-demand', authMiddleware, async (req, res) => {
 router.post('/optimize-price', authMiddleware, async (req, res) => {
   try {
     const { product_id, current_price, context } = req.body;
-    let result = await advancedOptimizePrice(product_id, current_price, context);
+    const result = await advancedOptimizePrice(product_id, current_price, context);
     res.json(result);
   } catch (error) {
     logger.error('Advanced price optimization API error', { error: error.message, stack: error.stack });
@@ -1511,7 +1510,7 @@ router.post('/assess-credit-risk', authMiddleware, async (req, res) => {
   try {
     const { farmer_id } = req.body;
     const financialService = require('./financialService');
-    let result = await financialService.farmerCreditRiskScore(farmer_id);
+    const result = await financialService.farmerCreditRiskScore(farmer_id);
     res.json({ ...result, delegatedFrom: 'advancedAIService.advancedAssessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
   } catch (error) {
     logger.error('Advanced credit risk assessment API error', { error: error.message, stack: error.stack });
@@ -1526,7 +1525,7 @@ router.post('/assess-credit-risk', authMiddleware, async (req, res) => {
 router.post('/detect-fraud', authMiddleware, async (req, res) => {
   try {
     const { transaction_data, user_id } = req.body;
-    let result = await advancedDetectFraud(transaction_data, user_id);
+    const result = await advancedDetectFraud(transaction_data, user_id);
     res.json(result);
   } catch (error) {
     logger.error('Advanced fraud detection API error', { error: error.message, stack: error.stack });
@@ -1541,7 +1540,7 @@ router.post('/detect-fraud', authMiddleware, async (req, res) => {
 router.post('/recommendations', authMiddleware, async (req, res) => {
   try {
     const { user_id, context } = req.body;
-    let result = await advancedGenerateRecommendations(user_id, context);
+    const result = await advancedGenerateRecommendations(user_id, context);
     res.json(result);
   } catch (error) {
     logger.error('Advanced recommendations API error', { error: error.message, stack: error.stack });
@@ -1556,7 +1555,7 @@ router.post('/recommendations', authMiddleware, async (req, res) => {
 router.post('/detect-crop-disease', authMiddleware, async (req, res) => {
   try {
     const { image_data, additional_data } = req.body;
-    let result = await detectCropDisease(image_data, additional_data);
+    const result = await detectCropDisease(image_data, additional_data);
     res.json(result);
   } catch (error) {
     logger.error('Crop disease detection API error', { error: error.message, stack: error.stack });
@@ -1571,7 +1570,7 @@ router.post('/detect-crop-disease', authMiddleware, async (req, res) => {
 router.get('/models', (req, res) => {
   res.json({
     models: ADVANCED_AI_MODELS,
-    total_models: Object.keys(ADVANCED_AI_MODELS).length
+    total_models: Object.keys(ADVANCED_AI_MODELS).length,
   });
 });
 
@@ -1591,8 +1590,8 @@ router.get('/health', (req, res) => {
       'recommendations',
       'crop_disease_detection',
       'yield_prediction',
-      'supply_chain_optimization'
-    ]
+      'supply_chain_optimization',
+    ],
   });
 });
 
@@ -1603,7 +1602,6 @@ module.exports = {
   advancedAssessCreditRisk,
   advancedDetectFraud,
   advancedGenerateRecommendations,
-  detectCropDisease
+  detectCropDisease,
 };
-
 

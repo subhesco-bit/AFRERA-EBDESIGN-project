@@ -59,7 +59,7 @@ class ProjectSystemsService {
         companyId, projectCode, projectName, reuId,
         projectType = 'infrastructure',
         plannedStartDate, plannedEndDate,
-        budgetAmount = 0, currency = 'INR', description
+        budgetAmount = 0, currency = 'INR', description,
       } = data || {};
 
       if (!companyId) throw new Error('companyId is required');
@@ -81,8 +81,8 @@ class ProjectSystemsService {
          RETURNING *`,
         [
           companyId, projectCode, projectName, reuId || null, projectType,
-          plannedStartDate || null, plannedEndDate || null, budgetAmount, currency, description || null
-        ]
+          plannedStartDate || null, plannedEndDate || null, budgetAmount, currency, description || null,
+        ],
       );
 
       logger.info(`Project created: ${result.rows[0].id} (${projectCode})`);
@@ -119,7 +119,7 @@ class ProjectSystemsService {
 
       query += ' ORDER BY project_code ASC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting projects', { error: error.message, stack: error.stack });
@@ -129,7 +129,7 @@ class ProjectSystemsService {
 
   async getProject(projectId) {
     try {
-      let result = await this.pool.query('SELECT * FROM projects WHERE id = $1', [projectId]);
+      const result = await this.pool.query('SELECT * FROM projects WHERE id = $1', [projectId]);
       if (result.rows.length === 0) throw new Error('Project not found');
       return result.rows[0];
     } catch (error) {
@@ -151,7 +151,7 @@ class ProjectSystemsService {
       }
       const { actualStartDate, actualEndDate } = dates;
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `UPDATE projects
          SET status = $1,
              actual_start_date = COALESCE($2, actual_start_date),
@@ -159,7 +159,7 @@ class ProjectSystemsService {
              updated_at = NOW()
          WHERE id = $4
          RETURNING *`,
-        [status, actualStartDate || null, actualEndDate || null, projectId]
+        [status, actualStartDate || null, actualEndDate || null, projectId],
       );
       if (result.rows.length === 0) throw new Error('Project not found');
 
@@ -181,7 +181,7 @@ class ProjectSystemsService {
 
       const {
         parentId, wbsCode, wbsName, sequenceNumber = 0,
-        plannedStartDate, plannedEndDate, plannedCost = 0
+        plannedStartDate, plannedEndDate, plannedCost = 0,
       } = data || {};
 
       if (!wbsCode) throw new Error('wbsCode is required');
@@ -198,7 +198,7 @@ class ProjectSystemsService {
         }
       }
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `INSERT INTO project_wbs
            (project_id, parent_id, wbs_code, wbs_name, sequence_number,
             planned_start_date, planned_end_date, planned_cost)
@@ -206,8 +206,8 @@ class ProjectSystemsService {
          RETURNING *`,
         [
           projectId, parentId || null, wbsCode, wbsName, sequenceNumber,
-          plannedStartDate || null, plannedEndDate || null, plannedCost
-        ]
+          plannedStartDate || null, plannedEndDate || null, plannedCost,
+        ],
       );
 
       logger.info(`WBS element created: ${result.rows[0].id} (${wbsCode}) for project ${projectId}`);
@@ -220,9 +220,9 @@ class ProjectSystemsService {
 
   async getProjectWbs(projectId) {
     try {
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         'SELECT * FROM project_wbs WHERE project_id = $1 ORDER BY sequence_number ASC, id ASC',
-        [projectId]
+        [projectId],
       );
       return result.rows;
     } catch (error) {
@@ -233,7 +233,7 @@ class ProjectSystemsService {
 
   async getWbsElement(wbsId) {
     try {
-      let result = await this.pool.query('SELECT * FROM project_wbs WHERE id = $1', [wbsId]);
+      const result = await this.pool.query('SELECT * FROM project_wbs WHERE id = $1', [wbsId]);
       if (result.rows.length === 0) throw new Error('WBS element not found');
       return result.rows[0];
     } catch (error) {
@@ -249,14 +249,14 @@ class ProjectSystemsService {
       }
       const { actualStartDate, actualEndDate } = dates;
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `UPDATE project_wbs
          SET status = $1,
              actual_start_date = COALESCE($2, actual_start_date),
              actual_end_date = COALESCE($3, actual_end_date)
          WHERE id = $4
          RETURNING *`,
-        [status, actualStartDate || null, actualEndDate || null, wbsId]
+        [status, actualStartDate || null, actualEndDate || null, wbsId],
       );
       if (result.rows.length === 0) throw new Error('WBS element not found');
 
@@ -287,16 +287,16 @@ class ProjectSystemsService {
    * path, rather than recursing forever.
    */
   buildWbsRollup(wbsRows, actualsByWbsId) {
-    const actuals = actualsByWbsId instanceof Map
-      ? actualsByWbsId
-      : new Map(Object.entries(actualsByWbsId || {}));
+    const actuals = actualsByWbsId instanceof Map ?
+      actualsByWbsId :
+      new Map(Object.entries(actualsByWbsId || {}));
 
     const byId = new Map();
     for (const row of wbsRows) {
       byId.set(row.id, {
         ...row,
         children: [],
-        ownActual: r4(Number(actuals.get(row.id) ?? actuals.get(String(row.id)) ?? 0))
+        ownActual: r4(Number(actuals.get(row.id) ?? actuals.get(String(row.id)) ?? 0)),
       });
     }
 
@@ -352,7 +352,7 @@ class ProjectSystemsService {
          JOIN chart_of_accounts coa ON coa.id = jl.account_id
          WHERE jl.project_id = $1 AND je.status = 'posted' AND jl.wbs_id IS NOT NULL
          GROUP BY jl.wbs_id`,
-        [projectId]
+        [projectId],
       );
       const actualsByWbsId = new Map(actualsResult.rows.map((r) => [r.wbs_id, r.amount]));
 
@@ -382,11 +382,11 @@ class ProjectSystemsService {
         }
       }
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `INSERT INTO project_milestones (project_id, wbs_id, milestone_name, target_date, notes)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [projectId, wbsId || null, milestoneName, targetDate, notes || null]
+        [projectId, wbsId || null, milestoneName, targetDate, notes || null],
       );
 
       logger.info(`Milestone created: ${result.rows[0].id} (${milestoneName}) for project ${projectId}`);
@@ -400,7 +400,7 @@ class ProjectSystemsService {
   async getProjectMilestones(projectId, filters = {}) {
     try {
       let query = 'SELECT * FROM project_milestones WHERE project_id = $1';
-      let params = [projectId];
+      const params = [projectId];
 
       if (filters.status) {
         if (!MILESTONE_STATUSES.includes(filters.status)) {
@@ -412,7 +412,7 @@ class ProjectSystemsService {
 
       query += ' ORDER BY target_date ASC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting project milestones', { error: error.message, stack: error.stack });
@@ -424,12 +424,12 @@ class ProjectSystemsService {
     try {
       if (!actualCompletionDate) throw new Error('actualCompletionDate is required');
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `UPDATE project_milestones
          SET status = 'completed', actual_completion_date = $1
          WHERE id = $2 AND status NOT IN ('completed', 'cancelled')
          RETURNING *`,
-        [actualCompletionDate, milestoneId]
+        [actualCompletionDate, milestoneId],
       );
       if (result.rows.length === 0) {
         throw new Error(`Milestone ${milestoneId} not found, or already completed/cancelled`);
@@ -477,9 +477,9 @@ class ProjectSystemsService {
           upcoming: buckets.upcoming.length,
           overdue: buckets.overdue.length,
           completed: buckets.completed.length,
-          cancelled: buckets.cancelled.length
+          cancelled: buckets.cancelled.length,
         },
-        buckets
+        buckets,
       };
     } catch (error) {
       logger.error('Error getting milestone status summary', { error: error.message, stack: error.stack });
@@ -500,13 +500,13 @@ class ProjectSystemsService {
     try {
       const project = await this.getProject(projectId);
 
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `SELECT SUM(CASE WHEN coa.normal_balance = 'DR' THEN jl.debit - jl.credit ELSE jl.credit - jl.debit END) AS amount
          FROM journal_lines jl
          JOIN journal_entries je ON je.id = jl.journal_entry_id
          JOIN chart_of_accounts coa ON coa.id = jl.account_id
          WHERE jl.project_id = $1 AND je.status = 'posted'`,
-        [projectId]
+        [projectId],
       );
 
       const actualAmount = r4(Number(result.rows[0]?.amount || 0));
@@ -523,6 +523,4 @@ class ProjectSystemsService {
 }
 
 module.exports = new ProjectSystemsService();
-
-
 

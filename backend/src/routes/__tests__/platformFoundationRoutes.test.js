@@ -5,7 +5,7 @@ const mockServices = {
   platform: { applyOptimizedConfiguration: jest.fn(), getConfigurationHistory: jest.fn() },
   tenant: { createTenant: jest.fn() },
   organization: { updateOrganization: jest.fn() },
-  system: { predictIncidents: jest.fn() }
+  system: { predictIncidents: jest.fn() },
 };
 const mockEmittedSignals = [];
 
@@ -14,18 +14,18 @@ jest.mock('../../middleware/auth', () => ({
     req.user = { id: 'admin-1', role: req.headers['x-test-role'] || 'admin' };
     next();
   },
-  requireRole: (...roles) => (req, res, next) => roles.includes(req.user.role)
-    ? next()
-    : res.status(403).json({ success: false, error: 'Insufficient permissions' })
+  requireRole: (...roles) => (req, res, next) => roles.includes(req.user.role) ?
+    next() :
+    res.status(403).json({ success: false, error: 'Insufficient permissions' }),
 }));
 jest.mock('../../middleware/rateLimit', () => ({
-  rateLimiters: { api: (req, res, next) => next(), read: (req, res, next) => next(), write: (req, res, next) => next() }
+  rateLimiters: { api: (req, res, next) => next(), read: (req, res, next) => next(), write: (req, res, next) => next() },
 }));
 jest.mock('../../utils/logger', () => ({ logger: { error: jest.fn(), warn: jest.fn(), info: jest.fn() } }));
 jest.mock('../../core/signalBus', () => ({
   SIGNAL: { CONFIGURATION_CHANGED: 'configuration.changed', TENANT_CREATED: 'tenant.created', ORGANIZATION_UPDATED: 'organization.updated', CAPACITY_FORECAST_UPDATED: 'capacity.updated' },
   SEVERITY: { INFO: 10, NOTICE: 20, WARNING: 30 },
-  signalBus: { emitSignal: (...args) => mockEmittedSignals.push(args) }
+  signalBus: { emitSignal: (...args) => mockEmittedSignals.push(args) },
 }));
 jest.mock('../../services/legacy/platformConfigurationService', () => mockServices.platform);
 jest.mock('../../services/legacy/tenantManagementService', () => mockServices.tenant);
@@ -59,7 +59,7 @@ test('rejects malformed writes before calling services', async () => {
 });
 
 test('redacts downstream failures and returns request correlation metadata', async () => {
-  mockServices.system.predictIncidents.mockRejectedValue(new Error('database password leaked')); 
+  mockServices.system.predictIncidents.mockRejectedValue(new Error('database password leaked'));
   const response = await request(app)
     .get('/system/incidents/predict?timeframe=24h')
     .set('x-correlation-id', 'req-123')

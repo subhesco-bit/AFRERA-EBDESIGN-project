@@ -36,7 +36,7 @@ async function registerGIProduct(data) {
     historical_significance,
     unique_characteristics,
     production_methods,
-    quality_standards
+    quality_standards,
   } = data;
 
   try {
@@ -60,8 +60,8 @@ async function registerGIProduct(data) {
         historical_significance,
         JSON.stringify(unique_characteristics),
         JSON.stringify(production_methods),
-        JSON.stringify(quality_standards)
-      ]
+        JSON.stringify(quality_standards),
+      ],
     );
 
     // Defensive fallback for test-mode mocks that may return an empty result
@@ -82,7 +82,7 @@ async function registerGIProduct(data) {
         unique_characteristics: unique_characteristics || [],
         production_methods: production_methods || [],
         quality_standards: quality_standards || [],
-        status: 'registered'
+        status: 'registered',
       };
       // Persist into test store when available
       persistTestFallback('gi_products', fallback.product_id, fallback);
@@ -101,7 +101,7 @@ async function registerGIProduct(data) {
  */
 router.post('/gi-products', authMiddleware, async (req, res) => {
   try {
-    let result = await registerGIProduct(req.body);
+    const result = await registerGIProduct(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register GI product API error', { error: error.message, stack: error.stack });
@@ -124,7 +124,7 @@ async function getGIProducts(state = null) {
 
     query += ' ORDER BY gi_name';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get GI products error', { error: error.message, stack: error.stack });
@@ -138,7 +138,7 @@ async function getGIProducts(state = null) {
 router.get('/gi-products', async (req, res) => {
   try {
     const { state } = req.query;
-    let result = await getGIProducts(state);
+    const result = await getGIProducts(state);
     res.json(result);
   } catch (error) {
     logger.error('Get GI products API error', { error: error.message, stack: error.stack });
@@ -161,11 +161,11 @@ async function registerGIProducer(data) {
     fpo_id,
     production_location_id,
     certified_area_hectares,
-    annual_production_tonnes
+    annual_production_tonnes,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO gi_producers 
        (gi_product_id, producer_id, farmer_id, fpo_id, registration_number, registration_date, 
         production_location_id, certified_area_hectares, annual_production_tonnes, certification_status)
@@ -179,14 +179,14 @@ async function registerGIProducer(data) {
         `GI-PROD-${Date.now()}`,
         production_location_id,
         certified_area_hectares,
-        annual_production_tonnes
-      ]
+        annual_production_tonnes,
+      ],
     );
 
     if (!result || !result.rows || !result.rows[0]) {
-      let fallback = {
+      const fallback = {
         id: `gip-${Date.now()}`,
-        gi_product_id: gi_product_id,
+        gi_product_id,
         producer_id: producer_id || `producer-${Date.now()}`,
         farmer_id: farmer_id || null,
         fpo_id: fpo_id || null,
@@ -195,7 +195,7 @@ async function registerGIProducer(data) {
         certified_area_hectares: certified_area_hectares || null,
         annual_production_tonnes: annual_production_tonnes || null,
         certification_status: 'active',
-        registration_date: new Date().toISOString()
+        registration_date: new Date().toISOString(),
       };
       persistTestFallback('gi_producers', gi_product_id, fallback, true);
       return fallback;
@@ -213,7 +213,7 @@ async function registerGIProducer(data) {
  */
 router.post('/gi-producers', authMiddleware, async (req, res) => {
   try {
-    let result = await registerGIProducer(req.body);
+    const result = await registerGIProducer(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Register GI producer API error', { error: error.message, stack: error.stack });
@@ -226,14 +226,14 @@ router.post('/gi-producers', authMiddleware, async (req, res) => {
  */
 async function getGIProducers(giProductId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT gp.*, u.first_name, u.last_name, a.city, a.state
        FROM gi_producers gp
        LEFT JOIN users u ON gp.producer_id = u.id
        LEFT JOIN addresses a ON gp.production_location_id = a.id
        WHERE gp.gi_product_id = $1 AND gp.certification_status = 'active'
        ORDER BY gp.registration_date DESC`,
-      [giProductId]
+      [giProductId],
     );
 
     return result.rows;
@@ -248,7 +248,7 @@ async function getGIProducers(giProductId) {
  */
 router.get('/gi-products/:giProductId/producers', async (req, res) => {
   try {
-    let result = await getGIProducers(req.params.giProductId);
+    const result = await getGIProducers(req.params.giProductId);
     res.json(result);
   } catch (error) {
     logger.error('Get GI producers API error', { error: error.message, stack: error.stack });
@@ -265,9 +265,9 @@ router.get('/gi-products/:giProductId/producers', async (req, res) => {
  */
 async function calculateGIPricing(productId, basePrice, giProductId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT calculate_gi_pricing($1, $2, $3) as pricing',
-      [productId, basePrice, giProductId]
+      [productId, basePrice, giProductId],
     );
 
     let pricing = result && result.rows && result.rows[0] ? result.rows[0].pricing : null;
@@ -283,7 +283,7 @@ async function calculateGIPricing(productId, basePrice, giProductId) {
         gi_premium: giPremium,
         final_price: finalPrice,
         premium_percentage: 20,
-        pricing_factors: { region_bonus: 0.1 }
+        pricing_factors: { region_bonus: 0.1 },
       };
     }
 
@@ -300,8 +300,8 @@ async function calculateGIPricing(productId, basePrice, giProductId) {
           pricing.gi_premium,
           pricing.final_price,
           pricing.premium_percentage,
-          JSON.stringify(pricing.pricing_factors)
-        ]
+          JSON.stringify(pricing.pricing_factors),
+        ],
       );
     } catch (e) {
       // ignore — this is best-effort persistence in test-mode
@@ -321,7 +321,7 @@ router.post('/gi-pricing', authMiddleware, async (req, res) => {
   try {
     const { product_id, base_price, gi_product_id } = req.body;
     // Was passing `basePrice` (never defined) -> ReferenceError on every call.
-    let result = await calculateGIPricing(product_id, base_price, gi_product_id);
+    const result = await calculateGIPricing(product_id, base_price, gi_product_id);
     res.json(result);
   } catch (error) {
     logger.error('Calculate GI pricing API error', { error: error.message, stack: error.stack });
@@ -340,23 +340,23 @@ async function authenticateGIProduct(productId, batchNumber, producerId) {
   try {
     const authCode = `GI-${Math.random().toString(36).substr(2, 9).toUpperCase()}-${Date.now()}`;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO gi_authentication 
        (product_id, batch_number, authentication_code, producer_id, production_date, authentication_status)
        VALUES ($1, $2, $3, $4, CURRENT_DATE, 'verified')
        RETURNING *`,
-      [productId, batchNumber, authCode, producerId]
+      [productId, batchNumber, authCode, producerId],
     );
 
     if (!result || !result.rows || !result.rows[0]) {
-      let fallback = {
+      const fallback = {
         id: `gia-${Date.now()}`,
         product_id: productId || null,
         batch_number: batchNumber || null,
         authentication_code: authCode,
         producer_id: producerId || null,
         production_date: new Date().toISOString(),
-        authentication_status: 'verified'
+        authentication_status: 'verified',
       };
       persistTestFallback('gi_authentication', authCode, fallback);
       return fallback;
@@ -375,7 +375,7 @@ async function authenticateGIProduct(productId, batchNumber, producerId) {
 router.post('/gi-authentication', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_number, producer_id } = req.body;
-    let result = await authenticateGIProduct(product_id, batch_number, producer_id);
+    const result = await authenticateGIProduct(product_id, batch_number, producer_id);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Authenticate GI product API error', { error: error.message, stack: error.stack });
@@ -388,12 +388,12 @@ router.post('/gi-authentication', authMiddleware, async (req, res) => {
  */
 async function verifyGIAuthCode(authCode) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT ga.*, gp.gi_name, gp.geographical_region, gp.state
        FROM gi_authentication ga
        LEFT JOIN gi_products gp ON ga.product_id = gp.id
        WHERE ga.authentication_code = $1`,
-      [authCode]
+      [authCode],
     );
 
     if (result.rows.length === 0) {
@@ -412,7 +412,7 @@ async function verifyGIAuthCode(authCode) {
  */
 router.get('/gi-authentication/verify/:authCode', async (req, res) => {
   try {
-    let result = await verifyGIAuthCode(req.params.authCode);
+    const result = await verifyGIAuthCode(req.params.authCode);
     res.json(result);
   } catch (error) {
     logger.error('Verify GI auth code API error', { error: error.message, stack: error.stack });
@@ -439,14 +439,14 @@ async function createGIListing(data) {
     price_per_unit,
     quality_tier,
     harvest_date,
-    location_id
+    location_id,
   } = data;
 
   try {
     // Calculate GI premium
     const pricing = await calculateGIPricing(product_id, price_per_unit, gi_product_id);
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO gi_marketplace_listings 
        (gi_product_id, product_id, seller_id, listing_title, description, available_quantity, 
         unit, price_per_unit, is_premium_priced, premium_percentage, quality_tier, 
@@ -465,8 +465,8 @@ async function createGIListing(data) {
         pricing.premium_percentage,
         quality_tier,
         harvest_date,
-        location_id
-      ]
+        location_id,
+      ],
     );
 
     const row = result.rows[0];
@@ -489,7 +489,7 @@ router.post('/gi-marketplace', authMiddleware, async (req, res) => {
     const sellerId = req.user && req.user.id ? req.user.id : (process.env.TEST_USER_ID || 'test-seller');
 
     // Calculate GI premium (will use DB UDF or local fallback)
-    let pricing = await calculateGIPricing(req.body.product_id, req.body.price_per_unit, req.body.gi_product_id);
+    const pricing = await calculateGIPricing(req.body.product_id, req.body.price_per_unit, req.body.gi_product_id);
 
     const listing = {
       id: `gml-${Date.now()}`,
@@ -507,7 +507,7 @@ router.post('/gi-marketplace', authMiddleware, async (req, res) => {
       harvest_date: req.body.harvest_date || null,
       location_id: req.body.location_id || null,
       listing_status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // Persist into test store when available
@@ -532,21 +532,21 @@ async function getGIListings(giProductId = null, state = null) {
       LEFT JOIN addresses a ON gml.location_id = a.id
       WHERE gml.listing_status = 'active'
     `;
-    let params = [];
+    const params = [];
 
     if (giProductId) {
-      query += ' AND gml.gi_product_id = $' + (params.length + 1);
+      query += ` AND gml.gi_product_id = $${ params.length + 1}`;
       params.push(giProductId);
     }
 
     if (state) {
-      query += ' AND gp.state = $' + (params.length + 1);
+      query += ` AND gp.state = $${ params.length + 1}`;
       params.push(state);
     }
 
     query += ' ORDER BY gml.created_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get GI listings error', { error: error.message, stack: error.stack });
@@ -560,7 +560,7 @@ async function getGIListings(giProductId = null, state = null) {
 router.get('/gi-marketplace', async (req, res) => {
   try {
     const { gi_product_id, state } = req.query;
-    let result = await getGIListings(gi_product_id, state);
+    const result = await getGIListings(gi_product_id, state);
     res.json(result);
   } catch (error) {
     logger.error('Get GI listings API error', { error: error.message, stack: error.stack });
@@ -577,7 +577,7 @@ router.get('/gi-marketplace', async (req, res) => {
  */
 async function recordGIAnalytics(giProductId, metrics) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO gi_analytics 
        (gi_product_id, date, total_views, total_searches, total_authentications, 
         total_sales, total_quantity_sold, average_premium_percentage, unique_consumers)
@@ -599,8 +599,8 @@ async function recordGIAnalytics(giProductId, metrics) {
         metrics.sales || 0,
         metrics.quantity_sold || 0,
         metrics.avg_premium || 0,
-        metrics.unique_consumers || 0
-      ]
+        metrics.unique_consumers || 0,
+      ],
     );
 
     return result.rows[0];
@@ -616,12 +616,12 @@ async function recordGIAnalytics(giProductId, metrics) {
 router.post('/gi-analytics', authMiddleware, async (req, res) => {
   try {
     const { gi_product_id, metrics } = req.body;
-    let result = await recordGIAnalytics(gi_product_id, metrics);
+    const result = await recordGIAnalytics(gi_product_id, metrics);
     if (!result) {
-      let fallback = Object.assign({
+      const fallback = Object.assign({
         id: `gian-${Date.now()}`,
         gi_product_id,
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split('T')[0],
       }, {
         total_views: metrics.views || 0,
         total_searches: metrics.searches || 0,
@@ -629,7 +629,7 @@ router.post('/gi-analytics', authMiddleware, async (req, res) => {
         total_sales: metrics.sales || 0,
         total_quantity_sold: metrics.quantity_sold || 0,
         average_premium_percentage: metrics.avg_premium || 0,
-        unique_consumers: metrics.unique_consumers || 0
+        unique_consumers: metrics.unique_consumers || 0,
       });
       return res.json(fallback);
     }
@@ -646,21 +646,21 @@ router.post('/gi-analytics', authMiddleware, async (req, res) => {
 async function getGIAnalytics(giProductId, startDate = null, endDate = null) {
   try {
     let query = 'SELECT * FROM gi_analytics WHERE gi_product_id = $1';
-    let params = [giProductId];
+    const params = [giProductId];
 
     if (startDate) {
-      query += ' AND date >= $' + (params.length + 1);
+      query += ` AND date >= $${ params.length + 1}`;
       params.push(startDate);
     }
 
     if (endDate) {
-      query += ' AND date <= $' + (params.length + 1);
+      query += ` AND date <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
     query += ' ORDER BY date DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get GI analytics error', { error: error.message, stack: error.stack });
@@ -674,7 +674,7 @@ async function getGIAnalytics(giProductId, startDate = null, endDate = null) {
 router.get('/gi-analytics/:giProductId', authMiddleware, async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    let result = await getGIAnalytics(req.params.giProductId, start_date, end_date);
+    const result = await getGIAnalytics(req.params.giProductId, start_date, end_date);
     res.json(result);
   } catch (error) {
     logger.error('Get GI analytics API error', { error: error.message, stack: error.stack });
@@ -703,8 +703,6 @@ module.exports = {
   getGIListings,
   recordGIAnalytics,
   getGIAnalytics,
-  isHealthy
+  isHealthy,
 };
-
-
 

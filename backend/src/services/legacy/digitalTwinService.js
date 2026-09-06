@@ -1,6 +1,6 @@
 /**
  * Digital Twin Service
- * Creates virtual representations of physical farms for real-time monitoring, 
+ * Creates virtual representations of physical farms for real-time monitoring,
  * simulation, and optimization. Integrates IoT sensors, satellite data, and AI analytics.
  * Based on latest research in agricultural digital twins (2024-2025)
  */
@@ -23,16 +23,16 @@ class DigitalTwinService {
 
     try {
       logger.info('Initializing Digital Twin Service');
-      
+
       // Initialize simulation engine
       this.initializeSimulationEngine();
-      
+
       // Load existing digital twins
       await this.loadExistingTwins();
-      
+
       // Start real-time data synchronization
       this.startDataSynchronization();
-      
+
       this.isInitialized = true;
       logger.info('Digital Twin Service initialized successfully');
     } catch (error) {
@@ -47,11 +47,11 @@ class DigitalTwinService {
       soilMoistureModel: this.soilMoistureSimulation.bind(this),
       pestSpreadModel: this.pestSpreadSimulation.bind(this),
       yieldPredictionModel: this.yieldPredictionSimulation.bind(this),
-      climateImpactModel: this.climateImpactSimulation.bind(this)
+      climateImpactModel: this.climateImpactSimulation.bind(this),
     };
 
     logger.info('Simulation engine initialized', {
-      models: Object.keys(this.simulationEngine)
+      models: Object.keys(this.simulationEngine),
     });
   }
 
@@ -69,12 +69,12 @@ class DigitalTwinService {
         this.activeTwins.set(twin.id, {
           ...twin,
           state: this.initializeTwinState(twin.configuration),
-          lastUpdate: twin.last_synced
+          lastUpdate: twin.last_synced,
         });
       });
 
       logger.info('Loaded existing digital twins', {
-        count: this.activeTwins.size
+        count: this.activeTwins.size,
       });
     } catch (error) {
       logger.warn('Failed to load existing twins', { error: error.message });
@@ -87,22 +87,22 @@ class DigitalTwinService {
       soil: {
         moisture: 50,
         ph: 6.5,
-        nutrients: { nitrogen: 50, phosphorus: 50, potassium: 50 }
+        nutrients: { nitrogen: 50, phosphorus: 50, potassium: 50 },
       },
       weather: {
         temperature: 25,
         humidity: 60,
-        rainfall: 0
+        rainfall: 0,
       },
       sensors: {
         active: 0,
-        dataPoints: []
+        dataPoints: [],
       },
       predictions: {
         yield: null,
         pestRisk: null,
-        irrigationNeed: null
-      }
+        irrigationNeed: null,
+      },
     };
   }
 
@@ -122,30 +122,30 @@ class DigitalTwinService {
 
   async createDigitalTwin(farmId, configuration) {
     try {
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         INSERT INTO digital_twins (farm_id, name, configuration, created_at, updated_at)
         VALUES ($1, $2, $3, NOW(), NOW())
         RETURNING id, farm_id, name, configuration
       `, [farmId, configuration.name || `Twin for Farm ${farmId}`, JSON.stringify(configuration)]);
 
       const twin = result.rows[0];
-      
+
       this.activeTwins.set(twin.id, {
         ...twin,
         state: this.initializeTwinState(configuration),
-        lastUpdate: new Date()
+        lastUpdate: new Date(),
       });
 
       logger.info('Digital twin created', { twinId: twin.id, farmId });
-      
+
       return {
         success: true,
         twin: {
           id: twin.id,
           farmId: twin.farm_id,
           name: twin.name,
-          state: this.activeTwins.get(twin.id).state
-        }
+          state: this.activeTwins.get(twin.id).state,
+        },
       };
     } catch (error) {
       logger.error('Failed to create digital twin', { error: error.message });
@@ -155,8 +155,8 @@ class DigitalTwinService {
 
   async updateDigitalTwin(twinId, updates) {
     try {
-      let twin = this.activeTwins.get(twinId);
-      
+      const twin = this.activeTwins.get(twinId);
+
       if (!twin) {
         throw new Error(`Digital twin not found: ${twinId}`);
       }
@@ -181,14 +181,14 @@ class DigitalTwinService {
       this.activeTwins.set(twinId, twin);
 
       logger.info('Digital twin updated', { twinId });
-      
+
       return {
         success: true,
         twin: {
           id: twin.id,
           state: twin.state,
-          lastUpdate: twin.lastUpdate
-        }
+          lastUpdate: twin.lastUpdate,
+        },
       };
     } catch (error) {
       logger.error('Failed to update digital twin', { error: error.message });
@@ -198,8 +198,8 @@ class DigitalTwinService {
 
   async ingestSensorData(twinId, sensorData) {
     try {
-      let twin = this.activeTwins.get(twinId);
-      
+      const twin = this.activeTwins.get(twinId);
+
       if (!twin) {
         throw new Error(`Digital twin not found: ${twinId}`);
       }
@@ -219,10 +219,10 @@ class DigitalTwinService {
       }
 
       logger.info('Sensor data ingested', { twinId, sensorType: sensorData.type });
-      
+
       return {
         success: true,
-        stateUpdated: true
+        stateUpdated: true,
       };
     } catch (error) {
       logger.error('Failed to ingest sensor data', { error: error.message });
@@ -252,7 +252,7 @@ class DigitalTwinService {
         twin.state.sensors.dataPoints.push({
           type: sensorData.type,
           value: sensorData.value,
-          timestamp: new Date()
+          timestamp: new Date(),
         });
     }
 
@@ -266,14 +266,14 @@ class DigitalTwinService {
 
   async runSimulation(twinId, modelType) {
     try {
-      let twin = this.activeTwins.get(twinId);
-      
+      const twin = this.activeTwins.get(twinId);
+
       if (!twin) {
         throw new Error(`Digital twin not found: ${twinId}`);
       }
 
       const model = this.simulationEngine[modelType];
-      
+
       if (!model) {
         throw new Error(`Simulation model not found: ${modelType}`);
       }
@@ -289,14 +289,14 @@ class DigitalTwinService {
       // Update twin predictions
       twin.state.predictions = {
         ...twin.state.predictions,
-        [modelType]: simulationResult
+        [modelType]: simulationResult,
       };
 
       logger.info('Simulation completed', { twinId, modelType });
-      
+
       return {
         success: true,
-        result: simulationResult
+        result: simulationResult,
       };
     } catch (error) {
       logger.error('Simulation failed', { twinId, modelType, error: error.message });
@@ -322,7 +322,7 @@ class DigitalTwinService {
       try {
         // Fetch latest sensor data from external sources
         const sensorData = await this.fetchExternalSensorData(twin.farm_id);
-        
+
         for (const data of sensorData) {
           await this.ingestSensorData(twinId, data);
         }
@@ -349,7 +349,7 @@ class DigitalTwinService {
   // Simulation models
   async cropGrowthSimulation(state, configuration) {
     const { crops, weather, soil } = state;
-    
+
     if (!crops || crops.length === 0) {
       return { message: 'No crops to simulate' };
     }
@@ -362,49 +362,49 @@ class DigitalTwinService {
       return {
         crop: crop.name,
         currentStage: crop.stage || 'seedling',
-        growthRate: growthRate,
-        daysToMaturity: daysToMaturity,
+        growthRate,
+        daysToMaturity,
         predictedYield: yieldPrediction,
-        recommendations: this.getGrowthRecommendations(crop, soil, weather)
+        recommendations: this.getGrowthRecommendations(crop, soil, weather),
       };
     });
 
     return {
       timestamp: new Date().toISOString(),
       predictions: growthPredictions,
-      overallHealth: this.calculateOverallHealth(growthPredictions)
+      overallHealth: this.calculateOverallHealth(growthPredictions),
     };
   }
 
   async soilMoistureSimulation(state, configuration) {
     const { soil, weather } = state;
-    
+
     const moistureRetention = this.calculateMoistureRetention(soil);
     const evaporationRate = this.calculateEvaporationRate(weather);
     const irrigationNeed = this.calculateIrrigationNeed(soil.moisture, moistureRetention);
-    
+
     const futureMoisture = Math.max(
       0,
-      soil.moisture + weather.rainfall - evaporationRate
+      soil.moisture + weather.rainfall - evaporationRate,
     );
 
     return {
       currentMoisture: soil.moisture,
       predictedMoisture: futureMoisture,
-      irrigationNeed: irrigationNeed,
+      irrigationNeed,
       retentionCapacity: moistureRetention,
-      evaporationRate: evaporationRate,
-      recommendations: this.getIrrigationRecommendations(irrigationNeed, soil.moisture)
+      evaporationRate,
+      recommendations: this.getIrrigationRecommendations(irrigationNeed, soil.moisture),
     };
   }
 
   async pestSpreadSimulation(state, configuration) {
     const { crops, weather } = state;
-    
+
     const pestRiskFactors = {
       temperature: weather.temperature > 30 ? 'high' : weather.temperature > 25 ? 'medium' : 'low',
       humidity: weather.humidity > 70 ? 'high' : weather.humidity > 50 ? 'medium' : 'low',
-      cropDensity: crops.length > 3 ? 'high' : crops.length > 1 ? 'medium' : 'low'
+      cropDensity: crops.length > 3 ? 'high' : crops.length > 1 ? 'medium' : 'low',
     };
 
     const overallRisk = this.calculateOverallPestRisk(pestRiskFactors);
@@ -412,17 +412,17 @@ class DigitalTwinService {
     const spreadRate = this.calculatePestSpreadRate(overallRisk, weather);
 
     return {
-      overallRisk: overallRisk,
+      overallRisk,
       riskFactors: pestRiskFactors,
-      likelyPests: likelyPests,
-      spreadRate: spreadRate,
-      recommendations: this.getPestManagementRecommendations(overallRisk, likelyPests)
+      likelyPests,
+      spreadRate,
+      recommendations: this.getPestManagementRecommendations(overallRisk, likelyPests),
     };
   }
 
   async yieldPredictionSimulation(state, configuration) {
     const { crops, soil, weather } = state;
-    
+
     const yieldPredictions = crops.map(crop => {
       const baseYield = this.getBaseYield(crop.name);
       const soilFactor = this.calculateSoilYieldFactor(soil, crop);
@@ -434,34 +434,34 @@ class DigitalTwinService {
 
       return {
         crop: crop.name,
-        baseYield: baseYield,
-        predictedYield: predictedYield,
+        baseYield,
+        predictedYield,
         unit: 'kg/hectare',
-        confidence: confidence,
+        confidence,
         factors: {
           soil: soilFactor,
           weather: weatherFactor,
-          management: managementFactor
+          management: managementFactor,
         },
-        optimizationPotential: this.calculateOptimizationPotential(predictedYield, baseYield)
+        optimizationPotential: this.calculateOptimizationPotential(predictedYield, baseYield),
       };
     });
 
     return {
       timestamp: new Date().toISOString(),
       predictions: yieldPredictions,
-      totalPredictedYield: yieldPredictions.reduce((sum, p) => sum + p.predictedYield, 0)
+      totalPredictedYield: yieldPredictions.reduce((sum, p) => sum + p.predictedYield, 0),
     };
   }
 
   async climateImpactSimulation(state, configuration) {
     const { weather, crops } = state;
-    
+
     const climateScenarios = [
       { name: 'current', conditions: weather },
       { name: 'drought', conditions: { ...weather, rainfall: weather.rainfall * 0.3, temperature: weather.temperature + 3 } },
       { name: 'flood', conditions: { ...weather, rainfall: weather.rainfall * 2.5 } },
-      { name: 'heat_wave', conditions: { ...weather, temperature: weather.temperature + 5, humidity: weather.humidity - 10 } }
+      { name: 'heat_wave', conditions: { ...weather, temperature: weather.temperature + 5, humidity: weather.humidity - 10 } },
     ];
 
     const impactAnalysis = climateScenarios.map(scenario => {
@@ -469,21 +469,21 @@ class DigitalTwinService {
         crop: crop.name,
         yieldImpact: this.calculateYieldImpact(scenario.conditions, crop),
         stressLevel: this.calculateCropStressLevel(scenario.conditions, crop),
-        adaptationNeeds: this.getAdaptationNeeds(scenario.name, crop)
+        adaptationNeeds: this.getAdaptationNeeds(scenario.name, crop),
       }));
 
       return {
         scenario: scenario.name,
         conditions: scenario.conditions,
-        cropImpacts: cropImpacts,
-        overallRisk: this.calculateScenarioRisk(cropImpacts)
+        cropImpacts,
+        overallRisk: this.calculateScenarioRisk(cropImpacts),
       };
     });
 
     return {
       timestamp: new Date().toISOString(),
       scenarios: impactAnalysis,
-      recommendations: this.getClimateAdaptationRecommendations(impactAnalysis)
+      recommendations: this.getClimateAdaptationRecommendations(impactAnalysis),
     };
   }
 
@@ -494,7 +494,7 @@ class DigitalTwinService {
     const tempFactor = Math.max(0, 1 - (tempDiff / 20));
     const moistureFactor = soil.moisture / 100;
     const nutrientFactor = (soil.nutrients.nitrogen + soil.nutrients.phosphorus + soil.nutrients.potassium) / 150;
-    
+
     return (tempFactor * 0.4 + moistureFactor * 0.3 + nutrientFactor * 0.3) * 100;
   }
 
@@ -504,16 +504,16 @@ class DigitalTwinService {
   }
 
   calculateYield(crop, soil, weather) {
-    let baseYield = this.getBaseYield(crop.name);
-    let soilFactor = soil.moisture / 100;
-    let weatherFactor = 1 - (Math.abs(weather.temperature - 25) / 30);
-    
+    const baseYield = this.getBaseYield(crop.name);
+    const soilFactor = soil.moisture / 100;
+    const weatherFactor = 1 - (Math.abs(weather.temperature - 25) / 30);
+
     return baseYield * soilFactor * weatherFactor;
   }
 
   getGrowthRecommendations(crop, soil, weather) {
     const recommendations = [];
-    
+
     if (soil.moisture < 40) {
       recommendations.push('Increase irrigation');
     }
@@ -523,15 +523,15 @@ class DigitalTwinService {
     if (soil.nutrients.nitrogen < 40) {
       recommendations.push('Apply nitrogen fertilizer');
     }
-    
+
     return recommendations;
   }
 
   calculateOverallHealth(predictions) {
     if (!predictions || predictions.length === 0) return 'unknown';
-    
+
     const avgGrowthRate = predictions.reduce((sum, p) => sum + p.growthRate, 0) / predictions.length;
-    
+
     if (avgGrowthRate > 80) return 'excellent';
     if (avgGrowthRate > 60) return 'good';
     if (avgGrowthRate > 40) return 'fair';
@@ -568,7 +568,7 @@ class DigitalTwinService {
   calculateOverallPestRisk(factors) {
     const riskScores = { high: 3, medium: 2, low: 1 };
     const totalScore = Object.values(factors).reduce((sum, factor) => sum + riskScores[factor], 0);
-    
+
     if (totalScore >= 8) return 'high';
     if (totalScore >= 5) return 'medium';
     return 'low';
@@ -579,10 +579,10 @@ class DigitalTwinService {
     const pestMap = {
       wheat: ['aphids', 'rust', 'armyworm'],
       rice: ['stem_borer', 'leaf_folder', 'brown_planthopper'],
-      maize: ['fall_armyworm', 'stem_borer', 'aphids']
+      maize: ['fall_armyworm', 'stem_borer', 'aphids'],
     };
 
-    let likelyPests = [];
+    const likelyPests = [];
     crops.forEach(crop => {
       if (pestMap[crop.name]) {
         likelyPests.push(...pestMap[crop.name]);
@@ -595,7 +595,7 @@ class DigitalTwinService {
   calculatePestSpreadRate(risk, weather) {
     const baseRate = risk === 'high' ? 0.8 : risk === 'medium' ? 0.5 : 0.2;
     const weatherMultiplier = weather.humidity > 70 ? 1.5 : 1.0;
-    
+
     return baseRate * weatherMultiplier;
   }
 
@@ -605,14 +605,14 @@ class DigitalTwinService {
         'Implement integrated pest management',
         'Monitor pest populations daily',
         'Consider preventive treatments',
-        'Use biological controls where possible'
+        'Use biological controls where possible',
       ];
     }
     if (risk === 'medium') {
       return [
         'Regular pest monitoring',
         'Maintain field hygiene',
-        'Use resistant varieties'
+        'Use resistant varieties',
       ];
     }
     return ['Continue routine monitoring'];
@@ -628,8 +628,8 @@ class DigitalTwinService {
   }
 
   calculateWeatherYieldFactor(weather, crop) {
-    let optimalTemp = 25;
-    let tempDiff = Math.abs(weather.temperature - optimalTemp);
+    const optimalTemp = 25;
+    const tempDiff = Math.abs(weather.temperature - optimalTemp);
     return Math.max(0.5, 1 - (tempDiff / 20));
   }
 
@@ -637,7 +637,7 @@ class DigitalTwinService {
     // Higher confidence with more data and optimal conditions
     const dataQuality = 0.8; // Placeholder for actual data quality assessment
     const conditionOptimality = (soil.moisture > 40 && soil.moisture < 80) ? 1 : 0.7;
-    
+
     return (dataQuality + conditionOptimality) / 2;
   }
 
@@ -647,7 +647,7 @@ class DigitalTwinService {
   }
 
   calculateYieldImpact(conditions, crop) {
-    let baseYield = this.getBaseYield(crop.name);
+    const baseYield = this.getBaseYield(crop.name);
     let impact = 0;
 
     if (conditions.rainfall < 50) impact -= 0.3; // Drought impact
@@ -659,7 +659,7 @@ class DigitalTwinService {
 
   calculateCropStressLevel(conditions, crop) {
     let stress = 0;
-    
+
     if (conditions.temperature > 30) stress += 0.3;
     if (conditions.rainfall < 30) stress += 0.4;
     if (conditions.rainfall > 150) stress += 0.3;
@@ -674,7 +674,7 @@ class DigitalTwinService {
     const needs = {
       drought: ['drought-resistant varieties', 'improved irrigation', 'soil moisture conservation'],
       flood: ['flood-tolerant varieties', 'drainage systems', 'raised beds'],
-      heat_wave: ['heat-tolerant varieties', 'shade structures', 'increased irrigation']
+      heat_wave: ['heat-tolerant varieties', 'shade structures', 'increased irrigation'],
     };
 
     return needs[scenario] || ['monitor conditions closely'];
@@ -683,15 +683,15 @@ class DigitalTwinService {
   calculateScenarioRisk(cropImpacts) {
     const avgYieldImpact = cropImpacts.reduce((sum, impact) => sum + impact.yieldImpact, 0) / cropImpacts.length;
     const avgStress = cropImpacts.reduce((sum, impact) => sum + (impact.stressLevel === 'severe' ? 2 : impact.stressLevel === 'moderate' ? 1 : 0), 0) / cropImpacts.length;
-    
+
     if (avgYieldImpact < 0.3 || avgStress > 1.5) return 'high';
     if (avgYieldImpact < 0.6 || avgStress > 0.8) return 'medium';
     return 'low';
   }
 
   getClimateAdaptationRecommendations(scenarios) {
-    let recommendations = [];
-    
+    const recommendations = [];
+
     scenarios.forEach(scenario => {
       if (scenario.overallRisk === 'high') {
         recommendations.push(`Prepare for ${scenario.name} scenario`);
@@ -710,7 +710,7 @@ class DigitalTwinService {
     app.post('/api/v1/digital-twin', async (req, res) => {
       try {
         const { farmId, configuration } = req.body;
-        let result = await this.createDigitalTwin(farmId, configuration);
+        const result = await this.createDigitalTwin(farmId, configuration);
         res.json(result);
       } catch (error) {
         logger.error('Failed to create digital twin', { error: error.message });
@@ -722,7 +722,7 @@ class DigitalTwinService {
     app.put('/api/v1/digital-twin/:twinId', async (req, res) => {
       try {
         const { twinId } = req.params;
-        let result = await this.updateDigitalTwin(twinId, req.body);
+        const result = await this.updateDigitalTwin(twinId, req.body);
         res.json(result);
       } catch (error) {
         logger.error('Failed to update digital twin', { error: error.message });
@@ -734,7 +734,7 @@ class DigitalTwinService {
     app.post('/api/v1/digital-twin/:twinId/sensor-data', async (req, res) => {
       try {
         const { twinId } = req.params;
-        let result = await this.ingestSensorData(twinId, req.body);
+        const result = await this.ingestSensorData(twinId, req.body);
         res.json(result);
       } catch (error) {
         logger.error('Failed to ingest sensor data', { error: error.message });
@@ -747,7 +747,7 @@ class DigitalTwinService {
       try {
         const { twinId } = req.params;
         const { modelType } = req.body;
-        let result = await this.runSimulation(twinId, modelType);
+        const result = await this.runSimulation(twinId, modelType);
         res.json(result);
       } catch (error) {
         logger.error('Failed to run simulation', { error: error.message });
@@ -759,8 +759,8 @@ class DigitalTwinService {
     app.get('/api/v1/digital-twin/:twinId', async (req, res) => {
       try {
         const { twinId } = req.params;
-        let twin = this.activeTwins.get(twinId);
-        
+        const twin = this.activeTwins.get(twinId);
+
         if (!twin) {
           return res.status(404).json({ success: false, error: 'Digital twin not found' });
         }
@@ -772,8 +772,8 @@ class DigitalTwinService {
             farmId: twin.farm_id,
             name: twin.name,
             state: twin.state,
-            lastUpdate: twin.lastUpdate
-          }
+            lastUpdate: twin.lastUpdate,
+          },
         });
       } catch (error) {
         logger.error('Failed to get digital twin', { error: error.message });
@@ -791,12 +791,12 @@ class DigitalTwinService {
           farmName: twin.farm_name,
           location: twin.location,
           lastUpdate: twin.lastUpdate,
-          state: twin.state
+          state: twin.state,
         }));
 
         res.json({
           success: true,
-          twins
+          twins,
         });
       } catch (error) {
         logger.error('Failed to list digital twins', { error: error.message });
@@ -810,7 +810,7 @@ class DigitalTwinService {
         const { twinId } = req.params;
         const { limit = 10 } = req.query;
 
-        let result = await getPostgreSQL().query(`
+        const result = await getPostgreSQL().query(`
           SELECT model_type, result, timestamp
           FROM simulation_results
           WHERE twin_id = $1
@@ -820,7 +820,7 @@ class DigitalTwinService {
 
         res.json({
           success: true,
-          simulations: result.rows
+          simulations: result.rows,
         });
       } catch (error) {
         logger.error('Failed to get simulation results', { error: error.message });
@@ -831,6 +831,4 @@ class DigitalTwinService {
 }
 
 module.exports = new DigitalTwinService();
-
-
 

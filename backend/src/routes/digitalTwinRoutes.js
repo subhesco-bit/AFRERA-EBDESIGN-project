@@ -35,7 +35,7 @@ router.post('/farm',
       }
 
       const result = await digitalTwinService.createFarmDigitalTwin(farmData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Farm digital twin created successfully');
       } else {
@@ -44,7 +44,7 @@ router.post('/farm',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to create farm digital twin', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -63,8 +63,8 @@ router.post('/crop',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      let result = await digitalTwinService.createCropDigitalTwin(cropData);
-      
+      const result = await digitalTwinService.createCropDigitalTwin(cropData);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Crop digital twin created successfully');
       } else {
@@ -73,7 +73,7 @@ router.post('/crop',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to create crop digital twin', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -86,8 +86,8 @@ router.post('/:twinId/sync',
     try {
       const { twinId } = req.params;
 
-      let result = await digitalTwinService.syncDigitalTwin(twinId);
-      
+      const result = await digitalTwinService.syncDigitalTwin(twinId);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Digital twin synced successfully');
       } else {
@@ -96,7 +96,7 @@ router.post('/:twinId/sync',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to sync digital twin', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -114,8 +114,8 @@ router.post('/:twinId/simulate',
         return apiResponseHandler.sendError(res, 'Simulation configuration is required', 400, 'MISSING_PARAMETER');
       }
 
-      let result = await digitalTwinService.runSimulation(twinId, simulationConfig);
-      
+      const result = await digitalTwinService.runSimulation(twinId, simulationConfig);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Simulation completed successfully');
       } else {
@@ -124,7 +124,7 @@ router.post('/:twinId/simulate',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to run simulation', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -138,23 +138,23 @@ router.get('/:twinId',
       const { twinId } = req.params;
 
       const twin = await digitalTwinService.getTwinById(twinId);
-      
+
       if (!twin) {
         return apiResponseHandler.sendError(res, 'Digital twin not found', 404, 'TWIN_NOT_FOUND', twinId);
       }
 
       // Get current state
-      const currentState = digitalTwinService.activeTwins.get(twinId) || 
+      const currentState = digitalTwinService.activeTwins.get(twinId) ||
                            await digitalTwinService.getLatestTwinState(twinId);
 
       return apiResponseHandler.sendSuccess(res, {
         ...twin,
-        currentState
+        currentState,
       }, 'Digital twin details retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get digital twin details', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -180,24 +180,24 @@ router.get('/farmers/:farmerId',
         ORDER BY created_at DESC
       `;
 
-      let result = await db.query(query, [farmerId]);
-      
+      const result = await db.query(query, [farmerId]);
+
       const twins = await Promise.all(
         result.rows.map(async (twin) => ({
           ...twin,
-          currentState: digitalTwinService.activeTwins.get(twin.twin_id) || null
-        }))
+          currentState: digitalTwinService.activeTwins.get(twin.twin_id) || null,
+        })),
       );
 
       return apiResponseHandler.sendSuccess(res, {
         farmerId,
         twinCount: twins.length,
-        twins
+        twins,
       }, 'Farmer digital twins retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get farmer digital twins', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -212,14 +212,14 @@ router.get('/system/status',
         activeTwins: digitalTwinService.getActiveTwinsCount(),
         simulationInterval: digitalTwinService.simulationInterval,
         systemHealth: 'operational',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       return apiResponseHandler.sendSuccess(res, systemStatus, 'Digital twin system status retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get system status', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 module.exports = router;

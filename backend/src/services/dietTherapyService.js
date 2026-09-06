@@ -1,6 +1,6 @@
 'use strict';
 
-const aiBackbone = require('./legacy/aiBackboneService');
+const aiGateway = require('./aiGatewayService');
 const { NUTRITION_WELLNESS_DISCLAIMER } = require('../utils/disclaimers');
 
 const REGIONAL_STAPLES = Object.freeze({
@@ -9,7 +9,7 @@ const REGIONAL_STAPLES = Object.freeze({
   north: ['whole wheat', 'millets', 'lentils', 'seasonal vegetables', 'curd'],
   south: ['rice', 'millets', 'lentils', 'coconut', 'seasonal vegetables'],
   west: ['millets', 'pulses', 'vegetables', 'groundnuts', 'curd'],
-  east: ['rice', 'fish or pulses', 'leafy greens', 'seasonal vegetables', 'curd']
+  east: ['rice', 'fish or pulses', 'leafy greens', 'seasonal vegetables', 'curd'],
 });
 
 function validateProfile(profile = {}) {
@@ -31,7 +31,7 @@ function buildBaseline(profile) {
     meal_pattern: ['vegetables or fruit', 'protein source', 'whole-food carbohydrate', 'water'],
     regional_food_groups: safeStaples,
     safety_flags: profile.allergies.length ? ['Review every ingredient and cross-contact risk with a qualified professional.'] : [],
-    clinical_status: 'education_only'
+    clinical_status: 'education_only',
   };
 }
 
@@ -42,8 +42,16 @@ async function createPlan(profileInput, options = {}) {
   if (options.useAI !== false) {
     try {
       const prompt = `Provide culturally appropriate nutrition education, not diagnosis or treatment. Return concise JSON with meal_ideas, substitutions, and questions_for_professional. Profile: ${JSON.stringify(profile)} Baseline: ${JSON.stringify(baseline)}`;
-      const response = await aiBackbone.callAI(prompt, { provider: options.provider });
-      ai = { status: 'generated', recommendations: response };
+      const response = await aiGateway.run({
+        moduleId: 'diet-therapy',
+        capability: 'nutrition-and-wellness-plan',
+        prompt,
+        context: { region: profile.region, goals: profile.goals },
+        provider: options.provider,
+      });
+      ai = response.success ?
+        { status: 'generated', recommendations: response } :
+        { status: response.status, recommendations: [], reason: response.error, provenance: response.provenance };
     } catch (error) {
       ai = { status: 'unavailable', recommendations: [], reason: 'AI provider unavailable' };
     }

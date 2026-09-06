@@ -44,7 +44,7 @@ describe('SignalBus', () => {
     bus.onSignal(SIGNAL.ORDER_PLACED, healthy);
 
     expect(() =>
-      bus.emitSignal(SIGNAL.ORDER_PLACED, {}, { source: 'test' })
+      bus.emitSignal(SIGNAL.ORDER_PLACED, {}, { source: 'test' }),
     ).not.toThrow();
     expect(healthy).toHaveBeenCalledTimes(1);
   });
@@ -85,7 +85,7 @@ describe('DecisionEngine — reflex path', () => {
     bus.emitSignal(SIGNAL.ORDER_PLACED, {}, { severity: SEVERITY.INFO, source: 'test' });
 
     expect(
-      engine.recentDecisions().find((x) => x.rule === 'reflex.emergency_escalation')
+      engine.recentDecisions().find((x) => x.rule === 'reflex.emergency_escalation'),
     ).toBeUndefined();
   });
 });
@@ -96,7 +96,7 @@ describe('DecisionEngine — cold chain correlation', () => {
     bus.emitSignal(SIGNAL.TEMPERATURE_BREACH, { temp: 9 }, { source: 'iot', entityId: 'S1' });
 
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'coldchain.compound_breach')
+      engine.recentDecisions().find((d) => d.rule === 'coldchain.compound_breach'),
     ).toBeUndefined();
   });
 
@@ -121,7 +121,7 @@ describe('DecisionEngine — cold chain correlation', () => {
     bus.emitSignal(SIGNAL.SHELF_LIFE_CRITICAL, {}, { source: 'shelfLife', entityId: 'OTHER' });
 
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'coldchain.compound_breach')
+      engine.recentDecisions().find((d) => d.rule === 'coldchain.compound_breach'),
     ).toBeUndefined();
   });
 });
@@ -132,7 +132,7 @@ describe('DecisionEngine — fraud with financial exposure', () => {
     bus.emitSignal(SIGNAL.FRAUD_SUSPECTED, { probability: 0.3 }, { source: 'ai', entityId: 'U1' });
 
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'risk.fraud_with_payment_exposure')
+      engine.recentDecisions().find((d) => d.rule === 'risk.fraud_with_payment_exposure'),
     ).toBeUndefined();
   });
 
@@ -144,7 +144,7 @@ describe('DecisionEngine — fraud with financial exposure', () => {
     const d = engine.recentDecisions().find((x) => x.rule === 'risk.fraud_with_payment_exposure');
     expect(d).toBeDefined();
     expect(d.actions).toEqual(
-      expect.arrayContaining([ACTION.BLOCK_TRANSACTION, ACTION.FREEZE_PAYOUT, ACTION.ESCALATE_HUMAN])
+      expect.arrayContaining([ACTION.BLOCK_TRANSACTION, ACTION.FREEZE_PAYOUT, ACTION.ESCALATE_HUMAN]),
     );
   });
 
@@ -165,11 +165,11 @@ describe('DecisionEngine — forecast trust gating', () => {
     bus.emitSignal(
       SIGNAL.DEMAND_FORECAST_UPDATED,
       { accuracy: 0.4, trend: 20, forecast: [100, 110] },
-      { source: 'ai', entityId: 'P1' }
+      { source: 'ai', entityId: 'P1' },
     );
 
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'commerce.demand_shift_response')
+      engine.recentDecisions().find((d) => d.rule === 'commerce.demand_shift_response'),
     ).toBeUndefined();
   });
 
@@ -178,11 +178,11 @@ describe('DecisionEngine — forecast trust gating', () => {
     bus.emitSignal(
       SIGNAL.DEMAND_FORECAST_UPDATED,
       { accuracy: 0.95, trend: 20, forecast: [100, 110], insufficientData: true },
-      { source: 'ai', entityId: 'P2' }
+      { source: 'ai', entityId: 'P2' },
     );
 
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'commerce.demand_shift_response')
+      engine.recentDecisions().find((d) => d.rule === 'commerce.demand_shift_response'),
     ).toBeUndefined();
   });
 
@@ -191,7 +191,7 @@ describe('DecisionEngine — forecast trust gating', () => {
     bus.emitSignal(
       SIGNAL.DEMAND_FORECAST_UPDATED,
       { accuracy: 0.9, trend: 15, forecast: [100, 110, 120] },
-      { source: 'ai', entityId: 'P3' }
+      { source: 'ai', entityId: 'P3' },
     );
 
     const d = engine.recentDecisions().find((x) => x.rule === 'commerce.demand_shift_response');
@@ -204,11 +204,11 @@ describe('DecisionEngine — forecast trust gating', () => {
     bus.emitSignal(
       SIGNAL.DEMAND_FORECAST_UPDATED,
       { accuracy: 0.95, trend: 0.1, forecast: [100, 100, 100] },
-      { source: 'ai', entityId: 'P4' }
+      { source: 'ai', entityId: 'P4' },
     );
 
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'commerce.demand_shift_response')
+      engine.recentDecisions().find((d) => d.rule === 'commerce.demand_shift_response'),
     ).toBeUndefined();
   });
 });
@@ -221,16 +221,16 @@ describe('DecisionEngine — resilience and auditability', () => {
       triggers: [SIGNAL.RECALL_ISSUED],
       evaluate: () => {
         throw new Error('rule is broken');
-      }
+      },
     });
 
     expect(() =>
-      bus.emitSignal(SIGNAL.RECALL_ISSUED, {}, { severity: SEVERITY.EMERGENCY, source: 't' })
+      bus.emitSignal(SIGNAL.RECALL_ISSUED, {}, { severity: SEVERITY.EMERGENCY, source: 't' }),
     ).not.toThrow();
 
     // The emergency reflex still fired despite the broken rule.
     expect(
-      engine.recentDecisions().find((d) => d.rule === 'reflex.emergency_escalation')
+      engine.recentDecisions().find((d) => d.rule === 'reflex.emergency_escalation'),
     ).toBeDefined();
   });
 

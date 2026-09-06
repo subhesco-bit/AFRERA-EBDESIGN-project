@@ -70,7 +70,7 @@ describe('Order Routes', () => {
       expect(response.body.data.orders).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ status: 'pending' }),
-        ])
+        ]),
       );
     });
   });

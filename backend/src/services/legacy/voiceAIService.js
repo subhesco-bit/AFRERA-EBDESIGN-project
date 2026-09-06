@@ -30,7 +30,7 @@ async function createVoiceSession(userId, language = 'en') {
        (user_id, session_id, language, status)
        VALUES ($1, $2, $3, 'active')
        RETURNING *`,
-      [userId, sessionId, language]
+      [userId, sessionId, language],
     );
 
     return result.rows[0];
@@ -46,7 +46,7 @@ async function createVoiceSession(userId, language = 'en') {
 router.post('/voice-sessions', authMiddleware, async (req, res) => {
   try {
     const { language } = req.body;
-    let result = await createVoiceSession(req.user.id, language);
+    const result = await createVoiceSession(req.user.id, language);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create voice session API error', { error: error.message, stack: error.stack });
@@ -59,14 +59,14 @@ router.post('/voice-sessions', authMiddleware, async (req, res) => {
  */
 async function endVoiceSession(sessionId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE voice_sessions 
        SET ended_at = CURRENT_TIMESTAMP, 
            status = 'ended',
            duration_seconds = calculate_session_duration(id)
        WHERE id = $1
        RETURNING *`,
-      [sessionId]
+      [sessionId],
     );
 
     return result.rows[0];
@@ -81,7 +81,7 @@ async function endVoiceSession(sessionId) {
  */
 router.post('/voice-sessions/:sessionId/end', authMiddleware, async (req, res) => {
   try {
-    let result = await endVoiceSession(req.params.sessionId);
+    const result = await endVoiceSession(req.params.sessionId);
     res.json(result);
   } catch (error) {
     logger.error('End voice session API error', { error: error.message, stack: error.stack });
@@ -102,12 +102,12 @@ async function processVoiceCommand(sessionId, transcript, commandType, parameter
     const intent = detectIntentFromTranscript(transcript);
     const confidence = 0.85;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO voice_commands 
        (session_id, command_type, transcript, intent, confidence_score, parameters, execution_status)
        VALUES ($1, $2, $3, $4, $5, $6, 'executed')
        RETURNING *`,
-      [sessionId, commandType, transcript, intent, confidence, JSON.stringify(parameters)]
+      [sessionId, commandType, transcript, intent, confidence, JSON.stringify(parameters)],
     );
 
     return result.rows[0];
@@ -122,13 +122,13 @@ async function processVoiceCommand(sessionId, transcript, commandType, parameter
  */
 function detectIntentFromTranscript(transcript) {
   const lowerTranscript = transcript.toLowerCase();
-  
+
   const intentMap = {
-    'product_search': ['search', 'find', 'show me', 'looking for'],
-    'order': ['order', 'buy', 'purchase', 'add to cart'],
-    'navigation': ['go to', 'navigate', 'open', 'show'],
-    'information': ['tell me', 'what is', 'how to', 'information'],
-    'control': ['stop', 'pause', 'play', 'cancel']
+    product_search: ['search', 'find', 'show me', 'looking for'],
+    order: ['order', 'buy', 'purchase', 'add to cart'],
+    navigation: ['go to', 'navigate', 'open', 'show'],
+    information: ['tell me', 'what is', 'how to', 'information'],
+    control: ['stop', 'pause', 'play', 'cancel'],
   };
 
   for (const [intent, keywords] of Object.entries(intentMap)) {
@@ -146,7 +146,7 @@ function detectIntentFromTranscript(transcript) {
 router.post('/voice-commands', authMiddleware, async (req, res) => {
   try {
     const { session_id, transcript, command_type, parameters } = req.body;
-    let result = await processVoiceCommand(session_id, transcript, command_type, parameters);
+    const result = await processVoiceCommand(session_id, transcript, command_type, parameters);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Process voice command API error', { error: error.message, stack: error.stack });
@@ -159,9 +159,9 @@ router.post('/voice-commands', authMiddleware, async (req, res) => {
  */
 async function getVoiceCommands(sessionId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM voice_commands WHERE session_id = $1 ORDER BY created_at ASC',
-      [sessionId]
+      [sessionId],
     );
 
     return result.rows;
@@ -176,7 +176,7 @@ async function getVoiceCommands(sessionId) {
  */
 router.get('/voice-sessions/:sessionId/commands', authMiddleware, async (req, res) => {
   try {
-    let result = await getVoiceCommands(req.params.sessionId);
+    const result = await getVoiceCommands(req.params.sessionId);
     res.json(result);
   } catch (error) {
     logger.error('Get voice commands API error', { error: error.message, stack: error.stack });
@@ -193,13 +193,13 @@ router.get('/voice-sessions/:sessionId/commands', authMiddleware, async (req, re
  */
 async function logSpeechRecognition(sessionId, audioDuration, transcript, confidence, language, provider, processingTime) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO speech_recognition_logs 
        (session_id, audio_duration_ms, transcript, confidence_score, language_detected, 
         recognition_provider, processing_time_ms)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [sessionId, audioDuration, transcript, confidence, language, provider, processingTime]
+      [sessionId, audioDuration, transcript, confidence, language, provider, processingTime],
     );
 
     return result.rows[0];
@@ -221,16 +221,16 @@ router.post('/speech-recognition', authMiddleware, async (req, res) => {
       confidence_score,
       language_detected,
       recognition_provider,
-      processing_time_ms
+      processing_time_ms,
     } = req.body;
-    let result = await logSpeechRecognition(
+    const result = await logSpeechRecognition(
       session_id,
       audio_duration_ms,
       transcript,
       confidence_score,
       language_detected,
       recognition_provider,
-      processing_time_ms
+      processing_time_ms,
     );
     res.status(201).json(result);
   } catch (error) {
@@ -248,12 +248,12 @@ router.post('/speech-recognition', authMiddleware, async (req, res) => {
  */
 async function createVoiceResponse(sessionId, commandId, responseType, content, audioUrl, language) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO voice_responses 
        (session_id, command_id, response_type, content, audio_url, language)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [sessionId, commandId, responseType, content, audioUrl, language]
+      [sessionId, commandId, responseType, content, audioUrl, language],
     );
 
     return result.rows[0];
@@ -269,7 +269,7 @@ async function createVoiceResponse(sessionId, commandId, responseType, content, 
 router.post('/voice-responses', authMiddleware, async (req, res) => {
   try {
     const { session_id, command_id, response_type, content, audio_url, language } = req.body;
-    let result = await createVoiceResponse(session_id, command_id, response_type, content, audio_url, language);
+    const result = await createVoiceResponse(session_id, command_id, response_type, content, audio_url, language);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create voice response API error', { error: error.message, stack: error.stack });
@@ -286,7 +286,7 @@ router.post('/voice-responses', authMiddleware, async (req, res) => {
  */
 async function setVoicePreferences(userId, preferences) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO voice_preferences 
        (user_id, preferred_language, voice_gender, speech_rate, voice_volume, 
         auto_response_enabled, confirmation_required)
@@ -308,8 +308,8 @@ async function setVoicePreferences(userId, preferences) {
         preferences.speech_rate || 1.0,
         preferences.voice_volume || 1.0,
         preferences.auto_response_enabled !== false,
-        preferences.confirmation_required !== false
-      ]
+        preferences.confirmation_required !== false,
+      ],
     );
 
     return result.rows[0];
@@ -324,7 +324,7 @@ async function setVoicePreferences(userId, preferences) {
  */
 router.post('/voice-preferences', authMiddleware, async (req, res) => {
   try {
-    let result = await setVoicePreferences(req.user.id, req.body);
+    const result = await setVoicePreferences(req.user.id, req.body);
     res.json(result);
   } catch (error) {
     logger.error('Set voice preferences API error', { error: error.message, stack: error.stack });
@@ -337,9 +337,9 @@ router.post('/voice-preferences', authMiddleware, async (req, res) => {
  */
 async function getVoicePreferences(userId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM voice_preferences WHERE user_id = $1',
-      [userId]
+      [userId],
     );
 
     if (result.rows.length === 0) {
@@ -350,7 +350,7 @@ async function getVoicePreferences(userId) {
         speech_rate: 1.0,
         voice_volume: 1.0,
         auto_response_enabled: true,
-        confirmation_required: true
+        confirmation_required: true,
       };
     }
 
@@ -366,7 +366,7 @@ async function getVoicePreferences(userId) {
  */
 router.get('/voice-preferences', authMiddleware, async (req, res) => {
   try {
-    let result = await getVoicePreferences(req.user.id);
+    const result = await getVoicePreferences(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get voice preferences API error', { error: error.message, stack: error.stack });
@@ -383,7 +383,7 @@ router.get('/voice-preferences', authMiddleware, async (req, res) => {
  */
 async function recordVoiceAnalytics(userId, metrics) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO voice_analytics 
        (user_id, date, total_sessions, total_commands, successful_commands, failed_commands, 
         avg_confidence_score, avg_session_duration_seconds, most_used_commands)
@@ -403,8 +403,8 @@ async function recordVoiceAnalytics(userId, metrics) {
         metrics.failed || 0,
         metrics.avg_confidence || 0,
         metrics.avg_duration || 0,
-        JSON.stringify(metrics.most_used || {})
-      ]
+        JSON.stringify(metrics.most_used || {}),
+      ],
     );
 
     return result.rows[0];
@@ -420,7 +420,7 @@ async function recordVoiceAnalytics(userId, metrics) {
 router.post('/voice-analytics', authMiddleware, async (req, res) => {
   try {
     const { metrics } = req.body;
-    let result = await recordVoiceAnalytics(req.user.id, metrics);
+    const result = await recordVoiceAnalytics(req.user.id, metrics);
     res.json(result);
   } catch (error) {
     logger.error('Record voice analytics API error', { error: error.message, stack: error.stack });
@@ -442,13 +442,13 @@ async function getVoiceAnalytics(userId, startDate = null, endDate = null) {
     }
 
     if (endDate) {
-      query += ' AND date <= $' + (params.length + 1);
+      query += ` AND date <= $${ params.length + 1}`;
       params.push(endDate);
     }
 
     query += ' ORDER BY date DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Get voice analytics error', { error: error.message, stack: error.stack });
@@ -462,7 +462,7 @@ async function getVoiceAnalytics(userId, startDate = null, endDate = null) {
 router.get('/voice-analytics', authMiddleware, async (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    let result = await getVoiceAnalytics(req.user.id, start_date, end_date);
+    const result = await getVoiceAnalytics(req.user.id, start_date, end_date);
     res.json(result);
   } catch (error) {
     logger.error('Get voice analytics API error', { error: error.message, stack: error.stack });
@@ -490,8 +490,6 @@ module.exports = {
   getVoicePreferences,
   recordVoiceAnalytics,
   getVoiceAnalytics,
-  isHealthy
+  isHealthy,
 };
-
-
 

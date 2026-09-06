@@ -42,7 +42,7 @@ router.get('/assets/summary', authMiddleware, async (req, res) => {
 
 router.get('/assets/:assetId', authMiddleware, async (req, res) => {
   try {
-    let asset = await assetAccountingService.getAsset(req.params.assetId);
+    const asset = await assetAccountingService.getAsset(req.params.assetId);
     res.json({ success: true, data: asset });
   } catch (error) {
     res.status(error.message === 'Fixed asset not found' ? 404 : 400).json({ success: false, error: error.message });
@@ -61,7 +61,7 @@ router.post('/assets/:assetId/depreciation-schedule', authMiddleware, adminMiddl
 
 router.get('/assets/:assetId/depreciation-schedule', authMiddleware, async (req, res) => {
   try {
-    let schedule = await assetAccountingService.getDepreciationSchedule(req.params.assetId);
+    const schedule = await assetAccountingService.getDepreciationSchedule(req.params.assetId);
     res.json({ success: true, data: schedule });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -80,7 +80,7 @@ router.post('/assets/:assetId/depreciation-schedule/:periodDate/post', authMiddl
 router.post('/depreciation-run', authLimiter, authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { companyId, asOfDate } = req.body;
-    let result = await assetAccountingService.runDepreciationForPeriod(companyId, asOfDate);
+    const result = await assetAccountingService.runDepreciationForPeriod(companyId, asOfDate);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
@@ -90,7 +90,7 @@ router.post('/depreciation-run', authLimiter, authMiddleware, adminMiddleware, a
 // Disposal
 router.post('/assets/:assetId/dispose', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    let result = await assetAccountingService.disposeAsset(req.params.assetId, req.body);
+    const result = await assetAccountingService.disposeAsset(req.params.assetId, req.body);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

@@ -1,6 +1,6 @@
 /**
  * Platform Configuration Module Routes - AI Enhanced
- * 
+ *
  * Routes for platform configuration management with AI-powered capabilities:
  * - Configuration management
  * - AI optimization recommendations
@@ -75,20 +75,20 @@ router.get('/configuration/recommendations', ...admin, async (req, res) => {
 router.post('/configuration/apply', ...writeAdmin, validateBody(), (req, res, next) => configurationBody(req, res) ? next() : undefined, async (req, res) => {
   try {
     const result = await platformConfigurationService.applyOptimizedConfiguration(req.body);
-    
+
     // Emit signal for configuration change
     signalBus.emitSignal(SIGNAL.CONFIGURATION_CHANGED, {
       configId: result.configId,
       changes: req.body,
       appliedBy: 'ai_optimizer',
-      monitoringStatus: result.monitoring
+      monitoringStatus: result.monitoring,
     }, {
       severity: SEVERITY.NOTICE,
       source: 'platform_configuration_routes',
       entityId: result.configId,
-      correlationId: correlationId(req)
+      correlationId: correlationId(req),
     });
-    
+
     res.json(result);
   } catch (error) {
     logger.error('platformConfigurationRoutes:applyConfiguration', { error: error.message });

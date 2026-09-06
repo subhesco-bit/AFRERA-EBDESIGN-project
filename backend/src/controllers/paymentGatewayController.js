@@ -31,7 +31,7 @@ const paymentGatewayController = {
   async refundPayment(req, res) {
     try {
       const { paymentId } = req.params;
-      let result = await paymentGatewayService.refundPayment(paymentId, req.body);
+      const result = await paymentGatewayService.refundPayment(paymentId, req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Payment refund failed', error);
@@ -47,7 +47,7 @@ const paymentGatewayController = {
       logger.error('Get supported gateways failed', error);
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 module.exports = paymentGatewayController;

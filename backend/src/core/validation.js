@@ -72,7 +72,7 @@ class Validator {
   }
 
   static enum(value, allowedValues, options = { required: true }) {
-    let validated = this.string(value, { required: options.required });
+    const validated = this.string(value, { required: options.required });
     if (value && !allowedValues.includes(validated)) {
       throw new ValidationError(`Value must be one of: ${allowedValues.join(', ')}`);
     }
@@ -100,8 +100,8 @@ const validateRequest = (schema) => {
           error: {
             code: 'VALIDATION_ERROR',
             message: error.message,
-            requestId: req.id
-          }
+            requestId: req.id,
+          },
         });
       }
       next(error);

@@ -115,7 +115,7 @@ async function extractAndStoreCertificateText(reportNumber, buffer, { language =
        SET report_data = report_data || $1::jsonb
        WHERE report_number = $2
        RETURNING id, report_number, report_type, status, report_data`,
-      [JSON.stringify(ocrPatch), reportNumber]
+      [JSON.stringify(ocrPatch), reportNumber],
     );
 
     if (result.rows.length === 0) {
@@ -136,6 +136,4 @@ module.exports = {
   extractTextFromImage,
   extractAndStoreCertificateText,
 };
-
-
 

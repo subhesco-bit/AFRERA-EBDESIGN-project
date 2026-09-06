@@ -14,8 +14,8 @@ jest.mock('../../middleware/auth', () => ({
     req.user = { id: 'user-1', role: req.headers['x-test-role'] || 'farmer' };
     next();
   },
-  requireRole: (...roles) => (req, res, next) => roles.includes(req.user.role)
-    ? next() : res.status(403).json({ success: false, error: 'Insufficient permissions' }),
+  requireRole: (...roles) => (req, res, next) => roles.includes(req.user.role) ?
+    next() : res.status(403).json({ success: false, error: 'Insufficient permissions' }),
 }));
 jest.mock('../../middleware/rateLimit', () => ({ rateLimiters: { read: (req, res, next) => next(), write: (req, res, next) => next() } }));
 jest.mock('../../utils/logger', () => ({ logger: { error: jest.fn(), warn: jest.fn(), info: jest.fn() } }));

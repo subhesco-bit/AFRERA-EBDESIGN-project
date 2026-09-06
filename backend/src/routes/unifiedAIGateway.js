@@ -55,9 +55,7 @@ router.use(authenticate);
 // HEALTH CHECK - Unified system health
 // ============================================================================
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/health', (req, res) => {
+router.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -71,16 +69,16 @@ router.get
       healing: 'operational',
       intelligence: 'operational',
       agent: 'operational',
-      gateway: 'operational'
+      gateway: 'operational',
     },
     architecture: {
       layers: {
         enterprise_backbone: 'M400 AI Backbone',
         coordinator: 'Claude AI Coordinator',
         copilot_framework: '16gm AI Copilot',
-        provider_integration: 'Multi-Provider AI'
-      }
-    }
+        provider_integration: 'Multi-Provider AI',
+      },
+    },
   });
 });
 
@@ -198,17 +196,15 @@ router.use('/transactions', transactionRoutes);
 // SMART ROUTING - Automatic routing to appropriate service
 // ============================================================================
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/route', async (req, res) => {
+router.post('/route', async (req, res) => {
   try {
     const { requestType, query, context, options } = req.body;
-    
+
     // Intelligent routing logic based on request type
     let targetService;
     let targetEndpoint;
     let routingReason;
-    
+
     switch (requestType) {
       case 'copilot':
       case 'finance':
@@ -221,7 +217,7 @@ router.post
         targetEndpoint = '/api/v1/ai/copilot';
         routingReason = 'Domain-specific copilot request';
         break;
-        
+
       case 'decision':
       case 'predict':
       case 'recommend':
@@ -229,7 +225,7 @@ router.post
         targetEndpoint = '/api/v1/ai/legacy';
         routingReason = 'Decision-making request using legacy AI engine';
         break;
-        
+
       case 'strategy':
       case 'plan':
       case 'optimize':
@@ -237,14 +233,14 @@ router.post
         targetEndpoint = '/api/v1/ai/brain';
         routingReason = 'Strategic planning request using AI Brain';
         break;
-        
+
       case 'prediction':
       case 'forecast':
         targetService = 'operation-intelligence';
         targetEndpoint = '/api/v1/ai/operation-intelligence';
         routingReason = 'Predictive analytics request';
         break;
-        
+
       case 'conversation':
       case 'chat':
       case 'dialogue':
@@ -252,14 +248,14 @@ router.post
         targetEndpoint = '/api/v1/ai/coordinate';
         routingReason = 'Conversational AI request via Claude Coordinator';
         break;
-        
+
       case 'advisory':
       case 'guidance':
         targetService = 'advisory';
         targetEndpoint = '/api/v1/ai/advisory';
         routingReason = 'AI advisory system request';
         break;
-        
+
       case 'ecommerce':
       case 'product':
       case 'market':
@@ -267,38 +263,38 @@ router.post
         targetEndpoint = '/api/v1/ai/ecommerce';
         routingReason = 'E-commerce AI request';
         break;
-        
+
       case 'voice':
       case 'audio':
         targetService = 'voice';
         targetEndpoint = '/api/v1/ai/voice';
         routingReason = 'Voice AI request';
         break;
-        
+
       case 'healing':
       case 'recovery':
         targetService = 'self-healing';
         targetEndpoint = '/api/v1/ai/self-healing';
         routingReason = 'Error recovery request';
         break;
-        
+
       default:
         // Default to Claude Coordinator for general requests
         targetService = 'coordinate';
         targetEndpoint = '/api/v1/ai/coordinate';
         routingReason = 'General AI request routed to Claude Coordinator';
     }
-    
+
     res.json({
       success: true,
       routing: {
-        requestType: requestType,
+        requestType,
         routedTo: targetService,
         endpoint: targetEndpoint,
-        reason: routingReason
+        reason: routingReason,
       },
       recommendation: `Use the ${targetEndpoint} endpoint for this request type`,
-      alternatives: getAlternativeEndpoints(requestType)
+      alternatives: getAlternativeEndpoints(requestType),
     });
   } catch (error) {
     res.status(500).json({
@@ -306,8 +302,8 @@ router.post
       error: error.message,
       routing: {
         fallback: '/api/v1/ai/coordinate',
-        reason: 'Error in routing, falling back to Claude Coordinator'
-      }
+        reason: 'Error in routing, falling back to Claude Coordinator',
+      },
     });
   }
 });
@@ -317,16 +313,16 @@ router.post
  */
 function getAlternativeEndpoints(requestType) {
   const alternatives = {
-    'copilot': ['/api/v1/ai/coordinate', '/api/v1/ai/legacy'],
-    'decision': ['/api/v1/ai/coordinate', '/api/v1/ai/brain'],
-    'strategy': ['/api/v1/ai/coordinate', '/api/v1/ai/operation-intelligence'],
-    'prediction': ['/api/v1/ai/coordinate', '/api/v1/ai/legacy'],
-    'conversation': ['/api/v1/ai/copilot', '/api/v1/ai/conversational'],
-    'advisory': ['/api/v1/ai/coordinate', '/api/v1/ai/copilot'],
-    'ecommerce': ['/api/v1/ai/copilot', '/api/v1/ai/coordinate'],
-    'voice': ['/api/v1/ai/conversational', '/api/v1/ai/coordinate']
+    copilot: ['/api/v1/ai/coordinate', '/api/v1/ai/legacy'],
+    decision: ['/api/v1/ai/coordinate', '/api/v1/ai/brain'],
+    strategy: ['/api/v1/ai/coordinate', '/api/v1/ai/operation-intelligence'],
+    prediction: ['/api/v1/ai/coordinate', '/api/v1/ai/legacy'],
+    conversation: ['/api/v1/ai/copilot', '/api/v1/ai/conversational'],
+    advisory: ['/api/v1/ai/coordinate', '/api/v1/ai/copilot'],
+    ecommerce: ['/api/v1/ai/copilot', '/api/v1/ai/coordinate'],
+    voice: ['/api/v1/ai/conversational', '/api/v1/ai/coordinate'],
   };
-  
+
   return alternatives[requestType] || ['/api/v1/ai/coordinate'];
 }
 
@@ -334,68 +330,66 @@ function getAlternativeEndpoints(requestType) {
 // SERVICE DISCOVERY - List all available AI services
 // ============================================================================
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/services', (req, res) => {
+router.get('/services', (req, res) => {
   res.json({
     services: {
       coordinator: {
         name: 'Claude AI Coordinator',
         endpoint: '/api/v1/ai/coordinate',
         description: 'Central AI orchestration with agent selection',
-        status: 'operational'
+        status: 'operational',
       },
       copilot: {
         name: 'AI Copilot Framework',
         endpoint: '/api/v1/ai/copilot',
         description: '16gm system with 7 specialized copilots',
         copilots: ['finance', 'logistics', 'warehouse', 'insurance', 'nutrition', 'marketplace', 'generic'],
-        status: 'operational'
+        status: 'operational',
       },
       backbone: {
         name: 'AI Backbone Service',
         endpoint: '/api/v1/ai/backbone',
         description: 'Multi-provider AI integration',
         providers: ['claude', 'openai', 'gemini', 'azure', 'huggingface', 'ollama'],
-        status: 'operational'
+        status: 'operational',
       },
       brain: {
         name: 'AI Brain Service',
         endpoint: '/api/v1/ai/brain',
         description: 'Cognitive processing and strategy generation',
-        status: 'operational'
+        status: 'operational',
       },
       legacy: {
         name: 'Legacy AI Service',
         endpoint: '/api/v1/ai/legacy',
         description: 'Original AI decision-making engine',
         capabilities: ['demand_forecasting', 'price_optimization', 'credit_scoring', 'fraud_detection'],
-        status: 'operational'
+        status: 'operational',
       },
       intelligence: {
         name: 'AI Operation Intelligence',
         endpoint: '/api/v1/ai/operation-intelligence',
         description: 'Real-time optimization and monitoring',
-        status: 'operational'
+        status: 'operational',
       },
       healing: {
         name: 'AI Self-Healing',
         endpoint: '/api/v1/ai/self-healing',
         description: 'Autonomous error recovery',
-        status: 'operational'
+        status: 'operational',
       },
       agent: {
         name: 'AI Agent Service',
         endpoint: '/api/v1/ai/agent',
         description: 'Agentic AI capabilities',
-        status: 'operational'
+        status: 'operational',
       },
       gateway: {
         name: 'AI Gateway',
         endpoint: '/api/v1/ai/gateway',
         description: 'Multi-provider LLM routing',
-        status: 'operational'
-      }
+        status: 'operational',
+      },
     },
     specialized_services: {
       advisory: '/api/v1/ai/advisory',
@@ -407,8 +401,8 @@ router.get
       maintenance: '/api/v1/ai/maintenance',
       advanced: '/api/v1/ai/advanced',
       complete: '/api/v1/ai/complete',
-      enterprise: '/api/v1/ai/enterprise'
-    }
+      enterprise: '/api/v1/ai/enterprise',
+    },
   });
 });
 
@@ -416,9 +410,7 @@ router.get
 // ARCHITECTURE INFO - System architecture information
 // ============================================================================
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/architecture', (req, res) => {
+router.get('/architecture', (req, res) => {
   res.json({
     name: 'Unified AI Gateway',
     version: '2.0.0',
@@ -427,29 +419,29 @@ router.get
       {
         name: 'Enterprise AI Backbone (M400)',
         components: ['Decision Engine', 'Strategy Engine', 'Learning Engine', 'Prediction Engine', 'Coordination Engine'],
-        purpose: 'Enterprise-level AI orchestration and decision-making'
+        purpose: 'Enterprise-level AI orchestration and decision-making',
       },
       {
         name: 'Claude AI Coordinator',
         components: ['Agent Selection', 'Context Management', 'Library Integration', 'Collaboration Tracking'],
-        purpose: 'Central AI request coordination and agent management'
+        purpose: 'Central AI request coordination and agent management',
       },
       {
         name: '16gm AI Copilot Framework',
         components: ['Finance Copilot', 'Logistics Copilot', 'Warehouse Copilot', 'Insurance Copilot', 'Nutrition Copilot', 'Marketplace Copilot', 'Generic Copilot'],
-        purpose: 'Domain-specific AI assistance and expertise'
+        purpose: 'Domain-specific AI assistance and expertise',
       },
       {
         name: 'Multi-Provider Integration',
         components: ['Claude', 'OpenAI', 'Gemini', 'Azure', 'Hugging Face', 'Ollama'],
-        purpose: 'Flexible AI provider access with failover'
-      }
+        purpose: 'Flexible AI provider access with failover',
+      },
     ],
     integration: {
       existing_services: 'All existing AI services integrated and accessible',
       backward_compatibility: 'Maintained through legacy endpoints',
-      new_capabilities: 'Unified gateway, smart routing, provider failover'
-    }
+      new_capabilities: 'Unified gateway, smart routing, provider failover',
+    },
   });
 });
 

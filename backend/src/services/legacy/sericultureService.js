@@ -44,7 +44,7 @@ class SericultureService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting sericulture:', error);
@@ -58,12 +58,12 @@ class SericultureService {
   async getSericultureById(sericultureId) {
     try {
       const query = 'SELECT * FROM sericulture WHERE id = $1';
-      let result = await this.pool.query(query, [sericultureId]);
-      
+      const result = await this.pool.query(query, [sericultureId]);
+
       if (result.rows.length === 0) {
         throw new Error('Sericulture not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting sericulture by ID:', error);
@@ -83,17 +83,17 @@ class SericultureService {
         variety,
         mulberry_area_acres,
         rearing_capacity,
-        current_rearing_count
+        current_rearing_count,
       } = sericultureData;
 
-      let query = `
+      const query = `
         INSERT INTO sericulture (farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
-        farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count
+      const result = await this.pool.query(query, [
+        farmer_id, name, location, variety, mulberry_area_acres, rearing_capacity, current_rearing_count,
       ]);
 
       return result.rows[0];
@@ -108,13 +108,13 @@ class SericultureService {
    */
   async getSilkProduction(sericultureId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM silk_production
         WHERE sericulture_id = $1
         ORDER BY production_date DESC
       `;
 
-      let result = await this.pool.query(query, [sericultureId]);
+      const result = await this.pool.query(query, [sericultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting silk production:', error);
@@ -127,13 +127,13 @@ class SericultureService {
    */
   async getMulberryCultivation(sericultureId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM mulberry_cultivation
         WHERE sericulture_id = $1
         ORDER BY assessment_date DESC
       `;
 
-      let result = await this.pool.query(query, [sericultureId]);
+      const result = await this.pool.query(query, [sericultureId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting mulberry cultivation:', error);
@@ -143,6 +143,4 @@ class SericultureService {
 }
 
 module.exports = new SericultureService();
-
-
 

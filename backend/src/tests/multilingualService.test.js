@@ -12,7 +12,7 @@ describe('Multilingual Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     // Create test user and get auth token
@@ -21,7 +21,7 @@ describe('Multilingual Service', () => {
       .send({
         email: 'test@example.com',
         password: 'Test123!@#',
-        role: 'consumer'
+        role: 'consumer',
       });
 
     authToken = registerResponse.body.token;
@@ -51,7 +51,7 @@ describe('Multilingual Service', () => {
         .post('/api/v1/multilingual/detect')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          text: 'Hello, this is a test message in English'
+          text: 'Hello, this is a test message in English',
         })
         .expect(200);
 
@@ -66,7 +66,7 @@ describe('Multilingual Service', () => {
         .post('/api/v1/multilingual/detect')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          text: 'नमस्ते, यह एक परीक्षण संदेश है'
+          text: 'नमस्ते, यह एक परीक्षण संदेश है',
         })
         .expect(200);
 
@@ -79,7 +79,7 @@ describe('Multilingual Service', () => {
         .post('/api/v1/multilingual/detect')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          text: ''
+          text: '',
         })
         .expect(400);
 
@@ -90,7 +90,7 @@ describe('Multilingual Service', () => {
       const response = await request(app)
         .post('/api/v1/multilingual/detect')
         .send({
-          text: 'Test message'
+          text: 'Test message',
         })
         .expect(401);
     });
@@ -104,7 +104,7 @@ describe('Multilingual Service', () => {
         .send({
           text: 'Hello',
           source_language: 'en',
-          target_language: 'hi'
+          target_language: 'hi',
         })
         .expect(200);
 
@@ -121,7 +121,7 @@ describe('Multilingual Service', () => {
         .post('/api/v1/multilingual/translate')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          text: 'Hello'
+          text: 'Hello',
         })
         .expect(400);
 
@@ -156,7 +156,7 @@ describe('Multilingual Service', () => {
         .send({
           primary_language: 'hi',
           auto_detect_language: true,
-          auto_translate_content: false
+          auto_translate_content: false,
         })
         .expect(200);
 
@@ -176,7 +176,7 @@ describe('Multilingual Service', () => {
           entity_id: null,
           language_code: 'hi',
           translated_text: 'उत्पाद नाम',
-          context: 'Product name translation'
+          context: 'Product name translation',
         })
         .expect(200);
 

@@ -118,7 +118,7 @@ class ProductionGates {
    * Check database health
    */
   async checkDatabaseHealth() {
-    let checks = {
+    const checks = {
       connectionEstablished: false,
       canRead: false,
       canWrite: false,
@@ -153,7 +153,7 @@ class ProductionGates {
         // Test write operation
         try {
           await client.query('BEGIN');
-          await client.query("INSERT INTO _healthcheck (id) VALUES (gen_random_uuid())");
+          await client.query('INSERT INTO _healthcheck (id) VALUES (gen_random_uuid())');
           await client.query('ROLLBACK');
           checks.canWrite = true;
         } catch (error) {
@@ -214,7 +214,7 @@ class ProductionGates {
         const response = await this.makeRequest(
           `${this.backendUrl}${endpoint.path}`,
           5000,
-          endpoint.method
+          endpoint.method,
         );
 
         const success = response.status === endpoint.expectedStatus;
@@ -252,7 +252,7 @@ class ProductionGates {
    * Check E2E readiness
    */
   async checkE2EReadiness() {
-    let checks = {
+    const checks = {
       testFrameworkReady: true,
       testDataSeeded: false,
       testEnvironmentConfigured: false,
@@ -274,7 +274,7 @@ class ProductionGates {
       try {
         const testDataRes = await this.makeRequest(
           `${this.backendUrl}/api/test/seed-status`,
-          5000
+          5000,
         );
         checks.testDataSeeded = testDataRes.status === 200 && testDataRes.data?.seeded;
       } catch {
@@ -290,12 +290,12 @@ class ProductionGates {
       ];
 
       checks.testEnvironmentConfigured = requiredEnvVars.every(
-        env => process.env[env]
+        env => process.env[env],
       );
 
       if (!checks.testEnvironmentConfigured) {
         checks.errors.push(
-          `Missing environment variables: ${requiredEnvVars.filter(e => !process.env[e]).join(', ')}`
+          `Missing environment variables: ${requiredEnvVars.filter(e => !process.env[e]).join(', ')}`,
         );
       }
 
@@ -317,7 +317,7 @@ class ProductionGates {
    * Check security requirements
    */
   async checkSecurity() {
-    let checks = {
+    const checks = {
       httpsRedirect: false,
       corsConfigured: false,
       helmHeadersPresent: false,
@@ -327,22 +327,20 @@ class ProductionGates {
     };
 
     try {
-      let response = await this.makeRequest(`${this.backendUrl}/health`, 5000);
+      const response = await this.makeRequest(`${this.backendUrl}/health`, 5000);
 
       // Check for security headers
       const headers = response.headers || {};
-      checks.helmHeadersPresent = !!(
-        headers['x-content-type-options'] ||
+      checks.helmHeadersPresent = Boolean(headers['x-content-type-options'] ||
         headers['x-frame-options'] ||
-        headers['content-security-policy']
-      );
+        headers['content-security-policy']);
 
       if (!checks.helmHeadersPresent) {
         checks.errors.push('Missing security headers (Helmet configuration)');
       }
 
       // Check CORS
-      checks.corsConfigured = !!headers['access-control-allow-origin'];
+      checks.corsConfigured = Boolean(headers['access-control-allow-origin']);
       if (!checks.corsConfigured) {
         checks.errors.push('CORS not properly configured');
       }
@@ -360,7 +358,7 @@ class ProductionGates {
    * Check performance requirements
    */
   async checkPerformance() {
-    let checks = {
+    const checks = {
       avgResponseTime: 0,
       maxResponseTime: 0,
       responsesUnder500ms: 0,
@@ -378,7 +376,7 @@ class ProductionGates {
 
     for (const endpoint of sampleEndpoints) {
       try {
-        let startTime = Date.now();
+        const startTime = Date.now();
         await this.makeRequest(`${this.backendUrl}${endpoint}`, 5000);
         const duration = Date.now() - startTime;
 
@@ -405,7 +403,7 @@ class ProductionGates {
    * Check environment configuration
    */
   async checkEnvironment() {
-    let checks = {
+    const checks = {
       nodeVersionValid: true,
       envFilePresent: false,
       requiredEnvVars: {},
@@ -421,7 +419,7 @@ class ProductionGates {
     ];
 
     for (const envVar of requiredVars) {
-      checks.requiredEnvVars[envVar] = !!process.env[envVar];
+      checks.requiredEnvVars[envVar] = Boolean(process.env[envVar]);
       if (!process.env[envVar]) {
         checks.errors.push(`Missing required environment variable: ${envVar}`);
       }
@@ -439,10 +437,10 @@ class ProductionGates {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    let startTime = Date.now();
+    const startTime = Date.now();
 
     try {
-      let response = await axios({
+      const response = await axios({
         method,
         url,
         signal: controller.signal,

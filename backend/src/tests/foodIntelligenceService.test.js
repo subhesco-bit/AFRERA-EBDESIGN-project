@@ -13,7 +13,7 @@ describe('Food Intelligence Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('Food Intelligence Service', () => {
       .send({
         email: 'food-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -50,7 +50,7 @@ describe('Food Intelligence Service', () => {
           is_gi: false,
           shelf_life_days: 365,
           storage_conditions: { temperature: 'cool', humidity: 'dry' },
-          allergens: []
+          allergens: [],
         })
         .expect(201);
 
@@ -63,7 +63,7 @@ describe('Food Intelligence Service', () => {
       const response = await request(app)
         .post('/api/v1/food-intelligence/food-items')
         .send({
-          name: 'Test Food'
+          name: 'Test Food',
         })
         .expect(401);
     });
@@ -99,9 +99,9 @@ describe('Food Intelligence Service', () => {
             appearance: 95,
             texture: 90,
             aroma: 92,
-            taste: 88
+            taste: 88,
           },
-          recommendations: ['Maintain current storage conditions']
+          recommendations: ['Maintain current storage conditions'],
         })
         .expect(201);
 
@@ -134,7 +134,7 @@ describe('Food Intelligence Service', () => {
           contaminant_level: 0.5,
           unit: 'mg/kg',
           detection_limit: 0.1,
-          test_method: 'HPLC'
+          test_method: 'HPLC',
         })
         .expect(201);
 
@@ -164,9 +164,9 @@ describe('Food Intelligence Service', () => {
           freshness_scores: {
             visual: 95,
             aroma: 90,
-            texture: 88
+            texture: 88,
           },
-          storage_recommendations: ['Store in cool dry place']
+          storage_recommendations: ['Store in cool dry place'],
         })
         .expect(201);
 
@@ -189,7 +189,7 @@ describe('Food Intelligence Service', () => {
           hazard_level: 'medium',
           affected_batches: ['BATCH-001'],
           affected_regions: ['Assam'],
-          recalling_firm: 'Test Company'
+          recalling_firm: 'Test Company',
         })
         .expect(201);
 
@@ -223,8 +223,8 @@ describe('Food Intelligence Service', () => {
             freshness_score: 88,
             market_price: 50,
             demand_index: 1.2,
-            supply_index: 0.9
-          }
+            supply_index: 0.9,
+          },
         })
         .expect(200);
 

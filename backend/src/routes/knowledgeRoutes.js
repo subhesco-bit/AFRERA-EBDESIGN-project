@@ -1,6 +1,6 @@
 /**
  * Knowledge Routes
- * 
+ *
  * Express routes for the Knowledge service,
  * providing endpoints for knowledge articles, wiki pages, taxonomies,
  * search, version control, access control, feedback, and AI recommendations.
@@ -24,19 +24,19 @@ router.get('/articles', (req, res) => {
       featured: req.query.featured,
       tag: req.query.tag,
       language: req.query.language,
-      sortBy: req.query.sortBy
+      sortBy: req.query.sortBy,
     };
-    
+
     const articles = knowledgeService.getArticles(filters);
     res.json({
       success: true,
       count: articles.length,
-      data: articles
+      data: articles,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -48,17 +48,17 @@ router.get('/articles/:articleId', (req, res) => {
     if (!article) {
       return res.status(404).json({
         success: false,
-        error: 'Article not found'
+        error: 'Article not found',
       });
     }
     res.json({
       success: true,
-      data: article
+      data: article,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -66,16 +66,16 @@ router.get('/articles/:articleId', (req, res) => {
 // Create a new article
 router.post('/articles', (req, res) => {
   try {
-    let article = knowledgeService.createArticle(req.body);
+    const article = knowledgeService.createArticle(req.body);
     res.status(201).json({
       success: true,
       message: 'Article created successfully',
-      data: article
+      data: article,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -83,16 +83,16 @@ router.post('/articles', (req, res) => {
 // Update an article
 router.put('/articles/:articleId', (req, res) => {
   try {
-    let article = knowledgeService.updateArticle(req.params.articleId, req.body);
+    const article = knowledgeService.updateArticle(req.params.articleId, req.body);
     res.json({
       success: true,
       message: 'Article updated successfully',
-      data: article
+      data: article,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -103,12 +103,12 @@ router.delete('/articles/:articleId', (req, res) => {
     const result = knowledgeService.deleteArticle(req.params.articleId);
     res.json({
       success: true,
-      message: result.message
+      message: result.message,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -120,22 +120,22 @@ router.delete('/articles/:articleId', (req, res) => {
 // Get all wiki pages
 router.get('/wiki', (req, res) => {
   try {
-    let filters = {
+    const filters = {
       status: req.query.status,
       parentId: req.query.parentId,
-      authorId: req.query.authorId
+      authorId: req.query.authorId,
     };
-    
+
     const pages = knowledgeService.getWikiPages(filters);
     res.json({
       success: true,
       count: pages.length,
-      data: pages
+      data: pages,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -147,17 +147,17 @@ router.get('/wiki/slug/:slug', (req, res) => {
     if (!page) {
       return res.status(404).json({
         success: false,
-        error: 'Wiki page not found'
+        error: 'Wiki page not found',
       });
     }
     res.json({
       success: true,
-      data: page
+      data: page,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -165,16 +165,16 @@ router.get('/wiki/slug/:slug', (req, res) => {
 // Create a new wiki page
 router.post('/wiki', (req, res) => {
   try {
-    let page = knowledgeService.createWikiPage(req.body);
+    const page = knowledgeService.createWikiPage(req.body);
     res.status(201).json({
       success: true,
       message: 'Wiki page created successfully',
-      data: page
+      data: page,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -182,16 +182,16 @@ router.post('/wiki', (req, res) => {
 // Update a wiki page
 router.put('/wiki/:wikiId', (req, res) => {
   try {
-    let page = knowledgeService.updateWikiPage(req.params.wikiId, req.body);
+    const page = knowledgeService.updateWikiPage(req.params.wikiId, req.body);
     res.json({
       success: true,
       message: 'Wiki page updated successfully',
-      data: page
+      data: page,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -203,21 +203,21 @@ router.put('/wiki/:wikiId', (req, res) => {
 // Get all taxonomies
 router.get('/taxonomies', (req, res) => {
   try {
-    let filters = {
+    const filters = {
       parentId: req.query.parentId,
-      level: req.query.level
+      level: req.query.level,
     };
-    
+
     const taxonomies = knowledgeService.getTaxonomies(filters);
     res.json({
       success: true,
       count: taxonomies.length,
-      data: taxonomies
+      data: taxonomies,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -229,12 +229,12 @@ router.get('/taxonomies/tree', (req, res) => {
     const tree = knowledgeService.getTaxonomyTree(rootId);
     res.json({
       success: true,
-      data: tree
+      data: tree,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -246,12 +246,12 @@ router.post('/taxonomies', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Taxonomy created successfully',
-      data: taxonomy
+      data: taxonomy,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -264,26 +264,26 @@ router.post('/taxonomies', (req, res) => {
 router.get('/search', (req, res) => {
   try {
     const query = req.query.q;
-    let filters = {
-      type: req.query.type
+    const filters = {
+      type: req.query.type,
     };
-    
+
     if (!query) {
       return res.status(400).json({
         success: false,
-        error: 'Search query (q) is required'
+        error: 'Search query (q) is required',
       });
     }
-    
+
     const results = knowledgeService.searchKnowledge(query, filters);
     res.json({
       success: true,
-      data: results
+      data: results,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -299,12 +299,12 @@ router.get('/versions/:itemId', (req, res) => {
     res.json({
       success: true,
       count: history.length,
-      data: history
+      data: history,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -316,12 +316,12 @@ router.post('/versions/:itemId/restore/:versionNumber', (req, res) => {
     res.json({
       success: true,
       message: 'Version restored successfully',
-      data: item
+      data: item,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -337,12 +337,12 @@ router.post('/access-control', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Access control set successfully',
-      data: control
+      data: control,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -354,16 +354,16 @@ router.get('/access-control/:resourceId/check/:userId', (req, res) => {
     const hasAccess = knowledgeService.checkAccess(
       req.params.resourceId,
       req.params.userId,
-      requiredPermission
+      requiredPermission,
     );
     res.json({
       success: true,
-      hasAccess: hasAccess
+      hasAccess,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -379,12 +379,12 @@ router.post('/feedback', (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Feedback submitted successfully',
-      data: feedback
+      data: feedback,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -392,16 +392,16 @@ router.post('/feedback', (req, res) => {
 // Get feedback for a resource
 router.get('/feedback/:resourceId', (req, res) => {
   try {
-    let feedback = knowledgeService.getFeedback(req.params.resourceId);
+    const feedback = knowledgeService.getFeedback(req.params.resourceId);
     res.json({
       success: true,
       count: feedback.length,
-      data: feedback
+      data: feedback,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -417,19 +417,19 @@ router.post('/ai-recommendations', async (req, res) => {
     if (!userId || !context) {
       return res.status(400).json({
         success: false,
-        error: 'userId and context are required in request body'
+        error: 'userId and context are required in request body',
       });
     }
-    
+
     const recommendations = await knowledgeService.generateAIRecommendations(userId, context);
     res.json({
       success: true,
-      data: recommendations
+      data: recommendations,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -444,12 +444,12 @@ router.get('/analytics', (req, res) => {
     const analytics = knowledgeService.getAnalytics();
     res.json({
       success: true,
-      data: analytics
+      data: analytics,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -464,12 +464,12 @@ router.get('/health', (req, res) => {
     const health = knowledgeService.getHealthStatus();
     res.json({
       success: true,
-      data: health
+      data: health,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });

@@ -26,7 +26,7 @@ const getSparePart = async (req, res) => {
 
 const registerSparePart = async (req, res) => {
   try {
-    let part = await partsService.registerSparePart(req.body);
+    const part = await partsService.registerSparePart(req.body);
     res.status(201).json({ success: true, data: part });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -66,5 +66,5 @@ module.exports = {
   registerSparePart,
   recordPartConsumption,
   trackInventoryStatus,
-  generateInventoryReport
+  generateInventoryReport,
 };

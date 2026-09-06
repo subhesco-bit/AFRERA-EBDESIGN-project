@@ -91,12 +91,12 @@ async function findBestTitle(query) {
  */
 async function getSummaryByTitle(title) {
   if (!title || !title.trim()) throw new Error('title is required');
-  let cacheKey = `summary:${title.trim().toLowerCase()}`;
-  let cached = getCached(cacheKey);
+  const cacheKey = `summary:${title.trim().toLowerCase()}`;
+  const cached = getCached(cacheKey);
   if (cached !== undefined) return cached;
 
   try {
-    let response = await client.get(`/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    const response = await client.get(`/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
     const data = response.data;
     const summary = {
       title: data.title,
@@ -124,7 +124,7 @@ async function getSummaryByTitle(title) {
  * summary. Returns null (never a fabricated fallback) if nothing is found.
  */
 async function lookup(query) {
-  let title = await findBestTitle(query);
+  const title = await findBestTitle(query);
   if (!title) return null;
   return getSummaryByTitle(title);
 }
@@ -134,6 +134,4 @@ module.exports = {
   findBestTitle,
   getSummaryByTitle,
 };
-
-
 

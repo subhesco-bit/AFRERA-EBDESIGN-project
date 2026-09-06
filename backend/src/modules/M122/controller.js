@@ -55,5 +55,5 @@ module.exports = {
   updateCattleHealth,
   trackCattlePerformance,
   generateRegistryReport,
-  getBreedingRecommendations
+  getBreedingRecommendations,
 };

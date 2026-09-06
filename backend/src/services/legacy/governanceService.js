@@ -26,7 +26,7 @@ class GovernanceService {
 
       const result = await this.pool.query(query, [
         name, district, state, population, households,
-        JSON.stringify(coordinates), JSON.stringify(demographics)
+        JSON.stringify(coordinates), JSON.stringify(demographics),
       ]);
 
       logger.info(`Village created: ${result.rows[0].id}`);
@@ -57,7 +57,7 @@ class GovernanceService {
 
       query += ' ORDER BY name ASC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting villages', { error: error.message, stack: error.stack });
@@ -67,8 +67,8 @@ class GovernanceService {
 
   async getVillage(villageId) {
     try {
-      let query = 'SELECT * FROM villages WHERE id = $1';
-      let result = await this.pool.query(query, [villageId]);
+      const query = 'SELECT * FROM villages WHERE id = $1';
+      const result = await this.pool.query(query, [villageId]);
 
       if (result.rows.length === 0) {
         throw new Error('Village not found');
@@ -83,7 +83,7 @@ class GovernanceService {
 
   async updateVillage(villageId, updateData) {
     try {
-      let query = `
+      const query = `
         UPDATE villages
         SET 
           name = COALESCE($1, name),
@@ -98,7 +98,7 @@ class GovernanceService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         updateData.name,
         updateData.district,
         updateData.state,
@@ -106,7 +106,7 @@ class GovernanceService {
         updateData.households,
         updateData.coordinates ? JSON.stringify(updateData.coordinates) : null,
         updateData.demographics ? JSON.stringify(updateData.demographics) : null,
-        villageId
+        villageId,
       ]);
 
       if (result.rows.length === 0) {
@@ -125,18 +125,18 @@ class GovernanceService {
     try {
       const { name, district, state, block, villages, contactInfo, chairman } = panchayatData;
 
-      let query = `
+      const query = `
         INSERT INTO panchayats 
         (name, district, state, block, villages, contact_info, chairman)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         name, district, state, block,
         JSON.stringify(villages),
         JSON.stringify(contactInfo),
-        chairman
+        chairman,
       ]);
 
       logger.info(`Panchayat created: ${result.rows[0].id}`);
@@ -150,7 +150,7 @@ class GovernanceService {
   async getPanchayats(filters = {}) {
     try {
       let query = 'SELECT * FROM panchayats WHERE 1=1';
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (filters.district) {
@@ -167,7 +167,7 @@ class GovernanceService {
 
       query += ' ORDER BY name ASC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting panchayats', { error: error.message, stack: error.stack });
@@ -177,8 +177,8 @@ class GovernanceService {
 
   async getPanchayat(panchayatId) {
     try {
-      let query = 'SELECT * FROM panchayats WHERE id = $1';
-      let result = await this.pool.query(query, [panchayatId]);
+      const query = 'SELECT * FROM panchayats WHERE id = $1';
+      const result = await this.pool.query(query, [panchayatId]);
 
       if (result.rows.length === 0) {
         throw new Error('Panchayat not found');
@@ -195,16 +195,16 @@ class GovernanceService {
     try {
       const { name, description, budget, startDate, endDate, targetBeneficiaries } = schemeData;
 
-      let query = `
+      const query = `
         INSERT INTO panchayat_schemes 
         (panchayat_id, name, description, budget, start_date, end_date, target_beneficiaries)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         panchayatId, name, description, budget, startDate, endDate,
-        JSON.stringify(targetBeneficiaries)
+        JSON.stringify(targetBeneficiaries),
       ]);
 
       logger.info(`Scheme added to panchayat ${panchayatId}`);
@@ -220,16 +220,16 @@ class GovernanceService {
     try {
       const { name, description, organization, budget, startDate, endDate, location, impactAreas } = projectData;
 
-      let query = `
+      const query = `
         INSERT INTO csr_projects 
         (name, description, organization, budget, start_date, end_date, location, impact_areas, status)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active')
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         name, description, organization, budget, startDate, endDate, location,
-        JSON.stringify(impactAreas)
+        JSON.stringify(impactAreas),
       ]);
 
       logger.info(`CSR project created: ${result.rows[0].id}`);
@@ -243,7 +243,7 @@ class GovernanceService {
   async getCSRProjects(filters = {}) {
     try {
       let query = 'SELECT * FROM csr_projects WHERE 1=1';
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (filters.organization) {
@@ -260,7 +260,7 @@ class GovernanceService {
 
       query += ' ORDER BY created_at DESC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting CSR projects', { error: error.message, stack: error.stack });
@@ -270,8 +270,8 @@ class GovernanceService {
 
   async getCSRProject(projectId) {
     try {
-      let query = 'SELECT * FROM csr_projects WHERE id = $1';
-      let result = await this.pool.query(query, [projectId]);
+      const query = 'SELECT * FROM csr_projects WHERE id = $1';
+      const result = await this.pool.query(query, [projectId]);
 
       if (result.rows.length === 0) {
         throw new Error('CSR project not found');
@@ -286,7 +286,7 @@ class GovernanceService {
 
   async updateCSRProject(projectId, updateData) {
     try {
-      let query = `
+      const query = `
         UPDATE csr_projects
         SET 
           name = COALESCE($1, name),
@@ -299,13 +299,13 @@ class GovernanceService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         updateData.name,
         updateData.description,
         updateData.budget,
         updateData.status,
         updateData.progress,
-        projectId
+        projectId,
       ]);
 
       if (result.rows.length === 0) {
@@ -323,14 +323,14 @@ class GovernanceService {
     try {
       const { amount, type, description } = contributionData;
 
-      let query = `
+      const query = `
         INSERT INTO csr_contributions 
         (project_id, contributor_id, amount, type, description)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [projectId, userId, amount, type, description]);
+      const result = await this.pool.query(query, [projectId, userId, amount, type, description]);
 
       logger.info(`CSR contribution added to project ${projectId}`);
       return result.rows[0];
@@ -342,7 +342,7 @@ class GovernanceService {
 
   async getCSRStatistics(filters = {}) {
     try {
-      let query = `
+      const query = `
         SELECT 
           COUNT(*) as total_projects,
           COUNT(CASE WHEN status = 'active' THEN 1 END) as active_projects,
@@ -354,7 +354,7 @@ class GovernanceService {
         WHERE 1=1
       `;
 
-      let result = await this.pool.query(query);
+      const result = await this.pool.query(query);
       return result.rows[0];
     } catch (error) {
       logger.error('Error getting CSR statistics', { error: error.message, stack: error.stack });
@@ -367,18 +367,18 @@ class GovernanceService {
     try {
       const { type, entity, entity_id, period, findings, recommendations, submittedBy } = reportData;
 
-      let query = `
+      const query = `
         INSERT INTO compliance_reports 
         (type, entity, entity_id, period, findings, recommendations, submitted_by, status)
         VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending_review')
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         type, entity, entity_id, period,
         JSON.stringify(findings),
         JSON.stringify(recommendations),
-        submittedBy
+        submittedBy,
       ]);
 
       logger.info(`Compliance report created: ${result.rows[0].id}`);
@@ -392,7 +392,7 @@ class GovernanceService {
   async getComplianceReports(filters = {}) {
     try {
       let query = 'SELECT * FROM compliance_reports WHERE 1=1';
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (filters.type) {
@@ -409,7 +409,7 @@ class GovernanceService {
 
       query += ' ORDER BY created_at DESC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting compliance reports', { error: error.message, stack: error.stack });
@@ -419,8 +419,8 @@ class GovernanceService {
 
   async getComplianceReport(reportId) {
     try {
-      let query = 'SELECT * FROM compliance_reports WHERE id = $1';
-      let result = await this.pool.query(query, [reportId]);
+      const query = 'SELECT * FROM compliance_reports WHERE id = $1';
+      const result = await this.pool.query(query, [reportId]);
 
       if (result.rows.length === 0) {
         throw new Error('Compliance report not found');
@@ -437,7 +437,7 @@ class GovernanceService {
     try {
       const { approved, comments, actionItems } = reviewData;
 
-      let query = `
+      const query = `
         UPDATE compliance_reports
         SET 
           status = $1,
@@ -449,12 +449,12 @@ class GovernanceService {
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         approved ? 'approved' : 'rejected',
         reviewerId,
         comments,
         JSON.stringify(actionItems),
-        reportId
+        reportId,
       ]);
 
       if (result.rows.length === 0) {
@@ -470,7 +470,7 @@ class GovernanceService {
 
   async getComplianceStatistics(filters = {}) {
     try {
-      let query = `
+      const query = `
         SELECT 
           type,
           COUNT(*) as total_reports,
@@ -482,7 +482,7 @@ class GovernanceService {
         ORDER BY total_reports DESC
       `;
 
-      let result = await this.pool.query(query);
+      const result = await this.pool.query(query);
       return result.rows;
     } catch (error) {
       logger.error('Error getting compliance statistics', { error: error.message, stack: error.stack });
@@ -506,7 +506,7 @@ class GovernanceService {
   async complianceGaps() {
     try {
       const { rows } = await this.pool.query(
-        'SELECT * FROM platform_compliance_record WHERE id = 1'
+        'SELECT * FROM platform_compliance_record WHERE id = 1',
       );
       const record = rows[0] || {};
 
@@ -516,7 +516,7 @@ class GovernanceService {
         ['grievance_email', 'Grievance Officer e-mail'],
         ['grievance_phone', 'Grievance Officer phone'],
         ['nodal_officer', 'Nodal Officer (IT Rules 2021)'],
-        ['gstin', 'GSTIN']
+        ['gstin', 'GSTIN'],
       ];
 
       const missing = need
@@ -528,7 +528,7 @@ class GovernanceService {
         totalRequired: need.length,
         completed: need.length - missing.length,
         isReady: missing.length === 0,
-        checkedAt: new Date().toISOString()
+        checkedAt: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Error checking compliance gaps', { error: error.message, stack: error.stack });
@@ -546,16 +546,16 @@ class GovernanceService {
     try {
       const { name, type, district, state, registrationNumber, members, bylaws } = cooperativeData;
 
-      let query = `
+      const query = `
         INSERT INTO cooperatives 
         (name, type, district, state, registration_number, members, bylaws, status)
         VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
+      const result = await this.pool.query(query, [
         name, type, district, state, registrationNumber,
-        JSON.stringify(members), JSON.stringify(bylaws)
+        JSON.stringify(members), JSON.stringify(bylaws),
       ]);
 
       logger.info(`Cooperative created: ${result.rows[0].id}`);
@@ -569,7 +569,7 @@ class GovernanceService {
   async getCooperatives(filters = {}) {
     try {
       let query = 'SELECT * FROM cooperatives WHERE 1=1';
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (filters.type) {
@@ -586,7 +586,7 @@ class GovernanceService {
 
       query += ' ORDER BY name ASC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting cooperatives', { error: error.message, stack: error.stack });
@@ -598,15 +598,15 @@ class GovernanceService {
     try {
       const { role, shareHolding, joiningDate } = memberData;
 
-      let query = `
+      const query = `
         INSERT INTO cooperative_members 
         (cooperative_id, user_id, role, share_holding, joining_date)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
-        cooperativeId, userId, role, shareHolding, joiningDate
+      const result = await this.pool.query(query, [
+        cooperativeId, userId, role, shareHolding, joiningDate,
       ]);
 
       logger.info(`Member added to cooperative ${cooperativeId}`);
@@ -619,6 +619,4 @@ class GovernanceService {
 }
 
 module.exports = new GovernanceService();
-
-
 

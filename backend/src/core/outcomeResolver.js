@@ -76,7 +76,7 @@ async function resolveDue({ limit = 500 } = {}) {
         AND (p.resolves_on IS NULL OR p.resolves_on <= CURRENT_DATE)
       ORDER BY p.predicted_at
       LIMIT $1`,
-    [limit]
+    [limit],
   );
 
   const out = { resolved: 0, no_truth_yet: 0, errors: 0, skipped_human_only: 0, details: [] };
@@ -118,7 +118,7 @@ async function resolveDue({ limit = 500 } = {}) {
         `UPDATE ai_prediction_log
             SET actual_value = $2, actual_label = $3, resolved_at = CURRENT_TIMESTAMP
           WHERE id = $1`,
-        [p.id, numeric ? Number(raw) : null, numeric ? null : String(raw)]
+        [p.id, numeric ? Number(raw) : null, numeric ? null : String(raw)],
       );
       out.resolved += 1;
       out.details.push({
@@ -136,7 +136,7 @@ async function resolveDue({ limit = 500 } = {}) {
   const { rows: hum } = await pool.query(
     `SELECT COUNT(*)::int AS n FROM ai_prediction_log p
        JOIN ai_resolution_rules r ON r.prediction_type = p.prediction_type
-      WHERE p.resolved_at IS NULL AND r.resolution_mode = 'human_only'`
+      WHERE p.resolved_at IS NULL AND r.resolution_mode = 'human_only'`,
   );
   out.skipped_human_only = hum[0]?.n ?? 0;
   return out;
@@ -159,7 +159,7 @@ async function autoJudgeOutcomes({ limit = 200 } = {}) {
         AND o.subject_id IS NOT NULL
       ORDER BY o.reacted_at
       LIMIT $1`,
-    [limit]
+    [limit],
   );
 
   let judged = 0;
@@ -176,7 +176,7 @@ async function autoJudgeOutcomes({ limit = 200 } = {}) {
         `SELECT check_status FROM quality_checks
           WHERE project_id::text = $1 AND check_date > $2
           ORDER BY check_date DESC LIMIT 1`,
-        [String(o.subject_id), o.reacted_at]
+        [String(o.subject_id), o.reacted_at],
       );
       if (!qc.length) { unresolvable += 1; continue; }
 
@@ -190,11 +190,11 @@ async function autoJudgeOutcomes({ limit = 200 } = {}) {
         [
           o.id,
           passed ? 'helped' : 'no_effect',
-          `Machine-resolved from quality_checks.check_status = "${qc[0].check_status}" observed after the reaction. `
-          + 'No human reviewed this. Proxy evidence: the intervention prevented the '
-          + 'outcome it was meant to prevent, so this is consistent with a correct '
-          + 'call rather than proof of one.',
-        ]
+          `Machine-resolved from quality_checks.check_status = "${qc[0].check_status}" observed after the reaction. ` +
+          'No human reviewed this. Proxy evidence: the intervention prevented the ' +
+          'outcome it was meant to prevent, so this is consistent with a correct ' +
+          'call rather than proof of one.',
+        ],
       );
       judged += 1;
     } catch (err) {
@@ -217,7 +217,7 @@ async function autoJudgeOutcomes({ limit = 200 } = {}) {
  */
 async function gateFor(actorId) {
   const { rows } = await pool.query(
-    'SELECT * FROM v_ai_agent_gate WHERE actor_id = $1', [actorId]
+    'SELECT * FROM v_ai_agent_gate WHERE actor_id = $1', [actorId],
   );
   if (!rows.length) {
     return {
@@ -225,8 +225,8 @@ async function gateFor(actorId) {
       gate: 'unproven',
       authorityMultiplier: 0.5,
       resolved: 0,
-      note: 'No resolved predictions. Authority halved — an unmeasured agent is '
-          + 'unknown, not trustworthy.',
+      note: 'No resolved predictions. Authority halved — an unmeasured agent is ' +
+          'unknown, not trustworthy.',
     };
   }
   const g = rows[0];
@@ -243,8 +243,8 @@ async function gateFor(actorId) {
     note: {
       trusted: 'Calibrated. Output may drive automated action.',
       discounted: 'Mildly overconfident. Confidence is scaled down before use.',
-      advisory_only: 'Overconfident by more than 25 points. Output may inform a '
-                   + 'person but must not trigger an action on its own.',
+      advisory_only: 'Overconfident by more than 25 points. Output may inform a ' +
+                   'person but must not trigger an action on its own.',
       underconfident: 'Understates its own accuracy. Numbers are usable but not at face value.',
       unproven: 'Fewer than 10 resolved predictions. Authority halved until it has a record.',
     }[g.gate],
@@ -256,7 +256,7 @@ async function gateFor(actorId) {
  * use before acting on an agent's number.
  */
 async function applyGate(actorId, statedConfidence) {
-  let g = await gateFor(actorId);
+  const g = await gateFor(actorId);
   return {
     ...g,
     statedConfidence,

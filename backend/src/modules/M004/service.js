@@ -20,7 +20,7 @@ async function createOrganization(orgData) {
       size,
       headquarters,
       parent_org_id,
-      configuration
+      configuration,
     } = orgData;
 
     const org = {
@@ -34,7 +34,7 @@ async function createOrganization(orgData) {
       parent_org_id,
       configuration,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered organization setup
@@ -44,8 +44,8 @@ async function createOrganization(orgData) {
         org_data: orgData,
         industry_best_practices: await getIndustryBestPractices(industry),
         organizational_structure: await recommendOrgStructure(size, org_type),
-        compliance_requirements: await getComplianceRequirements(industry)
-      }
+        compliance_requirements: await getComplianceRequirements(industry),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -69,8 +69,8 @@ async function createOrganization(orgData) {
         JSON.stringify(org.configuration),
         org.status,
         JSON.stringify(org.ai_setup),
-        org.created_at
-      ]
+        org.created_at,
+      ],
     );
 
     logger.info(`Organization created: ${org.org_id}`);
@@ -86,11 +86,11 @@ async function createOrganization(orgData) {
  */
 async function getOrganization(orgId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM organizations WHERE org_id = $1',
-      [orgId]
+      [orgId],
     );
-    
+
     if (result.rows.length === 0) {
       throw new Error('Organization not found');
     }
@@ -107,7 +107,7 @@ async function getOrganization(orgId) {
  */
 async function updateOrganization(orgId, updates) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE organizations 
        SET org_name = COALESCE($1, org_name),
            org_type = COALESCE($2, org_type),
@@ -121,8 +121,8 @@ async function updateOrganization(orgId, updates) {
         updates.org_type,
         updates.size,
         updates.configuration ? JSON.stringify(updates.configuration) : null,
-        orgId
-      ]
+        orgId,
+      ],
     );
 
     logger.info(`Organization updated: ${orgId}`);
@@ -139,7 +139,7 @@ async function updateOrganization(orgId, updates) {
 async function listOrganizations(filters) {
   try {
     const { org_type, industry, limit, offset } = filters;
-    
+
     let query = 'SELECT * FROM organizations WHERE 1=1';
     const params = [];
     let paramIndex = 1;
@@ -169,11 +169,11 @@ async function listOrganizations(filters) {
       params.push(offset);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
 
     return {
       total: result.rows.length,
-      organizations: result.rows
+      organizations: result.rows,
     };
   } catch (error) {
     logger.error('Error listing organizations', { error: error.message, stack: error.stack });
@@ -189,7 +189,7 @@ async function getIndustryBestPractices(industry) {
   return {
     agriculture: ['crop_management', 'weather_integration', 'market_pricing'],
     manufacturing: ['inventory_management', 'quality_control', 'supply_chain'],
-    services: ['customer_crm', 'project_management', 'resource_allocation']
+    services: ['customer_crm', 'project_management', 'resource_allocation'],
   };
 }
 
@@ -197,7 +197,7 @@ async function recommendOrgStructure(size, orgType) {
   const structures = {
     small: ['ceo', 'operations', 'finance'],
     medium: ['ceo', 'c_suite', 'departments', 'teams'],
-    large: ['ceo', 'board', 'executive_committee', 'divisions', 'departments', 'teams']
+    large: ['ceo', 'board', 'executive_committee', 'divisions', 'departments', 'teams'],
   };
   return structures[size] || structures.medium;
 }
@@ -206,7 +206,7 @@ async function getComplianceRequirements(industry) {
   return {
     reporting: ['financial', 'operational', 'environmental'],
     certifications: ['iso_9001', 'industry_specific'],
-    audits: ['annual', 'random']
+    audits: ['annual', 'random'],
   };
 }
 
@@ -214,5 +214,5 @@ module.exports = {
   createOrganization,
   getOrganization,
   updateOrganization,
-  listOrganizations
+  listOrganizations,
 };

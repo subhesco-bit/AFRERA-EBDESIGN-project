@@ -14,5 +14,5 @@ function initializeWebSocket(server) {
 
 module.exports = {
   initializeWebSocket,
-  socketServer
+  socketServer,
 };

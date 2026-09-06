@@ -35,7 +35,7 @@ async function generateWaterUsageAnalytics(params) {
       period_from,
       period_to,
       usage_type,
-      analytics_type
+      analytics_type,
     } = params;
 
     const analytics = {
@@ -53,20 +53,20 @@ async function generateWaterUsageAnalytics(params) {
       patterns: await identifyUsagePatterns(params),
       benchmarks: await compareWithBenchmarks(params),
       predictions: await generateUsagePredictions(params),
-      recommendations: await generateAnalyticsRecommendations(params)
+      recommendations: await generateAnalyticsRecommendations(params),
     };
 
     // AI-powered deep analytics
     const aiRequest = {
       task: 'water_usage_analytics',
       parameters: {
-        params: params,
+        params,
         historical_data: await getHistoricalUsageData(location_id, period_from, period_to),
         seasonal_patterns: await getSeasonalUsagePatterns(state, district),
         efficiency_metrics: await getEfficiencyMetrics(location_id),
         water_sources: await getWaterSources(location_id),
-        consumption_drivers: await getConsumptionDrivers(location_id)
-      }
+        consumption_drivers: await getConsumptionDrivers(location_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -97,8 +97,8 @@ async function generateWaterUsageAnalytics(params) {
         JSON.stringify(analytics.predictions),
         JSON.stringify(analytics.recommendations),
         JSON.stringify(analytics.ai_insights),
-        analytics.generated_at
-      ]
+        analytics.generated_at,
+      ],
     );
 
     logger.info(`Water usage analytics generated: ${analytics.analytics_id}`);
@@ -122,7 +122,7 @@ async function createWaterDashboard(dashboardConfig) {
       location_scope,
       widgets,
       refresh_interval,
-      data_sources
+      data_sources,
     } = dashboardConfig;
 
     const dashboard = {
@@ -135,26 +135,26 @@ async function createWaterDashboard(dashboardConfig) {
       refresh_interval,
       data_sources,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered dashboard optimization
-    let aiRequest = {
+    const aiRequest = {
       task: 'water_dashboard_optimization',
       parameters: {
         dashboard_config: dashboardConfig,
         user_preferences: await getUserPreferences(user_id),
         data_availability: await checkDataAvailability(data_sources),
         visualization_recommendations: await getVisualizationRecommendations(widgets),
-        performance_optimization: await optimizeDashboardPerformance(widgets)
-      }
+        performance_optimization: await optimizeDashboardPerformance(widgets),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     dashboard.ai_optimization = aiResponse;
 
     // Insert into database
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO water_dashboards 
        (dashboard_id, user_id, user_type, dashboard_name, location_scope, 
         widgets, refresh_interval, data_sources, status, ai_optimization, created_at)
@@ -171,8 +171,8 @@ async function createWaterDashboard(dashboardConfig) {
         JSON.stringify(dashboard.data_sources),
         dashboard.status,
         JSON.stringify(dashboard.ai_optimization),
-        dashboard.created_at
-      ]
+        dashboard.created_at,
+      ],
     );
 
     logger.info(`Water dashboard created: ${dashboard.dashboard_id}`);
@@ -193,7 +193,7 @@ async function generatePredictiveAnalysis(predictionParams) {
       prediction_horizon,
       prediction_type,
       confidence_threshold,
-      factors_to_consider
+      factors_to_consider,
     } = predictionParams;
 
     const prediction = {
@@ -205,28 +205,28 @@ async function generatePredictiveAnalysis(predictionParams) {
       factors_to_consider,
       generated_at: new Date().toISOString(),
       forecast: await generateWaterForecast(location_id, prediction_horizon),
-    risk_assessment: await assessWaterRisks(location_id, prediction_horizon),
-    scenario_analysis: await performScenarioAnalysis(location_id, prediction_horizon),
-    confidence_intervals: await calculateConfidenceIntervals(location_id, prediction_horizon),
-    recommendations: await generatePredictiveRecommendations(location_id, prediction_horizon)
+      risk_assessment: await assessWaterRisks(location_id, prediction_horizon),
+      scenario_analysis: await performScenarioAnalysis(location_id, prediction_horizon),
+      confidence_intervals: await calculateConfidenceIntervals(location_id, prediction_horizon),
+      recommendations: await generatePredictiveRecommendations(location_id, prediction_horizon),
     };
 
     // AI-powered predictive modeling
-    let aiRequest = {
+    const aiRequest = {
       task: 'water_predictive_modeling',
       parameters: {
-        location_id: location_id,
-        prediction_horizon: prediction_horizon,
-        prediction_type: prediction_type,
+        location_id,
+        prediction_horizon,
+        prediction_type,
         historical_data: await getHistoricalPredictionData(location_id),
         climate_projections: await getClimateProjections(location_id),
         demand_projections: await getDemandProjections(location_id),
         supply_constraints: await getSupplyConstraints(location_id),
-        regulatory_changes: await getRegulatoryChanges(location_id)
-      }
+        regulatory_changes: await getRegulatoryChanges(location_id),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     prediction.ai_predictions = aiResponse;
 
     return prediction;
@@ -245,7 +245,7 @@ async function compareWaterPerformance(comparisonParams) {
       location_ids,
       metrics,
       period,
-      normalization_method
+      normalization_method,
     } = comparisonParams;
 
     const comparison = {
@@ -259,7 +259,7 @@ async function compareWaterPerformance(comparisonParams) {
       rankings: await calculateRankings(location_ids, metrics, period),
       gaps: await identifyPerformanceGaps(location_ids, metrics, period),
       best_practices: await identifyBestPractices(location_ids, metrics),
-      benchmarks: await establishBenchmarks(location_ids, metrics)
+      benchmarks: await establishBenchmarks(location_ids, metrics),
     };
 
     return comparison;
@@ -280,7 +280,7 @@ async function generateUsageSummary(params) {
     average_daily_usage: 33333,
     peak_usage: 50000,
     efficiency_score: 75,
-    cost_per_unit: 0.15
+    cost_per_unit: 0.15,
   };
 }
 
@@ -292,8 +292,8 @@ async function analyzeUsageTrends(params) {
     trend_breakdown: {
       domestic: 'stable',
       agricultural: 'increasing',
-      industrial: 'decreasing'
-    }
+      industrial: 'decreasing',
+    },
   };
 }
 
@@ -302,7 +302,7 @@ async function identifyUsagePatterns(params) {
     daily_pattern: 'bimodal_peak',
     weekly_pattern: 'weekday_higher',
     seasonal_pattern: 'monsoon_peak',
-    anomaly_count: 3
+    anomaly_count: 3,
   };
 }
 
@@ -311,7 +311,7 @@ async function compareWithBenchmarks(params) {
     industry_benchmark: 80,
     regional_average: 70,
     national_average: 75,
-    performance_percentile: 65
+    performance_percentile: 65,
   };
 }
 
@@ -328,17 +328,17 @@ async function generateAnalyticsRecommendations(params) {
     'Implement smart metering for better tracking',
     'Optimize irrigation schedules',
     'Identify and fix leaks in distribution network',
-    'Consider water recycling for industrial use'
+    'Consider water recycling for industrial use',
   ];
 }
 
 async function getHistoricalUsageData(locationId, periodFrom, periodTo) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM water_usage_records 
        WHERE location_id = $1 AND usage_date BETWEEN $2 AND $3 
        ORDER BY usage_date`,
-      [locationId, periodFrom, periodTo]
+      [locationId, periodFrom, periodTo],
     );
     return result.rows;
   } catch (error) {
@@ -350,7 +350,7 @@ async function getSeasonalUsagePatterns(state, district) {
   return {
     summer: { multiplier: 1.2, pattern: 'high_usage' },
     monsoon: { multiplier: 0.8, pattern: 'reduced_usage' },
-    winter: { multiplier: 1.0, pattern: 'baseline' }
+    winter: { multiplier: 1.0, pattern: 'baseline' },
   };
 }
 
@@ -358,15 +358,15 @@ async function getEfficiencyMetrics(locationId) {
   return {
     current_efficiency: 75,
     target_efficiency: 85,
-    improvement_potential: 10
+    improvement_potential: 10,
   };
 }
 
 async function getWaterSources(locationId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM water_sources WHERE location_id = $1',
-      [locationId]
+      [locationId],
     );
     return result.rows;
   } catch (error) {
@@ -378,7 +378,7 @@ async function getConsumptionDrivers(locationId) {
   return [
     { driver: 'population_growth', impact: 'high' },
     { driver: 'industrial_activity', impact: 'medium' },
-    { driver: 'agricultural_expansion', impact: 'high' }
+    { driver: 'agricultural_expansion', impact: 'high' },
   ];
 }
 
@@ -386,7 +386,7 @@ async function getUserPreferences(userId) {
   return {
     preferred_visualizations: ['charts', 'maps'],
     refresh_frequency: 'hourly',
-    alert_thresholds: { warning: 80, critical: 90 }
+    alert_thresholds: { warning: 80, critical: 90 },
   };
 }
 
@@ -394,7 +394,7 @@ async function checkDataAvailability(dataSources) {
   return {
     available_sources: ['metering', 'satellite', 'sensor'],
     data_quality: 'good',
-    coverage: 95
+    coverage: 95,
   };
 }
 
@@ -402,7 +402,7 @@ async function getVisualizationRecommendations(widgets) {
   return [
     { widget: 'usage_chart', type: 'line_chart' },
     { widget: 'distribution_map', type: 'heatmap' },
-    { widget: 'efficiency_gauge', type: 'gauge' }
+    { widget: 'efficiency_gauge', type: 'gauge' },
   ];
 }
 
@@ -410,7 +410,7 @@ async function optimizeDashboardPerformance(widgets) {
   return {
     refresh_strategy: 'incremental',
     caching_enabled: true,
-    lazy_loading: true
+    lazy_loading: true,
   };
 }
 
@@ -428,7 +428,7 @@ async function assessWaterRisks(locationId, horizon) {
     scarcity_risk: 'moderate',
     quality_risk: 'low',
     infrastructure_risk: 'medium',
-    climate_risk: 'high'
+    climate_risk: 'high',
   };
 }
 
@@ -436,7 +436,7 @@ async function performScenarioAnalysis(locationId, horizon) {
   return {
     optimistic: { supply: 110, demand: 95 },
     baseline: { supply: 100, demand: 100 },
-    pessimistic: { supply: 90, demand: 105 }
+    pessimistic: { supply: 90, demand: 105 },
   };
 }
 
@@ -454,7 +454,7 @@ async function generatePredictiveRecommendations(locationId, horizon) {
     'Develop alternative water sources',
     'Implement demand management',
     'Invest in storage infrastructure',
-    'Plan for climate variability'
+    'Plan for climate variability',
   ];
 }
 
@@ -466,7 +466,7 @@ async function getClimateProjections(locationId) {
   return {
     temperature_change: '+1.5°C',
     rainfall_change: '-10%',
-    extreme_events: '+20%'
+    extreme_events: '+20%',
   };
 }
 
@@ -474,7 +474,7 @@ async function getDemandProjections(locationId) {
   return {
     population_growth: 2.5,
     economic_growth: 3.0,
-    projected_demand: 45000
+    projected_demand: 45000,
   };
 }
 
@@ -482,14 +482,14 @@ async function getSupplyConstraints(locationId) {
   return {
     source_capacity: 50000,
     current_utilization: 80,
-    expansion_potential: 10000
+    expansion_potential: 10000,
   };
 }
 
 async function getRegulatoryChanges(locationId) {
   return [
     { change: 'stricter_quality_standards', impact: 'high' },
-    { change: 'metering_mandate', impact: 'medium' }
+    { change: 'metering_mandate', impact: 'medium' },
   ];
 }
 
@@ -499,7 +499,7 @@ async function generatePerformanceMatrix(locationIds, metrics, period) {
     matrix[locationId] = {
       efficiency: 75,
       cost_effectiveness: 70,
-      sustainability: 80
+      sustainability: 80,
     };
   }
   return matrix;
@@ -508,21 +508,21 @@ async function generatePerformanceMatrix(locationIds, metrics, period) {
 async function calculateRankings(locationIds, metrics, period) {
   return [
     { location: locationIds[0], rank: 1, score: 85 },
-    { location: locationIds[1], rank: 2, score: 78 }
+    { location: locationIds[1], rank: 2, score: 78 },
   ];
 }
 
 async function identifyPerformanceGaps(locationIds, metrics, period) {
   return [
     { metric: 'efficiency', gap: 10, target: 85 },
-    { metric: 'cost', gap: 15, target: 70 }
+    { metric: 'cost', gap: 15, target: 70 },
   ];
 }
 
 async function identifyBestPractices(locationIds, metrics) {
   return [
     { practice: 'smart_metering', adoption: 60, impact: 'high' },
-    { practice: 'leak_detection', adoption: 40, impact: 'medium' }
+    { practice: 'leak_detection', adoption: 40, impact: 'medium' },
   ];
 }
 
@@ -530,7 +530,7 @@ async function establishBenchmarks(locationIds, metrics) {
   return {
     top_performer: locationIds[0],
     median_performance: 75,
-    target_benchmark: 85
+    target_benchmark: 85,
   };
 }
 
@@ -538,5 +538,5 @@ module.exports = {
   generateWaterUsageAnalytics,
   createWaterDashboard,
   generatePredictiveAnalysis,
-  compareWaterPerformance
+  compareWaterPerformance,
 };

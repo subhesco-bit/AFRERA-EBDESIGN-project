@@ -14,8 +14,8 @@ router.get('/fpos/:id/financial-summary', controller.getFPOFinancialSummary);
 router.post('/fpos/:id/transactions', controller.recordFPOTransaction);
 router.get('/fpos/:id/performance-report', controller.generateFPOPerformanceReport);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

@@ -124,7 +124,7 @@ const SPEECH_PROVIDER_ENV = {
 
 /** Configuration state only. Never logs or returns the key value itself. */
 function speechProviderStatus(providerKey) {
-  let env = SPEECH_PROVIDER_ENV[providerKey];
+  const env = SPEECH_PROVIDER_ENV[providerKey];
   if (!env) return { provider: providerKey, known: false, configured: false };
   return {
     provider: providerKey,
@@ -164,9 +164,9 @@ async function callSpeechProvider(providerKey, action, _input, _opts = {}) {
       status: 'not_configured',
       provider: providerKey,
       action,
-      reason: `${status.envVar} is not set. No live call was attempted. `
-        + 'services/advancedVoiceAI.js transcribeAudio() previously returned a fixed English '
-        + 'sentence regardless of input — that fabrication is not reproduced here.',
+      reason: `${status.envVar} is not set. No live call was attempted. ` +
+        'services/advancedVoiceAI.js transcribeAudio() previously returned a fixed English ' +
+        'sentence regardless of input — that fabrication is not reproduced here.',
     };
   }
   return {
@@ -174,11 +174,11 @@ async function callSpeechProvider(providerKey, action, _input, _opts = {}) {
     status: 'call_intentionally_not_implemented',
     provider: providerKey,
     action,
-    reason: 'A credential is present but this adapter is not wired to a live SDK call '
-      + '(ground rule for this change: draft interface, no live external call). Implement '
-      + 'the Google Speech-to-Text / Azure Speech SDK call here once a real key is '
-      + 'provisioned and the data-residency question (same one gating the LLM adapter above) '
-      + 'has been answered for voice audio specifically.',
+    reason: 'A credential is present but this adapter is not wired to a live SDK call ' +
+      '(ground rule for this change: draft interface, no live external call). Implement ' +
+      'the Google Speech-to-Text / Azure Speech SDK call here once a real key is ' +
+      'provisioned and the data-residency question (same one gating the LLM adapter above) ' +
+      'has been answered for voice audio specifically.',
   };
 }
 
@@ -192,7 +192,7 @@ async function callSpeechProvider(providerKey, action, _input, _opts = {}) {
  * data-residency question.
  */
 async function callProvider(providerKey, _prompt, _opts = {}) {
-  let status = providerStatus(providerKey);
+  const status = providerStatus(providerKey);
   if (!status.known) {
     return { ok: false, status: 'unknown_provider', provider: providerKey, knownProviders: Object.keys(PROVIDER_ENV) };
   }
@@ -209,10 +209,10 @@ async function callProvider(providerKey, _prompt, _opts = {}) {
     ok: false,
     status: 'call_intentionally_not_implemented',
     provider: providerKey,
-    reason: 'A credential is present but this adapter is not wired to a live SDK '
-      + 'call (ground rule for this change: draft code, no live external calls). '
-      + 'Implement the SDK call here, then enable the matching slot in '
-      + 'ai_model_registry (migration 058) once data residency is answered.',
+    reason: 'A credential is present but this adapter is not wired to a live SDK ' +
+      'call (ground rule for this change: draft code, no live external calls). ' +
+      'Implement the SDK call here, then enable the matching slot in ' +
+      'ai_model_registry (migration 058) once data residency is answered.',
   };
 }
 
@@ -253,8 +253,8 @@ const ENGINES = {
   rule_engine: {
     label: 'Rule Engine',
     status: 'real',
-    citation: 'core/decisionEngine.js — DecisionEngine class, signal-correlation '
-      + 'rules registered via addRule(), synchronous process(signal).',
+    citation: 'core/decisionEngine.js — DecisionEngine class, signal-correlation ' +
+      'rules registered via addRule(), synchronous process(signal).',
     invoke: async (payload = {}) => {
       const { signalBus } = require('./signalBus');
       const { decisionEngine } = require('./decisionEngine');
@@ -268,8 +268,8 @@ const ENGINES = {
   knowledge_graph: {
     label: 'Knowledge Graph',
     status: 'real',
-    citation: 'services/knowledgeGraphService.js — Postgres-backed knowledge_nodes '
-      + '/ knowledge_relationships, full-text search, find_related_nodes() SQL function.',
+    citation: 'services/knowledgeGraphService.js — Postgres-backed knowledge_nodes ' +
+      '/ knowledge_relationships, full-text search, find_related_nodes() SQL function.',
     invoke: async (payload = {}) => {
       const kg = require('../services/legacy/knowledgeGraphService');
       if (!payload.query) throw new Error('knowledge_graph requires payload.query');
@@ -280,15 +280,15 @@ const ENGINES = {
   enterprise_memory: {
     label: 'Enterprise Memory',
     status: 'real',
-    citation: 'services/enterpriseMemoryService.js — Postgres-backed '
-      + 'enterprise_memory_entries (migration 9997_enterprise_memory_schema.sql), '
-      + 'real full-text case retrieval (to_tsvector/to_tsquery, same pattern as '
-      + 'knowledgeGraphService), auto-recorded from core/signalBus.js TEMPERATURE_BREACH '
-      + '/ RECALL_ISSUED / FRAUD_SUSPECTED with a best-effort link to the ai_outcomes row '
-      + 'core/effectors.js writes for the same signal. Deliberately NOT a second copy of '
-      + 'ai_outcomes/ai_prediction_log (migration 990) — it points at those rows via '
-      + 'nullable FK and LEFT JOINs them at read time. Built 2026-08-09 to close the gap '
-      + 'this entry originally reported ("missing", invoke: null).',
+    citation: 'services/enterpriseMemoryService.js — Postgres-backed ' +
+      'enterprise_memory_entries (migration 9997_enterprise_memory_schema.sql), ' +
+      'real full-text case retrieval (to_tsvector/to_tsquery, same pattern as ' +
+      'knowledgeGraphService), auto-recorded from core/signalBus.js TEMPERATURE_BREACH ' +
+      '/ RECALL_ISSUED / FRAUD_SUSPECTED with a best-effort link to the ai_outcomes row ' +
+      'core/effectors.js writes for the same signal. Deliberately NOT a second copy of ' +
+      'ai_outcomes/ai_prediction_log (migration 990) — it points at those rows via ' +
+      'nullable FK and LEFT JOINs them at read time. Built 2026-08-09 to close the gap ' +
+      'this entry originally reported ("missing", invoke: null).',
     invoke: async (payload = {}) => {
       const mem = require('../services/legacy/enterpriseMemoryService');
       const { action = 'recallSimilar' } = payload;
@@ -311,18 +311,18 @@ const ENGINES = {
   business_logic_engine: {
     label: 'Business Logic Engine',
     status: 'real',
-    citation: '(2026-08-10) services/decisionSupportService.js — 12 real business-rule '
-      + 'functions (corpCreditEligible, buyVsRentDecision, farmerSelectionDecision, '
-      + 'claimFraudScore, moqPrice, benchmarkVerdict, floorBenchmark, ecoLogisticsMiles, '
-      + 'harvestPoints, allocScore, compostPlan, schemeExpiryStatus, complianceGaps), '
-      + 'already mounted at /api/v1/decision-support (index.js: '
-      + 'decisionSupportService.setupRoutes(app)). This closes the gap the entry originally '
-      + 'reported ("no single generic run-this-business-rule entry point") by adding a '
-      + 'named-rule dispatch onto that existing, live service — no new business logic was '
-      + 'written. core/businessCell.js execute() (still abstract by design, per directive '
-      + '§1.4 — each cell overrides its own) and core/erpAgents.js (ERP domain rules on '
-      + 'decisionEngine, dispatched separately via workflow_engine below) are unrelated and '
-      + 'untouched.',
+    citation: '(2026-08-10) services/decisionSupportService.js — 12 real business-rule ' +
+      'functions (corpCreditEligible, buyVsRentDecision, farmerSelectionDecision, ' +
+      'claimFraudScore, moqPrice, benchmarkVerdict, floorBenchmark, ecoLogisticsMiles, ' +
+      'harvestPoints, allocScore, compostPlan, schemeExpiryStatus, complianceGaps), ' +
+      'already mounted at /api/v1/decision-support (index.js: ' +
+      'decisionSupportService.setupRoutes(app)). This closes the gap the entry originally ' +
+      'reported ("no single generic run-this-business-rule entry point") by adding a ' +
+      'named-rule dispatch onto that existing, live service — no new business logic was ' +
+      'written. core/businessCell.js execute() (still abstract by design, per directive ' +
+      '§1.4 — each cell overrides its own) and core/erpAgents.js (ERP domain rules on ' +
+      'decisionEngine, dispatched separately via workflow_engine below) are unrelated and ' +
+      'untouched.',
     invoke: async (payload = {}) => {
       const decisionSupport = require('../services/legacy/decisionSupportService');
       const RULES = {
@@ -351,8 +351,8 @@ const ENGINES = {
   decision_engine: {
     label: 'Decision Engine',
     status: 'real',
-    citation: 'core/mcda.js gatedMcda(actorId, criteria) — MCDA score discounted by '
-      + "the calling actor's measured accuracy via core/outcomeResolver.js.",
+    citation: 'core/mcda.js gatedMcda(actorId, criteria) — MCDA score discounted by ' +
+      'the calling actor\'s measured accuracy via core/outcomeResolver.js.',
     invoke: async (payload = {}) => {
       const { gatedMcda } = require('./mcda');
       const { actorId = 'aiOrchestrator:decision_engine', criteria } = payload;
@@ -364,11 +364,11 @@ const ENGINES = {
   forecasting_engine: {
     label: 'Forecasting Engine',
     status: 'real',
-    citation: 'services/advancedAIService.js advancedPredictDemand() — Holt linear '
-      + 'forecast, seasonal indices, MAPE, confidence intervals, all from '
-      + 'utils/statistics.js (unit-tested classical statistics, not Math.random()). '
-      + 'services/predictiveAnalyticsService.js and services/demandService.js are '
-      + 'real but store/read stored forecasts only — neither computes one.',
+    citation: 'services/advancedAIService.js advancedPredictDemand() — Holt linear ' +
+      'forecast, seasonal indices, MAPE, confidence intervals, all from ' +
+      'utils/statistics.js (unit-tested classical statistics, not Math.random()). ' +
+      'services/predictiveAnalyticsService.js and services/demandService.js are ' +
+      'real but store/read stored forecasts only — neither computes one.',
     invoke: async (payload = {}) => {
       const { advancedPredictDemand } = require('../services/legacy/advancedAIService');
       const { productId, timeHorizon = 30, includeExplanations = true } = payload;
@@ -380,8 +380,8 @@ const ENGINES = {
   optimization_engine: {
     label: 'Optimization Engine',
     status: 'real',
-    citation: 'core/mcda.js rankOptions() — weighted multi-criteria ranking with a '
-      + 'decisiveness margin. No general LP/MILP/numeric solver exists beyond this.',
+    citation: 'core/mcda.js rankOptions() — weighted multi-criteria ranking with a ' +
+      'decisiveness margin. No general LP/MILP/numeric solver exists beyond this.',
     invoke: async (payload = {}) => {
       const { rankOptions } = require('./mcda');
       const { options } = payload;
@@ -393,20 +393,20 @@ const ENGINES = {
   simulation_engine: {
     label: 'Simulation Engine',
     status: 'partial',
-    citation: '(2026-08-10 re-audit, fix applied same day) core/businessCell.js simulate() '
-      + 'default remains an honest stub; core/mcda.js scores already-known options rather '
-      + 'than projecting a scenario forward, so that job stays with optimization_engine. '
-      + 'services/advancedAIService.js advancedOptimizePrice(productId, currentPrice, context) '
-      + 'was found broken this session (wrong-shape args into simulatePriceOutcomes() produced '
-      + 'silent NaN economics behind a fabricated "confidence: 0.91") and has since been fixed: '
-      + 'the argument mismatch, the risk/strategy call-order bug, and the hardcoded confidence '
-      + 'were all corrected, verified NaN-free by hand-trace on real sample values. It is '
-      + 'wired here now that it is honest end-to-end. Known real limitation, not fabricated: '
-      + 'because callers do not yet populate price_history/demand_history on currentState, the '
-      + 'underlying RL elasticity model always takes its "insufficient data" branch today, so '
-      + 'this will typically report confidence:0 and recommend holding the current price — an '
-      + 'honest "not enough data" result, not a wrong one. It will start producing real varying '
-      + 'recommendations once that history-wiring gap (a separate, already-flagged task) closes.',
+    citation: '(2026-08-10 re-audit, fix applied same day) core/businessCell.js simulate() ' +
+      'default remains an honest stub; core/mcda.js scores already-known options rather ' +
+      'than projecting a scenario forward, so that job stays with optimization_engine. ' +
+      'services/advancedAIService.js advancedOptimizePrice(productId, currentPrice, context) ' +
+      'was found broken this session (wrong-shape args into simulatePriceOutcomes() produced ' +
+      'silent NaN economics behind a fabricated "confidence: 0.91") and has since been fixed: ' +
+      'the argument mismatch, the risk/strategy call-order bug, and the hardcoded confidence ' +
+      'were all corrected, verified NaN-free by hand-trace on real sample values. It is ' +
+      'wired here now that it is honest end-to-end. Known real limitation, not fabricated: ' +
+      'because callers do not yet populate price_history/demand_history on currentState, the ' +
+      'underlying RL elasticity model always takes its "insufficient data" branch today, so ' +
+      'this will typically report confidence:0 and recommend holding the current price — an ' +
+      'honest "not enough data" result, not a wrong one. It will start producing real varying ' +
+      'recommendations once that history-wiring gap (a separate, already-flagged task) closes.',
     invoke: async (payload) => {
       const { productId, currentPrice, context } = payload || {};
       if (!productId || currentPrice == null) {
@@ -420,15 +420,15 @@ const ENGINES = {
   vision_engine: {
     label: 'Vision Engine',
     status: 'real',
-    citation: '(2026-08-09) services/visionService.js — real sharp(buffer).stats() / '
-      + '.metadata() / .resize() usage (sharp was previously a dead dependency: zero '
-      + 'require("sharp") call sites). Grounded in products.images JSONB '
-      + '(migrations/000_base_schema.sql) and user_profiles.profile_image_url. Bounded: '
-      + 'analyzeImageQuality() is a simple pixel-statistics heuristic (sharp\'s own '
-      + '"experimental" sharpness/entropy stats), NOT a deep-learning classifier — '
-      + 'services/advancedAIService.js loadComputerVisionModel() (crop-disease '
-      + 'classification) remains an honest {available:false} stub; this does not change '
-      + 'that.',
+    citation: '(2026-08-09) services/visionService.js — real sharp(buffer).stats() / ' +
+      '.metadata() / .resize() usage (sharp was previously a dead dependency: zero ' +
+      'require("sharp") call sites). Grounded in products.images JSONB ' +
+      '(migrations/000_base_schema.sql) and user_profiles.profile_image_url. Bounded: ' +
+      'analyzeImageQuality() is a simple pixel-statistics heuristic (sharp\'s own ' +
+      '"experimental" sharpness/entropy stats), NOT a deep-learning classifier — ' +
+      'services/advancedAIService.js loadComputerVisionModel() (crop-disease ' +
+      'classification) remains an honest {available:false} stub; this does not change ' +
+      'that.',
     invoke: async (payload = {}) => {
       const vision = require('../services/legacy/visionService');
       const { buffer, imageBase64, operation = 'analyze_quality', width, height, fit, format } = payload;
@@ -443,19 +443,19 @@ const ENGINES = {
   ocr_engine: {
     label: 'OCR Engine',
     status: 'real',
-    citation: '(2026-08-09) services/ocrService.js — real tesseract.js '
-      + 'createWorker/recognize usage, fully offline, no API key. tesseract.js was '
-      + 'added as a NEW package.json dependency for this change; npm install was not '
-      + 'run in this environment so installation is unverified end-to-end. Grounded in '
-      + 'certifications/farmer_certifications.document_url and '
-      + 'certification_reports.report_data (migrations/000 and 033) — '
-      + 'extractAndStoreCertificateText() merges OCR output into the existing '
-      + 'report_data JSONB column, no invented schema. Bounded: decent on clean printed '
-      + 'text, weak on handwriting/skewed scans — a human-review draft, not ground truth.',
+    citation: '(2026-08-09) services/ocrService.js — real tesseract.js ' +
+      'createWorker/recognize usage, fully offline, no API key. tesseract.js was ' +
+      'added as a NEW package.json dependency for this change; npm install was not ' +
+      'run in this environment so installation is unverified end-to-end. Grounded in ' +
+      'certifications/farmer_certifications.document_url and ' +
+      'certification_reports.report_data (migrations/000 and 033) — ' +
+      'extractAndStoreCertificateText() merges OCR output into the existing ' +
+      'report_data JSONB column, no invented schema. Bounded: decent on clean printed ' +
+      'text, weak on handwriting/skewed scans — a human-review draft, not ground truth.',
     invoke: async (payload = {}) => {
       const ocr = require('../services/legacy/ocrService');
       const { buffer, imageBase64, language = 'eng', reportNumber } = payload;
-      let imgBuffer = buffer || (imageBase64 ? Buffer.from(imageBase64, 'base64') : null);
+      const imgBuffer = buffer || (imageBase64 ? Buffer.from(imageBase64, 'base64') : null);
       if (!imgBuffer) throw new Error('ocr_engine requires payload.buffer (Buffer) or payload.imageBase64');
       if (reportNumber) return ocr.extractAndStoreCertificateText(reportNumber, imgBuffer, { language });
       return ocr.extractTextFromImage(imgBuffer, { language });
@@ -465,17 +465,17 @@ const ENGINES = {
   speech_engine: {
     label: 'Speech Engine',
     status: 'partial',
-    citation: '(2026-08-10) A real, switchable provider-adapter INTERFACE — same pattern as '
-      + 'PROVIDER_ENV/callProvider above — keyed off GOOGLE_SPEECH_API_KEY / '
-      + 'AZURE_SPEECH_KEY. Returns {ok:false, status:"not_configured"} honestly when no key '
-      + 'is present, and {ok:false, status:"call_intentionally_not_implemented"} when a key '
-      + 'is present but no live SDK call is wired — never a fabricated transcript. '
-      + 'services/voiceAIService.js and services/advancedVoiceAI.js manage session/transcript '
-      + 'rows and do keyword intent-matching on an ALREADY-PROVIDED transcript string; '
-      + 'unchanged by this entry. services/advancedVoiceAI.js transcribeAudio() remains a '
-      + 'hardcoded stub returning a fixed English sentence regardless of input (commented "In '
-      + 'production, use Google Speech-to-Text, Azure Speech, or similar") — this adapter '
-      + 'does not call it and should replace it once a real key is wired.',
+    citation: '(2026-08-10) A real, switchable provider-adapter INTERFACE — same pattern as ' +
+      'PROVIDER_ENV/callProvider above — keyed off GOOGLE_SPEECH_API_KEY / ' +
+      'AZURE_SPEECH_KEY. Returns {ok:false, status:"not_configured"} honestly when no key ' +
+      'is present, and {ok:false, status:"call_intentionally_not_implemented"} when a key ' +
+      'is present but no live SDK call is wired — never a fabricated transcript. ' +
+      'services/voiceAIService.js and services/advancedVoiceAI.js manage session/transcript ' +
+      'rows and do keyword intent-matching on an ALREADY-PROVIDED transcript string; ' +
+      'unchanged by this entry. services/advancedVoiceAI.js transcribeAudio() remains a ' +
+      'hardcoded stub returning a fixed English sentence regardless of input (commented "In ' +
+      'production, use Google Speech-to-Text, Azure Speech, or similar") — this adapter ' +
+      'does not call it and should replace it once a real key is wired.',
     invoke: async (payload = {}) => {
       const { provider, action = 'transcribe', audioBase64, text } = payload;
       if (!provider) {
@@ -483,8 +483,8 @@ const ENGINES = {
           ok: false,
           status: 'not_configured',
           providers: listSpeechProviders(),
-          reason: 'No provider specified. Pass { provider: "google"|"azure", '
-            + 'action: "transcribe"|"synthesize" } to check/attempt a real provider call.',
+          reason: 'No provider specified. Pass { provider: "google"|"azure", ' +
+            'action: "transcribe"|"synthesize" } to check/attempt a real provider call.',
         };
       }
       if (action === 'transcribe' && !audioBase64) {
@@ -500,10 +500,10 @@ const ENGINES = {
   recommendation_engine: {
     label: 'Recommendation Engine',
     status: 'real',
-    citation: 'services/catalogIntelligenceService.js wellnessRecommendation() / '
-      + 'productCalendar() / glutForecast() — real seasonality- and rule-driven '
-      + 'recommendations. services/nutritionIntelligenceService.js (built earlier '
-      + 'this session, not modified here) is the other real instance.',
+    citation: 'services/catalogIntelligenceService.js wellnessRecommendation() / ' +
+      'productCalendar() / glutForecast() — real seasonality- and rule-driven ' +
+      'recommendations. services/nutritionIntelligenceService.js (built earlier ' +
+      'this session, not modified here) is the other real instance.',
     invoke: async (payload = {}) => {
       const catalog = require('../services/legacy/catalogIntelligenceService');
       const { concern, month } = payload;
@@ -515,38 +515,38 @@ const ENGINES = {
   workflow_engine: {
     label: 'Workflow Engine (AI Proposal Gate)',
     status: 'partial',
-    citation: '(2026-08-10) DUPLICATION CHECKED against services/enterpriseControlService.js, '
-      + 'which backs migration 993 (workflow_definitions / workflow_steps / '
-      + 'workflow_instances) with real startWorkflow()/actOnWorkflow() functions — a '
-      + 'generic, multi-step, threshold-gated approval-chain engine already used for POs '
-      + 'and other entities, and already given a frontend UI this session. CONFIRMED NOT A '
-      + 'DUPLICATE: this entry is a different concept — migrations/995_erp_process_layer.sql '
-      + 'ai_proposals table + CHECK constraints, a flat "AI proposes ONE value change with a '
-      + 'rationale, a named human approves or rejects it" gate (see core/erpAgents.js '
-      + 'proposal()), not a multi-step process. Kept separate rather than merged. Wired to '
-      + 'core/erpAgents.js runAgent()/runDomain()/runAll(), which is real and already live '
-      + '(index.js POST /.../:agentId). (2026-08-29) Persistence gap closed: '
-      + 'core/erpAgents.js persistProposals() now does a real `INSERT INTO ai_proposals` '
-      + '(migration 995) — pass payload.persist:true to write proposals there and get back '
-      + 'real row ids a human can later approve/reject through whatever surface reads that '
-      + 'table. Defaults to false (unchanged in-memory-only behavior) so this stays backward '
-      + "compatible with any existing caller that relied on the old semantics. This entry "
-      + 'still does not approve, reject, or execute anything — that stays a named human\'s job. '
-      + 'If a multi-step, threshold-based approval chain is what is actually needed, call '
-      + 'services/enterpriseControlService.js startWorkflow() directly — that is the real '
-      + 'engine for that job, not this one.',
+    citation: '(2026-08-10) DUPLICATION CHECKED against services/enterpriseControlService.js, ' +
+      'which backs migration 993 (workflow_definitions / workflow_steps / ' +
+      'workflow_instances) with real startWorkflow()/actOnWorkflow() functions — a ' +
+      'generic, multi-step, threshold-gated approval-chain engine already used for POs ' +
+      'and other entities, and already given a frontend UI this session. CONFIRMED NOT A ' +
+      'DUPLICATE: this entry is a different concept — migrations/995_erp_process_layer.sql ' +
+      'ai_proposals table + CHECK constraints, a flat "AI proposes ONE value change with a ' +
+      'rationale, a named human approves or rejects it" gate (see core/erpAgents.js ' +
+      'proposal()), not a multi-step process. Kept separate rather than merged. Wired to ' +
+      'core/erpAgents.js runAgent()/runDomain()/runAll(), which is real and already live ' +
+      '(index.js POST /.../:agentId). (2026-08-29) Persistence gap closed: ' +
+      'core/erpAgents.js persistProposals() now does a real `INSERT INTO ai_proposals` ' +
+      '(migration 995) — pass payload.persist:true to write proposals there and get back ' +
+      'real row ids a human can later approve/reject through whatever surface reads that ' +
+      'table. Defaults to false (unchanged in-memory-only behavior) so this stays backward ' +
+      'compatible with any existing caller that relied on the old semantics. This entry ' +
+      'still does not approve, reject, or execute anything — that stays a named human\'s job. ' +
+      'If a multi-step, threshold-based approval chain is what is actually needed, call ' +
+      'services/enterpriseControlService.js startWorkflow() directly — that is the real ' +
+      'engine for that job, not this one.',
     invoke: async (payload = {}) => {
       const erpAgents = require('./erpAgents');
       const { agentId, domain, context = {}, persist = false } = payload;
-      const note = persist
-        ? 'Persisted to ai_proposals — see proposalIds. Still not approved, rejected, or '
-          + 'executed; a named human must act on these through whatever surface reads that table.'
-        : 'In-memory proposal(s) only — pass payload.persist:true to write these to '
-          + 'ai_proposals. Not approved, rejected, or executed either way.';
+      const note = persist ?
+        'Persisted to ai_proposals — see proposalIds. Still not approved, rejected, or ' +
+          'executed; a named human must act on these through whatever surface reads that table.' :
+        'In-memory proposal(s) only — pass payload.persist:true to write these to ' +
+          'ai_proposals. Not approved, rejected, or executed either way.';
 
-      const proposals = agentId ? [erpAgents.runAgent(agentId, context)].filter(Boolean)
-        : domain ? erpAgents.runDomain(domain, context)
-        : erpAgents.runAll(context);
+      const proposals = agentId ? [erpAgents.runAgent(agentId, context)].filter(Boolean) :
+        domain ? erpAgents.runDomain(domain, context) :
+          erpAgents.runAll(context);
 
       const proposalIds = persist && proposals.length ? await erpAgents.persistProposals(proposals) : [];
       const result = { proposals, persisted: persist, proposalIds, note };
@@ -558,30 +558,30 @@ const ENGINES = {
   agent_orchestrator: {
     label: 'Agent Orchestrator',
     status: 'built_here',
-    citation: 'Did not exist before this change. services/aiOrchestrationService.js '
-      + 'only manages ai_model_registry (LLM model slot CRUD) and never selected an '
-      + 'engine for a task. This file is the first code that reads a task type and '
-      + 'dispatches it. The DB schema for routing already existed, unused, in '
-      + 'migrations/058_sam_ai_orchestration.sql (ai_model_registry, '
-      + 'ai_routing_rules, sam_agents, ai_invocations).',
+    citation: 'Did not exist before this change. services/aiOrchestrationService.js ' +
+      'only manages ai_model_registry (LLM model slot CRUD) and never selected an ' +
+      'engine for a task. This file is the first code that reads a task type and ' +
+      'dispatches it. The DB schema for routing already existed, unused, in ' +
+      'migrations/058_sam_ai_orchestration.sql (ai_model_registry, ' +
+      'ai_routing_rules, sam_agents, ai_invocations).',
     invoke: null,
   },
 
   module_dispatch: {
     label: 'Module Dispatch (Plug-and-Play Registry)',
     status: 'real',
-    citation: '(2026-08-29) core/moduleRegistry.js — real discover()/discoverByCapabilities()/'
-      + 'execute() pipeline over the 302 registered plug-and-play modules (111 in '
-      + 'backend/src/modules/M0XX + 191 in root modules/, confirmed working earlier this '
-      + 'session via routes/claude/moduleRegistryRoutes.js at /api/v1/ai/modules). That route '
-      + "was previously the registry's ONLY caller — the orchestrator itself never queried it, "
-      + "so a task type this file's own ENGINES above has no entry for could not fall through "
-      + 'to any of the 302 modules even when one of them was the right tool. This entry closes '
-      + 'that gap: pass { moduleId, operation, parameters } to execute a known module directly, '
-      + 'or { query } / { requiredCapabilities, optionalCapabilities } to have the registry find '
-      + 'one first, same as the HTTP route does. Reuses one lazily-initialized ModuleRegistry '
-      + 'instance (mirrors moduleRegistryRoutes.js\'s own singleton pattern) rather than '
-      + 're-initializing the library service on every call.',
+    citation: '(2026-08-29) core/moduleRegistry.js — real discover()/discoverByCapabilities()/' +
+      'execute() pipeline over the 302 registered plug-and-play modules (111 in ' +
+      'backend/src/modules/M0XX + 191 in root modules/, confirmed working earlier this ' +
+      'session via routes/claude/moduleRegistryRoutes.js at /api/v1/ai/modules). That route ' +
+      'was previously the registry\'s ONLY caller — the orchestrator itself never queried it, ' +
+      'so a task type this file\'s own ENGINES above has no entry for could not fall through ' +
+      'to any of the 302 modules even when one of them was the right tool. This entry closes ' +
+      'that gap: pass { moduleId, operation, parameters } to execute a known module directly, ' +
+      'or { query } / { requiredCapabilities, optionalCapabilities } to have the registry find ' +
+      'one first, same as the HTTP route does. Reuses one lazily-initialized ModuleRegistry ' +
+      'instance (mirrors moduleRegistryRoutes.js\'s own singleton pattern) rather than ' +
+      're-initializing the library service on every call.',
     invoke: async (payload = {}) => {
       const registry = getModuleRegistry();
       await ensureModuleRegistryInitialized(registry);
@@ -600,8 +600,8 @@ const ENGINES = {
         return registry.discover(query, context);
       }
       throw new Error(
-        'module_dispatch requires either { moduleId, operation } to execute a known module, '
-        + 'or { query } / { requiredCapabilities } to discover one first'
+        'module_dispatch requires either { moduleId, operation } to execute a known module, ' +
+        'or { query } / { requiredCapabilities } to discover one first',
       );
     },
   },
@@ -609,16 +609,16 @@ const ENGINES = {
   claude_coordinator: {
     label: 'Claude AI Coordinator',
     status: 'real',
-    citation: '(2026-08-29) core/claudeAICoordinator.js — a separate, real, independently-live '
-      + 'AI orchestration entry point (constructs an actual @anthropic-ai/sdk client,'
-      + ' session-context tracking, library-knowledge enrichment, agent selection). Reachable '
-      + 'today via routes/unifiedAIRoutes.js AND its duplicate routes/claude/unifiedAIRoutes.js '
-      + "(both call coordinateAIRequest() directly) - this file's own ENGINES never routed to "
-      + "it, so the orchestrator's audit trail (ai_invocations) and guardrail pipeline never "
-      + "saw Claude-coordinator traffic even though it's real, live production code. This entry "
-      + "closes that gap without touching the existing routes (still call it directly, unaffected) "
-      + '- it just gives module_dispatch-style callers (and this file\'s own classifyAndRoute()) '
-      + 'a path to the same coordinator.',
+    citation: '(2026-08-29) core/claudeAICoordinator.js — a separate, real, independently-live ' +
+      'AI orchestration entry point (constructs an actual @anthropic-ai/sdk client,' +
+      ' session-context tracking, library-knowledge enrichment, agent selection). Reachable ' +
+      'today via routes/unifiedAIRoutes.js AND its duplicate routes/claude/unifiedAIRoutes.js ' +
+      '(both call coordinateAIRequest() directly) - this file\'s own ENGINES never routed to ' +
+      'it, so the orchestrator\'s audit trail (ai_invocations) and guardrail pipeline never ' +
+      'saw Claude-coordinator traffic even though it\'s real, live production code. This entry ' +
+      'closes that gap without touching the existing routes (still call it directly, unaffected) ' +
+      '- it just gives module_dispatch-style callers (and this file\'s own classifyAndRoute()) ' +
+      'a path to the same coordinator.',
     invoke: async (payload = {}) => {
       const claudeAICoordinator = require('./claudeAICoordinator');
       const { requestType = 'general', query, context = {}, userId, sessionId, agentPreference } = payload;
@@ -630,13 +630,13 @@ const ENGINES = {
   model_registry: {
     label: 'AI Model Registry',
     status: 'real',
-    citation: 'services/legacy/aiOrchestrationService.js — real Postgres-backed CRUD over '
-      + 'ai_model_registry (migration 058: which LLM vendor slot, cost, whether enabled) and '
-      + 'ai_routing_rules\' unserved-intent list. Config management, not task dispatch - this '
-      + 'is what tells an operator or the `llm` engine above which providers are actually '
-      + 'enabled before attempting a call, not a second competing orchestrator despite the '
-      + 'name. Already live via routes/enterpriseAIRoutes.js; this entry adds the same '
-      + 'orchestrator-reachable path the other real engines have.',
+    citation: 'services/legacy/aiOrchestrationService.js — real Postgres-backed CRUD over ' +
+      'ai_model_registry (migration 058: which LLM vendor slot, cost, whether enabled) and ' +
+      'ai_routing_rules\' unserved-intent list. Config management, not task dispatch - this ' +
+      'is what tells an operator or the `llm` engine above which providers are actually ' +
+      'enabled before attempting a call, not a second competing orchestrator despite the ' +
+      'name. Already live via routes/enterpriseAIRoutes.js; this entry adds the same ' +
+      'orchestrator-reachable path the other real engines have.',
     invoke: async (payload = {}) => {
       const aiOrchestrationService = require('../services/legacy/aiOrchestrationService');
       const { action = 'listModelSlots', slotData } = payload;
@@ -652,14 +652,14 @@ const ENGINES = {
   llm: {
     label: 'LLMs',
     status: 'not_configured',
-    citation: 'Zero LLM SDKs in backend/package.json (no @anthropic-ai/sdk, openai, '
-      + '@google/generative-ai, or a DeepSeek client); zero LLM API key env vars '
-      + 'referenced anywhere in backend/src. services/aiCopilotService.js, '
-      + 'conversationalAIService.js, advancedAIService.js and enterpriseAIService.js '
-      + 'generate responses via switch/case domain templates, not an LLM call. '
-      + "migrations/058 seeds ai_model_registry with 6 slots, all provider='UNASSIGNED', "
-      + 'enabled=false — the absence is already visible in the schema, this file makes '
-      + 'it visible in the routing layer too.',
+    citation: 'Zero LLM SDKs in backend/package.json (no @anthropic-ai/sdk, openai, ' +
+      '@google/generative-ai, or a DeepSeek client); zero LLM API key env vars ' +
+      'referenced anywhere in backend/src. services/aiCopilotService.js, ' +
+      'conversationalAIService.js, advancedAIService.js and enterpriseAIService.js ' +
+      'generate responses via switch/case domain templates, not an LLM call. ' +
+      'migrations/058 seeds ai_model_registry with 6 slots, all provider=\'UNASSIGNED\', ' +
+      'enabled=false — the absence is already visible in the schema, this file makes ' +
+      'it visible in the routing layer too.',
     invoke: async (payload = {}) => {
       const { provider, prompt, allowTemplateFallback = false } = payload;
       if (provider) return callProvider(provider, prompt, payload);
@@ -667,17 +667,17 @@ const ENGINES = {
         const copilot = require('../services/legacy/aiCopilotService');
         const { copilotType = 'generic', message, context = {}, session = {} } = payload;
         if (!message) throw new Error('llm template fallback requires payload.message');
-        let result = await copilot.generateCopilotResponse(copilotType, message, context, session);
+        const result = await copilot.generateCopilotResponse(copilotType, message, context, session);
         return { usedTemplateFallbackNotLLM: true, result };
       }
       return {
         ok: false,
         status: 'not_configured',
         providers: listProviders(),
-        reason: 'No provider specified and no template fallback requested. Pass '
-          + '{ provider: "claude"|"openai"|"gemini"|"deepseek" } to check/attempt a '
-          + 'real provider call, or { allowTemplateFallback: true } to use the '
-          + 'existing rule-based domain templates (NOT an LLM).',
+        reason: 'No provider specified and no template fallback requested. Pass ' +
+          '{ provider: "claude"|"openai"|"gemini"|"deepseek" } to check/attempt a ' +
+          'real provider call, or { allowTemplateFallback: true } to use the ' +
+          'existing rule-based domain templates (NOT an LLM).',
       };
     },
   },
@@ -694,7 +694,7 @@ async function logInvocation({ agentKey, intent, outcome, errorMessage = null, l
     await pool.query(
       `INSERT INTO ai_invocations (agent_key, intent, outcome, error_message, latency_ms)
        VALUES ($1, $2, $3, $4, $5)`,
-      [agentKey, intent, outcome, errorMessage, latencyMs]
+      [agentKey, intent, outcome, errorMessage, latencyMs],
     );
   } catch (err) {
     logger.error('aiOrchestrator:invocation_log_failed', { agentKey, intent, message: err.message });
@@ -743,13 +743,13 @@ async function route(taskType, payload = {}, opts = {}) {
       status: entry.status,
       engine: entry.label,
       citation: entry.citation,
-      reason: `${entry.label} is "${entry.status}" — no safe, real handler exists yet. `
-        + 'This is reported honestly rather than fabricating a result.',
+      reason: `${entry.label} is "${entry.status}" — no safe, real handler exists yet. ` +
+        'This is reported honestly rather than fabricating a result.',
     };
   }
 
   try {
-    let result = await entry.invoke(payload, opts);
+    const result = await entry.invoke(payload, opts);
     await logInvocation({ agentKey, intent: taskType, outcome: 'success', latencyMs: Date.now() - startedAt });
     return { ok: true, status: entry.status, engine: entry.label, citation: entry.citation, result };
   } catch (err) {
@@ -816,8 +816,8 @@ async function classifyAndRoute(taskDescription, payload = {}, opts = {}) {
       ok: false,
       status: 'unclassified',
       taskDescription,
-      reason: 'No registered capability keyword matched this description. Call route() '
-        + 'directly with an exact task type instead, or extend CLASSIFY_KEYWORDS.',
+      reason: 'No registered capability keyword matched this description. Call route() ' +
+        'directly with an exact task type instead, or extend CLASSIFY_KEYWORDS.',
       availableTaskTypes: Object.keys(ENGINES),
     };
   }

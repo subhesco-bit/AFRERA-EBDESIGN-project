@@ -32,9 +32,9 @@ jest.mock('../middleware/auth', () => ({
     req.user = { role: req.headers['x-test-role'] || 'farmer' };
     next();
   },
-  requireRole: (...roles) => (req, res, next) => roles.includes(req.user.role)
-    ? next()
-    : res.status(403).json({ error: 'Forbidden' }),
+  requireRole: (...roles) => (req, res, next) => roles.includes(req.user.role) ?
+    next() :
+    res.status(403).json({ error: 'Forbidden' }),
 }));
 
 const app = express();

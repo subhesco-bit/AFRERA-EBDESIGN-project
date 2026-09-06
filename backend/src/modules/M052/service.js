@@ -27,7 +27,7 @@ async function createProduct(productData) {
       tags,
       supplier_id,
       fpo_id,
-      metadata
+      metadata,
     } = productData;
 
     const product = {
@@ -47,7 +47,7 @@ async function createProduct(productData) {
       supplier_id,
       fpo_id,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered product optimization
@@ -58,8 +58,8 @@ async function createProduct(productData) {
         market_analysis: await getMarketAnalysis(category),
         pricing_recommendations: await getPricingRecommendations(price, cost_price, category),
         seo_suggestions: await getSEOSuggestions(name, description),
-        cross_sell_opportunities: await getCrossSellOpportunities(category, tags)
-      }
+        cross_sell_opportunities: await getCrossSellOpportunities(category, tags),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -92,8 +92,8 @@ async function createProduct(productData) {
         product.status,
         JSON.stringify(product.ai_recommendations),
         JSON.stringify(metadata || {}),
-        product.created_at
-      ]
+        product.created_at,
+      ],
     );
 
     logger.info(`Product created: ${product.product_id}`);
@@ -110,47 +110,47 @@ async function createProduct(productData) {
 async function listProducts({ page = 1, limit = 20, category = null, status = null, supplierId = null, fpoId = null } = {}) {
   try {
     const offset = (page - 1) * limit;
-    
+
     let countQuery = 'SELECT COUNT(*) FROM products';
-    let countParams = [];
-    let conditions = [];
-    
+    const countParams = [];
+    const conditions = [];
+
     if (category) {
-      conditions.push('category = $' + (conditions.length + 1));
+      conditions.push(`category = $${ conditions.length + 1}`);
       countParams.push(category);
     }
     if (status) {
-      conditions.push('status = $' + (conditions.length + 1));
+      conditions.push(`status = $${ conditions.length + 1}`);
       countParams.push(status);
     }
     if (supplierId) {
-      conditions.push('supplier_id = $' + (conditions.length + 1));
+      conditions.push(`supplier_id = $${ conditions.length + 1}`);
       countParams.push(supplierId);
     }
     if (fpoId) {
-      conditions.push('fpo_id = $' + (conditions.length + 1));
+      conditions.push(`fpo_id = $${ conditions.length + 1}`);
       countParams.push(fpoId);
     }
-    
+
     if (conditions.length > 0) {
-      countQuery += ' WHERE ' + conditions.join(' AND ');
+      countQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
+
     const totalRes = await pool.query(countQuery, countParams);
     const total = parseInt(totalRes.rows[0].count || '0');
-    
+
     let dataQuery = 'SELECT * FROM products';
-    let dataParams = [...countParams];
-    
+    const dataParams = [...countParams];
+
     if (conditions.length > 0) {
-      dataQuery += ' WHERE ' + conditions.join(' AND ');
+      dataQuery += ` WHERE ${ conditions.join(' AND ')}`;
     }
-    
-    dataQuery += ' ORDER BY created_at DESC LIMIT $' + (dataParams.length + 1) + ' OFFSET $' + (dataParams.length + 2);
+
+    dataQuery += ` ORDER BY created_at DESC LIMIT $${ dataParams.length + 1 } OFFSET $${ dataParams.length + 2}`;
     dataParams.push(limit, offset);
-    
+
     const res = await pool.query(dataQuery, dataParams);
-    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+    return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   } catch (error) {
     logger.error('Error listing products', { error: error.message });
     throw new Error('Failed to list products');
@@ -162,7 +162,7 @@ async function listProducts({ page = 1, limit = 20, category = null, status = nu
  */
 async function getProduct(productId) {
   try {
-    let res = await pool.query('SELECT * FROM products WHERE product_id = $1', [productId]);
+    const res = await pool.query('SELECT * FROM products WHERE product_id = $1', [productId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error getting product', { error: error.message });
@@ -189,10 +189,10 @@ async function updateProduct(productId, updates) {
       attributes,
       tags,
       status,
-      metadata
+      metadata,
     } = updates;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE products 
        SET name = COALESCE($1, name),
            description = COALESCE($2, description),
@@ -219,8 +219,8 @@ async function updateProduct(productId, updates) {
         tags ? JSON.stringify(tags) : null,
         status,
         metadata ? JSON.stringify(metadata) : null,
-        productId
-      ]
+        productId,
+      ],
     );
     return result.rows[0] || null;
   } catch (error) {
@@ -234,8 +234,8 @@ async function updateProduct(productId, updates) {
  */
 async function deleteProduct(productId) {
   try {
-    let res = await pool.query('DELETE FROM products WHERE product_id = $1 RETURNING product_id', [productId]);
-    return !!res.rows[0];
+    const res = await pool.query('DELETE FROM products WHERE product_id = $1 RETURNING product_id', [productId]);
+    return Boolean(res.rows[0]);
   } catch (error) {
     logger.error('Error deleting product', { error: error.message });
     throw new Error('Failed to delete product');
@@ -261,7 +261,7 @@ async function updateInventory(productId, quantity, operation = 'set') {
       params = [quantity, productId];
     }
 
-    let res = await pool.query(query, params);
+    const res = await pool.query(query, params);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error updating inventory', { error: error.message });
@@ -274,17 +274,17 @@ async function updateInventory(productId, quantity, operation = 'set') {
  */
 async function searchProducts(query, filters = {}) {
   try {
-    let aiRequest = {
+    const aiRequest = {
       task: 'product_search_optimization',
       parameters: {
         search_query: query,
-        filters: filters,
+        filters,
         user_preferences: await getUserSearchPreferences(),
-        trending_products: await getTrendingProducts()
-      }
+        trending_products: await getTrendingProducts(),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const searchResults = {
       search_id: generateId(),
@@ -294,7 +294,7 @@ async function searchProducts(query, filters = {}) {
       results: await executeProductSearch(query, filters),
       ai_rankings: aiResponse.rankings,
       suggested_alternatives: aiResponse.alternatives,
-      search_recommendations: aiResponse.recommendations
+      search_recommendations: aiResponse.recommendations,
     };
 
     return searchResults;
@@ -309,20 +309,20 @@ async function searchProducts(query, filters = {}) {
  */
 async function getProductRecommendations(productId, userId = null) {
   try {
-    let product = await getProduct(productId);
-    
-    let aiRequest = {
+    const product = await getProduct(productId);
+
+    const aiRequest = {
       task: 'product_recommendations',
       parameters: {
         product_data: product,
         user_history: userId ? await getUserPurchaseHistory(userId) : null,
         category_products: await getProductsByCategory(product.category),
         trending_products: await getTrendingProducts(),
-        seasonal_factors: await getSeasonalFactors()
-      }
+        seasonal_factors: await getSeasonalFactors(),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     return {
       recommendation_id: generateId(),
@@ -332,7 +332,7 @@ async function getProductRecommendations(productId, userId = null) {
       cross_sell: aiResponse.cross_sell,
       up_sell: aiResponse.up_sell,
       related_products: aiResponse.related,
-      frequently_bought_together: aiResponse.bundles
+      frequently_bought_together: aiResponse.bundles,
     };
   } catch (error) {
     logger.error('Error getting product recommendations', { error: error.message });
@@ -351,7 +351,7 @@ async function getMarketAnalysis(category) {
     competition_level: 'moderate',
     average_price: 100,
     price_range: { min: 50, max: 200 },
-    growth_trend: 'increasing'
+    growth_trend: 'increasing',
   };
 }
 
@@ -361,7 +361,7 @@ async function getPricingRecommendations(price, costPrice, category) {
     current_margin: margin,
     recommended_margin: 30,
     suggested_price: costPrice * 1.3,
-    pricing_strategy: margin < 20 ? 'increase' : margin > 50 ? 'competitive' : 'maintain'
+    pricing_strategy: margin < 20 ? 'increase' : margin > 50 ? 'competitive' : 'maintain',
   };
 }
 
@@ -370,7 +370,7 @@ async function getSEOSuggestions(name, description) {
     title: name,
     meta_description: description.substring(0, 160),
     keywords: [name.toLowerCase(), ...name.split(' ')],
-    alt_text_suggestions: [name + ' product image']
+    alt_text_suggestions: [`${name } product image`],
   };
 }
 
@@ -378,7 +378,7 @@ async function getCrossSellOpportunities(category, tags) {
   return [
     'Related accessories',
     'Complementary products',
-    'Bundle options'
+    'Bundle options',
   ];
 }
 
@@ -386,7 +386,7 @@ async function getUserSearchPreferences() {
   return {
     price_range: { min: 0, max: 1000 },
     preferred_categories: [],
-    recent_searches: []
+    recent_searches: [],
   };
 }
 
@@ -397,7 +397,7 @@ async function getTrendingProducts() {
 async function executeProductSearch(query, filters) {
   const searchQuery = `%${query}%`;
   let sql = 'SELECT * FROM products WHERE (name ILIKE $1 OR description ILIKE $1 OR category ILIKE $1)';
-  let params = [searchQuery];
+  const params = [searchQuery];
   let paramIndex = 2;
 
   if (filters.category) {
@@ -418,7 +418,7 @@ async function executeProductSearch(query, filters) {
 
   sql += ' ORDER BY created_at DESC LIMIT 50';
 
-  let res = await pool.query(sql, params);
+  const res = await pool.query(sql, params);
   return res.rows;
 }
 
@@ -427,14 +427,14 @@ async function getUserPurchaseHistory(userId) {
 }
 
 async function getProductsByCategory(category) {
-  let res = await pool.query('SELECT * FROM products WHERE category = $1 LIMIT 20', [category]);
+  const res = await pool.query('SELECT * FROM products WHERE category = $1 LIMIT 20', [category]);
   return res.rows;
 }
 
 async function getSeasonalFactors() {
   return {
     current_season: 'monsoon',
-    demand_factors: ['rainfall', 'harvest_season', 'festivals']
+    demand_factors: ['rainfall', 'harvest_season', 'festivals'],
   };
 }
 
@@ -446,5 +446,5 @@ module.exports = {
   deleteProduct,
   updateInventory,
   searchProducts,
-  getProductRecommendations
+  getProductRecommendations,
 };

@@ -16,7 +16,7 @@ describe('AI approval service', () => {
     pool.query.mockResolvedValue({ rows: [{ id: 1, proposed_by: 'u1', status: 'proposed' }] });
     const result = await service.createProposal({
       userId: 'u1', domain: 'pricing', proposalType: 'price_change',
-      proposedValue: { price: 120 }, rationale: 'Market signal supports the change'
+      proposedValue: { price: 120 }, rationale: 'Market signal supports the change',
     });
     expect(result.proposed_by).toBe('u1');
     expect(pool.query.mock.calls[0][1][0]).toBe('u1');

@@ -24,20 +24,20 @@ router.post('/unified', authMiddleware, async (req, res) => {
       context: context || {},
       userId,
       sessionId,
-      agentPreference
+      agentPreference,
     };
 
     const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
-      data: response
+      data: response,
     });
   } catch (error) {
     console.error('Unified AI endpoint error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to process AI request'
+      error: 'Failed to process AI request',
     });
   }
 });
@@ -49,29 +49,29 @@ router.post('/unified', authMiddleware, async (req, res) => {
 router.post('/conversational', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    let userId = req.user.id;
-    let sessionId = req.sessionID || req.headers['x-session-id'];
+    const userId = req.user.id;
+    const sessionId = req.sessionID || req.headers['x-session-id'];
 
-    let aiRequest = {
+    const aiRequest = {
       requestType: 'conversational',
       query,
       context: context || {},
       userId,
       sessionId,
-      agentPreference: 'farmer-advisor'
+      agentPreference: 'farmer-advisor',
     };
 
-    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
-      data: response
+      data: response,
     });
   } catch (error) {
     console.error('Conversational AI endpoint error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to process conversational request'
+      error: 'Failed to process conversational request',
     });
   }
 });
@@ -83,29 +83,29 @@ router.post('/conversational', authMiddleware, async (req, res) => {
 router.post('/analytical', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    let userId = req.user.id;
-    let sessionId = req.sessionID || req.headers['x-session-id'];
+    const userId = req.user.id;
+    const sessionId = req.sessionID || req.headers['x-session-id'];
 
-    let aiRequest = {
+    const aiRequest = {
       requestType: 'analytical',
       query,
       context: context || {},
       userId,
       sessionId,
-      agentPreference: 'business-analyst'
+      agentPreference: 'business-analyst',
     };
 
-    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
-      data: response
+      data: response,
     });
   } catch (error) {
     console.error('Analytical AI endpoint error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to process analytical request'
+      error: 'Failed to process analytical request',
     });
   }
 });
@@ -117,29 +117,29 @@ router.post('/analytical', authMiddleware, async (req, res) => {
 router.post('/automation', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    let userId = req.user.id;
-    let sessionId = req.sessionID || req.headers['x-session-id'];
+    const userId = req.user.id;
+    const sessionId = req.sessionID || req.headers['x-session-id'];
 
-    let aiRequest = {
+    const aiRequest = {
       requestType: 'automation',
       query,
       context: context || {},
       userId,
       sessionId,
-      agentPreference: 'operations-manager'
+      agentPreference: 'operations-manager',
     };
 
-    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
-      data: response
+      data: response,
     });
   } catch (error) {
     console.error('Automation AI endpoint error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to process automation request'
+      error: 'Failed to process automation request',
     });
   }
 });
@@ -151,29 +151,29 @@ router.post('/automation', authMiddleware, async (req, res) => {
 router.post('/governance', authMiddleware, async (req, res) => {
   try {
     const { query, context } = req.body;
-    let userId = req.user.id;
-    let sessionId = req.sessionID || req.headers['x-session-id'];
+    const userId = req.user.id;
+    const sessionId = req.sessionID || req.headers['x-session-id'];
 
-    let aiRequest = {
+    const aiRequest = {
       requestType: 'monitoring',
       query,
       context: context || {},
       userId,
       sessionId,
-      agentPreference: 'governance-agent'
+      agentPreference: 'governance-agent',
     };
 
-    let response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
+    const response = await claudeAICoordinator.coordinateAIRequest(aiRequest);
 
     res.json({
       success: true,
-      data: response
+      data: response,
     });
   } catch (error) {
     console.error('Governance AI endpoint error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to process governance request'
+      error: 'Failed to process governance request',
     });
   }
 });
@@ -194,15 +194,15 @@ router.get('/agents', authMiddleware, async (req, res) => {
           'Pest and disease management advice',
           'Market price analysis and timing',
           'Government scheme eligibility and application',
-          'Best practices for sustainable farming'
+          'Best practices for sustainable farming',
         ],
         tools: [
           'crop_recommendation_tool',
           'weather_api_tool',
           'market_data_tool',
           'scheme_search_tool',
-          'knowledge_base_tool'
-        ]
+          'knowledge_base_tool',
+        ],
       },
       {
         id: 'business-analyst',
@@ -213,15 +213,15 @@ router.get('/agents', authMiddleware, async (req, res) => {
           'Performance metrics and KPIs',
           'Trend analysis and forecasting',
           'Risk assessment and mitigation',
-          'Business process optimization'
+          'Business process optimization',
         ],
         tools: [
           'financial_analysis_tool',
           'metrics_tool',
           'trend_analysis_tool',
           'forecasting_tool',
-          'risk_assessment_tool'
-        ]
+          'risk_assessment_tool',
+        ],
       },
       {
         id: 'operations-manager',
@@ -232,15 +232,15 @@ router.get('/agents', authMiddleware, async (req, res) => {
           'Resource allocation and scheduling',
           'Supply chain management',
           'Automated workflow design',
-          'Operational cost reduction'
+          'Operational cost reduction',
         ],
         tools: [
           'process_optimization_tool',
           'resource_allocation_tool',
           'schedule_tool',
           'efficiency_tool',
-          'workflow_automation_tool'
-        ]
+          'workflow_automation_tool',
+        ],
       },
       {
         id: 'governance-agent',
@@ -251,27 +251,27 @@ router.get('/agents', authMiddleware, async (req, res) => {
           'Compliance checking and reporting',
           'Audit trail analysis',
           'Risk monitoring and mitigation',
-          'Governance dashboard and reporting'
+          'Governance dashboard and reporting',
         ],
         tools: [
           'policy_tool',
           'compliance_tool',
           'audit_tool',
           'risk_monitoring_tool',
-          'reporting_tool'
-        ]
-      }
+          'reporting_tool',
+        ],
+      },
     ];
 
     res.json({
       success: true,
-      data: agents
+      data: agents,
     });
   } catch (error) {
     console.error('Get agents error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get available agents'
+      error: 'Failed to get available agents',
     });
   }
 });
@@ -282,7 +282,7 @@ router.get('/agents', authMiddleware, async (req, res) => {
  */
 router.get('/usage', authMiddleware, async (req, res) => {
   try {
-    let userId = req.user.id;
+    const userId = req.user.id;
     const { startDate, endDate } = req.query;
 
     // This would query the ai_usage_tracking table
@@ -291,18 +291,18 @@ router.get('/usage', authMiddleware, async (req, res) => {
       totalTokens: 0,
       totalCost: 0,
       byAgent: {},
-      byRequestType: {}
+      byRequestType: {},
     };
 
     res.json({
       success: true,
-      data: usageStats
+      data: usageStats,
     });
   } catch (error) {
     console.error('Get usage stats error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get usage statistics'
+      error: 'Failed to get usage statistics',
     });
   }
 });

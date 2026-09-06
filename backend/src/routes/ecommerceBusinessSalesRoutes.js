@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce Business Sales Routes
- * 
+ *
  * B2B and business sales endpoints:
  * - Bulk Order Management
  * - Contract Farming

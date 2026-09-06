@@ -57,7 +57,7 @@ class ColdStorageService {
           capacityUnits, capacityUnitLabel,
           temperatureRangeMinC ?? null, temperatureRangeMaxC ?? null,
           operatorName || null, operatorPhone || null,
-        ]
+        ],
       );
 
       logger.info(`Cold storage facility created: ${result.rows[0].id} (${name})`);
@@ -82,7 +82,7 @@ class ColdStorageService {
       }
 
       query += ' ORDER BY name ASC';
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error listing cold storage facilities', { error: error.message, stack: error.stack });
@@ -92,7 +92,7 @@ class ColdStorageService {
 
   async getFacility(facilityId) {
     try {
-      let result = await this.pool.query('SELECT * FROM cold_storage_facilities WHERE id = $1', [facilityId]);
+      const result = await this.pool.query('SELECT * FROM cold_storage_facilities WHERE id = $1', [facilityId]);
       if (result.rows.length === 0) throw new Error('Cold storage facility not found');
       return result.rows[0];
     } catch (error) {
@@ -104,7 +104,7 @@ class ColdStorageService {
   async updateFacility(facilityId, data) {
     try {
       const fields = [];
-      let params = [];
+      const params = [];
       const map = {
         name: 'name', location: 'location', district: 'district', state: 'state',
         capacityUnits: 'capacity_units', capacityUnitLabel: 'capacity_unit_label',
@@ -120,9 +120,9 @@ class ColdStorageService {
       if (fields.length === 0) throw new Error('No fields to update');
 
       params.push(facilityId);
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `UPDATE cold_storage_facilities SET ${fields.join(', ')}, updated_at = NOW() WHERE id = $${params.length} RETURNING *`,
-        params
+        params,
       );
       if (result.rows.length === 0) throw new Error('Cold storage facility not found');
       return result.rows[0];
@@ -151,7 +151,7 @@ class ColdStorageService {
       // facility cannot read the same "capacity available" snapshot.
       const facilityResult = await client.query(
         'SELECT * FROM cold_storage_facilities WHERE id = $1 FOR UPDATE',
-        [facilityId]
+        [facilityId],
       );
       if (facilityResult.rows.length === 0) throw new Error('Cold storage facility not found');
       const facility = facilityResult.rows[0];
@@ -166,7 +166,7 @@ class ColdStorageService {
            AND status IN ('booked', 'checked_in')
            AND check_in_date <= $3
            AND check_out_date >= $2`,
-        [facilityId, checkInDate, checkOutDate]
+        [facilityId, checkInDate, checkOutDate],
       );
       const overlappingUnits = Number(overlapResult.rows[0].overlapping_units);
       const wouldBeBooked = overlappingUnits + Number(quantityUnits);
@@ -175,7 +175,7 @@ class ColdStorageService {
         const remaining = Number(facility.capacity_units) - overlappingUnits;
         const err = new Error(
           `Booking would exceed capacity: ${remaining.toFixed(2)} ${facility.capacity_unit_label} remaining ` +
-          `for ${checkInDate}–${checkOutDate}, requested ${Number(quantityUnits).toFixed(2)}.`
+          `for ${checkInDate}–${checkOutDate}, requested ${Number(quantityUnits).toFixed(2)}.`,
         );
         err.code = 'CAPACITY_EXCEEDED';
         throw err;
@@ -186,7 +186,7 @@ class ColdStorageService {
            (facility_id, farmer_id, fpo_id, produce_type, quantity_units, check_in_date, check_out_date, notes)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [facilityId, farmerId || null, fpoId || null, produceType, quantityUnits, checkInDate, checkOutDate, notes || null]
+        [facilityId, farmerId || null, fpoId || null, produceType, quantityUnits, checkInDate, checkOutDate, notes || null],
       );
 
       logger.info(`Cold storage booking created: ${bookingResult.rows[0].id} on facility ${facilityId}`);
@@ -202,14 +202,14 @@ class ColdStorageService {
         JOIN cold_storage_facilities f ON f.id = b.facility_id
         WHERE 1=1
       `;
-      let params = [];
+      const params = [];
       if (filters.facilityId) { params.push(filters.facilityId); query += ` AND b.facility_id = $${params.length}`; }
       if (filters.farmerId) { params.push(filters.farmerId); query += ` AND b.farmer_id = $${params.length}`; }
       if (filters.fpoId) { params.push(filters.fpoId); query += ` AND b.fpo_id = $${params.length}`; }
       if (filters.status) { params.push(filters.status); query += ` AND b.status = $${params.length}`; }
 
       query += ' ORDER BY b.check_in_date DESC, b.created_at DESC';
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error listing cold storage bookings', { error: error.message, stack: error.stack });
@@ -222,9 +222,9 @@ class ColdStorageService {
       if (!['booked', 'checked_in', 'checked_out', 'cancelled'].includes(status)) {
         throw new Error('Invalid status');
       }
-      let result = await this.pool.query(
-        `UPDATE cold_storage_bookings SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-        [status, bookingId]
+      const result = await this.pool.query(
+        'UPDATE cold_storage_bookings SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+        [status, bookingId],
       );
       if (result.rows.length === 0) throw new Error('Booking not found');
       return result.rows[0];
@@ -263,14 +263,14 @@ class ColdStorageService {
             AND b.check_out_date >= $1
         ) booked ON TRUE
       `;
-      let params = [date];
+      const params = [date];
       if (facilityId) {
         params.push(facilityId);
         query += ` WHERE f.id = $${params.length}`;
       }
       query += ' ORDER BY f.name';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       const rows = result.rows.map((r) => {
         const capacity = Number(r.capacity_units);
         const booked = Number(r.booked_units);
@@ -298,10 +298,8 @@ module.exports = new ColdStorageService();
 
 // Merged from backend/src/modules/M078
 {
-  const m078 = require("../../modules/M078/service");
+  const m078 = require('../../modules/M078/service');
   const { ...rest } = m078;
   Object.assign(module.exports, rest);
 }
-
-
 

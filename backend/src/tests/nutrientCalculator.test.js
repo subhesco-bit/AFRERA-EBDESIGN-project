@@ -4,7 +4,7 @@ describe('nutrient calculator', () => {
   it('calculates totals, serving values, daily values, and provenance', () => {
     const result = calculateNutrientTotals([
       { quantity: 2, nutrients: { PRO: 10, FIB: 4 } },
-      { quantity: 1, nutrients: { PRO: 5, FIB: 2 } }
+      { quantity: 1, nutrients: { PRO: 5, FIB: 2 } },
     ], 3);
 
     expect(result.per_serving).toEqual({ PRO: 8.33, FIB: 3.33 });

@@ -1,6 +1,6 @@
 /**
  * AI Brain Routes
- * 
+ *
  * API endpoints for cognitive processing capabilities including:
  * - Cognitive cycle execution
  * - Knowledge management
@@ -20,27 +20,27 @@ const aiBrainService = require('../services/legacy/aiBrainService');
 router.post('/cycle', async (req, res) => {
   try {
     const { input, context, goals, constraints } = req.body;
-    
+
     if (!input) {
       return res.status(400).json({
         success: false,
-        error: 'input is required'
+        error: 'input is required',
       });
     }
-    
+
     const result = await aiBrainService.executeCognitiveCycle(
       input,
       context || {},
       goals || [],
-      constraints || {}
+      constraints || {},
     );
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error executing cognitive cycle:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -52,22 +52,22 @@ router.post('/cycle', async (req, res) => {
 router.post('/perception', async (req, res) => {
   try {
     const { input, context } = req.body;
-    
+
     if (!input) {
       return res.status(400).json({
         success: false,
-        error: 'input is required'
+        error: 'input is required',
       });
     }
-    
-    let result = await aiBrainService.perceptionProcess(input, context || {});
-    
+
+    const result = await aiBrainService.perceptionProcess(input, context || {});
+
     res.json(result);
   } catch (error) {
     console.error('Error in perception process:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -79,22 +79,22 @@ router.post('/perception', async (req, res) => {
 router.post('/attention', async (req, res) => {
   try {
     const { perception, goals } = req.body;
-    
+
     if (!perception) {
       return res.status(400).json({
         success: false,
-        error: 'perception is required'
+        error: 'perception is required',
       });
     }
-    
-    let result = await aiBrainService.attentionProcess(perception, goals || []);
-    
+
+    const result = await aiBrainService.attentionProcess(perception, goals || []);
+
     res.json(result);
   } catch (error) {
     console.error('Error in attention process:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -106,22 +106,22 @@ router.post('/attention', async (req, res) => {
 router.post('/reasoning', async (req, res) => {
   try {
     const { attention, knowledge } = req.body;
-    
+
     if (!attention) {
       return res.status(400).json({
         success: false,
-        error: 'attention is required'
+        error: 'attention is required',
       });
     }
-    
-    let result = await aiBrainService.reasoningProcess(attention, knowledge || {});
-    
+
+    const result = await aiBrainService.reasoningProcess(attention, knowledge || {});
+
     res.json(result);
   } catch (error) {
     console.error('Error in reasoning process:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -133,22 +133,22 @@ router.post('/reasoning', async (req, res) => {
 router.post('/learning', async (req, res) => {
   try {
     const { experience, outcome } = req.body;
-    
+
     if (!experience || !outcome) {
       return res.status(400).json({
         success: false,
-        error: 'experience and outcome are required'
+        error: 'experience and outcome are required',
       });
     }
-    
-    let result = await aiBrainService.learningProcess(experience, outcome);
-    
+
+    const result = await aiBrainService.learningProcess(experience, outcome);
+
     res.json(result);
   } catch (error) {
     console.error('Error in learning process:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -160,26 +160,26 @@ router.post('/learning', async (req, res) => {
 router.post('/decision', async (req, res) => {
   try {
     const { reasoning, context, constraints } = req.body;
-    
+
     if (!reasoning) {
       return res.status(400).json({
         success: false,
-        error: 'reasoning is required'
+        error: 'reasoning is required',
       });
     }
-    
-    let result = await aiBrainService.decisionProcess(
+
+    const result = await aiBrainService.decisionProcess(
       reasoning,
       context || {},
-      constraints || {}
+      constraints || {},
     );
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error in decision process:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -191,26 +191,26 @@ router.post('/decision', async (req, res) => {
 router.post('/planning', async (req, res) => {
   try {
     const { decision, current_state, target_state } = req.body;
-    
+
     if (!decision) {
       return res.status(400).json({
         success: false,
-        error: 'decision is required'
+        error: 'decision is required',
       });
     }
-    
-    let result = await aiBrainService.planningProcess(
+
+    const result = await aiBrainService.planningProcess(
       decision,
       current_state || {},
-      target_state || {}
+      target_state || {},
     );
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error in planning process:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -222,26 +222,26 @@ router.post('/planning', async (req, res) => {
 router.post('/knowledge', (req, res) => {
   try {
     const { domain, knowledge } = req.body;
-    
+
     if (!domain || !knowledge) {
       return res.status(400).json({
         success: false,
-        error: 'domain and knowledge are required'
+        error: 'domain and knowledge are required',
       });
     }
-    
+
     aiBrainService.addKnowledge(domain, knowledge);
-    
+
     res.json({
       success: true,
-      domain: domain,
-      timestamp: new Date()
+      domain,
+      timestamp: new Date(),
     });
   } catch (error) {
     console.error('Error adding knowledge:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -254,24 +254,24 @@ router.get('/knowledge/:domain', (req, res) => {
   try {
     const { domain } = req.params;
     const knowledge = aiBrainService.getKnowledge(domain);
-    
+
     if (!knowledge) {
       return res.status(404).json({
         success: false,
-        error: `Knowledge domain ${domain} not found`
+        error: `Knowledge domain ${domain} not found`,
       });
     }
-    
+
     res.json({
       success: true,
-      domain: domain,
-      knowledge: knowledge
+      domain,
+      knowledge,
     });
   } catch (error) {
     console.error('Error getting knowledge:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -282,21 +282,21 @@ router.get('/knowledge/:domain', (req, res) => {
  */
 router.get('/knowledge', (req, res) => {
   try {
-    let knowledge = Array.from(aiBrainService.knowledgeGraph.entries()).map(([domain, data]) => ({
+    const knowledge = Array.from(aiBrainService.knowledgeGraph.entries()).map(([domain, data]) => ({
       domain,
       timestamp: data.timestamp,
-      confidence: data.confidence
+      confidence: data.confidence,
     }));
-    
+
     res.json({
       success: true,
-      domains: knowledge
+      domains: knowledge,
     });
   } catch (error) {
     console.error('Error getting knowledge domains:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -308,16 +308,16 @@ router.get('/knowledge', (req, res) => {
 router.get('/state', (req, res) => {
   try {
     const state = aiBrainService.getCognitiveState();
-    
+
     res.json({
       success: true,
-      state: state
+      state,
     });
   } catch (error) {
     console.error('Error getting cognitive state:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -329,18 +329,18 @@ router.get('/state', (req, res) => {
 router.put('/context', (req, res) => {
   try {
     const context = req.body;
-    
+
     aiBrainService.updateContext(context);
-    
+
     res.json({
       success: true,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   } catch (error) {
     console.error('Error updating context:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -351,14 +351,14 @@ router.put('/context', (req, res) => {
  */
 router.delete('/working-memory', (req, res) => {
   try {
-    let result = aiBrainService.clearWorkingMemory();
-    
+    const result = aiBrainService.clearWorkingMemory();
+
     res.json(result);
   } catch (error) {
     console.error('Error clearing working memory:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -374,7 +374,7 @@ router.get('/health', (req, res) => {
     knowledge_domains: aiBrainService.knowledgeGraph.size,
     working_memory_size: aiBrainService.workingMemory.size,
     long_term_memory_size: aiBrainService.longTermMemory.size,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

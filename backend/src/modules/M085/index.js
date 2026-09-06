@@ -17,8 +17,8 @@ router.get('/configs/:id/alerts', controller.getComparisonAlerts);
 
 router.post('/snapshots', controller.createSnapshot);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

@@ -5,13 +5,13 @@ const { ValidationError, NotFoundError } = require('../utils/errors');
 class SupplyChainTrackingService {
   async createShipment(productId, origin, destination) {
   // Validate inputs
-  if (!productId) throw new Error('Missing required parameter');
+    if (!productId) throw new Error('Missing required parameter');
 
     try {
       const shipmentId = require('uuid').v4();
       const shipment = await db('shipments').insert({
         id: shipmentId, product_id: productId, origin, destination,
-        status: 'created', created_at: new Date()
+        status: 'created', created_at: new Date(),
       }).returning('*');
       logger.info(`Shipment created: ${shipmentId}`);
       return { shipment_id: shipmentId, status: 'created' };
@@ -20,7 +20,7 @@ class SupplyChainTrackingService {
 
   async trackShipment(shipmentId) {
     try {
-      let shipment = await db('shipments').where('id', shipmentId).first();
+      const shipment = await db('shipments').where('id', shipmentId).first();
       if (!shipment) throw new NotFoundError('Shipment not found');
 
       const events = await db('tracking_events').where('shipment_id', shipmentId).orderBy('created_at');
@@ -32,7 +32,7 @@ class SupplyChainTrackingService {
     try {
       await db('tracking_events').insert({
         id: require('uuid').v4(), shipment_id: shipmentId, location, status,
-        created_at: new Date()
+        created_at: new Date(),
       });
 
       await db('shipments').where('id', shipmentId).update({ status, updated_at: new Date() });
