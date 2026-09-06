@@ -1,22 +1,22 @@
 /**
  * Product AI Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: Product intelligence with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, product data, market trends, inventory levels
  * Collaboration Mode: Product decision tracking, outcome logging, learning feedback
- * 
+ *
  * Original Devin Implementation: Product service with product management, inventory, pricing
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware product recommendations using library knowledge
  * - AI-powered demand forecasting
  * - Historical product performance analysis
  * - Multi-factor pricing optimization
  * - Real-time product confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All product operations preserved (products, inventory, pricing)
  * - Original product logic maintained
@@ -52,44 +52,44 @@ class ClaudeAIEnhancedProductService {
         work_type: 'product_recommendation',
         service: this.serviceName,
         params: { userContext, productData, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'recommendProduct',
-        userContext: userContext,
-        productData: productData
+        userContext,
+        productData,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'recommendation',
         query: this.buildProductRecommendationQuery(userContext, productData, options),
-        context: { 
-          userContext, 
-          productData, 
+        context: {
+          userContext,
+          productData,
           options,
           libraryContext,
-          marketTrends: await this.getMarketTrends()
+          marketTrends: await this.getMarketTrends(),
         },
-        agentPreference: 'business-analyst'
+        agentPreference: 'business-analyst',
       });
 
       const originalResult = await this.originalService.getProducts();
-      
+
       const enhancedResult = {
         products: originalResult,
         ai_enhanced: true,
         ai_recommendation_rationale: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_product_insights: this.extractProductInsights(aiEnhancement.content)
+        ai_product_insights: this.extractProductInsights(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'product_recommendation',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -98,9 +98,9 @@ class ClaudeAIEnhancedProductService {
         work_type: 'product_recommendation',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.getProducts();
     }
@@ -114,7 +114,7 @@ class ClaudeAIEnhancedProductService {
     return {
       demand_trends: { increasing: ['vegetables', 'fruits'], decreasing: ['grains'] },
       price_trends: { stable: ['dairy'], volatile: ['vegetables'] },
-      seasonal_factors: { high_season: ['vegetables'], low_season: ['grains'] }
+      seasonal_factors: { high_season: ['vegetables'], low_season: ['grains'] },
     };
   }
 
@@ -130,16 +130,16 @@ class ClaudeAIEnhancedProductService {
    */
   extractProductInsights(aiContent) {
     if (!aiContent) return [];
-    
+
     const insights = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('insight') || line.includes('trend') || line.includes('consideration')) {
         insights.push(line.trim());
       }
     });
-    
+
     return insights;
   }
 
@@ -172,7 +172,7 @@ class ClaudeAIEnhancedProductService {
       ai_coordinator: claudeAICoordinator ? 'available' : 'unavailable',
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
-      ai_enhanced_methods: ['recommendProductAI']
+      ai_enhanced_methods: ['recommendProductAI'],
     };
   }
 }

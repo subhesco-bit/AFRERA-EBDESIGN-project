@@ -63,7 +63,7 @@ async function createProject(userId, data) {
      RETURNING *`,
     [generateProjectNumber(), userId, fpoId || null, projectType, projectSubtype || null,
       industrySector || null, name, description || null, JSON.stringify(location),
-      capacity || null, capacityUnit || null, budget || null, timeline || null]
+      capacity || null, capacityUnit || null, budget || null, timeline || null],
   );
   return result.rows[0];
 }
@@ -75,26 +75,26 @@ async function getProject(projectId, userId, isAdmin = false) {
     where += ' AND user_id = $2';
     params.push(userId);
   }
-  let result = await pool.query(`SELECT * FROM engineering_projects WHERE ${where}`, params);
+  const result = await pool.query(`SELECT * FROM engineering_projects WHERE ${where}`, params);
   if (result.rows.length === 0) throw new Error('Project not found');
   return result.rows[0];
 }
 
 async function listProjects(userId, { status, projectType, page = 1, limit = 20 } = {}) {
   const conditions = ['user_id = $1', 'deleted_at IS NULL'];
-  let params = [userId];
+  const params = [userId];
   if (status) { params.push(status); conditions.push(`status = $${params.length}`); }
   if (projectType) { params.push(projectType); conditions.push(`project_type = $${params.length}`); }
 
   const offset = (Math.max(1, Number(page)) - 1) * Math.max(1, Number(limit));
   params.push(Math.max(1, Number(limit)), offset);
 
-  let result = await pool.query(
+  const result = await pool.query(
     `SELECT * FROM engineering_projects
      WHERE ${conditions.join(' AND ')}
      ORDER BY created_at DESC
      LIMIT $${params.length - 1} OFFSET $${params.length}`,
-    params
+    params,
   );
   return result.rows;
 }
@@ -103,7 +103,7 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
   await getProject(projectId, userId, isAdmin); // ownership check, 404s if not found/owned
 
   const sets = [];
-  let params = [];
+  const params = [];
   if (phase !== undefined) { params.push(phase); sets.push(`phase = $${params.length}`); }
   if (phaseProgress !== undefined) {
     if (phaseProgress < 0 || phaseProgress > 100) throw new Error('phaseProgress must be 0-100');
@@ -114,9 +114,9 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
 
   sets.push('updated_at = CURRENT_TIMESTAMP');
   params.push(projectId);
-  let result = await pool.query(
+  const result = await pool.query(
     `UPDATE engineering_projects SET ${sets.join(', ')} WHERE id = $${params.length} RETURNING *`,
-    params
+    params,
   );
   return result.rows[0];
 }
@@ -128,14 +128,14 @@ async function updateProjectPhase(projectId, userId, isAdmin, { phase, phaseProg
  */
 async function lookupReferenceRate(client, { rateSource, code, region }) {
   if (!code) return null;
-  const table = rateSource === 'labor' ? 'labor_rates'
-    : rateSource === 'equipment' ? 'equipment_rates'
-    : 'material_prices';
+  const table = rateSource === 'labor' ? 'labor_rates' :
+    rateSource === 'equipment' ? 'equipment_rates' :
+      'material_prices';
 
   if (table === 'material_prices') {
     const r = await client.query(
-      `SELECT base_price, regional_prices FROM material_prices WHERE material_code = $1`,
-      [code]
+      'SELECT base_price, regional_prices FROM material_prices WHERE material_code = $1',
+      [code],
     );
     if (r.rows.length === 0) return null;
     const row = r.rows[0];
@@ -143,14 +143,14 @@ async function lookupReferenceRate(client, { rateSource, code, region }) {
     return regional !== undefined ? Number(regional) : Number(row.base_price);
   }
   if (table === 'labor_rates') {
-    let r = await client.query(
+    const r = await client.query(
       `SELECT daily_rate FROM labor_rates WHERE skill_category = $1 AND ($2::text IS NULL OR region = $2)
        ORDER BY (region = $2) DESC LIMIT 1`,
-      [code, region || null]
+      [code, region || null],
     );
     return r.rows.length ? Number(r.rows[0].daily_rate) : null;
   }
-  let r = await client.query(`SELECT daily_rate FROM equipment_rates WHERE equipment_code = $1`, [code]);
+  const r = await client.query('SELECT daily_rate FROM equipment_rates WHERE equipment_code = $1', [code]);
   return r.rows.length ? Number(r.rows[0].daily_rate) : null;
 }
 
@@ -172,7 +172,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
   return withTransaction(async (client) => {
     const projectResult = await client.query(
       `SELECT * FROM engineering_projects WHERE id = $1 AND deleted_at IS NULL ${isAdmin ? '' : 'AND user_id = $2'}`,
-      isAdmin ? [projectId] : [projectId, userId]
+      isAdmin ? [projectId] : [projectId, userId],
     );
     if (projectResult.rows.length === 0) throw new Error('Project not found');
 
@@ -207,7 +207,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
         [projectId, boqId, item.category, item.subcategory || null, item.itemCode || null,
           item.description, item.specifications ? JSON.stringify(item.specifications) : null,
-          item.brand || null, item.model || null, item.unit, item.quantity, unitRate, totalAmount]
+          item.brand || null, item.model || null, item.unit, item.quantity, unitRate, totalAmount],
       );
       resolvedItems.push(inserted.rows[0]);
     }
@@ -230,7 +230,7 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
           assumptions, contingency_percentage, contingency_amount)
        VALUES ($1,$2,$3,$4,0,$5,$6,$7,$8) RETURNING *`,
       [projectId, estimateType, region || null, totalCapex, JSON.stringify(breakdown),
-        JSON.stringify({ boqId, lineCount: resolvedItems.length }), contingencyPercentage, contingencyAmount]
+        JSON.stringify({ boqId, lineCount: resolvedItems.length }), contingencyPercentage, contingencyAmount],
     );
 
     logger.info('Cost estimate created', { projectId, estimateId: estimateResult.rows[0].id, totalCapex });
@@ -240,9 +240,9 @@ async function createCostEstimate(projectId, userId, isAdmin, { estimateType = '
 
 async function getCostEstimates(projectId, userId, isAdmin = false) {
   await getProject(projectId, userId, isAdmin);
-  let result = await pool.query(
-    `SELECT * FROM cost_estimates WHERE project_id = $1 ORDER BY created_at DESC`,
-    [projectId]
+  const result = await pool.query(
+    'SELECT * FROM cost_estimates WHERE project_id = $1 ORDER BY created_at DESC',
+    [projectId],
   );
   return result.rows;
 }
@@ -256,6 +256,4 @@ module.exports = {
   createCostEstimate,
   getCostEstimates,
 };
-
-
 

@@ -1,6 +1,6 @@
 /**
  * AI Backbone Controller - Real AI Integration
- * 
+ *
  * REST API controller for AI backbone with real AI provider integrations
  * Handles HTTP requests and responses for AI operations
  */
@@ -42,7 +42,7 @@ const aiBackboneController = {
   switchProvider: async (req, res) => {
     try {
       const { provider } = req.body;
-      let result = aiBackboneService.switchProvider(provider);
+      const result = aiBackboneService.switchProvider(provider);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error switching AI provider', { error: error.message });
@@ -55,7 +55,7 @@ const aiBackboneController = {
    */
   resetAIStatistics: async (req, res) => {
     try {
-      let result = aiBackboneService.resetAIStatistics();
+      const result = aiBackboneService.resetAIStatistics();
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error resetting AI statistics', { error: error.message });
@@ -68,7 +68,7 @@ const aiBackboneController = {
    */
   supportAgriculturalDecision: async (req, res) => {
     try {
-      let result = await aiBackboneService.supportAgriculturalDecision(req.body);
+      const result = await aiBackboneService.supportAgriculturalDecision(req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in agricultural decision support', { error: error.message });
@@ -81,13 +81,13 @@ const aiBackboneController = {
    */
   optimizeLivestock: async (req, res) => {
     try {
-      let result = await aiBackboneService.optimizeLivestock(req.body);
+      const result = await aiBackboneService.optimizeLivestock(req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error in livestock optimization', { error: error.message });
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 module.exports = aiBackboneController;

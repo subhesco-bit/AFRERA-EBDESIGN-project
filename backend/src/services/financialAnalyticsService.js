@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 class FinancialAnalyticsService {
   async generateFinancialStatement(userId) {
   // Validate inputs
-  if (!userId) throw new Error('Missing required parameter');
+    if (!userId) throw new Error('Missing required parameter');
 
     try {
       const orders = await db('orders').where('user_id', userId);

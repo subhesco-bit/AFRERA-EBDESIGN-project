@@ -34,7 +34,7 @@ router.post('/calculate/order/:orderId', authMiddleware, async (req, res) => {
  */
 router.post('/calculate/product', authMiddleware, async (req, res) => {
   try {
-    let result = await gstService.calculateProductGST(req.body);
+    const result = await gstService.calculateProductGST(req.body);
     res.json(result);
   } catch (error) {
     logger.error('Calculate product GST API error', { error: error.message, stack: error.stack });
@@ -51,7 +51,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
     if (!startDate || !endDate) {
       return res.status(400).json({ error: 'startDate and endDate are required' });
     }
-    let result = await gstService.getGSTSummary(startDate, endDate);
+    const result = await gstService.getGSTSummary(startDate, endDate);
     res.json(result);
   } catch (error) {
     logger.error('Get GST summary API error', { error: error.message, stack: error.stack });
@@ -68,7 +68,7 @@ router.get('/summary', authMiddleware, async (req, res) => {
  */
 router.post('/invoice/:orderId', authMiddleware, async (req, res) => {
   try {
-    let result = await gstService.generateGSTInvoice(req.params.orderId);
+    const result = await gstService.generateGSTInvoice(req.params.orderId);
     res.json(result);
   } catch (error) {
     logger.error('Generate GST invoice API error', { error: error.message, stack: error.stack });
@@ -81,7 +81,7 @@ router.post('/invoice/:orderId', authMiddleware, async (req, res) => {
  */
 router.put('/order/:orderId/gst', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    let result = await gstService.updateOrderGST(req.params.orderId, req.body);
+    const result = await gstService.updateOrderGST(req.params.orderId, req.body);
     res.json(result);
   } catch (error) {
     logger.error('Update order GST API error', { error: error.message, stack: error.stack });
@@ -103,10 +103,10 @@ router.post('/validate/gst-number', async (req, res) => {
       return res.status(400).json({ error: 'GST number is required' });
     }
     const isValid = gstService.validateGSTNumber(gstNumber);
-    res.json({ 
+    res.json({
       gstNumber,
       isValid,
-      message: isValid ? 'Valid GST number format' : 'Invalid GST number format'
+      message: isValid ? 'Valid GST number format' : 'Invalid GST number format',
     });
   } catch (error) {
     logger.error('Validate GST number API error', { error: error.message, stack: error.stack });
@@ -120,9 +120,9 @@ router.post('/validate/gst-number', async (req, res) => {
 router.get('/rate/:category', async (req, res) => {
   try {
     const rate = gstService.getGSTRate(req.params.category);
-    res.json({ 
+    res.json({
       category: req.params.category,
-      gstRate: rate 
+      gstRate: rate,
     });
   } catch (error) {
     logger.error('Get GST rate API error', { error: error.message, stack: error.stack });
@@ -140,8 +140,8 @@ router.get('/rate/:category', async (req, res) => {
 router.get('/rates', authMiddleware, async (req, res) => {
   try {
     const pool = gstService.pool;
-    let result = await pool.query(
-      'SELECT * FROM gst_rates WHERE is_active = true ORDER BY product_category'
+    const result = await pool.query(
+      'SELECT * FROM gst_rates WHERE is_active = true ORDER BY product_category',
     );
     res.json(result.rows);
   } catch (error) {
@@ -156,15 +156,15 @@ router.get('/rates', authMiddleware, async (req, res) => {
 router.post('/rates', authMiddleware, async (req, res) => {
   try {
     const { productCategory, gstRate, hsnCode, description, effectiveDate } = req.body;
-    
+
     if (!productCategory || !gstRate || !effectiveDate) {
-      return res.status(400).json({ 
-        error: 'productCategory, gstRate, and effectiveDate are required' 
+      return res.status(400).json({
+        error: 'productCategory, gstRate, and effectiveDate are required',
       });
     }
 
-    let pool = gstService.pool;
-    let result = await pool.query(
+    const pool = gstService.pool;
+    const result = await pool.query(
       `INSERT INTO gst_rates 
        (product_category, gst_rate, hsn_code, description, effective_date, is_active)
        VALUES ($1, $2, $3, $4, $5, true)
@@ -177,7 +177,7 @@ router.post('/rates', authMiddleware, async (req, res) => {
          is_active = true,
          updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
-      [productCategory, gstRate, hsnCode, description, effectiveDate]
+      [productCategory, gstRate, hsnCode, description, effectiveDate],
     );
 
     res.status(201).json(result.rows[0]);
@@ -192,10 +192,10 @@ router.post('/rates', authMiddleware, async (req, res) => {
  */
 router.delete('/rates/:category', authMiddleware, requireRole(...PLATFORM_STAFF_ROLES), async (req, res) => {
   try {
-    let pool = gstService.pool;
-    let result = await pool.query(
+    const pool = gstService.pool;
+    const result = await pool.query(
       'UPDATE gst_rates SET is_active = false, updated_at = CURRENT_TIMESTAMP WHERE product_category = $1 RETURNING *',
-      [req.params.category]
+      [req.params.category],
     );
 
     if (result.rows.length === 0) {
@@ -226,18 +226,18 @@ router.post('/returns', authMiddleware, async (req, res) => {
       taxpayerState,
       dueDate,
       totalTurnover,
-      totalTaxLiability
+      totalTaxLiability,
     } = req.body;
 
-    let pool = gstService.pool;
-    let result = await pool.query(
+    const pool = gstService.pool;
+    const result = await pool.query(
       `INSERT INTO gst_returns 
        (return_period, return_type, taxpayer_gst_number, taxpayer_name, taxpayer_state, 
         due_date, total_turnover, total_tax_liability, return_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
        RETURNING *`,
-      [returnPeriod, returnType, taxpayerGstNumber, taxpayerName, taxpayerState, 
-       dueDate, totalTurnover, totalTaxLiability]
+      [returnPeriod, returnType, taxpayerGstNumber, taxpayerName, taxpayerState,
+        dueDate, totalTurnover, totalTaxLiability],
     );
 
     res.status(201).json(result.rows[0]);
@@ -253,7 +253,7 @@ router.post('/returns', authMiddleware, async (req, res) => {
 router.get('/returns', authMiddleware, async (req, res) => {
   try {
     const { taxpayerGstNumber, returnType, status, startDate, endDate } = req.query;
-    
+
     let query = 'SELECT * FROM gst_returns WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -290,8 +290,8 @@ router.get('/returns', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY due_date DESC';
 
-    let pool = gstService.pool;
-    let result = await pool.query(query, params);
+    const pool = gstService.pool;
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get GST returns API error', { error: error.message, stack: error.stack });
@@ -306,8 +306,8 @@ router.put('/returns/:returnId/status', authMiddleware, requireRole(...PLATFORM_
   try {
     const { returnStatus, acknowledgmentNumber, filedBy } = req.body;
 
-    let pool = gstService.pool;
-    let result = await pool.query(
+    const pool = gstService.pool;
+    const result = await pool.query(
       `UPDATE gst_returns 
        SET return_status = $1, 
            acknowledgment_number = $2,
@@ -316,7 +316,7 @@ router.put('/returns/:returnId/status', authMiddleware, requireRole(...PLATFORM_
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $4
        RETURNING *`,
-      [returnStatus, acknowledgmentNumber, filedBy, req.params.returnId]
+      [returnStatus, acknowledgmentNumber, filedBy, req.params.returnId],
     );
 
     if (result.rows.length === 0) {
@@ -346,16 +346,16 @@ router.post('/payments', authMiddleware, async (req, res) => {
       amount,
       paymentDate,
       paymentMethod,
-      transactionId
+      transactionId,
     } = req.body;
 
-    let pool = gstService.pool;
-    let result = await pool.query(
+    const pool = gstService.pool;
+    const result = await pool.query(
       `INSERT INTO gst_payments 
        (return_id, payment_type, tax_type, amount, payment_date, payment_method, transaction_id, payment_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')
        RETURNING *`,
-      [returnId, paymentType, taxType, amount, paymentDate, paymentMethod, transactionId]
+      [returnId, paymentType, taxType, amount, paymentDate, paymentMethod, transactionId],
     );
 
     res.status(201).json(result.rows[0]);
@@ -371,9 +371,9 @@ router.post('/payments', authMiddleware, async (req, res) => {
 router.get('/payments', authMiddleware, async (req, res) => {
   try {
     const { returnId, paymentType, status, startDate, endDate } = req.query;
-    
+
     let query = 'SELECT * FROM gst_payments WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (returnId) {
@@ -408,8 +408,8 @@ router.get('/payments', authMiddleware, async (req, res) => {
 
     query += ' ORDER BY payment_date DESC';
 
-    let pool = gstService.pool;
-    let result = await pool.query(query, params);
+    const pool = gstService.pool;
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get GST payments API error', { error: error.message, stack: error.stack });
@@ -424,8 +424,8 @@ router.put('/payments/:paymentId/status', authMiddleware, requireRole(...PLATFOR
   try {
     const { paymentStatus, challanNumber, bankName, branchName } = req.body;
 
-    let pool = gstService.pool;
-    let result = await pool.query(
+    const pool = gstService.pool;
+    const result = await pool.query(
       `UPDATE gst_payments 
        SET payment_status = $1,
            challan_number = $2,
@@ -434,7 +434,7 @@ router.put('/payments/:paymentId/status', authMiddleware, requireRole(...PLATFOR
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $5
        RETURNING *`,
-      [paymentStatus, challanNumber, bankName, branchName, req.params.paymentId]
+      [paymentStatus, challanNumber, bankName, branchName, req.params.paymentId],
     );
 
     if (result.rows.length === 0) {

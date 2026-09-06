@@ -39,8 +39,8 @@ const OFFLINE_SYNC_CONFIG = {
     critical: 1, // Orders, payments
     high: 2, // Inventory, prices
     medium: 3, // User data, preferences
-    low: 4 // Analytics, logs
-  }
+    low: 4, // Analytics, logs
+  },
 };
 
 // Production-readiness audit (2026-08-28): the old fallback was
@@ -93,7 +93,7 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
       JSON.stringify(entityData),
       operation,
       syncToken,
-      priorityValue
+      priorityValue,
     ]);
 
     logger.info(`Added to sync queue: ${entityType} for user ${userId}`);
@@ -102,7 +102,7 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
       success: true,
       queue_id: result.rows[0].id,
       sync_token: result.rows[0].sync_token,
-      priority: priority
+      priority,
     };
   } catch (error) {
     logger.error('Failed to add to sync queue', { error: error.message, stack: error.stack });
@@ -116,7 +116,7 @@ async function addToSyncQueue(userId, entityType, entityData, operation, priorit
 async function processSyncQueue(userId) {
   try {
     // Get pending sync items for user
-    let query = `
+    const query = `
       SELECT * FROM sync_queue
       WHERE user_id = $1
         AND status = 'pending'
@@ -125,7 +125,7 @@ async function processSyncQueue(userId) {
       LIMIT 50
     `;
 
-    let result = await pool.query(query, [userId, OFFLINE_SYNC_CONFIG.max_retry_attempts]);
+    const result = await pool.query(query, [userId, OFFLINE_SYNC_CONFIG.max_retry_attempts]);
     const syncItems = result.rows;
 
     let processedCount = 0;
@@ -143,7 +143,7 @@ async function processSyncQueue(userId) {
         results.push({
           queue_id: syncItem.id,
           status: 'success',
-          result: syncResult
+          result: syncResult,
         });
 
         logger.info(`Sync item processed: ${syncItem.entity_type} (ID: ${syncItem.id})`);
@@ -154,7 +154,7 @@ async function processSyncQueue(userId) {
           id: syncItem.id,
           retryCount,
           backoffTime,
-          errorMessage: error.message
+          errorMessage: error.message,
         });
 
         failedCount++;
@@ -162,7 +162,7 @@ async function processSyncQueue(userId) {
           queue_id: syncItem.id,
           status: 'failed',
           error: error.message,
-          retry_count: retryCount
+          retry_count: retryCount,
         });
 
         logger.error(`Sync item failed: ${syncItem.entity_type} (ID: ${syncItem.id})`, error);
@@ -175,7 +175,7 @@ async function processSyncQueue(userId) {
         `UPDATE sync_queue 
          SET status = 'completed', synced_at = NOW() 
          WHERE id = ANY($1)`,
-        [completedIds]
+        [completedIds],
       );
     }
 
@@ -197,7 +197,7 @@ async function processSyncQueue(userId) {
              error_message = v.error_message
          FROM (VALUES ${rows}) AS v(id, retry_count, backoff, error_message)
          WHERE sq.id = v.id`,
-        params
+        params,
       );
     }
 
@@ -205,7 +205,7 @@ async function processSyncQueue(userId) {
       success: true,
       processed_count: processedCount,
       failed_count: failedCount,
-      results: results
+      results,
     };
   } catch (error) {
     logger.error('Sync queue processing failed', { error: error.message, stack: error.stack });
@@ -223,8 +223,8 @@ async function processSyncItem(syncItem) {
   } catch (error) {
     throw new Error('Invalid JSON data in sync item');
   }
-  
-  let syncToken = generateSyncToken(entityData);
+
+  const syncToken = generateSyncToken(entityData);
 
   // Verify data integrity
   if (syncToken !== syncItem.sync_token) {
@@ -267,7 +267,7 @@ async function syncOrder(orderData, operation) {
           orderData.total_amount,
           orderData.status,
           JSON.stringify(orderData.metadata || {}),
-          orderData.created_at
+          orderData.created_at,
         ]);
         break;
       }
@@ -283,7 +283,7 @@ async function syncOrder(orderData, operation) {
           orderData.id,
           orderData.total_amount,
           orderData.status,
-          JSON.stringify(orderData.metadata || {})
+          JSON.stringify(orderData.metadata || {}),
         ]);
         break;
       }
@@ -307,7 +307,7 @@ async function syncProduct(productData, operation) {
   try {
     switch (operation) {
       case 'create': {
-        let createQuery = `
+        const createQuery = `
           INSERT INTO products (id, name, category, price, stock, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
           ON CONFLICT (id) DO NOTHING
@@ -320,13 +320,13 @@ async function syncProduct(productData, operation) {
           productData.price,
           productData.stock,
           JSON.stringify(productData.metadata || {}),
-          productData.created_at
+          productData.created_at,
         ]);
         break;
       }
 
       case 'update': {
-        let updateQuery = `
+        const updateQuery = `
           UPDATE products
           SET name = $2, category = $3, price = $4, stock = $5, metadata = $6, updated_at = NOW()
           WHERE id = $1
@@ -338,7 +338,7 @@ async function syncProduct(productData, operation) {
           productData.category,
           productData.price,
           productData.stock,
-          JSON.stringify(productData.metadata || {})
+          JSON.stringify(productData.metadata || {}),
         ]);
         break;
       }
@@ -362,7 +362,7 @@ async function syncUserProfile(profileData, operation) {
   try {
     switch (operation) {
       case 'update': {
-        let updateQuery = `
+        const updateQuery = `
           UPDATE user_profiles
           SET first_name = $2, last_name = $3, phone = $4, address = $5, preferences = $6, updated_at = NOW()
           WHERE user_id = $1
@@ -374,7 +374,7 @@ async function syncUserProfile(profileData, operation) {
           profileData.last_name,
           profileData.phone,
           profileData.address,
-          JSON.stringify(profileData.preferences || {})
+          JSON.stringify(profileData.preferences || {}),
         ]);
         break;
       }
@@ -394,7 +394,7 @@ async function syncInventory(inventoryData, operation) {
   try {
     switch (operation) {
       case 'update': {
-        let updateQuery = `
+        const updateQuery = `
           UPDATE inventory
           SET quantity = $2, location = $3, metadata = $4, updated_at = NOW()
           WHERE product_id = $1 AND warehouse_id = $5
@@ -405,7 +405,7 @@ async function syncInventory(inventoryData, operation) {
           inventoryData.quantity,
           inventoryData.location,
           JSON.stringify(inventoryData.metadata || {}),
-          inventoryData.warehouse_id
+          inventoryData.warehouse_id,
         ]);
         break;
       }
@@ -425,7 +425,7 @@ async function syncPayment(paymentData, operation) {
   try {
     switch (operation) {
       case 'create': {
-        let createQuery = `
+        const createQuery = `
           INSERT INTO transactions (transaction_id, user_id, type, amount, status, metadata, created_at)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
           ON CONFLICT (transaction_id) DO NOTHING
@@ -438,13 +438,13 @@ async function syncPayment(paymentData, operation) {
           paymentData.amount,
           paymentData.status,
           JSON.stringify(paymentData.metadata || {}),
-          paymentData.created_at
+          paymentData.created_at,
         ]);
         break;
       }
 
       case 'update': {
-        let updateQuery = `
+        const updateQuery = `
           UPDATE transactions
           SET status = $2, metadata = $3, updated_at = NOW()
           WHERE transaction_id = $1
@@ -453,7 +453,7 @@ async function syncPayment(paymentData, operation) {
         await pool.query(updateQuery, [
           paymentData.transaction_id,
           paymentData.status,
-          JSON.stringify(paymentData.metadata || {})
+          JSON.stringify(paymentData.metadata || {}),
         ]);
         break;
       }
@@ -472,7 +472,7 @@ async function syncPayment(paymentData, operation) {
 async function syncGenericEntity(entityData, entityType, operation) {
   try {
     // Generic sync handler for entities without specific handlers
-    let query = `
+    const query = `
       INSERT INTO generic_entities
       (entity_type, entity_id, entity_data, operation, created_at)
       VALUES ($1, $2, $3, $4, NOW())
@@ -485,7 +485,7 @@ async function syncGenericEntity(entityData, entityType, operation) {
       entityType,
       entityData.id,
       JSON.stringify(entityData),
-      operation
+      operation,
     ]);
 
     return { success: true, message: 'Generic entity synced successfully' };
@@ -520,7 +520,7 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
           entity_type: conflict.entity_type,
           entity_data: conflict.client_data,
           operation: conflict.operation,
-          sync_token: conflict.client_sync_token
+          sync_token: conflict.client_sync_token,
         });
         break;
 
@@ -534,15 +534,15 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
           entity_type: conflict.entity_type,
           entity_data: resolvedData,
           operation: conflict.operation,
-          sync_token: generateSyncToken(resolvedData)
+          sync_token: generateSyncToken(resolvedData),
         });
         break;
     }
 
     // Mark conflict as resolved
     await pool.query(
-      "UPDATE sync_conflicts SET status = 'resolved', resolution = $1, resolved_at = NOW() WHERE id = $2",
-      [resolution, conflictId]
+      'UPDATE sync_conflicts SET status = \'resolved\', resolution = $1, resolved_at = NOW() WHERE id = $2',
+      [resolution, conflictId],
     );
 
     logger.info(`Sync conflict resolved: ${conflictId} with resolution: ${resolution}`);
@@ -550,7 +550,7 @@ async function resolveSyncConflict(conflictId, resolution, resolvedData) {
     return {
       success: true,
       message: 'Conflict resolved successfully',
-      resolution: resolution
+      resolution,
     };
   } catch (error) {
     logger.error('Conflict resolution failed', { error: error.message, stack: error.stack });
@@ -594,7 +594,7 @@ async function getSyncStatus(userId) {
       queue_status: statusResult.rows[0],
       active_conflicts: conflictsResult.rows,
       sync_enabled: await isSyncEnabled(userId),
-      last_successful_sync: await getLastSuccessfulSync(userId)
+      last_successful_sync: await getLastSuccessfulSync(userId),
     };
   } catch (error) {
     logger.error('Failed to get sync status', { error: error.message, stack: error.stack });
@@ -607,12 +607,12 @@ async function getSyncStatus(userId) {
  */
 async function isSyncEnabled(userId) {
   try {
-    let query = `
+    const query = `
       SELECT sync_enabled FROM user_sync_preferences
       WHERE user_id = $1
     `;
 
-    let result = await pool.query(query, [userId]);
+    const result = await pool.query(query, [userId]);
 
     if (result.rows.length > 0) {
       return result.rows[0].sync_enabled;
@@ -630,13 +630,13 @@ async function isSyncEnabled(userId) {
  */
 async function getLastSuccessfulSync(userId) {
   try {
-    let query = `
+    const query = `
       SELECT MAX(synced_at) as last_sync
       FROM sync_queue
       WHERE user_id = $1 AND status = 'completed'
     `;
 
-    let result = await pool.query(query, [userId]);
+    const result = await pool.query(query, [userId]);
 
     return result.rows[0].last_sync || null;
   } catch (error) {
@@ -712,7 +712,7 @@ router.post('/queue', authLimiter, authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Entity type, data, and operation are required' });
     }
 
-    let result = await addToSyncQueue(req.user.id, entity_type, entity_data, operation, priority);
+    const result = await addToSyncQueue(req.user.id, entity_type, entity_data, operation, priority);
     res.json(result);
   } catch (error) {
     logger.error('Add to sync queue API error', { error: error.message, stack: error.stack });
@@ -726,7 +726,7 @@ router.post('/queue', authLimiter, authMiddleware, async (req, res) => {
  */
 router.post('/process', authLimiter, authMiddleware, async (req, res) => {
   try {
-    let result = await processSyncQueue(req.user.id);
+    const result = await processSyncQueue(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Process sync queue API error', { error: error.message, stack: error.stack });
@@ -740,7 +740,7 @@ router.post('/process', authLimiter, authMiddleware, async (req, res) => {
  */
 router.get('/status', authMiddleware, async (req, res) => {
   try {
-    let result = await getSyncStatus(req.user.id);
+    const result = await getSyncStatus(req.user.id);
     res.json(result);
   } catch (error) {
     logger.error('Get sync status API error', { error: error.message, stack: error.stack });
@@ -760,7 +760,7 @@ router.post('/resolve-conflict', authLimiter, authMiddleware, async (req, res) =
       return res.status(400).json({ error: 'Conflict ID and resolution are required' });
     }
 
-    let result = await resolveSyncConflict(conflict_id, resolution, resolved_data);
+    const result = await resolveSyncConflict(conflict_id, resolution, resolved_data);
     res.json(result);
   } catch (error) {
     logger.error('Resolve conflict API error', { error: error.message, stack: error.stack });
@@ -775,7 +775,7 @@ router.post('/resolve-conflict', authLimiter, authMiddleware, async (req, res) =
 router.get('/snapshot/:entityType', authMiddleware, async (req, res) => {
   try {
     const { last_sync } = req.query;
-    let result = await getOfflineDataSnapshot(req.user.id, req.params.entityType, last_sync);
+    const result = await getOfflineDataSnapshot(req.user.id, req.params.entityType, last_sync);
     res.json(result);
   } catch (error) {
     logger.error('Get offline snapshot API error', { error: error.message, stack: error.stack });
@@ -791,7 +791,7 @@ router.put('/preferences', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { sync_enabled, sync_frequency, sync_on_wifi_only } = req.body;
 
-    let query = `
+    const query = `
       INSERT INTO user_sync_preferences (user_id, sync_enabled, sync_frequency, sync_on_wifi_only)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (user_id) 
@@ -799,11 +799,11 @@ router.put('/preferences', authLimiter, authMiddleware, async (req, res) => {
       RETURNING *
     `;
 
-    let result = await pool.query(query, [
+    const result = await pool.query(query, [
       req.user.id,
       sync_enabled !== undefined ? sync_enabled : true,
       sync_frequency || 5,
-      sync_on_wifi_only || false
+      sync_on_wifi_only || false,
     ]);
 
     res.json(result.rows[0]);
@@ -819,12 +819,12 @@ router.put('/preferences', authLimiter, authMiddleware, async (req, res) => {
  */
 router.get('/preferences', authMiddleware, async (req, res) => {
   try {
-    let query = `
+    const query = `
       SELECT * FROM user_sync_preferences
       WHERE user_id = $1
     `;
 
-    let result = await pool.query(query, [req.user.id]);
+    const result = await pool.query(query, [req.user.id]);
 
     if (result.rows.length === 0) {
       // Return default preferences
@@ -832,7 +832,7 @@ router.get('/preferences', authMiddleware, async (req, res) => {
         user_id: req.user.id,
         sync_enabled: true,
         sync_frequency: 5,
-        sync_on_wifi_only: false
+        sync_on_wifi_only: false,
       });
     } else {
       res.json(result.rows[0]);
@@ -856,8 +856,8 @@ router.get('/health', (req, res) => {
       'conflict_resolution',
       'data_snapshot',
       'sync_preferences',
-      'retry_mechanisms'
-    ]
+      'retry_mechanisms',
+    ],
   });
 });
 
@@ -867,8 +867,6 @@ module.exports = {
   processSyncQueue,
   resolveSyncConflict,
   getSyncStatus,
-  getOfflineDataSnapshot
+  getOfflineDataSnapshot,
 };
-
-
 

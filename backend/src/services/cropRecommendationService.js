@@ -7,7 +7,7 @@ class CropRecommendationService {
       const recommendations = [
         { crop: 'Rice', confidence: 0.92, roi: 25 },
         { crop: 'Wheat', confidence: 0.85, roi: 20 },
-        { crop: 'Corn', confidence: 0.78, roi: 22 }
+        { crop: 'Corn', confidence: 0.78, roi: 22 },
       ];
       logger.info(`Recommendations generated: ${farmerId}`);
       return { farmer_id: farmerId, season, recommendations };
@@ -20,7 +20,7 @@ class CropRecommendationService {
         preparation: 'Prepare soil 2 weeks before planting',
         planting: 'Sow seeds at recommended depth',
         growth: 'Monitor irrigation and nutrition',
-        harvest: 'Pick at optimal ripeness'
+        harvest: 'Pick at optimal ripeness',
       };
       return { crop: cropType, phase, guidance: guidance[phase] || 'Standard care' };
     } catch (error) { logger.error(`Guidance failed: ${error.message}`); throw error; }
@@ -32,7 +32,7 @@ class CropRecommendationService {
         crop: cropType,
         price_trend: 'bullish',
         demand: 'high',
-        expected_price: 5000 + Math.random() * 1000
+        expected_price: 5000 + Math.random() * 1000,
       };
     } catch (error) { logger.error(`Market outlook failed: ${error.message}`); throw error; }
   }

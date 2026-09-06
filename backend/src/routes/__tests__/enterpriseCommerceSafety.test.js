@@ -3,7 +3,7 @@ const request = require('supertest');
 
 const mockSignals = [];
 const mockController = new Proxy({}, {
-  get: () => jest.fn().mockResolvedValue({ id: 'ok' })
+  get: () => jest.fn().mockResolvedValue({ id: 'ok' }),
 });
 const mockBulkController = {
   createBulkOrderRequest: jest.fn((req, res) => res.status(201).json({ success: true, data: req.body })),
@@ -14,7 +14,7 @@ const mockBulkController = {
   getBulkOrderQuotations: jest.fn(),
   submitQuotation: jest.fn(),
   acceptQuotation: jest.fn(),
-  cancelBulkOrder: jest.fn()
+  cancelBulkOrder: jest.fn(),
 };
 
 jest.mock('../../middleware/auth', () => ({
@@ -23,18 +23,18 @@ jest.mock('../../middleware/auth', () => ({
     req.user = { id: 'admin-1', role: 'admin', permissions: [] };
     next();
   },
-  requireRole: (...roles) => (req, res, next) => roles.includes(req.user?.role)
-    ? next() : res.status(403).json({ success: false, error: 'Insufficient permissions' })
+  requireRole: (...roles) => (req, res, next) => roles.includes(req.user?.role) ?
+    next() : res.status(403).json({ success: false, error: 'Insufficient permissions' }),
 }));
 jest.mock('../../middleware/rateLimiter', () => ({ rateLimiter: (req, res, next) => next() }));
 jest.mock('../../middleware/inputValidation', () => ({
-  sanitizeObject: (value) => JSON.parse(JSON.stringify(value).replace(/[<>]/g, ''))
+  sanitizeObject: (value) => JSON.parse(JSON.stringify(value).replace(/[<>]/g, '')),
 }));
 jest.mock('../../utils/logger', () => ({ logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() } }));
 jest.mock('../../core/signalBus', () => ({
   SIGNAL: {},
   SEVERITY: { INFO: 10 },
-  signalBus: { emitSignal: (...args) => mockSignals.push(args) }
+  signalBus: { emitSignal: (...args) => mockSignals.push(args) },
 }));
 jest.mock('../../controllers/completeERPIntegrationController', () => mockController);
 jest.mock('../../controllers/bulkOrderController', () => mockBulkController);
@@ -76,7 +76,7 @@ test('sanitizes commerce writes and emits a correlated mutation signal', async (
 
   expect(response.body.data.product).toBe('rice');
   expect(mockSignals).toEqual(expect.arrayContaining([
-    expect.arrayContaining(['commerce.bulk_order.changed', expect.any(Object), expect.objectContaining({ correlationId: 'commerce-1' })])
+    expect.arrayContaining(['commerce.bulk_order.changed', expect.any(Object), expect.objectContaining({ correlationId: 'commerce-1' })]),
   ]));
 });
 

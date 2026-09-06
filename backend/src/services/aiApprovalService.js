@@ -14,7 +14,7 @@ async function createProposal(data) {
       (proposed_by, domain, proposal_type, subject_type, subject_id, proposed_value, current_value, rationale, confidence, model_reference)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
     [userId, domain, proposalType, subjectType || null, subjectId || null, JSON.stringify(proposedValue),
-      currentValue === undefined ? null : JSON.stringify(currentValue), rationale, confidence ?? null, modelReference || null]
+      currentValue === undefined ? null : JSON.stringify(currentValue), rationale, confidence ?? null, modelReference || null],
   );
   return result.rows[0];
 }
@@ -28,8 +28,8 @@ async function listProposals({ user, status, domain }) {
     values.push(user.id);
     filters.push(`proposed_by = $${values.length}`);
   }
-  let result = await pool.query(
-    `SELECT * FROM ai_proposals ${filters.length ? `WHERE ${filters.join(' AND ')}` : ''} ORDER BY created_at DESC LIMIT 100`, values
+  const result = await pool.query(
+    `SELECT * FROM ai_proposals ${filters.length ? `WHERE ${filters.join(' AND ')}` : ''} ORDER BY created_at DESC LIMIT 100`, values,
   );
   return result.rows;
 }
@@ -37,7 +37,7 @@ async function listProposals({ user, status, domain }) {
 async function decideProposal({ proposalId, user, decision, rejectionReason }) {
   if (!['approved', 'rejected'].includes(decision)) throw new Error('Invalid proposal decision');
   if (decision === 'rejected' && !rejectionReason?.trim()) throw new Error('Rejection reason is required');
-  let result = await pool.query(
+  const result = await pool.query(
     `UPDATE ai_proposals SET status = $1,
       approved_by = CASE WHEN $1 = 'approved' THEN $2 ELSE approved_by END,
       approved_at = CASE WHEN $1 = 'approved' THEN NOW() ELSE approved_at END,
@@ -45,16 +45,16 @@ async function decideProposal({ proposalId, user, decision, rejectionReason }) {
       rejected_at = CASE WHEN $1 = 'rejected' THEN NOW() ELSE rejected_at END,
       rejection_reason = CASE WHEN $1 = 'rejected' THEN $3 ELSE rejection_reason END
      WHERE id = $4 AND status = 'proposed' RETURNING *`,
-    [decision, user.id, rejectionReason || null, proposalId]
+    [decision, user.id, rejectionReason || null, proposalId],
   );
   if (!result.rows.length) throw new Error('Proposal not found or already decided');
   return result.rows[0];
 }
 
 async function executeProposal({ proposalId, user }) {
-  let result = await pool.query(
+  const result = await pool.query(
     `UPDATE ai_proposals SET status = 'executed', executed_at = NOW()
-     WHERE id = $1 AND status = 'approved' AND approved_by IS NOT NULL RETURNING *`, [proposalId]
+     WHERE id = $1 AND status = 'approved' AND approved_by IS NOT NULL RETURNING *`, [proposalId],
   );
   if (!result.rows.length) throw new Error('Only approved proposals can be executed');
   if (HIGH_IMPACT_DOMAINS.has(result.rows[0].domain) && !ADMIN_ROLES.includes(user.role)) {

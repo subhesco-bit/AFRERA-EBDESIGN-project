@@ -54,8 +54,8 @@ const REACTIONS = [
     id: 'coldchain.breach_response',
     on: () => SIGNAL.TEMPERATURE_BREACH,
     escalate: true,
-    why: 'A temperature excursion starts a clock on both the produce and the '
-       + 'insurance claim. Late detection loses the consignment and the cover.',
+    why: 'A temperature excursion starts a clock on both the produce and the ' +
+       'insurance claim. Late detection loses the consignment and the cover.',
     handle(signal) {
       return {
         action: 'raise_incident',
@@ -64,9 +64,9 @@ const REACTIONS = [
         // A breach can arrive from a shipment sensor, a store sensor or a lot
         // reading. Looking only for shipmentId returned a null subject for
         // sensor-sourced breaches — an incident with nothing attached to it.
-        subject: signal.payload?.shipmentId ?? signal.payload?.batchId
-              ?? signal.payload?.lotId ?? signal.payload?.deviceId
-              ?? signal.payload?.sensorId ?? null,
+        subject: signal.payload?.shipmentId ?? signal.payload?.batchId ??
+              signal.payload?.lotId ?? signal.payload?.deviceId ??
+              signal.payload?.sensorId ?? null,
         followUp: ['file_insurance_claim', 'evaluate_reroute', 'notify_consignee'],
       };
     },
@@ -75,8 +75,8 @@ const REACTIONS = [
     id: 'quality.failure_response',
     on: () => SIGNAL.QUALITY_FAILED,
     escalate: true,
-    why: 'A failed quality test on a dispatched lot is a recall decision, not '
-       + 'a log entry. It must reach someone who can stop the shipment.',
+    why: 'A failed quality test on a dispatched lot is a recall decision, not ' +
+       'a log entry. It must reach someone who can stop the shipment.',
     handle(signal) {
       return {
         action: 'raise_incident',
@@ -91,9 +91,9 @@ const REACTIONS = [
     id: 'recall.notification',
     on: () => SIGNAL.RECALL_ISSUED,
     escalate: true,
-    why: 'A recall must reach every downstream holder of the batch. Anything '
-       + 'less is a partial recall, which is worse than none — it creates the '
-       + 'appearance of action while product stays on shelves.',
+    why: 'A recall must reach every downstream holder of the batch. Anything ' +
+       'less is a partial recall, which is worse than none — it creates the ' +
+       'appearance of action while product stays on shelves.',
     handle(signal) {
       return {
         action: 'notify_chain',
@@ -107,9 +107,9 @@ const REACTIONS = [
     id: 'shelflife.markdown_review',
     on: () => SIGNAL.SHELF_LIFE_CRITICAL,
     escalate: false,
-    why: 'Approaching expiry is the last point where value can still be '
-       + 'recovered — markdown, diversion to processing, or local sale. After '
-       + 'expiry the only options cost money.',
+    why: 'Approaching expiry is the last point where value can still be ' +
+       'recovered — markdown, diversion to processing, or local sale. After ' +
+       'expiry the only options cost money.',
     handle(signal) {
       return {
         action: 'propose_disposition',
@@ -125,17 +125,17 @@ const REACTIONS = [
     id: 'shipment.delay_response',
     on: () => SIGNAL.SHIPMENT_DELAYED,
     escalate: false,
-    why: 'A delay on a perishable lane is a different event from a delay on an '
-       + 'ambient one. The handling engine decides which.',
+    why: 'A delay on a perishable lane is a different event from a delay on an ' +
+       'ambient one. The handling engine decides which.',
     handle(signal) {
       const perishable = signal.payload?.perishable === true;
       return {
         action: perishable ? 'evaluate_reroute' : 'notify_consignee',
         urgency: perishable ? 'high' : 'normal',
         subject: signal.payload?.shipmentId ?? null,
-        followUp: perishable
-          ? ['check_alternate_lanes', 'assess_shelf_life_impact', 'notify_consignee']
-          : ['update_eta'],
+        followUp: perishable ?
+          ['check_alternate_lanes', 'assess_shelf_life_impact', 'notify_consignee'] :
+          ['update_eta'],
       };
     },
   },
@@ -143,9 +143,9 @@ const REACTIONS = [
     id: 'fraud.hold_review',
     on: () => SIGNAL.FRAUD_SUSPECTED,
     escalate: true,
-    why: 'Suspicion is not proof. This flags for review and never auto-blocks '
-       + 'an account — a false positive that freezes a farmer\'s payout at '
-       + 'harvest does more damage than the fraud it prevents.',
+    why: 'Suspicion is not proof. This flags for review and never auto-blocks ' +
+       'an account — a false positive that freezes a farmer\'s payout at ' +
+       'harvest does more damage than the fraud it prevents.',
     handle(signal) {
       return {
         action: 'flag_for_review',
@@ -160,9 +160,9 @@ const REACTIONS = [
     id: 'claim.intake',
     on: () => SIGNAL.CLAIM_SUBMITTED,
     escalate: false,
-    why: 'A claim submitted after a logged temperature breach should inherit '
-       + 'that evidence automatically rather than asking the farmer to prove '
-       + 'something the platform already recorded.',
+    why: 'A claim submitted after a logged temperature breach should inherit ' +
+       'that evidence automatically rather than asking the farmer to prove ' +
+       'something the platform already recorded.',
     handle(signal) {
       return {
         action: 'attach_evidence',
@@ -175,11 +175,11 @@ const REACTIONS = [
     id: 'emergency.escalation_watch',
     on: () => SIGNAL.EMERGENCY_RAISED,
     escalate: true,
-    why: 'An incident nobody acknowledges is an incident nobody is handling. '
-       + 'This is the backstop for the acknowledgement SLA.',
+    why: 'An incident nobody acknowledges is an incident nobody is handling. ' +
+       'This is the backstop for the acknowledgement SLA.',
     handle(signal) {
-      const critical = signal.payload?.severity === 'critical'
-        || signal.payload?.peopleAtRisk === true;
+      const critical = signal.payload?.severity === 'critical' ||
+        signal.payload?.peopleAtRisk === true;
       return {
         action: critical ? 'page_incident_commander' : 'notify_duty_officer',
         severity: critical ? 'critical' : 'high',
@@ -191,8 +191,8 @@ const REACTIONS = [
     id: 'risk.materialisation_watch',
     on: () => SIGNAL.RISK_CRITICAL,
     escalate: true,
-    why: 'A risk crossing critical residual score is the register telling you '
-       + 'a control has stopped working.',
+    why: 'A risk crossing critical residual score is the register telling you ' +
+       'a control has stopped working.',
     handle(signal) {
       return {
         action: 'review_controls',

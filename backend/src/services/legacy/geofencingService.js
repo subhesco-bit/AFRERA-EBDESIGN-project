@@ -69,7 +69,7 @@ class GeofencingService {
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
          RETURNING *`,
         [name, zoneType, centerLatitude, centerLongitude, radius,
-          description ?? null, referenceId ?? null, referenceType ?? null, createdBy ?? null]
+          description ?? null, referenceId ?? null, referenceType ?? null, createdBy ?? null],
       );
       return rows[0];
     } catch (error) {
@@ -90,7 +90,7 @@ class GeofencingService {
       const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
       const { rows } = await pool.query(
         `SELECT * FROM geofences ${where} ORDER BY created_at DESC`,
-        params
+        params,
       );
       return rows;
     } catch (error) {
@@ -141,20 +141,20 @@ class GeofencingService {
 
     // Find this identity's previous event on this geofence to detect a
     // genuine transition rather than restating the same state every call.
-    const identityCondition = source === 'manual_checkin'
-      ? { sql: 'user_id = $2', param: userId }
-      : { sql: 'driver_id = $2', param: driverId };
+    const identityCondition = source === 'manual_checkin' ?
+      { sql: 'user_id = $2', param: userId } :
+      { sql: 'driver_id = $2', param: driverId };
 
     const prev = await pool.query(
       `SELECT is_inside FROM geofence_events
         WHERE geofence_id = $1 AND source = '${source}' AND ${identityCondition.sql}
         ORDER BY recorded_at DESC LIMIT 1`,
-      [geofence.id, identityCondition.param]
+      [geofence.id, identityCondition.param],
     );
     const previouslyInside = prev.rows[0]?.is_inside ?? null;
-    const eventType = previouslyInside === null
-      ? (isInside ? 'entered' : null) // first-ever reading: only worth flagging if it lands inside
-      : (previouslyInside !== isInside ? (isInside ? 'entered' : 'exited') : null);
+    const eventType = previouslyInside === null ?
+      (isInside ? 'entered' : null) : // first-ever reading: only worth flagging if it lands inside
+      (previouslyInside !== isInside ? (isInside ? 'entered' : 'exited') : null);
 
     const { rows } = await pool.query(
       `INSERT INTO geofence_events
@@ -163,7 +163,7 @@ class GeofencingService {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
        RETURNING *`,
       [geofence.id, source, userId ?? null, driverId ?? null, shipmentId ?? null,
-        latitude, longitude, accuracyM ?? null, distanceMeters, isInside, eventType]
+        latitude, longitude, accuracyM ?? null, distanceMeters, isInside, eventType],
     );
     const event = rows[0];
 
@@ -186,7 +186,7 @@ class GeofencingService {
           severity: source === 'driver_ping' ? SEVERITY.NOTICE : SEVERITY.INFO,
           source: 'geofencingService',
           entityId: geofence.id,
-        }
+        },
       );
     }
 
@@ -196,10 +196,10 @@ class GeofencingService {
       distanceMeters,
       isInside,
       eventType,
-      accuracyNote: accuracyM != null && Number(accuracyM) > Number(geofence.radius_meters)
-        ? `Reported GPS accuracy (${accuracyM}m) is wider than this zone's radius `
-          + `(${geofence.radius_meters}m) — treat the inside/outside result as indicative, not certain.`
-        : null,
+      accuracyNote: accuracyM != null && Number(accuracyM) > Number(geofence.radius_meters) ?
+        `Reported GPS accuracy (${accuracyM}m) is wider than this zone's radius ` +
+          `(${geofence.radius_meters}m) — treat the inside/outside result as indicative, not certain.` :
+        null,
     };
   }
 
@@ -226,8 +226,8 @@ class GeofencingService {
   }
 
   async checkInHistory({ userId, geofenceId, limit = 50 } = {}) {
-    let conditions = ["source = 'manual_checkin'"];
-    let params = [];
+    const conditions = ['source = \'manual_checkin\''];
+    const params = [];
     if (userId) { params.push(userId); conditions.push(`user_id = $${params.length}`); }
     if (geofenceId) { params.push(geofenceId); conditions.push(`geofence_id = $${params.length}`); }
     params.push(Math.min(Number(limit) || 50, 200));
@@ -238,7 +238,7 @@ class GeofencingService {
         WHERE ${conditions.join(' AND ')}
         ORDER BY ge.recorded_at DESC
         LIMIT $${params.length}`,
-      params
+      params,
     );
     return rows;
   }
@@ -258,12 +258,12 @@ class GeofencingService {
     if (!geofenceId || !driverId) {
       throw new Error('geofenceId and driverId are required');
     }
-    let geofence = await this.getGeofence(geofenceId);
+    const geofence = await this.getGeofence(geofenceId);
     if (!geofence.is_active) {
       throw new Error('This geofence is not active');
     }
 
-    let params = [driverId];
+    const params = [driverId];
     let shipmentClause = '';
     if (shipmentId) {
       params.push(shipmentId);
@@ -275,7 +275,7 @@ class GeofencingService {
         WHERE driver_id = $1 ${shipmentClause}
         ORDER BY recorded_at DESC
         LIMIT 1`,
-      params
+      params,
     );
     const lastPing = rows[0];
     if (!lastPing) {
@@ -296,15 +296,13 @@ class GeofencingService {
       ...result,
       pingAgeMinutes: Math.round(minutesSincePing * 10) / 10,
       stale: minutesSincePing > 30,
-      note: minutesSincePing > 30
-        ? `Last driver ping was ${Math.round(minutesSincePing)} minutes ago — this is a `
-          + 'last-known position, not confirmation the truck is there right now.'
-        : null,
+      note: minutesSincePing > 30 ?
+        `Last driver ping was ${Math.round(minutesSincePing)} minutes ago — this is a ` +
+          'last-known position, not confirmation the truck is there right now.' :
+        null,
     };
   }
 }
 
 module.exports = new GeofencingService();
-
-
 

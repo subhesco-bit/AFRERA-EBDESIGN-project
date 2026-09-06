@@ -42,13 +42,13 @@ async function listSchemeRegistry(filters = {}) {
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const result = await pool.query(
     `SELECT * FROM government_schemes ${where} ORDER BY status, name`,
-    params
+    params,
   );
   return result.rows;
 }
 
 async function getSchemeByCode(code) {
-  let result = await pool.query('SELECT * FROM government_schemes WHERE code = $1', [code]);
+  const result = await pool.query('SELECT * FROM government_schemes WHERE code = $1', [code]);
   if (result.rows.length === 0) {
     throw new Error('Scheme not found');
   }
@@ -64,10 +64,10 @@ async function getSchemeByCode(code) {
  */
 async function updateSchemeRegistry(code, updates, verifiedBy) {
   const {
-    status, expiry_date, verification_source, notes, effective_from, applicable_states
+    status, expiry_date, verification_source, notes, effective_from, applicable_states,
   } = updates;
 
-  let result = await pool.query(
+  const result = await pool.query(
     `UPDATE government_schemes SET
        status = COALESCE($1, status),
        expiry_date = COALESCE($2, expiry_date),
@@ -80,7 +80,7 @@ async function updateSchemeRegistry(code, updates, verifiedBy) {
        updated_at = CURRENT_TIMESTAMP
      WHERE code = $8
      RETURNING *`,
-    [status, expiry_date, verification_source, notes, effective_from, applicable_states, verifiedBy || null, code]
+    [status, expiry_date, verification_source, notes, effective_from, applicable_states, verifiedBy || null, code],
   );
 
   if (result.rows.length === 0) {
@@ -96,12 +96,12 @@ async function updateSchemeRegistry(code, updates, verifiedBy) {
  * workflows per AdminDashboardPage.jsx / GovernmentDashboardPage.jsx).
  */
 async function getExpiringSchemeRegistry(days = 30) {
-  let result = await pool.query(
+  const result = await pool.query(
     `SELECT * FROM government_schemes
      WHERE expiry_date IS NOT NULL
        AND expiry_date <= CURRENT_DATE + ($1 || ' days')::INTERVAL
      ORDER BY expiry_date`,
-    [days]
+    [days],
   );
   return result.rows;
 }
@@ -123,7 +123,7 @@ async function schemeExpiryStatus() {
     `SELECT code AS id, name AS label, expiry_date
        FROM government_schemes
       WHERE expiry_date IS NOT NULL
-      ORDER BY expiry_date ASC`
+      ORDER BY expiry_date ASC`,
   );
 
   const now = Date.now();
@@ -136,7 +136,7 @@ async function schemeExpiryStatus() {
       expiry: s.expiry_date,
       days,
       state,
-      urgency: state === 'LAPSED' ? 'critical' : state === 'EXPIRING SOON' ? 'high' : 'low'
+      urgency: state === 'LAPSED' ? 'critical' : state === 'EXPIRING SOON' ? 'high' : 'low',
     };
   });
 }
@@ -165,11 +165,11 @@ async function checkSchemeEligibility(params = {}) {
       ministry: s.ministry,
       status: s.status,
       relevance: s.relevance,
-      notes: s.notes
+      notes: s.notes,
     })),
-    reminder: conditional.length > 0
-      ? `${conditional.length} scheme(s) are conditional — confirm current-year allocation with the primary source before committing.`
-      : 'Confirm with the primary source before applying.'
+    reminder: conditional.length > 0 ?
+      `${conditional.length} scheme(s) are conditional — confirm current-year allocation with the primary source before committing.` :
+      'Confirm with the primary source before applying.',
   };
 }
 
@@ -187,7 +187,7 @@ async function getApplicableSchemes(params) {
       category,
       crop_type,
       farm_size,
-      income_level
+      income_level,
     } = params;
 
     // AI-powered scheme matching
@@ -205,15 +205,15 @@ async function getApplicableSchemes(params) {
         income_level,
         all_schemes: await getAllGovernmentSchemes(),
         user_profile: await getUserProfile(user_id),
-        historical_applications: await getUserSchemeHistory(user_id)
-      }
+        historical_applications: await getUserSchemeHistory(user_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const schemes = {
-      user_id: user_id,
-      location: location,
+      user_id,
+      location,
       timestamp: new Date().toISOString(),
       eligible_schemes: aiResponse.eligible_schemes.map(scheme => ({
         scheme_name: scheme.name,
@@ -229,11 +229,11 @@ async function getApplicableSchemes(params) {
         application_process: scheme.process,
         contact_details: scheme.contact,
         ai_recommendation: scheme.recommendation,
-        confidence: scheme.confidence
+        confidence: scheme.confidence,
       })),
       recommended_schemes: aiResponse.recommended_schemes,
       total_schemes: aiResponse.eligible_schemes.length,
-      application_guidance: aiResponse.application_guidance
+      application_guidance: aiResponse.application_guidance,
     };
 
     return schemes;
@@ -249,13 +249,13 @@ async function getApplicableSchemes(params) {
 async function getWeatherAlerts(location) {
   try {
     const alerts = {
-      location: location,
+      location,
       timestamp: new Date().toISOString(),
       current_weather: await getCurrentWeather(location),
       alerts: await getActiveWeatherAlerts(location),
       forecast: await getWeatherForecast(location, 7),
       agricultural_impact: await assessAgriculturalImpact(location),
-      recommendations: await getWeatherRecommendations(location)
+      recommendations: await getWeatherRecommendations(location),
     };
 
     return alerts;
@@ -281,24 +281,24 @@ async function createGovernmentAnnouncement(announcementData) {
       valid_from,
       valid_until,
       attachments,
-      created_by
+      created_by,
     } = announcementData;
 
     const announcement = {
       announcement_id: generateId(),
-      title: title,
-      content: content,
-      announcement_type: announcement_type, // scheme_launch, policy_change, alert, general
-      target_audience: target_audience, // all, farmers, fpos, buyers, logistics
-      state: state,
-      district: district,
-      priority: priority, // low, medium, high, urgent
-      valid_from: valid_from,
-      valid_until: valid_until,
-      attachments: attachments,
-      created_by: created_by,
+      title,
+      content,
+      announcement_type, // scheme_launch, policy_change, alert, general
+      target_audience, // all, farmers, fpos, buyers, logistics
+      state,
+      district,
+      priority, // low, medium, high, urgent
+      valid_from,
+      valid_until,
+      attachments,
+      created_by,
       created_at: new Date().toISOString(),
-      status: 'published'
+      status: 'published',
     };
 
     // Broadcast announcement via WebSocket
@@ -324,15 +324,15 @@ async function getGovernmentAnnouncements(params) {
       state,
       district,
       announcement_type,
-      priority
+      priority,
     } = params;
 
     const announcements = {
-      user_id: user_id,
+      user_id,
       timestamp: new Date().toISOString(),
       announcements: await getFilteredAnnouncements(params),
       total_count: 0,
-      unread_count: 0
+      unread_count: 0,
     };
 
     announcements.total_count = announcements.announcements.length;
@@ -355,7 +355,7 @@ async function governmentOfficialLogin(credentials) {
       password,
       department,
       state,
-      designation
+      designation,
     } = credentials;
 
     // Validate credentials against government database
@@ -367,15 +367,15 @@ async function governmentOfficialLogin(credentials) {
 
     const official = {
       official_id: validation.official_id,
-      employee_id: employee_id,
+      employee_id,
       name: validation.name,
-      department: department,
-      state: state,
-      designation: designation,
+      department,
+      state,
+      designation,
       permissions: validation.permissions,
       access_level: validation.access_level,
       token: generateOfficialToken(validation),
-      last_login: new Date().toISOString()
+      last_login: new Date().toISOString(),
     };
 
     logger.info(`Government official login: ${official.employee_id}`);
@@ -396,11 +396,11 @@ async function getCSROpportunities(params) {
       sector,
       focus_area,
       budget_range,
-      company_type
+      company_type,
     } = params;
 
     // AI-powered CSR matching
-    let aiRequest = {
+    const aiRequest = {
       task: 'csr_opportunity_matching',
       parameters: {
         location,
@@ -410,11 +410,11 @@ async function getCSROpportunities(params) {
         company_type,
         available_projects: await getCSRProjects(params),
         impact_assessment: await assessCSRImpact(params),
-        compliance_requirements: await getCSRCompliance(params)
-      }
+        compliance_requirements: await getCSRCompliance(params),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const opportunities = {
       search_id: generateId(),
@@ -431,10 +431,10 @@ async function getCSROpportunities(params) {
         beneficiaries: opp.beneficiaries,
         timeline: opp.timeline,
         match_score: opp.match_score,
-        ai_recommendation: opp.recommendation
+        ai_recommendation: opp.recommendation,
       })),
       total_opportunities: aiResponse.opportunities.length,
-      recommendations: aiResponse.recommendations
+      recommendations: aiResponse.recommendations,
     };
 
     return opportunities;
@@ -460,39 +460,39 @@ async function submitCSRProposal(proposalData) {
       objectives,
       expected_outcomes,
       beneficiaries,
-      partnership_model
+      partnership_model,
     } = proposalData;
 
     const proposal = {
       proposal_id: generateId(),
-      company_id: company_id,
-      company_name: company_name,
-      project_name: project_name,
-      focus_area: focus_area,
-      location: location,
-      budget: budget,
-      timeline: timeline,
-      objectives: objectives,
-      expected_outcomes: expected_outcomes,
-      beneficiaries: beneficiaries,
-      partnership_model: partnership_model,
+      company_id,
+      company_name,
+      project_name,
+      focus_area,
+      location,
+      budget,
+      timeline,
+      objectives,
+      expected_outcomes,
+      beneficiaries,
+      partnership_model,
       status: 'submitted',
       submitted_at: new Date().toISOString(),
-      tracking_number: generateTrackingNumber()
+      tracking_number: generateTrackingNumber(),
     };
 
     // AI-powered proposal assessment
-    let aiRequest = {
+    const aiRequest = {
       task: 'csr_proposal_assessment',
       parameters: {
         proposal_data: proposalData,
         government_priorities: await getGovernmentPriorities(location),
         impact_potential: await assessImpactPotential(proposalData),
-        alignment_score: await calculateAlignmentScore(proposalData)
-      }
+        alignment_score: await calculateAlignmentScore(proposalData),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     proposal.ai_assessment = aiResponse;
 
     logger.info(`CSR proposal submitted: ${proposal.proposal_id}`);
@@ -509,16 +509,16 @@ async function submitCSRProposal(proposalData) {
 async function getLocalizedDefaultPage(location) {
   try {
     const pageContent = {
-      location: location,
+      location,
       timestamp: new Date().toISOString(),
       weather: await getCurrentWeather(location),
       weather_alerts: await getActiveWeatherAlerts(location),
-    local_schemes: await getFeaturedSchemes(location),
-    success_stories: await getLocalSuccessStories(location),
-    market_prices: await getLocalMarketPrices(location),
-    upcoming_events: await getUpcomingEvents(location),
-    government_announcements: await getPublicAnnouncements(location),
-    featured_products: await getFeaturedProducts(location)
+      local_schemes: await getFeaturedSchemes(location),
+      success_stories: await getLocalSuccessStories(location),
+      market_prices: await getLocalMarketPrices(location),
+      upcoming_events: await getUpcomingEvents(location),
+      government_announcements: await getPublicAnnouncements(location),
+      featured_products: await getFeaturedProducts(location),
     };
 
     return pageContent;
@@ -541,7 +541,7 @@ async function trackSchemeApplication(applicationId) {
       next_steps: await getNextSteps(applicationId),
       contact_officer: await getContactOfficer(applicationId),
       estimated_completion: await getEstimatedCompletion(applicationId),
-      documents_pending: await getPendingDocuments(applicationId)
+      documents_pending: await getPendingDocuments(applicationId),
     };
 
     return status;
@@ -562,7 +562,7 @@ function generateTrackingNumber() {
 
 function generateOfficialToken(validation) {
   // Generate JWT token for official
-  return 'official_token_' + Date.now();
+  return `official_token_${ Date.now()}`;
 }
 
 async function getAllGovernmentSchemes() {
@@ -576,7 +576,7 @@ async function getAllGovernmentSchemes() {
       description: 'Crop insurance scheme providing coverage against crop failure',
       subsidy_percentage: 50,
       max_amount: 50000,
-      deadline: '2026-12-31'
+      deadline: '2026-12-31',
     },
     {
       name: 'Mission for Integrated Development of Horticulture (MIDH)',
@@ -586,7 +586,7 @@ async function getAllGovernmentSchemes() {
       description: 'Integrated development of horticulture sector',
       subsidy_percentage: 40,
       max_amount: 5000000,
-      deadline: '2027-03-31'
+      deadline: '2027-03-31',
     },
     {
       name: 'PM-Kisan Samman Nidhi',
@@ -596,7 +596,7 @@ async function getAllGovernmentSchemes() {
       description: 'Income support of ₹6,000 per year to farmers',
       subsidy_percentage: 100,
       max_amount: 6000,
-      deadline: 'Ongoing'
+      deadline: 'Ongoing',
     },
     {
       name: 'Agriculture Infrastructure Fund (AIF)',
@@ -606,7 +606,7 @@ async function getAllGovernmentSchemes() {
       description: 'Financing facility for creation of agricultural infrastructure',
       subsidy_percentage: 33,
       max_amount: 20000000,
-      deadline: '2029-03-31'
+      deadline: '2029-03-31',
     },
     {
       name: 'North East Special Infrastructure Development Scheme (NESIDS)',
@@ -616,8 +616,8 @@ async function getAllGovernmentSchemes() {
       description: 'Infrastructure development in North East states',
       subsidy_percentage: 90,
       max_amount: 50000000,
-      deadline: '2027-03-31'
-    }
+      deadline: '2027-03-31',
+    },
   ];
 }
 
@@ -637,7 +637,7 @@ async function getCurrentWeather(location) {
     temperature: 28,
     humidity: 75,
     condition: 'partly_cloudy',
-    wind_speed: 12
+    wind_speed: 12,
   };
 }
 
@@ -678,7 +678,7 @@ async function validateGovernmentCredentials(credentials) {
     official_id: 'OFF-001',
     name: 'Rajesh Kumar',
     permissions: ['read', 'write', 'approve'],
-    access_level: 'state'
+    access_level: 'state',
   };
 }
 
@@ -776,7 +776,7 @@ async function getPendingDocuments(applicationId) {
 function setupRoutes(app) {
   app.get('/api/v1/government/schemes', async (req, res) => {
     try {
-      let schemes = await getApplicableSchemes(req.query);
+      const schemes = await getApplicableSchemes(req.query);
       res.json({ success: true, data: schemes });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -785,7 +785,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/weather/alerts', async (req, res) => {
     try {
-      let alerts = await getWeatherAlerts(req.query.location);
+      const alerts = await getWeatherAlerts(req.query.location);
       res.json({ success: true, data: alerts });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -794,7 +794,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/government/announcements', authMiddleware, async (req, res) => {
     try {
-      let announcement = await createGovernmentAnnouncement(req.body);
+      const announcement = await createGovernmentAnnouncement(req.body);
       res.json({ success: true, data: announcement });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -803,7 +803,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/announcements', async (req, res) => {
     try {
-      let announcements = await getGovernmentAnnouncements(req.query);
+      const announcements = await getGovernmentAnnouncements(req.query);
       res.json({ success: true, data: announcements });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -812,7 +812,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/government/official/login', async (req, res) => {
     try {
-      let official = await governmentOfficialLogin(req.body);
+      const official = await governmentOfficialLogin(req.body);
       res.json({ success: true, data: official });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -821,7 +821,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/csr/opportunities', async (req, res) => {
     try {
-      let opportunities = await getCSROpportunities(req.query);
+      const opportunities = await getCSROpportunities(req.query);
       res.json({ success: true, data: opportunities });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -830,7 +830,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/government/csr/proposals', authMiddleware, async (req, res) => {
     try {
-      let proposal = await submitCSRProposal(req.body);
+      const proposal = await submitCSRProposal(req.body);
       res.json({ success: true, data: proposal });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -848,7 +848,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/schemes/track/:id', async (req, res) => {
     try {
-      let status = await trackSchemeApplication(req.params.id);
+      const status = await trackSchemeApplication(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -863,7 +863,7 @@ function setupRoutes(app) {
   app.get('/api/v1/government/schemes/registry', async (req, res) => {
     try {
       const { status, category, state } = req.query;
-      let schemes = await listSchemeRegistry({ status, category, state });
+      const schemes = await listSchemeRegistry({ status, category, state });
       res.json({ success: true, data: schemes, total: schemes.length });
     } catch (error) {
       logger.error('List scheme registry error', { error: error.message, stack: error.stack });
@@ -873,8 +873,8 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/schemes/registry/expiring', async (req, res) => {
     try {
-      let days = Number(req.query.days) || 30;
-      let schemes = await getExpiringSchemeRegistry(days);
+      const days = Number(req.query.days) || 30;
+      const schemes = await getExpiringSchemeRegistry(days);
       res.json({ success: true, data: schemes, total: schemes.length });
     } catch (error) {
       logger.error('Get expiring schemes error', { error: error.message, stack: error.stack });
@@ -884,7 +884,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/government/schemes/checker', async (req, res) => {
     try {
-      let result = await checkSchemeEligibility(req.query);
+      const result = await checkSchemeEligibility(req.query);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Scheme eligibility checker error', { error: error.message, stack: error.stack });
@@ -907,7 +907,7 @@ function setupRoutes(app) {
   // used for /government/announcements above.
   app.put('/api/v1/government/schemes/registry/:code', authMiddleware, async (req, res) => {
     try {
-      let scheme = await updateSchemeRegistry(req.params.code, req.body, req.user && req.user.id);
+      const scheme = await updateSchemeRegistry(req.params.code, req.body, req.user && req.user.id);
       logger.info(`Scheme registry updated: ${req.params.code} -> ${scheme.status}`);
       res.json({ success: true, data: scheme });
     } catch (error) {
@@ -943,8 +943,6 @@ module.exports = {
   updateSchemeRegistry,
   getExpiringSchemeRegistry,
   checkSchemeEligibility,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

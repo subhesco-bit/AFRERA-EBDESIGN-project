@@ -15,36 +15,36 @@ const { adminMiddleware } = require('../../middleware/admin.js');
 router.post('/setup', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.user;
-    
+
     // Generate TOTP secret
     const { secret, otpauth_url } = mfaService.generateSecret(userId);
-    
+
     // Generate QR code
     const qrCode = await mfaService.generateQRCode(otpauth_url);
-    
+
     // Generate backup codes
     const backupCodes = mfaService.generateBackupCodes(userId);
-    
+
     // Get user phone number for SMS backup
     const phoneNumber = req.user.phoneNumber; // Would come from user record
-    
+
     // Enable MFA
     await mfaService.enableMFA(userId, secret, phoneNumber, backupCodes);
-    
+
     res.json({
       success: true,
       data: {
         qrCode,
         otpauth_url,
         backupCodes: backupCodes.slice(0, 3), // Show first 3 codes for emergency use
-        message: 'MFA setup complete. Save your backup codes securely.'
-      }
+        message: 'MFA setup complete. Save your backup codes securely.',
+      },
     });
   } catch (error) {
     console.error('MFA setup error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to setup MFA'
+      error: 'Failed to setup MFA',
     });
   }
 });
@@ -56,36 +56,36 @@ router.post('/setup', authMiddleware, async (req, res) => {
 router.post('/verify', async (req, res) => {
   try {
     const { token, userId } = req.body;
-    
+
     // Get user's MFA secret from database
     const userSecret = await getUserMFASecret(userId); // Placeholder - would be database call
-    
+
     if (!userSecret) {
       return res.status(400).json({
         success: false,
-        error: 'MFA not enabled for this user'
+        error: 'MFA not enabled for this user',
       });
     }
-    
+
     // Verify TOTP token
     const verified = mfaService.verifyToken(userSecret, token);
-    
+
     if (verified) {
       res.json({
         success: true,
-        message: 'MFA verification successful'
+        message: 'MFA verification successful',
       });
     } else {
       res.status(401).json({
         success: false,
-        error: 'Invalid MFA code'
+        error: 'Invalid MFA code',
       });
     }
   } catch (error) {
     console.error('MFA verification error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to verify MFA'
+      error: 'Failed to verify MFA',
     });
   }
 });
@@ -97,19 +97,19 @@ router.post('/verify', async (req, res) => {
 router.post('/disable', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.user;
-    
+
     // Disable MFA
     await mfaService.disableMFA(userId);
-    
+
     res.json({
       success: true,
-      message: 'MFA disabled successfully'
+      message: 'MFA disabled successfully',
     });
   } catch (error) {
     console.error('MFA disable error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to disable MFA'
+      error: 'Failed to disable MFA',
     });
   }
 });
@@ -121,28 +121,28 @@ router.post('/disable', authMiddleware, async (req, res) => {
 router.post('/backup/sms', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.user;
-    
+
     // Get user phone number
-    let phoneNumber = req.user.phoneNumber;
-    
+    const phoneNumber = req.user.phoneNumber;
+
     // Generate new backup code
     const backupCode = mfaService.generateBackupCode();
-    
+
     // Send SMS
     await mfaService.sendSMSBackupCode(phoneNumber, backupCode);
-    
+
     // Update backup codes in database
     await updateBackupCodes(userId, backupCode); // Placeholder - would be database call
-    
+
     res.json({
       success: true,
-      message: 'Backup code sent via SMS'
+      message: 'Backup code sent via SMS',
     });
   } catch (error) {
     console.error('SMS backup code error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to send SMS backup code'
+      error: 'Failed to send SMS backup code',
     });
   }
 });
@@ -154,21 +154,21 @@ router.post('/backup/sms', authMiddleware, async (req, res) => {
 router.get('/status', authMiddleware, async (req, res) => {
   try {
     const { userId } = req.user;
-    
+
     const isEnabled = await mfaService.isMFAEnabled(userId);
-    
+
     res.json({
       success: true,
       data: {
         enabled: isEnabled,
-        userId
-      }
+        userId,
+      },
     });
   } catch (error) {
     console.error('MFA status check error:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to check MFA status'
+      error: 'Failed to check MFA status',
     });
   }
 });

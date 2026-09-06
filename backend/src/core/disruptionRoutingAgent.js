@@ -35,20 +35,20 @@ class DisruptionRoutingAgent {
     // Subscribe to disruption reported signals
     const reportedSubscriber = signalBus.onSignal(
       SIGNAL.CIVIL_DISRUPTION_REPORTED,
-      this.handleDisruptionReported.bind(this)
+      this.handleDisruptionReported.bind(this),
     );
     this.subscribers.push(reportedSubscriber);
 
     // Subscribe to disruption resolved signals
     const resolvedSubscriber = signalBus.onSignal(
       SIGNAL.CIVIL_DISRUPTION_RESOLVED,
-      this.handleDisruptionResolved.bind(this)
+      this.handleDisruptionResolved.bind(this),
     );
     this.subscribers.push(resolvedSubscriber);
 
     this.initialized = true;
     logger.info('DisruptionRoutingAgent initialized', {
-      subscribedSignals: [SIGNAL.CIVIL_DISRUPTION_REPORTED, SIGNAL.CIVIL_DISRUPTION_RESOLVED]
+      subscribedSignals: [SIGNAL.CIVIL_DISRUPTION_REPORTED, SIGNAL.CIVIL_DISRUPTION_RESOLVED],
     });
   }
 
@@ -64,7 +64,7 @@ class DisruptionRoutingAgent {
         disruptionType,
         affectedState,
         affectedDistrict,
-        affectedShipmentCount
+        affectedShipmentCount,
       });
 
       // Execute routing actions in parallel
@@ -73,7 +73,7 @@ class DisruptionRoutingAgent {
         this.triggerShipmentRerouting(affectedShipmentIds, disruptionId),
         this.activateEmergencyProcurement(disruptionId, affectedState),
         this.logDisruptionImpact(disruptionId, affectedShipmentCount),
-        this.accelerateInsuranceClaims(affectedShipmentIds, disruptionId)
+        this.accelerateInsuranceClaims(affectedShipmentIds, disruptionId),
       ]);
 
       logger.info('Disruption routing response completed', { disruptionId });
@@ -97,7 +97,7 @@ class DisruptionRoutingAgent {
         this.notifyStakeholdersResolution(disruptionId, affectedState),
         this.restoreNormalRouting(disruptionId),
         this.deactivateEmergencyProcurement(disruptionId),
-        this.logResolutionImpact(disruptionId)
+        this.logResolutionImpact(disruptionId),
       ]);
 
       logger.info('Disruption resolution routing completed', { disruptionId });
@@ -124,7 +124,7 @@ class DisruptionRoutingAgent {
         disruptionId,
         affectedState,
         affectedDistrict,
-        stakeholderCount: stakeholders.length
+        stakeholderCount: stakeholders.length,
       });
 
       // Log notification activity
@@ -132,7 +132,7 @@ class DisruptionRoutingAgent {
         `INSERT INTO disruption_notifications 
          (disruption_id, notification_type, recipient_count, status, created_at)
          VALUES ($1, 'stakeholder_alert', $2, 'initiated', NOW())`,
-        [disruptionId, stakeholders.length]
+        [disruptionId, stakeholders.length],
       );
 
       return { notified: stakeholders.length };
@@ -159,13 +159,13 @@ class DisruptionRoutingAgent {
              rerouting_disruption_id = $1,
              updated_at = NOW()
          WHERE id = ANY($2) AND status NOT IN ('delivered', 'cancelled')`,
-        [disruptionId, affectedShipmentIds]
+        [disruptionId, affectedShipmentIds],
       );
 
       logger.info('Shipment rerouting triggered', {
         disruptionId,
         affectedShipments: affectedShipmentIds.length,
-        markedForRerouting: result.rowCount
+        markedForRerouting: result.rowCount,
       });
 
       return { rerouted: result.rowCount };
@@ -181,14 +181,14 @@ class DisruptionRoutingAgent {
   async activateEmergencyProcurement(disruptionId, affectedState) {
     try {
       // Activate alternative sourcing routes for affected region
-      let result = await pool.query(
+      const result = await pool.query(
         `INSERT INTO emergency_procurement_activations 
          (disruption_id, affected_state, activation_status, created_at)
          VALUES ($1, $2, 'active', NOW())
          ON CONFLICT (disruption_id) DO UPDATE SET
            activation_status = 'active',
            updated_at = NOW()`,
-        [disruptionId, affectedState]
+        [disruptionId, affectedState],
       );
 
       logger.info('Emergency procurement activated', { disruptionId, affectedState });
@@ -208,7 +208,7 @@ class DisruptionRoutingAgent {
         `INSERT INTO disruption_impact_log 
          (disruption_id, affected_shipment_count, impact_assessment, logged_at)
          VALUES ($1, $2, 'initial_assessment', NOW())`,
-        [disruptionId, affectedShipmentCount]
+        [disruptionId, affectedShipmentCount],
       );
 
       logger.info('Disruption impact logged', { disruptionId, affectedShipmentCount });
@@ -229,20 +229,20 @@ class DisruptionRoutingAgent {
       }
 
       // Mark related insurance claims for expedited processing
-      let result = await pool.query(
+      const result = await pool.query(
         `UPDATE insurance_claims 
          SET priority_level = 'expedited',
              expedited_reason = 'civil_disruption',
              expedited_disruption_id = $1,
              updated_at = NOW()
          WHERE shipment_id = ANY($2) AND status IN ('submitted', 'under_review')`,
-        [disruptionId, affectedShipmentIds]
+        [disruptionId, affectedShipmentIds],
       );
 
       logger.info('Insurance claims accelerated', {
         disruptionId,
         affectedShipments: affectedShipmentIds.length,
-        expeditedClaims: result.rowCount
+        expeditedClaims: result.rowCount,
       });
 
       return { accelerated: result.rowCount };
@@ -262,7 +262,7 @@ class DisruptionRoutingAgent {
         `INSERT INTO disruption_notifications 
          (disruption_id, notification_type, status, created_at)
          VALUES ($1, 'resolution_alert', 'sent', NOW())`,
-        [disruptionId]
+        [disruptionId],
       );
 
       logger.info('Resolution notifications sent', { disruptionId, affectedState });
@@ -278,14 +278,14 @@ class DisruptionRoutingAgent {
    */
   async restoreNormalRouting(disruptionId) {
     try {
-      let result = await pool.query(
+      const result = await pool.query(
         `UPDATE shipments 
          SET rerouting_required = false,
              rerouting_reason = NULL,
              rerouting_disruption_id = NULL,
              updated_at = NOW()
          WHERE rerouting_disruption_id = $1`,
-        [disruptionId]
+        [disruptionId],
       );
 
       logger.info('Normal routing restored', { disruptionId, restoredShipments: result.rowCount });
@@ -306,7 +306,7 @@ class DisruptionRoutingAgent {
          SET activation_status = 'inactive',
              updated_at = NOW()
          WHERE disruption_id = $1`,
-        [disruptionId]
+        [disruptionId],
       );
 
       logger.info('Emergency procurement deactivated', { disruptionId });
@@ -326,7 +326,7 @@ class DisruptionRoutingAgent {
         `INSERT INTO disruption_impact_log 
          (disruption_id, impact_assessment, logged_at)
          VALUES ($1, 'resolution_completed', NOW())`,
-        [disruptionId]
+        [disruptionId],
       );
 
       logger.info('Resolution impact logged', { disruptionId });
@@ -346,7 +346,7 @@ class DisruptionRoutingAgent {
         return [];
       }
 
-      let result = await pool.query(
+      const result = await pool.query(
         `SELECT DISTINCT 
            s.farmer_id,
            s.logistics_partner_id,
@@ -354,7 +354,7 @@ class DisruptionRoutingAgent {
          FROM shipments s
          LEFT JOIN orders o ON s.order_id = o.id
          WHERE s.id = ANY($1)`,
-        [shipmentIds]
+        [shipmentIds],
       );
 
       return result.rows;

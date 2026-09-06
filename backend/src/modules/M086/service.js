@@ -17,7 +17,7 @@ async function createMonitoringSource(sourceData) {
       source_type,
       connection_config,
       refresh_interval,
-      data_format
+      data_format,
     } = sourceData;
 
     const source = {
@@ -28,18 +28,18 @@ async function createMonitoringSource(sourceData) {
       refresh_interval,
       data_format,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered source configuration
     const aiRequest = {
       task: 'monitoring_source_optimization',
       parameters: {
-        source_type: source_type,
-        connection_config: connection_config,
+        source_type,
+        connection_config,
         best_practices: await getMonitoringBestPractices(source_type),
-        similar_sources: await getSimilarSources(source_type)
-      }
+        similar_sources: await getSimilarSources(source_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -59,8 +59,8 @@ async function createMonitoringSource(sourceData) {
         source.refresh_interval,
         source.data_format,
         source.status,
-        source.created_at
-      ]
+        source.created_at,
+      ],
     );
 
     logger.info(`Monitoring source created: ${source.source_id}`);
@@ -83,10 +83,10 @@ async function addMonitoringMetric(metricData) {
       data_path,
       aggregation_method,
       unit,
-      thresholds
+      thresholds,
     } = metricData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO monitoring_metrics 
        (metric_id, source_id, metric_name, metric_type, data_path, 
         aggregation_method, unit, thresholds, status, created_at)
@@ -102,8 +102,8 @@ async function addMonitoringMetric(metricData) {
         unit,
         JSON.stringify(thresholds || {}),
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Monitoring metric added: ${result.rows[0].metric_id}`);
@@ -120,17 +120,17 @@ async function addMonitoringMetric(metricData) {
 async function ingestRealTimeData(metricId, value, timestamp, metadata = {}) {
   try {
     // AI-powered data quality assessment
-    let aiRequest = {
+    const aiRequest = {
       task: 'data_quality_assessment',
       parameters: {
         metric_id: metricId,
         current_value: value,
         historical_values: await getHistoricalData(metricId),
-        expected_range: await getExpectedRange(metricId)
-      }
+        expected_range: await getExpectedRange(metricId),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const data = {
       data_id: generateId(),
@@ -139,10 +139,10 @@ async function ingestRealTimeData(metricId, value, timestamp, metadata = {}) {
       timestamp,
       quality_score: aiResponse.quality_score,
       metadata: JSON.stringify(metadata),
-      ingested_at: new Date().toISOString()
+      ingested_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO real_time_data 
        (data_id, metric_id, value, timestamp, quality_score, metadata, ingested_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -154,8 +154,8 @@ async function ingestRealTimeData(metricId, value, timestamp, metadata = {}) {
         data.timestamp,
         data.quality_score,
         data.metadata,
-        data.ingested_at
-      ]
+        data.ingested_at,
+      ],
     );
 
     // Check for alerts
@@ -193,7 +193,7 @@ async function getRealTimeData(metricId, filters = {}) {
 
     query += ' ORDER BY timestamp DESC LIMIT 1000';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting real-time data', { error: error.message });
@@ -212,10 +212,10 @@ async function createMonitoringDashboard(dashboardData) {
       layout_config,
       refresh_interval,
       is_public,
-      created_by
+      created_by,
     } = dashboardData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO monitoring_dashboards 
        (dashboard_id, dashboard_name, dashboard_type, layout_config, 
         refresh_interval, is_public, created_by, status, created_at)
@@ -230,8 +230,8 @@ async function createMonitoringDashboard(dashboardData) {
         is_public || false,
         created_by,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Monitoring dashboard created: ${result.rows[0].dashboard_id}`);
@@ -255,10 +255,10 @@ async function addDashboardWidget(widgetData) {
       position_x,
       position_y,
       width,
-      height
+      height,
     } = widgetData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO dashboard_widgets 
        (widget_id, dashboard_id, metric_id, widget_type, widget_config, 
         position_x, position_y, width, height, status, created_at)
@@ -275,8 +275,8 @@ async function addDashboardWidget(widgetData) {
         width,
         height,
         'active',
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Dashboard widget added: ${result.rows[0].widget_id}`);
@@ -301,10 +301,10 @@ async function createMonitoringAlert(alertData) {
       severity,
       notification_channels,
       recipients,
-      cooldown_period
+      cooldown_period,
     } = alertData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO monitoring_alerts 
        (alert_id, metric_id, alert_name, alert_type, condition_type, 
         threshold_value, severity, notification_channels, recipients, 
@@ -323,8 +323,8 @@ async function createMonitoringAlert(alertData) {
         recipients,
         cooldown_period,
         true,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Monitoring alert created: ${result.rows[0].alert_id}`);
@@ -340,9 +340,9 @@ async function createMonitoringAlert(alertData) {
  */
 async function getMonitoringAlerts(metricId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM monitoring_alerts WHERE metric_id = $1 AND is_active = $2',
-      [metricId, true]
+      [metricId, true],
     );
     return result.rows;
   } catch (error) {
@@ -363,10 +363,10 @@ async function logMonitoringEvent(eventData) {
       event_data,
       severity,
       source,
-      timestamp
+      timestamp,
     } = eventData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO monitoring_events 
        (event_id, event_type, entity_id, entity_type, event_data, 
         severity, source, timestamp, processed_at)
@@ -381,8 +381,8 @@ async function logMonitoringEvent(eventData) {
         severity,
         source,
         timestamp,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Monitoring event logged: ${result.rows[0].event_id}`);
@@ -400,7 +400,7 @@ async function getAlertHistory(alertId, filters = {}) {
   try {
     const { start_time, end_time } = filters;
     let query = 'SELECT * FROM alert_history WHERE alert_id = $1';
-    let params = [alertId];
+    const params = [alertId];
     let paramCount = 1;
 
     if (start_time) {
@@ -417,7 +417,7 @@ async function getAlertHistory(alertId, filters = {}) {
 
     query += ' ORDER BY triggered_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting alert history', { error: error.message });
@@ -434,15 +434,15 @@ async function getMonitoringBestPractices(sourceType) {
   return {
     recommended_refresh_intervals: ['1s', '5s', '30s', '1m'],
     data_formats: ['json', 'csv', 'xml'],
-    connection_methods: ['websocket', 'polling', 'webhook']
+    connection_methods: ['websocket', 'polling', 'webhook'],
   };
 }
 
 async function getSimilarSources(sourceType) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM monitoring_sources WHERE source_type = $1 LIMIT 5',
-      [sourceType]
+      [sourceType],
     );
     return result.rows;
   } catch (error) {
@@ -452,9 +452,9 @@ async function getSimilarSources(sourceType) {
 
 async function getHistoricalData(metricId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT value, timestamp FROM real_time_data WHERE metric_id = $1 ORDER BY timestamp DESC LIMIT 100',
-      [metricId]
+      [metricId],
     );
     return result.rows;
   } catch (error) {
@@ -464,9 +464,9 @@ async function getHistoricalData(metricId) {
 
 async function getExpectedRange(metricId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT thresholds FROM monitoring_metrics WHERE metric_id = $1',
-      [metricId]
+      [metricId],
     );
     return result.rows[0]?.thresholds || {};
   } catch (error) {
@@ -509,7 +509,7 @@ async function triggerMonitoringAlert(alert, value) {
       threshold_value: alert.threshold_value,
       message: `Alert triggered: ${alert.alert_name}`,
       status: 'triggered',
-      triggered_at: new Date().toISOString()
+      triggered_at: new Date().toISOString(),
     };
 
     await pool.query(
@@ -525,14 +525,14 @@ async function triggerMonitoringAlert(alert, value) {
         history.threshold_value,
         history.message,
         history.status,
-        history.triggered_at
-      ]
+        history.triggered_at,
+      ],
     );
 
     // Update alert trigger count
     await pool.query(
       'UPDATE monitoring_alerts SET last_triggered = $1, trigger_count = trigger_count + 1 WHERE alert_id = $2',
-      [new Date().toISOString(), alert.alert_id]
+      [new Date().toISOString(), alert.alert_id],
     );
 
     logger.info(`Monitoring alert triggered: ${alert.alert_id}`);
@@ -551,5 +551,5 @@ module.exports = {
   createMonitoringAlert,
   getMonitoringAlerts,
   logMonitoringEvent,
-  getAlertHistory
+  getAlertHistory,
 };

@@ -21,7 +21,7 @@ class PlatformCoreService {
         WHERE active = true
         ORDER BY category, key
       `;
-      
+
       const result = await this.pool.query(query);
       return result.rows;
     } catch (error) {
@@ -35,14 +35,14 @@ class PlatformCoreService {
    */
   async updatePlatformConfig(key, value, updatedBy) {
     try {
-      let query = `
+      const query = `
         UPDATE platform_config
         SET value = $1, updated_by = $2, updated_at = CURRENT_TIMESTAMP
         WHERE key = $3
         RETURNING *
       `;
-      
-      let result = await this.pool.query(query, [value, updatedBy, key]);
+
+      const result = await this.pool.query(query, [value, updatedBy, key]);
       return result.rows[0];
     } catch (error) {
       console.error('Error updating platform config:', error);
@@ -58,9 +58,9 @@ class PlatformCoreService {
       const health = {
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        services: {}
+        services: {},
       };
-      
+
       // Check database connection
       try {
         await this.pool.query('SELECT 1');
@@ -69,11 +69,11 @@ class PlatformCoreService {
         health.services.database = { status: 'unhealthy', message: 'Database connection failed' };
         health.status = 'degraded';
       }
-      
+
       // Check other services
       health.services.api = { status: 'healthy', message: 'API running' };
       health.services.authentication = { status: 'healthy', message: 'Auth service running' };
-      
+
       return health;
     } catch (error) {
       console.error('Error getting platform health:', error);
@@ -100,10 +100,10 @@ class PlatformCoreService {
         organizations: 0,
         active_sessions: null,
         api_calls_today: null,
-        untracked_fields_note: 'active_sessions and api_calls_today are not '
-          + 'currently tracked anywhere in this codebase (no session-store or '
-          + 'request-counter table exists) - reported as null rather than a '
-          + 'fabricated 0.',
+        untracked_fields_note: 'active_sessions and api_calls_today are not ' +
+          'currently tracked anywhere in this codebase (no session-store or ' +
+          'request-counter table exists) - reported as null rather than a ' +
+          'fabricated 0.',
       };
 
       // Get user count

@@ -78,7 +78,7 @@ const sessionManagement = {
        LEFT JOIN users u ON u.id = s.user_id
        ORDER BY s.created_at DESC
        LIMIT $1 OFFSET $2`,
-      [limitNum, offset]
+      [limitNum, offset],
     );
     let items = res.rows.map((r) => ({ ...r, last_active: null }));
     if (status) items = items.filter((r) => r.status === status);
@@ -87,12 +87,12 @@ const sessionManagement = {
   },
 
   async get(id) {
-    let res = await pool.query(
+    const res = await pool.query(
       `SELECT s.id, u.email AS user_identifier, s.user_agent AS device, s.ip_address,
               s.created_at AS login_time, s.expires_at, s.is_active, s.invalidated_at
        FROM sessions s LEFT JOIN users u ON u.id = s.user_id
        WHERE s.id = $1`,
-      [id]
+      [id],
     );
     return res.rows[0] ? { ...res.rows[0], last_active: null } : null;
   },
@@ -100,9 +100,9 @@ const sessionManagement = {
   /** Only a status change of 'Terminated' has real meaning here - it invalidates the session. */
   async update(id, payload = {}) {
     if (payload.status === 'Terminated') {
-      let res = await pool.query(
+      const res = await pool.query(
         'UPDATE sessions SET is_active = false, invalidated_at = NOW() WHERE id = $1 RETURNING id',
-        [id]
+        [id],
       );
       if (!res.rows[0]) return null;
     }
@@ -110,8 +110,8 @@ const sessionManagement = {
   },
 
   async remove(id) {
-    let res = await pool.query('DELETE FROM sessions WHERE id = $1 RETURNING id', [id]);
-    return !!res.rows[0];
+    const res = await pool.query('DELETE FROM sessions WHERE id = $1 RETURNING id', [id]);
+    return Boolean(res.rows[0]);
   },
 };
 
@@ -122,10 +122,8 @@ module.exports = {
 
 // Merged from backend/src/modules/M016
 {
-  const m016 = require("../../modules/M016/service");
+  const m016 = require('../../modules/M016/service');
   const { ...rest } = m016;
   Object.assign(module.exports, rest);
 }
-
-
 

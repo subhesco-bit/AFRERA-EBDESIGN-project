@@ -20,7 +20,7 @@ const transactionController = {
   async getTransaction(req, res) {
     try {
       const { transactionId } = req.params;
-      let transaction = await transactionService.getTransaction(transactionId);
+      const transaction = await transactionService.getTransaction(transactionId);
       res.json({ success: true, data: transaction });
     } catch (error) {
       logger.error('Get transaction failed', error);
@@ -48,7 +48,7 @@ const transactionController = {
       logger.error('Update transaction status failed', error);
       res.status(500).json({ success: false, error: error.message });
     }
-  }
+  },
 };
 
 module.exports = transactionController;

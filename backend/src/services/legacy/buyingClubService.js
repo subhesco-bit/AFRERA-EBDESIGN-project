@@ -1,6 +1,6 @@
 /**
  * Buying Club Service
- * 
+ *
  * Wires the existing `buying_clubs` table (migration 042) to application logic
  * Implements REOS Missing Layer 1.10-1.11: Group Buying / Community Buying
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getBuyingClub(clubId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM buying_clubs WHERE club_id = $1`,
-      [clubId]
+      'SELECT * FROM buying_clubs WHERE club_id = $1',
+      [clubId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Buying club not found: ${clubId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get buying club: ${error.message}`);
@@ -43,10 +43,10 @@ async function getBuyingClub(clubId) {
 async function getBuyingClubsByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM buying_clubs WHERE village_id = $1 ORDER BY club_name`,
-      [villageId]
+      'SELECT * FROM buying_clubs WHERE village_id = $1 ORDER BY club_name',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get buying clubs by village: ${error.message}`);
@@ -67,9 +67,9 @@ async function getBuyingClubsByDistrict(district) {
        LEFT JOIN village_profiles vp ON bc.village_id = vp.village_id
        WHERE vp.district = $1
        ORDER BY bc.club_name`,
-      [district]
+      [district],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get buying clubs by district: ${error.message}`);
@@ -96,7 +96,7 @@ async function createBuyingClub(club) {
       description,
       contact_phone,
       preferred_products,
-      procurement_frequency
+      procurement_frequency,
     } = club;
 
     const { rows } = await pool.query(
@@ -107,8 +107,8 @@ async function createBuyingClub(club) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'active', NOW())
        RETURNING *`,
       [club_id, club_name, village_id, district, club_type, leader_id,
-       member_count, founding_date, description, contact_phone,
-       preferred_products, procurement_frequency]
+        member_count, founding_date, description, contact_phone,
+        preferred_products, procurement_frequency],
     );
 
     logger.info(`Buying club created: ${club_id}`);
@@ -130,9 +130,9 @@ async function updateBuyingClub(clubId, updates) {
     const allowedFields = [
       'club_name', 'club_type', 'leader_id', 'member_count',
       'description', 'contact_phone', 'preferred_products',
-      'procurement_frequency', 'status'
+      'procurement_frequency', 'status',
     ];
-    
+
     const setClauses = [];
     const values = [];
     let paramIndex = 1;
@@ -159,7 +159,7 @@ async function updateBuyingClub(clubId, updates) {
     `;
 
     const { rows } = await pool.query(query, values);
-    
+
     if (!rows.length) {
       throw new Error(`Buying club not found: ${clubId}`);
     }
@@ -187,9 +187,9 @@ async function addMemberToClub(clubId, memberId, role = 'member') {
            updated_at = NOW()
        WHERE club_id = $1
        RETURNING *`,
-      [clubId]
+      [clubId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Buying club not found: ${clubId}`);
     }
@@ -217,7 +217,7 @@ async function createGroupBuyingOrder(order) {
       price_per_unit,
       delivery_address,
       delivery_date,
-      notes
+      notes,
     } = order;
 
     const total_amount = total_quantity * price_per_unit;
@@ -229,7 +229,7 @@ async function createGroupBuyingOrder(order) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', NOW(), $9)
        RETURNING *`,
       [order_id, club_id, product_id, total_quantity, price_per_unit,
-       total_amount, delivery_address, delivery_date, notes]
+        total_amount, delivery_address, delivery_date, notes],
     );
 
     logger.info(`Group buying order created: ${order_id}`);
@@ -251,9 +251,9 @@ async function getGroupBuyingOrdersByClub(clubId) {
       `SELECT * FROM group_buying_orders 
        WHERE club_id = $1 
        ORDER BY created_at DESC`,
-      [clubId]
+      [clubId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get group buying orders by club: ${error.message}`);
@@ -269,7 +269,7 @@ async function getGroupBuyingOrdersByClub(clubId) {
 async function getBuyingClubStatistics(filters = {}) {
   try {
     const { district, village_id, status } = filters;
-    
+
     let query = `
       SELECT 
         COUNT(*) as total_clubs,
@@ -280,7 +280,7 @@ async function getBuyingClubStatistics(filters = {}) {
       FROM buying_clubs
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramIndex = 1;
 
@@ -310,7 +310,7 @@ async function getBuyingClubStatistics(filters = {}) {
       activeClubs: parseInt(stats.active_clubs),
       inactiveClubs: parseInt(stats.inactive_clubs),
       totalMembers: stats.total_members ? parseInt(stats.total_members) : 0,
-      avgMembersPerClub: stats.avg_members_per_club ? r2(stats.avg_members_per_club) : 0
+      avgMembersPerClub: stats.avg_members_per_club ? r2(stats.avg_members_per_club) : 0,
     };
   } catch (error) {
     logger.error(`Failed to get buying club statistics: ${error.message}`);
@@ -345,7 +345,7 @@ function setupRoutes(app) {
 
   router.get('/clubs/district/:district', async (req, res) => {
     try {
-      let clubs = await getBuyingClubsByDistrict(req.params.district);
+      const clubs = await getBuyingClubsByDistrict(req.params.district);
       res.json({ success: true, data: clubs });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -354,7 +354,7 @@ function setupRoutes(app) {
 
   router.post('/clubs', async (req, res) => {
     try {
-      let club = await createBuyingClub(req.body);
+      const club = await createBuyingClub(req.body);
       res.status(201).json({ success: true, data: club });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -363,7 +363,7 @@ function setupRoutes(app) {
 
   router.put('/clubs/:clubId', async (req, res) => {
     try {
-      let club = await updateBuyingClub(req.params.clubId, req.body);
+      const club = await updateBuyingClub(req.params.clubId, req.body);
       res.json({ success: true, data: club });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -373,7 +373,7 @@ function setupRoutes(app) {
   router.post('/clubs/:clubId/members', async (req, res) => {
     try {
       const { memberId, role } = req.body;
-      let club = await addMemberToClub(req.params.clubId, memberId, role);
+      const club = await addMemberToClub(req.params.clubId, memberId, role);
       res.json({ success: true, data: club });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -400,7 +400,7 @@ function setupRoutes(app) {
 
   router.get('/clubs/statistics', async (req, res) => {
     try {
-      let stats = await getBuyingClubStatistics(req.query);
+      const stats = await getBuyingClubStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -421,8 +421,6 @@ module.exports = {
   createGroupBuyingOrder,
   getGroupBuyingOrdersByClub,
   getBuyingClubStatistics,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

@@ -25,7 +25,7 @@ class AuditService {
       ipAddress,
       userAgent,
       status = 'success',
-      metadata = {}
+      metadata = {},
     } = eventData;
 
     try {
@@ -46,7 +46,7 @@ class AuditService {
         ipAddress,
         userAgent,
         status,
-        JSON.stringify(metadata)
+        JSON.stringify(metadata),
       ]);
 
       logger.info(`Audit event logged: ${action} on ${entityType}:${entityId}`);
@@ -109,7 +109,7 @@ class AuditService {
         params.push(limit);
       }
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting entity logs', { error: error.message, stack: error.stack });
@@ -130,7 +130,7 @@ class AuditService {
         WHERE al.user_id = $1
       `;
 
-      let params = [userId];
+      const params = [userId];
       let paramCount = 1;
 
       if (startDate) {
@@ -165,7 +165,7 @@ class AuditService {
         params.push(limit);
       }
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Error getting user logs', { error: error.message, stack: error.stack });
@@ -178,14 +178,14 @@ class AuditService {
    */
   async getRecentEvents(limit = 20) {
     try {
-      let query = `
+      const query = `
         SELECT al.*, u.name as user_name, u.email as user_email
         FROM audit_logs al
         LEFT JOIN users u ON al.user_id = u.id
         ORDER BY al.created_at DESC
         LIMIT $1
       `;
-      let result = await this.pool.query(query, [limit]);
+      const result = await this.pool.query(query, [limit]);
       return result.rows;
     } catch (error) {
       logger.error('Error getting recent events', { error: error.message, stack: error.stack });
@@ -212,7 +212,7 @@ class AuditService {
         WHERE 1=1
       `;
 
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (startDate) {
@@ -242,14 +242,14 @@ class AuditService {
       query += groupBy === 'user' ? ' GROUP BY al.user_id, u.name' : ' GROUP BY al.entity_type, al.entity_id';
       query += ' ORDER BY event_count DESC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       return {
         reportType: groupBy,
         period: { startDate, endDate },
         filters,
         summary: result.rows,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error generating audit report', { error: error.message, stack: error.stack });
@@ -262,7 +262,7 @@ class AuditService {
    */
   async getComplianceAudit(complianceType, period) {
     try {
-      let query = `
+      const query = `
         SELECT 
           al.*,
           u.name as user_name,
@@ -277,13 +277,13 @@ class AuditService {
         ORDER BY al.created_at DESC
       `;
 
-      let result = await this.pool.query(query, [complianceType, period]);
+      const result = await this.pool.query(query, [complianceType, period]);
 
       return {
         complianceType,
         period,
         events: result.rows,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error getting compliance audit', { error: error.message, stack: error.stack });
@@ -310,7 +310,7 @@ class AuditService {
         WHERE al.action = ANY($1)
       `;
 
-      let params = [securityActions];
+      const params = [securityActions];
       let paramCount = 1;
 
       if (startDate) {
@@ -333,12 +333,12 @@ class AuditService {
 
       query += ' ORDER BY al.created_at DESC';
 
-      let result = await this.pool.query(query, params);
+      const result = await this.pool.query(query, params);
 
       return {
         securityEvents: result.rows,
         filters,
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
     } catch (error) {
       logger.error('Error getting security audit', { error: error.message, stack: error.stack });
@@ -354,8 +354,8 @@ class AuditService {
       const logs = await this.getEntityLogs(filters.entityType, filters.entityId, filters);
 
       const csvHeader = 'Timestamp,User,Action,Entity Type,Entity ID,Status,IP Address\n';
-      const csvRows = logs.map(log => 
-        `${log.created_at},${log.user_name || 'System'},${log.action},${log.entity_type},${log.entity_id},${log.status},${log.ip_address}`
+      const csvRows = logs.map(log =>
+        `${log.created_at},${log.user_name || 'System'},${log.action},${log.entity_type},${log.entity_id},${log.status},${log.ip_address}`,
       ).join('\n');
 
       return csvHeader + csvRows;
@@ -367,6 +367,4 @@ class AuditService {
 }
 
 module.exports = new AuditService();
-
-
 

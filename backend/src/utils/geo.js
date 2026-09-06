@@ -71,10 +71,10 @@ function distanceKm(lat1, lng1, lat2, lng2) {
  * Useful for delivery direction and route sequencing.
  */
 function bearingDeg(lat1, lng1, lat2, lng2) {
-  let a1 = num(lat1), o1 = num(lng1), a2 = num(lat2), o2 = num(lng2);
+  const a1 = num(lat1), o1 = num(lng1), a2 = num(lat2), o2 = num(lng2);
   if (!isValidCoord(a1, o1) || !isValidCoord(a2, o2)) return null;
 
-  let dLng = toRad(o2 - o1);
+  const dLng = toRad(o2 - o1);
   const y = Math.sin(dLng) * Math.cos(toRad(a2));
   const x =
     Math.cos(toRad(a1)) * Math.sin(toRad(a2)) -
@@ -91,7 +91,7 @@ function bearingDeg(lat1, lng1, lat2, lng2) {
  * distance must still be applied afterwards to remove the corners.
  */
 function boundingBox(lat, lng, radiusKm) {
-  let a = num(lat), o = num(lng), r = num(radiusKm);
+  const a = num(lat), o = num(lng), r = num(radiusKm);
   if (!isValidCoord(a, o) || !Number.isFinite(r) || r < 0) return null;
 
   const latDelta = toDeg(r / EARTH_RADIUS_KM);
@@ -103,7 +103,7 @@ function boundingBox(lat, lng, radiusKm) {
     minLat: Math.max(-90, a - latDelta),
     maxLat: Math.min(90, a + latDelta),
     minLng: Math.max(-180, o - Math.abs(lngDelta)),
-    maxLng: Math.min(180, o + Math.abs(lngDelta))
+    maxLng: Math.min(180, o + Math.abs(lngDelta)),
   };
 }
 
@@ -127,7 +127,7 @@ function radiusQueryFragment({ lat, lng, radiusKm, table = 't', latCol = 'latitu
     sql,
     params: [box.minLat, box.maxLat, box.minLng, box.maxLng],
     nextIndex: i + 4,
-    box
+    box,
   };
 }
 
@@ -143,7 +143,7 @@ function isWithinRadius(lat, lng, centreLat, centreLng, radiusKm) {
  */
 function isWithinPolygon(lat, lng, polygon) {
   if (!Array.isArray(polygon) || polygon.length < 3) return false;
-  let a = num(lat), o = num(lng);
+  const a = num(lat), o = num(lng);
   if (!isValidCoord(a, o)) return false;
 
   let inside = false;
@@ -165,7 +165,7 @@ function sortByProximity(originLat, originLng, items, latKey = 'latitude', lngKe
   return (items || [])
     .map((item) => ({
       ...item,
-      distanceKm: distanceKm(originLat, originLng, item?.[latKey], item?.[lngKey])
+      distanceKm: distanceKm(originLat, originLng, item?.[latKey], item?.[lngKey]),
     }))
     .filter((item) => item.distanceKm !== null)
     .sort((a, b) => a.distanceKm - b.distanceKm);
@@ -176,9 +176,9 @@ function routeLengthKm(points, latKey = 'latitude', lngKey = 'longitude') {
   if (!Array.isArray(points) || points.length < 2) return 0;
   let total = 0;
   for (let i = 1; i < points.length; i++) {
-    let d = distanceKm(
+    const d = distanceKm(
       points[i - 1]?.[latKey], points[i - 1]?.[lngKey],
-      points[i]?.[latKey], points[i]?.[lngKey]
+      points[i]?.[latKey], points[i]?.[lngKey],
     );
     if (d !== null) total += d;
   }
@@ -195,5 +195,5 @@ module.exports = {
   isWithinRadius,
   isWithinPolygon,
   sortByProximity,
-  routeLengthKm
+  routeLengthKm,
 };

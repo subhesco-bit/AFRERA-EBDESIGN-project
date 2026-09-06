@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 class MarketAnalyticsService {
   async analyzeMarket(productId) {
   // Validate inputs
-  if (!productId) throw new Error('Missing required parameter');
+    if (!productId) throw new Error('Missing required parameter');
 
     try {
       const prices = await db('price_history').where('product_id', productId).orderBy('created_at', 'desc').limit(30);

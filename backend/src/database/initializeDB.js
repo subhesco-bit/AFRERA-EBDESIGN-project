@@ -161,7 +161,7 @@ const verifyConnection = async (client) => {
 // Check table existence
 const verifyTables = async (client) => {
   try {
-    let result = await client.query(`
+    const result = await client.query(`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema = 'public'
     `);
@@ -171,7 +171,7 @@ const verifyTables = async (client) => {
 
     const requiredTables = [
       'users', 'addresses', 'products', 'orders',
-      'order_items', 'wallets', 'transactions', 'audit_logs'
+      'order_items', 'wallets', 'transactions', 'audit_logs',
     ];
 
     const missingTables = requiredTables.filter(t => !tables.includes(t));

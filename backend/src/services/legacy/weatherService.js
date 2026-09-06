@@ -39,10 +39,10 @@ async function recordObservation(obs) {
     [obs.stationId, obs.observedOn, obs.observedAt ?? null, obs.rainfallMm ?? null,
       obs.tempMaxC ?? null, obs.tempMinC ?? null, obs.tempMeanC ?? null,
       obs.humidityPct ?? null, obs.windSpeedKmph ?? null,
-      obs.source ?? 'imd', obs.qualityFlag ?? 'raw']
+      obs.source ?? 'imd', obs.qualityFlag ?? 'raw'],
   );
   return rows[0];
-  }
+}
 
 /**
  * Aggregate weather for a district over a window, shaped for the ARP yield
@@ -61,7 +61,7 @@ async function weatherForArp({ state, district, days = 120 }) {
          ON s.id = o.station_id
       WHERE s.state = $1 AND s.district = $2
         AND o.observed_on >= CURRENT_DATE - ($3 || ' days')::interval`,
-    [state, district, Number(days)]
+    [state, district, Number(days)],
   );
 
   if (!rows.length) {
@@ -70,9 +70,9 @@ async function weatherForArp({ state, district, days = 120 }) {
       observations: 0,
       calibrated: false,
       rainfallMm: null, meanTempC: null, heatDaysAboveThresh: null,
-      note: 'No weather observations for this district. The ARP yield model must treat '
-          + 'this as uncalibrated and decline to advise — substituting a regional average '
-          + "here would be guessing with someone's harvest while looking precise.",
+      note: 'No weather observations for this district. The ARP yield model must treat ' +
+          'this as uncalibrated and decline to advise — substituting a regional average ' +
+          'here would be guessing with someone\'s harvest while looking precise.',
     };
   }
 
@@ -91,10 +91,10 @@ async function weatherForArp({ state, district, days = 120 }) {
     rainfallMm: r2(rain),
     meanTempC: r2(meanTemp),
     heatDaysAboveThresh: heatDays,
-    note: rows.length < days * 0.6
-      ? `Only ${rows.length} observations across a ${days}-day window — coverage is too `
-      + 'sparse to characterise the season. Treat as uncalibrated.'
-      : null,
+    note: rows.length < days * 0.6 ?
+      `Only ${rows.length} observations across a ${days}-day window — coverage is too ` +
+      'sparse to characterise the season. Treat as uncalibrated.' :
+      null,
   };
 }
 
@@ -112,7 +112,7 @@ async function recordForecast(f) {
     [f.stationId ?? null, f.district ?? null, f.state ?? null, f.validFor, f.horizonDays,
       f.rainfallMm ?? null, f.rainfallProbabilityPct ?? null, f.tempMaxC ?? null,
       f.tempMinC ?? null, f.conditions ?? null, f.provider ?? 'imd',
-      f.statedConfidencePct ?? null]
+      f.statedConfidencePct ?? null],
   );
   return rows[0];
 }
@@ -134,7 +134,7 @@ async function scoreForecasts({ limit = 500 } = {}) {
         AND f.valid_for < CURRENT_DATE
         AND f.id IN (SELECT id FROM weather_forecasts WHERE scored_at IS NULL LIMIT $1)
       RETURNING f.id, f.provider, f.horizon_days`,
-    [Number(limit)]
+    [Number(limit)],
   );
   return { scored: rows.length, providers: [...new Set(rows.map((r) => r.provider))] };
 }
@@ -153,8 +153,8 @@ async function forecastAccuracy() {
 
 async function raiseAlert(a) {
   if (!a.recommendedAction || !a.recommendedAction.trim()) {
-    throw new Error('An alert must carry a recommended action — an alert with no action '
-                  + 'is noise that trains people to ignore the next one');
+    throw new Error('An alert must carry a recommended action — an alert with no action ' +
+                  'is noise that trains people to ignore the next one');
   }
   const { rows } = await pool.query(
     `INSERT INTO climate_alerts
@@ -164,7 +164,7 @@ async function raiseAlert(a) {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
     [a.alertCode, a.alertType, a.severity, a.state ?? null, a.districts ?? [],
       a.headline, a.detail ?? null, a.recommendedAction, a.effectiveFrom, a.effectiveUntil,
-      a.source ?? 'imd', a.sourceRef ?? null, Boolean(a.blocksDispatch), a.affectsRoutes ?? null]
+      a.source ?? 'imd', a.sourceRef ?? null, Boolean(a.blocksDispatch), a.affectsRoutes ?? null],
   );
   return rows[0];
 }
@@ -184,14 +184,14 @@ async function activeDispatchBlocks() {
 async function dispatchCheck(districts = []) {
   if (!districts.length) return { safe: true, blocks: [], note: 'No districts supplied to check.' };
   const { rows } = await pool.query(
-    `SELECT * FROM v_active_dispatch_blocks WHERE districts && $1::text[]`, [districts]
+    'SELECT * FROM v_active_dispatch_blocks WHERE districts && $1::text[]', [districts],
   );
   return {
     safe: rows.length === 0,
     blocks: rows,
-    note: rows.length
-      ? `${rows.length} active alert(s) block dispatch through these districts.`
-      : null,
+    note: rows.length ?
+      `${rows.length} active alert(s) block dispatch through these districts.` :
+      null,
   };
 }
 
@@ -210,7 +210,7 @@ async function pestForecast({ crop, district, days = 30 }) {
         CASE risk_level WHEN 'severe' THEN 0 WHEN 'high' THEN 1
                         WHEN 'moderate' THEN 2 ELSE 3 END,
         forecast_for`,
-    [crop ? `%${crop}%` : null, district ?? null, Number(days)]
+    [crop ? `%${crop}%` : null, district ?? null, Number(days)],
   );
   return {
     forecasts: rows.map((r) => ({
@@ -219,9 +219,9 @@ async function pestForecast({ crop, district, days = 30 }) {
       actionOrder: ['non_chemical', ...(r.chemical_action ? ['chemical'] : [])],
     })),
     count: rows.length,
-    note: 'Non-chemical action is listed first deliberately. An organic-certified plot '
-        + 'that sprays a banned compound on platform advice loses its certification and '
-        + 'its export market, and the platform caused it.',
+    note: 'Non-chemical action is listed first deliberately. An organic-certified plot ' +
+        'that sprays a banned compound on platform advice loses its certification and ' +
+        'its export market, and the platform caused it.',
   };
 }
 
@@ -237,10 +237,10 @@ async function coverage() {
     total: rows.length,
     currentWithinAWeek: current.length,
     stale: rows.length - current.length,
-    note: rows.length === 0
-      ? 'No weather stations registered. Every ARP forward price is currently computed '
-      + 'from a hard-coded fallback, not from observed weather.'
-      : null,
+    note: rows.length === 0 ?
+      'No weather stations registered. Every ARP forward price is currently computed ' +
+      'from a hard-coded fallback, not from observed weather.' :
+      null,
   };
 }
 
@@ -262,7 +262,7 @@ async function listAdvisories({ district, limit = 50 } = {}) {
       WHERE ($1::text IS NULL OR district = $1)
       ORDER BY issued_on DESC, id DESC
       LIMIT $2`,
-    [district || null, Number(limit) || 50]
+    [district || null, Number(limit) || 50],
   );
   return rows.map(shapeAdvisory);
 }
@@ -306,7 +306,7 @@ async function createAdvisory(payload) {
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'manual')
      RETURNING *`,
     [district, crop || null, type || null, validUntil || null, weatherSummary, advisory.trim(),
-      language || 'en', recommendedOps || null, postponeOps || null]
+      language || 'en', recommendedOps || null, postponeOps || null],
   );
   return shapeAdvisory(rows[0]);
 }
@@ -325,7 +325,7 @@ async function updateAdvisory(id, payload) {
      WHERE id = $8
      RETURNING *`,
     [title || null, advisory || null, type || null, (region && region.trim()) || null,
-      validUntil || null, crop || null, language || null, id]
+      validUntil || null, crop || null, language || null, id],
   );
   return rows[0] ? shapeAdvisory(rows[0]) : null;
 }
@@ -363,7 +363,7 @@ async function getAdvisoryTriggers({ district, state } = {}) {
         AND ($1::text IS NULL OR district = $1)
         AND ($2::text IS NULL OR state = $2)
       ORDER BY district, index_type, period_end DESC`,
-    [district || null, state || null]
+    [district || null, state || null],
   );
 
   const droughtWetTriggers = idx
@@ -380,11 +380,11 @@ async function getAdvisoryTriggers({ district, state } = {}) {
         periodEnd: r.period_end,
         departurePct: r.departure_pct !== null ? Number(r.departure_pct) : null,
         suggestedTitle: severeDrought ? `Severe drought signal — ${r.district}` : `Waterlogging risk — ${r.district}`,
-        suggestedAdvisory: severeDrought
-          ? 'Prioritise deficit irrigation and moisture-conserving mulch; postpone field operations that increase evapotranspiration.'
-          : 'Confirm field drainage is clear before the next rain event; postpone sowing and fertiliser application until waterlogging risk passes.',
-        basis: `real ${r.index_type.toUpperCase()} = ${r.index_value} for period ending ${r.period_end}; `
-          + 'SPI convention documented in migration 057 (below -1.5 severe drought, above +1.5 severe wet)',
+        suggestedAdvisory: severeDrought ?
+          'Prioritise deficit irrigation and moisture-conserving mulch; postpone field operations that increase evapotranspiration.' :
+          'Confirm field drainage is clear before the next rain event; postpone sowing and fertiliser application until waterlogging risk passes.',
+        basis: `real ${r.index_type.toUpperCase()} = ${r.index_value} for period ending ${r.period_end}; ` +
+          'SPI convention documented in migration 057 (below -1.5 severe drought, above +1.5 severe wet)',
       };
     });
 
@@ -397,7 +397,7 @@ async function getAdvisoryTriggers({ district, state } = {}) {
       WHERE o.observed_on >= CURRENT_DATE - ($1 || ' days')::interval
         AND ($2::text IS NULL OR s.district = $2)
       GROUP BY s.district, s.state`,
-    [HEAT_STRESS_TRAILING_DAYS, district || null, HEAT_STRESS_TEMP_C]
+    [HEAT_STRESS_TRAILING_DAYS, district || null, HEAT_STRESS_TEMP_C],
   );
 
   const heatTriggers = heat
@@ -410,11 +410,11 @@ async function getAdvisoryTriggers({ district, state } = {}) {
       windowDays: HEAT_STRESS_TRAILING_DAYS,
       totalObservations: Number(r.total_obs),
       suggestedTitle: `Heat stress risk — ${r.district}`,
-      suggestedAdvisory: `${r.hot_days} of the last ${HEAT_STRESS_TRAILING_DAYS} observed days exceeded `
-        + `${HEAT_STRESS_TEMP_C}°C. Schedule irrigation for early morning/evening, provide shade for `
-        + 'livestock, and delay transplanting heat-sensitive seedlings.',
-      basis: `real weather_observations over the trailing ${HEAT_STRESS_TRAILING_DAYS} days; `
-        + `${HEAT_STRESS_TEMP_C}°C is the same heat-stress reference weatherForArp() uses`,
+      suggestedAdvisory: `${r.hot_days} of the last ${HEAT_STRESS_TRAILING_DAYS} observed days exceeded ` +
+        `${HEAT_STRESS_TEMP_C}°C. Schedule irrigation for early morning/evening, provide shade for ` +
+        'livestock, and delay transplanting heat-sensitive seedlings.',
+      basis: `real weather_observations over the trailing ${HEAT_STRESS_TRAILING_DAYS} days; ` +
+        `${HEAT_STRESS_TEMP_C}°C is the same heat-stress reference weatherForArp() uses`,
     }));
 
   const triggers = [...droughtWetTriggers, ...heatTriggers];
@@ -442,10 +442,10 @@ async function getAdvisoryTriggers({ district, state } = {}) {
     },
     triggers,
     count: triggers.length,
-    note: triggers.length === 0
-      ? 'No climate_indices or weather_observations rows currently cross these thresholds — '
-      + 'this reflects real recorded data, not a placeholder.'
-      : null,
+    note: triggers.length === 0 ?
+      'No climate_indices or weather_observations rows currently cross these thresholds — ' +
+      'this reflects real recorded data, not a placeholder.' :
+      null,
   };
 }
 
@@ -457,6 +457,4 @@ module.exports = {
   listAdvisories, getAdvisory, createAdvisory, updateAdvisory,
   getAdvisoryTriggers,
 };
-
-
 

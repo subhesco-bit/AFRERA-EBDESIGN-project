@@ -1,0 +1,190 @@
+Commercial and Agronomic Master Database of the Edible and Agricultural Biodiversity of North-East India
+Geographic and Economic Framework for Procurement Mapping
+The North-East Region (NER) of India—comprising the states of Arunachal Pradesh, Assam, Manipur, Meghalaya, Mizoram, Nagaland, Sikkim, and Tripura—is a vital reservoir of rare flora, fauna, and indigenous agricultural systems1. Characterised by extreme altitudinal gradients ranging from 300 to over 3,000 metres above mean sea level, the region spans microclimates from humid subtropical plains to alpine zones3. This complex geography, combined with highly acidic clay-loam soils (), has fostered a dense concentration of endemic plant and animal species2. Traditional farming communities have domesticatied and preserved these genetic resources over centuries1.
+The Geographical Indications of Goods (Registration and Protection) Act, 1999, serves as the primary legal framework to protect the intellectual property of these unique regional goods8. Administered by the Geographical Indications Registry in Chennai, a Geographical Indication (GI) tag guarantees origin, standardises quality, and prevents unauthorized commercial exploitation by third parties10. In the NER, where agricultural systems are organic by default, GI tagging acts as a commercial catalyst7. It transitions subsistence crops into high-value export commodities, enabling local Farmer Producer Organisations (FPOs) and tribal cooperatives to command premium pricing in domestic and international wellness markets14.
+This master database has been compiled to serve as an exhaustive reference for NE Harvest, procurement mapping, FPO onboarding, export planning, product cataloguing, and value-added processing identification. It maps the regional edible biodiversity of the NER across 15 distinct product categories, detailing state-wise distribution, commercial potential, and legal status.
+Categorised Master Inventory and Taxonomic Characterisation
+Fruits of North-East India
+The horticultural sector of the NER is characterised by elite landraces of citrus, temperate exotic fruits, and highly pigmented wild berries rich in bioactive compounds2.
+Vegetables
+Vegetable crops in the NER include native leafy greens, high-starch root tubers, and temperate brassicas grown using sustainable smallholder methods36.
+Chillies and Spices
+Spices from the NER contain some of the highest recorded concentrations of active compounds like capsaicin, curcumin, and piperine17.
+Unique Fermented Foods
+Fermentation in the NER serves as both a traditional preservation technique and a source of unique, complex flavours40.
+Bamboo-Based Products, Honey, and Grains
+Pulses, Oilseeds, Nuts, and Beverages
+Animal Products, Fisheries, and Forest Edibles
+Deep-Dive Analysis of Regional Micro-Ecosystems and Cultivar Phenotypes
+Leafy Brassicas: Lai Patta (Brassica juncea var. rugosa L.)
+Lai Patta (leafy mustard) is a highly valued, cold-tolerant cruciferous vegetable cultivated across the hilly terrains of Assam, Sikkim, and Arunachal Pradesh36. Traditionally grown under smallholder kitchen garden systems, it thrives during the winter Sali season in rich, moist soils37. The crop possesses succulent leaves and a thick, fleshy petiole, exhibiting a characteristic peppery heat36. Research led by the Department of Plant Breeding and Genetics at Assam Agricultural University, Jorhat, successfully developed and registered two elite lines—JorMLG-1 and JorMLP-236. These lines are highly sought after because of their high yields and superior sensory characteristics compared to standard check varieties36.
+JorMLG-1 is a green-pigmented leaf variety, while JorMLP-2 exhibits a greenish-purple leaf pigmentation36. Both lines show an extended harvesting window of up to 55 to 60 days after transplanting before the initiation of bolting38. This is more than twice as long as the standard check variety ChL-9, which bolts prematurely at 25 days, reducing the quality of the leaves38. On-farm trials demonstrate average yields of 350.1 q/ha for JorMLG-1 and 318.2 q/ha for JorMLP-2, representing a 34% to 48% yield increase over traditional checks38. Nutritionally, these varieties have exceptionally dense mineral and vitamin profiles:
+These lines are registered under accession numbers IC 586672 (JorMLG-1) and IC 586673 (JorMLP-2) with the National Bureau of Plant Genetic Resources (NBPGR) in New Delhi36. Their long harvest window and high mineral content make them ideal candidates for FPO scaling38.
+Zingiberaceous Rhizomes: Ginger and Turmeric Varieties
+Zingiber officinale (Karbi Anglong Ginger): Cultivated across the steep slopes of the Singhasan Hills in Assam using the traditional Jhum and Tila systems, this ginger is distinguished by its high dry-matter recovery and essential oleoresin content48. The crop matures over 9 to 10 months in well-drained, acidic forest soils56. It is classified into two distinct commercial varieties:
+Nadia: A highly fibrous variety containing 56% starch and 5.4% crude fiber56. Its high fiber density makes it highly resistant to physical damage during transport and ideal for dry powdering, oleoresin extraction, and the production of medicinal extracts56.
+Aizol: A low-fiber, highly aromatic variety containing 45% starch and 4.1% crude fiber48. It is grown primarily for export because of its smooth skin, pleasant aroma, and ease of processing into premium ginger pastes48.
+Curcuma longa (Lakadong vs. Megha Turmeric-1): Wild-type Lakadong Turmeric (Curcuma longa), sourced from the West Jaintia Hills of Meghalaya, is globally unique for its high curcumin content of 7% to 12%6. This is significantly higher than the 2% to 4% found in conventional varieties59. This high concentration of non-volatile curcuminoids (curcumin, demethoxycurcumin, and bisdemethoxycurcumin) is highly dependent on the acidic soils () and microclimate of the Jaintia Hills6. To overcome this environmental sensitivity and lower agricultural yield (~15 t/ha), researchers developed Megha Turmeric-1 through clonal selection6. This improved cultivar stabilizes curcumin synthesis at approximately 6.6% across diverse soil profiles while increasing agricultural productivity to 22.5 t/ha, representing a highly scalable raw material for industrial curcumin extraction6.
+Specialty Rices (Oryza sativa): Aromatic, Deep-Water, and Glutinous
+The regional rice diversity of the NER includes hundreds of traditional landraces, categorized into three high-value groups81:
+Joha Rice (Aromatic Short-Grain): A group of indigenous winter rices (Sali crop) celebrated for its delicate kernel texture and sweet fragrance, which is distinct from the elongated grain of Basmati15. The grains possess a unique biochemical composition containing essential unsaturated fatty acids, specifically linoleic acid (omega-6) and linolenic acid (omega-3)79. This balanced polyunsaturated fatty acid profile, combined with rich concentrations of antioxidants (oryzanol, ferulic acid, and tocotrienols), provides significant anti-diabetic and cardio-protective benefits by regulating blood glucose and reducing oxidative stress15. The primary commercial varieties include:
+Kola Joha: A traditional landrace with a blackish-green husk77. It is a tall plant that is highly prone to lodging, producing a long-slender grain with a lower yield of 2.0 to 3.0 t/ha78.
+Keteki Joha: An improved semi-dwarf, lodging-resistant variety78. It yields 3.5 to 4.0 t/ha of medium-slender grain and features excellent disease tolerance78.
+Bokul Joha: An improved variety sharing the same parentage (SavitriBadsahbhog) as Keteki Joha78. It yields 3.5 to 4.0 t/ha of medium-bold grains and is highly sought after for processing into specialty rice flakes and traditional confectionery78.
+Manipuri Joha: A traditional short-grain variety morphologically characterised by an average grain length of 7.84 mm and a breadth of 1.04 mm106.
+Bao Rice (Deep-Water Red Rice): Cultivated in low-lying, flood-prone areas of the Brahmaputra valley81. Sown in April and harvested in December, the crop can survive water depths of over 1.0 metre by elongating its stem81. The red colour of the kernel is due to natural iron and zinc deposits in the pericarp, providing excellent nutrition78.
+Padmapani: An early-maturing (185 days) traditional Bao variety that matures quickly to escape damage from the devastating ufra disease78.
+LPR 106 (Panchanan): An improved deep-water variety78. It yields 3.0 t/ha of red-kernelled, medium-slender grain with strong resistance to lodging and shattering78.
+KDML 105 (Padumani): An improved aromatic deep-water variety78. It is submergence-tolerant, non-lodging, and yields 2.6 t/ha of medium-slender grains with a soft texture78.
+Chakhao (Scented Black Rice): Scented black rices native to the wetlands of Manipur83. The deep purplish-black pigmentation of the grain is due to exceptionally high concentrations of anthocyanins—specifically cyanidin-3-O-glucoside and peonidin-3-O-glucoside—concentrated within the outer fibrous bran layer82. These flavonoids provide superior radical scavenging activity compared to blueberries, aiding in the clinical management of atherosclerosis, diabetes, and high cholesterol20. Due to its thick, crude-fibre-rich outer bran layer, Chakhao requires a long cooking time of 40 to 45 minutes84. It is 100% gluten-free but highly glutinous (sticky) due to its low amylose content (3.4% to 6.97%) and high amylopectin ratio83.
+Chakhao Amubi: A highly aromatic variety characterized by a solid black pericarp, containing 26 identified volatile aromatic compounds that impart a deep nutty fragrance20.
+Chakhao Poireiton: A highly glutinous variety that turns a rich royal purple when cooked20. It contains 11 volatile aromatic compounds and exhibits the highest concentration of delphinidin 3-galactoside, commanding premium prices in gourmet organic export markets82.
+Microbiology, Biochemistry, and Preparation of Ethnic Ferments
+Traditional fermentation in the NER utilizes unique biochemical pathways to preserve perishable forest and aquatic resources40.
+[Fresh Taro/Colocasia Leaves]                                   │                  (Stack in baskets; cover to yellow)                                   │                                   ▼                    [Yellowed Leaves and Stems]                                   │              (Pound in wooden mortar to a thick paste)                                   │                                   ▼                            [Taro Leaf Paste]                                   │        (Wrap in banana leaves; cook slowly over fireplace)                                   │                                   ▼                          [Cooked Taro Paste]                                   │                 (Shape into small round patties)                                   │                                   ▼               (Smoke-dry over fireplace or sun-dry)                                   │                                   ▼                         [Finished Solid Anishi]
+Taro Leaf Preservation: Anishi / Nüoshi
+Anishi is a traditional, coal-hard fermented vegetable patty prepared by the Ao Naga tribe from mature leaves of taro (Colocasia esculenta)43. The process begins by collecting green, succulent colocasia leaves, which are washed and stacked tightly together before being wrapped in banana leaves44. These bundles are stored in woven baskets for 5 to 7 days, allowing natural respiration to yellow the leaves as chlorophyll degrades43.
+The yellowed leaves are then pounded in a large wooden mortar (pestle) to form a smooth, thick paste, occasionally seasoned with local chilies or salt44. This paste is wrapped in banana leaves and placed near the domestic hearth to cook slowly under low heat46. Once cooked, the paste is unwrapped and shaped into small, round patties46. These patties are placed on bamboo mats suspended directly over the fireplace (hargor) to undergo continuous smoke-drying44. The patties dry into coal-black, extremely hard pieces44. This intensive dehydration removes moisture, providing a long shelf life of over 12 months without any chemical preservatives44. During cooking, these patties dissolve in boiling stews, imparting a smoky, umami-rich, and mildly sour flavor to traditional pork and eel dishes44.
+Earthen Pot Solid-State Fish Aging: Ngari and Hentak
+Ngari: This unsalted fermented fish product is a staple of Manipuri cuisine, prepared primarily from small freshwater fish (Puntius sophore)64. Sun-dried fish are rinsed with water and drained for 24 to 48 hours66. The fish are then compressed using leg weights to squeeze out residual water and oils from the heads and bones, which helps initiate the fermentation process66. The pressed fish are packed tightly into large earthenware pots (Kharung) with a capacity of 45 to 50 kg66. The interior walls of new Kharungs are seasoned beforehand with 8 to 10 coats of edible mustard oil at weekly intervals, which helps create an anaerobic environment66. Skilled laborers pack the fish tightly to eliminate air pockets66. The pots are sealed with wires and thick, humus-rich clay, then stored in dark rooms at room temperature for 6 to 12 months66. During aging, proteolytic bacteria (primarily Bacillus spp., LAB, and yeasts) break down the fish muscle, transforming it into a high-protein, umami-rich condiment64.
+Hentak: A thick, dark fermented fish paste prepared from small freshwater fish (Esomus danricus) and Alocasia petioles65. The fish are crushed into a fine powder and blended with an equal weight of sliced, sun-wilted petioles of wild Alocasia macrorhiza (Hongu) and local onions66. Pounding these ingredients together forms a smooth, dark paste, which is shaped into small balls and aged in clay pots for 15 to 20 days66. Over this period, natural microbial activity breaks down the sharp calcium oxalate crystals of the wild Alocasia, making it safe and highly nutritious66.
+Proteolytic Soybean Souring: Axone / Akhuni and Tungrymbai
+These alkaline fermented soybean foods are produced through solid-state bacterial processes63:
+Axone / Akhuni: Reared by the Sumi (Sema) Naga tribe, cleaned soybeans are boiled until soft but whole45. The warm beans are wrapped in fresh leaves of banana or Phrynium pubinerve and kept above the fireplace to ferment for 3 to 7 days45. Proteolytic Bacillus species hydrolyse the proteins into free amino acids and release ammonia, raising the pH47. This produces a sticky paste with a highly pungent, umami-rich aroma47.
+Tungrymbai: Reared by the Khasi community, the boiled soybeans are wrapped in Pyrnium pubinerve leaves and incubated in baskets64. The fermentation is driven by Bacillus subtilis and Lactobacillus species, producing a dense, high-protein paste with distinct flavor notes64.
+Traditional Indigenous Brews: Judima
+Judima is the first traditional alcoholic beverage of Northeast India to receive a GI tag (September 2021)112. Brewed by the Dimasa community of Dima Hasao, Assam, it is made by fermenting semi-cooked sticky rices like Bora or Bairing113. The fermentation uses a starter cake called Humao (composed of rice powder and the dried bark of the wild herb Thembra / Acacia pennata)113.
+Fresh Judima: Clear, pale-yellow liquid with a  and an alcohol content of approximately 20% (v/v)114.
+Old Preserved Judima: Aging concentrates the alcohol to 21.5% (v/v) and increases free amino acids to 1.3 mg/ml due to natural enzymatic breakdown, yielding a sweet, complex flavor114.
+Indigenous Animal Genetic Resources and High-Altitude Husbandry
+The livestock and fisheries of the NER represent highly adapted, climate-resilient genetic resources that thrive in challenging high-altitude and forest-scavenging terrains71.
+Highland Bovines: Mithun (Bos frontalis) and Yak (Poephagus grunniens)
+Mithun: Known as the "Cattle of the Mountain," this massive, semi-domesticated bovine is native to Arunachal Pradesh, Nagaland, Manipur, and Mizoram5. It is widely considered a domesticated derivative of the wild gaur (Bos gaurus)71. Physically, it is characterized by a broad, concave forehead, thick, short, upwardly curved horns, a prominent dorsal ridge (no hump), a double dewlap, a short tail that does not cross the hock joint, and distinct white stockings on all four legs71. Mithuns graze freely in subtropical and temperate hill forests at altitudes of 1,000 to 3,000 metres71. Mithun meat is exceptionally tender, fine-grained, and low in fat, making it superior to conventional beef71. While its milk yield is low (1.0 to 1.5 kg/day), the milk is highly concentrated, containing 8% to 13% fat, 18% to 24% Solid-Not-Fat (SNF), and 5% to 7% protein5.
+Yak: Reared by the Brokpa community in the high-altitude alpine zones (>3,000 metres) of western Arunachal Pradesh (Tawang, West Kameng) and Sikkim71. Yaks are highly adapted to freezing temperatures down to  and low oxygen pressures, possessing nearly three times the lung capacity of ordinary cattle71. Yak meat is extremely lean (20% to 22% protein) and free of marbling71. Its milk, containing up to 10.9% fat, is processed into Churpi (a hard, sun-dried fermented yak cheese)71.
+Regional Swine Genetic Diversity
+Pork is a vital dietary protein source in the NER, which houses over 25% of India's total pig population50. Five indigenous breeds are registered with the ICAR-National Bureau of Animal Genetic Resources (NBAGR)117:
+Tenyi Vo: Bred primarily by the Tenyimia communities (Angami, Chakhesang, Rengma, Zeliang) in Kohima, Phek, and Dimapur92. It is characterised by a long, strong, tapering snout, small erect ears, a pot-bellied appearance with a sagging back in females, and white stockings92. It is highly disease-resistant and adapted to zero-grain backyard diets, converting kitchen waste and wild forage into lean pork92.
+Niang Megha: A small-sized breed reared in the Khasi, Jaintia, and Garo hills91. It is predominantly black with occasional white markings on its forehead and hock joints, and features a medium snout and long bristles along the midline91. It reaches 35 to 40 kg at 10 months and has excellent mothering ability91. It is used in crossbreeding programmes to produce improved regional varieties like Lumsniang (25% Niang Megha, 75% Hampshire)50.
+Doom: Native to Dhubri, Kokrajhar, and Bongaigaon, it is reared by the local Doom community92. This breed is completely black with a short concave snout, flat-bellied body, and extremely long, stiff bristles extending to the thoraco-lumbar area92. It is adapted to migratory scavenging and is resistant to piglet diarrhoea50.
+Wak Chambil: A small, compact indigenous breed native to the Garo Hills93. It has a highly unique appearance, featuring a round, pendulous belly that almost touches the ground, resembling the "Chambil" citrus fruit94. It is predominantly black-and-white patched, with short limbs, a small head, and small hooves94. It reaches an average adult body weight of 34 kg at 10 months94. Its meat is highly prized during Garo festivals for its unique, rich pork flavor and aromatic fat93.
+Strategic Value-Chain Optimisation and Procurement Mapping
+To transition North-East India's rich agricultural biodiversity into robust commercial value chains, several strategic interventions are recommended for FPOs, procurement agencies, and food engineers:
+[Local Production & FPO Aggregation] ──► [Central Quality Testing & Grading]                                                     │                             ┌───────────────────────┴───────────────────────┐                             ▼                                               ▼               [High-Volume Processing]                        [Premium Export & Wellness]                - Megha Turmeric-1 (Extraction)                 - Pure Lakadong (Turmeric Latte)                - Nadia Ginger (Powder/Oleoresin)               - Aizol Ginger (Fresh Pastes)                - Boka Chaul (Rations/Flakes)                   - Chakhao Poireiton (Gourmet)                                                                - Joha Rice (Organic Table)
+Strategic Curcumin Extraction & Cultivar Deployment: FPOs in Meghalaya should separate value chains based on curcumin content6. Pure Lakadong (7% to 12% curcumin) should be reserved for premium, low-volume clinical and cosmetic markets where origin is a key driver6. Conversely, the high-yielding Megha Turmeric-1 (6.6% curcumin, 22.5 t/ha) should be scaled across the region to supply high-volume industrial processing units for dry powdering and oleoresin extraction6.
+Industrialisation of Zero-Cook and Low-Energy Grains: Assam's Boka Chaul (which requires only cold-water soaking) represents an eco-friendly food resource33. Food engineers should utilize this variety to manufacture vacuum-sealed, self-hydrating organic travel meals and disaster-relief rations, bypassing the need for heating fuel33.
+Export Expansion of GI-Tagged Aromatic Rices: Following the successful March 2026 export of Joha Rice to the UK and Italy, procurement mapping should target Upper Assam districts (Sivasagar, Jorhat, Lakhimpur)14. Standardising organic certification and building direct links with international buyers will help establish premium export corridors for other high-value grains like Chakhao Poireiton and Sikkim Large Cardamom54.
+Commercialisation of Probiotic Fermented Beverages: The successful development of shelf-stable Sohiong kombucha highlights the potential for commercializing wild berries18. Setting up state-of-the-art cold chains and processing units in Shillong and Gangtok will allow FPOs to supply premium functional beverages directly to urban health markets across India3.
+Genetic Conservation of Resilient Swine Breeds: The extreme climate resilience, disease resistance, and low-input efficiency of registered pig breeds (such as Tenyi Vo, Wak Chambil, and Doom) must be conserved92. These breeds are ideal for low-input backyard farming systems, supporting rural food security92. They can also be integrated into high-quality organic cured meat brands (such as smoked wild bacon) to command premium prices in metropolitan culinary markets46.
+Works cited
+HANDBOOK ON THE GEOGRAPHICAL INDICATIONS - NLUJAA,
+Geographical Indications in Horticulture: North East India Perspective - ijcmas,
+PM Formalisation of Micro Food Processing Enterprises Scheme Processing of Sohiong Jam - NIFTEM Thanjavur,
+star anise (illicium griffithii hook. f. and thoms.): a socially important tree species from high altitude region of arunachal pradesh - ResearchGate,
+(PDF) Mithun : The Pride animal of North-eastern hilly region of India - ResearchGate,
+Lakadong turmeric: Package of practice - Indian Agricultural Research Journals,
+North East Booklet (without certificate).pdf - cii ipr,
+Geographical indications in India - Wikipedia,
+List of Geographical Indications (GI Tags) in India 2024 - Vajiram,
+List of Geographical Indication (GI) Tags in India 2026 (UPSC) - SuperKalam,
+GI Tag India 2026: Full Form, Meaning, Complete State-wise List & Export Guide,
+List Of GI Tags In India 2026: State-wise GI Tags List And Registration Details - PWOnlyIAS,
+board - spices,
+APEDA Facilitates First Export of GI-Tagged Joha Rice from Assam to the United Kingdom and Italy - Press Release: Press Information Bureau,
+Assam's GI-Tagged Joha Rice Exported to Europe - INSIGHTS IAS,
+Meghalaya seeks GI tags for 32 indigenous products, from Sohra Honey to tribal musical instruments - Hub News,
+Benefits of Lakadong Turmeric for Health - nakistore,
+Sohiong steps into the global wellness market with first-ever Kombucha breakthrough,
+MEGHALAYA - APEDA,
+GI Tagged Agricultural Products of Manipur - MyGov Blogs,
+Geographical Indications - Nagaland,
+Nagaland GI tag - Innercall,
+Exotic fruits of the Northeast India - Mountain Echo,
+The Wild Fruits of Meghalaya | Sohphie Fruit - Polo Hotels and Resorts,
+Arunachal's Big Push for GI Tags on 10 Agro Products - Ajmal IAS Academy,
+GST Rationalistaion: Cultivating Growth, Crafting Prosperity in Mizoram - PIB,
+Geographical Indication Tags in India - Taro Pumps,
+Tripura - APEDA,
+5 G I – Tagged Products of Arunachal Pradesh - MyGov Blogs,
+Tripura 'Sarinda' Receives GI Tag, CM Dr Manik Saha Hails Milestone for State's Cultural Heritage - Northeast Today,
+Traditional Tripura Sarinda earns Geographical Indication recognition,
+GOVERNMENT OF INDIA MINISTRY OF COMMERCE & INDUSTRY DEPARTMENT FOR PROMOTION OF INDUSTRY AND INTERNAL TRADE LOK SABHA UNSTAR,
+GI Tag in Assam: List of GI Products - Borthakur's IAS Academy,
+GI tag boost for 9 Northeast products - Telegraph India,
+Marketing Indigenous Fruits of Meghalaya: Challenges and Opportunities - Journal of North East India Studies,
+Evaluation of promising lines of Lai Patta (Brassica juncea varrugosa L.) suitable for cultivation in North Eastern India - AWS,
+View of Mustard Green - A Step Towards Health,
+Evaluation of Promising Lines of Lai Patta (Brassica juncea var rugosa L.) Suitable for Cultivation in North Eastern India,
+The Gastronomic Heritage of Northeast India: Exploring the Diversity of Ethnic Crops - Vigyan Varta,
+Traditional knowledge of biopreservation of perishable vegetable and bamboo shoots in Northeast India as food resources - ResearchGate,
+Indian Journal of Hill Farming - kiran,
+Dr. Gobin Chandra Bora - College of Agriculture - AAU,
+All About Anishi, The Naga Delicacy That Resembles Coal - Slurrp,
+Nagaland Food - Naga Cuisine : Naga Viper Pepper - Rice Beer - Eastern Routes,
+Anishi with pork recipe/ Nuoshi Aon recipe/ Smoked pork with nuoshi recipe - At My Kitchen,
+4 Fermented Ingredients Of Nagaland That Deserve More Attention - Slurrp,
+Karbi Anglong Ginger - Himalayan Organic India,
+GI-Tagged Products of Manipur | PDF - Scribd,
+The Relevance of Pig Breeds from North Eastern India towards Pork Production - ResearchGate,
+Shillong Tej Patta price in IndiaShillong bay leaf (Tej Patta), p - nIK ENTERPRISE,
+Geographical indicators - PIB,
+SIKKIM - APEDA,
+The importance of GI tags for Sikkim - Sikkimexpress,
+Karbi Anglong Ginger - NERAMAC,
+Assam Karbi Anglong Ginger - - sudurbhai,
+GI Tags Awarded to 19 Goods from Assam; 2 from Tripura and 4 from Meghalaya,
+Lakadong Turmeric Powder - The Good Health (TGH),
+Curcumin from Lakadong Turmeric: Benefits Explained - Food Safety Works,
+TURMERIC – Welcome Manipur Organic Mission Agency website,
+Culinary uses of star anise - nIK ENTERPRISE,
+Bay leaf C1 Shillong Clean grade Manufacturer from Kalyani - IndiaMART,
+Indigenous Fermented Food Products of Eastern and Western Himalayan Region: A review,
+Tungtap - A traditional ethnic fermented fish product of Meghalaya, Northeast India,
+— Flow chart for Hentak preparation | Download Scientific Diagram - ResearchGate,
+Fermented fish products of North-East India - Chronicle of Aquatic Science,
+Tungtap: Fermented Fish Paste of Meghalaya | PDF - Scribd,
+Eating the Landscape: Bamboo and North-East Indian Identity - GOYA,
+Bamboo Shoot: A Traditional Indian Superfood from Northeast - Shaheed Rajguru College,
+Bamboo shoot - Wikipedia,
+Non-Conventional Meat Animals in India: Yaks and Mithuns - Agriculture Institute,
+Which of the following products from Arunachal Pradesh received GI tag? - Testbook,
+Native microorganisms in the fermentation of kinema - ResearchGate,
+Owa Meoyai | Kokrajhar District | Government Of Assam, India,
+Edible bamboo shoots: a sustainable nexus of nutrition, livelihood, and food security for rural communities in India - Frontiers,
+From Spices to Sustainability - PIB,
+Premium Quality Rice Varieties ( PQR) - RCSKB,Assam,
+Joha Rice, Season, Features, Latest News - Vajiram,
+First Export of Assam's Joha Rice - Drishti IAS,
+Premium Quality Rice - RCSKB,Assam - AAU,
+Genetic Architecture and Anthocyanin Profiling of Aromatic Rice From Manipur Reveals Divergence of Chakhao Landraces - PMC,
+An insight into the morphological, biochemical and molecular diversity of GI tagged black scented rice, Chakhao landraces of Manipur, India | Plant Genetic Resources,
+Black Rice (Chak-Hao) - Manipur CSCCE PDF Download - EduRev,
+Arunachal Pradesh Achieves 20 GI Registrations, Boosting Tribal Heritage and Rural Livelihoods - Arunachal24,
+ARUNACHAL PRADESH - APEDA,
+GI Tag List of India: State-Wise & Category-Wise GI Tags Breakdown - The Legal School,
+Mithun: An Animal of Indian Pride - Livestock Research for Rural Development,
+Mithun (Bos frontalis)-A unique bovine species of North Eastern hilly region of India,
+Indigenous breeds of Pigs - ICAR - National Research Centre on Pig,
+Pig genetic resources and their distribution in India,
+Ten New Breeds of Indigenous Farm Animals Registered by ICAR-NBAGR,
+(PDF) Phenotypic characterization and performance evaluation of Wak Chambil: A unique indigenous pigs of north east region of India - ResearchGate,
+Agri - Kaleidoscope - Poultry Genetic Resources of NEH Region,
+Evaluating the varied economic traits of Kamrupa chickens in backyard rearing systems of Assam - International Journal of Agriculture Extension and Social Development,
+BACKYARD POULTRY MANAGEMENT,
+Mahseer in recreational fisheries and eco-tourisM in india - CICFR Bhimtal,
+progress and prospects for sustainable production and conservation of threatened coldwater fishes of north - Connect Journals,
+ADVANCES IN INDIAN COLDWATER FISHERIES AND AQUACULTURE - Journal of Fisheriessciences.com,
+Fresh Karbi Anglong Ginger, Nadia at best price in New Delhi | ID: 2859058341273 - IndiaMART,
+Classification of traditional Joha rice using deep neural network - ResearchGate,
+GI tag to Manipur black rice, Gorakhpur terracotta - The Hindu,
+(PDF) Chak-hao, the Forbidden Rice of Manipur and Its Sustainable Protection from Post-Harvest Storage Pests using Indigenous Botanical Plant Powders - ResearchGate,
+Genetic Architecture and Anthocyanin Profiling of Aromatic Rice From Manipur Reveals Divergence of Chakhao Landraces - Frontiers,
+This Rice From Manipur Has More Antioxidants Than Blueberries - Outlook Traveller,
+Hentak An indigenous Manipuri food By Bidyarani Thingujam - E-Pao,
+Assam's rice wine Judima gets GI tag - The Hindu,
+Assam's Iconic Judima Rice Wine Is Northeast's First Traditional Brew To Get GI Tag,
+Documentation of Traditional Method of Preparation and Characterization of Judima, a Traditional Rice Beer of Dimasa Tribe of Assam and its Comparison with Old Preserved Judima. - Biosciences Biotechnology Research Asia,
+GI Tag to Assam's Judima Wine Rice - Unacademy,
+mithun - an important bovine species of indian origin - Food and Agriculture Organization of the United Nations,
+PIG Breeds of India - ICAR-NBAGR,
+Indigenous pig genetic resources of India: Distribution, types and their characteristics,
+Phenotypic characterization and performance evaluation of Wak Chambil: A unique indigenous pigs of north east region of India - ResearchGate,

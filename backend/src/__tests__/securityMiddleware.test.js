@@ -98,7 +98,7 @@ describe('Security Middleware', () => {
 
   describe('SQL Injection Prevention', () => {
     it('should reject SQL keywords', () => {
-      expect(validateSQLInput("'; DROP TABLE users; --")).toBe(false);
+      expect(validateSQLInput('\'; DROP TABLE users; --')).toBe(false);
       expect(validateSQLInput('1 UNION SELECT * FROM users')).toBe(false);
       expect(validateSQLInput('value; DELETE FROM accounts')).toBe(false);
     });

@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce Routes
- * 
+ *
  * Comprehensive marketplace API routes with authentication and rate limiting.
  */
 

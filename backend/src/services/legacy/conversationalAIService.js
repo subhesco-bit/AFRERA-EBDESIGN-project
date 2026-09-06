@@ -32,8 +32,8 @@ async function createConversationSession(userId, domainId, language = 'en') {
         userId,
         `SESSION-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         domainId,
-        language
-      ]
+        language,
+      ],
     );
 
     return result.rows[0];
@@ -49,7 +49,7 @@ async function createConversationSession(userId, domainId, language = 'en') {
 router.post('/sessions', authMiddleware, async (req, res) => {
   try {
     const { domain_id, language } = req.body;
-    let result = await createConversationSession(req.user.id, domain_id, language);
+    const result = await createConversationSession(req.user.id, domain_id, language);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create session API error', { error: error.message, stack: error.stack });
@@ -62,12 +62,12 @@ router.post('/sessions', authMiddleware, async (req, res) => {
  */
 async function getConversationSession(sessionId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT cs.*, cd.name as domain_name 
        FROM conversation_sessions cs
        LEFT JOIN conversation_domains cd ON cs.domain_id = cd.id
        WHERE cs.session_id = $1`,
-      [sessionId]
+      [sessionId],
     );
 
     if (result.rows.length === 0) {
@@ -86,7 +86,7 @@ async function getConversationSession(sessionId) {
  */
 router.get('/sessions/:sessionId', authMiddleware, async (req, res) => {
   try {
-    let result = await getConversationSession(req.params.sessionId);
+    const result = await getConversationSession(req.params.sessionId);
     res.json(result);
   } catch (error) {
     logger.error('Get session API error', { error: error.message, stack: error.stack });
@@ -117,7 +117,7 @@ async function addMessage(sessionId, role, content, contentType = 'text', metada
 
     const processingTime = Date.now() - startTime;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO conversation_messages 
        (session_id, role, content, content_type, metadata, intent_detected, confidence_score, processing_time_ms)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -130,8 +130,8 @@ async function addMessage(sessionId, role, content, contentType = 'text', metada
         JSON.stringify(metadata),
         intentDetected,
         confidenceScore,
-        processingTime
-      ]
+        processingTime,
+      ],
     );
 
     // Update session activity
@@ -150,7 +150,7 @@ async function addMessage(sessionId, role, content, contentType = 'text', metada
 router.post('/sessions/:sessionId/messages', authMiddleware, async (req, res) => {
   try {
     const { role, content, content_type, metadata } = req.body;
-    let result = await addMessage(req.params.sessionId, role, content, content_type, metadata);
+    const result = await addMessage(req.params.sessionId, role, content, content_type, metadata);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add message API error', { error: error.message, stack: error.stack });
@@ -163,12 +163,12 @@ router.post('/sessions/:sessionId/messages', authMiddleware, async (req, res) =>
  */
 async function getConversationMessages(sessionId, limit = 50) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM conversation_messages 
        WHERE session_id = $1 
        ORDER BY timestamp ASC 
        LIMIT $2`,
-      [sessionId, limit]
+      [sessionId, limit],
     );
 
     return result.rows;
@@ -184,7 +184,7 @@ async function getConversationMessages(sessionId, limit = 50) {
 router.get('/sessions/:sessionId/messages', authMiddleware, async (req, res) => {
   try {
     const { limit } = req.query;
-    let result = await getConversationMessages(req.params.sessionId, parseInt(limit) || 50);
+    const result = await getConversationMessages(req.params.sessionId, parseInt(limit) || 50);
     res.json(result);
   } catch (error) {
     logger.error('Get messages API error', { error: error.message, stack: error.stack });
@@ -203,18 +203,18 @@ async function detectIntent(message) {
   try {
     // Simple keyword-based intent detection (can be enhanced with ML model)
     const lowerMessage = message.toLowerCase();
-    
+
     const intentMap = {
-      'greeting': ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
-      'product_search': ['search', 'find', 'looking for', 'show me', 'product'],
-      'order_status': ['order', 'status', 'track', 'where is my'],
-      'farmer_info': ['farmer', 'profile', 'farmer details'],
-      'loan_inquiry': ['loan', 'credit', 'finance', 'money'],
-      'shipment_tracking': ['shipment', 'delivery', 'track package'],
-      'insurance': ['insurance', 'policy', 'claim'],
-      'organic': ['organic', 'certification', 'traceability'],
-      'nutrition': ['nutrition', 'health', 'dietary'],
-      'help': ['help', 'assist', 'support', 'what can you do']
+      greeting: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
+      product_search: ['search', 'find', 'looking for', 'show me', 'product'],
+      order_status: ['order', 'status', 'track', 'where is my'],
+      farmer_info: ['farmer', 'profile', 'farmer details'],
+      loan_inquiry: ['loan', 'credit', 'finance', 'money'],
+      shipment_tracking: ['shipment', 'delivery', 'track package'],
+      insurance: ['insurance', 'policy', 'claim'],
+      organic: ['organic', 'certification', 'traceability'],
+      nutrition: ['nutrition', 'health', 'dietary'],
+      help: ['help', 'assist', 'support', 'what can you do'],
     };
 
     let detectedIntent = 'general';
@@ -230,7 +230,7 @@ async function detectIntent(message) {
 
     return {
       intent: detectedIntent,
-      confidence: maxMatches > 0 ? 0.85 : 0.50
+      confidence: maxMatches > 0 ? 0.85 : 0.50,
     };
   } catch (error) {
     logger.error('Detect intent error', { error: error.message, stack: error.stack });
@@ -244,7 +244,7 @@ async function detectIntent(message) {
 router.post('/detect-intent', authMiddleware, async (req, res) => {
   try {
     const { message } = req.body;
-    let result = await detectIntent(message);
+    const result = await detectIntent(message);
     res.json(result);
   } catch (error) {
     logger.error('Detect intent API error', { error: error.message, stack: error.stack });
@@ -263,20 +263,20 @@ async function generateResponse(sessionId, userMessage, context = {}) {
   try {
     // Get session info
     const session = await getConversationSession(sessionId);
-    
+
     // Detect intent
-    let intentResult = await detectIntent(userMessage);
-    
+    const intentResult = await detectIntent(userMessage);
+
     // Get response template based on intent
     const response = await getResponseForIntent(intentResult.intent, session.domain_id, context);
-    
+
     // In production, this would call an AI model (OpenAI, Anthropic, etc.)
     // For now, return template-based response
     return {
       content: response,
       intent: intentResult.intent,
       confidence: intentResult.confidence,
-      requires_action: determineIfActionRequired(intentResult.intent)
+      requires_action: determineIfActionRequired(intentResult.intent),
     };
   } catch (error) {
     logger.error('Generate response error', { error: error.message, stack: error.stack });
@@ -291,23 +291,23 @@ async function getResponseForIntent(intent, domainId, context) {
   try {
     // Simple response templates (can be enhanced with knowledge base)
     const responses = {
-      greeting: "Hello! I'm your AFRERA assistant. How can I help you today?",
-      product_search: "I can help you search for products. What type of product are you looking for?",
-      order_status: "I can help you check your order status. Please provide your order number.",
-      farmer_info: "I can help you with farmer information. What would you like to know?",
-      loan_inquiry: "I can help you with loan information. Are you looking to apply for a loan or check your status?",
-      shipment_tracking: "I can help you track your shipment. Please provide your tracking number.",
-      insurance: "I can help you with insurance information. What would you like to know?",
-      organic: "I can help you with organic certification and traceability information.",
-      nutrition: "I can help you with nutrition information and dietary recommendations.",
-      help: "I can assist you with products, orders, farmers, loans, shipments, insurance, organic certification, and nutrition information. What would you like help with?",
-      general: "I'm here to help. Could you please provide more details about what you need?"
+      greeting: 'Hello! I\'m your AFRERA assistant. How can I help you today?',
+      product_search: 'I can help you search for products. What type of product are you looking for?',
+      order_status: 'I can help you check your order status. Please provide your order number.',
+      farmer_info: 'I can help you with farmer information. What would you like to know?',
+      loan_inquiry: 'I can help you with loan information. Are you looking to apply for a loan or check your status?',
+      shipment_tracking: 'I can help you track your shipment. Please provide your tracking number.',
+      insurance: 'I can help you with insurance information. What would you like to know?',
+      organic: 'I can help you with organic certification and traceability information.',
+      nutrition: 'I can help you with nutrition information and dietary recommendations.',
+      help: 'I can assist you with products, orders, farmers, loans, shipments, insurance, organic certification, and nutrition information. What would you like help with?',
+      general: 'I\'m here to help. Could you please provide more details about what you need?',
     };
 
     return responses[intent] || responses.general;
   } catch (error) {
     logger.error('Get response for intent error', { error: error.message, stack: error.stack });
-    return "I apologize, but I'm having trouble processing your request. Please try again.";
+    return 'I apologize, but I\'m having trouble processing your request. Please try again.';
   }
 }
 
@@ -325,16 +325,16 @@ function determineIfActionRequired(intent) {
 router.post('/sessions/:sessionId/respond', authMiddleware, async (req, res) => {
   try {
     const { message, context } = req.body;
-    
+
     // Add user message
     await addMessage(req.params.sessionId, 'user', message);
-    
+
     // Generate response
-    let response = await generateResponse(req.params.sessionId, message, context);
-    
+    const response = await generateResponse(req.params.sessionId, message, context);
+
     // Add assistant message
     await addMessage(req.params.sessionId, 'assistant', response.content);
-    
+
     res.json(response);
   } catch (error) {
     logger.error('Generate response API error', { error: error.message, stack: error.stack });
@@ -351,8 +351,8 @@ router.post('/sessions/:sessionId/respond', authMiddleware, async (req, res) => 
  */
 async function getConversationDomains() {
   try {
-    let result = await pool.query(
-      'SELECT * FROM conversation_domains WHERE is_active = true ORDER BY priority DESC, name'
+    const result = await pool.query(
+      'SELECT * FROM conversation_domains WHERE is_active = true ORDER BY priority DESC, name',
     );
     return result.rows;
   } catch (error) {
@@ -366,7 +366,7 @@ async function getConversationDomains() {
  */
 router.get('/domains', async (req, res) => {
   try {
-    let result = await getConversationDomains();
+    const result = await getConversationDomains();
     res.json(result);
   } catch (error) {
     logger.error('Get domains API error', { error: error.message, stack: error.stack });
@@ -383,7 +383,7 @@ router.get('/domains', async (req, res) => {
  */
 async function setContext(sessionId, contextKey, contextValue, expiresAt = null) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO conversation_context (session_id, context_key, context_value, expires_at)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (session_id, context_key)
@@ -391,7 +391,7 @@ async function setContext(sessionId, contextKey, contextValue, expiresAt = null)
                       expires_at = EXCLUDED.expires_at,
                       updated_at = CURRENT_TIMESTAMP
        RETURNING *`,
-      [sessionId, contextKey, JSON.stringify(contextValue), expiresAt]
+      [sessionId, contextKey, JSON.stringify(contextValue), expiresAt],
     );
 
     return result.rows[0];
@@ -417,7 +417,7 @@ async function getContext(sessionId, contextKey = null) {
     // Filter expired contexts
     query += ' AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
 
     if (contextKey) {
       return result.rows.length > 0 ? result.rows[0] : null;
@@ -442,7 +442,7 @@ async function getContext(sessionId, contextKey = null) {
 router.post('/sessions/:sessionId/context', authMiddleware, async (req, res) => {
   try {
     const { context_key, context_value, expires_at } = req.body;
-    let result = await setContext(req.params.sessionId, context_key, context_value, expires_at);
+    const result = await setContext(req.params.sessionId, context_key, context_value, expires_at);
     res.json(result);
   } catch (error) {
     logger.error('Set context API error', { error: error.message, stack: error.stack });
@@ -456,7 +456,7 @@ router.post('/sessions/:sessionId/context', authMiddleware, async (req, res) => 
 router.get('/sessions/:sessionId/context', authMiddleware, async (req, res) => {
   try {
     const { context_key } = req.query;
-    let result = await getContext(req.params.sessionId, context_key);
+    const result = await getContext(req.params.sessionId, context_key);
     res.json(result);
   } catch (error) {
     logger.error('Get context API error', { error: error.message, stack: error.stack });
@@ -475,7 +475,7 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
   try {
     // Get session messages
     const messages = await getConversationMessages(sessionId);
-    
+
     const userMessages = messages.filter(m => m.role === 'user').length;
     const assistantMessages = messages.filter(m => m.role === 'assistant').length;
     const avgResponseTime = messages
@@ -483,7 +483,7 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
       .reduce((sum, m) => sum + m.processing_time_ms, 0) / assistantMessages || 0;
 
     // Get session info
-    let session = await getConversationSession(sessionId);
+    const session = await getConversationSession(sessionId);
 
     // Record analytics
     await pool.query(
@@ -501,14 +501,14 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
         avgResponseTime,
         resolutionStatus,
         userSatisfaction,
-        feedback
-      ]
+        feedback,
+      ],
     );
 
     // Update session status
     await pool.query(
       'UPDATE conversation_sessions SET status = $1, last_activity_at = CURRENT_TIMESTAMP WHERE id = $2',
-      ['ended', sessionId]
+      ['ended', sessionId],
     );
 
     return { success: true };
@@ -524,7 +524,7 @@ async function endConversation(sessionId, resolutionStatus, userSatisfaction = n
 router.post('/sessions/:sessionId/end', authMiddleware, async (req, res) => {
   try {
     const { resolution_status, user_satisfaction, feedback } = req.body;
-    let result = await endConversation(req.params.sessionId, resolution_status, user_satisfaction, feedback);
+    const result = await endConversation(req.params.sessionId, resolution_status, user_satisfaction, feedback);
     res.json(result);
   } catch (error) {
     logger.error('End conversation API error', { error: error.message, stack: error.stack });
@@ -552,8 +552,6 @@ module.exports = {
   setContext,
   getContext,
   endConversation,
-  isHealthy
+  isHealthy,
 };
-
-
 

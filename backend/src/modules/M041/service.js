@@ -28,7 +28,7 @@ async function createVillage(villageData) {
       infrastructure,
       agricultural_land_area,
       major_crops,
-      livestock_count
+      livestock_count,
     } = villageData;
 
     const village = {
@@ -53,7 +53,7 @@ async function createVillage(villageData) {
       major_crops: major_crops || [],
       livestock_count: livestock_count || {},
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered development index calculation
@@ -64,8 +64,8 @@ async function createVillage(villageData) {
         infrastructure_score: await calculateInfrastructureScore(infrastructure),
         resource_availability: await assessResourceAvailability(water_sources),
         agricultural_potential: await assessAgriculturalPotential(agricultural_land_area, major_crops),
-        demographic_indicators: await calculateDemographicIndicators(population, households)
-      }
+        demographic_indicators: await calculateDemographicIndicators(population, households),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -87,8 +87,8 @@ async function createVillage(villageData) {
         JSON.stringify(village.water_sources), JSON.stringify(village.infrastructure),
         village.agricultural_land_area, JSON.stringify(village.major_crops),
         JSON.stringify(village.livestock_count), village.ai_development_index,
-        village.status, village.created_at
-      ]
+        village.status, village.created_at,
+      ],
     );
 
     logger.info(`Village created: ${village.village_id}`);
@@ -109,7 +109,7 @@ async function addVillageResource(villageId, resourceData) {
       condition,
       last_maintenance_date,
       next_maintenance_date,
-      responsible_person
+      responsible_person,
     } = resourceData;
 
     const resource = {
@@ -123,10 +123,10 @@ async function addVillageResource(villageId, resourceData) {
       last_maintenance_date,
       next_maintenance_date,
       responsible_person,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO village_resources 
        (resource_id, village_id, resource_type, resource_name, capacity, current_utilization, 
         condition, last_maintenance_date, next_maintenance_date, responsible_person, created_at)
@@ -136,8 +136,8 @@ async function addVillageResource(villageId, resourceData) {
         resource.resource_id, resource.village_id, resource.resource_type, resource.resource_name,
         resource.capacity, resource.current_utilization, resource.condition,
         resource.last_maintenance_date, resource.next_maintenance_date,
-        resource.responsible_person, resource.created_at
-      ]
+        resource.responsible_person, resource.created_at,
+      ],
     );
 
     logger.info(`Village resource added: ${resource.resource_id}`);
@@ -150,7 +150,7 @@ async function addVillageResource(villageId, resourceData) {
 
 async function getVillageAnalytics(villageId) {
   try {
-    let village = await pool.query('SELECT * FROM villages WHERE village_id = $1', [villageId]);
+    const village = await pool.query('SELECT * FROM villages WHERE village_id = $1', [villageId]);
     if (village.rows.length === 0) {
       throw new Error('Village not found');
     }
@@ -164,17 +164,17 @@ async function getVillageAnalytics(villageId) {
         total_resources: resources.rows.length,
         by_type: getResourceTypeSummary(resources.rows),
         utilization_rate: calculateAverageUtilization(resources.rows),
-        maintenance_status: getMaintenanceStatus(resources.rows)
+        maintenance_status: getMaintenanceStatus(resources.rows),
       },
       development_metrics: {
         development_index: village.rows[0].ai_development_index,
         infrastructure_score: await calculateInfrastructureScore(village.rows[0].infrastructure),
         agricultural_potential: await assessAgriculturalPotential(
           village.rows[0].agricultural_land_area,
-          village.rows[0].major_crops
-        )
+          village.rows[0].major_crops,
+        ),
       },
-      ai_insights: await generateVillageInsights(village.rows[0], resources.rows)
+      ai_insights: await generateVillageInsights(village.rows[0], resources.rows),
     };
 
     return analytics;
@@ -190,10 +190,10 @@ function generateId() {
 
 async function calculateInfrastructureScore(infrastructure) {
   if (!infrastructure) return 50;
-  
+
   let score = 0;
   const features = ['roads', 'electricity', 'water_supply', 'healthcare', 'education', 'internet'];
-  
+
   features.forEach(feature => {
     if (infrastructure[feature]) score += 16.67;
   });
@@ -216,7 +216,7 @@ async function assessAgriculturalPotential(landArea, crops) {
 async function calculateDemographicIndicators(population, households) {
   return {
     population_density: households > 0 ? population / households : 0,
-    household_size: households > 0 ? population / households : 0
+    household_size: households > 0 ? population / households : 0,
   };
 }
 
@@ -237,30 +237,30 @@ function calculateAverageUtilization(resources) {
 function getMaintenanceStatus(resources) {
   const needsMaintenance = resources.filter(r => r.condition === 'poor').length;
   const wellMaintained = resources.filter(r => r.condition === 'good').length;
-  
+
   return {
     needs_maintenance: needsMaintenance,
     well_maintained: wellMaintained,
-    overall_status: needsMaintenance > resources.length / 2 ? 'attention_needed' : 'good'
+    overall_status: needsMaintenance > resources.length / 2 ? 'attention_needed' : 'good',
   };
 }
 
 async function generateVillageInsights(village, resources) {
-  let aiRequest = {
+  const aiRequest = {
     task: 'village_analytics_insights',
     parameters: {
       village_data: village,
       resource_data: resources,
-      development_index: village.ai_development_index
-    }
+      development_index: village.ai_development_index,
+    },
   };
 
-  let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
   return aiResponse;
 }
 
 module.exports = {
   createVillage,
   addVillageResource,
-  getVillageAnalytics
+  getVillageAnalytics,
 };

@@ -14,7 +14,7 @@ const router = express.Router();
 
 const DAILY_VALUES = Object.freeze({
   CAL: 2000, PRO: 50, CARB: 275, FIB: 28, FAT: 78, SAT_FAT: 20,
-  SOD: 2300, IRON: 18, VIT_A: 900, VIT_C: 90
+  SOD: 2300, IRON: 18, VIT_A: 900, VIT_C: 90,
 });
 
 function calculateNutrientTotals(items, servings = 1) {
@@ -45,7 +45,7 @@ function calculateNutrientTotals(items, servings = 1) {
     per_serving: perServing,
     daily_value_percent: dailyValue,
     provenance: 'calculated from caller-supplied ingredient values; values require verified food or laboratory sources',
-    disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
   };
 }
 
@@ -81,7 +81,7 @@ if (process.env.NODE_ENV === 'test') {
         PRO: 8.0,
         CARB: 70,
         FIB: 3.5,
-        FAT: 1.0
+        FAT: 1.0,
       },
       calories_per_serving: 320,
       serving_size_g: 100,
@@ -90,7 +90,7 @@ if (process.env.NODE_ENV === 'test') {
       confidence_score: 0.95,
       testing_laboratory: 'Test Lab',
       sample_batch_number: 'BATCH-001',
-      test_date: '2024-01-15'
+      test_date: '2024-01-15',
     };
   };
 
@@ -115,7 +115,7 @@ if (process.env.NODE_ENV === 'test') {
       product_a: { id: productAId, nutrition_data: {}, score: 80, grade: 'A' },
       product_b: { id: productBId, nutrition_data: {}, score: 70, grade: 'B+' },
       winner: productAId,
-      comparison_reason: 'Product A has higher nutrition score (80 vs 70)'
+      comparison_reason: 'Product A has higher nutrition score (80 vs 70)',
     };
   };
 
@@ -144,7 +144,7 @@ async function getNutrients() {
       `SELECT n.*, nc.name as category_name 
        FROM nutrients n 
        LEFT JOIN nutrient_categories nc ON n.category_id = nc.id 
-       ORDER BY nc.display_order, n.name`
+       ORDER BY nc.display_order, n.name`,
     );
     return result.rows;
   } catch (error) {
@@ -158,7 +158,7 @@ async function getNutrients() {
  */
 router.get('/nutrients', async (req, res) => {
   try {
-    let result = await getNutrients();
+    const result = await getNutrients();
     res.json(result);
   } catch (error) {
     logger.error('Get nutrients API error', { error: error.message, stack: error.stack });
@@ -188,11 +188,11 @@ async function createFoodNutritionProfile(data) {
     glycemic_index,
     glycemic_load,
     anti_inflammatory_score,
-    antioxidant_capacity
+    antioxidant_capacity,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO food_nutrition_profiles 
        (food_name, scientific_name, food_group, botanical_family, variety, origin_region, 
         is_organic, nutrition_data, serving_size_g, calories_per_100g, glycemic_index, 
@@ -213,8 +213,8 @@ async function createFoodNutritionProfile(data) {
         glycemic_index,
         glycemic_load,
         anti_inflammatory_score,
-        antioxidant_capacity
-      ]
+        antioxidant_capacity,
+      ],
     );
 
     return result.rows[0];
@@ -229,7 +229,7 @@ async function createFoodNutritionProfile(data) {
  */
 router.post('/food-profiles', authMiddleware, async (req, res) => {
   try {
-    let result = await createFoodNutritionProfile(req.body);
+    const result = await createFoodNutritionProfile(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Create food profile API error', { error: error.message, stack: error.stack });
@@ -255,7 +255,7 @@ async function searchFoodProfiles(query, foodGroup = null) {
 
     queryText += ' ORDER BY food_name LIMIT 50';
 
-    let result = await pool.query(queryText, queryParams);
+    const result = await pool.query(queryText, queryParams);
     return result.rows;
   } catch (error) {
     logger.error('Search food profiles error', { error: error.message, stack: error.stack });
@@ -272,7 +272,7 @@ router.get('/food-profiles/search', async (req, res) => {
     if (!q) {
       return res.status(400).json({ error: 'Query parameter q is required' });
     }
-    let result = await searchFoodProfiles(q, food_group);
+    const result = await searchFoodProfiles(q, food_group);
     res.json(result);
   } catch (error) {
     logger.error('Search food profiles API error', { error: error.message, stack: error.stack });
@@ -300,11 +300,11 @@ async function addProductNutrition(data) {
     serving_size_g,
     servings_per_container,
     verification_method,
-    confidence_score
+    confidence_score,
   } = data;
 
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO product_nutrition 
        (product_id, nutrition_profile_id, lab_test_id, test_date, testing_laboratory, 
         sample_batch_number, nutrition_data, calories_per_serving, serving_size_g, 
@@ -323,8 +323,8 @@ async function addProductNutrition(data) {
         serving_size_g,
         servings_per_container,
         verification_method,
-        confidence_score
-      ]
+        confidence_score,
+      ],
     );
 
     return result.rows[0];
@@ -339,7 +339,7 @@ async function addProductNutrition(data) {
  */
 router.post('/product-nutrition', authMiddleware, async (req, res) => {
   try {
-    let result = await addProductNutrition(req.body);
+    const result = await addProductNutrition(req.body);
     res.status(201).json(result);
   } catch (error) {
     logger.error('Add product nutrition API error', { error: error.message, stack: error.stack });
@@ -352,14 +352,14 @@ router.post('/product-nutrition', authMiddleware, async (req, res) => {
  */
 async function getProductNutrition(productId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT pn.*, fnp.food_name 
        FROM product_nutrition pn
        LEFT JOIN food_nutrition_profiles fnp ON pn.nutrition_profile_id = fnp.id
        WHERE pn.product_id = $1
        ORDER BY pn.created_at DESC
        LIMIT 1`,
-      [productId]
+      [productId],
     );
 
     if (result.rows.length === 0) {
@@ -378,7 +378,7 @@ async function getProductNutrition(productId) {
  */
 router.get('/product-nutrition/:productId', async (req, res) => {
   try {
-    let result = await getProductNutrition(req.params.productId);
+    const result = await getProductNutrition(req.params.productId);
     res.json(result);
   } catch (error) {
     logger.error('Get product nutrition API error', { error: error.message, stack: error.stack });
@@ -398,7 +398,7 @@ async function calculateProductNutritionScore(productId, scoringModelId = 1) {
     // Get product nutrition
     const nutritionResult = await pool.query(
       'SELECT nutrition_data FROM product_nutrition WHERE product_id = $1 ORDER BY created_at DESC LIMIT 1',
-      [productId]
+      [productId],
     );
 
     if (nutritionResult.rows.length === 0) {
@@ -410,7 +410,7 @@ async function calculateProductNutritionScore(productId, scoringModelId = 1) {
     // Calculate score using database function
     const scoreResult = await pool.query(
       'SELECT calculate_nutrition_score($1, $2) as score',
-      [JSON.stringify(nutritionData), scoringModelId]
+      [JSON.stringify(nutritionData), scoringModelId],
     );
 
     const overallScore = scoreResult.rows[0].score;
@@ -418,10 +418,10 @@ async function calculateProductNutritionScore(productId, scoringModelId = 1) {
     // Assign grade
     const gradeResult = await pool.query(
       'SELECT assign_nutrition_grade($1) as grade',
-      [overallScore]
+      [overallScore],
     );
 
-    let grade = gradeResult.rows[0].grade;
+    const grade = gradeResult.rows[0].grade;
 
     // Save score
     const saveResult = await pool.query(
@@ -429,7 +429,7 @@ async function calculateProductNutritionScore(productId, scoringModelId = 1) {
        (product_id, scoring_model_id, overall_score, grade)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [productId, scoringModelId, overallScore, grade]
+      [productId, scoringModelId, overallScore, grade],
     );
 
     return saveResult.rows[0];
@@ -445,7 +445,7 @@ async function calculateProductNutritionScore(productId, scoringModelId = 1) {
 router.post('/product-nutrition/:productId/score', authMiddleware, async (req, res) => {
   try {
     const { scoring_model_id } = req.body;
-    let result = await calculateProductNutritionScore(req.params.productId, scoring_model_id);
+    const result = await calculateProductNutritionScore(req.params.productId, scoring_model_id);
     res.json(result);
   } catch (error) {
     logger.error('Calculate score API error', { error: error.message, stack: error.stack });
@@ -458,12 +458,12 @@ router.post('/product-nutrition/:productId/score', authMiddleware, async (req, r
  */
 async function getProductNutritionScore(productId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM product_nutrition_scores 
        WHERE product_id = $1 
        ORDER BY calculated_at DESC 
        LIMIT 1`,
-      [productId]
+      [productId],
     );
 
     if (result.rows.length === 0) {
@@ -482,7 +482,7 @@ async function getProductNutritionScore(productId) {
  */
 router.get('/product-nutrition/:productId/score', async (req, res) => {
   try {
-    let result = await getProductNutritionScore(req.params.productId);
+    const result = await getProductNutritionScore(req.params.productId);
     res.json(result);
   } catch (error) {
     logger.error('Get score API error', { error: error.message, stack: error.stack });
@@ -501,11 +501,11 @@ async function calculateNutritionPricing(productId, basePrice, pricingRuleId = 1
   try {
     // Get nutrition score
     const scoreData = await getProductNutritionScore(productId);
-    
+
     // Get pricing rule
     const ruleResult = await pool.query(
       'SELECT * FROM nutrition_pricing_rules WHERE id = $1 AND is_active = true',
-      [pricingRuleId]
+      [pricingRuleId],
     );
 
     if (ruleResult.rows.length === 0) {
@@ -534,7 +534,7 @@ async function calculateNutritionPricing(productId, basePrice, pricingRuleId = 1
     const premiumPercentage = (adjustment / basePrice) * 100;
 
     // Save pricing
-    let saveResult = await pool.query(
+    const saveResult = await pool.query(
       `INSERT INTO product_nutrition_pricing 
        (product_id, nutrition_score_id, pricing_rule_id, base_price, nutrition_adjustment, 
         final_price, price_premium_percentage, value_factors)
@@ -551,9 +551,9 @@ async function calculateNutritionPricing(productId, basePrice, pricingRuleId = 1
         JSON.stringify({
           nutrition_grade: scoreData.grade,
           nutrition_score: score,
-          base_price: basePrice
-        })
-      ]
+          base_price: basePrice,
+        }),
+      ],
     );
 
     return saveResult.rows[0];
@@ -569,7 +569,7 @@ async function calculateNutritionPricing(productId, basePrice, pricingRuleId = 1
 router.post('/product-nutrition/:productId/pricing', authMiddleware, async (req, res) => {
   try {
     const { base_price, pricing_rule_id } = req.body;
-    let result = await calculateNutritionPricing(req.params.productId, base_price, pricing_rule_id);
+    const result = await calculateNutritionPricing(req.params.productId, base_price, pricing_rule_id);
     res.json(result);
   } catch (error) {
     logger.error('Calculate pricing API error', { error: error.message, stack: error.stack });
@@ -608,12 +608,12 @@ const NUTRIENT_META = {
   CAL: { label: 'Calcium', unit: 'mg' },
   FIB: { label: 'Dietary Fiber', unit: 'g' },
   // Specialty/spice value compounds
-  CURCUMIN_PCT: { label: 'Curcumin content', unit: '%' },       // turmeric
+  CURCUMIN_PCT: { label: 'Curcumin content', unit: '%' }, // turmeric
   CAPSAICIN_SHU: { label: 'Pungency (Scoville)', unit: 'SHU' }, // chilli — heat-focused varieties (Dragon, Naga/Bhut Jolokia)
-  ASTA_COLOR: { label: 'Color value (ASTA)', unit: 'ASTA' },    // chilli — color-focused varieties (Kashmiri mirch: low heat, high color)
-  PIPERINE_PCT: { label: 'Piperine content', unit: '%' },       // black pepper
-  GINGEROL_PCT: { label: 'Gingerol content', unit: '%' },       // ginger
-  CATECHIN_PCT: { label: 'Catechin content', unit: '%' },       // tea
+  ASTA_COLOR: { label: 'Color value (ASTA)', unit: 'ASTA' }, // chilli — color-focused varieties (Kashmiri mirch: low heat, high color)
+  PIPERINE_PCT: { label: 'Piperine content', unit: '%' }, // black pepper
+  GINGEROL_PCT: { label: 'Gingerol content', unit: '%' }, // ginger
+  CATECHIN_PCT: { label: 'Catechin content', unit: '%' }, // tea
 };
 
 /**
@@ -635,7 +635,7 @@ async function calculateValuePerNutrient(productId) {
        FROM products p
        LEFT JOIN regional_variety_directory rvd ON rvd.id = p.variety_directory_id
        WHERE p.id = $1`,
-      [productId]
+      [productId],
     );
     if (productResult.rows.length === 0) throw new Error('Product not found');
     const product = productResult.rows[0];
@@ -650,7 +650,7 @@ async function calculateValuePerNutrient(productId) {
         `SELECT compound_key, typical_min, typical_max, unit, source_url
          FROM crop_value_compound_reference
          WHERE variety_name = $1 AND verified = TRUE`,
-        [product.variety_name]
+        [product.variety_name],
       );
       varietyReferences = refResult.rows;
     }
@@ -663,7 +663,7 @@ async function calculateValuePerNutrient(productId) {
        JOIN products p ON p.id = pn.product_id
        WHERE p.category_id = $1 AND p.id != $2 AND p.is_active = true
        ORDER BY pn.product_id, pn.created_at DESC`,
-      [product.category_id, productId]
+      [product.category_id, productId],
     );
 
     const nutrientComparisons = [];
@@ -694,9 +694,9 @@ async function calculateValuePerNutrient(productId) {
     }
 
     const withCategoryData = nutrientComparisons.filter((c) => c.pct_vs_category !== null);
-    const leadingNutrient = withCategoryData.length > 0
-      ? withCategoryData.reduce((best, c) => (c.pct_vs_category > best.pct_vs_category ? c : best))
-      : null;
+    const leadingNutrient = withCategoryData.length > 0 ?
+      withCategoryData.reduce((best, c) => (c.pct_vs_category > best.pct_vs_category ? c : best)) :
+      null;
 
     let explanation;
     if (!leadingNutrient) {
@@ -717,9 +717,9 @@ async function calculateValuePerNutrient(productId) {
       // Published, human-verified reference ranges for the variety — labelled
       // distinctly from the per-batch comparisons above; a variety-typical
       // range is not a claim about this specific seller's lot.
-      variety_published_references: product.variety_name
-        ? { variety_name: product.variety_name, ranges: varietyReferences }
-        : null,
+      variety_published_references: product.variety_name ?
+        { variety_name: product.variety_name, ranges: varietyReferences } :
+        null,
     };
   } catch (error) {
     logger.error('Calculate value-per-nutrient error', { error: error.message, stack: error.stack });
@@ -729,7 +729,7 @@ async function calculateValuePerNutrient(productId) {
 
 router.get('/product-nutrition/:productId/value-per-nutrient', async (req, res) => {
   try {
-    let result = await calculateValuePerNutrient(req.params.productId);
+    const result = await calculateValuePerNutrient(req.params.productId);
     res.json(result);
   } catch (error) {
     logger.error('Value-per-nutrient API error', { error: error.message, stack: error.stack });
@@ -756,18 +756,18 @@ async function compareProductsNutrition(productAId, productBId) {
         id: productAId,
         nutrition_data: nutritionA.nutrition_data,
         score: scoreA.overall_score,
-        grade: scoreA.grade
+        grade: scoreA.grade,
       },
       product_b: {
         id: productBId,
         nutrition_data: nutritionB.nutrition_data,
         score: scoreB.overall_score,
-        grade: scoreB.grade
+        grade: scoreB.grade,
       },
       winner: scoreA.overall_score >= scoreB.overall_score ? productAId : productBId,
-      comparison_reason: scoreA.overall_score >= scoreB.overall_score 
-        ? `Product A has higher nutrition score (${scoreA.overall_score} vs ${scoreB.overall_score})`
-        : `Product B has higher nutrition score (${scoreB.overall_score} vs ${scoreA.overall_score})`
+      comparison_reason: scoreA.overall_score >= scoreB.overall_score ?
+        `Product A has higher nutrition score (${scoreA.overall_score} vs ${scoreB.overall_score})` :
+        `Product B has higher nutrition score (${scoreB.overall_score} vs ${scoreA.overall_score})`,
     };
 
     // Save comparison
@@ -775,7 +775,7 @@ async function compareProductsNutrition(productAId, productBId) {
       `INSERT INTO nutrition_comparisons 
        (product_a_id, product_b_id, comparison_metrics, winner_product_id, comparison_reason)
        VALUES ($1, $2, $3, $4, $5)`,
-      [productAId, productBId, JSON.stringify(comparison), comparison.winner, comparison.comparison_reason]
+      [productAId, productBId, JSON.stringify(comparison), comparison.winner, comparison.comparison_reason],
     );
 
     return comparison;
@@ -791,7 +791,7 @@ async function compareProductsNutrition(productAId, productBId) {
 router.post('/compare', async (req, res) => {
   try {
     const { product_a_id, product_b_id } = req.body;
-    let result = await compareProductsNutrition(product_a_id, product_b_id);
+    const result = await compareProductsNutrition(product_a_id, product_b_id);
     res.json(result);
   } catch (error) {
     logger.error('Compare products API error', { error: error.message, stack: error.stack });
@@ -808,8 +808,8 @@ router.post('/compare', async (req, res) => {
  */
 async function getDietaryProfiles() {
   try {
-    let result = await pool.query(
-      'SELECT * FROM dietary_profiles ORDER BY name'
+    const result = await pool.query(
+      'SELECT * FROM dietary_profiles ORDER BY name',
     );
     return result.rows;
   } catch (error) {
@@ -823,7 +823,7 @@ async function getDietaryProfiles() {
  */
 router.get('/dietary-profiles', async (req, res) => {
   try {
-    let result = await getDietaryProfiles();
+    const result = await getDietaryProfiles();
     res.json(result);
   } catch (error) {
     logger.error('Get dietary profiles API error', { error: error.message, stack: error.stack });
@@ -841,9 +841,9 @@ router.get('/dietary-profiles', async (req, res) => {
  */
 async function getDietaryProfileById(dietaryProfileId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM dietary_profiles WHERE id = $1',
-      [dietaryProfileId]
+      [dietaryProfileId],
     );
 
     if (result.rows.length === 0) {
@@ -882,13 +882,13 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
   try {
     const profile = await getDietaryProfileById(dietaryProfileId);
 
-    const preferredFoods = Array.isArray(profile.preferred_foods) && profile.preferred_foods.length > 0
-      ? profile.preferred_foods
-      : null;
+    const preferredFoods = Array.isArray(profile.preferred_foods) && profile.preferred_foods.length > 0 ?
+      profile.preferred_foods :
+      null;
 
-    const effectiveCalorieTarget = options.targetCalories != null
-      ? Number(options.targetCalories)
-      : (profile.daily_calorie_target || null);
+    const effectiveCalorieTarget = options.targetCalories != null ?
+      Number(options.targetCalories) :
+      (profile.daily_calorie_target || null);
 
     // Rough per-serving ceiling so a single recommended product doesn't blow
     // past a whole day's calorie target (roughly one meal's worth).
@@ -896,7 +896,7 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
 
     const resultLimit = Math.min(Math.max(parseInt(options.limit, 10) || 10, 1), 50);
 
-    let productResult = await pool.query(
+    const productResult = await pool.query(
       `WITH latest_nutrition AS (
          SELECT DISTINCT ON (product_id) product_id, nutrition_profile_id, nutrition_data,
                 calories_per_serving, serving_size_g
@@ -921,7 +921,7 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
          AND ($2::numeric IS NULL OR ln.calories_per_serving IS NULL OR ln.calories_per_serving <= $2)
        ORDER BY ls.overall_score DESC NULLS LAST, p.name
        LIMIT $3`,
-      [preferredFoods, perServingCeiling, resultLimit]
+      [preferredFoods, perServingCeiling, resultLimit],
     );
 
     const wellnessResult = await pool.query(
@@ -931,10 +931,10 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
        WHERE ($1::text[] IS NULL OR related_product_tags && $1::text[])
        ORDER BY practice_name
        LIMIT 5`,
-      [preferredFoods]
+      [preferredFoods],
     );
 
-    let saveResult = await pool.query(
+    const saveResult = await pool.query(
       `INSERT INTO nutrition_recommendations
          (user_id, dietary_profile_id, recommended_products, daily_nutrition_targets, meal_plan_suggestions, expires_at)
        VALUES ($1, $2, $3, $4, $5, NOW() + INTERVAL '30 days')
@@ -944,8 +944,8 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
         dietaryProfileId,
         JSON.stringify(productResult.rows),
         JSON.stringify({ calorie_target_kcal_per_day: effectiveCalorieTarget }),
-        JSON.stringify(wellnessResult.rows)
-      ]
+        JSON.stringify(wellnessResult.rows),
+      ],
     );
 
     return {
@@ -956,7 +956,7 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
       wellness_suggestions: wellnessResult.rows,
       generated_at: saveResult.rows[0].generated_at,
       expires_at: saveResult.rows[0].expires_at,
-      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
     };
   } catch (error) {
     logger.error('Get personalized product recommendations error', { error: error.message, stack: error.stack });
@@ -973,20 +973,20 @@ router.post('/recommendations', authMiddleware, async (req, res) => {
     if (!dietary_profile_id) {
       return res.status(400).json({
         error: 'dietary_profile_id is required',
-        disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
       });
     }
 
-    let result = await getPersonalizedProductRecommendations(req.user.id, dietary_profile_id, {
+    const result = await getPersonalizedProductRecommendations(req.user.id, dietary_profile_id, {
       targetCalories: target_calories,
-      limit
+      limit,
     });
     res.json(result);
   } catch (error) {
     logger.error('Generate recommendations API error', { error: error.message, stack: error.stack });
     res.status(500).json({
       error: 'Failed to generate personalized recommendations',
-      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
     });
   }
 });
@@ -996,18 +996,18 @@ router.post('/recommendations', authMiddleware, async (req, res) => {
  */
 router.get('/recommendations', authMiddleware, async (req, res) => {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT * FROM nutrition_recommendations
        WHERE user_id = $1
        ORDER BY generated_at DESC
        LIMIT 1`,
-      [req.user.id]
+      [req.user.id],
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
         error: 'No recommendations found',
-        disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
       });
     }
 
@@ -1036,7 +1036,7 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
  */
 async function generateDietBasedRecipe(userId, dietaryProfileId, options = {}) {
   try {
-    let profile = await getDietaryProfileById(dietaryProfileId);
+    const profile = await getDietaryProfileById(dietaryProfileId);
     const recommendations = await getPersonalizedProductRecommendations(userId, dietaryProfileId, {
       targetCalories: options.targetCalories,
       limit: options.ingredientLimit || 8,
@@ -1054,14 +1054,14 @@ async function generateDietBasedRecipe(userId, dietaryProfileId, options = {}) {
       .map((p) => `${p.name} (${p.food_group || 'uncategorized'}${p.calories_per_serving ? `, ${p.calories_per_serving} kcal/serving` : ''})`)
       .join('; ');
 
-    const prompt = `You are a nutrition-focused recipe assistant for an Indian agri-marketplace. `
-      + `Using ONLY these real available ingredients: ${ingredientList}. `
-      + `${profile.name ? `Dietary profile: ${profile.name}. ` : ''}`
-      + `${profile.avoid_nutrients ? `Avoid: ${JSON.stringify(profile.avoid_nutrients)}. ` : ''}`
-      + `${recommendations.calorie_target_kcal_per_day ? `Target roughly ${recommendations.calorie_target_kcal_per_day} kcal/day for this meal's share. ` : ''}`
-      + `Suggest one practical recipe using a subset of these ingredients. Include: dish name, `
-      + `ingredient list with approximate quantities, preparation steps, and an approximate calorie `
-      + `estimate per serving. Do not invent ingredients outside the list given.`;
+    const prompt = 'You are a nutrition-focused recipe assistant for an Indian agri-marketplace. ' +
+      `Using ONLY these real available ingredients: ${ingredientList}. ` +
+      `${profile.name ? `Dietary profile: ${profile.name}. ` : ''}` +
+      `${profile.avoid_nutrients ? `Avoid: ${JSON.stringify(profile.avoid_nutrients)}. ` : ''}` +
+      `${recommendations.calorie_target_kcal_per_day ? `Target roughly ${recommendations.calorie_target_kcal_per_day} kcal/day for this meal's share. ` : ''}` +
+      'Suggest one practical recipe using a subset of these ingredients. Include: dish name, ' +
+      'ingredient list with approximate quantities, preparation steps, and an approximate calorie ' +
+      'estimate per serving. Do not invent ingredients outside the list given.';
 
     let aiResult;
     try {
@@ -1108,7 +1108,7 @@ router.post('/recipes', authMiddleware, async (req, res) => {
       });
     }
 
-    let result = await generateDietBasedRecipe(req.user.id, dietary_profile_id, {
+    const result = await generateDietBasedRecipe(req.user.id, dietary_profile_id, {
       targetCalories: target_calories,
       provider,
     });
@@ -1156,10 +1156,10 @@ async function getWellnessPractices(filters = {}) {
 
     query += ' ORDER BY practice_name';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return {
       practices: result.rows,
-      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
     };
   } catch (error) {
     logger.error('Get wellness practices error', { error: error.message, stack: error.stack });
@@ -1173,7 +1173,7 @@ async function getWellnessPractices(filters = {}) {
 router.get('/wellness-practices', async (req, res) => {
   try {
     const { category, tag } = req.query;
-    let result = await getWellnessPractices({ category, tag });
+    const result = await getWellnessPractices({ category, tag });
     res.json(result);
   } catch (error) {
     logger.error('Get wellness practices API error', { error: error.message, stack: error.stack });
@@ -1207,8 +1207,6 @@ module.exports = {
   generateDietBasedRecipe,
   getWellnessPractices,
   calculateNutrientTotals,
-  isHealthy
+  isHealthy,
 };
-
-
 

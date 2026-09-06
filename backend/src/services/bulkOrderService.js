@@ -7,7 +7,7 @@ class BulkOrderService {
       const id = require('uuid').v4();
       await db('bulk_orders').insert({
         id, buyer_id: data.buyer_id, quantity: data.quantity, total_amount: data.total_amount,
-        status: 'requested', created_at: new Date()
+        status: 'requested', created_at: new Date(),
       });
       logger.info(`Bulk order created: ${id}`);
       return { order_id: id, status: 'requested' };

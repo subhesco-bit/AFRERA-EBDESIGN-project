@@ -59,7 +59,7 @@ const DOMAIN = Object.freeze({
   CRM: 'AF-CRM',
   LEGAL: 'AF-LEG',
   RISK: 'AF-RSK',
-  EMERGENCY: 'AF-EMR'
+  EMERGENCY: 'AF-EMR',
 });
 
 /**
@@ -84,9 +84,9 @@ function proposal({ domain, type, subjectType, subjectId, proposed, current, rat
     mcda_breakdown: breakdown ?? null,
     caused_by: causedBy ?? [],
     status: 'proposed',
-    approved_by: null,      // stays null until a human sets it
+    approved_by: null, // stays null until a human sets it
     requires_human: true,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
   };
 }
 
@@ -129,9 +129,9 @@ const AGENTS = [
         rationale:
           `Projected cash over the next ${ctx.horizonDays ?? 30} days is short by ₹${Math.round(shortfall)}: ` +
           `₹${Math.round(cash)} on hand plus ₹${Math.round(inflow)} receivable against ₹${Math.round(outflow)} payable. ` +
-          'Consider accelerating collections or rescheduling payables before the window closes.'
+          'Consider accelerating collections or rescheduling payables before the window closes.',
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -158,14 +158,14 @@ const AGENTS = [
         proposed: {
           action: 'prioritise_collections',
           exposure,
-          accounts: overdue.slice(0, 10).map((i) => ({ customer: i.customerId, amount: i.amountDue, daysOverdue: i.daysOverdue }))
+          accounts: overdue.slice(0, 10).map((i) => ({ customer: i.customerId, amount: i.amountDue, daysOverdue: i.daysOverdue })),
         },
         confidence: 1, // this is arithmetic on recorded invoices, not a prediction
         rationale:
           `${overdue.length} invoice(s) are overdue, totalling ₹${Math.round(exposure)} of exposure. ` +
-          `The oldest is ${worst.daysOverdue} days past due. Collections effort ranked by amount at risk.`
+          `The oldest is ${worst.daysOverdue} days past due. Collections effort ranked by amount at risk.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -189,36 +189,36 @@ const AGENTS = [
             name: 'Price competitiveness',
             weight: 0.40,
             score: price > 0 ? Math.max(0, Math.min(100, (lowest / price) * 100)) : 0,
-            dataQuality: 'real'
+            dataQuality: 'real',
           },
           {
             name: 'Delivery lead time',
             weight: 0.25,
-            score: Number.isFinite(Number(b.deliveryDays))
-              ? Math.max(0, 100 - Number(b.deliveryDays) * 2)
-              : 50,
-            dataQuality: Number.isFinite(Number(b.deliveryDays)) ? 'real' : 'assumed'
+            score: Number.isFinite(Number(b.deliveryDays)) ?
+              Math.max(0, 100 - Number(b.deliveryDays) * 2) :
+              50,
+            dataQuality: Number.isFinite(Number(b.deliveryDays)) ? 'real' : 'assumed',
           },
           {
             name: 'Past quality performance',
             weight: 0.25,
             score: Number.isFinite(Number(b.qualityScore)) ? Number(b.qualityScore) : 50,
-            dataQuality: Number.isFinite(Number(b.qualityScore)) ? 'real' : 'assumed'
+            dataQuality: Number.isFinite(Number(b.qualityScore)) ? 'real' : 'assumed',
           },
           {
             name: 'Delivery reliability',
             weight: 0.10,
             score: Number.isFinite(Number(b.onTimePct)) ? Number(b.onTimePct) : 50,
-            dataQuality: Number.isFinite(Number(b.onTimePct)) ? 'real' : 'assumed'
-          }
+            dataQuality: Number.isFinite(Number(b.onTimePct)) ? 'real' : 'assumed',
+          },
         ];
         return { vendor: b.vendorId, quotedTotal: price, result: mcda(criteria) };
       }).sort((a, b) => b.result.total - a.result.total);
 
       const winner = scored[0];
-      const margin = scored.length > 1
-        ? Math.round((winner.result.total - scored[1].result.total) * 10) / 10
-        : winner.result.total;
+      const margin = scored.length > 1 ?
+        Math.round((winner.result.total - scored[1].result.total) * 10) / 10 :
+        winner.result.total;
 
       // A close call should not look like a clear recommendation.
       const decisive = margin >= 5;
@@ -235,14 +235,14 @@ const AGENTS = [
         breakdown: winner.result,
         rationale:
           `${winner.vendor} scores ${winner.result.total}/100 (${winner.result.confidenceLabel.toLowerCase()}), ` +
-          `leading by ${margin} points. Most sensitive to: ${winner.result.mostSensitiveTo}. ` +
-          (notCheapest
-            ? `Note this is NOT the lowest bid — ${cheapest.vendor} quoted ₹${Math.round(cheapest.quotedTotal)} — the difference is justified by delivery and quality weighting. `
-            : '') +
-          (decisive ? '' : 'Margin is under 5 points, so treat this as a close call rather than a clear winner. ') +
-          'Award requires human approval.'
+          `leading by ${margin} points. Most sensitive to: ${winner.result.mostSensitiveTo}. ${
+            notCheapest ?
+              `Note this is NOT the lowest bid — ${cheapest.vendor} quoted ₹${Math.round(cheapest.quotedTotal)} — the difference is justified by delivery and quality weighting. ` :
+              ''
+          }${decisive ? '' : 'Margin is under 5 points, so treat this as a close call rather than a clear winner. '
+          }Award requires human approval.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -281,11 +281,11 @@ const AGENTS = [
         rationale:
           `Stock on hand (${onHand}) is below the reorder point of ${Math.ceil(reorderPoint)} ` +
           `(${Math.round(dailyMean)}/day over a ${leadDays}-day lead time, plus ${Math.ceil(safety)} safety stock ` +
-          `for demand variability). ` +
-          (daysCover !== null ? `About ${daysCover} days of cover remain. ` : '') +
-          `Suggest ordering ${suggestedQty}. Confidence reflects ${history.length} days of history.`
+          `for demand variability). ${
+            daysCover !== null ? `About ${daysCover} days of cover remain. ` : ''
+          }Suggest ordering ${suggestedQty}. Confidence reflects ${history.length} days of history.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -312,14 +312,14 @@ const AGENTS = [
           action: 'review_for_markdown_or_write_off',
           itemCount: slow.length,
           capitalTiedUp: tied,
-          items: slow.slice(0, 10).map((i) => ({ code: i.code, value: i.value, idleDays: i.daysSinceLastMovement }))
+          items: slow.slice(0, 10).map((i) => ({ code: i.code, value: i.value, idleDays: i.daysSinceLastMovement })),
         },
         confidence: 1,
         rationale:
           `${slow.length} item(s) have not moved in ${ctx.thresholdDays ?? 90}+ days, tying up ₹${Math.round(tied)}. ` +
-          'For perishable stock this is also a spoilage risk, not only a capital one. Review for markdown, redeployment or write-off.'
+          'For perishable stock this is also a spoilage risk, not only a capital one. Review for markdown, redeployment or write-off.',
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -367,16 +367,16 @@ const AGENTS = [
           percentPerPeriod: Math.round((trend / currentLevel) * 1000) / 10,
           horizonPeriods: horizon,
           forecastTotal: Math.round(forecast.reduce((s, v) => s + v, 0)),
-          action: rising ? 'increase_supply' : 'review_pricing'
+          action: rising ? 'increase_supply' : 'review_pricing',
         },
         confidence: accuracy,
         rationale:
           `Demand is ${rising ? 'rising' : 'falling'} — projected ${(projectedChange * 100).toFixed(0)}% ` +
           `change over the next ${horizon} periods from a current level of ${Math.round(currentLevel)}, ` +
-          `on a forecast with ${(accuracy * 100).toFixed(0)}% in-sample accuracy across ${series.length} observations. ` +
-          (rising ? 'Secure additional supply before the trend prices it up.' : 'Review pricing to defend volume.')
+          `on a forecast with ${(accuracy * 100).toFixed(0)}% in-sample accuracy across ${series.length} observations. ${
+            rising ? 'Secure additional supply before the trend prices it up.' : 'Review pricing to defend volume.'}`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -407,16 +407,16 @@ const AGENTS = [
         proposed: {
           action: 'open_investigation',
           trendPerPeriod: Math.round(relSlope * 1000) / 10,
-          outlierCount: outliers.length
+          outlierCount: outliers.length,
         },
         confidence: r2,
         rationale:
           `Defect rate is trending up ${(relSlope * 100).toFixed(1)}% per period ` +
-          `(fit r²=${r2.toFixed(2)} over ${rates.length} periods)` +
-          (outliers.length ? `, with ${outliers.length} statistical outlier(s)` : '') +
-          '. Investigate before this reaches a customer — a recall costs far more than an inspection.'
+          `(fit r²=${r2.toFixed(2)} over ${rates.length} periods)${
+            outliers.length ? `, with ${outliers.length} statistical outlier(s)` : ''
+          }. Investigate before this reaches a customer — a recall costs far more than an inspection.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -434,7 +434,7 @@ const AGENTS = [
       // An overdue calibration on a cold-chain sensor is not a maintenance
       // backlog item — it invalidates every consignment that sensor certifies.
       const blocking = due.filter((a) => a.blocksColdDispatch);
-      let overdue = due.filter((a) => Number(a.daysUntilDue) < 0);
+      const overdue = due.filter((a) => Number(a.daysUntilDue) < 0);
 
       return proposal({
         domain: DOMAIN.MAINTENANCE,
@@ -445,18 +445,18 @@ const AGENTS = [
           action: blocking.length ? 'schedule_urgently' : 'schedule',
           dueCount: due.length,
           overdueCount: overdue.length,
-          blockingColdDispatch: blocking.map((a) => a.assetCode)
+          blockingColdDispatch: blocking.map((a) => a.assetCode),
         },
         confidence: 1,
         rationale:
-          `${due.length} asset(s) fall due within ${ctx.warnDays ?? 14} days` +
-          (overdue.length ? `, of which ${overdue.length} are already overdue` : '') +
-          '. ' +
-          (blocking.length
-            ? `${blocking.length} of these gate cold-chain dispatch — until calibrated, consignments they certify cannot be trusted.`
-            : 'None currently block dispatch.')
+          `${due.length} asset(s) fall due within ${ctx.warnDays ?? 14} days${
+            overdue.length ? `, of which ${overdue.length} are already overdue` : ''
+          }. ${
+            blocking.length ?
+              `${blocking.length} of these gate cold-chain dispatch — until calibrated, consignments they certify cannot be trusted.` :
+              'None currently block dispatch.'}`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -481,15 +481,15 @@ const AGENTS = [
           action: 'plan_absorption',
           peakingCount: peaking.length,
           products: peaking.slice(0, 12),
-          options: ['pre-book cold storage', 'accelerate processing', 'stagger harvest windows', 'open institutional channel']
+          options: ['pre-book cold storage', 'accelerate processing', 'stagger harvest windows', 'open institutional channel'],
         },
         confidence: 0.85,
         rationale:
           `${peaking.length} products peak in ${ctx.month} against a monthly average of ${average} — ` +
           'simultaneous peaks depress farmgate prices and strain cold storage. ' +
-          'Plan absorption capacity now; the alternative is distress selling at harvest.'
+          'Plan absorption capacity now; the alternative is distress selling at harvest.',
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -504,7 +504,7 @@ const AGENTS = [
       const breached = pending.filter((p) => p.slaStatus === 'breached');
       if (breached.length === 0) return null;
 
-      let worst = [...breached].sort((a, b) => b.hoursOpen - a.hoursOpen)[0];
+      const worst = [...breached].sort((a, b) => b.hoursOpen - a.hoursOpen)[0];
 
       return proposal({
         domain: DOMAIN.WORKFLOW,
@@ -516,16 +516,16 @@ const AGENTS = [
           breachedCount: breached.length,
           items: breached.slice(0, 10).map((b) => ({
             instance: b.instanceCode, entity: b.entityType, step: b.currentStep,
-            role: b.requiredRole, hoursOpen: Math.round(b.hoursOpen)
-          }))
+            role: b.requiredRole, hoursOpen: Math.round(b.hoursOpen),
+          })),
         },
         confidence: 1,
         rationale:
           `${breached.length} approval(s) have passed their SLA; the oldest has waited ` +
           `${Math.round(worst.hoursOpen)} hours at "${worst.currentStep}" for ${worst.requiredRole}. ` +
-          'A request that stalls indefinitely is indistinguishable from one that was refused — escalate or decide.'
+          'A request that stalls indefinitely is indistinguishable from one that was refused — escalate or decide.',
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -539,33 +539,33 @@ const AGENTS = [
       const lead = ctx.lead;
       if (!lead) return null;
 
-      let criteria = [
+      const criteria = [
         {
           name: 'Segment fit',
           weight: 0.35,
           score: ['horeca', 'corporate', 'export', 'institution'].includes(String(lead.segment).toLowerCase()) ? 90 : 45,
-          dataQuality: lead.segment ? 'real' : 'assumed'
+          dataQuality: lead.segment ? 'real' : 'assumed',
         },
         {
           name: 'Estimated deal value',
           weight: 0.30,
-          score: Number.isFinite(Number(lead.estimatedValue))
-            ? Math.min(100, (Number(lead.estimatedValue) / 500000) * 100)
-            : 40,
-          dataQuality: Number.isFinite(Number(lead.estimatedValue)) ? 'real' : 'assumed'
+          score: Number.isFinite(Number(lead.estimatedValue)) ?
+            Math.min(100, (Number(lead.estimatedValue) / 500000) * 100) :
+            40,
+          dataQuality: Number.isFinite(Number(lead.estimatedValue)) ? 'real' : 'assumed',
         },
         {
           name: 'Engagement',
           weight: 0.20,
           score: Math.min(100, (Number(lead.activityCount) || 0) * 20),
-          dataQuality: 'real'
+          dataQuality: 'real',
         },
         {
           name: 'Reachability',
           weight: 0.15,
           score: (lead.email ? 50 : 0) + (lead.phone ? 50 : 0),
-          dataQuality: 'real'
-        }
+          dataQuality: 'real',
+        },
       ];
 
       const result = mcda(criteria);
@@ -581,18 +581,18 @@ const AGENTS = [
         proposed: {
           action: strong ? 'prioritise_contact' : 'deprioritise',
           score: result.total,
-          verdict: result.verdict
+          verdict: result.verdict,
         },
         confidence: result.confidence / 100,
         breakdown: result,
         rationale:
           `Lead scores ${result.total}/100 (${result.verdict}, ${result.confidenceLabel.toLowerCase()}), ` +
-          `most sensitive to ${result.mostSensitiveTo}. ` +
-          (strong
-            ? 'Prioritise contact while engagement is warm.'
-            : 'Weak on fit or value — deprioritise rather than disqualify, and record why if closing it.')
+          `most sensitive to ${result.mostSensitiveTo}. ${
+            strong ?
+              'Prioritise contact while engagement is warm.' :
+              'Weak on fit or value — deprioritise rather than disqualify, and record why if closing it.'}`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -604,11 +604,11 @@ const AGENTS = [
     description: 'Warns before a legal or contractual obligation falls due.',
     evaluate(ctx = {}) {
       const obligations = ctx.obligations || [];
-      let horizon = ctx.warnDays ?? 30;
-      let due = obligations.filter((o) => Number(o.daysUntilDue) <= horizon);
+      const horizon = ctx.warnDays ?? 30;
+      const due = obligations.filter((o) => Number(o.daysUntilDue) <= horizon);
       if (due.length === 0) return null;
 
-      let overdue = due.filter((o) => Number(o.daysUntilDue) < 0);
+      const overdue = due.filter((o) => Number(o.daysUntilDue) < 0);
       const withConsequence = due.filter((o) => o.breachConsequence);
 
       return proposal({
@@ -622,20 +622,20 @@ const AGENTS = [
           overdueCount: overdue.length,
           items: due.slice(0, 10).map((o) => ({
             code: o.obligationCode, description: o.description,
-            daysUntilDue: o.daysUntilDue, consequence: o.breachConsequence || null
-          }))
+            daysUntilDue: o.daysUntilDue, consequence: o.breachConsequence || null,
+          })),
         },
         confidence: 1,
         rationale:
-          `${due.length} obligation(s) fall due within ${horizon} days` +
-          (overdue.length ? `, of which ${overdue.length} are ALREADY BREACHED` : '') +
-          '. ' +
-          (withConsequence.length
-            ? `${withConsequence.length} carry a stated breach consequence. `
-            : '') +
-          'Legal obligations do not lapse quietly — a missed filing is discovered by the regulator, not by us.'
+          `${due.length} obligation(s) fall due within ${horizon} days${
+            overdue.length ? `, of which ${overdue.length} are ALREADY BREACHED` : ''
+          }. ${
+            withConsequence.length ?
+              `${withConsequence.length} carry a stated breach consequence. ` :
+              ''
+          }Legal obligations do not lapse quietly — a missed filing is discovered by the regulator, not by us.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -666,17 +666,17 @@ const AGENTS = [
           criticalCount: critical.length,
           staleReviewCount: staleReview.length,
           breachedIndicators: breachedKri.length,
-          topRisks: critical.slice(0, 5).map((r) => ({ code: r.riskCode, title: r.title, score: r.residualScore }))
+          topRisks: critical.slice(0, 5).map((r) => ({ code: r.riskCode, title: r.title, score: r.residualScore })),
         },
         confidence: 1,
         rationale:
           (critical.length ? `${critical.length} risk(s) sit at critical residual score (15+). ` : '') +
           (breachedKri.length ? `${breachedKri.length} key risk indicator(s) have breached threshold. ` : '') +
-          (staleReview.length
-            ? `${staleReview.length} risk(s) are past their review date — the register currently describes what was true when it was last examined, not now.`
-            : '')
+          (staleReview.length ?
+            `${staleReview.length} risk(s) are past their review date — the register currently describes what was true when it was last examined, not now.` :
+            ''),
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -693,12 +693,12 @@ const AGENTS = [
 
       const unacknowledged = live.filter((i) => i.acknowledgementOverdue);
       const lifeSafety = live.filter((i) => i.peopleAtRisk);
-      let critical = live.filter((i) => i.severity === 'critical');
+      const critical = live.filter((i) => i.severity === 'critical');
 
       // Nothing overdue and nothing critical means the response is working.
       if (unacknowledged.length === 0 && critical.length === 0 && lifeSafety.length === 0) return null;
 
-      let worst = lifeSafety[0] || critical[0] || unacknowledged[0];
+      const worst = lifeSafety[0] || critical[0] || unacknowledged[0];
 
       return proposal({
         domain: DOMAIN.EMERGENCY,
@@ -711,20 +711,20 @@ const AGENTS = [
           unacknowledgedCount: unacknowledged.length,
           criticalCount: critical.length,
           peopleAtRisk: lifeSafety.length > 0,
-          immediateActions: worst.immediateActions || null
+          immediateActions: worst.immediateActions || null,
         },
         confidence: 1,
         rationale:
-          (lifeSafety.length
-            ? `PEOPLE AT RISK on ${lifeSafety.length} incident(s) — this outranks every other consideration. `
-            : '') +
-          (unacknowledged.length
-            ? `${unacknowledged.length} incident(s) are past their acknowledgement target and nobody has picked them up. `
-            : '') +
+          (lifeSafety.length ?
+            `PEOPLE AT RISK on ${lifeSafety.length} incident(s) — this outranks every other consideration. ` :
+            '') +
+          (unacknowledged.length ?
+            `${unacknowledged.length} incident(s) are past their acknowledgement target and nobody has picked them up. ` :
+            '') +
           (critical.length ? `${critical.length} at critical severity. ` : '') +
-          (worst.immediateActions ? `Standing instruction: ${worst.immediateActions}` : 'No standing instruction on file for this type — that gap is itself worth fixing.')
+          (worst.immediateActions ? `Standing instruction: ${worst.immediateActions}` : 'No standing instruction on file for this type — that gap is itself worth fixing.'),
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -738,7 +738,7 @@ const AGENTS = [
       const violations = ctx.violations || [];
       if (violations.length === 0) return null;
 
-      let critical = violations.filter((v) => v.severity === 'critical' || v.severity === 'high');
+      const critical = violations.filter((v) => v.severity === 'critical' || v.severity === 'high');
 
       return proposal({
         domain: DOMAIN.COMPLIANCE,
@@ -749,15 +749,15 @@ const AGENTS = [
           action: critical.length ? 'revoke_conflicting_access' : 'review_access',
           violationCount: violations.length,
           criticalCount: critical.length,
-          rules: violations.slice(0, 5).map((v) => v.ruleCode)
+          rules: violations.slice(0, 5).map((v) => v.ruleCode),
         },
         confidence: 1,
         rationale:
-          `${violations.length} segregation-of-duties conflict(s) detected` +
-          (critical.length ? `, ${critical.length} at high or critical severity` : '') +
-          '. One person able to both initiate and approve the same transaction defeats the control entirely.'
+          `${violations.length} segregation-of-duties conflict(s) detected${
+            critical.length ? `, ${critical.length} at high or critical severity` : ''
+          }. One person able to both initiate and approve the same transaction defeats the control entirely.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -788,12 +788,12 @@ const AGENTS = [
         rationale:
           `Cost center is ${Math.abs(Math.round(pct * 100))}% ${over ? 'over' : 'under'} budget for ` +
           `${ctx.periodLabel ?? 'the period'}: ₹${Math.round(actual)} actual against ₹${Math.round(budgeted)} budgeted ` +
-          `(₹${Math.round(Math.abs(variance))} ${over ? 'overspend' : 'underspend'}). ` +
-          (over
-            ? 'Review the driving line items before the variance compounds into the next period.'
-            : 'Sustained underspend against budget may mean the budget was wrong, or planned work did not happen — worth a look either way.')
+          `(₹${Math.round(Math.abs(variance))} ${over ? 'overspend' : 'underspend'}). ${
+            over ?
+              'Review the driving line items before the variance compounds into the next period.' :
+              'Sustained underspend against budget may mean the budget was wrong, or planned work did not happen — worth a look either way.'}`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -804,7 +804,7 @@ const AGENTS = [
     domain: DOMAIN.ASSETS,
     description: 'Flags fully depreciated assets still carried as active, and assets sitting idle.',
     evaluate(ctx = {}) {
-      let assets = ctx.assets || [];
+      const assets = ctx.assets || [];
       if (assets.length === 0) return null;
 
       const fullyDepreciatedActive = assets.filter((a) => a.fullyDepreciated && a.status === 'active');
@@ -820,18 +820,18 @@ const AGENTS = [
           action: fullyDepreciatedActive.length ? 'review_disposal_or_revalue' : 'review_idle_assets',
           fullyDepreciatedCount: fullyDepreciatedActive.length,
           idleCount: idle.length,
-          assets: [...fullyDepreciatedActive, ...idle].slice(0, 10).map((a) => ({ code: a.assetCode, idleDays: a.idleDays ?? null }))
+          assets: [...fullyDepreciatedActive, ...idle].slice(0, 10).map((a) => ({ code: a.assetCode, idleDays: a.idleDays ?? null })),
         },
         confidence: 1,
         rationale:
-          (fullyDepreciatedActive.length
-            ? `${fullyDepreciatedActive.length} asset(s) are fully depreciated but still carried active — decide disposal, revaluation, or continued use. `
-            : '') +
-          (idle.length
-            ? `${idle.length} asset(s) have been idle ${ctx.idleThresholdDays ?? 60}+ days while marked active — capital sitting unused, or a status that no longer reflects reality.`
-            : '')
+          (fullyDepreciatedActive.length ?
+            `${fullyDepreciatedActive.length} asset(s) are fully depreciated but still carried active — decide disposal, revaluation, or continued use. ` :
+            '') +
+          (idle.length ?
+            `${idle.length} asset(s) have been idle ${ctx.idleThresholdDays ?? 60}+ days while marked active — capital sitting unused, or a status that no longer reflects reality.` :
+            ''),
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -846,12 +846,12 @@ const AGENTS = [
       const atRisk = shipments.filter((s) =>
         Number.isFinite(Number(s.etaHoursRemaining)) &&
         Number.isFinite(Number(s.committedHoursRemaining)) &&
-        Number(s.etaHoursRemaining) > Number(s.committedHoursRemaining)
+        Number(s.etaHoursRemaining) > Number(s.committedHoursRemaining),
       );
       if (atRisk.length === 0) return null;
 
-      let worst = [...atRisk].sort((a, b) =>
-        (b.etaHoursRemaining - b.committedHoursRemaining) - (a.etaHoursRemaining - a.committedHoursRemaining)
+      const worst = [...atRisk].sort((a, b) =>
+        (b.etaHoursRemaining - b.committedHoursRemaining) - (a.etaHoursRemaining - a.committedHoursRemaining),
       )[0];
       const worstOverrun = Math.round(worst.etaHoursRemaining - worst.committedHoursRemaining);
 
@@ -864,16 +864,16 @@ const AGENTS = [
           action: 'expedite_or_notify_customer',
           atRiskCount: atRisk.length,
           shipments: atRisk.slice(0, 10).map((s) => ({
-            code: s.shipmentCode, overrunHours: Math.round(s.etaHoursRemaining - s.committedHoursRemaining)
-          }))
+            code: s.shipmentCode, overrunHours: Math.round(s.etaHoursRemaining - s.committedHoursRemaining),
+          })),
         },
         confidence: 1,
         rationale:
           `${atRisk.length} shipment(s) are tracking to arrive later than their delivery commitment. ` +
           `Worst case: ${worst.shipmentCode} is projected ${worstOverrun}h over commitment. ` +
-          'Expedite where possible, or notify the customer now — a late notice costs less trust than a silent miss.'
+          'Expedite where possible, or notify the customer now — a late notice costs less trust than a silent miss.',
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -895,7 +895,7 @@ const AGENTS = [
       const factors = [
         { name: 'availability', value: availability },
         { name: 'performance', value: performance },
-        { name: 'quality', value: quality }
+        { name: 'quality', value: quality },
       ].sort((a, b) => a.value - b.value);
       const weakest = factors[0];
 
@@ -908,7 +908,7 @@ const AGENTS = [
           action: 'investigate_line',
           oee: Math.round(oee * 1000) / 10,
           weakestFactor: weakest.name,
-          weakestValue: Math.round(weakest.value * 1000) / 10
+          weakestValue: Math.round(weakest.value * 1000) / 10,
         },
         current: { availability, performance, quality },
         confidence: 1,
@@ -916,9 +916,9 @@ const AGENTS = [
           `OEE is ${Math.round(oee * 100)}% (availability ${Math.round(availability * 100)}%, ` +
           `performance ${Math.round(performance * 100)}%, quality ${Math.round(quality * 100)}%), below the ` +
           `${Math.round((ctx.warnBelow ?? 0.6) * 100)}% floor. ${weakest.name} is the weakest factor at ` +
-          `${Math.round(weakest.value * 100)}% — start there, since the lowest factor caps every other gain.`
+          `${Math.round(weakest.value * 100)}% — start there, since the lowest factor caps every other gain.`,
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -931,7 +931,7 @@ const AGENTS = [
     evaluate(ctx = {}) {
       const employees = ctx.employees || [];
       const cap = Number(ctx.capDays) || 45;
-      let over = employees.filter((e) => Number(e.leaveBalanceDays) > cap);
+      const over = employees.filter((e) => Number(e.leaveBalanceDays) > cap);
       if (over.length === 0) return null;
 
       const liabilityDays = over.reduce((s, e) => s + (Number(e.leaveBalanceDays) - cap), 0);
@@ -945,15 +945,15 @@ const AGENTS = [
           action: 'schedule_leave_or_encash',
           overCapCount: over.length,
           excessDaysTotal: Math.round(liabilityDays),
-          employees: over.slice(0, 10).map((e) => ({ id: e.employeeId, balance: e.leaveBalanceDays }))
+          employees: over.slice(0, 10).map((e) => ({ id: e.employeeId, balance: e.leaveBalanceDays })),
         },
         confidence: 1,
         rationale:
           `${over.length} employee(s) carry a leave balance above the ${cap}-day policy cap, ` +
           `${Math.round(liabilityDays)} excess day(s) combined. This is both a growing encashment liability on the ` +
-          'books and, for the individuals, a sign they are not taking the rest the policy assumes they are.'
+          'books and, for the individuals, a sign they are not taking the rest the policy assumes they are.',
       });
-    }
+    },
   },
 
   // -------------------------------------------------------------------
@@ -979,22 +979,22 @@ const AGENTS = [
           incompleteCount: incomplete.length,
           duplicateCount: duplicates.length,
           examples: [...incomplete, ...duplicates].slice(0, 10).map((r) => ({
-            id: r.recordId, missingFields: r.missingFields || null, duplicateOf: r.duplicateOf || null
-          }))
+            id: r.recordId, missingFields: r.missingFields || null, duplicateOf: r.duplicateOf || null,
+          })),
         },
         confidence: 1,
         rationale:
-          (incomplete.length
-            ? `${incomplete.length} record(s) are missing a required field — every downstream process that reads ` +
-              'them inherits the gap silently. '
-            : '') +
-          (duplicates.length
-            ? `${duplicates.length} record(s) appear to duplicate an existing one — left unresolved, transactions ` +
-              'and history split across both copies.'
-            : '')
+          (incomplete.length ?
+            `${incomplete.length} record(s) are missing a required field — every downstream process that reads ` +
+              'them inherits the gap silently. ' :
+            '') +
+          (duplicates.length ?
+            `${duplicates.length} record(s) appear to duplicate an existing one — left unresolved, transactions ` +
+              'and history split across both copies.' :
+            ''),
       });
-    }
-  }
+    },
+  },
 ];
 
 // ===========================================================================
@@ -1042,8 +1042,8 @@ function publishProposals(proposals) {
       {
         severity: p.confidence >= 0.9 ? SEVERITY.NOTICE : SEVERITY.INFO,
         source: `erpAgent:${p.domain}`,
-        entityId: p.subject_id
-      }
+        entityId: p.subject_id,
+      },
     );
   }
   return proposals.length;
@@ -1083,7 +1083,7 @@ async function persistProposals(proposals) {
           JSON.stringify(p.proposed_value), p.current_value ? JSON.stringify(p.current_value) : null,
           p.rationale, p.confidence, p.mcda_breakdown ? JSON.stringify(p.mcda_breakdown) : null,
           p.status || 'proposed',
-        ]
+        ],
       );
       ids.push(rows[0].id);
     } catch (err) {
@@ -1098,5 +1098,5 @@ module.exports = {
   runAgent, runDomain, runAll,
   publishProposals, persistProposals, listAgents,
   proposal,
-  decisionEngine
+  decisionEngine,
 };

@@ -37,674 +37,674 @@ const { logger } = require('../../utils/logger');
 
 const router = express.Router();
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const SEASONALITY = [
   {
-    "product": "Naga King Chilli",
-    "note": "Spice · GI: Naga Mircha",
-    "months": [
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK"
-    ]
+    product: 'Naga King Chilli',
+    note: 'Spice · GI: Naga Mircha',
+    months: [
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+    ],
   },
   {
-    "product": "Kazi Nemu Lemon",
-    "note": "Fruit · GI Assam · DISPATCH NOW",
-    "months": [
-      "-",
-      "MED",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "MED",
-      "MED",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Kazi Nemu Lemon',
+    note: 'Fruit · GI Assam · DISPATCH NOW',
+    months: [
+      '-',
+      'MED',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'MED',
+      'MED',
+      'MED',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Bamboo Shoots",
-    "note": "Vegetable · Fresh peak Jun–Sep",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "MED",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Bamboo Shoots',
+    note: 'Vegetable · Fresh peak Jun–Sep',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      'MED',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Jalukee Pineapple",
-    "note": "Fruit · Brix 17–22° · GI potential",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "MED",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Jalukee Pineapple',
+    note: 'Fruit · Brix 17–22° · GI potential',
+    months: [
+      '-',
+      '-',
+      '-',
+      'MED',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Passion Fruit",
-    "note": "Fruit · Passiflora edulis",
-    "months": [
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Passion Fruit',
+    note: 'Fruit · Passiflora edulis',
+    months: [
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Hill Kiwi",
-    "note": "Fruit · 44hr fresh · 56% below BB",
-    "months": [
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK"
-    ]
+    product: 'Hill Kiwi',
+    note: 'Fruit · 44hr fresh · 56% below BB',
+    months: [
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+    ],
   },
   {
-    "product": "Avocado",
-    "note": "Fruit · Fuerte/Hass hill",
-    "months": [
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Avocado',
+    note: 'Fruit · Fuerte/Hass hill',
+    months: [
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Jackfruit",
-    "note": "Fruit · very high margin",
-    "months": [
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Jackfruit',
+    note: 'Fruit · very high margin',
+    months: [
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Dragon Fruit",
-    "note": "Fruit · growing NCR demand",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "MED",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Dragon Fruit',
+    note: 'Fruit · growing NCR demand',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      'MED',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Sirarakhong Hathei",
-    "note": "Chilli · GI Manipur · chef demand",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-"
-    ]
+    product: 'Sirarakhong Hathei',
+    note: 'Chilli · GI Manipur · chef demand',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Forest Honey",
-    "note": "Honey · Apis cerana · year-round anchor",
-    "months": [
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "PEAK"
-    ]
+    product: 'Forest Honey',
+    note: 'Honey · Apis cerana · year-round anchor',
+    months: [
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+    ],
   },
   {
-    "product": "Litchi Honey",
-    "note": "Honey · seasonal varietal",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Litchi Honey',
+    note: 'Honey · seasonal varietal',
+    months: [
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Jamun Honey",
-    "note": "Honey · Jun–Aug blossom",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Jamun Honey',
+    note: 'Honey · Jun–Aug blossom',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Mustard Honey",
-    "note": "Honey · Feb–Apr varietal",
-    "months": [
-      "-",
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "MED"
-    ]
+    product: 'Mustard Honey',
+    note: 'Honey · Feb–Apr varietal',
+    months: [
+      '-',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'MED',
+    ],
   },
   {
-    "product": "Cliff Honey",
-    "note": "Honey · ULTRA-RARE · Apis dorsata",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "PEAK",
-      "PEAK",
-      "-"
-    ]
+    product: 'Cliff Honey',
+    note: 'Honey · ULTRA-RARE · Apis dorsata',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'PEAK',
+      'PEAK',
+      '-',
+    ],
   },
   {
-    "product": "Oyster Mushroom",
-    "note": "Mushroom · NE forest",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Oyster Mushroom',
+    note: 'Mushroom · NE forest',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Lakadong Turmeric",
-    "note": "Spice · NABL 6–12% curcumin",
-    "months": [
-      "HIGH",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK"
-    ]
+    product: 'Lakadong Turmeric',
+    note: 'Spice · NABL 6–12% curcumin',
+    months: [
+      'HIGH',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+    ],
   },
   {
-    "product": "Chak-Hao Black Rice",
-    "note": "Grain · GI Manipur",
-    "months": [
-      "HIGH",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "MED",
-      "PEAK",
-      "PEAK"
-    ]
+    product: 'Chak-Hao Black Rice',
+    note: 'Grain · GI Manipur',
+    months: [
+      'HIGH',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'MED',
+      'PEAK',
+      'PEAK',
+    ],
   },
   {
-    "product": "Wild Amla",
-    "note": "Fruit · forest-gathered",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "MED",
-      "PEAK",
-      "PEAK"
-    ]
+    product: 'Wild Amla',
+    note: 'Fruit · forest-gathered',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'MED',
+      'PEAK',
+      'PEAK',
+    ],
   },
   {
-    "product": "Wild Apples",
-    "note": "Fruit · Malus baccata NER",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-"
-    ]
+    product: 'Wild Apples',
+    note: 'Fruit · Malus baccata NER',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+    ],
   },
   {
-    "product": "Persimmon",
-    "note": "Fruit · gifting/hamper · Oct–Dec",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "PEAK",
-      "PEAK",
-      "HIGH"
-    ]
+    product: 'Persimmon',
+    note: 'Fruit · gifting/hamper · Oct–Dec',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+    ],
   },
   {
-    "product": "Pears (hill NER)",
-    "note": "Fruit · Jul–Oct",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "PEAK",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-"
-    ]
+    product: 'Pears (hill NER)',
+    note: 'Fruit · Jul–Oct',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'PEAK',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Mulberry",
-    "note": "Fruit · AIR ONLY · KrishiUdaan",
-    "months": [
-      "-",
-      "-",
-      "AIR",
-      "AIR",
-      "AIR",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Mulberry',
+    note: 'Fruit · AIR ONLY · KrishiUdaan',
+    months: [
+      '-',
+      '-',
+      'AIR',
+      'AIR',
+      'AIR',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Roselle Hibiscus",
-    "note": "Botanical dried · herbal tea",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-"
-    ]
+    product: 'Roselle Hibiscus',
+    note: 'Botanical dried · herbal tea',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+    ],
   },
   {
-    "product": "Malbhog Banana",
-    "note": "Fruit · Assam GI",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "HIGH",
-      "MED",
-      "-",
-      "-"
-    ]
+    product: 'Malbhog Banana',
+    note: 'Fruit · Assam GI',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'HIGH',
+      'MED',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Garlic (direct farm)",
-    "note": "Spice · Feb–May viable",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Garlic (direct farm)',
+    note: 'Spice · Feb–May viable',
+    months: [
+      '-',
+      '-',
+      '-',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Stingless Bee Honey",
-    "note": "Honey · medicinal vials · 30ml",
-    "months": [
-      "MED",
-      "MED",
-      "MED",
-      "MED",
-      "MED",
-      "MED",
-      "MED",
-      "MED",
-      "MED",
-      "PEAK",
-      "PEAK",
-      "MED"
-    ]
+    product: 'Stingless Bee Honey',
+    note: 'Honey · medicinal vials · 30ml',
+    months: [
+      'MED',
+      'MED',
+      'MED',
+      'MED',
+      'MED',
+      'MED',
+      'MED',
+      'MED',
+      'MED',
+      'PEAK',
+      'PEAK',
+      'MED',
+    ],
   },
   {
-    "product": "Ginger (direct farm)",
-    "note": "Spice · Oct–Nov spike only",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "PEAK",
-      "PEAK",
-      "MED"
-    ]
+    product: 'Ginger (direct farm)',
+    note: 'Spice · Oct–Nov spike only',
+    months: [
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'PEAK',
+      'PEAK',
+      'MED',
+    ],
   },
   {
-    "product": "Queen Pineapple",
-    "note": "Fruit · Tripura GI",
-    "months": [
-      "-",
-      "-",
-      "-",
-      "MED",
-      "HIGH",
-      "PEAK",
-      "PEAK",
-      "MED",
-      "-",
-      "-",
-      "-",
-      "-"
-    ]
+    product: 'Queen Pineapple',
+    note: 'Fruit · Tripura GI',
+    months: [
+      '-',
+      '-',
+      '-',
+      'MED',
+      'HIGH',
+      'PEAK',
+      'PEAK',
+      'MED',
+      '-',
+      '-',
+      '-',
+      '-',
+    ],
   },
   {
-    "product": "Naga Arabica Coffee",
-    "note": "Beverage · SCA 84+ · Nov–Apr",
-    "months": [
-      "HIGH",
-      "HIGH",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "-",
-      "MED",
-      "PEAK",
-      "PEAK"
-    ]
-  }
+    product: 'Naga Arabica Coffee',
+    note: 'Beverage · SCA 84+ · Nov–Apr',
+    months: [
+      'HIGH',
+      'HIGH',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      '-',
+      'MED',
+      'PEAK',
+      'PEAK',
+    ],
+  },
 ];
 
 const JARGON = {
-  "kcc": "KCC means Kisan Credit Card. It is a bank loan card for farmers — low interest, for buying seeds, fertiliser, or daily farm costs.",
-  "escrow": "Escrow means the platform is holding payment safely until your delivery is confirmed. It is not your money yet, and it is not taken from you — it is \"on hold\" for the deal to complete.",
-  "pgs": "PGS means Participatory Guarantee System — a simpler, group-based way (instead of paying a private company) to certify your farm as organic, checked by other farmers in your area.",
-  "po": "PO means Purchase Order — a buyer\\'s written promise to buy a fixed amount from you at a fixed price.",
-  "cert": "A \"cert\" is a certificate — an official paper or number proving something about your farm, like organic status. If you are not sure you have one, ask your FPO or coordinator before relying on it.",
-  "nabard": "NABARD is a government bank that gives farm loans, often through your local bank branch.",
-  "movcd": "MOVCD-NER is a government scheme that gives money to help Northeast farmers switch to organic farming.",
-  "gi": "GI means Geographical Indication — a government tag proving a crop (like Lakadong Turmeric) genuinely comes from its named place, protecting it from being copied.",
-  "map": "MAP here means Minimum Acceptable Price — the lowest price you, the farmer, say you are willing to accept. You set this yourself.",
-  "fpo": "FPO means Farmer Producer Organisation — a group of farmers registered together, often to get better prices and access loans as a group.",
-  "cfa": "CFA means Contract Farming Agreement — a signed promise between you and a buyer to sell a fixed amount at a fixed price before harvest."
+  kcc: 'KCC means Kisan Credit Card. It is a bank loan card for farmers — low interest, for buying seeds, fertiliser, or daily farm costs.',
+  escrow: 'Escrow means the platform is holding payment safely until your delivery is confirmed. It is not your money yet, and it is not taken from you — it is "on hold" for the deal to complete.',
+  pgs: 'PGS means Participatory Guarantee System — a simpler, group-based way (instead of paying a private company) to certify your farm as organic, checked by other farmers in your area.',
+  po: 'PO means Purchase Order — a buyer\\\'s written promise to buy a fixed amount from you at a fixed price.',
+  cert: 'A "cert" is a certificate — an official paper or number proving something about your farm, like organic status. If you are not sure you have one, ask your FPO or coordinator before relying on it.',
+  nabard: 'NABARD is a government bank that gives farm loans, often through your local bank branch.',
+  movcd: 'MOVCD-NER is a government scheme that gives money to help Northeast farmers switch to organic farming.',
+  gi: 'GI means Geographical Indication — a government tag proving a crop (like Lakadong Turmeric) genuinely comes from its named place, protecting it from being copied.',
+  map: 'MAP here means Minimum Acceptable Price — the lowest price you, the farmer, say you are willing to accept. You set this yourself.',
+  fpo: 'FPO means Farmer Producer Organisation — a group of farmers registered together, often to get better prices and access loans as a group.',
+  cfa: 'CFA means Contract Farming Agreement — a signed promise between you and a buyer to sell a fixed amount at a fixed price before harvest.',
 };
 
 const WELLNESS_MAP = {
-  "inflammation": [
+  inflammation: [
     {
-      "name": "Lakadong Turmeric",
-      "why": "6–12% curcumin — the anti-inflammatory benchmark"
+      name: 'Lakadong Turmeric',
+      why: '6–12% curcumin — the anti-inflammatory benchmark',
     },
     {
-      "name": "Wild Forest Honey",
-      "why": "Raw enzymes + anti-inflammatory compounds"
+      name: 'Wild Forest Honey',
+      why: 'Raw enzymes + anti-inflammatory compounds',
     },
     {
-      "name": "Bhut Jolokia (micro-dose)",
-      "why": "Capsaicin has documented anti-inflammatory properties"
+      name: 'Bhut Jolokia (micro-dose)',
+      why: 'Capsaicin has documented anti-inflammatory properties',
     },
     {
-      "name": "Chak-Hao Black Rice",
-      "why": "Anthocyanin — powerful antioxidant, lower GI"
-    }
+      name: 'Chak-Hao Black Rice',
+      why: 'Anthocyanin — powerful antioxidant, lower GI',
+    },
   ],
-  "immunity": [
+  immunity: [
     {
-      "name": "Hill Kiwi (fresh)",
-      "why": "High Vitamin C — altitude-grown, tree-ripened"
+      name: 'Hill Kiwi (fresh)',
+      why: 'High Vitamin C — altitude-grown, tree-ripened',
     },
     {
-      "name": "Lakadong Turmeric",
-      "why": "High curcumin supports immune function"
+      name: 'Lakadong Turmeric',
+      why: 'High curcumin supports immune function',
     },
     {
-      "name": "Wild Forest Honey",
-      "why": "Raw honey contains natural antimicrobials"
+      name: 'Wild Forest Honey',
+      why: 'Raw honey contains natural antimicrobials',
     },
     {
-      "name": "Kazi Nemu Lemon",
-      "why": "Natural Vitamin C, high-altitude citrus"
-    }
+      name: 'Kazi Nemu Lemon',
+      why: 'Natural Vitamin C, high-altitude citrus',
+    },
   ],
-  "gut": [
+  gut: [
     {
-      "name": "Akhuni (fermented)",
-      "why": "Natural probiotic cultures — centuries of traditional fermentation"
+      name: 'Akhuni (fermented)',
+      why: 'Natural probiotic cultures — centuries of traditional fermentation',
     },
     {
-      "name": "Bamboo Shoots",
-      "why": "High prebiotic fibre — feeds good gut bacteria"
+      name: 'Bamboo Shoots',
+      why: 'High prebiotic fibre — feeds good gut bacteria',
     },
     {
-      "name": "Wild Forest Honey",
-      "why": "Raw honey supports beneficial gut bacteria"
+      name: 'Wild Forest Honey',
+      why: 'Raw honey supports beneficial gut bacteria',
     },
     {
-      "name": "Chak-Hao Black Rice",
-      "why": "High fibre content + anthocyanins support gut lining"
-    }
+      name: 'Chak-Hao Black Rice',
+      why: 'High fibre content + anthocyanins support gut lining',
+    },
   ],
-  "energy": [
+  energy: [
     {
-      "name": "Jalukee Pineapple",
-      "why": "High Brix natural sugar + enzymes for fast absorption"
+      name: 'Jalukee Pineapple',
+      why: 'High Brix natural sugar + enzymes for fast absorption',
     },
     {
-      "name": "Hill Kiwi",
-      "why": "High Vitamin C + natural sugars for quick energy"
+      name: 'Hill Kiwi',
+      why: 'High Vitamin C + natural sugars for quick energy',
     },
     {
-      "name": "Forest Honey",
-      "why": "Natural sugars (glucose + fructose) — preferred pre-workout"
+      name: 'Forest Honey',
+      why: 'Natural sugars (glucose + fructose) — preferred pre-workout',
     },
     {
-      "name": "Naga Arabica Coffee",
-      "why": "84+ SCA score mountain-grown coffee"
-    }
+      name: 'Naga Arabica Coffee',
+      why: '84+ SCA score mountain-grown coffee',
+    },
   ],
-  "sleep": [
+  sleep: [
     {
-      "name": "Wild Forest Honey",
-      "why": "Raw honey before bed supports serotonin → melatonin pathway"
+      name: 'Wild Forest Honey',
+      why: 'Raw honey before bed supports serotonin → melatonin pathway',
     },
     {
-      "name": "Cliff Honey",
-      "why": "Medicinal-class honey — traditional sleep and recovery use"
+      name: 'Cliff Honey',
+      why: 'Medicinal-class honey — traditional sleep and recovery use',
     },
     {
-      "name": "Lakadong Turmeric",
-      "why": "Evening golden milk — reduces systemic inflammation that disrupts sleep"
+      name: 'Lakadong Turmeric',
+      why: 'Evening golden milk — reduces systemic inflammation that disrupts sleep',
     },
     {
-      "name": "Chak-Hao Black Rice",
-      "why": "Complex carbohydrates support melatonin production"
-    }
+      name: 'Chak-Hao Black Rice',
+      why: 'Complex carbohydrates support melatonin production',
+    },
   ],
-  "glow": [
+  glow: [
     {
-      "name": "Wild Forest Honey",
-      "why": "Applied internally and topically — enzymes support skin cell turnover"
+      name: 'Wild Forest Honey',
+      why: 'Applied internally and topically — enzymes support skin cell turnover',
     },
     {
-      "name": "Lakadong Turmeric",
-      "why": "Curcumin anti-inflammatory reduces skin redness and hyperpigmentation"
+      name: 'Lakadong Turmeric',
+      why: 'Curcumin anti-inflammatory reduces skin redness and hyperpigmentation',
     },
     {
-      "name": "Hill Kiwi",
-      "why": "High Vitamin C supports collagen synthesis"
+      name: 'Hill Kiwi',
+      why: 'High Vitamin C supports collagen synthesis',
     },
     {
-      "name": "Jalukee Pineapple",
-      "why": "Bromelain enzyme supports skin health + digestion"
-    }
-  ]
+      name: 'Jalukee Pineapple',
+      why: 'Bromelain enzyme supports skin health + digestion',
+    },
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -739,8 +739,8 @@ function inSeason({ month, minLevel = 'MED' } = {}) {
 function productCalendar({ product } = {}) {
   const q = String(product || '').toLowerCase().trim();
   if (!q) throw new Error('product is required');
-  const p = SEASONALITY.find((x) => x.product.toLowerCase() === q)
-        || SEASONALITY.find((x) => x.product.toLowerCase().includes(q));
+  const p = SEASONALITY.find((x) => x.product.toLowerCase() === q) ||
+        SEASONALITY.find((x) => x.product.toLowerCase().includes(q));
   if (!p) throw new Error(`No seasonality data for "${product}"`);
 
   const calendar = p.months.map((level, i) => ({ month: MONTHS[i], level }));
@@ -754,7 +754,7 @@ function productCalendar({ product } = {}) {
     peakMonths: peak,
     unavailableMonths: none,
     // Year-round supply is a genuine commercial property worth flagging.
-    yearRound: none.length === 0
+    yearRound: none.length === 0,
   };
 }
 
@@ -776,8 +776,8 @@ function glutForecast() {
     months: byMonth.map((b) => ({
       ...b,
       // Deliberately a simple, explainable threshold rather than a hidden model.
-      glutRisk: b.peakCount >= mean * 1.5 ? 'high' : b.peakCount >= mean ? 'moderate' : 'low'
-    }))
+      glutRisk: b.peakCount >= mean * 1.5 ? 'high' : b.peakCount >= mean ? 'moderate' : 'low',
+    })),
   };
 }
 
@@ -800,11 +800,11 @@ function scarcityMonths() {
  */
 function wellnessRecommendation({ concern, month } = {}) {
   const key = String(concern || '').toLowerCase().trim();
-  let items = WELLNESS_MAP[key];
+  const items = WELLNESS_MAP[key];
   if (!items) {
     throw new Error(`concern must be one of: ${Object.keys(WELLNESS_MAP).join(', ')}`);
   }
-  let idx = monthIndex(month);
+  const idx = monthIndex(month);
 
   return {
     concern: key,
@@ -816,11 +816,11 @@ function wellnessRecommendation({ concern, month } = {}) {
         product: it.name,
         reason: it.why,
         availabilityThisMonth: level,
-        inSeason: level ? (LEVEL_RANK[level] ?? 0) > 0 : null
+        inSeason: level ? (LEVEL_RANK[level] ?? 0) > 0 : null,
       };
     }),
     // Never presented as medical advice.
-    disclaimer: 'Food and nutrition information only. Not medical advice, and not a treatment for any condition.'
+    disclaimer: 'Food and nutrition information only. Not medical advice, and not a treatment for any condition.',
   };
 }
 
@@ -838,14 +838,14 @@ function listConcerns() {
  * meaningfully consent. Explanations are preserved verbatim from the original.
  */
 function explainTerm({ term } = {}) {
-  let key = String(term || '').toLowerCase().replace(/[^a-z]/g, '');
+  const key = String(term || '').toLowerCase().replace(/[^a-z]/g, '');
   const text = JARGON[key];
   if (!text) {
     return {
       term: key || null,
       known: false,
       available: Object.keys(JARGON),
-      message: 'No plain-language explanation on file for that term yet.'
+      message: 'No plain-language explanation on file for that term yet.',
     };
   }
   return { term: key, known: true, explanation: text };
@@ -882,7 +882,7 @@ function isHealthy() {
     status: 'ok',
     seasonalityProducts: SEASONALITY.length,
     wellnessConcerns: Object.keys(WELLNESS_MAP).length,
-    glossaryTerms: Object.keys(JARGON).length
+    glossaryTerms: Object.keys(JARGON).length,
   };
 }
 
@@ -899,8 +899,6 @@ module.exports = {
   listTerms,
   SEASONALITY,
   WELLNESS_MAP,
-  JARGON
+  JARGON,
 };
-
-
 

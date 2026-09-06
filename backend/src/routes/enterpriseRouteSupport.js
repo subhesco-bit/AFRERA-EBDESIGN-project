@@ -21,7 +21,7 @@ function fail(res, req, status, message, code = 'REQUEST_ERROR') {
     success: false,
     error: status >= 500 ? 'Internal server error' : message,
     code: status >= 500 ? 'INTERNAL_ERROR' : code,
-    requestId: correlationId(req)
+    requestId: correlationId(req),
   });
 }
 
@@ -59,7 +59,7 @@ function requestGuard(req, res, next, { signal, advisory = false } = {}) {
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT) return fail(res, req, 400, 'limit is outside the allowed range', 'INVALID_PAGINATION');
 
   req.body = sanitizeObject(req.body || {});
-  let error = validateValue(req.body, 'body');
+  const error = validateValue(req.body, 'body');
   if (error) return fail(res, req, 400, error, 'INVALID_INPUT');
 
   const originalJson = res.json.bind(res);
@@ -69,7 +69,7 @@ function requestGuard(req, res, next, { signal, advisory = false } = {}) {
         success: false,
         error: 'Internal server error',
         code: 'INTERNAL_ERROR',
-        requestId: correlationId(req)
+        requestId: correlationId(req),
       });
     }
     let output = body;
@@ -84,7 +84,7 @@ function requestGuard(req, res, next, { signal, advisory = false } = {}) {
         severity: SEVERITY.INFO,
         source: 'enterprise_routes',
         entityId: req.params.id || req.params.orderId || null,
-        correlationId: correlationId(req)
+        correlationId: correlationId(req),
       });
     }
     return originalJson(output);
@@ -113,5 +113,5 @@ module.exports = {
   protectRouter,
   requireHumanAuthorization,
   correlationId,
-  fail
+  fail,
 };

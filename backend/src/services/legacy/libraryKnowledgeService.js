@@ -37,22 +37,22 @@ class LibraryKnowledgeService {
    */
   async buildIndex() {
     console.log('Building library index...');
-    
+
     // Index module cards
     const modulesDir = path.join(this.modulesPath, 'Module_Cards');
     if (fs.existsSync(modulesDir)) {
       const moduleFiles = fs.readdirSync(modulesDir).filter(f => f.endsWith('.md'));
-      
+
       for (const file of moduleFiles) {
         const filePath = path.join(modulesDir, file);
         const content = fs.readFileSync(filePath, 'utf8');
         const moduleData = this.parseModuleCard(content);
-        
+
         this.index.set(file, {
           type: 'module',
           data: moduleData,
           path: filePath,
-          lastModified: fs.statSync(filePath).mtime
+          lastModified: fs.statSync(filePath).mtime,
         });
       }
     }
@@ -61,17 +61,17 @@ class LibraryKnowledgeService {
     const componentsDir = path.join(this.modulesPath, 'Component_Cards');
     if (fs.existsSync(componentsDir)) {
       const componentFiles = fs.readdirSync(componentsDir).filter(f => f.endsWith('.md'));
-      
+
       for (const file of componentFiles) {
-        let filePath = path.join(componentsDir, file);
-        let content = fs.readFileSync(filePath, 'utf8');
+        const filePath = path.join(componentsDir, file);
+        const content = fs.readFileSync(filePath, 'utf8');
         const componentData = this.parseComponentCard(content);
-        
+
         this.index.set(file, {
           type: 'component',
           data: componentData,
           path: filePath,
-          lastModified: fs.statSync(filePath).mtime
+          lastModified: fs.statSync(filePath).mtime,
         });
       }
     }
@@ -84,16 +84,16 @@ class LibraryKnowledgeService {
    */
   async computeContentHashes() {
     console.log('Computing content hashes...');
-    
+
     for (const [filename, item] of this.index) {
-      let content = fs.readFileSync(item.path, 'utf8');
+      const content = fs.readFileSync(item.path, 'utf8');
       const hash = crypto.createHash('sha256').update(content).digest('hex');
-      
+
       this.contentHashes.set(filename, {
         hash,
         path: item.path,
         size: Buffer.byteLength(content),
-        computedAt: new Date().toISOString()
+        computedAt: new Date().toISOString(),
       });
     }
 
@@ -106,7 +106,7 @@ class LibraryKnowledgeService {
   async syncToDatabase() {
     try {
       const pool = await getPostgreSQL();
-      
+
       // Create library_knowledge table if not exists
       await pool.query(`
         CREATE TABLE IF NOT EXISTS library_knowledge (
@@ -137,7 +137,7 @@ class LibraryKnowledgeService {
       // Insert/update library items
       for (const [filename, item] of this.index) {
         const hashData = this.contentHashes.get(filename);
-        
+
         await pool.query(`
           INSERT INTO library_knowledge (filename, type, content_hash, data, file_path, file_size, last_modified)
           VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -156,7 +156,7 @@ class LibraryKnowledgeService {
           JSON.stringify(item.data),
           item.path,
           hashData.size,
-          item.lastModified
+          item.lastModified,
         ]);
       }
 
@@ -175,7 +175,7 @@ class LibraryKnowledgeService {
           hashData.hash,
           hashData.path,
           hashData.size,
-          hashData.computedAt
+          hashData.computedAt,
         ]);
       }
 
@@ -190,13 +190,13 @@ class LibraryKnowledgeService {
    * Parse module card from markdown
    */
   parseModuleCard(content) {
-    let moduleData = {
+    const moduleData = {
       id: '',
       name: '',
       domain: '',
       status: '',
       implementation: '',
-      components: []
+      components: [],
     };
 
     const lines = content.split('\n');
@@ -221,15 +221,15 @@ class LibraryKnowledgeService {
    * Parse component card from markdown
    */
   parseComponentCard(content) {
-    let componentData = {
+    const componentData = {
       id: '',
       name: '',
       type: '',
       module: '',
-      status: ''
+      status: '',
     };
 
-    let lines = content.split('\n');
+    const lines = content.split('\n');
     for (const line of lines) {
       if (line.startsWith('# Component ID:')) {
         componentData.id = line.replace('# Component ID:', '').trim();
@@ -255,13 +255,13 @@ class LibraryKnowledgeService {
     const lowerQuery = query.toLowerCase();
 
     for (const [filename, item] of this.index) {
-      let content = JSON.stringify(item.data).toLowerCase();
+      const content = JSON.stringify(item.data).toLowerCase();
       if (content.includes(lowerQuery)) {
         results.push({
           filename,
           type: item.type,
           data: item.data,
-          relevance: this.calculateRelevance(content, lowerQuery)
+          relevance: this.calculateRelevance(content, lowerQuery),
         });
       }
     }
@@ -275,7 +275,7 @@ class LibraryKnowledgeService {
   calculateRelevance(content, query) {
     const words = query.split(' ');
     let score = 0;
-    
+
     for (const word of words) {
       const occurrences = (content.match(new RegExp(word, 'g')) || []).length;
       score += occurrences * 10;
@@ -293,7 +293,7 @@ class LibraryKnowledgeService {
       modules: 0,
       components: 0,
       totalHashes: this.contentHashes.size,
-      lastIndexed: new Date().toISOString()
+      lastIndexed: new Date().toISOString(),
     };
 
     for (const [, item] of this.index) {
@@ -309,27 +309,27 @@ class LibraryKnowledgeService {
    */
   async verifyCatalogIntegrity() {
     const issues = [];
-    
+
     for (const [filename, hashData] of this.contentHashes) {
       if (!fs.existsSync(hashData.path)) {
         issues.push({
           type: 'missing_file',
           filename,
-          path: hashData.path
+          path: hashData.path,
         });
         continue;
       }
 
       const currentContent = fs.readFileSync(hashData.path, 'utf8');
       const currentHash = crypto.createHash('sha256').update(currentContent).digest('hex');
-      
+
       if (currentHash !== hashData.hash) {
         issues.push({
           type: 'hash_mismatch',
           filename,
           path: hashData.path,
           expected: hashData.hash,
-          actual: currentHash
+          actual: currentHash,
         });
       }
     }
@@ -338,12 +338,10 @@ class LibraryKnowledgeService {
       verified: issues.length === 0,
       totalFiles: this.contentHashes.size,
       issues,
-      verificationDate: new Date().toISOString()
+      verificationDate: new Date().toISOString(),
     };
   }
 }
 
 module.exports = new LibraryKnowledgeService();
-
-
 

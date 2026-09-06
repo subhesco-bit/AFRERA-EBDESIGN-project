@@ -37,7 +37,7 @@ describe('missing coordinates must fail closed (Null Island guard)', () => {
   test.each([
     ['null', null],
     ['undefined', undefined],
-    ['empty string', '']
+    ['empty string', ''],
   ])('%s coordinates return null, not a distance', (_label, value) => {
     expect(geo.distanceKm(26, 91, value, value)).toBeNull();
     expect(geo.isValidCoord(value, value)).toBe(false);
@@ -51,7 +51,7 @@ describe('missing coordinates must fail closed (Null Island guard)', () => {
     const sorted = geo.sortByProximity(26.1445, 91.7362, [
       { id: 'far', latitude: 28.6, longitude: 77.2 },
       { id: 'near', latitude: 26.15, longitude: 91.74 },
-      { id: 'unlocated', latitude: null, longitude: null }
+      { id: 'unlocated', latitude: null, longitude: null },
     ]);
     expect(sorted).toHaveLength(2);
     expect(sorted[0].id).toBe('near');
@@ -83,7 +83,7 @@ describe('boundingBox', () => {
     // Every corner must be at least r away, i.e. the box encloses the circle.
     const corners = [
       [b.minLat, b.minLng], [b.maxLat, b.maxLng],
-      [b.minLat, b.maxLng], [b.maxLat, b.minLng]
+      [b.minLat, b.maxLng], [b.maxLat, b.minLng],
     ];
     corners.forEach(([la, lo]) => {
       expect(geo.distanceKm(c.lat, c.lng, la, lo)).toBeGreaterThanOrEqual(r);
@@ -105,7 +105,7 @@ describe('boundingBox', () => {
 describe('radiusQueryFragment', () => {
   test('produces correctly numbered placeholders and params', () => {
     const f = geo.radiusQueryFragment({
-      lat: 26.1445, lng: 91.7362, radiusKm: 50, table: 'w', startIndex: 3
+      lat: 26.1445, lng: 91.7362, radiusKm: 50, table: 'w', startIndex: 3,
     });
     expect(f.sql).toContain('$3');
     expect(f.sql).toContain('$6');
@@ -121,7 +121,7 @@ describe('radiusQueryFragment', () => {
 describe('isWithinPolygon', () => {
   const square = [
     { lat: 0, lng: 0 }, { lat: 0, lng: 10 },
-    { lat: 10, lng: 10 }, { lat: 10, lng: 0 }
+    { lat: 10, lng: 10 }, { lat: 10, lng: 0 },
   ];
 
   test('detects inside and outside', () => {
@@ -140,7 +140,7 @@ describe('routeLengthKm', () => {
     const km = geo.routeLengthKm([
       { latitude: 0, longitude: 0 },
       { latitude: 0, longitude: 1 },
-      { latitude: 0, longitude: 2 }
+      { latitude: 0, longitude: 2 },
     ]);
     expect(km).toBeCloseTo(222.4, 0);
   });

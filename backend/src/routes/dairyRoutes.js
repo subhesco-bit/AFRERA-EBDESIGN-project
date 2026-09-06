@@ -37,7 +37,7 @@ router.post('/animals', authMiddleware, async (req, res) => {
 
 router.put('/animals/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
   try {
-    let animal = await dairyService.updateAnimal(req.params.id, req.body);
+    const animal = await dairyService.updateAnimal(req.params.id, req.body);
     if (!animal) return res.status(404).json({ success: false, error: 'Not found' });
     res.json({ success: true, data: animal });
   } catch (error) {
@@ -57,7 +57,7 @@ router.delete('/animals/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROL
 
 router.get('/milk-records', async (req, res) => {
   try {
-    let result = await dairyService.listMilkRecords({ page: req.query.page, limit: req.query.limit });
+    const result = await dairyService.listMilkRecords({ page: req.query.page, limit: req.query.limit });
     res.json({ success: true, data: result.items, pagination: result.pagination });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -67,20 +67,20 @@ router.get('/milk-records', async (req, res) => {
 router.post('/milk-records', authMiddleware, async (req, res) => {
   try {
     const record = await dairyService.recordMilk(req.body);
-    
+
     // Emit signal for milk production recording
     signalBus.emitSignal(SIGNAL.MILK_PRODUCTION_RECORDED, {
       recordId: record.id,
       animalId: record.animal_id,
       quantity: record.quantity,
       quality: record.quality,
-      recordingDate: record.recording_date
+      recordingDate: record.recording_date,
     }, {
       severity: SEVERITY.INFO,
       source: 'dairy_routes',
-      entityId: record.animal_id
+      entityId: record.animal_id,
     });
-    
+
     res.status(201).json({ success: true, data: record });
   } catch (error) {
     logger.error('dairyRoutes:recordMilk', { error: error.message });
@@ -115,7 +115,7 @@ router.get('/health-alerts', async (req, res) => {
 // AI-powered milk production optimization
 router.post('/ai/optimize-production/:animalId', async (req, res) => {
   try {
-    let result = await dairyService.optimizeMilkProduction(req.params.animalId);
+    const result = await dairyService.optimizeMilkProduction(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -125,7 +125,7 @@ router.post('/ai/optimize-production/:animalId', async (req, res) => {
 // AI-powered health prediction
 router.post('/ai/predict-health/:animalId', async (req, res) => {
   try {
-    let result = await dairyService.predictHealthRisks(req.params.animalId);
+    const result = await dairyService.predictHealthRisks(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -136,7 +136,7 @@ router.post('/ai/predict-health/:animalId', async (req, res) => {
 router.post('/ai/optimize-feed/:animalId', async (req, res) => {
   try {
     const { productionGoal } = req.body;
-    let result = await dairyService.optimizeFeedComposition(req.params.animalId, productionGoal);
+    const result = await dairyService.optimizeFeedComposition(req.params.animalId, productionGoal);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -146,7 +146,7 @@ router.post('/ai/optimize-feed/:animalId', async (req, res) => {
 // AI-powered breeding recommendations
 router.post('/ai/recommend-breeding/:animalId', async (req, res) => {
   try {
-    let result = await dairyService.recommendBreeding(req.params.animalId);
+    const result = await dairyService.recommendBreeding(req.params.animalId);
     res.json({ success: true, data: result.data });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

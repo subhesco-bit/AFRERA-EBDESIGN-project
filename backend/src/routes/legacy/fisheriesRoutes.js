@@ -18,7 +18,7 @@ router.get('/', authenticate, async (req, res) => {
     const filters = {
       farmer_id: req.query.farmer_id,
       species: req.query.species,
-      status: req.query.status
+      status: req.query.status,
     };
     const fisheries = await fisheriesService.getAllFisheries(filters);
     res.json({ success: true, data: fisheries });
@@ -40,7 +40,7 @@ router.get('/:id', authenticate, async (req, res) => {
 // POST /api/v1/fisheries - Create fishery
 router.post('/', authenticate, async (req, res) => {
   try {
-    let fishery = await fisheriesService.createFishery(req.body);
+    const fishery = await fisheriesService.createFishery(req.body);
     res.status(201).json({ success: true, data: fishery });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });

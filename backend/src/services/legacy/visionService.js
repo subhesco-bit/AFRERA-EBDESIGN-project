@@ -84,9 +84,9 @@ async function analyzeImageQuality(buffer) {
       format: metadata.format ?? null,
     },
     thresholds: QUALITY_THRESHOLDS,
-    method: 'sharp .stats() Laplacian-stdev sharpness + per-channel mean brightness — '
-      + 'a real, simple statistical heuristic (sharp marks sharpness/entropy as '
-      + '"experimental" in its own docs), not deep-learning-grade quality scoring.',
+    method: 'sharp .stats() Laplacian-stdev sharpness + per-channel mean brightness — ' +
+      'a real, simple statistical heuristic (sharp marks sharpness/entropy as ' +
+      '"experimental" in its own docs), not deep-learning-grade quality scoring.',
   };
 }
 
@@ -146,6 +146,4 @@ module.exports = {
   getImageMetadata,
   generateThumbnail,
 };
-
-
 

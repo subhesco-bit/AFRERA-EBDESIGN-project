@@ -1,6 +1,6 @@
 /**
  * AFRERA Complete AI Integration Routes
- * 
+ *
  * Exposes AI integration endpoints for farmer, crop, livestock, and inbuilt modules
  * Integrates all agricultural operations with predictive analytics, disease detection, yield prediction, and optimization
  */

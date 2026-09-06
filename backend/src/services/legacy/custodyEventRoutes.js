@@ -1,8 +1,8 @@
 /**
  * Custody Event Routes
- * 
+ *
  * API endpoints for custody chain management and settlement instructions.
- * 
+ *
  * Routes:
  * - POST /api/v1/custody/events - Append custody event (basic auth)
  * - GET /api/v1/custody/chain/:shipmentId - Get custody chain with verification
@@ -28,29 +28,29 @@ router.post('/events', authMiddleware, async (req, res) => {
   try {
     const { shipment_id, event_type, event_data } = req.body;
     const recorded_by = req.user.id;
-    
+
     // Validation
     if (!shipment_id || !event_type) {
       return res.status(400).json({
-        error: 'Missing required fields: shipment_id, event_type'
+        error: 'Missing required fields: shipment_id, event_type',
       });
     }
-    
+
     const event = await custodyEventService.appendEvent({
       shipment_id,
       event_type,
       event_data,
-      recorded_by
+      recorded_by,
     });
-    
+
     res.status(201).json({
       success: true,
-      event
+      event,
     });
   } catch (error) {
     logger.error('Error appending custody event', { error: error.message });
     res.status(400).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -64,19 +64,19 @@ router.get('/chain/:shipmentId', authMiddleware, async (req, res) => {
   try {
     const { shipmentId } = req.params;
     const { verify } = req.query;
-    
+
     const verifyHash = verify !== 'false'; // Default to true
-    
+
     const chain = await custodyEventService.getChain(shipmentId, verifyHash);
-    
+
     res.json({
       success: true,
-      chain
+      chain,
     });
   } catch (error) {
     logger.error('Error getting custody chain', { error: error.message });
     res.status(500).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -91,10 +91,10 @@ router.post('/settlement/instructions', authMiddleware, async (req, res) => {
     // Admin-only check
     if (req.user.role !== 'admin') {
       return res.status(403).json({
-        error: 'Admin access required for settlement instructions'
+        error: 'Admin access required for settlement instructions',
       });
     }
-    
+
     const {
       shipment_id,
       custody_event_id,
@@ -103,16 +103,16 @@ router.post('/settlement/instructions', authMiddleware, async (req, res) => {
       currency,
       payer_account,
       payee_account,
-      notes
+      notes,
     } = req.body;
-    
+
     // Validation
     if (!shipment_id || !custody_event_id || !amount || !settlement_type) {
       return res.status(400).json({
-        error: 'Missing required fields: shipment_id, custody_event_id, amount, settlement_type'
+        error: 'Missing required fields: shipment_id, custody_event_id, amount, settlement_type',
       });
     }
-    
+
     const instruction = await custodyEventService.issueSettlementInstruction({
       shipment_id,
       custody_event_id,
@@ -121,17 +121,17 @@ router.post('/settlement/instructions', authMiddleware, async (req, res) => {
       currency,
       payer_account,
       payee_account,
-      notes
+      notes,
     });
-    
+
     res.status(201).json({
       success: true,
-      instruction
+      instruction,
     });
   } catch (error) {
     logger.error('Error issuing settlement instruction', { error: error.message });
     res.status(400).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -146,26 +146,26 @@ router.post('/settlement/:instructionId/confirm', authMiddleware, async (req, re
     // Admin-only check
     if (req.user.role !== 'admin') {
       return res.status(403).json({
-        error: 'Admin access required to confirm settlement execution'
+        error: 'Admin access required to confirm settlement execution',
       });
     }
-    
+
     const { instructionId } = req.params;
     const confirmedBy = req.user.id;
-    
-    let instruction = await custodyEventService.confirmSettlementExecution(
+
+    const instruction = await custodyEventService.confirmSettlementExecution(
       instructionId,
-      confirmedBy
+      confirmedBy,
     );
-    
+
     res.json({
       success: true,
-      instruction
+      instruction,
     });
   } catch (error) {
     logger.error('Error confirming settlement execution', { error: error.message });
     res.status(400).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -178,17 +178,17 @@ router.post('/settlement/:instructionId/confirm', authMiddleware, async (req, re
 router.get('/settlement/:instructionId', authMiddleware, async (req, res) => {
   try {
     const { instructionId } = req.params;
-    
-    let instruction = await custodyEventService.getSettlementInstruction(instructionId);
-    
+
+    const instruction = await custodyEventService.getSettlementInstruction(instructionId);
+
     res.json({
       success: true,
-      instruction
+      instruction,
     });
   } catch (error) {
     logger.error('Error getting settlement instruction', { error: error.message });
     res.status(404).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -202,12 +202,12 @@ router.get('/state-machine', authMiddleware, async (req, res) => {
   try {
     res.json({
       success: true,
-      state_transitions: custodyEventService.STATE_TRANSITIONS
+      state_transitions: custodyEventService.STATE_TRANSITIONS,
     });
   } catch (error) {
     logger.error('Error getting state machine rules', { error: error.message });
     res.status(500).json({
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -222,8 +222,6 @@ function setupRoutes(app) {
 
 module.exports = {
   router,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

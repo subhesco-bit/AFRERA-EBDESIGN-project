@@ -1,6 +1,6 @@
 /**
  * AFRERA Complete ERP Integration Routes
- * 
+ *
  * Exposes ERP integration endpoints for farmer, crop, livestock, and inbuilt modules
  * Integrates all agricultural operations with financial ERP, supply chain ERP, production ERP, and customer ERP
  */
@@ -13,12 +13,12 @@ const { protectRouter, requireHumanAuthorization } = require('./enterpriseRouteS
 
 router.use(authMiddleware);
 protectRouter(router, { signal: 'enterprise.erp.integration.changed', params: {
-	farmerId: true, cropId: true, livestockId: true, dairyId: true, poultryId: true,
-	goatId: true, sheepId: true, pigId: true
+  farmerId: true, cropId: true, livestockId: true, dairyId: true, poultryId: true,
+  goatId: true, sheepId: true, pigId: true,
 } });
 router.use((req, res, next) => {
-	if (req.method === 'GET') return next();
-	requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
+  if (req.method === 'GET') return next();
+  requireRole('admin', 'superadmin')(req, res, () => requireHumanAuthorization(req, res, next));
 });
 
 // ============================================================================

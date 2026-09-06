@@ -1,22 +1,22 @@
 /**
  * AI Provider Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: Multi-provider AI routing with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, provider performance data, request patterns
  * Collaboration Mode: Provider usage tracking, performance monitoring, collaboration logging
- * 
+ *
  * Original Devin Implementation: Multi-provider AI backbone with Claude, OpenAI, Gemini, Azure, Hugging Face, Ollama
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware provider selection using library knowledge
  * - AI-powered provider performance analysis
  * - Historical provider usage pattern analysis
  * - Multi-factor provider optimization
  * - Real-time provider confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All 6 provider integrations preserved (Claude, OpenAI, Gemini, Azure, Hugging Face, Ollama)
  * - Original provider logic maintained
@@ -38,7 +38,7 @@ class ClaudeAIEnhancedProviderService {
     this.serviceName = 'AI Provider Service';
     this.aiEnabled = process.env.CLAUDE_AI_ENABLED === 'true';
     this.originalService = originalAIBackboneService;
-    
+
     // AI Provider configurations (preserved from original)
     this.AI_PROVIDERS = originalAIBackboneService.AI_PROVIDERS || {
       claude: {
@@ -46,43 +46,43 @@ class ClaudeAIEnhancedProviderService {
         apiKey: process.env.CLAUDE_API_KEY,
         baseUrl: 'https://api.anthropic.com/v1',
         model: process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20241022',
-        maxTokens: parseInt(process.env.CLAUDE_MAX_TOKENS) || 4096
+        maxTokens: parseInt(process.env.CLAUDE_MAX_TOKENS) || 4096,
       },
       openai: {
         enabled: process.env.OPENAI_ENABLED === 'true',
         apiKey: process.env.OPENAI_API_KEY,
         baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
         model: process.env.OPENAI_MODEL || 'gpt-4-turbo',
-        maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS) || 4096
+        maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS) || 4096,
       },
       gemini: {
         enabled: process.env.GEMINI_ENABLED === 'true',
         apiKey: process.env.GEMINI_API_KEY,
         baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
         model: process.env.GEMINI_MODEL || 'gemini-pro',
-        maxTokens: parseInt(process.env.GEMINI_MAX_TOKENS) || 4096
+        maxTokens: parseInt(process.env.GEMINI_MAX_TOKENS) || 4096,
       },
       azure: {
         enabled: process.env.AZURE_OPENAI_ENABLED === 'true',
         apiKey: process.env.AZURE_OPENAI_API_KEY,
         endpoint: process.env.AZURE_OPENAI_ENDPOINT,
         deployment: process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4',
-        apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-02-15-preview'
+        apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-02-15-preview',
       },
       huggingface: {
         enabled: process.env.HUGGINGFACE_ENABLED === 'true',
         apiKey: process.env.HUGGINGFACE_API_KEY,
         baseUrl: 'https://api-inference.huggingface.co',
-        defaultModel: process.env.HUGGINGFACE_DEFAULT_MODEL || 'meta-llama/Llama-2-7b-chat-hf'
+        defaultModel: process.env.HUGGINGFACE_DEFAULT_MODEL || 'meta-llama/Llama-2-7b-chat-hf',
       },
       ollama: {
         enabled: process.env.OLLAMA_ENABLED === 'true',
         baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
         model: process.env.OLLAMA_MODEL || 'llama3.1',
-        maxTokens: parseInt(process.env.OLLAMA_MAX_TOKENS) || 4096
-      }
+        maxTokens: parseInt(process.env.OLLAMA_MAX_TOKENS) || 4096,
+      },
     };
-    
+
     // Request tracking (preserved from original)
     this.aiRequestTracker = originalAIBackboneService.aiRequestTracker || {
       totalRequests: 0,
@@ -94,8 +94,8 @@ class ClaudeAIEnhancedProviderService {
         gemini: { total: 0, success: 0, failed: 0 },
         azure: { total: 0, success: 0, failed: 0 },
         huggingface: { total: 0, success: 0, failed: 0 },
-        ollama: { total: 0, success: 0, failed: 0 }
-      }
+        ollama: { total: 0, success: 0, failed: 0 },
+      },
     };
   }
 
@@ -112,42 +112,42 @@ class ClaudeAIEnhancedProviderService {
         work_type: 'provider_selection',
         service: this.serviceName,
         params: { requestContext, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'selectProvider',
-        requestContext: requestContext
+        requestContext,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'decision',
         query: this.buildProviderSelectionQuery(requestContext, options),
-        context: { 
-          requestContext, 
+        context: {
+          requestContext,
           options,
           libraryContext,
-          providerStats: this.aiRequestTracker.providerStats
+          providerStats: this.aiRequestTracker.providerStats,
         },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
       const originalResult = await this.originalService.autoSelectProvider(requestContext, options);
-      
+
       const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_selection_rationale: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || originalResult.confidence,
-        ai_provider_recommendations: this.extractProviderRecommendations(aiEnhancement.content)
+        ai_provider_recommendations: this.extractProviderRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'provider_selection',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -156,9 +156,9 @@ class ClaudeAIEnhancedProviderService {
         work_type: 'provider_selection',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.autoSelectProvider(requestContext, options);
     }
@@ -177,42 +177,42 @@ class ClaudeAIEnhancedProviderService {
         work_type: 'provider_call',
         service: this.serviceName,
         params: { provider, promptLength: prompt.length, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
-      let libraryContext = await libraryKnowledgeService.buildAIContext({
+      const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'callProvider',
-        provider: provider,
-        promptContext: this.extractPromptContext(prompt)
+        provider,
+        promptContext: this.extractPromptContext(prompt),
       });
 
-      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: this.buildProviderCallQuery(provider, prompt, options),
-        context: { 
-          provider, 
+        context: {
+          provider,
           promptContext: this.extractPromptContext(prompt),
           options,
-          libraryContext
+          libraryContext,
         },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
-      let originalResult = await this.originalService.callProvider(provider, prompt, options);
-      
-      let enhancedResult = {
+      const originalResult = await this.originalService.callProvider(provider, prompt, options);
+
+      const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_optimization_insights: aiEnhancement.content || null,
-        ai_call_efficiency: this.extractCallEfficiency(aiEnhancement.content)
+        ai_call_efficiency: this.extractCallEfficiency(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'provider_call',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -221,9 +221,9 @@ class ClaudeAIEnhancedProviderService {
         work_type: 'provider_call',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.callProvider(provider, prompt, options);
     }
@@ -251,7 +251,7 @@ class ClaudeAIEnhancedProviderService {
       length: prompt.length,
       language: this.detectLanguage(prompt),
       complexity: this.assessComplexity(prompt),
-      domain: this.detectDomain(prompt)
+      domain: this.detectDomain(prompt),
     };
   }
 
@@ -281,10 +281,10 @@ class ClaudeAIEnhancedProviderService {
    */
   detectDomain(prompt) {
     const domainKeywords = {
-      'financial': ['price', 'cost', 'payment', 'loan', 'credit'],
-      'agriculture': ['crop', 'soil', 'fertilizer', 'harvest', 'yield'],
-      'logistics': ['route', 'transport', 'delivery', 'warehouse', 'shipping'],
-      'insurance': ['claim', 'policy', 'premium', 'coverage', 'risk']
+      financial: ['price', 'cost', 'payment', 'loan', 'credit'],
+      agriculture: ['crop', 'soil', 'fertilizer', 'harvest', 'yield'],
+      logistics: ['route', 'transport', 'delivery', 'warehouse', 'shipping'],
+      insurance: ['claim', 'policy', 'premium', 'coverage', 'risk'],
     };
 
     for (const [domain, keywords] of Object.entries(domainKeywords)) {
@@ -300,16 +300,16 @@ class ClaudeAIEnhancedProviderService {
    */
   extractProviderRecommendations(aiContent) {
     if (!aiContent) return [];
-    
+
     const recommendations = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('recommend') || line.includes('suggest') || line.includes('advise')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -318,10 +318,10 @@ class ClaudeAIEnhancedProviderService {
    */
   extractCallEfficiency(aiContent) {
     if (!aiContent) return null;
-    
+
     const efficiencyMetrics = {};
-    let lines = aiContent.split('\n');
-    
+    const lines = aiContent.split('\n');
+
     lines.forEach(line => {
       if (line.includes('token') || line.includes('latency') || line.includes('cost')) {
         const parts = line.split(':');
@@ -330,7 +330,7 @@ class ClaudeAIEnhancedProviderService {
         }
       }
     });
-    
+
     return Object.keys(efficiencyMetrics).length > 0 ? efficiencyMetrics : null;
   }
 
@@ -392,7 +392,7 @@ class ClaudeAIEnhancedProviderService {
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
       providers: Object.keys(this.AI_PROVIDERS),
-      ai_enhanced_methods: ['selectProviderAI', 'callProviderAI']
+      ai_enhanced_methods: ['selectProviderAI', 'callProviderAI'],
     };
   }
 }

@@ -22,7 +22,7 @@ async function getAuditLogs(req, res) {
       action: req.query.action,
       entity: req.query.entity,
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
     const result = await service.getAuditLogs(filters);
     res.json({ success: true, data: result });
@@ -34,7 +34,7 @@ async function getAuditLogs(req, res) {
 
 async function getAuditLog(req, res) {
   try {
-    let log = await service.getAuditLog(req.params.id);
+    const log = await service.getAuditLog(req.params.id);
     if (!log) return res.status(404).json({ success: false, error: 'Audit log not found' });
     res.json({ success: true, data: log });
   } catch (error) {
@@ -115,18 +115,18 @@ module.exports = {
   createAuditLog,
   getAuditLogs,
   getAuditLog,
-  
+
   // Blockchain verification
   verifyAuditLogIntegrity,
-  
+
   // Compliance rules
   createComplianceRule,
   listComplianceRules,
   evaluateComplianceRules,
-  
+
   // Regulatory reporting
   generateComplianceReport,
-  
+
   // AI-powered anomaly detection
   detectAuditAnomalies,
 };

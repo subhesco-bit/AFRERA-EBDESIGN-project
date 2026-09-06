@@ -25,7 +25,7 @@ const listFPOs = async (req, res) => {
 
 const getFPO = async (req, res) => {
   try {
-    let fpo = await fpoService.getFPO(req.params.id);
+    const fpo = await fpoService.getFPO(req.params.id);
     if (!fpo) {
       return res.status(404).json({ success: false, error: 'FPO not found' });
     }
@@ -37,7 +37,7 @@ const getFPO = async (req, res) => {
 
 const updateFPO = async (req, res) => {
   try {
-    let fpo = await fpoService.updateFPO(req.params.id, req.body);
+    const fpo = await fpoService.updateFPO(req.params.id, req.body);
     if (!fpo) {
       return res.status(404).json({ success: false, error: 'FPO not found' });
     }
@@ -114,5 +114,5 @@ module.exports = {
   getFPOMembers,
   getFPOFinancialSummary,
   recordFPOTransaction,
-  generateFPOPerformanceReport
+  generateFPOPerformanceReport,
 };

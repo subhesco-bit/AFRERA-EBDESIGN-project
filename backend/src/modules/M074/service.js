@@ -7,47 +7,47 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function registerSheepFlock(flockData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { flockName, breed, sheepCount, location, farmId, averageWoolProduction, meatProductionTarget, healthStatus } = flockData;
-  
+
   const res = await pg.query(
     `INSERT INTO sheep_flocks (flock_name, breed, sheep_count, location, farm_id, average_wool_production, meat_production_target, health_status, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'active', NOW(), NOW())
      RETURNING *`,
-    [flockName, breed, sheepCount, JSON.stringify(location), farmId, averageWoolProduction, meatProductionTarget, healthStatus]
+    [flockName, breed, sheepCount, JSON.stringify(location), farmId, averageWoolProduction, meatProductionTarget, healthStatus],
   );
-  
+
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'sheep_flock',
     flockId: res.rows[0].id,
     flockName,
     breed,
-    sheepCount
+    sheepCount,
   }, {
     severity: SEVERITY.INFO,
     source: 'sheep_management_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
 async function getSheepFlock(flockId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  let res = await pg.query('SELECT * FROM sheep_flocks WHERE id = $1', [flockId]);
+  const res = await pg.query('SELECT * FROM sheep_flocks WHERE id = $1', [flockId]);
   return res.rows[0] || null;
 }
 
 async function listSheepFlocks({ page = 1, limit = 20, farmId, breed, status } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const offset = (page - 1) * limit;
   let query = 'SELECT * FROM sheep_flocks WHERE 1=1';
   const params = [];
   let paramIndex = 1;
-  
+
   if (farmId) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
@@ -60,24 +60,24 @@ async function listSheepFlocks({ page = 1, limit = 20, farmId, breed, status } =
     query += ` AND status = $${paramIndex++}`;
     params.push(status);
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
-  
-  let res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM sheep_flocks`, 'SELECT COUNT(*) FROM sheep_flocks').split('LIMIT')[0], params.slice(0, -2));
+
+  const res = await pg.query(query, params);
+  const totalRes = await pg.query(query.replace('SELECT * FROM sheep_flocks', 'SELECT COUNT(*) FROM sheep_flocks').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
-  
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updateSheepFlock(flockId, updates) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { flockName, breed, sheepCount, location, averageWoolProduction, meatProductionTarget, healthStatus, status } = updates;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `UPDATE sheep_flocks 
      SET flock_name = COALESCE($1, flock_name),
          breed = COALESCE($2, breed),
@@ -90,31 +90,31 @@ async function updateSheepFlock(flockId, updates) {
          updated_at = NOW()
      WHERE id = $9
      RETURNING *`,
-    [flockName, breed, sheepCount, location ? JSON.stringify(location) : null, averageWoolProduction, meatProductionTarget, healthStatus, status, flockId]
+    [flockName, breed, sheepCount, location ? JSON.stringify(location) : null, averageWoolProduction, meatProductionTarget, healthStatus, status, flockId],
   );
-  
+
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'sheep_flock',
     flockId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'sheep_management_service',
-    entityId: flockId
+    entityId: flockId,
   });
-  
+
   return res.rows[0] || null;
 }
 
 async function analyzeSheepProduction(flockId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const flock = await getSheepFlock(flockId);
   if (!flock) {
     return { success: false, error: 'Flock not found' };
   }
-  
+
   const analysis = {
     flockId,
     flockName: flock.flock_name,
@@ -122,9 +122,9 @@ async function analyzeSheepProduction(flockId) {
     efficiencyScore: calculateEfficiencyScore(flock),
     feedOptimization: generateFeedOptimization(flock),
     breedingRecommendations: generateBreedingRecommendations(flock),
-    healthAlerts: generateHealthAlerts(flock)
+    healthAlerts: generateHealthAlerts(flock),
   };
-  
+
   return { success: true, data: analysis };
 }
 
@@ -149,19 +149,19 @@ function generateFeedOptimization(flock) {
     recommendations.push({
       type: 'feed',
       message: 'Increase protein in feed to improve wool quality',
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;
 }
 
 function generateBreedingRecommendations(flock) {
-  let recommendations = [];
+  const recommendations = [];
   if (flock.sheep_count && flock.sheep_count < 25) {
     recommendations.push({
       type: 'breeding',
       message: 'Consider expanding flock size for optimal production',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
   return recommendations;
@@ -173,16 +173,16 @@ function generateHealthAlerts(flock) {
     alerts.push({
       type: 'health',
       message: 'Health status requires attention',
-      priority: 'high'
+      priority: 'high',
     });
   }
   return alerts;
 }
 
 async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = `
     SELECT 
       breed,
@@ -192,9 +192,9 @@ async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
     FROM sheep_flocks
     WHERE 1=1
   `;
-  let params = [];
+  const params = [];
   let paramIndex = 1;
-  
+
   if (startDate) {
     query += ` AND created_at >= $${paramIndex++}`;
     params.push(startDate);
@@ -207,27 +207,27 @@ async function getSheepAnalytics({ startDate, endDate, farmId } = {}) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
   }
-  
-  query += ` GROUP BY breed ORDER BY total_sheep DESC`;
-  
-  let res = await pg.query(query, params);
-  
+
+  query += ' GROUP BY breed ORDER BY total_sheep DESC';
+
+  const res = await pg.query(query, params);
+
   return {
     byBreed: res.rows,
     totalFlocks: res.rows.reduce((sum, row) => sum + parseInt(row.flock_count), 0),
     totalSheep: res.rows.reduce((sum, row) => sum + parseInt(row.total_sheep), 0),
-    recommendations: generateSheepAnalyticsRecommendations(res.rows)
+    recommendations: generateSheepAnalyticsRecommendations(res.rows),
   };
 }
 
 function generateSheepAnalyticsRecommendations(breedData) {
-  let recommendations = [];
+  const recommendations = [];
   const topBreed = breedData[0];
   if (topBreed) {
     recommendations.push({
       type: 'resource_allocation',
       message: `Highest concentration of ${topBreed.breed}. Allocate specialized resources.`,
-      priority: 'high'
+      priority: 'high',
     });
   }
   return recommendations;

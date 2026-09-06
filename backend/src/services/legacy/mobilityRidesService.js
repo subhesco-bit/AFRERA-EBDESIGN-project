@@ -1,6 +1,6 @@
 /**
  * Mobility Rides Service
- * 
+ *
  * Wires the existing `mobility_rides` table (migration 042) to application logic
  * Implements REOS Rural Life OS component for rural mobility and transportation
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getMobilityRide(rideId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM mobility_rides WHERE ride_id = $1`,
-      [rideId]
+      'SELECT * FROM mobility_rides WHERE ride_id = $1',
+      [rideId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Mobility ride not found: ${rideId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get mobility ride: ${error.message}`);
@@ -43,10 +43,10 @@ async function getMobilityRide(rideId) {
 async function getMobilityRidesByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM mobility_rides WHERE village_id = $1 ORDER BY scheduled_date DESC`,
-      [villageId]
+      'SELECT * FROM mobility_rides WHERE village_id = $1 ORDER BY scheduled_date DESC',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get mobility rides by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getMobilityRidesByVillage(villageId) {
 async function getMobilityRidesByDriver(driverId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM mobility_rides WHERE driver_id = $1 ORDER BY scheduled_date DESC`,
-      [driverId]
+      'SELECT * FROM mobility_rides WHERE driver_id = $1 ORDER BY scheduled_date DESC',
+      [driverId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get mobility rides by driver: ${error.message}`);
@@ -93,7 +93,7 @@ async function createMobilityRide(ride) {
       capacity,
       fare_per_seat,
       status,
-      notes
+      notes,
     } = ride;
 
     const { rows } = await pool.query(
@@ -104,8 +104,8 @@ async function createMobilityRide(ride) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
        RETURNING *`,
       [ride_id, village_id, district, driver_id, vehicle_type,
-       origin, destination, scheduled_date, scheduled_time,
-       capacity, fare_per_seat, status, notes]
+        origin, destination, scheduled_date, scheduled_time,
+        capacity, fare_per_seat, status, notes],
     );
 
     logger.info(`Mobility ride created: ${ride_id}`);
@@ -130,9 +130,9 @@ async function updateRideStatus(rideId, status) {
            updated_at = NOW()
        WHERE ride_id = $2
        RETURNING *`,
-      [status, rideId]
+      [status, rideId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Mobility ride not found: ${rideId}`);
     }
@@ -153,7 +153,7 @@ async function updateRideStatus(rideId, status) {
 async function getMobilityRideStatistics(filters = {}) {
   try {
     const { district, village_id, driver_id, status } = filters;
-    
+
     let query = `
       SELECT 
         COUNT(*) as total_rides,
@@ -165,7 +165,7 @@ async function getMobilityRideStatistics(filters = {}) {
       FROM mobility_rides
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramIndex = 1;
 
@@ -202,7 +202,7 @@ async function getMobilityRideStatistics(filters = {}) {
       completedRides: parseInt(stats.completed_rides),
       cancelledRides: parseInt(stats.cancelled_rides),
       avgFarePerSeat: stats.avg_fare_per_seat ? r2(stats.avg_fare_per_seat) : 0,
-      totalCapacity: stats.total_capacity ? parseInt(stats.total_capacity) : 0
+      totalCapacity: stats.total_capacity ? parseInt(stats.total_capacity) : 0,
     };
   } catch (error) {
     logger.error(`Failed to get mobility ride statistics: ${error.message}`);
@@ -237,7 +237,7 @@ function setupRoutes(app) {
 
   router.get('/rides/driver/:driverId', async (req, res) => {
     try {
-      let rides = await getMobilityRidesByDriver(req.params.driverId);
+      const rides = await getMobilityRidesByDriver(req.params.driverId);
       res.json({ success: true, data: rides });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -246,7 +246,7 @@ function setupRoutes(app) {
 
   router.post('/rides', async (req, res) => {
     try {
-      let ride = await createMobilityRide(req.body);
+      const ride = await createMobilityRide(req.body);
       res.status(201).json({ success: true, data: ride });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -256,7 +256,7 @@ function setupRoutes(app) {
   router.put('/rides/:rideId/status', async (req, res) => {
     try {
       const { status } = req.body;
-      let ride = await updateRideStatus(req.params.rideId, status);
+      const ride = await updateRideStatus(req.params.rideId, status);
       res.json({ success: true, data: ride });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -265,7 +265,7 @@ function setupRoutes(app) {
 
   router.get('/rides/statistics', async (req, res) => {
     try {
-      let stats = await getMobilityRideStatistics(req.query);
+      const stats = await getMobilityRideStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -283,8 +283,6 @@ module.exports = {
   createMobilityRide,
   updateRideStatus,
   getMobilityRideStatistics,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

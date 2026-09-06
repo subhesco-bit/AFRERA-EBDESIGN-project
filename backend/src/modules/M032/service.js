@@ -33,7 +33,7 @@ async function createSoilSample(sampleData) {
       cation_exchange_capacity,
       texture,
       structure,
-      water_holding_capacity
+      water_holding_capacity,
     } = sampleData;
 
     const sample = {
@@ -62,7 +62,7 @@ async function createSoilSample(sampleData) {
       texture,
       structure,
       water_holding_capacity,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered soil health analysis
@@ -72,8 +72,8 @@ async function createSoilSample(sampleData) {
         sample_data: sampleData,
         nutrient_standards: await getNutrientStandards(soil_type),
         regional_benchmarks: await getRegionalBenchmarks(sample_location),
-        crop_requirements: await getCropRequirements()
-      }
+        crop_requirements: await getCropRequirements(),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -98,8 +98,8 @@ async function createSoilSample(sampleData) {
         sample.zinc, sample.copper, sample.manganese, sample.boron,
         sample.electrical_conductivity, sample.cation_exchange_capacity, sample.texture,
         sample.structure, sample.water_holding_capacity, sample.ai_health_score,
-        JSON.stringify(sample.ai_recommendations), sample.created_at
-      ]
+        JSON.stringify(sample.ai_recommendations), sample.created_at,
+      ],
     );
 
     // Generate health report
@@ -125,7 +125,7 @@ async function generateSoilHealthReport(sampleId, sampleData, aiAnalysis) {
       recommended_amendments: aiAnalysis.amendments || [],
       recommended_crops: aiAnalysis.recommended_crops || [],
       irrigation_recommendations: aiAnalysis.irrigation || [],
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     await pool.query(
@@ -137,8 +137,8 @@ async function generateSoilHealthReport(sampleId, sampleData, aiAnalysis) {
         report.report_id, report.sample_id, report.overall_health, report.fertility_rating,
         JSON.stringify(report.suitability_rating), JSON.stringify(report.nutrient_deficiencies),
         JSON.stringify(report.recommended_amendments), JSON.stringify(report.recommended_crops),
-        JSON.stringify(report.irrigation_recommendations), report.created_at
-      ]
+        JSON.stringify(report.irrigation_recommendations), report.created_at,
+      ],
     );
 
     return report;
@@ -153,23 +153,23 @@ async function getSoilRecommendations(farmerId, parcelId) {
       `SELECT * FROM soil_samples 
        WHERE farmer_id = $1 AND parcel_id = $2 
        ORDER BY sample_date DESC LIMIT 1`,
-      [farmerId, parcelId]
+      [farmerId, parcelId],
     );
 
     if (latestSample.rows.length === 0) {
       return { message: 'No soil samples found for this parcel' };
     }
 
-    let sample = latestSample.rows[0];
-    let report = await pool.query(
+    const sample = latestSample.rows[0];
+    const report = await pool.query(
       'SELECT * FROM soil_health_reports WHERE sample_id = $1',
-      [sample.sample_id]
+      [sample.sample_id],
     );
 
     return {
-      sample: sample,
+      sample,
       health_report: report.rows[0] || null,
-      ai_insights: sample.ai_recommendations
+      ai_insights: sample.ai_recommendations,
     };
   } catch (error) {
     logger.error('Error getting soil recommendations', { error: error.message, stack: error.stack });
@@ -186,7 +186,7 @@ async function getNutrientStandards(soilType) {
     nitrogen: { optimal_min: 20, optimal_max: 40 },
     phosphorus: { optimal_min: 15, optimal_max: 30 },
     potassium: { optimal_min: 150, optimal_max: 250 },
-    ph_level: { optimal_min: 6.0, optimal_max: 7.5 }
+    ph_level: { optimal_min: 6.0, optimal_max: 7.5 },
   };
 }
 
@@ -195,8 +195,8 @@ async function getRegionalBenchmarks(location) {
     regional_average: {
       organic_matter: 2.5,
       nitrogen: 25,
-      phosphorus: 20
-    }
+      phosphorus: 20,
+    },
   };
 }
 
@@ -204,7 +204,7 @@ async function getCropRequirements() {
   return {
     wheat: { nitrogen: 30, phosphorus: 20, potassium: 180 },
     rice: { nitrogen: 40, phosphorus: 20, potassium: 200 },
-    vegetables: { nitrogen: 35, phosphorus: 25, potassium: 220 }
+    vegetables: { nitrogen: 35, phosphorus: 25, potassium: 220 },
   };
 }
 
@@ -218,7 +218,7 @@ function determineOverallHealth(healthScore) {
 function determineFertilityRating(sampleData) {
   let score = 0;
   const nutrients = ['nitrogen', 'phosphorus', 'potassium', 'organic_matter'];
-  
+
   nutrients.forEach(nutrient => {
     if (sampleData[nutrient] > 20) score += 25;
   });
@@ -234,7 +234,7 @@ function identifyDeficiencies(sampleData) {
     nitrogen: 20,
     phosphorus: 15,
     potassium: 150,
-    organic_matter: 2.0
+    organic_matter: 2.0,
   };
 
   Object.keys(standards).forEach(nutrient => {
@@ -243,7 +243,7 @@ function identifyDeficiencies(sampleData) {
         nutrient,
         current_level: sampleData[nutrient],
         recommended_level: standards[nutrient],
-        severity: sampleData[nutrient] < standards[nutrient] * 0.5 ? 'severe' : 'moderate'
+        severity: sampleData[nutrient] < standards[nutrient] * 0.5 ? 'severe' : 'moderate',
       });
     }
   });
@@ -254,5 +254,5 @@ function identifyDeficiencies(sampleData) {
 module.exports = {
   createSoilSample,
   generateSoilHealthReport,
-  getSoilRecommendations
+  getSoilRecommendations,
 };

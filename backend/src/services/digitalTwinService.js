@@ -28,7 +28,7 @@ class DigitalTwinService {
         area,
         soilType,
         climateZone,
-        initialConditions
+        initialConditions,
       } = farmData;
 
       // Verify farm exists
@@ -37,7 +37,7 @@ class DigitalTwinService {
         return {
           success: false,
           error: 'Farm not found',
-          farmId
+          farmId,
         };
       }
 
@@ -58,12 +58,12 @@ class DigitalTwinService {
         climateZone,
         initialConditions,
         syncInterval: this.simulationInterval,
-        modelVersion: '1.0'
+        modelVersion: '1.0',
       };
 
       const result = await db.query(query, [
         twinId, 'farm', farmId, farmerId, name, location,
-        JSON.stringify(specifications)
+        JSON.stringify(specifications),
       ]);
 
       // Initialize twin state
@@ -80,15 +80,15 @@ class DigitalTwinService {
           entityId: result.rows[0].entity_id,
           status: result.rows[0].status,
           initialState: twinState,
-          createdAt: new Date().toISOString()
-        }
+          createdAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - createFarmDigitalTwin error:`, error);
       return {
         success: false,
         error: 'Failed to create farm digital twin',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -105,7 +105,7 @@ class DigitalTwinService {
         variety,
         plantingDate,
         location,
-        fieldConditions
+        fieldConditions,
       } = cropData;
 
       const crop = await this.verifyCrop(cropId);
@@ -113,11 +113,11 @@ class DigitalTwinService {
         return {
           success: false,
           error: 'Crop not found',
-          cropId
+          cropId,
         };
       }
 
-      let query = `
+      const query = `
         INSERT INTO digital_twins (
           twin_id, entity_type, entity_id, owner_id,
           name, location, specifications, status,
@@ -126,24 +126,24 @@ class DigitalTwinService {
         RETURNING twin_id, entity_id, status
       `;
 
-      let twinId = this.generateTwinId();
-      let specifications = {
+      const twinId = this.generateTwinId();
+      const specifications = {
         cropType,
         variety,
         plantingDate,
         fieldConditions,
         growthStage: 'seedling',
         expectedYield: this.calculateExpectedYield(cropType, fieldConditions),
-        modelVersion: '1.0'
+        modelVersion: '1.0',
       };
 
-      let result = await db.query(query, [
+      const result = await db.query(query, [
         twinId, 'crop', cropId, farmerId,
         `${cropType} - ${variety}`, location,
-        JSON.stringify(specifications)
+        JSON.stringify(specifications),
       ]);
 
-      let twinState = this.initializeTwinState('crop', specifications);
+      const twinState = this.initializeTwinState('crop', specifications);
       this.activeTwins.set(twinId, twinState);
 
       return {
@@ -153,15 +153,15 @@ class DigitalTwinService {
           entityId: result.rows[0].entity_id,
           status: result.rows[0].status,
           initialState: twinState,
-          createdAt: new Date().toISOString()
-        }
+          createdAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - createCropDigitalTwin error:`, error);
       return {
         success: false,
         error: 'Failed to create crop digital twin',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -176,19 +176,19 @@ class DigitalTwinService {
         return {
           success: false,
           error: 'Digital twin not found',
-          twinId
+          twinId,
         };
       }
 
       // Get real-world data based on entity type
       const realWorldData = await this.getRealWorldData(twin);
-      
+
       // Update twin state
       const updatedState = this.updateTwinState(twin, realWorldData);
-      
+
       // Store updated state
       await this.storeTwinState(twinId, updatedState);
-      
+
       // Update cache
       this.activeTwins.set(twinId, updatedState);
 
@@ -202,17 +202,17 @@ class DigitalTwinService {
           syncTimestamp: new Date().toISOString(),
           stateChanges: this.calculateStateChanges(
             this.activeTwins.get(twinId),
-            updatedState
+            updatedState,
           ),
-          dataPoints: Object.keys(realWorldData).length
-        }
+          dataPoints: Object.keys(realWorldData).length,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - syncDigitalTwin error:`, error);
       return {
         success: false,
         error: 'Failed to sync digital twin',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -222,22 +222,22 @@ class DigitalTwinService {
    */
   async runSimulation(twinId, simulationConfig) {
     try {
-      let twin = await this.getTwinById(twinId);
+      const twin = await this.getTwinById(twinId);
       if (!twin) {
         return {
           success: false,
           error: 'Digital twin not found',
-          twinId
+          twinId,
         };
       }
 
-      const currentState = this.activeTwins.get(twinId) || 
+      const currentState = this.activeTwins.get(twinId) ||
                            await this.getLatestTwinState(twinId);
 
       // Run simulation based on configuration
       const simulationResults = this.executeSimulation(
         currentState,
-        simulationConfig
+        simulationConfig,
       );
 
       // Store simulation results
@@ -250,15 +250,15 @@ class DigitalTwinService {
           simulationId: simulationResults.id,
           simulationType: simulationConfig.type,
           results: simulationResults,
-          executedAt: new Date().toISOString()
-        }
+          executedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - runSimulation error:`, error);
       return {
         success: false,
         error: 'Failed to run simulation',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -267,7 +267,7 @@ class DigitalTwinService {
    * Get twin by ID
    */
   async getTwinById(twinId) {
-    let query = `
+    const query = `
       SELECT twin_id, entity_type, entity_id, owner_id,
              name, location, specifications, status,
              created_at, last_synced
@@ -275,7 +275,7 @@ class DigitalTwinService {
       WHERE twin_id = $1
     `;
 
-    let result = await db.query(query, [twinId]);
+    const result = await db.query(query, [twinId]);
     return result.rows[0];
   }
 
@@ -309,7 +309,7 @@ class DigitalTwinService {
    * Get farm real-time data
    */
   async getFarmRealTimeData(farmId) {
-    let query = `
+    const query = `
       SELECT
         f.area,
         f.soil_type,
@@ -322,7 +322,7 @@ class DigitalTwinService {
       GROUP BY f.id
     `;
 
-    let result = await db.query(query, [farmId]);
+    const result = await db.query(query, [farmId]);
     return result.rows[0] || {};
   }
 
@@ -332,7 +332,7 @@ class DigitalTwinService {
    * crops.id itself (see schema-decisions.json's digital_twins entry).
    */
   async getCropRealTimeData(cropPlantingId) {
-    let query = `
+    const query = `
       SELECT
         cat.common_name as crop_type,
         cp.growth_stage,
@@ -345,7 +345,7 @@ class DigitalTwinService {
       WHERE cp.id = $1
     `;
 
-    let result = await db.query(query, [cropPlantingId]);
+    const result = await db.query(query, [cropPlantingId]);
     return result.rows[0] || {};
   }
 
@@ -359,16 +359,16 @@ class DigitalTwinService {
       // iot_devices links to its owner via farmer_id (see the note in
       // getRealWorldData above) - not a generic entity_id, which does not
       // exist on this table.
-      let query = `
+      const query = `
         SELECT device_id, device_type, last_active
         FROM iot_devices
         WHERE farmer_id = $1 AND status = 'active'
       `;
 
-      let result = await db.query(query, [farmerId]);
-      
+      const result = await db.query(query, [farmerId]);
+
       if (result.rows.length === 0) return null;
-      
+
       // Get recent sensor data
       const sensorData = await Promise.all(
         result.rows.map(async (device) => {
@@ -377,11 +377,11 @@ class DigitalTwinService {
             deviceId: device.device_id,
             deviceType: device.device_type,
             lastActive: device.last_active,
-            recentReadings: recentData.slice(0, 5)
+            recentReadings: recentData.slice(0, 5),
           };
-        })
+        }),
       );
-      
+
       return sensorData;
     } catch (error) {
       logger.error('Error getting IoT data:', error);
@@ -396,7 +396,7 @@ class DigitalTwinService {
     const baseState = {
       version: '1.0',
       lastUpdated: new Date().toISOString(),
-      syncStatus: 'initialized'
+      syncStatus: 'initialized',
     };
 
     if (entityType === 'farm') {
@@ -409,9 +409,9 @@ class DigitalTwinService {
         resourceLevels: {
           water: 100,
           nutrients: 100,
-            energy: 100
+          energy: 100,
         },
-        activityLevel: 'normal'
+        activityLevel: 'normal',
       };
     } else if (entityType === 'crop') {
       return {
@@ -421,7 +421,7 @@ class DigitalTwinService {
         healthStatus: 'healthy',
         biomass: this.calculateInitialBiomass(specifications.growthStage),
         stressFactors: [],
-        predictedYield: specifications.expectedYield
+        predictedYield: specifications.expectedYield,
       };
     }
 
@@ -432,7 +432,7 @@ class DigitalTwinService {
    * Update twin state
    */
   updateTwinState(twin, realWorldData) {
-    let currentState = this.activeTwins.get(twin.twin_id) || {};
+    const currentState = this.activeTwins.get(twin.twin_id) || {};
     const newState = { ...currentState };
 
     // Update based on entity type
@@ -440,18 +440,18 @@ class DigitalTwinService {
       newState.area = realWorldData.area || newState.area;
       newState.activeCrops = realWorldData.active_crops || 0;
       newState.totalExpectedYield = realWorldData.total_expected_yield || 0;
-      
+
       if (realWorldData.iot) {
         newState.resourceLevels = this.updateResourceLevels(
           newState.resourceLevels,
-          realWorldData.iot
+          realWorldData.iot,
         );
       }
     } else if (twin.entity_type === 'crop') {
       newState.growthStage = realWorldData.growth_stage || newState.growthStage;
       newState.healthStatus = this.assessCropHealth(realWorldData.current_health);
       newState.estimatedYield = realWorldData.estimated_yield_kg || newState.predictedYield;
-      
+
       if (realWorldData.iot) {
         newState.stressFactors = this.identifyStressFactors(realWorldData.iot);
       }
@@ -473,7 +473,7 @@ class DigitalTwinService {
       type: config.type,
       timestamp: new Date().toISOString(),
       initialState: { ...currentState },
-      scenarios: []
+      scenarios: [],
     };
 
     switch (config.type) {
@@ -499,13 +499,13 @@ class DigitalTwinService {
   simulateYieldPrediction(state, config) {
     const scenarios = [];
     const baseYield = state.predictedYield || 1000;
-    
+
     // Different scenarios
     const scenarios_config = [
       { name: 'Optimal', multiplier: 1.2, conditions: 'ideal_conditions' },
       { name: 'Normal', multiplier: 1.0, conditions: 'current_conditions' },
       { name: 'Suboptimal', multiplier: 0.8, conditions: 'stress_conditions' },
-      { name: 'Poor', multiplier: 0.6, conditions: 'adverse_conditions' }
+      { name: 'Poor', multiplier: 0.6, conditions: 'adverse_conditions' },
     ];
 
     scenarios_config.forEach(scenario => {
@@ -513,7 +513,7 @@ class DigitalTwinService {
         name: scenario.name,
         predictedYield: Math.round(baseYield * scenario.multiplier),
         confidence: this.calculateScenarioConfidence(scenario.conditions),
-        factors: this.getImpactFactors(scenario.conditions)
+        factors: this.getImpactFactors(scenario.conditions),
       });
     });
 
@@ -524,14 +524,14 @@ class DigitalTwinService {
    * Simulate resource optimization
    */
   simulateResourceOptimization(state, config) {
-    let scenarios = [];
+    const scenarios = [];
     const currentResources = state.resourceLevels || { water: 100, nutrients: 100, energy: 100 };
 
     scenarios.push({
       name: 'Current Usage',
       resources: { ...currentResources },
       efficiency: 0.75,
-      cost: this.calculateResourceCost(currentResources)
+      cost: this.calculateResourceCost(currentResources),
     });
 
     scenarios.push({
@@ -539,15 +539,15 @@ class DigitalTwinService {
       resources: {
         water: currentResources.water * 0.85,
         nutrients: currentResources.nutrients * 0.90,
-        energy: currentResources.energy * 0.80
+        energy: currentResources.energy * 0.80,
       },
       efficiency: 0.92,
       cost: this.calculateResourceCost({
         water: currentResources.water * 0.85,
         nutrients: currentResources.nutrients * 0.90,
-        energy: currentResources.energy * 0.80
+        energy: currentResources.energy * 0.80,
       }),
-      savings: 15
+      savings: 15,
     });
 
     return scenarios;
@@ -557,12 +557,12 @@ class DigitalTwinService {
    * Simulate climate impact
    */
   simulateClimateImpact(state, config) {
-    let scenarios = [];
+    const scenarios = [];
     const climateScenarios = [
       { name: 'Normal Rainfall', rainfall: 'normal', impact: 0 },
       { name: 'Drought Conditions', rainfall: 'low', impact: -0.25 },
       { name: 'Excess Rainfall', rainfall: 'high', impact: -0.15 },
-      { name: 'Optimal Conditions', rainfall: 'optimal', impact: 0.15 }
+      { name: 'Optimal Conditions', rainfall: 'optimal', impact: 0.15 },
     ];
 
     climateScenarios.forEach(scenario => {
@@ -570,7 +570,7 @@ class DigitalTwinService {
         name: scenario.name,
         rainfallPattern: scenario.rainfall,
         yieldImpact: scenario.impact,
-        recommendations: this.getClimateRecommendations(scenario.rainfall)
+        recommendations: this.getClimateRecommendations(scenario.rainfall),
       });
     });
 
@@ -585,7 +585,7 @@ class DigitalTwinService {
       name: 'Basic Scenario',
       parameters: config.parameters || {},
       outcome: 'Simulation executed',
-      confidence: 0.7
+      confidence: 0.7,
     }];
   }
 
@@ -614,20 +614,20 @@ class DigitalTwinService {
 
   calculateExpectedYield(cropType, conditions) {
     const baseYields = {
-      'rice': 5000,
-      'wheat': 3500,
-      'maize': 4000,
-      'vegetables': 2000
+      rice: 5000,
+      wheat: 3500,
+      maize: 4000,
+      vegetables: 2000,
     };
     return baseYields[cropType] || 3000;
   }
 
   assessSoilHealth(soilType) {
     const healthMap = {
-      'loam': 0.9,
-      'clay': 0.75,
-      'sandy': 0.7,
-      'silt': 0.8
+      loam: 0.9,
+      clay: 0.75,
+      sandy: 0.7,
+      silt: 0.8,
     };
     return healthMap[soilType] || 0.75;
   }
@@ -637,16 +637,16 @@ class DigitalTwinService {
       temperature: 25,
       humidity: 70,
       rainfall: 'normal',
-      zone: climateZone
+      zone: climateZone,
     };
   }
 
   calculateInitialBiomass(growthStage) {
     const biomassMap = {
-      'seedling': 0.1,
-      'vegetative': 0.4,
-      'flowering': 0.7,
-      'maturity': 1.0
+      seedling: 0.1,
+      vegetative: 0.4,
+      flowering: 0.7,
+      maturity: 1.0,
     };
     return biomassMap[growthStage] || 0.5;
   }
@@ -657,7 +657,7 @@ class DigitalTwinService {
 
   updateResourceLevels(currentLevels, iotData) {
     const updated = { ...currentLevels };
-    
+
     iotData.forEach(device => {
       device.recentReadings.forEach(reading => {
         if (reading.sensorType === 'soil_moisture') {
@@ -668,50 +668,50 @@ class DigitalTwinService {
         }
       });
     });
-    
+
     return updated;
   }
 
   identifyStressFactors(iotData) {
     const factors = [];
-    
+
     iotData.forEach(device => {
       device.recentReadings.forEach(reading => {
         if (reading.quality === 'out_of_range') {
           factors.push({
             type: reading.sensorType,
             severity: 'warning',
-            value: reading.value
+            value: reading.value,
           });
         }
       });
     });
-    
+
     return factors;
   }
 
   calculateStateChanges(oldState, newState) {
     const changes = [];
-    
+
     Object.keys(newState).forEach(key => {
       if (JSON.stringify(oldState[key]) !== JSON.stringify(newState[key])) {
         changes.push({
           field: key,
           oldValue: oldState[key],
-          newValue: newState[key]
+          newValue: newState[key],
         });
       }
     });
-    
+
     return changes;
   }
 
   calculateScenarioConfidence(conditions) {
     const confidenceMap = {
-      'ideal_conditions': 0.9,
-      'current_conditions': 0.8,
-      'stress_conditions': 0.7,
-      'adverse_conditions': 0.6
+      ideal_conditions: 0.9,
+      current_conditions: 0.8,
+      stress_conditions: 0.7,
+      adverse_conditions: 0.6,
     };
     return confidenceMap[conditions] || 0.7;
   }
@@ -721,7 +721,7 @@ class DigitalTwinService {
       weather: 0.3,
       soil: 0.25,
       management: 0.25,
-      variety: 0.2
+      variety: 0.2,
     };
   }
 
@@ -729,9 +729,9 @@ class DigitalTwinService {
     const costs = {
       water: 0.05,
       nutrients: 0.15,
-      energy: 0.10
+      energy: 0.10,
     };
-    
+
     return Object.keys(resources).reduce((total, key) => {
       return total + (resources[key] * costs[key]);
     }, 0);
@@ -739,18 +739,18 @@ class DigitalTwinService {
 
   getClimateRecommendations(rainfall) {
     const recommendations = {
-      'normal': ['Continue current irrigation schedule'],
-      'low': ['Increase irrigation frequency', 'Consider drought-resistant varieties'],
-      'high': ['Reduce irrigation', 'Improve drainage', 'Monitor for fungal diseases'],
-      'optimal': ['Maintain current practices', 'Monitor for pests']
+      normal: ['Continue current irrigation schedule'],
+      low: ['Increase irrigation frequency', 'Consider drought-resistant varieties'],
+      high: ['Reduce irrigation', 'Improve drainage', 'Monitor for fungal diseases'],
+      optimal: ['Maintain current practices', 'Monitor for pests'],
     };
     return recommendations[rainfall] || ['Monitor conditions closely'];
   }
 
   storeTwinState(twinId, state) {
     return db.query(
-      `UPDATE digital_twins SET current_state = $2, last_synced = NOW() WHERE twin_id = $1`,
-      [twinId, JSON.stringify(state)]
+      'UPDATE digital_twins SET current_state = $2, last_synced = NOW() WHERE twin_id = $1',
+      [twinId, JSON.stringify(state)],
     );
   }
 
@@ -758,14 +758,14 @@ class DigitalTwinService {
     return db.query(
       `INSERT INTO twin_simulations (twin_id, simulation_id, results, created_at)
        VALUES ($1, $2, $3, NOW())`,
-      [twinId, results.id, JSON.stringify(results)]
+      [twinId, results.id, JSON.stringify(results)],
     );
   }
 
   getLatestTwinState(twinId) {
     return db.query(
-      `SELECT entity_type, specifications, current_state FROM digital_twins WHERE twin_id = $1`,
-      [twinId]
+      'SELECT entity_type, specifications, current_state FROM digital_twins WHERE twin_id = $1',
+      [twinId],
     ).then(result => {
       const row = result.rows[0];
       if (!row) return this.initializeTwinState('farm', {});
@@ -776,8 +776,8 @@ class DigitalTwinService {
 
   updateSyncTimestamp(twinId) {
     return db.query(
-      `UPDATE digital_twins SET last_synced = NOW() WHERE twin_id = $1`,
-      [twinId]
+      'UPDATE digital_twins SET last_synced = NOW() WHERE twin_id = $1',
+      [twinId],
     );
   }
 

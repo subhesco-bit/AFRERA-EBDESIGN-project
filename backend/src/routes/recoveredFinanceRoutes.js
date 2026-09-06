@@ -50,16 +50,12 @@ function fail(res, error) {
 // (financeAPI.trialBalance()/verifyLedger()) - deleting the dangerous write
 // path does not affect them, since gl_ledger_chain's existing rows stay
 // queryable without new appends.
-router.get
-    // Log request
-    logger.debug('router.get request');('/ledger/trial-balance', authMiddleware, async (req, res) => {
+router.get('/ledger/trial-balance', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await fin.trialBalance() });
   } catch (e) { fail(res, e); }
 });
-router.get
-    // Log request
-    logger.debug('router.get request');('/ledger/verify', authMiddleware, async (req, res) => {
+router.get('/ledger/verify', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await fin.verifyLedger() });
   } catch (e) { fail(res, e); }
@@ -67,9 +63,7 @@ router.get
 
 // ---- Schemes ---------------------------------------------------------------
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/schemes/match', async (req, res) => {
+router.get('/schemes/match', async (req, res) => {
   try {
     const { projectType, state } = req.query;
     if (!projectType) throw new Error('projectType is required');
@@ -79,9 +73,7 @@ router.get
 
 // ---- eNWR ------------------------------------------------------------------
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/enwr/issue', authMiddleware, async (req, res) => {
+router.post('/enwr/issue', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await fin.issueEnwr({ ...req.body, issuedBy: req.user?.id }) });
   } catch (e) { fail(res, e); }
@@ -89,9 +81,7 @@ router.post
 
 // "Bank Passport" — added 2026-08-15. issueEnwr() had no way to list what
 // had been issued; a lender-facing evidence view needs this to exist at all.
-router.get
-    // Log request
-    logger.debug('router.get request');('/enwr/my-receipts', authMiddleware, resolveFarmerId, async (req, res) => {
+router.get('/enwr/my-receipts', authMiddleware, resolveFarmerId, async (req, res) => {
   try {
     res.json({ success: true, data: await fin.listMyEnwrReceipts(req.farmerId) });
   } catch (e) { fail(res, e); }
@@ -99,9 +89,7 @@ router.get
 
 // ---- Freight ---------------------------------------------------------------
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/freight/rate', async (req, res) => {
+router.get('/freight/rate', async (req, res) => {
   try {
     const { km, class: cls, utilisation } = req.query;
     if (!km || !cls) throw new Error('km and class are required');
@@ -118,9 +106,7 @@ router.get
 
 // ---- Subsidy + risk --------------------------------------------------------
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/subsidy/equipment', async (req, res) => {
+router.get('/subsidy/equipment', async (req, res) => {
   try {
     const { price, tier } = req.query;
     if (!price) throw new Error('price is required');
@@ -128,9 +114,7 @@ router.get
   } catch (e) { fail(res, e); }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/risk/event', authMiddleware, async (req, res) => {
+router.post('/risk/event', authMiddleware, async (req, res) => {
   try {
     const b = req.body || {};
     if (!b.partyId || !b.eventType) throw new Error('partyId and eventType are required');
@@ -138,15 +122,11 @@ router.post
   } catch (e) { fail(res, e); }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/risk/:partyId', authMiddleware, async (req, res) => {
+router.get('/risk/:partyId', authMiddleware, async (req, res) => {
   try { res.json({ success: true, data: await fin.partyRisk(req.params.partyId) }); } catch (e) { fail(res, e); }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/certificates/expiring', authMiddleware, async (req, res) => {
+router.get('/certificates/expiring', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await fin.certExpiryAlerts(Number(req.query.days) || 120) });
   } catch (e) { fail(res, e); }

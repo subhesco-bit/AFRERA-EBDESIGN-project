@@ -12,9 +12,7 @@ const router = express.Router();
 const sellerRankingService = require('../services/legacy/sellerRankingService');
 const { authMiddleware } = require('../middleware/auth');
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/sellers', async (req, res) => {
+router.get('/sellers', async (req, res) => {
   try {
     const { categoryId, stateId, limit } = req.query;
     const sellers = await sellerRankingService.getRankedSellers({
@@ -28,9 +26,7 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/sellers/:userId/trust-score', authMiddleware, async (req, res) => {
+router.get('/sellers/:userId/trust-score', authMiddleware, async (req, res) => {
   try {
     const score = await sellerRankingService.getSellerTrustScore(req.params.userId);
     res.json({ success: true, data: score });

@@ -16,7 +16,7 @@ describe('formService', () => {
       title: 'Quality Inspection',
       description: 'Inspection checklist',
       category: 'quality',
-      fields: [{ label: 'Observation', type: 'text', required: true }]
+      fields: [{ label: 'Observation', type: 'text', required: true }],
     });
 
     const forms = await listForms();
@@ -31,7 +31,7 @@ describe('formService', () => {
       title: 'Submission test',
       description: 'Capture payload',
       category: 'operations',
-      fields: [{ label: 'Amount', type: 'number', required: true }]
+      fields: [{ label: 'Amount', type: 'number', required: true }],
     });
 
     const submission = await submitForm(form.id, { amount: 120 });

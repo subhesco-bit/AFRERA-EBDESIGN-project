@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 class SupplyChainAnalyticsService {
   async analyzeShipments(origin, destination) {
   // Validate inputs
-  if (!origin) throw new Error('Missing required parameter');
+    if (!origin) throw new Error('Missing required parameter');
 
     try {
       const shipments = await db('shipments').where('origin', origin).andWhere('destination', destination);

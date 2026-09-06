@@ -1,6 +1,6 @@
 /**
  * AFRERA Nervous System - Enterprise Route Control
- * 
+ *
  * Biological Architecture Metaphor:
  * - BRAIN (Central Intelligence): AI Decision Engine, Orchestrator
  * - HEART (Core Operations): Business Logic, Transaction Processing
@@ -8,7 +8,7 @@
  * - REFLEX (Automatic Responses): Triggers, Auto-scaling, Failover
  * - SENSORS (Data Collection): IoT, Monitoring, Analytics
  * - MOTOR FUNCTIONS (Action Execution): Automation, Workflows
- * 
+ *
  * This system enables:
  * - Cross-module communication like neural pathways
  * - Automatic reflex responses to events
@@ -44,23 +44,23 @@ class CentralBrain {
   async processEvent(event) {
     try {
       const { event_type, entity_id, entity_type, ...context } = event;
-      
+
       logger.info('Brain processing event', { event_type, entity_id });
-      
+
       // Route to appropriate cognitive process
       const decision = await this.makeDecision(event_type, context);
-      
+
       // Store decision in memory
       this.decisionHistory.push({
         event_type,
         entity_id,
         decision,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-      
+
       // Execute decision through nervous system
       await this.executeDecision(decision);
-      
+
       return { success: true, decision };
     } catch (error) {
       logger.error('Brain processing error', { error: error.message, event });
@@ -72,13 +72,13 @@ class CentralBrain {
    * Make intelligent decision based on event
    */
   async makeDecision(eventType, context) {
-    let decision = {
+    const decision = {
       event_type: eventType,
       action: null,
       modules_to_inform: [],
       reflex_to_trigger: [],
       priority: 'normal',
-      reasoning: ''
+      reasoning: '',
     };
 
     switch (eventType) {
@@ -153,14 +153,14 @@ class CentralBrain {
     // Emit brain decision event
     await signalBus.emit('brain.decision.made', {
       decision,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Inform relevant modules
     for (const module of decision.modules_to_inform) {
       await signalBus.emit(`nervous.inform.${module}`, {
         decision,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -175,20 +175,20 @@ class CentralBrain {
    */
   async triggerReflex(reflexName, context) {
     logger.info('Triggering reflex', { reflexName, context });
-    
+
     const reflexActions = {
-      'update_visibility_score': () => this.reflexUpdateVisibility(context),
-      'send_alert': () => this.reflexSendAlert(context),
-      'auto_create_po': () => this.reflexAutoCreatePO(context),
-      'update_seller_analytics': () => this.reflexUpdateSellerAnalytics(context),
-      'check_inventory': () => this.reflexCheckInventory(context),
-      'adjust_production_planning': () => this.reflexAdjustProduction(context),
-      'create_milestones': () => this.reflexCreateMilestones(context),
-      'schedule_payments': () => this.reflexSchedulePayments(context),
-      'track_conversions': () => this.reflexTrackConversions(context),
-      'budget_monitoring': () => this.reflexBudgetMonitoring(context),
-      'apply_tier_premium': () => this.reflexApplyTierPremium(context),
-      'update_badges': () => this.reflexUpdateBadges(context)
+      update_visibility_score: () => this.reflexUpdateVisibility(context),
+      send_alert: () => this.reflexSendAlert(context),
+      auto_create_po: () => this.reflexAutoCreatePO(context),
+      update_seller_analytics: () => this.reflexUpdateSellerAnalytics(context),
+      check_inventory: () => this.reflexCheckInventory(context),
+      adjust_production_planning: () => this.reflexAdjustProduction(context),
+      create_milestones: () => this.reflexCreateMilestones(context),
+      schedule_payments: () => this.reflexSchedulePayments(context),
+      track_conversions: () => this.reflexTrackConversions(context),
+      budget_monitoring: () => this.reflexBudgetMonitoring(context),
+      apply_tier_premium: () => this.reflexApplyTierPremium(context),
+      update_badges: () => this.reflexUpdateBadges(context),
     };
 
     if (reflexActions[reflexName]) {
@@ -209,7 +209,7 @@ class CentralBrain {
       severity: 'high',
       recipients: ['seller', 'admin'],
       message: `Critical inventory for product ${context.entity_id}`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -309,7 +309,7 @@ class HeartBeat {
     try {
       // Execute core operations in each beat
       await this.executeCoreOperations();
-      
+
       // Schedule next beat
       setTimeout(() => this.pump(), (60000 / this.heartRate));
     } catch (error) {
@@ -325,18 +325,18 @@ class HeartBeat {
   async executeCoreOperations() {
     // Monitor system health
     await this.monitorHealth();
-    
+
     // Process pending operations
     await this.processPendingOperations();
-    
+
     // Maintain data integrity
     await this.maintainIntegrity();
-    
+
     // Emit heart beat event
     await signalBus.emit('nervous.heartbeat', {
       heart_rate: this.heartRate,
       last_beat: this.lastBeat,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -348,7 +348,7 @@ class HeartBeat {
       database: await this.checkDatabaseHealth(),
       cache: await this.checkCacheHealth(),
       apis: await this.checkAPIHealth(),
-      modules: await this.checkModuleHealth()
+      modules: await this.checkModuleHealth(),
     };
 
     await signalBus.emit('nervous.health.check', healthCheck);
@@ -419,14 +419,14 @@ class NervousSystem {
    */
   createNeuralPathway(fromModule, toModule, strength = 0.5) {
     const pathwayId = `${fromModule}-${toModule}`;
-    
+
     this.neuralPathways.set(pathwayId, {
       from: fromModule,
       to: toModule,
       strength,
       activationCount: 0,
       lastActivated: null,
-      effectiveness: 1.0
+      effectiveness: 1.0,
     });
 
     logger.info('Neural pathway created', { fromModule, toModule, strength });
@@ -441,7 +441,7 @@ class NervousSystem {
       pathway.strength = Math.min(1.0, pathway.strength + 0.01);
       pathway.activationCount++;
       pathway.lastActivated = new Date().toISOString();
-      
+
       logger.debug('Neural pathway strengthened', { pathwayId, strength: pathway.strength });
     }
   }
@@ -454,7 +454,7 @@ class NervousSystem {
       action: responseAction,
       condition,
       triggerCount: 0,
-      effectiveness: 1.0
+      effectiveness: 1.0,
     });
 
     logger.info('Reflex arc created', { triggerEvent, responseAction });
@@ -465,7 +465,7 @@ class NervousSystem {
    */
   async triggerReflex(triggerEvent, context) {
     const reflex = this.reflexArcs.get(triggerEvent);
-    
+
     if (!reflex) {
       return { triggered: false, reason: 'No reflex found for event' };
     }
@@ -506,7 +506,7 @@ class NervousSystem {
    */
   async propagateEvent(event) {
     const { event_type, source_module } = event;
-    
+
     // Find all relevant pathways
     const relevantPathways = [];
     for (const [pathwayId, pathway] of this.neuralPathways) {
@@ -518,11 +518,11 @@ class NervousSystem {
     // Propagate to connected modules
     for (const pathway of relevantPathways) {
       const targetModule = pathway.from === source_module ? pathway.to : pathway.from;
-      
+
       await signalBus.emit(`nervous.module.${targetModule}`, {
         event,
         pathway_strength: pathway.strength,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Strengthen pathway on successful propagation
@@ -553,7 +553,7 @@ class SensorNetwork {
       ...sensorConfig,
       lastReading: null,
       readingCount: 0,
-      isHealthy: true
+      isHealthy: true,
     });
 
     logger.info('Sensor registered', { sensorId, sensorConfig });
@@ -564,28 +564,28 @@ class SensorNetwork {
    */
   async collectSensorData(sensorId) {
     const sensor = this.sensors.get(sensorId);
-    
+
     if (!sensor) {
       return { success: false, error: 'Sensor not found' };
     }
 
     try {
       const reading = await this.readSensor(sensor);
-      
+
       sensor.lastReading = reading;
       sensor.readingCount++;
-      
+
       this.sensorData.set(sensorId, {
         readings: [...(this.sensorData.get(sensorId)?.readings || []), reading],
         lastReading: reading,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Emit sensor data event
       await signalBus.emit('nervous.sensor.data', {
         sensorId,
         reading,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return { success: true, reading };
@@ -613,7 +613,7 @@ class SensorNetwork {
   }
 
   async readDatabaseSensor(sensor) {
-    let pool = require('../database/pool');
+    const pool = require('../database/pool');
     const result = await pool.query(sensor.query);
     return { type: 'database', data: result.rows };
   }
@@ -653,49 +653,49 @@ class MotorFunctions {
    */
   async executeFunction(functionName, parameters) {
     const actionId = `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const action = {
       id: actionId,
       functionName,
       parameters,
       status: 'pending',
-      startedAt: new Date().toISOString()
+      startedAt: new Date().toISOString(),
     };
 
     this.activeActions.set(actionId, action);
 
     try {
       await this.performAction(functionName, parameters);
-      
+
       action.status = 'completed';
       action.completedAt = new Date().toISOString();
-      
+
       // Emit action completion event
       await signalBus.emit('nervous.action.completed', {
         actionId,
         functionName,
         status: 'completed',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       this.activeActions.delete(actionId);
-      
+
       return { success: true, actionId };
     } catch (error) {
       action.status = 'failed';
       action.error = error.message;
       action.completedAt = new Date().toISOString();
-      
+
       // Emit action failure event
       await signalBus.emit('nervous.action.failed', {
         actionId,
         functionName,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       this.activeActions.delete(actionId);
-      
+
       return { success: false, error: error.message };
     }
   }
@@ -706,13 +706,13 @@ class MotorFunctions {
   async performAction(functionName, parameters) {
     // Map function names to actual implementations
     const actionImplementations = {
-      'update_product_pricing': () => this.updateProductPricing(parameters),
-      'process_order': () => this.processOrder(parameters),
-      'trigger_reorder': () => this.triggerReorder(parameters),
-      'optimize_inventory': () => this.optimizeInventory(parameters),
-      'setup_production_schedule': () => this.setupProductionSchedule(parameters),
-      'monitor_performance': () => this.monitorPerformance(parameters),
-      'update_product_tier': () => this.updateProductTier(parameters)
+      update_product_pricing: () => this.updateProductPricing(parameters),
+      process_order: () => this.processOrder(parameters),
+      trigger_reorder: () => this.triggerReorder(parameters),
+      optimize_inventory: () => this.optimizeInventory(parameters),
+      setup_production_schedule: () => this.setupProductionSchedule(parameters),
+      monitor_performance: () => this.monitorPerformance(parameters),
+      update_product_tier: () => this.updateProductTier(parameters),
     };
 
     const implementation = actionImplementations[functionName];
@@ -795,7 +795,7 @@ class EnterpriseRouteControl {
       module,
       priority = 'normal',
       conditions = [],
-      dependencies = []
+      dependencies = [],
     } = routeConfig;
 
     this.routeTable.set(routeId, {
@@ -806,7 +806,7 @@ class EnterpriseRouteControl {
       conditions,
       dependencies,
       isActive: true,
-      usageCount: 0
+      usageCount: 0,
     });
 
     this.routePriorities.set(routeId, priority);
@@ -854,7 +854,7 @@ class EnterpriseRouteControl {
       routeId,
       path,
       module,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     logger.info('Enterprise route activated', { routeId, path, module });
@@ -872,7 +872,7 @@ class EnterpriseRouteControl {
 
       await signalBus.emit('nervous.route.deactivated', {
         routeId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       logger.info('Enterprise route deactivated', { routeId });
@@ -892,7 +892,7 @@ class EnterpriseRouteControl {
     // Find the best route based on priority, conditions, and current system state
     // This is like the brain deciding which neural pathway to use
     const activeRoutes = Array.from(this.activeRoutes).map(id => this.routeTable.get(id));
-    
+
     // Sort by priority
     const priorityOrder = { critical: 1, high: 2, normal: 3, low: 4 };
     activeRoutes.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
@@ -941,17 +941,17 @@ function initializeNervousSystem() {
   sensorNetwork.registerSensor('database_health', {
     type: 'database',
     query: 'SELECT 1',
-    interval: 60000
+    interval: 60000,
   });
 
   sensorNetwork.registerSensor('cache_health', {
     type: 'cache',
-    interval: 30000
+    interval: 30000,
   });
 
   sensorNetwork.registerSensor('api_health', {
     type: 'api',
-    interval: 60000
+    interval: 60000,
   });
 
   // Register enterprise routes
@@ -960,7 +960,7 @@ function initializeNervousSystem() {
     path: '/api/v1/ecommerce/listings',
     module: 'ecommerce',
     priority: 'high',
-    dependencies: ['database', 'cache']
+    dependencies: ['database', 'cache'],
   });
 
   enterpriseRouteControl.registerRoute({
@@ -968,7 +968,7 @@ function initializeNervousSystem() {
     path: '/api/v1/orders',
     module: 'order',
     priority: 'critical',
-    dependencies: ['database', 'inventory', 'finance']
+    dependencies: ['database', 'inventory', 'finance'],
   });
 
   enterpriseRouteControl.registerRoute({
@@ -976,7 +976,7 @@ function initializeNervousSystem() {
     path: '/api/v1/ecommerce-ai',
     module: 'ai',
     priority: 'high',
-    dependencies: ['database', 'cache']
+    dependencies: ['database', 'cache'],
   });
 
   // Subscribe to signal bus events
@@ -1028,5 +1028,5 @@ module.exports = {
   // Route Control
   registerRoute: (config) => enterpriseRouteControl.registerRoute(config),
   routeRequest: (config, request) => enterpriseRouteControl.routeRequest(config, request),
-  getOptimalRoute: (context) => enterpriseRouteControl.getOptimalRoute(context)
+  getOptimalRoute: (context) => enterpriseRouteControl.getOptimalRoute(context),
 };

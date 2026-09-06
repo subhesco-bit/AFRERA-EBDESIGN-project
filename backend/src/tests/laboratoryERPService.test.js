@@ -13,7 +13,7 @@ describe('Laboratory ERP Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     // Create test user and get auth token
@@ -22,7 +22,7 @@ describe('Laboratory ERP Service', () => {
       .send({
         email: 'lab-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
 
     authToken = registerResponse.body.token;
@@ -50,7 +50,7 @@ describe('Laboratory ERP Service', () => {
           contact_email: 'test@lab.com',
           contact_phone: '+919876543210',
           testing_capabilities: ['soil', 'water', 'food'],
-          equipment_list: ['spectrometer', 'microscope']
+          equipment_list: ['spectrometer', 'microscope'],
         })
         .expect(201);
 
@@ -64,7 +64,7 @@ describe('Laboratory ERP Service', () => {
         .post('/api/v1/laboratory-erp/laboratories')
         .send({
           lab_code: 'LAB-002',
-          lab_name: 'Test Lab 2'
+          lab_name: 'Test Lab 2',
         })
         .expect(401);
     });
@@ -125,7 +125,7 @@ describe('Laboratory ERP Service', () => {
           batch_number: 'BATCH-001',
           priority: 'normal',
           requested_tests: [1, 2],
-          special_instructions: 'Handle with care'
+          special_instructions: 'Handle with care',
         })
         .expect(201);
 
@@ -139,7 +139,7 @@ describe('Laboratory ERP Service', () => {
       const response = await request(app)
         .post('/api/v1/laboratory-erp/samples')
         .send({
-          sample_type: 'soil'
+          sample_type: 'soil',
         })
         .expect(401);
     });
@@ -164,7 +164,7 @@ describe('Laboratory ERP Service', () => {
         .send({
           sample_id: testSampleId,
           test_method_id: 1,
-          assigned_to: 'analyst-001'
+          assigned_to: 'analyst-001',
         })
         .expect(201);
 
@@ -180,7 +180,7 @@ describe('Laboratory ERP Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           results: { nitrogen: 2.5, phosphorus: 1.8 },
-          comments: 'Test completed successfully'
+          comments: 'Test completed successfully',
         })
         .expect(200);
 
@@ -195,7 +195,7 @@ describe('Laboratory ERP Service', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .send({
           sample_id: testSampleId,
-          report_type: 'test_report'
+          report_type: 'test_report',
         })
         .expect(201);
 
@@ -214,7 +214,7 @@ describe('Laboratory ERP Service', () => {
           status: 'testing',
           location: 'Lab Room A',
           handled_by: 'Analyst 1',
-          notes: 'Sample received for testing'
+          notes: 'Sample received for testing',
         })
         .expect(201);
 

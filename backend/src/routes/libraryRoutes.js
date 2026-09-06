@@ -17,13 +17,13 @@ router.get('/', async (req, res) => {
     res.json({
       success: true,
       data: [],
-      message: 'Resources retrieved'
+      message: 'Resources retrieved',
     });
   } catch (error) {
     logger.error('GET / failed', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -38,20 +38,20 @@ router.post('/', async (req, res) => {
     if (!req.body) {
       return res.status(400).json({
         success: false,
-        error: 'Request body is required'
+        error: 'Request body is required',
       });
     }
 
     res.json({
       success: true,
       data: { id: 1 },
-      message: 'Resource created'
+      message: 'Resource created',
     });
   } catch (error) {
     logger.error('POST / failed', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -66,13 +66,13 @@ router.get('/:id', async (req, res) => {
     res.json({
       success: true,
       data: { id: req.params.id },
-      message: 'Resource retrieved'
+      message: 'Resource retrieved',
     });
   } catch (error) {
     logger.error('GET /:id failed', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });

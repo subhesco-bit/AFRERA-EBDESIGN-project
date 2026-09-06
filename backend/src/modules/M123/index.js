@@ -8,8 +8,8 @@ router.put('/flocks/:id/health', controller.updateFlockHealth);
 router.get('/flocks/:id/performance', controller.trackFlockPerformance);
 router.get('/farmers/:farmerId/report', controller.generatePoultryReport);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

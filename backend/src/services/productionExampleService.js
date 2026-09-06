@@ -50,8 +50,8 @@ class ProductionExampleService extends ProductionService {
         itemValidator: (item) =>
           Validator.object(item, {
             name: (v) => Validator.string(v, { minLength: 1, maxLength: 255 }),
-            description: (v) => Validator.string(v, { maxLength: 1000, required: false })
-          })
+            description: (v) => Validator.string(v, { maxLength: 1000, required: false }),
+          }),
       });
 
       // Execute in transaction
@@ -59,7 +59,7 @@ class ProductionExampleService extends ProductionService {
         `INSERT INTO resources (id, name, description, created_at)
          VALUES (gen_random_uuid(), $1, $2, NOW())
          RETURNING *`,
-        [resource.name, resource.description || null]
+        [resource.name, resource.description || null],
       ]);
 
       const results = await this.executeInTransaction(operations);
@@ -79,16 +79,16 @@ class ProductionExampleService extends ProductionService {
       const validatedLimit = Validator.number(limit, { min: 1, max: 100, integer: true });
 
       // Build cache key
-      let cacheKey = `resources:page:${validatedPage}:limit:${validatedLimit}:filters:${JSON.stringify(filters)}`;
+      const cacheKey = `resources:page:${validatedPage}:limit:${validatedLimit}:filters:${JSON.stringify(filters)}`;
 
       // Try cache
-      let cached = await this.cache.get(cacheKey);
+      const cached = await this.cache.get(cacheKey);
       if (cached) return cached;
 
       // Execute paginated query
-      let result = await this.paginate('resources', validatedPage, validatedLimit, {
+      const result = await this.paginate('resources', validatedPage, validatedLimit, {
         deleted_at: null,
-        ...filters
+        ...filters,
       });
 
       // Cache pagination result
@@ -101,7 +101,7 @@ class ProductionExampleService extends ProductionService {
   // Update with optimistic locking
   async updateResource(resourceId, updates, version = null) {
     return this.executeWithErrorHandling('updateResource', async () => {
-      let validatedId = Validator.uuid(resourceId);
+      const validatedId = Validator.uuid(resourceId);
 
       // Fetch current resource
       const current = await this.getResourceById(validatedId);
@@ -111,7 +111,7 @@ class ProductionExampleService extends ProductionService {
       }
 
       // Execute update in transaction
-      let operations = [
+      const operations = [
         [
           `UPDATE resources
            SET ${Object.keys(updates).map((k, i) => `${k} = $${i + 1}`).join(', ')},
@@ -120,8 +120,8 @@ class ProductionExampleService extends ProductionService {
            WHERE id = $${Object.keys(updates).length + 1}
            AND deleted_at IS NULL
            RETURNING *`,
-          [...Object.values(updates), validatedId]
-        ]
+          [...Object.values(updates), validatedId],
+        ],
       ];
 
       const [result] = await this.executeInTransaction(operations);
@@ -132,7 +132,7 @@ class ProductionExampleService extends ProductionService {
 
       // Invalidate cache
       await this.cache.delete(`resource:${validatedId}`);
-      await this.cache.clear(`resources:page:*`);
+      await this.cache.clear('resources:page:*');
 
       return result;
     }, [resourceId, updates, version]);
@@ -141,12 +141,12 @@ class ProductionExampleService extends ProductionService {
   // Soft delete with cascade
   async deleteResource(resourceId) {
     return this.executeWithErrorHandling('deleteResource', async () => {
-      let validatedId = Validator.uuid(resourceId);
+      const validatedId = Validator.uuid(resourceId);
 
       // Check for dependencies
       const dependencies = await this.db.query(
         'SELECT COUNT(*) FROM resource_items WHERE resource_id = $1',
-        [validatedId]
+        [validatedId],
       );
 
       if (parseInt(dependencies.rows[0].count) > 0) {
@@ -154,9 +154,9 @@ class ProductionExampleService extends ProductionService {
       }
 
       // Soft delete
-      let result = await this.db.query(
+      const result = await this.db.query(
         'UPDATE resources SET deleted_at = NOW(), deleted_by = $1 WHERE id = $2 RETURNING *',
-        ['system', validatedId]
+        ['system', validatedId],
       );
 
       if (!result.rows[0]) {
@@ -165,7 +165,7 @@ class ProductionExampleService extends ProductionService {
 
       // Invalidate cache
       await this.cache.delete(`resource:${validatedId}`);
-      await this.cache.clear(`resources:page:*`);
+      await this.cache.clear('resources:page:*');
 
       return { success: true, message: 'Resource deleted' };
     }, [resourceId]);
@@ -176,18 +176,18 @@ class ProductionExampleService extends ProductionService {
     return this.executeWithErrorHandling('searchResources', async () => {
       const validatedQuery = Validator.string(query, { minLength: 1, maxLength: 255 });
 
-      let cacheKey = `search:${validatedQuery}:${page}:${limit}`;
-      let cached = await this.cache.get(cacheKey);
+      const cacheKey = `search:${validatedQuery}:${page}:${limit}`;
+      const cached = await this.cache.get(cacheKey);
       if (cached) return cached;
 
       const offset = (page - 1) * limit;
 
-      let result = await this.db.query(
+      const result = await this.db.query(
         `SELECT * FROM resources
          WHERE deleted_at IS NULL
          AND (name ILIKE $1 OR description ILIKE $1)
          LIMIT $2 OFFSET $3`,
-        [`%${validatedQuery}%`, limit, offset]
+        [`%${validatedQuery}%`, limit, offset],
       );
 
       await this.cache.set(cacheKey, result.rows, this.cache.ttl.short);
@@ -202,8 +202,8 @@ class ProductionExampleService extends ProductionService {
       ...this.getHealth(),
       cacheStats: {
         hits: this.cache.hits || 0,
-        misses: this.cache.misses || 0
-      }
+        misses: this.cache.misses || 0,
+      },
     };
   }
 }

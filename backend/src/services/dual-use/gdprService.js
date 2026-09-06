@@ -22,7 +22,7 @@ class GDPRService {
         DO UPDATE SET consent_given = $3, ip_address = $4, user_agent = $5, updated_at = CURRENT_TIMESTAMP
         RETURNING *
       `;
-      
+
       const result = await this.pool.query(query, [userId, consentType, consentGiven, ipAddress, userAgent]);
       return result.rows[0];
     } catch (error) {
@@ -36,14 +36,14 @@ class GDPRService {
    */
   async getUserConsent(userId) {
     try {
-      let query = `
+      const query = `
         SELECT consent_type, consent_given, created_at, updated_at
         FROM user_consent
         WHERE user_id = $1
         ORDER BY updated_at DESC
       `;
-      
-      let result = await this.pool.query(query, [userId]);
+
+      const result = await this.pool.query(query, [userId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting user consent:', error);
@@ -58,7 +58,7 @@ class GDPRService {
     try {
       // Start transaction
       await this.pool.query('BEGIN');
-      
+
       // Anonymize user personal data
       const anonymizedUser = await this.pool.query(`
         UPDATE users 
@@ -75,19 +75,19 @@ class GDPRService {
         WHERE id = $1
         RETURNING *
       `, [userId]);
-      
+
       // Log the deletion request
       await this.pool.query(`
         INSERT INTO data_subject_requests (user_id, request_type, reason, status, created_at)
         VALUES ($1, 'RIGHT_TO_BE_FORGOTTEN', $2, 'COMPLETED', CURRENT_TIMESTAMP)
       `, [userId, reason]);
-      
+
       await this.pool.query('COMMIT');
-      
+
       return {
         success: true,
         message: 'User data anonymized successfully',
-        requestId
+        requestId,
       };
     } catch (error) {
       await this.pool.query('ROLLBACK');
@@ -107,10 +107,10 @@ class GDPRService {
         FROM users
         WHERE id = $1
       `, [userId]);
-      
+
       // Get user consent data
       const consentData = await this.getUserConsent(userId);
-      
+
       // Get user activity data
       const activityData = await this.pool.query(`
         SELECT activity_type, description, created_at
@@ -119,22 +119,22 @@ class GDPRService {
         ORDER BY created_at DESC
         LIMIT 100
       `, [userId]);
-      
+
       const exportData = {
         user: userData.rows[0],
         consent: consentData,
         activity: activityData.rows,
         exportDate: new Date().toISOString(),
-        format: format
+        format,
       };
-      
+
       if (format === 'json') {
         return JSON.stringify(exportData, null, 2);
       } else if (format === 'csv') {
         // Convert to CSV format
         return this.convertToCSV(exportData);
       }
-      
+
       return exportData;
     } catch (error) {
       console.error('Error exporting user data:', error);
@@ -148,40 +148,40 @@ class GDPRService {
   async checkDataResidency(userId, dataRegion) {
     try {
       // Check if user data is stored in the correct region
-      let query = `
+      const query = `
         SELECT id, data_region, created_at
         FROM user_data_residency
         WHERE user_id = $1
       `;
-      
-      let result = await this.pool.query(query, [userId]);
-      
+
+      const result = await this.pool.query(query, [userId]);
+
       if (result.rows.length === 0) {
         // Create residency record
         await this.pool.query(`
           INSERT INTO user_data_residency (user_id, data_region, created_at)
           VALUES ($1, $2, CURRENT_TIMESTAMP)
         `, [userId, dataRegion]);
-        
+
         return {
           compliant: true,
-          message: 'Data residency record created'
+          message: 'Data residency record created',
         };
       }
-      
+
       const existingResidency = result.rows[0];
       if (existingResidency.data_region !== dataRegion) {
         return {
           compliant: false,
           message: 'Data stored in incorrect region',
           currentRegion: existingResidency.data_region,
-          requiredRegion: dataRegion
+          requiredRegion: dataRegion,
         };
       }
-      
+
       return {
         compliant: true,
-        message: 'Data residency compliant'
+        message: 'Data residency compliant',
       };
     } catch (error) {
       console.error('Error checking data residency:', error);
@@ -196,44 +196,44 @@ class GDPRService {
     try {
       const assessment = {
         component: systemComponent,
-        dataTypes: dataTypes,
-        processingPurpose: processingPurpose,
+        dataTypes,
+        processingPurpose,
         risks: [],
         mitigations: [],
-        assessmentDate: new Date().toISOString()
+        assessmentDate: new Date().toISOString(),
       };
-      
+
       // Analyze risks based on data types
       if (dataTypes.includes('personal_identifiable')) {
         assessment.risks.push({
           risk: 'Personal data exposure',
           severity: 'HIGH',
-          mitigation: 'Implement encryption at rest and in transit'
+          mitigation: 'Implement encryption at rest and in transit',
         });
       }
-      
+
       if (dataTypes.includes('financial')) {
         assessment.risks.push({
           risk: 'Financial data compromise',
           severity: 'CRITICAL',
-          mitigation: 'Implement PCI DSS compliance, strict access controls'
+          mitigation: 'Implement PCI DSS compliance, strict access controls',
         });
       }
-      
+
       if (dataTypes.includes('health')) {
         assessment.risks.push({
           risk: 'Health data breach',
           severity: 'CRITICAL',
-          mitigation: 'Implement HIPAA-level protections, audit logging'
+          mitigation: 'Implement HIPAA-level protections, audit logging',
         });
       }
-      
+
       // Log the assessment
       await this.pool.query(`
         INSERT INTO privacy_impact_assessments (component, data_types, processing_purpose, risks, mitigations, assessment_date)
         VALUES ($1, $2, $3, $4, $5, $6)
       `, [systemComponent, dataTypes, processingPurpose, JSON.stringify(assessment.risks), JSON.stringify(assessment.mitigations), assessment.assessmentDate]);
-      
+
       return assessment;
     } catch (error) {
       console.error('Error conducting privacy impact assessment:', error);
@@ -247,7 +247,7 @@ class GDPRService {
   convertToCSV(data) {
     // Simple CSV conversion - would be more sophisticated in production
     let csv = '';
-    
+
     // Convert user data
     if (data.user) {
       csv += 'User Data\n';
@@ -255,7 +255,7 @@ class GDPRService {
         csv += `${key},${data.user[key]}\n`;
       });
     }
-    
+
     return csv;
   }
 }

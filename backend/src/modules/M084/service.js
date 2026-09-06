@@ -25,7 +25,7 @@ async function createDisasterAlert(data) {
   const from = new Date(effective_from); const until = new Date(effective_until);
   if (!effective_from || Number.isNaN(from.valueOf()) || !effective_until || Number.isNaN(until.valueOf()) || until < from) throw alertError('effective alert window is invalid');
   if ((severity === 'severe' || severity === 'extreme') && !blocks_dispatch && !detail) throw alertError('severe alerts require detail or blocks_dispatch');
-  const result = await pool.query(`INSERT INTO climate_alerts (alert_code, alert_type, severity, state, districts, headline, detail, recommended_action, effective_from, effective_until, source, source_ref, blocks_dispatch, affects_routes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`, [alert_code, alert_type, severity, state || null, districts, headline, detail || null, recommended_action, from.toISOString(), until.toISOString(), source, source_ref || null, blocks_dispatch, affects_routes]);
+  const result = await pool.query('INSERT INTO climate_alerts (alert_code, alert_type, severity, state, districts, headline, detail, recommended_action, effective_from, effective_until, source, source_ref, blocks_dispatch, affects_routes) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *', [alert_code, alert_type, severity, state || null, districts, headline, detail || null, recommended_action, from.toISOString(), until.toISOString(), source, source_ref || null, blocks_dispatch, affects_routes]);
   signalBus.emitSignal('climate.disaster_alert.created', { alertId: result.rows[0].id, alertCode: alert_code, severity }, { source: 'M084', entityId: String(result.rows[0].id) });
   return { ...result.rows[0], ai_advisory_metadata: ai_advisory_metadata || { status: 'not_generated', source: 'operator_authored' } };
 }
@@ -54,7 +54,7 @@ async function createTrendDefinition(trendData) {
       metric_name,
       analysis_frequency,
       time_horizon,
-      confidence_threshold
+      confidence_threshold,
     } = trendData;
 
     const trend = {
@@ -67,24 +67,24 @@ async function createTrendDefinition(trendData) {
       time_horizon,
       confidence_threshold,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered trend configuration
     const aiRequest = {
       task: 'trend_configuration_optimization',
       parameters: {
-        trend_type: trend_type,
-        metric_name: metric_name,
+        trend_type,
+        metric_name,
         data_characteristics: await analyzeDataCharacteristics(data_source),
-        best_practices: await getTrendBestPractices(trend_type)
-      }
+        best_practices: await getTrendBestPractices(trend_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     trend.ai_recommendations = aiResponse;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_definitions 
        (trend_id, trend_name, trend_type, data_source, metric_name, 
         analysis_frequency, time_horizon, confidence_threshold, status, created_at)
@@ -100,8 +100,8 @@ async function createTrendDefinition(trendData) {
         trend.time_horizon,
         trend.confidence_threshold,
         trend.status,
-        trend.created_at
-      ]
+        trend.created_at,
+      ],
     );
 
     logger.info(`Trend definition created: ${trend.trend_id}`);
@@ -119,7 +119,7 @@ async function addDataPoint(trendId, dataPointData) {
   try {
     const { timestamp, value, is_forecast, confidence_level, metadata } = dataPointData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_data_points 
        (data_point_id, trend_id, timestamp, value, is_forecast, confidence_level, metadata, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -132,8 +132,8 @@ async function addDataPoint(trendId, dataPointData) {
         is_forecast || false,
         confidence_level,
         JSON.stringify(metadata || {}),
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Data point added: ${result.rows[0].data_point_id}`);
@@ -151,7 +151,7 @@ async function getTrendDataPoints(trendId, filters = {}) {
   try {
     const { start_time, end_time, is_forecast } = filters;
     let query = 'SELECT * FROM trend_data_points WHERE trend_id = $1';
-    let params = [trendId];
+    const params = [trendId];
     let paramCount = 1;
 
     if (start_time) {
@@ -174,7 +174,7 @@ async function getTrendDataPoints(trendId, filters = {}) {
 
     query += ' ORDER BY timestamp ASC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting trend data points', { error: error.message });
@@ -190,7 +190,7 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
     const dataPoints = await getTrendDataPoints(trendId, {
       start_time: periodStart,
       end_time: periodEnd,
-      is_forecast: false
+      is_forecast: false,
     });
 
     if (dataPoints.length < 2) {
@@ -198,17 +198,17 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
     }
 
     // AI-powered trend analysis
-    let aiRequest = {
+    const aiRequest = {
       task: 'trend_analysis',
       parameters: {
         data_points: dataPoints,
         analysis_type: analysisType,
         historical_context: await getHistoricalContext(trendId),
-        external_factors: await getExternalFactors(trendId)
-      }
+        external_factors: await getExternalFactors(trendId),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const analysis = {
       analysis_id: generateId(),
@@ -225,10 +225,10 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
       anomaly_count: aiResponse.anomaly_count || 0,
       analysis_period_start: periodStart,
       analysis_period_end: periodEnd,
-      analyzed_at: new Date().toISOString()
+      analyzed_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_analysis 
        (analysis_id, trend_id, analysis_type, trend_direction, trend_strength, 
         trend_slope, r_squared, seasonality_pattern, seasonality_strength, 
@@ -251,8 +251,8 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
         analysis.anomaly_count,
         analysis.analysis_period_start,
         analysis.analysis_period_end,
-        analysis.analyzed_at
-      ]
+        analysis.analyzed_at,
+      ],
     );
 
     logger.info(`Trend analysis completed: ${analysis.analysis_id}`);
@@ -268,21 +268,21 @@ async function analyzeTrend(trendId, analysisType, periodStart, periodEnd) {
  */
 async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
   try {
-    let dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
+    const dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
 
     // AI-powered forecasting
-    let aiRequest = {
+    const aiRequest = {
       task: 'trend_forecasting',
       parameters: {
         historical_data: dataPoints,
         forecast_type: forecastType,
         forecast_horizon: forecastHorizon,
         seasonality: await detectSeasonality(trendId),
-        model_options: await getModelOptions(forecastType)
-      }
+        model_options: await getModelOptions(forecastType),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const forecast = {
       forecast_id: generateId(),
@@ -294,10 +294,10 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
       model_used: aiResponse.model_used,
       model_accuracy: aiResponse.model_accuracy,
       generated_at: new Date().toISOString(),
-      valid_until: new Date(Date.now() + forecastHorizon * 24 * 60 * 60 * 1000).toISOString()
+      valid_until: new Date(Date.now() + forecastHorizon * 24 * 60 * 60 * 1000).toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_forecasts 
        (forecast_id, trend_id, forecast_type, forecast_horizon, forecast_data, 
         confidence_intervals, model_used, model_accuracy, generated_at, valid_until)
@@ -313,8 +313,8 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
         forecast.model_used,
         forecast.model_accuracy,
         forecast.generated_at,
-        forecast.valid_until
-      ]
+        forecast.valid_until,
+      ],
     );
 
     // Add forecast data points
@@ -323,7 +323,7 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
         timestamp: point.timestamp,
         value: point.value,
         is_forecast: true,
-        confidence_level: point.confidence_level
+        confidence_level: point.confidence_level,
       });
     }
 
@@ -340,18 +340,18 @@ async function generateTrendForecast(trendId, forecastType, forecastHorizon) {
  */
 async function detectSeasonality(trendId) {
   try {
-    let dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
+    const dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
 
     // AI-powered seasonality detection
-    let aiRequest = {
+    const aiRequest = {
       task: 'seasonality_detection',
       parameters: {
         data_points: dataPoints,
-        potential_periods: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly']
-      }
+        potential_periods: ['daily', 'weekly', 'monthly', 'quarterly', 'yearly'],
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const seasonality = {
       seasonality_id: generateId(),
@@ -361,10 +361,10 @@ async function detectSeasonality(trendId) {
       amplitude: aiResponse.amplitude,
       phase: aiResponse.phase,
       seasonal_indices: aiResponse.seasonal_indices,
-      detected_at: new Date().toISOString()
+      detected_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_seasonality 
        (seasonality_id, trend_id, seasonality_type, period, amplitude, phase, 
         seasonal_indices, detected_at)
@@ -378,8 +378,8 @@ async function detectSeasonality(trendId) {
         seasonality.amplitude,
         seasonality.phase,
         JSON.stringify(seasonality.seasonal_indices),
-        seasonality.detected_at
-      ]
+        seasonality.detected_at,
+      ],
     );
 
     logger.info(`Seasonality detected: ${seasonality.seasonality_id}`);
@@ -399,16 +399,16 @@ async function calculateCorrelation(trendId, correlatedMetric) {
     const correlatedData = await getCorrelatedData(correlatedMetric);
 
     // AI-powered correlation analysis
-    let aiRequest = {
+    const aiRequest = {
       task: 'correlation_analysis',
       parameters: {
         trend_data: trendData,
         correlated_data: correlatedData,
-        correlation_methods: ['pearson', 'spearman', 'kendall']
-      }
+        correlation_methods: ['pearson', 'spearman', 'kendall'],
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const correlation = {
       correlation_id: generateId(),
@@ -418,10 +418,10 @@ async function calculateCorrelation(trendId, correlatedMetric) {
       p_value: aiResponse.p_value,
       lead_lag_period: aiResponse.lead_lag_period,
       correlation_type: aiResponse.correlation_type,
-      calculated_at: new Date().toISOString()
+      calculated_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_correlations 
        (correlation_id, trend_id, correlated_metric, correlation_coefficient, 
         p_value, lead_lag_period, correlation_type, calculated_at)
@@ -435,8 +435,8 @@ async function calculateCorrelation(trendId, correlatedMetric) {
         correlation.p_value,
         correlation.lead_lag_period,
         correlation.correlation_type,
-        correlation.calculated_at
-      ]
+        correlation.calculated_at,
+      ],
     );
 
     logger.info(`Correlation calculated: ${correlation.correlation_id}`);
@@ -452,18 +452,18 @@ async function calculateCorrelation(trendId, correlatedMetric) {
  */
 async function detectBreakpoints(trendId) {
   try {
-    let dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
+    const dataPoints = await getTrendDataPoints(trendId, { is_forecast: false });
 
     // AI-powered breakpoint detection
-    let aiRequest = {
+    const aiRequest = {
       task: 'breakpoint_detection',
       parameters: {
         data_points: dataPoints,
-        detection_methods: ['chow_test', 'cusum', 'bayan']
-      }
+        detection_methods: ['chow_test', 'cusum', 'bayan'],
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const breakpoints = [];
     for (const bp of aiResponse.breakpoints) {
@@ -476,10 +476,10 @@ async function detectBreakpoints(trendId) {
         post_trend_slope: bp.post_slope,
         significance_level: bp.significance,
         description: bp.description,
-        detected_at: new Date().toISOString()
+        detected_at: new Date().toISOString(),
       };
 
-      let result = await pool.query(
+      const result = await pool.query(
         `INSERT INTO trend_breakpoints 
          (breakpoint_id, trend_id, breakpoint_timestamp, breakpoint_type, 
           pre_trend_slope, post_trend_slope, significance_level, description, detected_at)
@@ -494,8 +494,8 @@ async function detectBreakpoints(trendId) {
           breakpoint.post_trend_slope,
           breakpoint.significance_level,
           breakpoint.description,
-          breakpoint.detected_at
-        ]
+          breakpoint.detected_at,
+        ],
       );
 
       breakpoints.push(result.rows[0]);
@@ -520,10 +520,10 @@ async function createTrendAlert(alertData) {
       alert_condition,
       threshold_value,
       severity,
-      message
+      message,
     } = alertData;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO trend_alerts 
        (alert_id, trend_id, alert_type, alert_condition, threshold_value, severity, message, triggered_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -536,8 +536,8 @@ async function createTrendAlert(alertData) {
         threshold_value,
         severity,
         message,
-        new Date().toISOString()
-      ]
+        new Date().toISOString(),
+      ],
     );
 
     logger.info(`Trend alert created: ${result.rows[0].alert_id}`);
@@ -555,7 +555,7 @@ async function getTrendAlerts(trendId, filters = {}) {
   try {
     const { is_active } = filters;
     let query = 'SELECT * FROM trend_alerts WHERE trend_id = $1';
-    let params = [trendId];
+    const params = [trendId];
     let paramCount = 1;
 
     if (is_active !== undefined) {
@@ -566,7 +566,7 @@ async function getTrendAlerts(trendId, filters = {}) {
 
     query += ' ORDER BY triggered_at DESC';
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     logger.error('Error getting trend alerts', { error: error.message });
@@ -584,7 +584,7 @@ async function analyzeDataCharacteristics(dataSource) {
     data_type: 'time_series',
     frequency: 'daily',
     completeness: 0.95,
-    noise_level: 'low'
+    noise_level: 'low',
   };
 }
 
@@ -592,7 +592,7 @@ async function getTrendBestPractices(trendType) {
   return {
     minimum_data_points: 30,
     recommended_methods: ['linear_regression', 'moving_average', 'exponential_smoothing'],
-    confidence_interval: 0.95
+    confidence_interval: 0.95,
   };
 }
 
@@ -600,7 +600,7 @@ async function getHistoricalContext(trendId) {
   return {
     similar_trends: [],
     historical_patterns: [],
-    event_history: []
+    event_history: [],
   };
 }
 
@@ -608,7 +608,7 @@ async function getExternalFactors(trendId) {
   return {
     market_conditions: 'stable',
     seasonality: 'moderate',
-    external_events: []
+    external_events: [],
   };
 }
 
@@ -617,8 +617,8 @@ async function getModelOptions(forecastType) {
     models: ['arima', 'prophet', 'lstm', 'ensemble'],
     parameters: {
       lookback_window: 30,
-      forecast_steps: 10
-    }
+      forecast_steps: 10,
+    },
   };
 }
 
@@ -641,5 +641,5 @@ module.exports = {
   listDisasterAlerts,
   getDisasterAlert,
   cancelDisasterAlert,
-  getDisasterAlertAdvisory
+  getDisasterAlertAdvisory,
 };

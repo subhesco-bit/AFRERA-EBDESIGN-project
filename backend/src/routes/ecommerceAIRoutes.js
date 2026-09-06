@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce AI Routes
- * 
+ *
  * AI-powered marketplace endpoints:
  * - Customer Segmentation
  * - Demand Forecasting

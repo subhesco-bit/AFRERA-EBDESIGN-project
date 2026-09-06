@@ -26,7 +26,7 @@ const getEquipment = async (req, res) => {
 
 const registerEquipment = async (req, res) => {
   try {
-    let equipment = await equipmentService.registerEquipment(req.body);
+    const equipment = await equipmentService.registerEquipment(req.body);
     res.status(201).json({ success: true, data: equipment });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -66,5 +66,5 @@ module.exports = {
   registerEquipment,
   updateEquipmentStatus,
   trackEquipmentUtilization,
-  generateInventoryReport
+  generateInventoryReport,
 };

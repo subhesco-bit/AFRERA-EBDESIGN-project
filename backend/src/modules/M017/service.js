@@ -8,40 +8,44 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function createConsent(consentData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { userId, consentType, consentCategory, consentText, dataCategories, validityPeriod } = consentData;
-  
+  const validityDays = Number(validityPeriod ?? 365);
+  if (!Number.isInteger(validityDays) || validityDays < 1 || validityDays > 3650) {
+    throw new Error('validityPeriod must be an integer number of days between 1 and 3650');
+  }
+
   const res = await pg.query(
     `INSERT INTO consents (user_id, consent_type, consent_category, consent_text, data_categories, valid_from, valid_until, version, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, NOW(), NOW() + INTERVAL '${validityPeriod || '365 days'}', 1, 'active', NOW(), NOW())
+    VALUES ($1, $2, $3, $4, $5, NOW(), NOW() + ($6 * INTERVAL '1 day'), 1, 'active', NOW(), NOW())
      RETURNING *`,
-    [userId, consentType, consentCategory, consentText, JSON.stringify(dataCategories || [])]
+    [userId, consentType, consentCategory, consentText, JSON.stringify(dataCategories || []), validityDays],
   );
-  
+
   // Emit signal
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'consent',
     consentId: res.rows[0].id,
     userId,
     consentType,
-    consentCategory
+    consentCategory,
   }, {
     severity: SEVERITY.INFO,
     source: 'consent_management_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
 async function getUserConsents(userId, { category, status } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = 'SELECT * FROM consents WHERE user_id = $1';
   const params = [userId];
   let paramIndex = 2;
-  
+
   if (category) {
     query += ` AND consent_category = $${paramIndex++}`;
     params.push(category);
@@ -50,28 +54,28 @@ async function getUserConsents(userId, { category, status } = {}) {
     query += ` AND status = $${paramIndex++}`;
     params.push(status);
   }
-  
+
   query += ' ORDER BY created_at DESC';
-  
-  let res = await pg.query(query, params);
+
+  const res = await pg.query(query, params);
   return res.rows;
 }
 
 async function getConsent(consentId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  let res = await pg.query('SELECT * FROM consents WHERE id = $1', [consentId]);
+
+  const res = await pg.query('SELECT * FROM consents WHERE id = $1', [consentId]);
   return res.rows[0] || null;
 }
 
 async function updateConsent(consentId, updates) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { consentText, dataCategories, status } = updates;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `UPDATE consents 
      SET consent_text = COALESCE($1, consent_text),
          data_categories = COALESCE($2, data_categories),
@@ -79,100 +83,100 @@ async function updateConsent(consentId, updates) {
          updated_at = NOW()
      WHERE id = $4
      RETURNING *`,
-    [consentText, dataCategories ? JSON.stringify(dataCategories) : null, status, consentId]
+    [consentText, dataCategories ? JSON.stringify(dataCategories) : null, status, consentId],
   );
-  
+
   // Emit signal for consent update
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'consent',
     consentId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'consent_management_service',
-    entityId: consentId
+    entityId: consentId,
   });
-  
+
   return res.rows[0] || null;
 }
 
 async function revokeConsent(consentId, reason) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `UPDATE consents 
      SET status = 'revoked', revoked_at = NOW(), revoked_reason = $1, updated_at = NOW()
      WHERE id = $2
      RETURNING *`,
-    [reason, consentId]
+    [reason, consentId],
   );
-  
+
   // Emit signal for consent revocation
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'consent',
     consentId,
     action: 'revoked',
-    reason
+    reason,
   }, {
     severity: SEVERITY.WARNING,
     source: 'consent_management_service',
-    entityId: consentId
+    entityId: consentId,
   });
-  
+
   return res.rows[0] || null;
 }
 
 // Consent category management
 async function createConsentCategory(categoryData) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { name, description, required, dataTypes, retentionPeriod } = categoryData;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `INSERT INTO consent_categories (name, description, required, data_types, retention_period, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
      RETURNING *`,
-    [name, description, required || false, JSON.stringify(dataTypes || []), retentionPeriod]
+    [name, description, required || false, JSON.stringify(dataTypes || []), retentionPeriod],
   );
-  
+
   return res.rows[0];
 }
 
 async function getConsentCategories() {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  let res = await pg.query('SELECT * FROM consent_categories ORDER BY name');
+
+  const res = await pg.query('SELECT * FROM consent_categories ORDER BY name');
   return res.rows;
 }
 
 // Consent template management
 async function createConsentTemplate(templateData) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { name, consentType, consentCategory, consentText, dataCategories, validityPeriod } = templateData;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `INSERT INTO consent_templates (name, consent_type, consent_category, consent_text, data_categories, validity_period, is_active, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, true, NOW(), NOW())
      RETURNING *`,
-    [name, consentType, consentCategory, consentText, JSON.stringify(dataCategories || []), validityPeriod]
+    [name, consentType, consentCategory, consentText, JSON.stringify(dataCategories || []), validityPeriod],
   );
-  
+
   return res.rows[0];
 }
 
 async function getConsentTemplates({ consentType, consentCategory } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = 'SELECT * FROM consent_templates WHERE is_active = true';
-  let params = [];
+  const params = [];
   let paramIndex = 1;
-  
+
   if (consentType) {
     query += ` AND consent_type = $${paramIndex++}`;
     params.push(consentType);
@@ -181,25 +185,25 @@ async function getConsentTemplates({ consentType, consentCategory } = {}) {
     query += ` AND consent_category = $${paramIndex++}`;
     params.push(consentCategory);
   }
-  
+
   query += ' ORDER BY name';
-  
-  let res = await pg.query(query, params);
+
+  const res = await pg.query(query, params);
   return res.rows;
 }
 
 async function applyConsentTemplate(userId, templateId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   // Get template
   const templateRes = await pg.query('SELECT * FROM consent_templates WHERE id = $1', [templateId]);
   const template = templateRes.rows[0];
-  
+
   if (!template) {
     return { success: false, error: 'Template not found' };
   }
-  
+
   // Create consent from template
   const consent = await createConsent({
     userId,
@@ -207,46 +211,46 @@ async function applyConsentTemplate(userId, templateId) {
     consentCategory: template.consent_category,
     consentText: template.consent_text,
     dataCategories: template.data_categories,
-    validityPeriod: template.validity_period
+    validityPeriod: template.validity_period,
   });
-  
+
   return { success: true, data: consent };
 }
 
 // AI-powered consent analysis
 async function analyzeConsentCompliance(userId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   // Get user's consents
   const userConsents = await getUserConsents(userId);
-  
+
   // Get required consent categories
   const requiredCategories = await pg.query(
-    'SELECT * FROM consent_categories WHERE required = true'
+    'SELECT * FROM consent_categories WHERE required = true',
   );
-  
+
   // Check for missing required consents
   const missingConsents = [];
   requiredCategories.rows.forEach(category => {
-    const hasConsent = userConsents.some(c => 
-      c.consent_category === category.name && c.status === 'active'
+    const hasConsent = userConsents.some(c =>
+      c.consent_category === category.name && c.status === 'active',
     );
     if (!hasConsent) {
       missingConsents.push(category);
     }
   });
-  
+
   // Check for expired consents
-  const expiredConsents = userConsents.filter(c => 
-    c.status === 'active' && new Date(c.valid_until) < new Date()
+  const expiredConsents = userConsents.filter(c =>
+    c.status === 'active' && new Date(c.valid_until) < new Date(),
   );
-  
+
   // Calculate compliance score
   const totalRequired = requiredCategories.rows.length;
   const compliantRequired = totalRequired - missingConsents.length;
   const complianceScore = totalRequired > 0 ? (compliantRequired / totalRequired) * 100 : 100;
-  
+
   return {
     userId,
     complianceScore: Math.round(complianceScore),
@@ -254,97 +258,97 @@ async function analyzeConsentCompliance(userId) {
     expiredConsents,
     totalConsents: userConsents.length,
     activeConsents: userConsents.filter(c => c.status === 'active').length,
-    recommendations: generateConsentRecommendations(missingConsents, expiredConsents)
+    recommendations: generateConsentRecommendations(missingConsents, expiredConsents),
   };
 }
 
 function generateConsentRecommendations(missingConsents, expiredConsents) {
   const recommendations = [];
-  
+
   if (missingConsents.length > 0) {
     recommendations.push({
       type: 'compliance',
       message: `${missingConsents.length} required consent(s) missing. User should be prompted to give consent.`,
       priority: 'high',
-      categories: missingConsents.map(c => c.name)
+      categories: missingConsents.map(c => c.name),
     });
   }
-  
+
   if (expiredConsents.length > 0) {
     recommendations.push({
       type: 'renewal',
       message: `${expiredConsents.length} consent(s) expired. User should be prompted to renew.`,
       priority: 'medium',
-      consentIds: expiredConsents.map(c => c.id)
+      consentIds: expiredConsents.map(c => c.id),
     });
   }
-  
+
   return recommendations;
 }
 
 // Consent history and audit
 async function getConsentHistory(consentId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `SELECT * FROM consent_history 
      WHERE consent_id = $1 
      ORDER BY created_at DESC`,
-    [consentId]
+    [consentId],
   );
-  
+
   return res.rows;
 }
 
 async function logConsentEvent(consentId, eventType, details) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   await pg.query(
     `INSERT INTO consent_history (consent_id, event_type, details, created_at)
      VALUES ($1, $2, $3, NOW())`,
-    [consentId, eventType, JSON.stringify(details)]
+    [consentId, eventType, JSON.stringify(details)],
   );
 }
 
 // Automated consent expiration
 async function checkExpiredConsents() {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `UPDATE consents 
      SET status = 'expired', updated_at = NOW()
      WHERE status = 'active' AND valid_until < NOW()
-     RETURNING *`
+     RETURNING *`,
   );
-  
+
   // Emit signal for each expired consent
   res.rows.forEach(consent => {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
       entityType: 'consent',
       consentId: consent.id,
       userId: consent.user_id,
-      action: 'expired'
+      action: 'expired',
     }, {
       severity: SEVERITY.WARNING,
       source: 'consent_management_service',
-      entityId: consent.id
+      entityId: consent.id,
     });
   });
-  
+
   return {
     expiredCount: res.rows.length,
-    expiredConsents: res.rows
+    expiredConsents: res.rows,
   };
 }
 
 // Consent analytics
 async function getConsentAnalytics({ startDate, endDate, consentCategory } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = `
     SELECT 
       consent_category,
@@ -354,9 +358,9 @@ async function getConsentAnalytics({ startDate, endDate, consentCategory } = {})
     FROM consents
     WHERE 1=1
   `;
-  let params = [];
+  const params = [];
   let paramIndex = 1;
-  
+
   if (startDate) {
     query += ` AND created_at >= $${paramIndex++}`;
     params.push(startDate);
@@ -369,16 +373,16 @@ async function getConsentAnalytics({ startDate, endDate, consentCategory } = {})
     query += ` AND consent_category = $${paramIndex++}`;
     params.push(consentCategory);
   }
-  
-  query += ` GROUP BY consent_category, status, DATE(created_at) ORDER BY date DESC`;
-  
-  let res = await pg.query(query, params);
-  
+
+  query += ' GROUP BY consent_category, status, DATE(created_at) ORDER BY date DESC';
+
+  const res = await pg.query(query, params);
+
   return {
     data: res.rows,
     totalConsents: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
     byCategory: groupBy(res.rows, 'consent_category'),
-    byStatus: groupBy(res.rows, 'status')
+    byStatus: groupBy(res.rows, 'status'),
   };
 }
 
@@ -391,25 +395,25 @@ function groupBy(array, key) {
 
 // Bulk consent operations
 async function bulkCreateConsents(consents) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const results = [];
-  
+
   for (const consentData of consents) {
     try {
-      let consent = await createConsent(consentData);
+      const consent = await createConsent(consentData);
       results.push({ success: true, consent });
     } catch (error) {
       results.push({ success: false, error: error.message, consentData });
     }
   }
-  
+
   return {
     total: consents.length,
     successful: results.filter(r => r.success).length,
     failed: results.filter(r => !r.success).length,
-    results
+    results,
   };
 }
 
@@ -420,29 +424,29 @@ module.exports = {
   getConsent,
   updateConsent,
   revokeConsent,
-  
+
   // Consent category management
   createConsentCategory,
   getConsentCategories,
-  
+
   // Consent template management
   createConsentTemplate,
   getConsentTemplates,
   applyConsentTemplate,
-  
+
   // AI-powered analysis
   analyzeConsentCompliance,
-  
+
   // Consent history and audit
   getConsentHistory,
   logConsentEvent,
-  
+
   // Automated expiration
   checkExpiredConsents,
-  
+
   // Analytics
   getConsentAnalytics,
-  
+
   // Bulk operations
   bulkCreateConsents,
 };

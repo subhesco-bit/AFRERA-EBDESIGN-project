@@ -8,18 +8,18 @@ const crypto = require('crypto');
 const { getPostgreSQL } = require('../database/connection');
 const cacheService = require('./cacheService');
 
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? require('stripe')(process.env.STRIPE_SECRET_KEY)
-  : null;
-const Razorpay = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET
-  ? require('razorpay')
-  : null;
-const razorpay = Razorpay
-  ? new Razorpay({
+const stripe = process.env.STRIPE_SECRET_KEY ?
+  require('stripe')(process.env.STRIPE_SECRET_KEY) :
+  null;
+const Razorpay = process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET ?
+  require('razorpay') :
+  null;
+const razorpay = Razorpay ?
+  new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
     key_secret: process.env.RAZORPAY_KEY_SECRET,
-  })
-  : null;
+  }) :
+  null;
 
 function database() {
   const db = getPostgreSQL();
@@ -56,7 +56,7 @@ class PaymentService {
     try {
       const result = await database().query(
         'INSERT INTO wallets (user_id, balance, created_at) VALUES ($1, $2, NOW()) RETURNING *',
-        [userId, 0]
+        [userId, 0],
       );
       return result.rows[0];
     } catch (error) {
@@ -71,9 +71,9 @@ class PaymentService {
       const cached = await cacheService.get(`wallet:${userId}:balance`);
       if (cached) return cached;
 
-      let result = await database().query(
+      const result = await database().query(
         'SELECT balance FROM wallets WHERE user_id = $1',
-        [userId]
+        [userId],
       );
 
       const balance = result.rows[0]?.balance || 0;
@@ -134,12 +134,12 @@ class PaymentService {
   // Record transaction
   async recordTransaction(userId, amount, gateway, transactionId) {
     try {
-      let result = await database().query(
+      const result = await database().query(
         `INSERT INTO transactions
          (user_id, amount, gateway, transaction_id, status, created_at)
          VALUES ($1, $2, $3, $4, $5, NOW())
          RETURNING *`,
-        [userId, amount, gateway, transactionId, 'completed']
+        [userId, amount, gateway, transactionId, 'completed'],
       );
 
       await cacheService.invalidate(`transactions:${userId}:*`);
@@ -153,9 +153,9 @@ class PaymentService {
   // Update wallet balance
   async updateBalance(userId, amount) {
     try {
-      let result = await database().query(
+      const result = await database().query(
         'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2 RETURNING *',
-        [amount, userId]
+        [amount, userId],
       );
 
       await cacheService.del(`wallet:${userId}:balance`);
@@ -178,13 +178,13 @@ class PaymentService {
       // Debit from user
       await database().query(
         'UPDATE wallets SET balance = balance - $1 WHERE user_id = $2',
-        [amount, fromUserId]
+        [amount, fromUserId],
       );
 
       // Credit to user
       await database().query(
         'UPDATE wallets SET balance = balance + $1 WHERE user_id = $2',
-        [amount, toUserId]
+        [amount, toUserId],
       );
 
       // Record transactions
@@ -201,13 +201,13 @@ class PaymentService {
   // Get transaction history
   async getTransactionHistory(userId, limit = 50) {
     try {
-      let cached = await cacheService.get(`transactions:${userId}:history`);
+      const cached = await cacheService.get(`transactions:${userId}:history`);
       if (cached) return cached;
 
-      let result = await database().query(
+      const result = await database().query(
         `SELECT * FROM transactions WHERE user_id = $1
          ORDER BY created_at DESC LIMIT $2`,
-        [userId, limit]
+        [userId, limit],
       );
 
       const transactions = result.rows;
@@ -258,8 +258,8 @@ class PaymentService {
       .digest('hex');
     const expectedBuffer = Buffer.from(expected);
     const signatureBuffer = Buffer.from(signature);
-    return expectedBuffer.length === signatureBuffer.length
-      && crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
+    return expectedBuffer.length === signatureBuffer.length &&
+      crypto.timingSafeEqual(expectedBuffer, signatureBuffer);
   }
 }
 

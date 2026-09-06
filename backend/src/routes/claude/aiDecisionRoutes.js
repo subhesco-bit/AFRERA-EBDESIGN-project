@@ -1,6 +1,6 @@
 /**
  * AI Decision Routes - Claude AI Integration
- * 
+ *
  * AI-Enhanced Endpoints:
  * - POST /ai-enhanced/predict-demand - AI-enhanced demand prediction
  * - POST /ai-enhanced/optimize-price - AI-enhanced price optimization
@@ -9,7 +9,7 @@
  * - POST /ai-enhanced/generate-recommendations - AI-enhanced recommendation generation
  * - GET /ai-context/* - Context retrieval for operations
  * - GET /ai-capability - AI capability status
- * 
+ *
  * Original Endpoints (Preserved):
  * - POST /predict/demand - Original demand prediction
  * - POST /optimize/price - Original price optimization
@@ -38,17 +38,17 @@ router.post('/ai-enhanced/predict-demand', async (req, res) => {
   try {
     const { productId, timeHorizon, options } = req.body;
     const result = await service.predictDemandAI(productId, timeHorizon, options);
-    
+
     res.json({
       success: true,
       ai_enhanced: true,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -59,18 +59,18 @@ router.post('/ai-enhanced/predict-demand', async (req, res) => {
 router.post('/ai-enhanced/optimize-price', async (req, res) => {
   try {
     const { productId, marketConditions, options } = req.body;
-    let result = await service.optimizePriceAI(productId, marketConditions, options);
-    
+    const result = await service.optimizePriceAI(productId, marketConditions, options);
+
     res.json({
       success: true,
       ai_enhanced: true,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -81,18 +81,18 @@ router.post('/ai-enhanced/optimize-price', async (req, res) => {
 router.post('/ai-enhanced/assess-credit-risk', async (req, res) => {
   try {
     const { farmerId, loanApplication, options } = req.body;
-    let result = await service.assessCreditRiskAI(farmerId, loanApplication, options);
-    
+    const result = await service.assessCreditRiskAI(farmerId, loanApplication, options);
+
     res.json({
       success: true,
       ai_enhanced: true,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -103,18 +103,18 @@ router.post('/ai-enhanced/assess-credit-risk', async (req, res) => {
 router.post('/ai-enhanced/detect-fraud', async (req, res) => {
   try {
     const { transactionData, options } = req.body;
-    let result = await service.detectFraudAI(transactionData, options);
-    
+    const result = await service.detectFraudAI(transactionData, options);
+
     res.json({
       success: true,
       ai_enhanced: true,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -125,18 +125,18 @@ router.post('/ai-enhanced/detect-fraud', async (req, res) => {
 router.post('/ai-enhanced/generate-recommendations', async (req, res) => {
   try {
     const { userId, context, options } = req.body;
-    let result = await service.generateRecommendationsAI(userId, context, options);
-    
+    const result = await service.generateRecommendationsAI(userId, context, options);
+
     res.json({
       success: true,
       ai_enhanced: true,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -152,15 +152,15 @@ router.get('/ai-context/predict-demand', async (req, res) => {
   try {
     const { productId, timeHorizon } = req.query;
     const context = await service.getAIContext('predictDemand', { productId, timeHorizon });
-    
+
     res.json({
       success: true,
-      context: context
+      context,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -171,16 +171,16 @@ router.get('/ai-context/predict-demand', async (req, res) => {
 router.get('/ai-context/optimize-price', async (req, res) => {
   try {
     const { productId } = req.query;
-    let context = await service.getAIContext('optimizePrice', { productId });
-    
+    const context = await service.getAIContext('optimizePrice', { productId });
+
     res.json({
       success: true,
-      context: context
+      context,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -191,16 +191,16 @@ router.get('/ai-context/optimize-price', async (req, res) => {
 router.get('/ai-context/assess-credit-risk', async (req, res) => {
   try {
     const { farmerId } = req.query;
-    let context = await service.getAIContext('assessCreditRisk', { farmerId });
-    
+    const context = await service.getAIContext('assessCreditRisk', { farmerId });
+
     res.json({
       success: true,
-      context: context
+      context,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -211,16 +211,16 @@ router.get('/ai-context/assess-credit-risk', async (req, res) => {
 router.get('/ai-context/detect-fraud', async (req, res) => {
   try {
     const { transactionId } = req.query;
-    let context = await service.getAIContext('detectFraud', { transactionId });
-    
+    const context = await service.getAIContext('detectFraud', { transactionId });
+
     res.json({
       success: true,
-      context: context
+      context,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -231,16 +231,16 @@ router.get('/ai-context/detect-fraud', async (req, res) => {
 router.get('/ai-context/generate-recommendations', async (req, res) => {
   try {
     const { userId } = req.query;
-    let context = await service.getAIContext('generateRecommendations', { userId });
-    
+    const context = await service.getAIContext('generateRecommendations', { userId });
+
     res.json({
       success: true,
-      context: context
+      context,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -256,7 +256,7 @@ router.get('/ai-capability', (req, res) => {
   const status = service.getAICapabilityStatus();
   res.json({
     success: true,
-    status: status
+    status,
   });
 });
 
@@ -270,18 +270,18 @@ router.get('/ai-capability', (req, res) => {
 router.post('/predict/demand', async (req, res) => {
   try {
     const { productId, timeHorizon } = req.body;
-    let result = await originalService.predictDemand(productId, timeHorizon);
-    
+    const result = await originalService.predictDemand(productId, timeHorizon);
+
     res.json({
       success: true,
       ai_enhanced: false,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -292,18 +292,18 @@ router.post('/predict/demand', async (req, res) => {
 router.post('/optimize/price', async (req, res) => {
   try {
     const { productId, marketConditions, options } = req.body;
-    let result = await originalService.optimizePrice(productId, marketConditions, options);
-    
+    const result = await originalService.optimizePrice(productId, marketConditions, options);
+
     res.json({
       success: true,
       ai_enhanced: false,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -314,18 +314,18 @@ router.post('/optimize/price', async (req, res) => {
 router.post('/assess/credit-risk', async (req, res) => {
   try {
     const { farmerId, loanApplication } = req.body;
-    let result = await originalService.assessCreditRisk(farmerId, loanApplication);
-    
+    const result = await originalService.assessCreditRisk(farmerId, loanApplication);
+
     res.json({
       success: true,
       ai_enhanced: false,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -336,18 +336,18 @@ router.post('/assess/credit-risk', async (req, res) => {
 router.post('/detect/fraud', async (req, res) => {
   try {
     const { transactionData, options } = req.body;
-    let result = await originalService.detectFraud(transactionData, options);
-    
+    const result = await originalService.detectFraud(transactionData, options);
+
     res.json({
       success: true,
       ai_enhanced: false,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });
@@ -358,18 +358,18 @@ router.post('/detect/fraud', async (req, res) => {
 router.post('/recommend', async (req, res) => {
   try {
     const { userId, context, options } = req.body;
-    let result = await originalService.generateRecommendations(userId, context, options);
-    
+    const result = await originalService.generateRecommendations(userId, context, options);
+
     res.json({
       success: true,
       ai_enhanced: false,
-      result: result
+      result,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: error.message,
-      ai_enhanced: false
+      ai_enhanced: false,
     });
   }
 });

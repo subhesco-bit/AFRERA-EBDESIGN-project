@@ -49,5 +49,5 @@ module.exports = {
   ai: require('./ai'),
 
   // Civil disruption routing
-  DisruptionRoutingAgent: require('./disruptionRoutingAgent')
+  DisruptionRoutingAgent: require('./disruptionRoutingAgent'),
 };

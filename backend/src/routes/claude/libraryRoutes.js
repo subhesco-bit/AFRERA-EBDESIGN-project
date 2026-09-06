@@ -15,12 +15,12 @@ router.post('/initialize', async (req, res) => {
     await libraryKnowledgeService.initialize();
     res.json({
       success: true,
-      message: 'Library service initialized successfully'
+      message: 'Library service initialized successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -31,28 +31,28 @@ router.post('/initialize', async (req, res) => {
 router.get('/search', async (req, res) => {
   try {
     const { query } = req.query;
-    
+
     if (!query) {
       return res.status(400).json({
         success: false,
-        error: 'Query parameter is required'
+        error: 'Query parameter is required',
       });
     }
 
     const results = await libraryKnowledgeService.searchLibrary(query);
-    
+
     res.json({
       success: true,
       data: {
         query,
         results,
-        count: results.length
-      }
+        count: results.length,
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -63,15 +63,15 @@ router.get('/search', async (req, res) => {
 router.get('/statistics', async (req, res) => {
   try {
     const stats = await libraryKnowledgeService.getStatistics();
-    
+
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -82,15 +82,15 @@ router.get('/statistics', async (req, res) => {
 router.get('/verify', async (req, res) => {
   try {
     const verification = await libraryKnowledgeService.verifyCatalogIntegrity();
-    
+
     res.json({
       success: true,
-      data: verification
+      data: verification,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -102,22 +102,22 @@ router.get('/item/:filename', async (req, res) => {
   try {
     const { filename } = req.params;
     const item = libraryKnowledgeService.index.get(filename);
-    
+
     if (!item) {
       return res.status(404).json({
         success: false,
-        error: 'Library item not found'
+        error: 'Library item not found',
       });
     }
 
     res.json({
       success: true,
-      data: item
+      data: item,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -128,13 +128,13 @@ router.get('/item/:filename', async (req, res) => {
 router.get('/modules', async (req, res) => {
   try {
     const modules = [];
-    
+
     for (const [filename, item] of libraryKnowledgeService.index) {
       if (item.type === 'module') {
         modules.push({
           filename,
           data: item.data,
-          lastModified: item.lastModified
+          lastModified: item.lastModified,
         });
       }
     }
@@ -143,13 +143,13 @@ router.get('/modules', async (req, res) => {
       success: true,
       data: {
         modules,
-        count: modules.length
-      }
+        count: modules.length,
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -160,13 +160,13 @@ router.get('/modules', async (req, res) => {
 router.get('/components', async (req, res) => {
   try {
     const components = [];
-    
+
     for (const [filename, item] of libraryKnowledgeService.index) {
       if (item.type === 'component') {
         components.push({
           filename,
           data: item.data,
-          lastModified: item.lastModified
+          lastModified: item.lastModified,
         });
       }
     }
@@ -175,13 +175,13 @@ router.get('/components', async (req, res) => {
       success: true,
       data: {
         components,
-        count: components.length
-      }
+        count: components.length,
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });

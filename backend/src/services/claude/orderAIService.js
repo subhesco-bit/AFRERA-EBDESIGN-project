@@ -17,42 +17,42 @@ class ClaudeAIEnhancedOrderService {
 
   async optimizeOrderAI(orderData, options = {}) {
     if (!this.aiEnabled) return await this.originalService.createOrder(orderData);
-    
+
     try {
       await aiCollaborationService.logWork('claude', {
         work_type: 'order_optimization',
         service: this.serviceName,
         params: { orderData, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'optimizeOrder',
-        orderData: orderData
+        orderData,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'optimization',
         query: `Optimize order with data: ${JSON.stringify(orderData)}`,
         context: { orderData, options, libraryContext },
-        agentPreference: 'operations-manager'
+        agentPreference: 'operations-manager',
       });
 
       const originalResult = await this.originalService.createOrder(orderData);
-      
+
       return {
         ...originalResult,
         ai_enhanced: true,
         ai_optimization: aiEnhancement.content || null,
-        ai_confidence: aiEnhancement.confidence || 0.8
+        ai_confidence: aiEnhancement.confidence || 0.8,
       };
     } catch (error) {
       await aiCollaborationService.logWork('claude', {
         work_type: 'order_optimization',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
       return await this.originalService.createOrder(orderData);
     }
@@ -69,7 +69,7 @@ class ClaudeAIEnhancedOrderService {
       ai_coordinator: claudeAICoordinator ? 'available' : 'unavailable',
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
-      ai_enhanced_methods: ['optimizeOrderAI']
+      ai_enhanced_methods: ['optimizeOrderAI'],
     };
   }
 }

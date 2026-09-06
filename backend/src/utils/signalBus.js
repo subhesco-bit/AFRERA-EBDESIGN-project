@@ -13,5 +13,5 @@ module.exports = {
   signalBus,
   SIGNAL,
   SEVERITY,
-  SignalBus
+  SignalBus,
 };

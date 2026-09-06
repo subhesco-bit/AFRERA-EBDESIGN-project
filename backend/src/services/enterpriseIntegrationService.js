@@ -28,7 +28,7 @@ class EnterpriseIntegrationService {
         endpointUrl,
         apiKey,
         config,
-        organizationId
+        organizationId,
       } = integrationData;
 
       // Validate integration type
@@ -37,7 +37,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Unsupported integration type',
-          supportedTypes
+          supportedTypes,
         };
       }
 
@@ -47,7 +47,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Connection test failed',
-          details: connectionTest.error
+          details: connectionTest.error,
         };
       }
 
@@ -65,7 +65,7 @@ class EnterpriseIntegrationService {
       const result = await db.query(query, [
         integrationId, integrationType, integrationName,
         endpointUrl, this.encryptApiKey(apiKey),
-        JSON.stringify(config), organizationId
+        JSON.stringify(config), organizationId,
       ]);
 
       // Add to active integrations
@@ -75,7 +75,7 @@ class EnterpriseIntegrationService {
         endpointUrl,
         config,
         organizationId,
-        lastUsed: new Date()
+        lastUsed: new Date(),
       });
 
       return {
@@ -85,15 +85,15 @@ class EnterpriseIntegrationService {
           integrationType: result.rows[0].integration_type,
           status: result.rows[0].status,
           connectionStatus: 'connected',
-          registeredAt: new Date().toISOString()
-        }
+          registeredAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - registerIntegration error:`, error);
       return {
         success: false,
         error: 'Failed to register integration',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -108,7 +108,7 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid ERP integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -134,15 +134,15 @@ class EnterpriseIntegrationService {
           dataType,
           recordsProcessed: syncResult.recordsProcessed,
           syncStatus: syncResult.status,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - syncWithERP error:`, error);
       return {
         success: false,
         error: 'Failed to sync with ERP',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -152,12 +152,12 @@ class EnterpriseIntegrationService {
    */
   async processPayment(integrationId, paymentData) {
     try {
-      let integration = await this.getIntegration(integrationId);
+      const integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'payment_gateway') {
         return {
           success: false,
           error: 'Invalid payment gateway integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -169,14 +169,14 @@ class EnterpriseIntegrationService {
         return {
           success: false,
           error: 'Invalid payment data',
-          validationErrors: validation.errors
+          validationErrors: validation.errors,
         };
       }
 
       // Process payment
       const paymentResult = await this.sendPaymentRequest(
         integration,
-        paymentData
+        paymentData,
       );
 
       // Store payment record
@@ -190,7 +190,7 @@ class EnterpriseIntegrationService {
       return {
         success: false,
         error: 'Failed to process payment',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -200,12 +200,12 @@ class EnterpriseIntegrationService {
    */
   async syncLogistics(integrationId, logisticsData) {
     try {
-      let integration = await this.getIntegration(integrationId);
+      const integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'logistics') {
         return {
           success: false,
           error: 'Invalid logistics integration',
-          integrationId
+          integrationId,
         };
       }
 
@@ -226,7 +226,7 @@ class EnterpriseIntegrationService {
           result = {
             success: false,
             error: 'Invalid logistics operation',
-            operation
+            operation,
           };
       }
 
@@ -236,7 +236,7 @@ class EnterpriseIntegrationService {
       return {
         success: false,
         error: 'Failed to sync logistics',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -246,24 +246,24 @@ class EnterpriseIntegrationService {
    */
   async sendAnalytics(integrationId, analyticsData) {
     try {
-      let integration = await this.getIntegration(integrationId);
+      const integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'analytics') {
         return {
           success: false,
           error: 'Invalid analytics integration',
-          integrationId
+          integrationId,
         };
       }
 
       const { eventType, eventData, userId, sessionId } = analyticsData;
 
       // Send analytics event
-      let result = await this.sendAnalyticsEvent(
+      const result = await this.sendAnalyticsEvent(
         integration,
         eventType,
         eventData,
         userId,
-        sessionId
+        sessionId,
       );
 
       return {
@@ -271,15 +271,15 @@ class EnterpriseIntegrationService {
         data: {
           eventId: result.eventId,
           eventType,
-          processedAt: new Date().toISOString()
-        }
+          processedAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - sendAnalytics error:`, error);
       return {
         success: false,
         error: 'Failed to send analytics',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -289,23 +289,23 @@ class EnterpriseIntegrationService {
    */
   async sendCommunication(integrationId, messageData) {
     try {
-      let integration = await this.getIntegration(integrationId);
+      const integration = await this.getIntegration(integrationId);
       if (!integration || integration.integration_type !== 'communication') {
         return {
           success: false,
           error: 'Invalid communication integration',
-          integrationId
+          integrationId,
         };
       }
 
       const { channel, recipients, message, templateId } = messageData;
 
-      let result = await this.sendMessage(
+      const result = await this.sendMessage(
         integration,
         channel,
         recipients,
         message,
-        templateId
+        templateId,
       );
 
       return {
@@ -314,15 +314,15 @@ class EnterpriseIntegrationService {
           messageId: result.messageId,
           channel,
           recipientsCount: recipients.length,
-          sentAt: new Date().toISOString()
-        }
+          sentAt: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - sendCommunication error:`, error);
       return {
         success: false,
         error: 'Failed to send communication',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -331,7 +331,7 @@ class EnterpriseIntegrationService {
    * Get integration by ID
    */
   async getIntegration(integrationId) {
-    let query = `
+    const query = `
       SELECT integration_id, integration_type, integration_name,
              endpoint_url, config, organization_id, status,
              created_at, last_tested
@@ -339,10 +339,10 @@ class EnterpriseIntegrationService {
       WHERE integration_id = $1 AND status = 'active'
     `;
 
-    let result = await db.query(query, [integrationId]);
+    const result = await db.query(query, [integrationId]);
     if (result.rows.length === 0) return null;
 
-    let integration = result.rows[0];
+    const integration = result.rows[0];
     integration.config = JSON.parse(integration.config);
     return integration;
   }
@@ -355,23 +355,23 @@ class EnterpriseIntegrationService {
       const options = {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
         },
-        timeout: 10000
+        timeout: 10000,
       };
 
-      const response = await this.makeHttpRequest(endpointUrl + '/health', options);
-      
+      const response = await this.makeHttpRequest(`${endpointUrl }/health`, options);
+
       return {
         success: response.statusCode === 200,
         statusCode: response.statusCode,
-        responseTime: response.responseTime
+        responseTime: response.responseTime,
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -381,21 +381,21 @@ class EnterpriseIntegrationService {
    */
   async pushToERP(integration, dataType, records) {
     const endpoint = `${integration.endpoint_url}/api/${dataType}`;
-    let options = {
+    const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ records })
+      body: JSON.stringify({ records }),
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     return {
       status: response.statusCode === 200 ? 'success' : 'failed',
       recordsProcessed: records.length,
-      response: response.body
+      response: response.body,
     };
   }
 
@@ -403,30 +403,30 @@ class EnterpriseIntegrationService {
    * Pull data from ERP
    */
   async pullFromERP(integration, dataType) {
-    let endpoint = `${integration.endpoint_url}/api/${dataType}`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/api/${dataType}`;
+    const options = {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
+      },
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     if (response.statusCode === 200) {
       const records = JSON.parse(response.body);
       return {
         status: 'success',
         recordsProcessed: records.length,
-        records
+        records,
       };
     }
-    
+
     return {
       status: 'failed',
       recordsProcessed: 0,
-      error: response.body
+      error: response.body,
     };
   }
 
@@ -436,12 +436,12 @@ class EnterpriseIntegrationService {
   async bidirectionalSync(integration, dataType, records) {
     const pushResult = await this.pushToERP(integration, dataType, records);
     const pullResult = await this.pullFromERP(integration, dataType);
-    
+
     return {
       status: pushResult.status === 'success' && pullResult.status === 'success' ? 'success' : 'partial',
       pushResult,
       pullResult,
-      recordsProcessed: pushResult.recordsProcessed + pullResult.recordsProcessed
+      recordsProcessed: pushResult.recordsProcessed + pullResult.recordsProcessed,
     };
   }
 
@@ -449,34 +449,34 @@ class EnterpriseIntegrationService {
    * Send payment request
    */
   async sendPaymentRequest(integration, paymentData) {
-    let endpoint = `${integration.endpoint_url}/payments`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/payments`;
+    const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(paymentData)
+      body: JSON.stringify(paymentData),
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     if (response.statusCode === 200) {
-      let result = JSON.parse(response.body);
+      const result = JSON.parse(response.body);
       return {
         success: true,
         data: {
           paymentId: result.payment_id,
           status: result.status,
-          transactionId: result.transaction_id
-        }
+          transactionId: result.transaction_id,
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Payment processing failed',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -484,34 +484,34 @@ class EnterpriseIntegrationService {
    * Create shipment
    */
   async createShipment(integration, shipmentData) {
-    let endpoint = `${integration.endpoint_url}/shipments`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/shipments`;
+    const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(shipmentData)
+      body: JSON.stringify(shipmentData),
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     if (response.statusCode === 200) {
-      let result = JSON.parse(response.body);
+      const result = JSON.parse(response.body);
       return {
         success: true,
         data: {
           shipmentId: result.shipment_id,
           trackingNumber: result.tracking_number,
-          estimatedDelivery: result.estimated_delivery
-        }
+          estimatedDelivery: result.estimated_delivery,
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Failed to create shipment',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -519,19 +519,19 @@ class EnterpriseIntegrationService {
    * Track shipment
    */
   async trackShipment(integration, shipmentId) {
-    let endpoint = `${integration.endpoint_url}/shipments/${shipmentId}/track`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/shipments/${shipmentId}/track`;
+    const options = {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
+      },
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     if (response.statusCode === 200) {
-      let result = JSON.parse(response.body);
+      const result = JSON.parse(response.body);
       return {
         success: true,
         data: {
@@ -539,15 +539,15 @@ class EnterpriseIntegrationService {
           currentStatus: result.status,
           location: result.current_location,
           estimatedDelivery: result.estimated_delivery,
-          trackingHistory: result.tracking_history
-        }
+          trackingHistory: result.tracking_history,
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Failed to track shipment',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -555,32 +555,32 @@ class EnterpriseIntegrationService {
    * Update shipment
    */
   async updateShipment(integration, shipmentData) {
-    let endpoint = `${integration.endpoint_url}/shipments/${shipmentData.shipmentId}`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/shipments/${shipmentData.shipmentId}`;
+    const options = {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(shipmentData)
+      body: JSON.stringify(shipmentData),
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     if (response.statusCode === 200) {
       return {
         success: true,
         data: {
           shipmentId: shipmentData.shipmentId,
-          updatedAt: new Date().toISOString()
-        }
+          updatedAt: new Date().toISOString(),
+        },
       };
     }
-    
+
     return {
       success: false,
       error: 'Failed to update shipment',
-      details: response.body
+      details: response.body,
     };
   }
 
@@ -588,27 +588,27 @@ class EnterpriseIntegrationService {
    * Send analytics event
    */
   async sendAnalyticsEvent(integration, eventType, eventData, userId, sessionId) {
-    let endpoint = `${integration.endpoint_url}/events`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/events`;
+    const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         event_type: eventType,
         event_data: eventData,
         user_id: userId,
         session_id: sessionId,
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     return {
       eventId: `evt-${Date.now()}`,
-      status: response.statusCode === 200 ? 'delivered' : 'failed'
+      status: response.statusCode === 200 ? 'delivered' : 'failed',
     };
   }
 
@@ -616,26 +616,26 @@ class EnterpriseIntegrationService {
    * Send message
    */
   async sendMessage(integration, channel, recipients, message, templateId) {
-    let endpoint = `${integration.endpoint_url}/messages`;
-    let options = {
+    const endpoint = `${integration.endpoint_url}/messages`;
+    const options = {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.decryptApiKey(integration.api_key)}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.decryptApiKey(integration.api_key)}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         channel,
         recipients,
         message,
-        template_id: templateId
-      })
+        template_id: templateId,
+      }),
     };
 
-    let response = await this.makeHttpRequest(endpoint, options);
-    
+    const response = await this.makeHttpRequest(endpoint, options);
+
     return {
       messageId: `msg-${Date.now()}`,
-      status: response.statusCode === 200 ? 'sent' : 'failed'
+      status: response.statusCode === 200 ? 'sent' : 'failed',
     };
   }
 
@@ -655,17 +655,17 @@ class EnterpriseIntegrationService {
           resolve({
             statusCode: res.statusCode,
             body: data,
-            responseTime: Date.now() - startTime
+            responseTime: Date.now() - startTime,
           });
         });
       });
 
       req.on('error', reject);
-      
+
       if (options.body) {
         req.write(options.body);
       }
-      
+
       req.end();
     });
   }
@@ -675,26 +675,26 @@ class EnterpriseIntegrationService {
    */
   validatePaymentData(paymentData) {
     const errors = [];
-    
+
     if (!paymentData.amount || paymentData.amount <= 0) {
       errors.push('Invalid amount');
     }
-    
+
     if (!paymentData.currency || paymentData.currency.length !== 3) {
       errors.push('Invalid currency code');
     }
-    
+
     if (!paymentData.orderId) {
       errors.push('Order ID is required');
     }
-    
+
     if (!paymentData.customerDetails || !paymentData.customerDetails.email) {
       errors.push('Customer email is required');
     }
-    
+
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -702,7 +702,7 @@ class EnterpriseIntegrationService {
    * Store payment record
    */
   async storePaymentRecord(paymentResult, integrationId) {
-    let query = `
+    const query = `
       INSERT INTO payment_records (
         payment_id, integration_id, order_id, amount,
         currency, status, transaction_id, created_at
@@ -716,7 +716,7 @@ class EnterpriseIntegrationService {
       paymentResult.data.amount,
       paymentResult.data.currency,
       paymentResult.data.status,
-      paymentResult.data.transactionId
+      paymentResult.data.transactionId,
     ]);
   }
 
@@ -724,7 +724,7 @@ class EnterpriseIntegrationService {
    * Log sync activity
    */
   async logSyncActivity(integrationId, syncConfig, syncResult) {
-    let query = `
+    const query = `
       INSERT INTO integration_sync_logs (
         integration_id, sync_type, data_type, sync_direction,
         records_processed, status, error_message, created_at
@@ -738,7 +738,7 @@ class EnterpriseIntegrationService {
       syncConfig.syncDirection,
       syncResult.recordsProcessed,
       syncResult.status,
-      syncResult.error || null
+      syncResult.error || null,
     ]);
   }
 
@@ -769,7 +769,7 @@ class EnterpriseIntegrationService {
    * Get organization integrations
    */
   async getOrganizationIntegrations(organizationId) {
-    let query = `
+    const query = `
       SELECT integration_id, integration_type, integration_name,
              status, created_at, last_tested
       FROM enterprise_integrations
@@ -777,15 +777,15 @@ class EnterpriseIntegrationService {
       ORDER BY created_at DESC
     `;
 
-    let result = await db.query(query, [organizationId]);
-    
+    const result = await db.query(query, [organizationId]);
+
     return {
       success: true,
       data: {
         organizationId,
         integrationCount: result.rows.length,
-        integrations: result.rows
-      }
+        integrations: result.rows,
+      },
     };
   }
 
@@ -793,15 +793,15 @@ class EnterpriseIntegrationService {
    * Deactivate integration
    */
   async deactivateIntegration(integrationId) {
-    let query = `
+    const query = `
       UPDATE enterprise_integrations
       SET status = 'inactive', deactivated_at = NOW()
       WHERE integration_id = $1
       RETURNING integration_id, status
     `;
 
-    let result = await db.query(query, [integrationId]);
-    
+    const result = await db.query(query, [integrationId]);
+
     // Remove from active integrations
     this.activeIntegrations.delete(integrationId);
 
@@ -810,8 +810,8 @@ class EnterpriseIntegrationService {
       data: {
         integrationId: result.rows[0].integration_id,
         status: result.rows[0].status,
-        deactivatedAt: new Date().toISOString()
-      }
+        deactivatedAt: new Date().toISOString(),
+      },
     };
   }
 
@@ -819,18 +819,18 @@ class EnterpriseIntegrationService {
    * Get integration health status
    */
   async getIntegrationHealth(integrationId) {
-    let integration = await this.getIntegration(integrationId);
+    const integration = await this.getIntegration(integrationId);
     if (!integration) {
       return {
         success: false,
         error: 'Integration not found',
-        integrationId
+        integrationId,
       };
     }
 
     const healthCheck = await this.testConnection(
       integration.endpoint_url,
-      this.decryptApiKey(integration.api_key)
+      this.decryptApiKey(integration.api_key),
     );
 
     // Get recent sync activity
@@ -844,8 +844,8 @@ class EnterpriseIntegrationService {
         connectionStatus: healthCheck.success ? 'healthy' : 'unhealthy',
         lastTested: integration.last_tested,
         recentSyncActivity: syncActivity,
-        activeSince: integration.created_at
-      }
+        activeSince: integration.created_at,
+      },
     };
   }
 
@@ -853,7 +853,7 @@ class EnterpriseIntegrationService {
    * Get recent sync activity
    */
   async getRecentSyncActivity(integrationId) {
-    let query = `
+    const query = `
       SELECT sync_type, data_type, sync_direction,
              records_processed, status, created_at
       FROM integration_sync_logs
@@ -862,7 +862,7 @@ class EnterpriseIntegrationService {
       LIMIT 10
     `;
 
-    let result = await db.query(query, [integrationId]);
+    const result = await db.query(query, [integrationId]);
     return result.rows;
   }
 

@@ -26,10 +26,10 @@ async function getSetting(req, res) {
 
 async function upsertSetting(req, res) {
   try {
-    let name = req.params.name;
+    const name = req.params.name;
     const value = req.body.value;
     const description = req.body.description;
-    let row = await service.upsertSetting(name, value, description);
+    const row = await service.upsertSetting(name, value, description);
     res.json({ success: true, data: row });
   } catch (error) {
     logger.error('upsertSetting error', { error: error.message });
@@ -79,13 +79,13 @@ async function getPredictiveMaintenance(req, res) {
   }
 }
 
-module.exports = { 
-  listSettings, 
-  getSetting, 
-  upsertSetting, 
+module.exports = {
+  listSettings,
+  getSetting,
+  upsertSetting,
   ingestAudit,
   getSystemAnalytics,
   detectAnomalies,
-  getPredictiveMaintenance
+  getPredictiveMaintenance,
 };
 

@@ -133,5 +133,5 @@ module.exports = {
   getDisasterAlertAdvisory: async (req, res) => {
     try { const advisory = await trendService.getDisasterAlertAdvisory(req.params.id); if (!advisory) return res.status(404).json({ success: false, error: 'Disaster alert not found' }); res.json({ success: true, data: advisory }); }
     catch (error) { sendError(res, error); }
-  }
+  },
 };

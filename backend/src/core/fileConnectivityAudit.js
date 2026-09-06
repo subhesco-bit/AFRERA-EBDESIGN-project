@@ -11,7 +11,7 @@ class FileConnectivityAudit {
       connected: [],
       orphaned: [],
       partial: [],
-      total: 0
+      total: 0,
     };
     this.connections = new Map();
     this.claudeIntegrationPoints = [
@@ -22,7 +22,7 @@ class FileConnectivityAudit {
       'services/',
       'routes/',
       'middleware/',
-      'database/'
+      'database/',
     ];
   }
 
@@ -38,7 +38,7 @@ class FileConnectivityAudit {
         connectedFiles: 0,
         orphanedFiles: 0,
         partiallyConnectedFiles: 0,
-        connectivityRate: 0
+        connectivityRate: 0,
       },
       byCategory: {
         services: { total: 0, connected: 0, orphaned: 0 },
@@ -49,12 +49,12 @@ class FileConnectivityAudit {
         core: { total: 0, connected: 0, orphaned: 0 },
         config: { total: 0, connected: 0, orphaned: 0 },
         tests: { total: 0, connected: 0, orphaned: 0 },
-        other: { total: 0, connected: 0, orphaned: 0 }
+        other: { total: 0, connected: 0, orphaned: 0 },
       },
       connected: [],
       orphaned: [],
       partial: [],
-      claudeIntegrationPoints: this.claudeIntegrationPoints
+      claudeIntegrationPoints: this.claudeIntegrationPoints,
     };
 
     try {
@@ -73,7 +73,7 @@ class FileConnectivityAudit {
             file: path.relative(rootDir, filePath),
             category,
             connectionPoints: connectivityStatus.connectionPoints,
-            referencedBy: connectivityStatus.referencedBy
+            referencedBy: connectivityStatus.referencedBy,
           });
           report.byCategory[category].connected++;
           report.summary.connectedFiles++;
@@ -82,7 +82,7 @@ class FileConnectivityAudit {
             file: path.relative(rootDir, filePath),
             category,
             connectionPoints: connectivityStatus.connectionPoints,
-            missingConnections: connectivityStatus.missingConnections
+            missingConnections: connectivityStatus.missingConnections,
           });
           report.byCategory[category].connected++;
           report.summary.partiallyConnectedFiles++;
@@ -91,7 +91,7 @@ class FileConnectivityAudit {
             file: path.relative(rootDir, filePath),
             category,
             size: fs.statSync(filePath).size,
-            lastModified: fs.statSync(filePath).mtime
+            lastModified: fs.statSync(filePath).mtime,
           });
           report.byCategory[category].orphaned++;
           report.summary.orphanedFiles++;
@@ -100,8 +100,8 @@ class FileConnectivityAudit {
 
       // Calculate connectivity rate
       report.summary.connectivityRate =
-        ((report.summary.connectedFiles + report.summary.partiallyConnectedFiles) /
-         report.summary.totalFiles * 100).toFixed(2) + '%';
+        `${((report.summary.connectedFiles + report.summary.partiallyConnectedFiles) /
+         report.summary.totalFiles * 100).toFixed(2) }%`;
 
       return report;
     } catch (error) {
@@ -139,7 +139,7 @@ class FileConnectivityAudit {
         'core/validation',
         'core/monitoring',
         'core/productionService',
-        'core/enhancedServiceFramework'
+        'core/enhancedServiceFramework',
       ];
 
       for (const requires of claudeRequires) {
@@ -177,7 +177,7 @@ class FileConnectivityAudit {
         isConnected,
         isPartial,
         connectionPoints,
-        referencedBy
+        referencedBy,
       };
     } catch (error) {
       logger.error(`Error checking connectivity for ${filePath}`, error);
@@ -185,7 +185,7 @@ class FileConnectivityAudit {
         isConnected: false,
         isPartial: false,
         connectionPoints: [],
-        referencedBy: []
+        referencedBy: [],
       };
     }
   }
@@ -230,7 +230,7 @@ class FileConnectivityAudit {
       const indexPath = path.join(rootDir, 'src', 'core', 'index.js');
       if (fs.existsSync(indexPath)) {
         const indexContent = fs.readFileSync(indexPath, 'utf8');
-        let fileName = path.basename(filePath, path.extname(filePath));
+        const fileName = path.basename(filePath, path.extname(filePath));
         return indexContent.includes(fileName);
       }
       return false;
@@ -266,11 +266,11 @@ class FileConnectivityAudit {
    * Generate detailed connectivity report
    */
   generateDetailedReport(auditResults) {
-    let report = `# File Connectivity Audit Report\n`;
+    let report = '# File Connectivity Audit Report\n';
     report += `Generated: ${auditResults.timestamp}\n\n`;
 
     // Summary
-    report += `## Summary\n`;
+    report += '## Summary\n';
     report += `- Total Files: ${auditResults.summary.totalFiles}\n`;
     report += `- Connected: ${auditResults.summary.connectedFiles}\n`;
     report += `- Partially Connected: ${auditResults.summary.partiallyConnectedFiles}\n`;
@@ -278,7 +278,7 @@ class FileConnectivityAudit {
     report += `- Connectivity Rate: ${auditResults.summary.connectivityRate}\n\n`;
 
     // By Category
-    report += `## Connectivity by Category\n`;
+    report += '## Connectivity by Category\n';
     for (const [category, stats] of Object.entries(auditResults.byCategory)) {
       if (stats.total > 0) {
         const rate = ((stats.connected / stats.total) * 100).toFixed(1);
@@ -298,7 +298,7 @@ class FileConnectivityAudit {
       if (auditResults.orphaned.length > 20) {
         report += `- ... and ${auditResults.orphaned.length - 20} more\n`;
       }
-      report += `\n`;
+      report += '\n';
     }
 
     // Partially Connected Files
@@ -308,11 +308,11 @@ class FileConnectivityAudit {
         report += `- ${file.file}\n`;
         report += `  Connections: ${file.connectionPoints.join(', ')}\n`;
       }
-      report += `\n`;
+      report += '\n';
     }
 
     // Claude Integration Points
-    report += `## Claude Integration Points\n`;
+    report += '## Claude Integration Points\n';
     for (const point of auditResults.claudeIntegrationPoints) {
       report += `- ${point}\n`;
     }

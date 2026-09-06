@@ -1,6 +1,6 @@
 /**
  * Rural Finance Service
- * 
+ *
  * Wires the existing `rural_finance` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for rural financial services
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getRuralFinance(financeId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM rural_finance WHERE finance_id = $1`,
-      [financeId]
+      'SELECT * FROM rural_finance WHERE finance_id = $1',
+      [financeId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Rural finance record not found: ${financeId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get rural finance: ${error.message}`);
@@ -43,10 +43,10 @@ async function getRuralFinance(financeId) {
 async function getRuralFinanceByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM rural_finance WHERE village_id = $1 ORDER BY service_type`,
-      [villageId]
+      'SELECT * FROM rural_finance WHERE village_id = $1 ORDER BY service_type',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get rural finance by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getRuralFinanceByVillage(villageId) {
 async function getRuralFinanceByServiceType(serviceType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM rural_finance WHERE service_type = $1 ORDER BY village_id`,
-      [serviceType]
+      'SELECT * FROM rural_finance WHERE service_type = $1 ORDER BY village_id',
+      [serviceType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get rural finance by service type: ${error.message}`);
@@ -93,7 +93,7 @@ async function upsertRuralFinance(finance) {
       average_loan_size,
       repayment_rate,
       interest_rate_range,
-      last_updated
+      last_updated,
     } = finance;
 
     const { rows } = await pool.query(
@@ -118,8 +118,8 @@ async function upsertRuralFinance(finance) {
          last_updated = NOW()
        RETURNING *`,
       [finance_id, village_id, district, service_type, provider_id,
-       provider_name, service_coverage, active_borrowers, total_loan_portfolio,
-       average_loan_size, repayment_rate, interest_rate_range]
+        provider_name, service_coverage, active_borrowers, total_loan_portfolio,
+        average_loan_size, repayment_rate, interest_rate_range],
     );
 
     logger.info(`Rural finance upserted: ${finance_id}`);
@@ -148,7 +148,7 @@ async function getVillageFinanceSummary(villageId) {
        FROM rural_finance
        WHERE village_id = $1
        GROUP BY service_type`,
-      [villageId]
+      [villageId],
     );
 
     return {
@@ -159,8 +159,8 @@ async function getVillageFinanceSummary(villageId) {
         totalActiveBorrowers: row.total_active_borrowers ? parseInt(row.total_active_borrowers) : 0,
         totalLoanPortfolio: row.total_loan_portfolio ? r2(row.total_loan_portfolio) : 0,
         avgLoanSize: row.avg_loan_size ? r2(row.avg_loan_size) : 0,
-        avgRepaymentRate: row.avg_repayment_rate ? r2(row.avg_repayment_rate) : 0
-      }))
+        avgRepaymentRate: row.avg_repayment_rate ? r2(row.avg_repayment_rate) : 0,
+      })),
     };
   } catch (error) {
     logger.error(`Failed to get village finance summary: ${error.message}`);
@@ -195,7 +195,7 @@ function setupRoutes(app) {
 
   router.get('/finance/service/:serviceType', async (req, res) => {
     try {
-      let financeRecords = await getRuralFinanceByServiceType(req.params.serviceType);
+      const financeRecords = await getRuralFinanceByServiceType(req.params.serviceType);
       res.json({ success: true, data: financeRecords });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -213,7 +213,7 @@ function setupRoutes(app) {
 
   router.post('/finance', async (req, res) => {
     try {
-      let finance = await upsertRuralFinance(req.body);
+      const finance = await upsertRuralFinance(req.body);
       res.status(201).json({ success: true, data: finance });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -230,8 +230,6 @@ module.exports = {
   getRuralFinanceByServiceType,
   upsertRuralFinance,
   getVillageFinanceSummary,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

@@ -44,7 +44,7 @@ class ForestryService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting forestry:', error);
@@ -58,12 +58,12 @@ class ForestryService {
   async getForestryById(forestryId) {
     try {
       const query = 'SELECT * FROM forestry WHERE id = $1';
-      let result = await this.pool.query(query, [forestryId]);
-      
+      const result = await this.pool.query(query, [forestryId]);
+
       if (result.rows.length === 0) {
         throw new Error('Forestry not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting forestry by ID:', error);
@@ -84,17 +84,17 @@ class ForestryService {
         area_hectares,
         species,
         planting_date,
-        expected_harvest_date
+        expected_harvest_date,
       } = forestryData;
 
-      let query = `
+      const query = `
         INSERT INTO forestry (farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
-        farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date
+      const result = await this.pool.query(query, [
+        farmer_id, name, location, type, area_hectares, species, planting_date, expected_harvest_date,
       ]);
 
       return result.rows[0];
@@ -109,13 +109,13 @@ class ForestryService {
    */
   async getTimberInventory(forestryId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM timber_inventory
         WHERE forestry_id = $1
         ORDER BY inventory_date DESC
       `;
 
-      let result = await this.pool.query(query, [forestryId]);
+      const result = await this.pool.query(query, [forestryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting timber inventory:', error);
@@ -128,13 +128,13 @@ class ForestryService {
    */
   async getPlantationData(forestryId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM plantation_data
         WHERE forestry_id = $1
         ORDER BY assessment_date DESC
       `;
 
-      let result = await this.pool.query(query, [forestryId]);
+      const result = await this.pool.query(query, [forestryId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting plantation data:', error);
@@ -144,6 +144,4 @@ class ForestryService {
 }
 
 module.exports = new ForestryService();
-
-
 

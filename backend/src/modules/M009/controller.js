@@ -22,7 +22,7 @@ async function getSecurityEvents(req, res) {
       eventType: req.query.eventType,
       severity: req.query.severity,
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
     const result = await service.getSecurityEvents(filters);
     res.json({ success: true, data: result });
@@ -83,7 +83,7 @@ async function checkIpAccess(req, res) {
 async function checkRateLimit(req, res) {
   try {
     const { identifier, limit, windowMinutes } = req.body;
-    let result = await service.checkRateLimit(identifier, limit, windowMinutes);
+    const result = await service.checkRateLimit(identifier, limit, windowMinutes);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('checkRateLimit error', { error: error.message });
@@ -127,7 +127,7 @@ async function createAccessPolicy(req, res) {
 async function evaluateAccessPolicy(req, res) {
   try {
     const { userId, resource, action } = req.body;
-    let result = await service.evaluateAccessPolicy(userId, resource, action);
+    const result = await service.evaluateAccessPolicy(userId, resource, action);
     res.json({ success: true, data: result });
   } catch (error) {
     logger.error('evaluateAccessPolicy error', { error: error.message });
@@ -139,22 +139,22 @@ module.exports = {
   // Security event logging
   createSecurityEvent,
   getSecurityEvents,
-  
+
   // IP whitelist/blacklist
   addToIpList,
   removeFromIpList,
   getIpLists,
   checkIpAccess,
-  
+
   // Rate limiting
   checkRateLimit,
-  
+
   // AI-powered threat detection
   detectThreats,
-  
+
   // Security score
   calculateSecurityScore,
-  
+
   // Access control policies
   createAccessPolicy,
   evaluateAccessPolicy,

@@ -6,7 +6,7 @@ describe('Farmer Journey E2E Tests', () => {
         email: 'farmer@example.com',
         password: 'Farmer@123',
         name: 'Rajesh Das',
-        phone: '+919876543210'
+        phone: '+919876543210',
       };
 
       const registrationResponse = {
@@ -14,8 +14,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           id: 'farmer-123',
           email: registrationData.email,
-          name: registrationData.name
-        }
+          name: registrationData.name,
+        },
       };
 
       expect(registrationResponse.status).toBe(201);
@@ -25,15 +25,15 @@ describe('Farmer Journey E2E Tests', () => {
         userId: 'farmer-123',
         aadhaar: '1234-5678-9012',
         landRecords: ['land-doc-1.pdf'],
-        bankAccount: 'HDFC0001234'
+        bankAccount: 'HDFC0001234',
       };
 
       const kycResponse = {
         status: 200,
         data: {
           status: 'verified',
-          verifiedAt: new Date()
-        }
+          verifiedAt: new Date(),
+        },
       };
 
       expect(kycResponse.status).toBe(200);
@@ -44,10 +44,10 @@ describe('Farmer Journey E2E Tests', () => {
         farmerId: 'farmer-123',
         location: {
           latitude: 26.1445,
-          longitude: 91.7362
+          longitude: 91.7362,
         },
         area: 2.5,
-        soilType: 'Alluvial'
+        soilType: 'Alluvial',
       };
 
       const farmResponse = {
@@ -55,8 +55,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           id: 'farm-123',
           ...farmData,
-          fdiScore: 65
-        }
+          fdiScore: 65,
+        },
       };
 
       expect(farmResponse.status).toBe(201);
@@ -70,15 +70,15 @@ describe('Farmer Journey E2E Tests', () => {
         price: 50,
         quantity: 500,
         unit: 'kg',
-        isOrganic: true
+        isOrganic: true,
       };
 
       const productResponse = {
         status: 201,
         data: {
           id: 'prod-123',
-          ...productData
-        }
+          ...productData,
+        },
       };
 
       expect(productResponse.status).toBe(201);
@@ -89,8 +89,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           orderId: 'order-123',
           items: [{ productId: 'prod-123', quantity: 100 }],
-          totalAmount: 5000
-        }
+          totalAmount: 5000,
+        },
       };
 
       expect(orderResponse.status).toBe(200);
@@ -105,15 +105,15 @@ describe('Farmer Journey E2E Tests', () => {
         email: 'buyer@example.com',
         password: 'Buyer@123',
         name: 'Amit Sharma',
-        phone: '+919876543211'
+        phone: '+919876543211',
       };
 
       const buyerResponse = {
         status: 201,
         data: {
           id: 'buyer-123',
-          email: buyerData.email
-        }
+          email: buyerData.email,
+        },
       };
 
       expect(buyerResponse.status).toBe(201);
@@ -124,10 +124,10 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           products: [
             { id: 'prod-1', name: 'Organic Rice', price: 50 },
-            { id: 'prod-2', name: 'Organic Wheat', price: 40 }
+            { id: 'prod-2', name: 'Organic Wheat', price: 40 },
           ],
-          total: 2
-        }
+          total: 2,
+        },
       };
 
       expect(browseResponse.status).toBe(200);
@@ -138,10 +138,10 @@ describe('Farmer Journey E2E Tests', () => {
         status: 200,
         data: {
           items: [
-            { productId: 'prod-1', quantity: 10, price: 50 }
+            { productId: 'prod-1', quantity: 10, price: 50 },
           ],
-          totalAmount: 500
-        }
+          totalAmount: 500,
+        },
       };
 
       expect(cartResponse.status).toBe(200);
@@ -154,9 +154,9 @@ describe('Farmer Journey E2E Tests', () => {
           street: '456 Market St',
           city: 'Guwahati',
           state: 'Assam',
-          zip: '781002'
+          zip: '781002',
         },
-        paymentMethod: 'UPI'
+        paymentMethod: 'UPI',
       };
 
       const orderResponse = {
@@ -165,8 +165,8 @@ describe('Farmer Journey E2E Tests', () => {
           id: 'order-456',
           ...orderData,
           status: 'pending',
-          totalAmount: 500
-        }
+          totalAmount: 500,
+        },
       };
 
       expect(orderResponse.status).toBe(201);
@@ -178,8 +178,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           paymentId: 'pay-123',
           status: 'success',
-          amount: 500
-        }
+          amount: 500,
+        },
       };
 
       expect(paymentResponse.status).toBe(200);
@@ -191,8 +191,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           orderId: 'order-456',
           status: 'shipped',
-          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-        }
+          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        },
       };
 
       expect(trackingResponse.status).toBe(200);
@@ -211,16 +211,16 @@ describe('Farmer Journey E2E Tests', () => {
               code: 'PMFBY',
               name: 'Pradhan Mantri Fasal Bima Yojana',
               eligible: true,
-              subsidyPercentage: 50
+              subsidyPercentage: 50,
             },
             {
               code: 'PM-KISAN',
               name: 'Pradhan Mantri Kisan Samman Nidhi',
               eligible: true,
-              subsidyAmount: 6000
-            }
-          ]
-        }
+              subsidyAmount: 6000,
+            },
+          ],
+        },
       };
 
       expect(eligibilityResponse.status).toBe(200);
@@ -230,7 +230,7 @@ describe('Farmer Journey E2E Tests', () => {
       const applicationData = {
         farmerId: 'farmer-123',
         schemeCode: 'PMFBY',
-        documents: ['aadhaar.pdf', 'land-record.pdf']
+        documents: ['aadhaar.pdf', 'land-record.pdf'],
       };
 
       const applicationResponse = {
@@ -238,8 +238,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           applicationId: 'app-123',
           status: 'submitted',
-          submittedAt: new Date()
-        }
+          submittedAt: new Date(),
+        },
       };
 
       expect(applicationResponse.status).toBe(201);
@@ -251,8 +251,8 @@ describe('Farmer Journey E2E Tests', () => {
         data: {
           applicationId: 'app-123',
           status: 'under_review',
-          currentStage: 'document_verification'
-        }
+          currentStage: 'document_verification',
+        },
       };
 
       expect(trackingResponse.status).toBe(200);
@@ -265,8 +265,8 @@ describe('Farmer Journey E2E Tests', () => {
           applicationId: 'app-123',
           status: 'approved',
           subsidyAmount: 3000,
-          approvedAt: new Date()
-        }
+          approvedAt: new Date(),
+        },
       };
 
       expect(approvalResponse.status).toBe(200);

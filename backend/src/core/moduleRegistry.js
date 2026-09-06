@@ -28,9 +28,9 @@ class ModuleRegistry {
    */
   async initialize() {
     console.log('Initializing Module Registry...');
-    
+
     await this.libraryService.initialize();
-    
+
     console.log('Module Registry initialized successfully');
   }
 
@@ -40,16 +40,16 @@ class ModuleRegistry {
   async discover(query, context = {}) {
     try {
       const result = await this.libraryService.discoverModules(query, context);
-      
+
       console.log(`Discovered ${result.modules.length} modules for query: "${query}"`);
-      
+
       return result;
     } catch (error) {
       console.error('Module discovery failed:', error);
       return {
         success: false,
         error: error.message,
-        modules: []
+        modules: [],
       };
     }
   }
@@ -59,31 +59,31 @@ class ModuleRegistry {
    */
   async discoverByCapabilities(requirements, context = {}) {
     try {
-      const query = requirements.requiredCapabilities.join(' ') + ' ' + 
-                   requirements.optionalCapabilities.join(' ');
-      
-      let result = await this.discover(query, context);
-      
+      const query = `${requirements.requiredCapabilities.join(' ') } ${
+        requirements.optionalCapabilities.join(' ')}`;
+
+      const result = await this.discover(query, context);
+
       // Filter by capability requirements
       const filteredModules = result.modules.filter(module => {
-        const hasAllRequired = requirements.requiredCapabilities.every(cap => 
-          module.capabilities.includes(cap)
+        const hasAllRequired = requirements.requiredCapabilities.every(cap =>
+          module.capabilities.includes(cap),
         );
-        
+
         return hasAllRequired;
       });
 
       return {
         success: true,
         modules: filteredModules,
-        metadata: result.metadata
+        metadata: result.metadata,
       };
     } catch (error) {
       console.error('Capability-based discovery failed:', error);
       return {
         success: false,
         error: error.message,
-        modules: []
+        modules: [],
       };
     }
   }
@@ -101,7 +101,7 @@ class ModuleRegistry {
         return {
           success: true,
           message: 'Module already loaded',
-          module: this.loadedModules.get(moduleId)
+          module: this.loadedModules.get(moduleId),
         };
       }
 
@@ -111,7 +111,7 @@ class ModuleRegistry {
       if (this.loadingInProgress.has(moduleId)) {
         return {
           success: false,
-          error: `Circular dependency detected: ${moduleId} is already being loaded`
+          error: `Circular dependency detected: ${moduleId} is already being loaded`,
         };
       }
       this.loadingInProgress.add(moduleId);
@@ -122,7 +122,7 @@ class ModuleRegistry {
         this.loadingInProgress.delete(moduleId);
         return {
           success: false,
-          error: `Module ${moduleId} not found`
+          error: `Module ${moduleId} not found`,
         };
       }
 
@@ -132,7 +132,7 @@ class ModuleRegistry {
         this.loadingInProgress.delete(moduleId);
         return {
           success: false,
-          error: `Failed to resolve dependencies for ${moduleId}`
+          error: `Failed to resolve dependencies for ${moduleId}`,
         };
       }
 
@@ -144,7 +144,7 @@ class ModuleRegistry {
             this.loadingInProgress.delete(moduleId);
             return {
               success: false,
-              error: `Failed to load dependency ${depId}`
+              error: `Failed to load dependency ${depId}`,
             };
           }
         }
@@ -156,14 +156,14 @@ class ModuleRegistry {
       const modulePath = moduleInfo.module.path;
       const manifestServicePath = path.join(modulePath, 'backend', 'service.js');
       const flatServicePath = path.join(modulePath, 'service.js');
-      const backendServicePath = fs.existsSync(manifestServicePath)
-        ? manifestServicePath
-        : (fs.existsSync(flatServicePath) ? flatServicePath : null);
+      const backendServicePath = fs.existsSync(manifestServicePath) ?
+        manifestServicePath :
+        (fs.existsSync(flatServicePath) ? flatServicePath : null);
 
       if (!backendServicePath) {
         return {
           success: false,
-          error: `Backend service not found under ${modulePath}`
+          error: `Backend service not found under ${modulePath}`,
         };
       }
 
@@ -177,7 +177,7 @@ class ModuleRegistry {
         if (typeof moduleInstance.execute !== 'function') {
           return {
             success: false,
-            error: `Module ${moduleId} class export has no execute() method`
+            error: `Module ${moduleId} class export has no execute() method`,
           };
         }
         if (typeof moduleInstance.initialize !== 'function') {
@@ -208,46 +208,46 @@ class ModuleRegistry {
             if (typeof required[operation] !== 'function') {
               return {
                 success: false,
-                error: `Unknown operation "${operation}" on ${moduleId}. Available: ${availableOps.join(', ')}`
+                error: `Unknown operation "${operation}" on ${moduleId}. Available: ${availableOps.join(', ')}`,
               };
             }
             const data = await required[operation](parameters, context);
             return { success: true, data };
-          }
+          },
         };
       } else {
         return {
           success: false,
-          error: `Module ${moduleId} export shape not recognized (expected a class or an object of functions)`
+          error: `Module ${moduleId} export shape not recognized (expected a class or an object of functions)`,
         };
       }
 
       // Initialize module
       await moduleInstance.initialize({
-        moduleId: moduleId,
-        libraryService: this.libraryService
+        moduleId,
+        libraryService: this.libraryService,
       });
 
       // Cache loaded module
       this.loadedModules.set(moduleId, {
         instance: moduleInstance,
         info: moduleInfo.module,
-        loadedAt: new Date().toISOString()
+        loadedAt: new Date().toISOString(),
       });
 
       // Update registry status
       await this.libraryService.updateModuleStatus(moduleId, {
         loaded: true,
         initialized: true,
-        healthy: true
+        healthy: true,
       });
 
       console.log(`Module ${moduleId} loaded successfully`);
-      
+
       return {
         success: true,
         message: 'Module loaded successfully',
-        module: this.loadedModules.get(moduleId)
+        module: this.loadedModules.get(moduleId),
       };
     } catch (error) {
       console.error(`Failed to load module ${moduleId}:`, error);
@@ -256,12 +256,12 @@ class ModuleRegistry {
       await this.libraryService.updateModuleStatus(moduleId, {
         loaded: false,
         initialized: false,
-        healthy: false
+        healthy: false,
       });
 
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     } finally {
       // Guaranteed cleanup on every exit path (success, early return, or thrown
@@ -277,14 +277,14 @@ class ModuleRegistry {
   async execute(moduleId, operation, parameters = {}, context = {}) {
     try {
       console.log(`Executing operation ${operation} on module ${moduleId}`);
-      
+
       // Ensure module is loaded
       if (!this.loadedModules.has(moduleId)) {
         const loadResult = await this.load(moduleId);
         if (!loadResult.success) {
           return {
             success: false,
-            error: `Failed to load module ${moduleId}`
+            error: `Failed to load module ${moduleId}`,
           };
         }
       }
@@ -294,35 +294,35 @@ class ModuleRegistry {
 
       // Execute operation
       const startTime = Date.now();
-      let result = await moduleInstance.execute(operation, parameters, context);
+      const result = await moduleInstance.execute(operation, parameters, context);
       const executionTime = Date.now() - startTime;
 
       // Add execution metadata
       if (result.success) {
         result.metadata = {
           ...result.metadata,
-          operation: operation,
-          moduleId: moduleId,
+          operation,
+          moduleId,
           executionTime: `${executionTime}ms`,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
       console.log(`Operation ${operation} completed in ${executionTime}ms`);
-      
+
       return result;
     } catch (error) {
       console.error(`Failed to execute operation ${operation} on module ${moduleId}:`, error);
-      
+
       return {
         success: false,
         error: {
           code: 'MODULE_EXECUTION_ERROR',
           message: error.message,
-          operation: operation,
-          moduleId: moduleId,
-          timestamp: new Date().toISOString()
-        }
+          operation,
+          moduleId,
+          timestamp: new Date().toISOString(),
+        },
       };
     }
   }
@@ -333,16 +333,16 @@ class ModuleRegistry {
   async unload(moduleId) {
     try {
       console.log(`Unloading module: ${moduleId}`);
-      
+
       if (!this.loadedModules.has(moduleId)) {
         return {
           success: true,
-          message: 'Module not loaded'
+          message: 'Module not loaded',
         };
       }
 
-      let moduleData = this.loadedModules.get(moduleId);
-      let moduleInstance = moduleData.instance;
+      const moduleData = this.loadedModules.get(moduleId);
+      const moduleInstance = moduleData.instance;
 
       // Shutdown module if method exists
       if (typeof moduleInstance.shutdown === 'function') {
@@ -356,21 +356,21 @@ class ModuleRegistry {
       await this.libraryService.updateModuleStatus(moduleId, {
         loaded: false,
         initialized: false,
-        healthy: false
+        healthy: false,
       });
 
       console.log(`Module ${moduleId} unloaded successfully`);
-      
+
       return {
         success: true,
-        message: 'Module unloaded successfully'
+        message: 'Module unloaded successfully',
       };
     } catch (error) {
       console.error(`Failed to unload module ${moduleId}:`, error);
-      
+
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -383,18 +383,18 @@ class ModuleRegistry {
       if (!this.loadedModules.has(moduleId)) {
         return {
           success: false,
-          error: 'Module not loaded'
+          error: 'Module not loaded',
         };
       }
 
-      let moduleData = this.loadedModules.get(moduleId);
-      let moduleInstance = moduleData.instance;
+      const moduleData = this.loadedModules.get(moduleId);
+      const moduleInstance = moduleData.instance;
 
       if (typeof moduleInstance.healthCheck === 'function') {
         const health = await moduleInstance.healthCheck();
         return {
           success: true,
-          health: health
+          health,
         };
       }
 
@@ -402,15 +402,15 @@ class ModuleRegistry {
         success: true,
         health: {
           status: 'unknown',
-          message: 'Health check not implemented'
-        }
+          message: 'Health check not implemented',
+        },
       };
     } catch (error) {
       console.error(`Failed to get health for module ${moduleId}:`, error);
-      
+
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -423,7 +423,7 @@ class ModuleRegistry {
       library: this.libraryService.getStatistics(),
       loadedModules: this.loadedModules.size,
       cachedModules: this.moduleCache.size,
-      executionQueueSize: this.executionQueue.size
+      executionQueueSize: this.executionQueue.size,
     };
   }
 
@@ -434,7 +434,7 @@ class ModuleRegistry {
     return Array.from(this.loadedModules.entries()).map(([id, data]) => ({
       moduleId: id,
       info: data.info,
-      loadedAt: data.loadedAt
+      loadedAt: data.loadedAt,
     }));
   }
 
@@ -450,14 +450,14 @@ class ModuleRegistry {
    */
   async executeWorkflow(workflowSteps, context = {}) {
     const results = [];
-    
+
     for (const step of workflowSteps) {
       const { moduleId, operation, parameters } = step;
-      
-      let result = await this.execute(moduleId, operation, parameters, context);
+
+      const result = await this.execute(moduleId, operation, parameters, context);
       results.push({
-        step: step,
-        result: result
+        step,
+        result,
       });
 
       if (!result.success) {
@@ -468,7 +468,7 @@ class ModuleRegistry {
 
     return {
       success: results.every(r => r.result.success),
-      results: results
+      results,
     };
   }
 }

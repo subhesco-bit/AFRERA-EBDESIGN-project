@@ -6,12 +6,12 @@ class ColdChainMonitoringService {
     try {
       await db('temperature_readings').insert({
         id: require('uuid').v4(), cold_storage_unit_id: unitId, temperature,
-        recorded_at: new Date()
+        recorded_at: new Date(),
       });
       if (temperature > 5 || temperature < -18) {
         await db('temperature_alerts').insert({
           id: require('uuid').v4(), cold_storage_unit_id: unitId,
-          alert_type: temperature > 5 ? 'HIGH_TEMP' : 'LOW_TEMP', created_at: new Date()
+          alert_type: temperature > 5 ? 'HIGH_TEMP' : 'LOW_TEMP', created_at: new Date(),
         });
       }
       logger.info(`Temperature monitored: ${unitId}`);

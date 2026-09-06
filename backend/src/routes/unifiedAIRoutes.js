@@ -10,36 +10,38 @@
 const express = require('express');
 const claudeAICoordinator = require('../core/claudeAICoordinator');
 const { authMiddleware } = require('../middleware/auth');
+const aiDomainAdapterRoutes = require('./aiDomainAdapterRoutes');
 
 const logger = console; // TODO: use Winston/Pino logger
 
 const router = express.Router();
+router.use('/adapters', aiDomainAdapterRoutes);
 
 const AGENTS = [
   {
     id: 'farmer-advisor',
     name: 'Farmer Advisor',
     description: 'Agricultural advisor for farmers',
-    capabilities: ['crop advice', 'pest risk', 'market timing', 'scheme eligibility']
+    capabilities: ['crop advice', 'pest risk', 'market timing', 'scheme eligibility'],
   },
   {
     id: 'business-analyst',
     name: 'Business Analyst',
     description: 'Business intelligence and performance analysis',
-    capabilities: ['financial analysis', 'KPI review', 'forecasting', 'risk assessment']
+    capabilities: ['financial analysis', 'KPI review', 'forecasting', 'risk assessment'],
   },
   {
     id: 'operations-manager',
     name: 'Operations Manager',
     description: 'Workflow and operating optimization',
-    capabilities: ['resource allocation', 'scheduling', 'supply chain', 'workflow automation']
+    capabilities: ['resource allocation', 'scheduling', 'supply chain', 'workflow automation'],
   },
   {
     id: 'governance-agent',
     name: 'Governance Agent',
     description: 'Compliance, audit, and policy monitoring',
-    capabilities: ['policy checks', 'audit trails', 'risk monitoring', 'governance reporting']
-  }
+    capabilities: ['policy checks', 'audit trails', 'risk monitoring', 'governance reporting'],
+  },
 ];
 
 async function coordinate(req, res, requestType, agentPreference) {
@@ -52,57 +54,43 @@ async function coordinate(req, res, requestType, agentPreference) {
       context: req.body?.context || {},
       userId,
       sessionId,
-      agentPreference: req.body?.agentPreference || agentPreference
+      agentPreference: req.body?.agentPreference || agentPreference,
     });
 
     res.json({ success: true, data: response });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to process AI request'
+      error: error.message || 'Failed to process AI request',
     });
   }
 }
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/unified', authMiddleware, (req, res) => {
+router.post('/unified', authMiddleware, (req, res) => {
   coordinate(req, res, req.body?.requestType || 'conversational', req.body?.agentPreference);
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/conversational', authMiddleware, (req, res) => {
+router.post('/conversational', authMiddleware, (req, res) => {
   coordinate(req, res, 'conversational', 'farmer-advisor');
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/analytical', authMiddleware, (req, res) => {
+router.post('/analytical', authMiddleware, (req, res) => {
   coordinate(req, res, 'analytical', 'business-analyst');
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/automation', authMiddleware, (req, res) => {
+router.post('/automation', authMiddleware, (req, res) => {
   coordinate(req, res, 'automation', 'operations-manager');
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/governance', authMiddleware, (req, res) => {
+router.post('/governance', authMiddleware, (req, res) => {
   coordinate(req, res, 'monitoring', 'governance-agent');
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/agents', authMiddleware, (req, res) => {
+router.get('/agents', authMiddleware, (req, res) => {
   res.json({ success: true, data: AGENTS });
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/usage', authMiddleware, (req, res) => {
+router.get('/usage', authMiddleware, (req, res) => {
   res.json({
     success: true,
     data: {
@@ -111,8 +99,8 @@ router.get
       totalCost: 0,
       byAgent: {},
       byRequestType: {},
-      note: 'Usage aggregation requires ai_usage_tracking rows.'
-    }
+      note: 'Usage aggregation requires ai_usage_tracking rows.',
+    },
   });
 });
 

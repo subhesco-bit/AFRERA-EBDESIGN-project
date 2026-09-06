@@ -17,19 +17,19 @@ async function createReturn(returnData) {
       reason,
       quantity,
       status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const aiRequest = {
       task: 'return_analysis',
-      parameters: { return_data: returnData, product_quality: await assessProductQuality(product_id) }
+      parameters: { return_data: returnData, product_quality: await assessProductQuality(product_id) },
     };
     returnRequest.ai_recommendations = await aiAPI.generateRecommendation(aiRequest);
 
     const result = await pool.query(
       `INSERT INTO returns (return_id, order_id, product_id, reason, quantity, status, ai_recommendations, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [returnRequest.return_id, returnRequest.order_id, returnRequest.product_id, returnRequest.reason, returnRequest.quantity, returnRequest.status, JSON.stringify(returnRequest.ai_recommendations), returnRequest.created_at]
+      [returnRequest.return_id, returnRequest.order_id, returnRequest.product_id, returnRequest.reason, returnRequest.quantity, returnRequest.status, JSON.stringify(returnRequest.ai_recommendations), returnRequest.created_at],
     );
 
     logger.info(`Return created: ${returnRequest.return_id}`);
@@ -52,9 +52,9 @@ async function getReturn(returnId) {
 
 async function updateReturnStatus(returnId, status, notes = null) {
   try {
-    let res = await pool.query(
+    const res = await pool.query(
       'UPDATE returns SET status = $1, notes = COALESCE($2, notes), updated_at = NOW() WHERE return_id = $3 RETURNING *',
-      [status, notes, returnId]
+      [status, notes, returnId],
     );
     return res.rows[0] || null;
   } catch (error) {

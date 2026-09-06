@@ -15,7 +15,7 @@ async function createSeedPlan(planData) {
     `INSERT INTO seed_plans (farmer_id, crop_id, variety_id, area, seed_rate, total_seed_required, planting_date, supplier_id, estimated_cost, notes, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'pending', NOW(), NOW())
      RETURNING *`,
-    [farmerId, cropId, varietyId, area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes]
+    [farmerId, cropId, varietyId, area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes],
   );
 
   // Emit signal for seed plan creation
@@ -23,26 +23,26 @@ async function createSeedPlan(planData) {
     entityType: 'seed_plan',
     planId: res.rows[0].id,
     farmerId,
-    cropId
+    cropId,
   }, {
     severity: SEVERITY.INFO,
     source: 'seed_planning_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
 
   return res.rows[0];
 }
 
 async function getSeedPlan(planId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  let res = await pg.query('SELECT * FROM seed_plans WHERE id = $1', [planId]);
+  const res = await pg.query('SELECT * FROM seed_plans WHERE id = $1', [planId]);
   return res.rows[0] || null;
 }
 
 async function listSeedPlans({ page = 1, limit = 20, farmerId, cropId, status } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const offset = (page - 1) * limit;
@@ -66,20 +66,20 @@ async function listSeedPlans({ page = 1, limit = 20, farmerId, cropId, status } 
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
 
-  let res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM seed_plans`, 'SELECT COUNT(*) FROM seed_plans').split('LIMIT')[0], params.slice(0, -2));
+  const res = await pg.query(query, params);
+  const totalRes = await pg.query(query.replace('SELECT * FROM seed_plans', 'SELECT COUNT(*) FROM seed_plans').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
 
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updateSeedPlan(planId, updates) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes, status } = updates;
 
-  let res = await pg.query(
+  const res = await pg.query(
     `UPDATE seed_plans
      SET area = COALESCE($1, area),
          seed_rate = COALESCE($2, seed_rate),
@@ -92,46 +92,46 @@ async function updateSeedPlan(planId, updates) {
          updated_at = NOW()
      WHERE id = $9
      RETURNING *`,
-    [area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes, status, planId]
+    [area, seedRate, totalSeedRequired, plantingDate, supplierId, estimatedCost, notes, status, planId],
   );
 
   // Emit signal for seed plan update
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'seed_plan',
     planId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'seed_planning_service',
-    entityId: planId
+    entityId: planId,
   });
 
   return res.rows[0] || null;
 }
 
 async function deleteSeedPlan(planId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  let res = await pg.query('DELETE FROM seed_plans WHERE id = $1 RETURNING id', [planId]);
+  const res = await pg.query('DELETE FROM seed_plans WHERE id = $1 RETURNING id', [planId]);
 
   if (res.rows[0]) {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
       entityType: 'seed_plan',
-      planId
+      planId,
     }, {
       severity: SEVERITY.INFO,
       source: 'seed_planning_service',
-      entityId: planId
+      entityId: planId,
     });
   }
 
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 // AI-powered seed requirement calculation
 async function calculateSeedRequirements(cropId, varietyId, area, conditions = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   // Get crop and variety information
@@ -150,7 +150,7 @@ async function calculateSeedRequirements(cropId, varietyId, area, conditions = {
     totalSeedRequired: 0,
     estimatedCost: 0,
     plantingWindow: identifyPlantingWindow(crop, conditions),
-    alternatives: generateSeedAlternatives(crop, variety, area)
+    alternatives: generateSeedAlternatives(crop, variety, area),
   };
 
   calculation.totalSeedRequired = calculation.seedRate * area;
@@ -180,7 +180,7 @@ function identifyPlantingWindow(crop, conditions) {
     startMonth: 'June',
     endMonth: 'July',
     optimalSeason: 'kharif',
-    bufferDays: 15
+    bufferDays: 15,
   };
 }
 
@@ -190,51 +190,51 @@ function generateSeedAlternatives(crop, variety, area) {
       type: 'hybrid',
       seedRate: 2.5,
       costMultiplier: 1.5,
-      yieldPotential: 'high'
+      yieldPotential: 'high',
     },
     {
       type: 'traditional',
       seedRate: 2.0,
       costMultiplier: 1.0,
-      yieldPotential: 'medium'
-    }
+      yieldPotential: 'medium',
+    },
   ];
 }
 
 // Seed supplier management
 async function addSeedSupplier(supplierData) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { name, contact, location, cropsAvailable, qualityRating, notes } = supplierData;
 
-  let res = await pg.query(
+  const res = await pg.query(
     `INSERT INTO seed_suppliers (name, contact, location, crops_available, quality_rating, notes, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, 'active', NOW(), NOW())
      RETURNING *`,
-    [name, JSON.stringify(contact), location, JSON.stringify(cropsAvailable || []), qualityRating, notes]
+    [name, JSON.stringify(contact), location, JSON.stringify(cropsAvailable || []), qualityRating, notes],
   );
 
   // Emit signal for supplier addition
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'seed_supplier',
     supplierId: res.rows[0].id,
-    name
+    name,
   }, {
     severity: SEVERITY.INFO,
     source: 'seed_planning_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
 
   return res.rows[0];
 }
 
 async function listSeedSuppliers({ cropType, minQualityRating } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   let query = 'SELECT * FROM seed_suppliers WHERE status = $1';
-  let params = ['active'];
+  const params = ['active'];
   let paramIndex = 2;
 
   if (cropType) {
@@ -246,15 +246,15 @@ async function listSeedSuppliers({ cropType, minQualityRating } = {}) {
     params.push(minQualityRating);
   }
 
-  query += ` ORDER BY quality_rating DESC`;
+  query += ' ORDER BY quality_rating DESC';
 
-  let res = await pg.query(query, params);
+  const res = await pg.query(query, params);
   return res.rows;
 }
 
 // Seed analytics
 async function getSeedAnalytics({ startDate, endDate, cropId } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   let query = `
@@ -266,7 +266,7 @@ async function getSeedAnalytics({ startDate, endDate, cropId } = {}) {
     FROM seed_plans
     WHERE 1=1
   `;
-  let params = [];
+  const params = [];
   let paramIndex = 1;
 
   if (startDate) {
@@ -282,15 +282,15 @@ async function getSeedAnalytics({ startDate, endDate, cropId } = {}) {
     params.push(cropId);
   }
 
-  query += ` GROUP BY crop_id ORDER BY count DESC`;
+  query += ' GROUP BY crop_id ORDER BY count DESC';
 
-  let res = await pg.query(query, params);
+  const res = await pg.query(query, params);
 
   return {
     byCrop: res.rows,
     totalPlans: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
     totalSeed: res.rows.reduce((sum, row) => sum + (parseFloat(row.total_seed) || 0), 0),
-    recommendations: generateSeedAnalyticsRecommendations(res.rows)
+    recommendations: generateSeedAnalyticsRecommendations(res.rows),
   };
 }
 
@@ -302,7 +302,7 @@ function generateSeedAnalyticsRecommendations(seedData) {
     recommendations.push({
       type: 'bulk_procurement',
       message: `High seed volume for ${highSeedCrops.map(c => c.crop_id).join(', ')}. Consider bulk procurement discounts.`,
-      priority: 'high'
+      priority: 'high',
     });
   }
 

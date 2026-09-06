@@ -11,7 +11,7 @@ class TransactionManager {
     this.config = {
       // Default isolation level
       defaultIsolationLevel: config.defaultIsolationLevel || 'READ COMMITTED',
-      
+
       // Retry configuration
       enableRetry: config.enableRetry !== false,
       maxRetries: config.maxRetries || 3,
@@ -22,24 +22,24 @@ class TransactionManager {
         '08006', // connection_failure
         '08001', // connection_not_established
         '08004', // server_not_connected
-        '57P02'  // shutdown_in_progress
+        '57P02', // shutdown_in_progress
       ],
-      
+
       // Timeout configuration
       statementTimeout: config.statementTimeout || 30000, // 30 seconds
       idleInTransactionSessionTimeout: config.idleInTransactionSessionTimeout || 60000, // 1 minute
-      
+
       // Distributed transaction configuration
       enableDistributedTransactions: config.enableDistributedTransactions !== false,
       distributedTransactionTimeout: config.distributedTransactionTimeout || 30000,
-      
+
       // Savepoint configuration
       enableSavepoints: config.enableSavepoints !== false,
-      
+
       // Database connection
       databaseUrl: config.databaseUrl || process.env.DATABASE_URL,
-      
-      ...config
+
+      ...config,
     };
 
     this.pool = null;
@@ -53,7 +53,7 @@ class TransactionManager {
   async initialize() {
     try {
       this.pool = new Pool({
-        connectionString: this.config.databaseUrl
+        connectionString: this.config.databaseUrl,
       });
 
       this.isInitialized = true;
@@ -89,7 +89,7 @@ class TransactionManager {
         startTime: Date.now(),
         isolationLevel,
         readOnly,
-        savepoints: []
+        savepoints: [],
       });
 
       logger.debug('Transaction started', { transactionId, isolationLevel });
@@ -101,7 +101,7 @@ class TransactionManager {
         createSavepoint: (name) => this.createSavepoint(transactionId, name),
         rollbackToSavepoint: (name) => this.rollbackToSavepoint(transactionId, name),
         commit: () => this.commitTransaction(transactionId),
-        rollback: () => this.rollbackTransaction(transactionId)
+        rollback: () => this.rollbackTransaction(transactionId),
       };
     } catch (error) {
       client.release();
@@ -114,15 +114,15 @@ class TransactionManager {
    */
   buildTransactionOptions(isolationLevel, readOnly, deferrable) {
     const options = [];
-    
+
     if (isolationLevel) {
       options.push(`ISOLATION LEVEL ${isolationLevel}`);
     }
-    
+
     if (readOnly) {
       options.push('READ ONLY');
     }
-    
+
     if (deferrable) {
       options.push('DEFERRABLE');
     }
@@ -142,7 +142,7 @@ class TransactionManager {
    */
   async executeInTransaction(transactionId, query, params) {
     const transaction = this.activeTransactions.get(transactionId);
-    
+
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
     }
@@ -153,7 +153,7 @@ class TransactionManager {
     } catch (error) {
       logger.error('Query execution failed in transaction', {
         transactionId,
-        error: error.message
+        error: error.message,
       });
       throw error;
     }
@@ -167,8 +167,8 @@ class TransactionManager {
       throw new Error('Savepoints are not enabled');
     }
 
-    let transaction = this.activeTransactions.get(transactionId);
-    
+    const transaction = this.activeTransactions.get(transactionId);
+
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
     }
@@ -181,7 +181,7 @@ class TransactionManager {
       logger.error('Failed to create savepoint', {
         transactionId,
         name,
-        error: error.message
+        error: error.message,
       });
       throw error;
     }
@@ -195,8 +195,8 @@ class TransactionManager {
       throw new Error('Savepoints are not enabled');
     }
 
-    let transaction = this.activeTransactions.get(transactionId);
-    
+    const transaction = this.activeTransactions.get(transactionId);
+
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
     }
@@ -212,7 +212,7 @@ class TransactionManager {
       logger.error('Failed to rollback to savepoint', {
         transactionId,
         name,
-        error: error.message
+        error: error.message,
       });
       throw error;
     }
@@ -222,21 +222,21 @@ class TransactionManager {
    * Commit transaction
    */
   async commitTransaction(transactionId) {
-    let transaction = this.activeTransactions.get(transactionId);
-    
+    const transaction = this.activeTransactions.get(transactionId);
+
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
     }
 
     try {
       await transaction.client.query('COMMIT');
-      
+
       const duration = Date.now() - transaction.startTime;
-      
+
       logger.info('Transaction committed', {
         transactionId,
-        duration: duration + 'ms',
-        isolationLevel: transaction.isolationLevel
+        duration: `${duration }ms`,
+        isolationLevel: transaction.isolationLevel,
       });
 
       transaction.client.release();
@@ -246,9 +246,9 @@ class TransactionManager {
     } catch (error) {
       logger.error('Failed to commit transaction', {
         transactionId,
-        error: error.message
+        error: error.message,
       });
-      
+
       await transaction.client.query('ROLLBACK');
       transaction.client.release();
       this.activeTransactions.delete(transactionId);
@@ -261,20 +261,20 @@ class TransactionManager {
    * Rollback transaction
    */
   async rollbackTransaction(transactionId) {
-    let transaction = this.activeTransactions.get(transactionId);
-    
+    const transaction = this.activeTransactions.get(transactionId);
+
     if (!transaction) {
       throw new Error(`Transaction ${transactionId} not found`);
     }
 
     try {
       await transaction.client.query('ROLLBACK');
-      
-      let duration = Date.now() - transaction.startTime;
-      
+
+      const duration = Date.now() - transaction.startTime;
+
       logger.info('Transaction rolled back', {
         transactionId,
-        duration: duration + 'ms'
+        duration: `${duration }ms`,
       });
 
       transaction.client.release();
@@ -284,9 +284,9 @@ class TransactionManager {
     } catch (error) {
       logger.error('Failed to rollback transaction', {
         transactionId,
-        error: error.message
+        error: error.message,
       });
-      
+
       transaction.client.release();
       this.activeTransactions.delete(transactionId);
 
@@ -303,10 +303,10 @@ class TransactionManager {
     const maxRetries = options.maxRetries || this.config.maxRetries;
 
     while (attempt <= maxRetries) {
-      let transaction = await this.beginTransaction(options);
+      const transaction = await this.beginTransaction(options);
 
       try {
-        let result = await callback(transaction);
+        const result = await callback(transaction);
         await transaction.commit();
         return result;
       } catch (error) {
@@ -317,7 +317,7 @@ class TransactionManager {
         if (!this.isRetryableError(error)) {
           logger.debug('Non-retryable error encountered', {
             error: error.message,
-            code: error.code
+            code: error.code,
           });
           await transaction.rollback();
           throw error;
@@ -327,7 +327,7 @@ class TransactionManager {
           const delay = this.config.retryDelay * Math.pow(2, attempt - 1);
           logger.warn(`Transaction failed, retrying (${attempt}/${maxRetries})`, {
             error: error.message,
-            delay: delay + 'ms'
+            delay: `${delay }ms`,
           });
 
           await transaction.rollback();
@@ -338,7 +338,7 @@ class TransactionManager {
 
     logger.error('Transaction failed after all retries', {
       attempts: maxRetries,
-      error: lastError.message
+      error: lastError.message,
     });
 
     throw lastError;
@@ -363,11 +363,11 @@ class TransactionManager {
       const results = [];
 
       for (const operation of operations) {
-        let result = await transaction.execute(operation.query, operation.params);
+        const result = await transaction.execute(operation.query, operation.params);
         results.push({
           operation: operation.name || 'unnamed',
           result,
-          success: true
+          success: true,
         });
       }
 
@@ -383,7 +383,7 @@ class TransactionManager {
       throw new Error('Distributed transactions are not enabled');
     }
 
-    let transactionId = this.generateTransactionId();
+    const transactionId = this.generateTransactionId();
     const startTime = Date.now();
 
     logger.info('Starting distributed transaction', { transactionId, participants: participants.length });
@@ -391,7 +391,7 @@ class TransactionManager {
     try {
       // Phase 1: Prepare all participants
       const preparedParticipants = [];
-      
+
       for (const participant of participants) {
         try {
           await participant.prepare();
@@ -401,9 +401,9 @@ class TransactionManager {
           logger.error('Participant prepare failed', {
             transactionId,
             participant: participant.name,
-            error: error.message
+            error: error.message,
           });
-          
+
           // Rollback all prepared participants
           for (const prepared of preparedParticipants) {
             try {
@@ -411,11 +411,11 @@ class TransactionManager {
             } catch (rollbackError) {
               logger.error('Participant rollback failed', {
                 participant: prepared.name,
-                error: rollbackError.message
+                error: rollbackError.message,
               });
             }
           }
-          
+
           throw error;
         }
       }
@@ -429,31 +429,31 @@ class TransactionManager {
           logger.error('Participant commit failed', {
             transactionId,
             participant: participant.name,
-            error: error.message
+            error: error.message,
           });
           // Note: In a real distributed transaction, we would need compensation logic here
         }
       }
 
-      let duration = Date.now() - startTime;
+      const duration = Date.now() - startTime;
       logger.info('Distributed transaction completed', {
         transactionId,
-        duration: duration + 'ms',
-        participants: preparedParticipants.length
+        duration: `${duration }ms`,
+        participants: preparedParticipants.length,
       });
 
       return {
         success: true,
         transactionId,
         duration,
-        participants: preparedParticipants.length
+        participants: preparedParticipants.length,
       };
     } catch (error) {
-      let duration = Date.now() - startTime;
+      const duration = Date.now() - startTime;
       logger.error('Distributed transaction failed', {
         transactionId,
-        duration: duration + 'ms',
-        error: error.message
+        duration: `${duration }ms`,
+        error: error.message,
       });
       throw error;
     }
@@ -463,8 +463,8 @@ class TransactionManager {
    * Get active transaction info
    */
   getTransactionInfo(transactionId) {
-    let transaction = this.activeTransactions.get(transactionId);
-    
+    const transaction = this.activeTransactions.get(transactionId);
+
     if (!transaction) {
       return null;
     }
@@ -475,7 +475,7 @@ class TransactionManager {
       duration: Date.now() - transaction.startTime,
       isolationLevel: transaction.isolationLevel,
       readOnly: transaction.readOnly,
-      savepoints: transaction.savepoints.length
+      savepoints: transaction.savepoints.length,
     };
   }
 
@@ -484,7 +484,7 @@ class TransactionManager {
    */
   getActiveTransactions() {
     const transactions = [];
-    
+
     for (const [id, transaction] of this.activeTransactions.entries()) {
       transactions.push({
         transactionId: id,
@@ -492,7 +492,7 @@ class TransactionManager {
         duration: Date.now() - transaction.startTime,
         isolationLevel: transaction.isolationLevel,
         readOnly: transaction.readOnly,
-        savepoints: transaction.savepoints.length
+        savepoints: transaction.savepoints.length,
       });
     }
 
@@ -507,8 +507,8 @@ class TransactionManager {
     const staleTransactions = [];
 
     for (const [id, transaction] of this.activeTransactions.entries()) {
-      let duration = now - transaction.startTime;
-      
+      const duration = now - transaction.startTime;
+
       if (duration > timeout) {
         staleTransactions.push({ id, transaction, duration });
       }
@@ -517,7 +517,7 @@ class TransactionManager {
     for (const { id, transaction, duration } of staleTransactions) {
       logger.warn('Cleaning up stale transaction', {
         transactionId: id,
-        duration: duration + 'ms'
+        duration: `${duration }ms`,
       });
 
       try {
@@ -527,7 +527,7 @@ class TransactionManager {
       } catch (error) {
         logger.error('Failed to cleanup stale transaction', {
           transactionId: id,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -542,7 +542,7 @@ class TransactionManager {
     return this.executeInTransactionWithRetry(callback, {
       ...options,
       readOnly: true,
-      isolationLevel: options.isolationLevel || 'REPEATABLE READ'
+      isolationLevel: options.isolationLevel || 'REPEATABLE READ',
     });
   }
 
@@ -552,7 +552,7 @@ class TransactionManager {
   async executeSerializableTransaction(callback, options = {}) {
     return this.executeInTransactionWithRetry(callback, {
       ...options,
-      isolationLevel: 'SERIALIZABLE'
+      isolationLevel: 'SERIALIZABLE',
     });
   }
 
@@ -569,7 +569,7 @@ class TransactionManager {
       } catch (error) {
         logger.error('Failed to rollback transaction during shutdown', {
           transactionId: id,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -620,5 +620,5 @@ module.exports = {
   TransactionManager,
   getTransactionManager,
   initializeTransactionManager,
-  shutdownTransactionManager
+  shutdownTransactionManager,
 };

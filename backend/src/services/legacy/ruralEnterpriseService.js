@@ -1,6 +1,6 @@
 /**
  * Rural Enterprise Service
- * 
+ *
  * Wires the existing `rural_enterprises` table (migration 041) to application logic
  * Implements REOS Rural Life OS component for rural business entities
  */
@@ -20,14 +20,14 @@ const r2 = (n) => Math.round(n * 100) / 100;
 async function getRuralEnterprise(enterpriseId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM rural_enterprises WHERE enterprise_id = $1`,
-      [enterpriseId]
+      'SELECT * FROM rural_enterprises WHERE enterprise_id = $1',
+      [enterpriseId],
     );
-    
+
     if (!rows.length) {
       throw new Error(`Rural enterprise not found: ${enterpriseId}`);
     }
-    
+
     return rows[0];
   } catch (error) {
     logger.error(`Failed to get rural enterprise: ${error.message}`);
@@ -43,10 +43,10 @@ async function getRuralEnterprise(enterpriseId) {
 async function getRuralEnterprisesByVillage(villageId) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM rural_enterprises WHERE village_id = $1 ORDER BY enterprise_name`,
-      [villageId]
+      'SELECT * FROM rural_enterprises WHERE village_id = $1 ORDER BY enterprise_name',
+      [villageId],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get rural enterprises by village: ${error.message}`);
@@ -62,10 +62,10 @@ async function getRuralEnterprisesByVillage(villageId) {
 async function getRuralEnterprisesByType(enterpriseType) {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM rural_enterprises WHERE enterprise_type = $1 ORDER BY village_id`,
-      [enterpriseType]
+      'SELECT * FROM rural_enterprises WHERE enterprise_type = $1 ORDER BY village_id',
+      [enterpriseType],
     );
-    
+
     return rows;
   } catch (error) {
     logger.error(`Failed to get rural enterprises by type: ${error.message}`);
@@ -97,7 +97,7 @@ async function createRuralEnterprise(enterprise) {
       infrastructure_assets,
       funding_sources,
       market_reach,
-      status
+      status,
     } = enterprise;
 
     const { rows } = await pool.query(
@@ -109,9 +109,9 @@ async function createRuralEnterprise(enterprise) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW())
        RETURNING *`,
       [enterprise_id, enterprise_name, village_id, district, enterprise_type,
-       owner_id, registration_number, registration_date, business_scale,
-       annual_turnover, employee_count, main_products, main_services,
-       infrastructure_assets, funding_sources, market_reach, status]
+        owner_id, registration_number, registration_date, business_scale,
+        annual_turnover, employee_count, main_products, main_services,
+        infrastructure_assets, funding_sources, market_reach, status],
     );
 
     logger.info(`Rural enterprise created: ${enterprise_id}`);
@@ -134,9 +134,9 @@ async function updateRuralEnterprise(enterpriseId, updates) {
       'enterprise_name', 'enterprise_type', 'business_scale',
       'annual_turnover', 'employee_count', 'main_products',
       'main_services', 'infrastructure_assets', 'funding_sources',
-      'market_reach', 'status'
+      'market_reach', 'status',
     ];
-    
+
     const setClauses = [];
     const values = [];
     let paramIndex = 1;
@@ -163,7 +163,7 @@ async function updateRuralEnterprise(enterpriseId, updates) {
     `;
 
     const { rows } = await pool.query(query, values);
-    
+
     if (!rows.length) {
       throw new Error(`Rural enterprise not found: ${enterpriseId}`);
     }
@@ -184,7 +184,7 @@ async function updateRuralEnterprise(enterpriseId, updates) {
 async function getRuralEnterpriseStatistics(filters = {}) {
   try {
     const { district, village_id, enterprise_type, status } = filters;
-    
+
     let query = `
       SELECT 
         COUNT(*) as total_enterprises,
@@ -197,7 +197,7 @@ async function getRuralEnterpriseStatistics(filters = {}) {
       FROM rural_enterprises
       WHERE 1=1
     `;
-    
+
     const params = [];
     let paramIndex = 1;
 
@@ -235,7 +235,7 @@ async function getRuralEnterpriseStatistics(filters = {}) {
       totalEmployees: stats.total_employees ? parseInt(stats.total_employees) : 0,
       avgEmployeesPerEnterprise: stats.avg_employees_per_enterprise ? r2(stats.avg_employees_per_enterprise) : 0,
       totalAnnualTurnover: stats.total_annual_turnover ? r2(stats.total_annual_turnover) : 0,
-      avgAnnualTurnover: stats.avg_annual_turnover ? r2(stats.avg_annual_turnover) : 0
+      avgAnnualTurnover: stats.avg_annual_turnover ? r2(stats.avg_annual_turnover) : 0,
     };
   } catch (error) {
     logger.error(`Failed to get rural enterprise statistics: ${error.message}`);
@@ -257,11 +257,11 @@ async function searchRuralEnterprises(filters) {
       minTurnover,
       maxTurnover,
       minEmployees,
-      status
+      status,
     } = filters;
 
-    let query = `SELECT * FROM rural_enterprises WHERE 1=1`;
-    let params = [];
+    let query = 'SELECT * FROM rural_enterprises WHERE 1=1';
+    const params = [];
     let paramIndex = 1;
 
     if (district) {
@@ -306,7 +306,7 @@ async function searchRuralEnterprises(filters) {
       paramIndex++;
     }
 
-    query += ` ORDER BY enterprise_name LIMIT 100`;
+    query += ' ORDER BY enterprise_name LIMIT 100';
 
     const { rows } = await pool.query(query, params);
     return rows;
@@ -343,7 +343,7 @@ function setupRoutes(app) {
 
   router.get('/enterprises/type/:enterpriseType', async (req, res) => {
     try {
-      let enterprises = await getRuralEnterprisesByType(req.params.enterpriseType);
+      const enterprises = await getRuralEnterprisesByType(req.params.enterpriseType);
       res.json({ success: true, data: enterprises });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -352,7 +352,7 @@ function setupRoutes(app) {
 
   router.post('/enterprises', async (req, res) => {
     try {
-      let enterprise = await createRuralEnterprise(req.body);
+      const enterprise = await createRuralEnterprise(req.body);
       res.status(201).json({ success: true, data: enterprise });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -361,7 +361,7 @@ function setupRoutes(app) {
 
   router.put('/enterprises/:enterpriseId', async (req, res) => {
     try {
-      let enterprise = await updateRuralEnterprise(req.params.enterpriseId, req.body);
+      const enterprise = await updateRuralEnterprise(req.params.enterpriseId, req.body);
       res.json({ success: true, data: enterprise });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -370,7 +370,7 @@ function setupRoutes(app) {
 
   router.get('/enterprises/statistics', async (req, res) => {
     try {
-      let stats = await getRuralEnterpriseStatistics(req.query);
+      const stats = await getRuralEnterpriseStatistics(req.query);
       res.json({ success: true, data: stats });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -379,7 +379,7 @@ function setupRoutes(app) {
 
   router.get('/enterprises/search', async (req, res) => {
     try {
-      let enterprises = await searchRuralEnterprises(req.query);
+      const enterprises = await searchRuralEnterprises(req.query);
       res.json({ success: true, data: enterprises });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -398,8 +398,6 @@ module.exports = {
   updateRuralEnterprise,
   getRuralEnterpriseStatistics,
   searchRuralEnterprises,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

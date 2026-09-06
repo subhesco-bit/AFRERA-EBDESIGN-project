@@ -1,5 +1,3 @@
-const express = require('express');
-
 /**
  * Security Middleware Suite
  * OWASP Top 10 compliance and security hardening
@@ -8,6 +6,7 @@ const express = require('express');
 // Rate limiting (prevent brute force attacks)
 const rateLimit = (() => {
   const requests = new Map();
+  const maxTrackedClients = 10000;
 
   return (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
     return (req, res, next) => {
@@ -20,6 +19,15 @@ const rateLimit = (() => {
 
       const userRequests = requests.get(ip);
       const recentRequests = userRequests.filter(time => now - time < windowMs);
+
+      if (recentRequests.length === 0) {
+        requests.delete(ip);
+      }
+
+      if (requests.size >= maxTrackedClients && !requests.has(ip)) {
+        const oldestClient = requests.keys().next().value;
+        requests.delete(oldestClient);
+      }
 
       if (recentRequests.length >= maxRequests) {
         return res.status(429).json({
@@ -41,7 +49,7 @@ const validateInput = (req, res, next) => {
     if (typeof value !== 'string') return value;
     return value
       .replace(/[<>]/g, '') // Remove HTML tags
-      .replace(/['";]/g, '')  // Remove quotes
+      .replace(/['";]/g, '') // Remove quotes
       .trim();
   };
 
@@ -62,7 +70,16 @@ const validateInput = (req, res, next) => {
 
 // CORS security
 const corsMiddleware = (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
+  const configuredOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+  const requestOrigin = req.get('Origin');
+
+  if (requestOrigin && configuredOrigins.includes(requestOrigin)) {
+    res.header('Access-Control-Allow-Origin', requestOrigin);
+    res.header('Vary', 'Origin');
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Max-Age', '3600');
@@ -74,28 +91,41 @@ const corsMiddleware = (req, res, next) => {
   next();
 };
 
-// Security headers
+// Security headers (OWASP + industry standard)
 const securityHeaders = (req, res, next) => {
-  // Prevent clickjacking
+  // Prevent clickjacking (X-Frame-Options)
   res.setHeader('X-Frame-Options', 'DENY');
 
   // Prevent MIME-type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
-  // Enable XSS protection
+  // Enable XSS protection (legacy browsers)
   res.setHeader('X-XSS-Protection', '1; mode=block');
 
   // Prevent referrer leakage
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  // Content Security Policy
+  // Content Security Policy (strict)
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+    'default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: https:; font-src \'self\'; connect-src \'self\'; frame-ancestors \'none\'',
   );
 
-  // HSTS (HTTPS only)
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  // HSTS (HTTPS only, 1 year, include subdomains)
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+
+  // Permissions Policy (Feature-Policy) - disable dangerous features
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
+
+  // Remove server header (don't leak technology stack)
+  res.removeHeader('X-Powered-By');
+
+  // Disable caching for sensitive content
+  if (req.path.includes('/auth') || req.path.includes('/admin')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
 
   next();
 };

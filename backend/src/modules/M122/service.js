@@ -42,27 +42,27 @@ async function registerCattle(cattleData) {
       district,
       registration_date,
       purpose,
-      tag_number
+      tag_number,
     } = cattleData;
 
     const cattle = {
       registry_id: generateId(),
-      cattle_id: cattle_id,
-      farmer_id: farmer_id,
-      breed: breed,
-      age: age,
-      gender: gender,
-      weight: weight,
-      health_status: health_status,
-      vaccination_status: vaccination_status,
-      location: location,
-      state: state,
-      district: district,
-      registration_date: registration_date,
-      purpose: purpose,
-      tag_number: tag_number,
+      cattle_id,
+      farmer_id,
+      breed,
+      age,
+      gender,
+      weight,
+      health_status,
+      vaccination_status,
+      location,
+      state,
+      district,
+      registration_date,
+      purpose,
+      tag_number,
       status: 'registered',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered cattle health assessment
@@ -73,8 +73,8 @@ async function registerCattle(cattleData) {
         breed_characteristics: await getBreedCharacteristics(breed),
         regional_health_patterns: await getRegionalHealthPatterns(state, district),
         vaccination_schedule: await getVaccinationSchedule(breed, age),
-        nutritional_requirements: await getNutritionalRequirements(breed, purpose)
-      }
+        nutritional_requirements: await getNutritionalRequirements(breed, purpose),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -106,8 +106,8 @@ async function registerCattle(cattleData) {
         cattle.tag_number,
         cattle.status,
         JSON.stringify(cattle.ai_health_assessment),
-        cattle.created_at
-      ]
+        cattle.created_at,
+      ],
     );
 
     logger.info(`Cattle registered: ${cattle.registry_id}`);
@@ -131,45 +131,45 @@ async function updateCattleHealth(registryId, healthData) {
       treatment_history,
       reproductive_status,
       milk_production,
-      feed_intake
+      feed_intake,
     } = healthData;
 
     const healthRecord = {
       record_id: generateId(),
       registry_id: registryId,
-      health_status: health_status,
-      weight: weight,
-      body_condition_score: body_condition_score,
-      vaccination_records: vaccination_records,
-      treatment_history: treatment_history,
-      reproductive_status: reproductive_status,
-      milk_production: milk_production,
-      feed_intake: feed_intake,
-      recorded_at: new Date().toISOString()
+      health_status,
+      weight,
+      body_condition_score,
+      vaccination_records,
+      treatment_history,
+      reproductive_status,
+      milk_production,
+      feed_intake,
+      recorded_at: new Date().toISOString(),
     };
 
     // AI-powered health analysis
-    let aiRequest = {
+    const aiRequest = {
       task: 'cattle_health_analysis',
       parameters: {
         registry_id: registryId,
         health_data: healthData,
         historical_health: await getCattleHealthHistory(registryId),
         breed_standards: await getBreedHealthStandards(await getCattleBreed(registryId)),
-        environmental_factors: await getEnvironmentalFactors(await getCattleLocation(registryId))
-      }
+        environmental_factors: await getEnvironmentalFactors(await getCattleLocation(registryId)),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     healthRecord.ai_analysis = aiResponse;
 
     // Update database
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE cattle_registry 
        SET health_status = $1, weight = $2, updated_at = CURRENT_TIMESTAMP
        WHERE registry_id = $3
        RETURNING *`,
-      [health_status, weight, registryId]
+      [health_status, weight, registryId],
     );
 
     // Insert health record
@@ -191,8 +191,8 @@ async function updateCattleHealth(registryId, healthData) {
         JSON.stringify(milk_production),
         JSON.stringify(feed_intake),
         JSON.stringify(healthRecord.ai_analysis),
-        healthRecord.recorded_at
-      ]
+        healthRecord.recorded_at,
+      ],
     );
 
     logger.info(`Cattle health updated: ${registryId}`);
@@ -211,14 +211,14 @@ async function trackCattlePerformance(registryId, period) {
     const performance = {
       tracking_id: generateId(),
       registry_id: registryId,
-      period: period,
+      period,
       timestamp: new Date().toISOString(),
       weight_gain: await calculateWeightGain(registryId, period),
       feed_efficiency: await calculateFeedEfficiency(registryId, period),
       health_metrics: await getHealthMetrics(registryId, period),
       reproductive_performance: await getReproductivePerformance(registryId, period),
       milk_production_metrics: await getMilkProductionMetrics(registryId, period),
-      recommendations: await generatePerformanceRecommendations(registryId, period)
+      recommendations: await generatePerformanceRecommendations(registryId, period),
     };
 
     return performance;
@@ -243,7 +243,7 @@ async function generateRegistryReport(farmerId, reportType) {
       health_summary: await getHealthSummary(farmerId),
       production_metrics: await getProductionMetrics(farmerId),
       vaccination_status: await getVaccinationStatus(farmerId),
-      recommendations: await generateFarmerRecommendations(farmerId)
+      recommendations: await generateFarmerRecommendations(farmerId),
     };
 
     return report;
@@ -258,20 +258,20 @@ async function generateRegistryReport(farmerId, reportType) {
  */
 async function getBreedingRecommendations(registryId) {
   try {
-    let cattle = await getCattleDetails(registryId);
-    
-    let aiRequest = {
+    const cattle = await getCattleDetails(registryId);
+
+    const aiRequest = {
       task: 'cattle_breeding_recommendations',
       parameters: {
         cattle_details: cattle,
         breed_characteristics: await getBreedCharacteristics(cattle.breed),
         genetic_pool: await getAvailableGeneticPool(cattle.state, cattle.district),
         breeding_goals: await getBreedingGoals(cattle.purpose),
-        health_factors: await getBreedingHealthFactors(registryId)
-      }
+        health_factors: await getBreedingHealthFactors(registryId),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       registry_id: registryId,
@@ -280,7 +280,7 @@ async function getBreedingRecommendations(registryId) {
       optimal_breeding_time: aiResponse.optimal_timing,
       genetic_considerations: aiResponse.genetic_considerations,
       expected_outcomes: aiResponse.expected_outcomes,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     return recommendations;
@@ -297,9 +297,9 @@ function generateId() {
 
 async function getBreedCharacteristics(breed) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM cattle_breed_characteristics WHERE breed_name = $1',
-      [breed]
+      [breed],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -309,9 +309,9 @@ async function getBreedCharacteristics(breed) {
 
 async function getRegionalHealthPatterns(state, district) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM regional_cattle_health_patterns WHERE state = $1 AND district = $2',
-      [state, district]
+      [state, district],
     );
     return result.rows;
   } catch (error) {
@@ -323,7 +323,7 @@ async function getVaccinationSchedule(breed, age) {
   return [
     { vaccine: 'FMD', due_date: '2026-09-01', status: 'pending' },
     { vaccine: 'Brucellosis', due_date: '2026-10-01', status: 'pending' },
-    { vaccine: 'HS', due_date: '2026-11-01', status: 'pending' }
+    { vaccine: 'HS', due_date: '2026-11-01', status: 'pending' },
   ];
 }
 
@@ -332,15 +332,15 @@ async function getNutritionalRequirements(breed, purpose) {
     daily_dry_matter: 10,
     protein_requirement: 12,
     energy_requirement: 65,
-    mineral_requirements: ['calcium', 'phosphorus', 'magnesium']
+    mineral_requirements: ['calcium', 'phosphorus', 'magnesium'],
   };
 }
 
 async function getCattleHealthHistory(registryId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM cattle_health_records WHERE registry_id = $1 ORDER BY recorded_at DESC LIMIT 10',
-      [registryId]
+      [registryId],
     );
     return result.rows;
   } catch (error) {
@@ -352,7 +352,7 @@ async function getBreedHealthStandards(breed) {
   return {
     ideal_weight_range: { min: 400, max: 600 },
     ideal_body_condition: 3,
-    common_health_issues: ['mastitis', 'lameness', 'respiratory']
+    common_health_issues: ['mastitis', 'lameness', 'respiratory'],
   };
 }
 
@@ -361,15 +361,15 @@ async function getEnvironmentalFactors(location) {
     climate: 'tropical',
     altitude: 100,
     forage_availability: 'good',
-    water_quality: 'excellent'
+    water_quality: 'excellent',
   };
 }
 
 async function getCattleBreed(registryId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT breed FROM cattle_registry WHERE registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0]?.breed || 'unknown';
   } catch (error) {
@@ -379,9 +379,9 @@ async function getCattleBreed(registryId) {
 
 async function getCattleLocation(registryId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT location, state, district FROM cattle_registry WHERE registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -395,7 +395,7 @@ async function calculateWeightGain(registryId, period) {
     end_weight: 480,
     gain: 30,
     gain_percentage: 6.7,
-    daily_gain: 0.3
+    daily_gain: 0.3,
   };
 }
 
@@ -403,7 +403,7 @@ async function calculateFeedEfficiency(registryId, period) {
   return {
     feed_conversion_ratio: 6.5,
     feed_cost_per_kg_gain: 45,
-    efficiency_rating: 'good'
+    efficiency_rating: 'good',
   };
 }
 
@@ -412,7 +412,7 @@ async function getHealthMetrics(registryId, period) {
     overall_health_score: 85,
     disease_incidence: 2,
     mortality_rate: 1,
-    treatment_frequency: 3
+    treatment_frequency: 3,
   };
 }
 
@@ -420,7 +420,7 @@ async function getReproductivePerformance(registryId, period) {
   return {
     conception_rate: 75,
     calving_interval: 420,
-    calf_survival_rate: 95
+    calf_survival_rate: 95,
   };
 }
 
@@ -429,7 +429,7 @@ async function getMilkProductionMetrics(registryId, period) {
     daily_production: 15,
     fat_content: 4.0,
     protein_content: 3.2,
-    somatic_cell_count: 200
+    somatic_cell_count: 200,
   };
 }
 
@@ -437,15 +437,15 @@ async function generatePerformanceRecommendations(registryId, period) {
   return [
     'Increase protein content in feed for better weight gain',
     'Monitor body condition score regularly',
-    'Implement vaccination schedule reminders'
+    'Implement vaccination schedule reminders',
   ];
 }
 
 async function getCattleCount(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT COUNT(*) as count FROM cattle_registry WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -455,9 +455,9 @@ async function getCattleCount(farmerId) {
 
 async function getBreedDistribution(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT breed, COUNT(*) as count FROM cattle_registry WHERE farmer_id = $1 GROUP BY breed',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -469,7 +469,7 @@ async function getHealthSummary(farmerId) {
   return {
     healthy: 85,
     needs_attention: 12,
-    critical: 3
+    critical: 3,
   };
 }
 
@@ -477,7 +477,7 @@ async function getProductionMetrics(farmerId) {
   return {
     total_milk_production: 1500,
     average_milk_per_cattle: 15,
-    total_weight_gain: 450
+    total_weight_gain: 450,
   };
 }
 
@@ -485,7 +485,7 @@ async function getVaccinationStatus(farmerId) {
   return {
     fully_vaccinated: 70,
     partially_vaccinated: 20,
-    not_vaccinated: 10
+    not_vaccinated: 10,
   };
 }
 
@@ -493,15 +493,15 @@ async function generateFarmerRecommendations(farmerId) {
   return [
     'Complete vaccination schedule for all cattle',
     'Implement regular health check-ups',
-    'Optimize feed composition for better production'
+    'Optimize feed composition for better production',
   ];
 }
 
 async function getCattleDetails(registryId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM cattle_registry WHERE registry_id = $1',
-      [registryId]
+      [registryId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -513,7 +513,7 @@ async function getAvailableGeneticPool(state, district) {
   return [
     { breed: 'Holstein Friesian', availability: 'high', quality: 'excellent' },
     { breed: 'Jersey', availability: 'medium', quality: 'good' },
-    { breed: ' indigenous', availability: 'high', quality: 'good' }
+    { breed: ' indigenous', availability: 'high', quality: 'good' },
   ];
 }
 
@@ -531,7 +531,7 @@ async function getBreedingHealthFactors(registryId) {
   return {
     reproductive_health: 'good',
     genetic_diseases: [],
-    overall_fitness: 'excellent'
+    overall_fitness: 'excellent',
   };
 }
 
@@ -540,5 +540,5 @@ module.exports = {
   updateCattleHealth,
   trackCattlePerformance,
   generateRegistryReport,
-  getBreedingRecommendations
+  getBreedingRecommendations,
 };

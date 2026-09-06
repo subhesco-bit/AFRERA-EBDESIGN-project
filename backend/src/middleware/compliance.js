@@ -6,12 +6,12 @@ const complianceLogger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.json()
+    winston.format.json(),
   ),
   transports: [
     new winston.transports.File({ filename: 'logs/compliance.log' }),
-    new winston.transports.Console()
-  ]
+    new winston.transports.Console(),
+  ],
 });
 
 // GDPR compliance middleware
@@ -23,7 +23,7 @@ const gdprCompliance = (req, res, next) => {
       endpoint: req.url,
       method: req.method,
       timestamp: new Date().toISOString(),
-      purpose: req.headers['x-purpose'] || 'unknown'
+      purpose: req.headers['x-purpose'] || 'unknown',
     });
   }
 
@@ -42,7 +42,7 @@ const dataRetention = (req, res, next) => {
       endpoint: req.url,
       method: req.method,
       timestamp: new Date().toISOString(),
-      retentionPeriod: '7-years'
+      retentionPeriod: '7-years',
     });
   }
 
@@ -53,21 +53,21 @@ const dataRetention = (req, res, next) => {
 const consentManagement = (req, res, next) => {
   // Check for user consent
   const consentHeader = req.headers['x-consent'];
-  
+
   if (!consentHeader) {
     return res.status(403).json({
       error: 'Consent required',
-      message: 'Please provide consent for data processing'
+      message: 'Please provide consent for data processing',
     });
   }
 
   // Parse consent
   const consent = JSON.parse(consentHeader);
-  
+
   if (!consent.marketing && !consent.analytics && !consent.essential) {
     return res.status(403).json({
       error: 'Invalid consent',
-      message: 'At least essential consent is required'
+      message: 'At least essential consent is required',
     });
   }
 
@@ -84,7 +84,7 @@ const dataMinimization = (req, res, next) => {
     const allowedFields = [
       'id', 'name', 'email', 'phone', 'address',
       'productId', 'quantity', 'price', 'category',
-      'orderId', 'status', 'createdAt', 'updatedAt'
+      'orderId', 'status', 'createdAt', 'updatedAt',
     ];
 
     const minimized = {};
@@ -110,7 +110,7 @@ const rightToBeForgotten = async (req, res, next) => {
     // Log data deletion request
     complianceLogger.info('Right to be Forgotten Request', {
       userId: req.user?.id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Not implemented. Deliberately do NOT report success: no deletion has
@@ -123,7 +123,7 @@ const rightToBeForgotten = async (req, res, next) => {
       implemented: false,
       error: 'Not Implemented',
       message: 'Right to be forgotten (GDPR Article 17) deletion is not yet implemented. No data was deleted.',
-      code: 'GDPR_DELETION_NOT_IMPLEMENTED'
+      code: 'GDPR_DELETION_NOT_IMPLEMENTED',
     });
   }
 
@@ -136,7 +136,7 @@ const dataPortability = (req, res, next) => {
     // Log data export request
     complianceLogger.info('Data Portability Request', {
       userId: req.user?.id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Not implemented. Deliberately do NOT report success: no export was
@@ -148,7 +148,7 @@ const dataPortability = (req, res, next) => {
       implemented: false,
       error: 'Not Implemented',
       message: 'Data portability (GDPR Article 20) export is not yet implemented. No data was exported.',
-      code: 'GDPR_EXPORT_NOT_IMPLEMENTED'
+      code: 'GDPR_EXPORT_NOT_IMPLEMENTED',
     });
   }
 
@@ -166,12 +166,12 @@ const auditTrail = (logger) => {
       ipAddress: req.ip,
       userAgent: req.get('user-agent'),
       requestData: req.body,
-      responseData: null
+      responseData: null,
     };
 
     // Capture response
     const originalSend = res.send;
-    res.send = function(data) {
+    res.send = function (data) {
       auditData.responseData = data;
       auditData.statusCode = res.statusCode;
 
@@ -189,7 +189,7 @@ const generateComplianceReport = async (startDate, endDate) => {
   const report = {
     period: {
       start: startDate,
-      end: endDate
+      end: endDate,
     },
     metrics: {
       // totalRequests is computed below from the real audit_logs table.
@@ -200,11 +200,11 @@ const generateComplianceReport = async (startDate, endDate) => {
       dataAccessRequests: null,
       dataDeletionRequests: null,
       consentDenials: null,
-      complianceViolations: null
+      complianceViolations: null,
     },
     violations: [],
     recommendations: [],
-    notes: []
+    notes: [],
   };
 
   // totalRequests: real count of audited events in the period, sourced from
@@ -227,7 +227,7 @@ const generateComplianceReport = async (startDate, endDate) => {
     report.metrics.totalRequests = result.rows[0] ? result.rows[0].count : 0;
   } catch (error) {
     complianceLogger.error('Failed to compute totalRequests from audit_logs', {
-      error: error.message
+      error: error.message,
     });
     report.metrics.totalRequests = null;
     report.notes.push('totalRequests: query against audit_logs failed; not tracked for this report.');
@@ -240,7 +240,7 @@ const generateComplianceReport = async (startDate, endDate) => {
   // compliance-violation detector anywhere in this codebase. Reporting them
   // as 0 would be a fabricated "no incidents" claim, so they stay null.
   report.notes.push(
-    'dataAccessRequests, dataDeletionRequests, consentDenials, and complianceViolations are not tracked by any data source yet (not implemented).'
+    'dataAccessRequests, dataDeletionRequests, consentDenials, and complianceViolations are not tracked by any data source yet (not implemented).',
   );
 
   return report;
@@ -253,7 +253,7 @@ const complianceCheck = (req, res, next) => {
     'X-Compliance-Status': 'compliant',
     'X-Data-Residency': 'India',
     'X-Encryption': 'AES-256',
-    'X-Privacy-Policy': '/privacy'
+    'X-Privacy-Policy': '/privacy',
   };
 
   Object.entries(complianceHeaders).forEach(([key, value]) => {
@@ -274,5 +274,5 @@ module.exports = {
   dataPortability,
   auditTrail,
   generateComplianceReport,
-  complianceCheck
+  complianceCheck,
 };

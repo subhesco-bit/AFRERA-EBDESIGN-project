@@ -15,7 +15,7 @@ async function registerCrop(cropData) {
     `INSERT INTO crop_registrations (farmer_id, crop_name, variety, area, village_id, soil_type, irrigation_type, planting_date, expected_yield, notes, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'active', NOW(), NOW())
      RETURNING *`,
-    [farmerId, cropName, variety, area, villageId, soilType, irrigationType, plantingDate, expectedYield, notes]
+    [farmerId, cropName, variety, area, villageId, soilType, irrigationType, plantingDate, expectedYield, notes],
   );
 
   // Emit signal for crop registration
@@ -24,26 +24,26 @@ async function registerCrop(cropData) {
     cropId: res.rows[0].id,
     farmerId,
     cropName,
-    variety
+    variety,
   }, {
     severity: SEVERITY.INFO,
     source: 'crop_registration_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
 
   return res.rows[0];
 }
 
 async function getCropRegistration(registrationId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  let res = await pg.query('SELECT * FROM crop_registrations WHERE id = $1', [registrationId]);
+  const res = await pg.query('SELECT * FROM crop_registrations WHERE id = $1', [registrationId]);
   return res.rows[0] || null;
 }
 
 async function listCropRegistrations({ page = 1, limit = 20, farmerId, cropName, villageId, status } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const offset = (page - 1) * limit;
@@ -71,20 +71,20 @@ async function listCropRegistrations({ page = 1, limit = 20, farmerId, cropName,
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
 
-  let res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM crop_registrations`, 'SELECT COUNT(*) FROM crop_registrations').split('LIMIT')[0], params.slice(0, -2));
+  const res = await pg.query(query, params);
+  const totalRes = await pg.query(query.replace('SELECT * FROM crop_registrations', 'SELECT COUNT(*) FROM crop_registrations').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
 
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updateCropRegistration(registrationId, updates) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const { cropName, variety, area, soilType, irrigationType, plantingDate, expectedYield, notes, status } = updates;
 
-  let res = await pg.query(
+  const res = await pg.query(
     `UPDATE crop_registrations
      SET crop_name = COALESCE($1, crop_name),
          variety = COALESCE($2, variety),
@@ -98,46 +98,46 @@ async function updateCropRegistration(registrationId, updates) {
          updated_at = NOW()
      WHERE id = $10
      RETURNING *`,
-    [cropName, variety, area, soilType, irrigationType, plantingDate, expectedYield, notes, status, registrationId]
+    [cropName, variety, area, soilType, irrigationType, plantingDate, expectedYield, notes, status, registrationId],
   );
 
   // Emit signal for crop update
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'crop_registration',
     cropId: registrationId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'crop_registration_service',
-    entityId: registrationId
+    entityId: registrationId,
   });
 
   return res.rows[0] || null;
 }
 
 async function deleteCropRegistration(registrationId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
-  let res = await pg.query('DELETE FROM crop_registrations WHERE id = $1 RETURNING id', [registrationId]);
+  const res = await pg.query('DELETE FROM crop_registrations WHERE id = $1 RETURNING id', [registrationId]);
 
   if (res.rows[0]) {
     signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED, {
       entityType: 'crop_registration',
-      cropId: registrationId
+      cropId: registrationId,
     }, {
       severity: SEVERITY.INFO,
       source: 'crop_registration_service',
-      entityId: registrationId
+      entityId: registrationId,
     });
   }
 
-  return !!res.rows[0];
+  return Boolean(res.rows[0]);
 }
 
 // AI-powered crop recommendation
 async function recommendCrops(farmerId, constraints = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const farmer = await pg.query('SELECT * FROM farmers WHERE id = $1', [farmerId]);
@@ -154,14 +154,14 @@ async function recommendCrops(farmerId, constraints = {}) {
     alternativeOptions: generateAlternativeOptions(farmerData, constraints),
     marketAnalysis: analyzeMarketDemand(farmerData),
     profitabilityScores: calculateProfitabilityScores(farmerData),
-    riskAssessment: assessCropRisks(farmerData)
+    riskAssessment: assessCropRisks(farmerData),
   };
 
   return { success: true, data: recommendations };
 }
 
 function generatePrimaryRecommendations(farmerData, constraints) {
-  let recommendations = [];
+  const recommendations = [];
 
   // Based on land size
   if (farmerData.land_size < 2) {
@@ -171,7 +171,7 @@ function generatePrimaryRecommendations(farmerData, constraints) {
       reason: 'High value per unit area for small holdings',
       expectedYield: 'High value, low volume',
       confidence: 0.9,
-      marketDemand: 'high'
+      marketDemand: 'high',
     });
   } else if (farmerData.land_size < 5) {
     recommendations.push({
@@ -180,7 +180,7 @@ function generatePrimaryRecommendations(farmerData, constraints) {
       reason: 'Balanced yield and risk for medium holdings',
       expectedYield: 'Medium volume, stable profit',
       confidence: 0.85,
-      marketDemand: 'medium'
+      marketDemand: 'medium',
     });
   } else {
     recommendations.push({
@@ -189,7 +189,7 @@ function generatePrimaryRecommendations(farmerData, constraints) {
       reason: 'Scale economies for large holdings',
       expectedYield: 'High volume, market-dependent',
       confidence: 0.8,
-      marketDemand: 'high'
+      marketDemand: 'high',
     });
   }
 
@@ -201,7 +201,7 @@ function generatePrimaryRecommendations(farmerData, constraints) {
       reason: 'Leveraging existing expertise',
       expectedYield: 'Improved over baseline',
       confidence: 0.9,
-      marketDemand: 'medium'
+      marketDemand: 'medium',
     });
   }
 
@@ -216,7 +216,7 @@ function generateAlternativeOptions(farmerData, constraints) {
     variety: 'nitrogen_fixing',
     reason: 'Soil health improvement',
     rotationBenefit: 'high',
-    confidence: 0.75
+    confidence: 0.75,
   });
 
   alternatives.push({
@@ -224,7 +224,7 @@ function generateAlternativeOptions(farmerData, constraints) {
     variety: 'drought_tolerant',
     reason: 'Risk diversification',
     rotationBenefit: 'medium',
-    confidence: 0.7
+    confidence: 0.7,
   });
 
   return alternatives;
@@ -235,13 +235,13 @@ function analyzeMarketDemand(farmerData) {
     shortTerm: {
       trend: 'stable',
       topCrops: ['vegetables', 'cereals', 'pulses'],
-      priceOutlook: 'moderate_increase'
+      priceOutlook: 'moderate_increase',
     },
     longTerm: {
       trend: 'growing',
       emergingCrops: ['organic_farming', 'specialty_crops'],
-      priceOutlook: 'favorable'
-    }
+      priceOutlook: 'favorable',
+    },
   };
 }
 
@@ -249,7 +249,7 @@ function calculateProfitabilityScores(farmerData) {
   const scores = [
     { crop: 'vegetables', score: 85, factors: ['high_value', 'quick_turnover'] },
     { crop: 'cereals', score: 70, factors: ['stable_market', 'lower_risk'] },
-    { crop: 'cash_crops', score: 80, factors: ['high_profit_potential', 'market_risk'] }
+    { crop: 'cash_crops', score: 80, factors: ['high_profit_potential', 'market_risk'] },
   ];
 
   return scores;
@@ -263,7 +263,7 @@ function assessCropRisks(farmerData) {
       type: 'climate',
       severity: 'high',
       description: 'Small holdings vulnerable to weather extremes',
-      mitigation: 'Consider drought-resistant varieties'
+      mitigation: 'Consider drought-resistant varieties',
     });
   }
 
@@ -272,7 +272,7 @@ function assessCropRisks(farmerData) {
       type: 'experience',
       severity: 'medium',
       description: 'Limited experience may affect yield optimization',
-      mitigation: 'Follow advisory recommendations'
+      mitigation: 'Follow advisory recommendations',
     });
   }
 
@@ -281,7 +281,7 @@ function assessCropRisks(farmerData) {
 
 // Yield estimation
 async function estimateYield(registrationId, factors = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   const registration = await getCropRegistration(registrationId);
@@ -294,7 +294,7 @@ async function estimateYield(registrationId, factors = {}) {
     baselineYield: registration.expected_yield,
     adjustedYield: calculateAdjustedYield(registration, factors),
     confidenceInterval: calculateConfidenceInterval(registration),
-    influencingFactors: identifyInfluencingFactors(registration, factors)
+    influencingFactors: identifyInfluencingFactors(registration, factors),
   };
 
   return { success: true, data: estimation };
@@ -320,7 +320,7 @@ function calculateConfidenceInterval(registration) {
   return {
     lower: 0.8,
     upper: 1.2,
-    confidence: 0.85
+    confidence: 0.85,
   };
 }
 
@@ -328,13 +328,13 @@ function identifyInfluencingFactors(registration, factors) {
   return [
     { factor: 'soil_quality', impact: 'high', value: registration.soil_type },
     { factor: 'irrigation', impact: 'medium', value: registration.irrigation_type },
-    { factor: 'area', impact: 'medium', value: registration.area }
+    { factor: 'area', impact: 'medium', value: registration.area },
   ];
 }
 
 // Crop analytics
 async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
 
   let query = `
@@ -347,7 +347,7 @@ async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}
     FROM crop_registrations
     WHERE 1=1
   `;
-  let params = [];
+  const params = [];
   let paramIndex = 1;
 
   if (startDate) {
@@ -367,27 +367,27 @@ async function getCropAnalytics({ startDate, endDate, villageId, cropName } = {}
     params.push(`%${cropName}%`);
   }
 
-  query += ` GROUP BY crop_name, variety ORDER BY count DESC`;
+  query += ' GROUP BY crop_name, variety ORDER BY count DESC';
 
-  let res = await pg.query(query, params);
+  const res = await pg.query(query, params);
 
   return {
     byCrop: res.rows,
     totalRegistrations: res.rows.reduce((sum, row) => sum + parseInt(row.count), 0),
     totalArea: res.rows.reduce((sum, row) => sum + (parseFloat(row.total_area) || 0), 0),
-    recommendations: generateCropAnalyticsRecommendations(res.rows)
+    recommendations: generateCropAnalyticsRecommendations(res.rows),
   };
 }
 
 function generateCropAnalyticsRecommendations(cropData) {
-  let recommendations = [];
+  const recommendations = [];
 
   const topCrop = cropData[0];
   if (topCrop) {
     recommendations.push({
       type: 'resource_allocation',
       message: `Highest concentration of ${topCrop.crop_name}. Ensure adequate input supply.`,
-      priority: 'high'
+      priority: 'high',
     });
   }
 

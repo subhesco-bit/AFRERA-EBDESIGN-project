@@ -28,7 +28,7 @@ class BlockchainVerificationService {
         quantity,
         batchNumber,
         location,
-        timestamp = new Date()
+        timestamp = new Date(),
       } = productData;
 
       // Verify product exists
@@ -37,7 +37,7 @@ class BlockchainVerificationService {
         return {
           success: false,
           error: 'Product not found',
-          productId
+          productId,
         };
       }
 
@@ -54,8 +54,8 @@ class BlockchainVerificationService {
         timestamp,
         metadata: {
           source: 'afrera_platform',
-          verificationLevel: 'initial'
-        }
+          verificationLevel: 'initial',
+        },
       };
 
       // Add to pending transactions
@@ -73,15 +73,15 @@ class BlockchainVerificationService {
           transactionId: transaction.id,
           blockHeight: block.height,
           timestamp: transaction.timestamp,
-          hash: block.hash
-        }
+          hash: block.hash,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - createProductTransaction error:`, error);
       return {
         success: false,
         error: 'Failed to create product transaction',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -97,7 +97,7 @@ class BlockchainVerificationService {
         toEntity,
         transferType,
         location,
-        timestamp = new Date()
+        timestamp = new Date(),
       } = transferData;
 
       // Verify product custody chain
@@ -106,11 +106,11 @@ class BlockchainVerificationService {
         return {
           success: false,
           error: 'Invalid custody transfer - from entity does not match current custody',
-          currentCustody: currentCustody.entity
+          currentCustody: currentCustody.entity,
         };
       }
 
-      let transaction = {
+      const transaction = {
         id: this.generateTransactionId(),
         type: 'custody_transfer',
         productId,
@@ -121,12 +121,12 @@ class BlockchainVerificationService {
         timestamp,
         metadata: {
           previousCustody: currentCustody?.entity,
-          transferReason: transferType
-        }
+          transferReason: transferType,
+        },
       };
 
       this.pendingTransactions.push(transaction);
-      let block = await this.mineBlock([transaction]);
+      const block = await this.mineBlock([transaction]);
       await this.storeTransaction(transaction, block);
 
       return {
@@ -135,15 +135,15 @@ class BlockchainVerificationService {
           transactionId: transaction.id,
           blockHeight: block.height,
           newCustody: toEntity,
-          timestamp: transaction.timestamp
-        }
+          timestamp: transaction.timestamp,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - addCustodyTransfer error:`, error);
       return {
         success: false,
         error: 'Failed to add custody transfer',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -155,21 +155,21 @@ class BlockchainVerificationService {
     try {
       // Get product transaction history
       const history = await this.getProductTransactionHistory(productId);
-      
+
       if (history.length === 0) {
         return {
           success: false,
           error: 'No blockchain records found for product',
-          productId
+          productId,
         };
       }
 
       // Verify chain integrity
       const chainValid = this.verifyChainIntegrity(history);
-      
+
       // Get custody chain
       const custodyChain = this.extractCustodyChain(history);
-      
+
       // Calculate authenticity score
       const authenticityScore = this.calculateAuthenticityScore(history, custodyChain);
 
@@ -183,15 +183,15 @@ class BlockchainVerificationService {
           custodyChain,
           firstTransaction: history[0],
           lastTransaction: history[history.length - 1],
-          verificationTimestamp: new Date().toISOString()
-        }
+          verificationTimestamp: new Date().toISOString(),
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - verifyProductAuthenticity error:`, error);
       return {
         success: false,
         error: 'Failed to verify product authenticity',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -220,7 +220,7 @@ class BlockchainVerificationService {
       data: row.transaction_data,
       blockHeight: row.block_height,
       blockHash: row.block_hash,
-      timestamp: row.timestamp
+      timestamp: row.timestamp,
     }));
   }
 
@@ -228,7 +228,7 @@ class BlockchainVerificationService {
    * Get current custody
    */
   async getCurrentCustody(productId) {
-    let query = `
+    const query = `
       SELECT 
         bt.transaction_data->>'toEntity' as entity,
         bt.transaction_data->>'location' as location,
@@ -240,7 +240,7 @@ class BlockchainVerificationService {
       LIMIT 1
     `;
 
-    let result = await db.query(query, [productId]);
+    const result = await db.query(query, [productId]);
     return result.rows[0];
   }
 
@@ -248,13 +248,13 @@ class BlockchainVerificationService {
    * Verify product exists
    */
   async verifyProduct(productId) {
-    let query = `
+    const query = `
       SELECT id, name AS product_name, created_by AS farmer_id, is_active AS status
       FROM products
       WHERE id = $1
     `;
 
-    let result = await db.query(query, [productId]);
+    const result = await db.query(query, [productId]);
     return result.rows[0];
   }
 
@@ -262,7 +262,7 @@ class BlockchainVerificationService {
    * Store transaction in database
    */
   async storeTransaction(transaction, block) {
-    let query = `
+    const query = `
       INSERT INTO product_custody_transactions (
         transaction_id, transaction_type, transaction_data,
         block_height, block_hash, timestamp
@@ -275,7 +275,7 @@ class BlockchainVerificationService {
       JSON.stringify(transaction),
       block.height,
       block.hash,
-      transaction.timestamp
+      transaction.timestamp,
     ]);
   }
 
@@ -284,19 +284,19 @@ class BlockchainVerificationService {
    */
   async mineBlock(transactions) {
     const previousBlock = this.chain[this.chain.length - 1] || this.createGenesisBlock();
-    
+
     const newBlock = {
       height: previousBlock.height + 1,
       timestamp: new Date(),
-      transactions: transactions,
+      transactions,
       previousHash: previousBlock.hash,
       nonce: 0,
-      hash: ''
+      hash: '',
     };
 
     // Mine block with proof of work
     newBlock.hash = this.calculateBlockHash(newBlock);
-    
+
     while (!this.hashMatchesDifficulty(newBlock.hash, this.difficulty)) {
       newBlock.nonce++;
       newBlock.hash = this.calculateBlockHash(newBlock);
@@ -317,11 +317,11 @@ class BlockchainVerificationService {
         id: 'genesis-transaction',
         type: 'genesis',
         data: { message: 'AFRERA Blockchain Genesis Block' },
-        timestamp: new Date('2024-01-01')
+        timestamp: new Date('2024-01-01'),
       }],
       previousHash: '0',
       nonce: 0,
-      hash: this.calculateHash('0', new Date('2024-01-01'), [], 0)
+      hash: this.calculateHash('0', new Date('2024-01-01'), [], 0),
     };
 
     this.chain.push(genesisBlock);
@@ -336,7 +336,7 @@ class BlockchainVerificationService {
       block.previousHash,
       block.timestamp,
       block.transactions,
-      block.nonce
+      block.nonce,
     );
   }
 
@@ -365,18 +365,18 @@ class BlockchainVerificationService {
     for (let i = 1; i < transactions.length; i++) {
       const current = transactions[i];
       const previous = transactions[i - 1];
-      
+
       // Verify block height sequence
       if (current.blockHeight !== previous.blockHeight + 1) {
         return false;
       }
-      
+
       // Verify hash consistency (simplified)
       if (!current.blockHash || current.blockHash.length !== 64) {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -392,9 +392,9 @@ class BlockchainVerificationService {
         toEntity: t.data.toEntity,
         transferType: t.data.transferType,
         location: t.data.location,
-        timestamp: t.timestamp
+        timestamp: t.timestamp,
       }));
-    
+
     return custodyTransfers;
   }
 
@@ -403,28 +403,28 @@ class BlockchainVerificationService {
    */
   calculateAuthenticityScore(transactions, custodyChain) {
     let score = 100;
-    
+
     // Deduct points for chain issues
     if (!this.verifyChainIntegrity(transactions)) {
       score -= 30;
     }
-    
+
     // Deduct points for missing custody information
     if (custodyChain.length === 0) {
       score -= 20;
     }
-    
+
     // Deduct points for gaps in custody chain
     const hasGaps = this.checkCustodyGaps(custodyChain);
     if (hasGaps) {
       score -= 15;
     }
-    
+
     // Bonus for complete traceability
     if (transactions.length >= 3 && custodyChain.length >= 2) {
       score += 10;
     }
-    
+
     return Math.max(0, Math.min(100, score));
   }
 
@@ -433,17 +433,17 @@ class BlockchainVerificationService {
    */
   checkCustodyGaps(custodyChain) {
     if (custodyChain.length < 2) return false;
-    
+
     for (let i = 1; i < custodyChain.length; i++) {
-      let current = custodyChain[i];
-      let previous = custodyChain[i - 1];
-      
+      const current = custodyChain[i];
+      const previous = custodyChain[i - 1];
+
       // Check if custody transfer is sequential
       if (current.fromEntity !== previous.toEntity) {
         return true;
       }
     }
-    
+
     return false;
   }
 
@@ -459,7 +459,7 @@ class BlockchainVerificationService {
    */
   async getBlockchainStats() {
     try {
-      let query = `
+      const query = `
         SELECT 
           COUNT(*) as total_transactions,
           COUNT(DISTINCT transaction_data->>'productId') as unique_products,
@@ -469,8 +469,8 @@ class BlockchainVerificationService {
         FROM product_custody_transactions
       `;
 
-      let result = await db.query(query);
-      
+      const result = await db.query(query);
+
       return {
         success: true,
         data: {
@@ -480,15 +480,15 @@ class BlockchainVerificationService {
           genesisTimestamp: result.rows[0].genesis_timestamp,
           latestTimestamp: result.rows[0].latest_timestamp,
           chainLength: this.chain.length,
-          pendingTransactions: this.pendingTransactions.length
-        }
+          pendingTransactions: this.pendingTransactions.length,
+        },
       };
     } catch (error) {
       logger.error(`${this.serviceName} - getBlockchainStats error:`, error);
       return {
         success: false,
         error: 'Failed to get blockchain statistics',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -498,28 +498,28 @@ class BlockchainVerificationService {
    */
   async getProductTraceabilityReport(productId) {
     try {
-      let history = await this.getProductTransactionHistory(productId);
-      let custodyChain = this.extractCustodyChain(history);
-      
+      const history = await this.getProductTransactionHistory(productId);
+      const custodyChain = this.extractCustodyChain(history);
+
       const report = {
         productId,
         totalTransactions: history.length,
         custodyChainLength: custodyChain.length,
         journey: this.buildProductJourney(history, custodyChain),
         authenticityVerification: await this.verifyProductAuthenticity(productId),
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
       };
 
       return {
         success: true,
-        data: report
+        data: report,
       };
     } catch (error) {
       logger.error(`${this.serviceName} - getProductTraceabilityReport error:`, error);
       return {
         success: false,
         error: 'Failed to generate traceability report',
-        details: error.message
+        details: error.message,
       };
     }
   }
@@ -529,7 +529,7 @@ class BlockchainVerificationService {
    */
   buildProductJourney(history, custodyChain) {
     const journey = [];
-    
+
     // Add creation event
     const creation = history.find(t => t.type === 'product_creation');
     if (creation) {
@@ -541,11 +541,11 @@ class BlockchainVerificationService {
         details: {
           cropId: creation.data.cropId,
           quantity: creation.data.quantity,
-          batchNumber: creation.data.batchNumber
-        }
+          batchNumber: creation.data.batchNumber,
+        },
       });
     }
-    
+
     // Add custody transfers
     custodyChain.forEach(transfer => {
       journey.push({
@@ -555,11 +555,11 @@ class BlockchainVerificationService {
         location: transfer.location,
         timestamp: transfer.timestamp,
         details: {
-          transferType: transfer.transferType
-        }
+          transferType: transfer.transferType,
+        },
       });
     });
-    
+
     return journey;
   }
 
@@ -570,14 +570,14 @@ class BlockchainVerificationService {
     if (this.pendingTransactions.length === 0) {
       return {
         success: true,
-        message: 'No pending transactions to process'
+        message: 'No pending transactions to process',
       };
     }
 
     const transactionsToProcess = [...this.pendingTransactions];
     this.pendingTransactions = [];
 
-    let block = await this.mineBlock(transactionsToProcess);
+    const block = await this.mineBlock(transactionsToProcess);
 
     for (const transaction of transactionsToProcess) {
       await this.storeTransaction(transaction, block);
@@ -588,8 +588,8 @@ class BlockchainVerificationService {
       data: {
         processedTransactions: transactionsToProcess.length,
         blockHeight: block.height,
-        blockHash: block.hash
-      }
+        blockHash: block.hash,
+      },
     };
   }
 
@@ -599,7 +599,7 @@ class BlockchainVerificationService {
   getPendingTransactions() {
     return {
       count: this.pendingTransactions.length,
-      transactions: this.pendingTransactions
+      transactions: this.pendingTransactions,
     };
   }
 }

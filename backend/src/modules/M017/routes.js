@@ -2,7 +2,7 @@
 const router = express.Router();
 const controller = require('./controller');
 const { authMiddleware, requireRole } = require('../../middleware/auth');
-const { requireResourceOwner } = require('../../middleware/ownership');
+const { requireResourceOwner, requireSelfOrAdmin } = require('../../middleware/ownership');
 
 // consents.user_id is the owner; :consentId alone let any account mutate
 // or revoke another user's consent record.
@@ -10,8 +10,8 @@ const ownsConsent = requireResourceOwner({ table: 'consents', idParam: 'consentI
 
 // Consent management
 router.post('/consents', authMiddleware, controller.createConsent);
-router.get('/consents/:userId', authMiddleware, controller.getUserConsents);
-router.get('/consents/:consentId', authMiddleware, controller.getConsent);
+router.get('/consents/user/:userId', authMiddleware, requireSelfOrAdmin('userId'), controller.getUserConsents);
+router.get('/consents/:consentId', authMiddleware, ownsConsent, controller.getConsent);
 router.put('/consents/:consentId', authMiddleware, ownsConsent, controller.updateConsent);
 router.post('/consents/:consentId/revoke', authMiddleware, ownsConsent, controller.revokeConsent);
 
@@ -25,10 +25,10 @@ router.get('/templates', authMiddleware, controller.getConsentTemplates);
 router.post('/templates/apply', authMiddleware, controller.applyConsentTemplate);
 
 // AI-powered analysis
-router.get('/consents/:userId/compliance', authMiddleware, controller.analyzeConsentCompliance);
+router.get('/consents/user/:userId/compliance', authMiddleware, requireSelfOrAdmin('userId'), controller.analyzeConsentCompliance);
 
 // Consent history and audit
-router.get('/consents/:consentId/history', authMiddleware, controller.getConsentHistory);
+router.get('/consents/:consentId/history', authMiddleware, ownsConsent, controller.getConsentHistory);
 
 // Automated expiration
 router.post('/consents/check-expired', authMiddleware, requireRole('admin'), controller.checkExpiredConsents);

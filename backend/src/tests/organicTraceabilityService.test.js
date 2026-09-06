@@ -13,7 +13,7 @@ describe('Organic Traceability Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     // Create test user and get auth token
@@ -22,7 +22,7 @@ describe('Organic Traceability Service', () => {
       .send({
         email: 'organic-test@example.com',
         password: 'Test123!@#',
-        role: 'farmer'
+        role: 'farmer',
       });
 
     authToken = registerResponse.body.token;
@@ -57,7 +57,7 @@ describe('Organic Traceability Service', () => {
           organic_area_hectares: 5.0,
           in_conversion_area_hectares: 5.5,
           location_id: null,
-          gps_coordinates: { lat: 26.1445, lng: 91.7362 }
+          gps_coordinates: { lat: 26.1445, lng: 91.7362 },
         })
         .expect(201);
 
@@ -72,7 +72,7 @@ describe('Organic Traceability Service', () => {
       const response = await request(app)
         .post('/api/v1/organic-traceability/farms')
         .send({
-          farm_name: 'Test Farm'
+          farm_name: 'Test Farm',
         })
         .expect(401);
     });
@@ -102,7 +102,7 @@ describe('Organic Traceability Service', () => {
           certification_status: 'certified',
           gps_boundary: null,
           soil_type: 'Loamy',
-          irrigation_type: 'Drip'
+          irrigation_type: 'Drip',
         })
         .expect(201);
 
@@ -129,7 +129,7 @@ describe('Organic Traceability Service', () => {
           cultivation_practices: {},
           pest_management_practices: {},
           soil_management_practices: {},
-          water_management_practices: {}
+          water_management_practices: {},
         })
         .expect(201);
 
@@ -152,7 +152,7 @@ describe('Organic Traceability Service', () => {
           moisture_content: 12.5,
           quality_parameters: {},
           harvested_by: 'Test Farmer',
-          storage_location: 'Warehouse A'
+          storage_location: 'Warehouse A',
         })
         .expect(201);
 
@@ -175,7 +175,7 @@ describe('Organic Traceability Service', () => {
           transfer_from_type: 'farmer',
           transfer_from_id: testFarmId,
           quantity_kg: 8000,
-          document_reference: 'DOC-001'
+          document_reference: 'DOC-001',
         })
         .expect(201);
 
@@ -204,7 +204,7 @@ describe('Organic Traceability Service', () => {
           nutritional_info: {},
           organic_certification_details: {},
           chain_of_custody_summary: [],
-          quality_test_results: {}
+          quality_test_results: {},
         })
         .expect(201);
 
@@ -240,7 +240,7 @@ describe('Organic Traceability Service', () => {
           entity_type: 'farm',
           entity_id: testFarmId,
           description: 'Suspicious certificate detected',
-          evidence: {}
+          evidence: {},
         })
         .expect(201);
 

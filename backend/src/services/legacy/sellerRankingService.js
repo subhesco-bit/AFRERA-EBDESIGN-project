@@ -32,11 +32,11 @@ const pool = require('../../database/pool');
 // weighting is a judgment call, same discipline as
 // costControlService.js's OVER_BUDGET_THRESHOLD_PCT.
 const WEIGHTS = {
-  fdiScore: 0.35,        // farmers.fdi_score, already a real composite index (0-100)
+  fdiScore: 0.35, // farmers.fdi_score, already a real composite index (0-100)
   fulfillmentRate: 0.30, // fulfilled_orders relative to disputes
-  experience: 0.15,      // years_active, capped
-  certification: 0.10,   // certification_count, capped
-  training: 0.10,        // training_completed boolean
+  experience: 0.15, // years_active, capped
+  certification: 0.10, // certification_count, capped
+  training: 0.10, // training_completed boolean
 };
 
 function clamp(n, min, max) {
@@ -102,14 +102,14 @@ class SellerRankingService {
       if (stateId) { params.push(stateId); conditions.push(`p.state_id = $${params.length}`); }
     }
 
-    let result = await pool.query(
+    const result = await pool.query(
       `SELECT DISTINCT f.id, f.user_id, u.name, f.fdi_score, f.fulfilled_orders, f.disputes,
               f.years_active, f.certification_count, f.training_completed
          FROM farmers f
          JOIN users u ON u.id = f.user_id
          ${joinClause}
         WHERE ${conditions.join(' AND ')}`,
-      params
+      params,
     );
 
     const ranked = result.rows
@@ -127,6 +127,4 @@ class SellerRankingService {
 }
 
 module.exports = new SellerRankingService();
-
-
 

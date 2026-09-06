@@ -30,7 +30,7 @@ class AIFeedbackService {
         feedbackType,
         feedbackRating,
         feedbackText,
-        contextData
+        contextData,
       } = feedbackData;
 
       const feedbackId = `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -54,7 +54,7 @@ class AIFeedbackService {
         feedbackType,
         feedbackRating,
         feedbackText,
-        JSON.stringify(contextData || {})
+        JSON.stringify(contextData || {}),
       ]);
 
       // Update learning metrics
@@ -63,7 +63,7 @@ class AIFeedbackService {
       return {
         success: true,
         feedbackId,
-        message: 'Feedback recorded successfully'
+        message: 'Feedback recorded successfully',
       };
     } catch (error) {
       console.error('Error recording AI feedback:', error);
@@ -76,10 +76,10 @@ class AIFeedbackService {
    */
   async updateLearningMetrics(feedbackType, rating) {
     try {
-      let pool = await this.getPool();
+      const pool = await this.getPool();
       const metricId = `metric_${feedbackType}_${Date.now()}`;
 
-      let query = `
+      const query = `
         INSERT INTO ai_learning_metrics (id, metric_type, metric_value, metric_count, metadata)
         VALUES ($1, $2, $3, 1, $4)
         ON CONFLICT (metric_type) DO UPDATE SET
@@ -92,7 +92,7 @@ class AIFeedbackService {
         metricId,
         feedbackType,
         rating || 3,
-        JSON.stringify({ last_updated: new Date().toISOString() })
+        JSON.stringify({ last_updated: new Date().toISOString() }),
       ]);
     } catch (error) {
       console.error('Error updating learning metrics:', error);
@@ -104,8 +104,8 @@ class AIFeedbackService {
    */
   async getSessionFeedbackStats(sessionId) {
     try {
-      let pool = await this.getPool();
-      let query = `
+      const pool = await this.getPool();
+      const query = `
         SELECT 
           feedback_type,
           COUNT(*) as count,
@@ -128,8 +128,8 @@ class AIFeedbackService {
    */
   async getOverallMetrics() {
     try {
-      let pool = await this.getPool();
-      let query = `
+      const pool = await this.getPool();
+      const query = `
         SELECT 
           metric_type,
           metric_value,
@@ -140,7 +140,7 @@ class AIFeedbackService {
         LIMIT 20
       `;
 
-      let result = await pool.query(query);
+      const result = await pool.query(query);
       return result.rows;
     } catch (error) {
       console.error('Error getting overall metrics:', error);
@@ -153,8 +153,8 @@ class AIFeedbackService {
    */
   async analyzeNegativeFeedback() {
     try {
-      let pool = await this.getPool();
-      let query = `
+      const pool = await this.getPool();
+      const query = `
         SELECT 
           feedback_type,
           COUNT(*) as count,
@@ -166,7 +166,7 @@ class AIFeedbackService {
         ORDER BY count DESC
       `;
 
-      let result = await pool.query(query);
+      const result = await pool.query(query);
       return result.rows;
     } catch (error) {
       console.error('Error analyzing negative feedback:', error);
@@ -188,14 +188,14 @@ class AIFeedbackService {
             type: pattern.feedback_type,
             priority: 'high',
             suggestion: `Significant negative feedback detected for ${pattern.feedback_type}. Consider reviewing response patterns and adjusting AI behavior.`,
-            affectedResponses: pattern.count
+            affectedResponses: pattern.count,
           });
         } else if (pattern.count > 5 && pattern.avg_rating < 3.0) {
           suggestions.push({
             type: pattern.feedback_type,
             priority: 'medium',
             suggestion: `Moderate negative feedback for ${pattern.feedback_type}. Monitor this pattern closely.`,
-            affectedResponses: pattern.count
+            affectedResponses: pattern.count,
           });
         }
       });

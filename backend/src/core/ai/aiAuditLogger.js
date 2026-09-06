@@ -2,7 +2,7 @@
  * AI Audit Logger
  * Component ID: EBD-CMP-00000007
  * Purpose: AI decision audit trail and provenance tracking
- * 
+ *
  * This module provides comprehensive audit logging for all AI decisions
  * including full provenance tracking, decision metadata, and audit trails.
  */
@@ -49,7 +49,7 @@ const AUDIT_SCHEMA = {
 async function logAIDecision(decision) {
   const auditId = generateAuditId();
   const timestamp = new Date().toISOString();
-  
+
   const auditEntry = {
     id: auditId,
     timestamp,
@@ -77,7 +77,7 @@ async function logAIDecision(decision) {
     error: decision.error || null,
     trace_id: decision.traceId || generateTraceId(),
   };
-  
+
   try {
     // Log to database
     await pool.query(
@@ -98,11 +98,11 @@ async function logAIDecision(decision) {
         auditEntry.validation_status, auditEntry.human_approved, auditEntry.approver_id,
         auditEntry.cost_tokens, auditEntry.cost_usd, auditEntry.latency_ms, auditEntry.error,
         auditEntry.trace_id,
-      ]
+      ],
     );
-    
+
     logger.info(`AI decision logged: ${auditId} for operation ${decision.operation}`);
-    
+
     return {
       auditId,
       success: true,
@@ -110,10 +110,10 @@ async function logAIDecision(decision) {
     };
   } catch (error) {
     logger.error(`Failed to log AI decision: ${error.message}`);
-    
+
     // Fallback to file logging
     logger.error(JSON.stringify(auditEntry));
-    
+
     return {
       auditId,
       success: false,
@@ -128,10 +128,10 @@ async function logAIDecision(decision) {
 async function getAuditTrail(traceId) {
   try {
     const result = await pool.query(
-      `SELECT * FROM ai_audit_logs WHERE trace_id = $1 ORDER BY timestamp ASC`,
-      [traceId]
+      'SELECT * FROM ai_audit_logs WHERE trace_id = $1 ORDER BY timestamp ASC',
+      [traceId],
     );
-    
+
     return {
       success: true,
       trail: result.rows,
@@ -150,26 +150,26 @@ async function getAuditTrail(traceId) {
  */
 async function getActorAuditLogs(actorId, options = {}) {
   const { limit = 100, offset = 0, startDate, endDate } = options;
-  
+
   try {
-    let query = `SELECT * FROM ai_audit_logs WHERE actor_id = $1`;
+    let query = 'SELECT * FROM ai_audit_logs WHERE actor_id = $1';
     const params = [actorId];
-    
+
     if (startDate) {
-      query += ` AND timestamp >= $2`;
+      query += ' AND timestamp >= $2';
       params.push(startDate);
     }
-    
+
     if (endDate) {
-      query += ` AND timestamp <= $3`;
+      query += ' AND timestamp <= $3';
       params.push(endDate);
     }
-    
-    query += ` ORDER BY timestamp DESC LIMIT $4 OFFSET $5`;
+
+    query += ' ORDER BY timestamp DESC LIMIT $4 OFFSET $5';
     params.push(limit, offset);
-    
-    let result = await pool.query(query, params);
-    
+
+    const result = await pool.query(query, params);
+
     return {
       success: true,
       logs: result.rows,
@@ -188,26 +188,26 @@ async function getActorAuditLogs(actorId, options = {}) {
  */
 async function getOperationAuditLogs(operation, options = {}) {
   const { limit = 100, offset = 0, startDate, endDate } = options;
-  
+
   try {
-    let query = `SELECT * FROM ai_audit_logs WHERE operation = $1`;
-    let params = [operation];
-    
+    let query = 'SELECT * FROM ai_audit_logs WHERE operation = $1';
+    const params = [operation];
+
     if (startDate) {
-      query += ` AND timestamp >= $2`;
+      query += ' AND timestamp >= $2';
       params.push(startDate);
     }
-    
+
     if (endDate) {
-      query += ` AND timestamp <= $3`;
+      query += ' AND timestamp <= $3';
       params.push(endDate);
     }
-    
-    query += ` ORDER BY timestamp DESC LIMIT $4 OFFSET $5`;
+
+    query += ' ORDER BY timestamp DESC LIMIT $4 OFFSET $5';
     params.push(limit, offset);
-    
-    let result = await pool.query(query, params);
-    
+
+    const result = await pool.query(query, params);
+
     return {
       success: true,
       logs: result.rows,
@@ -243,7 +243,7 @@ function summarizeInput(input) {
     return input.substring(0, 500) + (input.length > 500 ? '...' : '');
   }
   if (typeof input === 'object') {
-    return JSON.stringify(input).substring(0, 500) + '...';
+    return `${JSON.stringify(input).substring(0, 500) }...`;
   }
   return String(input).substring(0, 500);
 }
@@ -256,7 +256,7 @@ function summarizeOutput(output) {
     return output.substring(0, 500) + (output.length > 500 ? '...' : '');
   }
   if (typeof output === 'object') {
-    return JSON.stringify(output).substring(0, 500) + '...';
+    return `${JSON.stringify(output).substring(0, 500) }...`;
   }
   return String(output).substring(0, 500);
 }
@@ -266,7 +266,7 @@ function summarizeOutput(output) {
  */
 async function getAuditStatistics(options = {}) {
   const { startDate, endDate } = options;
-  
+
   try {
     let query = `SELECT 
       COUNT(*) as total_decisions,
@@ -278,21 +278,21 @@ async function getAuditStatistics(options = {}) {
       SUM(cost_usd) as total_cost,
       AVG(latency_ms) as avg_latency
     FROM ai_audit_logs`;
-    
-    let params = [];
-    
+
+    const params = [];
+
     if (startDate) {
-      query += ` WHERE timestamp >= $1`;
+      query += ' WHERE timestamp >= $1';
       params.push(startDate);
     }
-    
+
     if (endDate) {
-      query += ` AND timestamp <= $2`;
+      query += ' AND timestamp <= $2';
       params.push(endDate);
     }
-    
-    let result = await pool.query(query, params);
-    
+
+    const result = await pool.query(query, params);
+
     return {
       success: true,
       statistics: result.rows[0],

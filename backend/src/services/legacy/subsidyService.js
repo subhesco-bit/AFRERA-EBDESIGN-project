@@ -23,7 +23,7 @@ async function checkProjectSubsidyEligibility(projectDetails) {
       land_ownership,
       existing_infrastructure,
       crop_type,
-      scale_of_operation
+      scale_of_operation,
     } = projectDetails;
 
     // AI-powered subsidy eligibility check
@@ -41,8 +41,8 @@ async function checkProjectSubsidyEligibility(projectDetails) {
         existing_infrastructure,
         crop_type,
         scale_of_operation,
-        government_schemes: await getGovernmentSchemes(state, project_type)
-      }
+        government_schemes: await getGovernmentSchemes(state, project_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -62,14 +62,14 @@ async function checkProjectSubsidyEligibility(projectDetails) {
         requirements: scheme.requirements,
         documents_required: scheme.documents,
         application_deadline: scheme.deadline,
-        expected_processing_time: scheme.processing_time
+        expected_processing_time: scheme.processing_time,
       })),
       recommended_scheme: aiResponse.recommended_scheme,
       total_potential_subsidy: aiResponse.total_potential_subsidy,
       subsidy_breakdown: aiResponse.subsidy_breakdown,
       application_guidance: aiResponse.application_guidance,
       next_steps: aiResponse.next_steps,
-      ai_confidence: aiResponse.confidence
+      ai_confidence: aiResponse.confidence,
     };
 
     logger.info(`Project subsidy eligibility check: ${eligibility.check_id}`);
@@ -98,10 +98,10 @@ async function checkEquipmentSubsidyEligibility(equipmentDetails) {
       farmer_category,
       existing_equipment,
       intended_use,
-      power_source
+      power_source,
     } = equipmentDetails;
 
-    let aiRequest = {
+    const aiRequest = {
       task: 'subsidy_eligibility_check',
       parameters: {
         subsidy_type: 'equipment',
@@ -118,13 +118,13 @@ async function checkEquipmentSubsidyEligibility(equipmentDetails) {
         existing_equipment,
         intended_use,
         power_source,
-        government_schemes: await getEquipmentSchemes(state, equipment_category)
-      }
+        government_schemes: await getEquipmentSchemes(state, equipment_category),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    let eligibility = {
+    const eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       equipment_details: equipmentDetails,
@@ -140,14 +140,14 @@ async function checkEquipmentSubsidyEligibility(equipmentDetails) {
         requirements: scheme.requirements,
         documents_required: scheme.documents,
         application_deadline: scheme.deadline,
-        brand_restrictions: scheme.brand_restrictions
+        brand_restrictions: scheme.brand_restrictions,
       })),
       recommended_scheme: aiResponse.recommended_scheme,
       total_potential_subsidy: aiResponse.total_potential_subsidy,
       subsidy_breakdown: aiResponse.subsidy_breakdown,
       alternative_equipment: aiResponse.alternatives,
       application_guidance: aiResponse.application_guidance,
-      ai_confidence: aiResponse.confidence
+      ai_confidence: aiResponse.confidence,
     };
 
     logger.info(`Equipment subsidy eligibility check: ${eligibility.check_id}`);
@@ -176,10 +176,10 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
       farmer_category,
       state,
       is_northeast_route,
-      is_interstate
+      is_interstate,
     } = logisticsDetails;
 
-    let aiRequest = {
+    const aiRequest = {
       task: 'subsidy_eligibility_check',
       parameters: {
         subsidy_type: 'logistics',
@@ -196,13 +196,13 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
         state,
         is_northeast_route,
         is_interstate,
-        government_schemes: await getLogisticsSchemes(state, is_northeast_route)
-      }
+        government_schemes: await getLogisticsSchemes(state, is_northeast_route),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    let eligibility = {
+    const eligibility = {
       check_id: generateId(),
       timestamp: new Date().toISOString(),
       logistics_details: logisticsDetails,
@@ -217,7 +217,7 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
         confidence: scheme.confidence,
         requirements: scheme.requirements,
         documents_required: scheme.documents,
-        application_deadline: scheme.deadline
+        application_deadline: scheme.deadline,
       })),
       recommended_scheme: aiResponse.recommended_scheme,
       total_potential_subsidy: aiResponse.total_potential_subsidy,
@@ -226,7 +226,7 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
       gst_applicability: aiResponse.gst_applicability,
       alternative_routes: aiResponse.alternative_routes,
       application_guidance: aiResponse.application_guidance,
-      ai_confidence: aiResponse.confidence
+      ai_confidence: aiResponse.confidence,
     };
 
     // If subsidy not available, route through private company with GST
@@ -237,7 +237,7 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
         gst_applicable: true,
         gst_rate: 18,
         private_logistics_partners: await getPrivateLogisticsPartners(state),
-        estimated_cost_with_gst: aiResponse.estimated_private_cost
+        estimated_cost_with_gst: aiResponse.estimated_private_cost,
       };
     }
 
@@ -255,10 +255,10 @@ async function checkLogisticsSubsidyEligibility(logisticsDetails) {
 async function getApplicableSchemes(location, category) {
   try {
     const schemes = await getGovernmentSchemes(location.state, category);
-    
+
     return {
-      location: location,
-      category: category,
+      location,
+      category,
       schemes: schemes.map(scheme => ({
         name: scheme.name,
         code: scheme.code,
@@ -270,10 +270,10 @@ async function getApplicableSchemes(location, category) {
         application_process: scheme.application_process,
         documents_required: scheme.documents,
         contact_details: scheme.contact,
-        last_updated: scheme.updated_at
+        last_updated: scheme.updated_at,
       })),
       total_schemes: schemes.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error) {
     logger.error('Error getting applicable schemes', { error: error.message, stack: error.stack });
@@ -293,26 +293,26 @@ async function submitSubsidyApplication(applicationData) {
       project_details,
       documents,
       bank_details,
-      declaration
+      declaration,
     } = applicationData;
 
     const application = {
       application_id: generateId(),
-      scheme_code: scheme_code,
-      applicant_type: applicant_type,
-      applicant_id: applicant_id,
-      project_details: project_details,
-      documents: documents,
-      bank_details: bank_details,
-      declaration: declaration,
+      scheme_code,
+      applicant_type,
+      applicant_id,
+      project_details,
+      documents,
+      bank_details,
+      declaration,
       status: 'submitted',
       submitted_at: new Date().toISOString(),
       estimated_processing_time: await getProcessingTime(scheme_code),
-      tracking_number: generateTrackingNumber()
+      tracking_number: generateTrackingNumber(),
     };
 
     // In production, save to database and trigger workflow
-    
+
     logger.info(`Subsidy application submitted: ${application.application_id}`);
     return application;
   } catch (error) {
@@ -329,24 +329,24 @@ async function trackSubsidyApplication(applicationId) {
     // In production, fetch from database
     const status = {
       application_id: applicationId,
-      tracking_number: 'SUB-' + applicationId,
+      tracking_number: `SUB-${ applicationId}`,
       current_status: 'under_review',
       status_history: [
         {
           status: 'submitted',
           timestamp: '2026-07-20T10:00:00Z',
-          remarks: 'Application submitted successfully'
+          remarks: 'Application submitted successfully',
         },
         {
           status: 'document_verification',
           timestamp: '2026-07-21T14:30:00Z',
-          remarks: 'Documents under verification'
+          remarks: 'Documents under verification',
         },
         {
           status: 'under_review',
           timestamp: '2026-07-23T09:15:00Z',
-          remarks: 'Application under departmental review'
-        }
+          remarks: 'Application under departmental review',
+        },
       ],
       expected_completion: '2026-08-15T00:00:00Z',
       next_steps: ['Field inspection scheduled', 'Technical approval pending'],
@@ -354,8 +354,8 @@ async function trackSubsidyApplication(applicationId) {
         name: 'Rajesh Kumar',
         designation: 'Agricultural Officer',
         phone: '+91-9876543210',
-        email: 'rajesh.kumar@agri.gov.in'
-      }
+        email: 'rajesh.kumar@agri.gov.in',
+      },
     };
 
     return status;
@@ -376,7 +376,7 @@ async function calculateGSTApplicability(logisticsDetails) {
       cargo_type,
       cargo_value,
       distance,
-      vehicle_type
+      vehicle_type,
     } = logisticsDetails;
 
     const gstApplicability = {
@@ -386,18 +386,18 @@ async function calculateGSTApplicability(logisticsDetails) {
       calculation: {
         base_value: cargo_value,
         gst_amount: cargo_value * 0.18,
-        total_with_gst: cargo_value * 1.18
+        total_with_gst: cargo_value * 1.18,
       },
       exemptions: [],
       compliance_requirements: [
         'GST registration required',
         'E-invoice generation',
         'E-way bill for interstate movement',
-        'GST return filing'
+        'GST return filing',
       ],
       input_tax_credit_available: true,
       reverse_charge_applicable: false,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Check for exemptions
@@ -428,14 +428,14 @@ function generateTrackingNumber() {
 
 async function getGovernmentSchemes(state, projectType) {
   // In production, fetch from government schemes database
-  let schemes = [
+  const schemes = [
     {
       name: 'Mission for Integrated Development of Horticulture (MIDH)',
       code: 'MIDH',
       ministry: 'Ministry of Agriculture',
       subsidy_percentage: 40,
       max_amount: 5000000,
-      eligibility: { state: ['all'], category: ['greenhouse', 'cold_storage', 'processing'] }
+      eligibility: { state: ['all'], category: ['greenhouse', 'cold_storage', 'processing'] },
     },
     {
       name: 'Agriculture Infrastructure Fund (AIF)',
@@ -443,7 +443,7 @@ async function getGovernmentSchemes(state, projectType) {
       ministry: 'Ministry of Agriculture',
       subsidy_percentage: 33,
       max_amount: 20000000,
-      eligibility: { state: ['all'], category: ['infrastructure', 'warehouse', 'logistics'] }
+      eligibility: { state: ['all'], category: ['infrastructure', 'warehouse', 'logistics'] },
     },
     {
       name: 'PM Formalization of Micro Food Processing Enterprises (PM-FME)',
@@ -451,7 +451,7 @@ async function getGovernmentSchemes(state, projectType) {
       ministry: 'Ministry of Food Processing',
       subsidy_percentage: 35,
       max_amount: 10000000,
-      eligibility: { state: ['all'], category: ['processing', 'equipment'] }
+      eligibility: { state: ['all'], category: ['processing', 'equipment'] },
     },
     {
       name: 'North East Special Infrastructure Development Scheme (NESIDS)',
@@ -459,7 +459,7 @@ async function getGovernmentSchemes(state, projectType) {
       ministry: 'MDoNER',
       subsidy_percentage: 90,
       max_amount: 50000000,
-      eligibility: { state: ['arunachal', 'assam', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'sikkim', 'tripura'], category: ['infrastructure', 'logistics', 'processing'] }
+      eligibility: { state: ['arunachal', 'assam', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'sikkim', 'tripura'], category: ['infrastructure', 'logistics', 'processing'] },
     },
     {
       name: 'MOVCDNER (Mission on Organic Value Chain Development for North East Region)',
@@ -467,12 +467,12 @@ async function getGovernmentSchemes(state, projectType) {
       ministry: 'Ministry of Agriculture',
       subsidy_percentage: 50,
       max_amount: 30000000,
-      eligibility: { state: ['arunachal', 'assam', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'sikkim', 'tripura'], category: ['organic', 'processing', 'value_addition'] }
-    }
+      eligibility: { state: ['arunachal', 'assam', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'sikkim', 'tripura'], category: ['organic', 'processing', 'value_addition'] },
+    },
   ];
 
-  return schemes.filter(scheme => 
-    scheme.eligibility.state.includes('all') || scheme.eligibility.state.includes(state.toLowerCase())
+  return schemes.filter(scheme =>
+    scheme.eligibility.state.includes('all') || scheme.eligibility.state.includes(state.toLowerCase()),
   );
 }
 
@@ -482,8 +482,8 @@ async function getEquipmentSchemes(state, equipmentCategory) {
 }
 
 async function getLogisticsSchemes(state, isNortheastRoute) {
-  let schemes = [];
-  
+  const schemes = [];
+
   if (isNortheastRoute) {
     schemes.push({
       name: 'North East Logistics Support Scheme',
@@ -492,7 +492,7 @@ async function getLogisticsSchemes(state, isNortheastRoute) {
       subsidy_type: 'per_ton',
       rate: 25, // per ton
       max_amount: 500000,
-      eligibility: { state: ['arunachal', 'assam', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'sikkim', 'tripura'] }
+      eligibility: { state: ['arunachal', 'assam', 'manipur', 'meghalaya', 'mizoram', 'nagaland', 'sikkim', 'tripura'] },
     });
   }
 
@@ -504,7 +504,7 @@ async function getPrivateLogisticsPartners(state) {
   return [
     { name: 'AgriTrans Logistics', gstin: '27AAAAA0000A1Z5', rating: 4.5 },
     { name: 'FarmFresh Transport', gstin: '27BBBBB0000B1Z5', rating: 4.2 },
-    { name: 'ColdChain Express', gstin: '27CCCCC0000C1Z5', rating: 4.7 }
+    { name: 'ColdChain Express', gstin: '27CCCCC0000C1Z5', rating: 4.7 },
   ];
 }
 
@@ -517,7 +517,7 @@ async function getProcessingTime(schemeCode) {
 function setupRoutes(app) {
   app.post('/api/v1/subsidy/project/check', authMiddleware, async (req, res) => {
     try {
-      let eligibility = await checkProjectSubsidyEligibility(req.body);
+      const eligibility = await checkProjectSubsidyEligibility(req.body);
       res.json({ success: true, data: eligibility });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -526,7 +526,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/subsidy/equipment/check', authMiddleware, async (req, res) => {
     try {
-      let eligibility = await checkEquipmentSubsidyEligibility(req.body);
+      const eligibility = await checkEquipmentSubsidyEligibility(req.body);
       res.json({ success: true, data: eligibility });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -535,7 +535,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/subsidy/logistics/check', authMiddleware, async (req, res) => {
     try {
-      let eligibility = await checkLogisticsSubsidyEligibility(req.body);
+      const eligibility = await checkLogisticsSubsidyEligibility(req.body);
       res.json({ success: true, data: eligibility });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -544,7 +544,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/subsidy/schemes', async (req, res) => {
     try {
-      let schemes = await getApplicableSchemes(req.query);
+      const schemes = await getApplicableSchemes(req.query);
       res.json({ success: true, data: schemes });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -553,7 +553,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/subsidy/apply', authMiddleware, async (req, res) => {
     try {
-      let application = await submitSubsidyApplication(req.body);
+      const application = await submitSubsidyApplication(req.body);
       res.json({ success: true, data: application });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -562,7 +562,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/subsidy/track/:id', async (req, res) => {
     try {
-      let status = await trackSubsidyApplication(req.params.id);
+      const status = await trackSubsidyApplication(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -587,8 +587,6 @@ module.exports = {
   submitSubsidyApplication,
   trackSubsidyApplication,
   calculateGSTApplicability,
-  setupRoutes
+  setupRoutes,
 };
-
-
 

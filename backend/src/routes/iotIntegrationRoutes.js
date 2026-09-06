@@ -34,7 +34,7 @@ router.post('/devices/register',
       }
 
       const result = await iotService.registerDevice(deviceData);
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'IoT device registered successfully');
       } else {
@@ -43,7 +43,7 @@ router.post('/devices/register',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to register IoT device', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -61,8 +61,8 @@ router.post('/devices/:deviceId/data',
         return apiResponseHandler.sendError(res, 'Invalid sensor data format', 400, 'INVALID_DATA');
       }
 
-      let result = await iotService.receiveDeviceData(deviceId, sensorData);
-      
+      const result = await iotService.receiveDeviceData(deviceId, sensorData);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Device data received successfully');
       } else {
@@ -71,7 +71,7 @@ router.post('/devices/:deviceId/data',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to receive device data', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -84,8 +84,8 @@ router.get('/devices/:deviceId/status',
     try {
       const { deviceId } = req.params;
 
-      let result = await iotService.getDeviceStatus(deviceId);
-      
+      const result = await iotService.getDeviceStatus(deviceId);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Device status retrieved');
       } else {
@@ -94,7 +94,7 @@ router.get('/devices/:deviceId/status',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get device status', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -112,8 +112,8 @@ router.get('/farmers/:farmerId/devices',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      let result = await iotService.getFarmerDevices(farmerId);
-      
+      const result = await iotService.getFarmerDevices(farmerId);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Farmer devices retrieved');
       } else {
@@ -122,7 +122,7 @@ router.get('/farmers/:farmerId/devices',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get farmer devices', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -136,8 +136,8 @@ router.put('/devices/:deviceId/configure',
       const { deviceId } = req.params;
       const configuration = req.body;
 
-      let result = await iotService.configureDevice(deviceId, configuration);
-      
+      const result = await iotService.configureDevice(deviceId, configuration);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Device configured successfully');
       } else {
@@ -146,7 +146,7 @@ router.put('/devices/:deviceId/configure',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to configure device', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -168,8 +168,8 @@ router.get('/data/aggregated',
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      let result = await iotService.getAggregatedData(farmerId, sensorType, timeRange);
-      
+      const result = await iotService.getAggregatedData(farmerId, sensorType, timeRange);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Aggregated data retrieved');
       } else {
@@ -178,7 +178,7 @@ router.get('/data/aggregated',
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get aggregated data', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -189,12 +189,12 @@ router.post('/buffer/process',
   authorize(['admin']),
   async (req, res) => {
     try {
-      let result = await iotService.forceProcessBuffer();
+      const result = await iotService.forceProcessBuffer();
       return apiResponseHandler.sendSuccess(res, null, result.message);
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to process buffer', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
@@ -209,14 +209,14 @@ router.get('/system/status',
         connectedDevices: iotService.getConnectedDevicesCount(),
         bufferStatus: iotService.getBufferStatus(),
         systemHealth: 'operational',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       return apiResponseHandler.sendSuccess(res, systemStatus, 'IoT system status retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get system status', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 module.exports = router;

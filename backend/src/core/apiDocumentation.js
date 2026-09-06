@@ -18,7 +18,7 @@ class APIDocumentation {
       responses: config.responses || {},
       examples: config.examples || {},
       tags: config.tags || [],
-      deprecated: config.deprecated || false
+      deprecated: config.deprecated || false,
     });
   }
 
@@ -33,11 +33,11 @@ class APIDocumentation {
         title: 'EBDESIGN Agricultural Platform API',
         version: '1.0.0',
         description: 'Production-grade agricultural digital operating system',
-        contact: { name: 'EBDESIGN Team', url: 'https://ebdesign.io' }
+        contact: { name: 'EBDESIGN Team', url: 'https://ebdesign.io' },
       },
       servers: [
         { url: 'http://localhost:3000/api/v1', description: 'Development' },
-        { url: 'https://api.ebdesign.io/api/v1', description: 'Production' }
+        { url: 'https://api.ebdesign.io/api/v1', description: 'Production' },
       ],
       paths: this.generatePaths(),
       components: {
@@ -46,10 +46,10 @@ class APIDocumentation {
           bearerAuth: {
             type: 'http',
             scheme: 'bearer',
-            bearerFormat: 'JWT'
-          }
-        }
-      }
+            bearerFormat: 'JWT',
+          },
+        },
+      },
     };
   }
 
@@ -68,15 +68,15 @@ class APIDocumentation {
         tags: endpoint.tags,
         deprecated: endpoint.deprecated,
         ...(endpoint.authentication && {
-          security: [{ bearerAuth: [] }]
+          security: [{ bearerAuth: [] }],
         }),
         ...(endpoint.parameters.length > 0 && {
-          parameters: endpoint.parameters
+          parameters: endpoint.parameters,
         }),
         ...(endpoint.requestBody && {
-          requestBody: endpoint.requestBody
+          requestBody: endpoint.requestBody,
         }),
-        responses: endpoint.responses
+        responses: endpoint.responses,
       };
     }
 
@@ -84,11 +84,11 @@ class APIDocumentation {
   }
 
   generateMarkdown() {
-    let markdown = `# EBDESIGN API Documentation\n\n`;
+    let markdown = '# EBDESIGN API Documentation\n\n';
     markdown += `Generated: ${new Date().toISOString()}\n\n`;
-    markdown += `## Authentication\n\n`;
-    markdown += `All endpoints require a Bearer token in the Authorization header.\n\n`;
-    markdown += `\`\`\`\nAuthorization: Bearer YOUR_JWT_TOKEN\n\`\`\`\n\n`;
+    markdown += '## Authentication\n\n';
+    markdown += 'All endpoints require a Bearer token in the Authorization header.\n\n';
+    markdown += '```\nAuthorization: Bearer YOUR_JWT_TOKEN\n```\n\n';
 
     // Group by tags
     const byTag = {};
@@ -108,18 +108,18 @@ class APIDocumentation {
         markdown += `${endpoint.description}\n\n`;
 
         if (endpoint.parameters.length > 0) {
-          markdown += `**Parameters:**\n\n`;
+          markdown += '**Parameters:**\n\n';
           for (const param of endpoint.parameters) {
             markdown += `- \`${param.name}\` (${param.in}): ${param.description}\n`;
           }
-          markdown += `\n`;
+          markdown += '\n';
         }
 
         if (endpoint.examples[endpoint.method]) {
-          markdown += `**Example:**\n\n`;
-          markdown += `\`\`\`bash\n`;
+          markdown += '**Example:**\n\n';
+          markdown += '```bash\n';
           markdown += endpoint.examples[endpoint.method];
-          markdown += `\n\`\`\`\n\n`;
+          markdown += '\n```\n\n';
         }
       }
     }

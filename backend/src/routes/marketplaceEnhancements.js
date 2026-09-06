@@ -26,7 +26,7 @@ router.post('/gst/calculate/order/:orderId', authMiddleware, async (req, res) =>
 
 router.post('/gst/calculate/product', authMiddleware, async (req, res) => {
   try {
-    let gstCalculation = await gstService.calculateProductGST(req.body);
+    const gstCalculation = await gstService.calculateProductGST(req.body);
     return apiResponseHandler.sendSuccess(res, gstCalculation, 'Product GST calculated successfully');
   } catch (error) {
     return apiResponseHandler.sendError(res, 'Failed to calculate product GST', 500, 'SERVER_ERROR', error.message);
@@ -106,7 +106,7 @@ router.post('/reviews/:reviewId/helpful', authLimiter, authMiddleware, async (re
 router.put('/reviews/:reviewId', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
-    let review = await productReviewService.updateReview(reviewId, req.user.id, req.body);
+    const review = await productReviewService.updateReview(reviewId, req.user.id, req.body);
     res.json({ success: true, data: review });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -116,7 +116,7 @@ router.put('/reviews/:reviewId', authLimiter, authMiddleware, async (req, res) =
 router.delete('/reviews/:reviewId', authLimiter, authMiddleware, async (req, res) => {
   try {
     const { reviewId } = req.params;
-    let result = await productReviewService.deleteReview(reviewId, req.user.id);
+    const result = await productReviewService.deleteReview(reviewId, req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -127,7 +127,7 @@ router.put('/reviews/:reviewId/moderate', authMiddleware, adminMiddleware, async
   try {
     const { reviewId } = req.params;
     const { status } = req.body;
-    let review = await productReviewService.moderateReview(reviewId, status, req.user.id);
+    const review = await productReviewService.moderateReview(reviewId, status, req.user.id);
     res.json({ success: true, data: review });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -136,7 +136,7 @@ router.put('/reviews/:reviewId/moderate', authMiddleware, adminMiddleware, async
 
 router.get('/reviews/user', authMiddleware, async (req, res) => {
   try {
-    let reviews = await productReviewService.getUserReviews(req.user.id, req.query);
+    const reviews = await productReviewService.getUserReviews(req.user.id, req.query);
     res.json({ success: true, data: reviews });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -167,7 +167,7 @@ router.post('/bulk-orders', authLimiter, authMiddleware, async (req, res) => {
 router.get('/bulk-orders/:orderId', authMiddleware, async (req, res) => {
   try {
     const { orderId } = req.params;
-    let bulkOrder = await bulkOrderService.getBulkOrder(orderId, req.user.id, req.user.role === 'admin');
+    const bulkOrder = await bulkOrderService.getBulkOrder(orderId, req.user.id, req.user.role === 'admin');
     res.json({ success: true, data: bulkOrder });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -180,7 +180,7 @@ router.get('/bulk-orders', authMiddleware, async (req, res) => {
       const bulkOrders = await bulkOrderService.getAllBulkOrders(req.query);
       res.json({ success: true, data: bulkOrders });
     } else {
-      let bulkOrders = await bulkOrderService.getUserBulkOrders(req.user.id, req.query);
+      const bulkOrders = await bulkOrderService.getUserBulkOrders(req.user.id, req.query);
       res.json({ success: true, data: bulkOrders });
     }
   } catch (error) {
@@ -192,7 +192,7 @@ router.put('/bulk-orders/:orderId/status', authMiddleware, adminMiddleware, asyn
   try {
     const { orderId } = req.params;
     const { status, notes } = req.body;
-    let bulkOrder = await bulkOrderService.updateBulkOrderStatus(orderId, status, req.user.id, notes);
+    const bulkOrder = await bulkOrderService.updateBulkOrderStatus(orderId, status, req.user.id, notes);
     res.json({ success: true, data: bulkOrder });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -212,7 +212,7 @@ router.post('/bulk-orders/:orderId/quotation', authMiddleware, adminMiddleware, 
 router.post('/quotations/:quotationId/accept', authMiddleware, async (req, res) => {
   try {
     const { quotationId } = req.params;
-    let quotation = await bulkOrderService.acceptQuotation(quotationId, req.user.id);
+    const quotation = await bulkOrderService.acceptQuotation(quotationId, req.user.id);
     res.json({ success: true, data: quotation });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -223,7 +223,7 @@ router.post('/quotations/:quotationId/reject', authMiddleware, async (req, res) 
   try {
     const { quotationId } = req.params;
     const { reason } = req.body;
-    let quotation = await bulkOrderService.rejectQuotation(quotationId, req.user.id, reason);
+    const quotation = await bulkOrderService.rejectQuotation(quotationId, req.user.id, reason);
     res.json({ success: true, data: quotation });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -232,7 +232,7 @@ router.post('/quotations/:quotationId/reject', authMiddleware, async (req, res) 
 
 router.get('/bulk-orders/stats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    let stats = await bulkOrderService.getBulkOrderStats(req.query);
+    const stats = await bulkOrderService.getBulkOrderStats(req.query);
     res.json({ success: true, data: stats });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -242,7 +242,7 @@ router.get('/bulk-orders/stats', authMiddleware, adminMiddleware, async (req, re
 router.delete('/bulk-orders/:orderId', authMiddleware, async (req, res) => {
   try {
     const { orderId } = req.params;
-    let result = await bulkOrderService.cancelBulkOrder(orderId, req.user.id);
+    const result = await bulkOrderService.cancelBulkOrder(orderId, req.user.id);
     res.json({ success: true, data: result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

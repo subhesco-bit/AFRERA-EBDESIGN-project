@@ -23,9 +23,7 @@ router.use(apiLimiter);
  * GET /api/predictive/demand/:cropType
  * Predict crop demand forecast
  */
-router.get
-    // Log request
-    logger.debug('router.get request');('/demand/:cropType',
+router.get('/demand/:cropType',
   authorize(['farmer', 'admin', 'analyst', 'buyer']),
   async (req, res) => {
     try {
@@ -33,55 +31,51 @@ router.get
       const { region, forecastDays = 30 } = req.query;
 
       const result = await predictiveService.predictCropDemand(cropType, region, parseInt(forecastDays));
-      
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Demand forecast generated');
       } else {
         return apiResponseHandler.sendError(res, result.error, 400, 'PREDICTION_ERROR', null, {
-          dataPoints: result.dataPoints
+          dataPoints: result.dataPoints,
         });
       }
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate demand forecast', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
  * GET /api/predictive/pricing/:cropType
  * Predict optimal pricing
  */
-router.get
-    // Log request
-    logger.debug('router.get request');('/pricing/:cropType',
+router.get('/pricing/:cropType',
   authorize(['farmer', 'admin', 'analyst']),
   async (req, res) => {
     try {
       const { cropType } = req.params;
       const { region, qualityGrade = 'standard' } = req.query;
 
-      let result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
-      
+      const result = await predictiveService.predictOptimalPricing(cropType, region, qualityGrade);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Pricing prediction generated');
       } else {
         return apiResponseHandler.sendError(res, result.error, 400, 'PREDICTION_ERROR', null, {
-          dataPoints: result.dataPoints
+          dataPoints: result.dataPoints,
         });
       }
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate pricing prediction', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
  * POST /api/predictive/yield
  * Predict crop yield
  */
-router.post
-    // Log request
-    logger.debug('router.post request');('/yield',
+router.post('/yield',
   authorize(['farmer', 'admin', 'analyst']),
   async (req, res) => {
     try {
@@ -96,8 +90,8 @@ router.post
         return apiResponseHandler.sendError(res, 'Unauthorized access', 403, 'FORBIDDEN');
       }
 
-      let result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
-      
+      const result = await predictiveService.predictCropYield(farmerId, cropId, conditions);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Yield prediction generated');
       } else {
@@ -106,23 +100,21 @@ router.post
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to generate yield prediction', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
  * GET /api/predictive/seasonal/:region/:season
  * Get seasonal recommendations
  */
-router.get
-    // Log request
-    logger.debug('router.get request');('/seasonal/:region/:season',
+router.get('/seasonal/:region/:season',
   authorize(['farmer', 'admin', 'analyst']),
   async (req, res) => {
     try {
       const { region, season } = req.params;
 
-      let result = await predictiveService.getSeasonalRecommendations(region, season);
-      
+      const result = await predictiveService.getSeasonalRecommendations(region, season);
+
       if (result.success) {
         return apiResponseHandler.sendSuccess(res, result.data, 'Seasonal recommendations retrieved');
       } else {
@@ -131,16 +123,14 @@ router.get
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get seasonal recommendations', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 /**
  * GET /api/predictive/models/status
  * Get predictive models status
  */
-router.get
-    // Log request
-    logger.debug('router.get request');('/models/status',
+router.get('/models/status',
   authorize(['admin', 'analyst']),
   async (req, res) => {
     try {
@@ -149,14 +139,14 @@ router.get
         pricing: predictiveService.models.pricing,
         yield: predictiveService.models.yield,
         overallStatus: 'operational',
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       };
 
       return apiResponseHandler.sendSuccess(res, modelsStatus, 'Predictive models status retrieved');
     } catch (error) {
       return apiResponseHandler.sendError(res, 'Failed to get models status', 500, 'SERVER_ERROR', error.message);
     }
-  }
+  },
 );
 
 module.exports = router;

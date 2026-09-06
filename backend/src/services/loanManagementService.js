@@ -16,7 +16,7 @@ class LoanManagementService {
    */
   async createLoanApplication(farmerId, loanData) {
   // Validate inputs
-  if (!farmerId) throw new Error('Missing required parameter');
+    if (!farmerId) throw new Error('Missing required parameter');
 
     try {
       if (!farmerId || !loanData.amount || !loanData.purpose) {
@@ -34,7 +34,7 @@ class LoanManagementService {
         status: 'applied',
         application_date: new Date(),
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       }).returning('*');
 
       logger.info(`Loan application created: ${farmerId}`);
@@ -42,7 +42,7 @@ class LoanManagementService {
       return {
         loan_id: loanId,
         status: 'applied',
-        amount: loanData.amount
+        amount: loanData.amount,
       };
     } catch (error) {
       logger.error(`Create loan application failed: ${error.message}`);
@@ -55,7 +55,7 @@ class LoanManagementService {
    */
   async getLoanStatus(loanId) {
     try {
-      let loan = await db('loans').where('id', loanId).first();
+      const loan = await db('loans').where('id', loanId).first();
       if (!loan) throw new NotFoundError('Loan not found');
 
       const payments = await db('loan_payments').where('loan_id', loanId);
@@ -67,7 +67,7 @@ class LoanManagementService {
         interest_rate: loan.interest_rate,
         disbursed_date: loan.disbursed_date,
         total_payments_made: payments.filter(p => p.status === 'completed').length,
-        total_payments_due: loan.tenure_months
+        total_payments_due: loan.tenure_months,
       };
     } catch (error) {
       logger.error(`Get loan status failed: ${error.message}`);
@@ -86,14 +86,14 @@ class LoanManagementService {
           status: 'approved',
           admin_notes: adminNotes,
           approved_date: new Date(),
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       logger.info(`Loan approved: ${loanId}`);
 
       return {
         loan_id: loanId,
-        status: 'approved'
+        status: 'approved',
       };
     } catch (error) {
       logger.error(`Approve loan failed: ${error.message}`);
@@ -106,7 +106,7 @@ class LoanManagementService {
    */
   async disburseLoan(loanId) {
     try {
-      let loan = await db('loans').where('id', loanId).first();
+      const loan = await db('loans').where('id', loanId).first();
       if (!loan) throw new NotFoundError('Loan not found');
 
       await db('loans')
@@ -114,7 +114,7 @@ class LoanManagementService {
         .update({
           status: 'disbursed',
           disbursed_date: new Date(),
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       logger.info(`Loan disbursed: ${loanId}`);
@@ -122,7 +122,7 @@ class LoanManagementService {
       return {
         loan_id: loanId,
         status: 'disbursed',
-        amount: loan.amount
+        amount: loan.amount,
       };
     } catch (error) {
       logger.error(`Disburse loan failed: ${error.message}`);
@@ -135,10 +135,10 @@ class LoanManagementService {
    */
   async trackRepayment(loanId) {
     try {
-      let loan = await db('loans').where('id', loanId).first();
+      const loan = await db('loans').where('id', loanId).first();
       if (!loan) throw new NotFoundError('Loan not found');
 
-      let payments = await db('loan_payments')
+      const payments = await db('loan_payments')
         .where('loan_id', loanId)
         .orderBy('due_date');
 
@@ -151,7 +151,7 @@ class LoanManagementService {
         total_amount: loan.amount,
         completed_payments: completed,
         pending_payments: pending,
-        overdue_payments: overdue
+        overdue_payments: overdue,
       };
     } catch (error) {
       logger.error(`Track repayment failed: ${error.message}`);

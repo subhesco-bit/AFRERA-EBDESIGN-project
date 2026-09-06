@@ -25,7 +25,7 @@ const list = async (req, res) => {
 
 const get = async (req, res) => {
   try {
-    let customer = await customerService.getCustomer(req.params.id);
+    const customer = await customerService.getCustomer(req.params.id);
     if (!customer) {
       return res.status(404).json({ success: false, error: 'Customer not found' });
     }
@@ -37,7 +37,7 @@ const get = async (req, res) => {
 
 const update = async (req, res) => {
   try {
-    let customer = await customerService.updateCustomer(req.params.id, req.body);
+    const customer = await customerService.updateCustomer(req.params.id, req.body);
     if (!customer) {
       return res.status(404).json({ success: false, error: 'Customer not found' });
     }
@@ -74,5 +74,5 @@ module.exports = {
   get,
   update,
   remove,
-  getCustomerInsights
+  getCustomerInsights,
 };

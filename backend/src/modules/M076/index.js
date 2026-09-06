@@ -8,8 +8,8 @@ router.get('/budgets/:id/usage', controller.trackWaterUsage);
 router.post('/budgets/:id/optimize', controller.optimizeWaterAllocation);
 router.get('/budgets/:id/report', controller.generateBudgetReport);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

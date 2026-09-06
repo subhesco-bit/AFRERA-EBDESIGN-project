@@ -43,7 +43,7 @@ class AicollaborationService {
       return {
         success: true,
         message: 'Operation completed',
-        data: null
+        data: null,
       };
     } catch (error) {
       logger.error('aiCollaborationService execute failed', error);

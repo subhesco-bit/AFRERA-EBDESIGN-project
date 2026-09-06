@@ -1,9 +1,9 @@
 /**
  * Government Subsidy Management Service
  * Strategic implementation for government subsidy tracking, distribution, and monitoring
- * 
- * Business Concept: Government subsidy management involves tracking, distributing, and 
- * monitoring agricultural subsidies, DBT payments, and support programs to ensure efficient 
+ *
+ * Business Concept: Government subsidy management involves tracking, distributing, and
+ * monitoring agricultural subsidies, DBT payments, and support programs to ensure efficient
  * resource allocation and prevent leakage.
  */
 
@@ -13,7 +13,7 @@ const logger = require('../../utils/logger');
 class GovernmentSubsidyService {
   constructor() {
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL
+      connectionString: process.env.DATABASE_URL,
     });
   }
 
@@ -24,17 +24,17 @@ class GovernmentSubsidyService {
    */
   async createSubsidyProgram(programData) {
     const client = await this.pool.connect();
-    
+
     try {
       await client.query('BEGIN');
-      
+
       // Validate ministry and fiscal year
       const validationResult = await this.validateProgramDetails(client, programData);
-      
+
       if (!validationResult.valid) {
         throw new Error(`Program validation failed: ${validationResult.reason}`);
       }
-      
+
       // Create subsidy program
       const programResult = await client.query(
         `INSERT INTO government_subsidy_programs 
@@ -63,19 +63,19 @@ class GovernmentSubsidyService {
           programData.application_period_end,
           JSON.stringify(programData.disbursement_schedule || {}),
           programData.utilization_target || 80.0,
-          programData.leak_detection_threshold || 10.0
-        ]
+          programData.leak_detection_threshold || 10.0,
+        ],
       );
-      
+
       const programId = programResult.rows[0].id;
-      
+
       // Generate program monitoring dashboard
       await this.initializeProgramMonitoring(client, programId);
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Government subsidy program created: ${programId}`);
-      
+
       return {
         success: true,
         program: {
@@ -84,10 +84,10 @@ class GovernmentSubsidyService {
           ministry: programData.ministry,
           fiscal_year: programData.fiscal_year,
           budget_allocation: programData.budget_allocation,
-          created_at: programResult.rows[0].created_at
-        }
+          created_at: programResult.rows[0].created_at,
+        },
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error creating subsidy program: ${error.message}`);
@@ -109,34 +109,34 @@ class GovernmentSubsidyService {
       const duplicateResult = await client.query(
         `SELECT id FROM government_subsidy_programs 
          WHERE program_name = $1 AND fiscal_year = $2`,
-        [programData.program_name, programData.fiscal_year]
+        [programData.program_name, programData.fiscal_year],
       );
-      
+
       if (duplicateResult.rows.length > 0) {
         return { valid: false, reason: 'Program with same name already exists in this fiscal year' };
       }
-      
+
       // Validate budget allocation is positive
       if (programData.budget_allocation <= 0) {
         return { valid: false, reason: 'Budget allocation must be positive' };
       }
-      
+
       // Validate application period
       if (new Date(programData.application_period_start) >= new Date(programData.application_period_end)) {
         return { valid: false, reason: 'Application period end must be after start' };
       }
-      
+
       // Validate subsidy type has corresponding amount/percentage
       if (programData.subsidy_type === 'fixed_amount' && !programData.subsidy_amount) {
         return { valid: false, reason: 'Fixed amount subsidy requires subsidy_amount' };
       }
-      
+
       if (programData.subsidy_type === 'percentage' && !programData.subsidy_percentage) {
         return { valid: false, reason: 'Percentage subsidy requires subsidy_percentage' };
       }
-      
+
       return { valid: true };
-      
+
     } catch (error) {
       logger.error(`Error validating program details: ${error.message}`);
       return { valid: false, reason: 'Validation error' };
@@ -162,8 +162,8 @@ class GovernmentSubsidyService {
    */
   async calculateEligibility(farmerId, programId) {
     try {
-      let client = await this.pool.connect();
-      
+      const client = await this.pool.connect();
+
       try {
         // Get farmer details
         const farmerResult = await client.query(
@@ -171,30 +171,30 @@ class GovernmentSubsidyService {
            FROM farmers f
            LEFT JOIN land_records l ON f.id = l.farmer_id
            WHERE f.id = $1`,
-          [farmerId]
+          [farmerId],
         );
-        
+
         if (farmerResult.rows.length === 0) {
           return { eligible: false, reason: 'Farmer not found' };
         }
-        
+
         const farmer = farmerResult.rows[0];
-        
+
         // Get program details
-        let programResult = await client.query(
-          `SELECT * FROM government_subsidy_programs WHERE id = $1`,
-          [programId]
+        const programResult = await client.query(
+          'SELECT * FROM government_subsidy_programs WHERE id = $1',
+          [programId],
         );
-        
+
         if (programResult.rows.length === 0) {
           return { eligible: false, reason: 'Program not found' };
         }
-        
+
         const program = programResult.rows[0];
-        
+
         // Check eligibility criteria
         const eligibilityChecks = [];
-        
+
         // Land ownership check
         if (program.land_ownership_requirement) {
           const landVerified = farmer.land_verification_status === 'verified';
@@ -202,18 +202,18 @@ class GovernmentSubsidyService {
             criterion: 'land_ownership',
             required: true,
             actual: landVerified,
-            passed: landVerified
+            passed: landVerified,
           });
-          
+
           if (!landVerified) {
-            return { 
-              eligible: false, 
+            return {
+              eligible: false,
               reason: 'Land ownership not verified',
-              checks: eligibilityChecks
+              checks: eligibilityChecks,
             };
           }
         }
-        
+
         // Land size check
         if (program.minimum_land_hectares) {
           const landHectares = farmer.land_hectares || 0;
@@ -222,18 +222,18 @@ class GovernmentSubsidyService {
             criterion: 'minimum_land',
             required: program.minimum_land_hectares,
             actual: landHectares,
-            passed: landCheck
+            passed: landCheck,
           });
-          
+
           if (!landCheck) {
-            return { 
-              eligible: false, 
+            return {
+              eligible: false,
               reason: `Land holding (${landHectares} hectares) below minimum (${program.minimum_land_hectares} hectares)`,
-              checks: eligibilityChecks
+              checks: eligibilityChecks,
             };
           }
         }
-        
+
         // Income threshold check
         if (program.maximum_income_threshold) {
           const farmerIncome = farmer.annual_income || 0;
@@ -242,70 +242,70 @@ class GovernmentSubsidyService {
             criterion: 'income_threshold',
             maximum: program.maximum_income_threshold,
             actual: farmerIncome,
-            passed: incomeCheck
+            passed: incomeCheck,
           });
-          
+
           if (!incomeCheck) {
-            return { 
-              eligible: false, 
+            return {
+              eligible: false,
               reason: `Annual income (₹${farmerIncome}) exceeds maximum threshold (₹${program.maximum_income_threshold})`,
-              checks: eligibilityChecks
+              checks: eligibilityChecks,
             };
           }
         }
-        
+
         // Crop eligibility check
         if (program.eligible_crops && program.eligible_crops.length > 0) {
           const farmerCrops = await this.getFarmerCrops(client, farmerId);
-          const cropMatch = farmerCrops.some(crop => 
-            program.eligible_crops.includes(crop)
+          const cropMatch = farmerCrops.some(crop =>
+            program.eligible_crops.includes(crop),
           );
-          
+
           eligibilityChecks.push({
             criterion: 'crop_eligibility',
             required_crops: program.eligible_crops,
             farmer_crops: farmerCrops,
-            passed: cropMatch
+            passed: cropMatch,
           });
-          
+
           if (!cropMatch) {
-            return { 
-              eligible: false, 
+            return {
+              eligible: false,
               reason: 'Farmer does not grow any eligible crops for this program',
-              checks: eligibilityChecks
+              checks: eligibilityChecks,
             };
           }
         }
-        
+
         // Regional eligibility check
         if (program.eligible_regions && program.eligible_regions.length > 0) {
-          const regionMatch = program.eligible_regions.includes(farmer.state) || 
+          const regionMatch = program.eligible_regions.includes(farmer.state) ||
                            program.eligible_regions.includes(farmer.district);
-          
+
           eligibilityChecks.push({
             criterion: 'regional_eligibility',
             eligible_regions: program.eligible_regions,
             farmer_region: `${farmer.district}, ${farmer.state}`,
-            passed: regionMatch
+            passed: regionMatch,
           });
-          
+
           if (!regionMatch) {
-            return { 
-              eligible: false, 
+            return {
+              eligible: false,
               reason: 'Farmer region not eligible for this program',
-              checks: eligibilityChecks
+              checks: eligibilityChecks,
             };
           }
         }
-        
+
         client.release();
-        
+
         // Calculate subsidy amount if eligible
         const subsidyAmount = await this.calculateSubsidyAmount(
           program,
-          farmer
+          farmer,
         );
-        
+
         return {
           eligible: true,
           subsidy_amount: subsidyAmount,
@@ -313,14 +313,14 @@ class GovernmentSubsidyService {
           program_details: {
             program_name: program.program_name,
             subsidy_type: program.subsidy_type,
-            application_deadline: program.application_period_end
-          }
+            application_deadline: program.application_period_end,
+          },
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error calculating eligibility: ${error.message}`);
       throw error;
@@ -338,11 +338,11 @@ class GovernmentSubsidyService {
       const result = await client.query(
         `SELECT DISTINCT crop_name FROM crop_plantings 
          WHERE farmer_id = $1 AND status = 'active'`,
-        [farmerId]
+        [farmerId],
       );
-      
+
       return result.rows.map(row => row.crop_name);
-      
+
     } catch (error) {
       logger.error(`Error getting farmer crops: ${error.message}`);
       return [];
@@ -358,40 +358,40 @@ class GovernmentSubsidyService {
   async calculateSubsidyAmount(program, farmer) {
     try {
       let subsidyAmount = 0;
-      
+
       switch (program.subsidy_type) {
         case 'fixed_amount':
           subsidyAmount = program.subsidy_amount;
           break;
-          
+
         case 'percentage': {
           // Calculate based on farmer's input costs or production value
           const baseValue = farmer.estimated_annual_input_cost || 50000; // Default fallback
           subsidyAmount = baseValue * (program.subsidy_percentage / 100);
           break;
         }
-          
+
         case 'input':
           // Calculate based on actual input purchases
           subsidyAmount = await this.calculateInputBasedSubsidy(farmer.id);
           break;
-          
+
         case 'output':
           // Calculate based on production
           subsidyAmount = await this.calculateOutputBasedSubsidy(farmer.id);
           break;
-          
+
         default:
           subsidyAmount = program.subsidy_amount || 0;
       }
-      
+
       // Apply maximum cap if specified
       if (program.maximum_subsidy_per_farmer && subsidyAmount > program.maximum_subsidy_per_farmer) {
         subsidyAmount = program.maximum_subsidy_per_farmer;
       }
-      
+
       return Math.round(subsidyAmount);
-      
+
     } catch (error) {
       logger.error(`Error calculating subsidy amount: ${error.message}`);
       return 0;
@@ -405,17 +405,17 @@ class GovernmentSubsidyService {
    */
   async calculateInputBasedSubsidy(farmerId) {
     try {
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `SELECT SUM(purchase_amount) as total_input_cost
          FROM farmer_input_purchases 
          WHERE farmer_id = $1 
          AND purchase_date >= NOW() - INTERVAL '12 months'`,
-        [farmerId]
+        [farmerId],
       );
-      
+
       const totalInputCost = result.rows[0].total_input_cost || 0;
       return totalInputCost * 0.5; // 50% subsidy on inputs
-      
+
     } catch (error) {
       logger.error(`Error calculating input-based subsidy: ${error.message}`);
       return 0;
@@ -429,17 +429,17 @@ class GovernmentSubsidyService {
    */
   async calculateOutputBasedSubsidy(farmerId) {
     try {
-      let result = await this.pool.query(
+      const result = await this.pool.query(
         `SELECT SUM(sales_value) as total_output_value
          FROM farmer_sales 
          WHERE farmer_id = $1 
          AND sale_date >= NOW() - INTERVAL '12 months'`,
-        [farmerId]
+        [farmerId],
       );
-      
+
       const totalOutputValue = result.rows[0].total_output_value || 0;
       return totalOutputValue * 0.1; // 10% subsidy on output
-      
+
     } catch (error) {
       logger.error(`Error calculating output-based subsidy: ${error.message}`);
       return 0;
@@ -452,43 +452,43 @@ class GovernmentSubsidyService {
    * @returns {Object} Application result
    */
   async submitSubsidyApplication(applicationData) {
-    let client = await this.pool.connect();
-    
+    const client = await this.pool.connect();
+
     try {
       await client.query('BEGIN');
-      
+
       // Check eligibility first
       const eligibility = await this.calculateEligibility(
         applicationData.farmer_id,
-        applicationData.program_id
+        applicationData.program_id,
       );
-      
+
       if (!eligibility.eligible) {
         await client.query('ROLLBACK');
         return {
           success: false,
           reason: eligibility.reason,
-          eligibility_checks: eligibility.checks
+          eligibility_checks: eligibility.checks,
         };
       }
-      
+
       // Check if application already exists for this program and farmer
       const existingApplication = await client.query(
         `SELECT id FROM government_subsidy_applications 
          WHERE farmer_id = $1 AND program_id = $2 
          AND status IN ('submitted', 'under_review', 'approved')
          AND application_date >= NOW() - INTERVAL '1 year'`,
-        [applicationData.farmer_id, applicationData.program_id]
+        [applicationData.farmer_id, applicationData.program_id],
       );
-      
+
       if (existingApplication.rows.length > 0) {
         await client.query('ROLLBACK');
         return {
           success: false,
-          reason: 'Application already exists for this program in current fiscal year'
+          reason: 'Application already exists for this program in current fiscal year',
         };
       }
-      
+
       // Create application
       const applicationResult = await client.query(
         `INSERT INTO government_subsidy_applications 
@@ -508,19 +508,19 @@ class GovernmentSubsidyService {
           applicationData.land_document_url || null,
           applicationData.aadhaar_number,
           applicationData.bank_account_number,
-          applicationData.bank_ifsc_code
-        ]
+          applicationData.bank_ifsc_code,
+        ],
       );
-      
+
       const applicationId = applicationResult.rows[0].id;
-      
+
       // Initiate verification processes
       await this.initiateVerifications(client, applicationId, applicationData);
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Subsidy application submitted: ${applicationId}`);
-      
+
       return {
         success: true,
         application: {
@@ -529,16 +529,16 @@ class GovernmentSubsidyService {
           program_id: applicationData.program_id,
           subsidy_amount: eligibility.subsidy_amount,
           status: 'submitted',
-          created_at: applicationResult.rows[0].created_at
+          created_at: applicationResult.rows[0].created_at,
         },
         next_steps: [
           'Land verification in progress',
           'Aadhaar verification pending',
           'Bank account verification pending',
-          'Expected processing time: 15-30 working days'
-        ]
+          'Expected processing time: 15-30 working days',
+        ],
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error submitting subsidy application: ${error.message}`);
@@ -563,16 +563,16 @@ class GovernmentSubsidyService {
              aadhaar_verification_status = 'pending',
              bank_verification_status = 'pending'
          WHERE id = $1`,
-        [applicationId]
+        [applicationId],
       );
-      
+
       // In production, this would trigger actual verification processes:
       // - Land record verification with revenue department
       // - Aadhaar verification with UIDAI
       // - Bank account verification with NPCI
-      
+
       logger.info(`Verifications initiated for application: ${applicationId}`);
-      
+
     } catch (error) {
       logger.error(`Error initiating verifications: ${error.message}`);
     }
@@ -585,32 +585,32 @@ class GovernmentSubsidyService {
    * @returns {Object} Disbursement result
    */
   async disburseSubsidy(applicationId, disbursementData) {
-    let client = await this.pool.connect();
-    
+    const client = await this.pool.connect();
+
     try {
       await client.query('BEGIN');
-      
+
       // Get application details
-      let applicationResult = await client.query(
+      const applicationResult = await client.query(
         `SELECT sa.*, sp.subsidy_amount, sp.subsidy_percentage, sp.subsidy_type
          FROM government_subsidy_applications sa
          JOIN government_subsidy_programs sp ON sa.program_id = sp.id
          WHERE sa.id = $1`,
-        [applicationId]
+        [applicationId],
       );
-      
+
       if (applicationResult.rows.length === 0) {
         throw new Error('Application not found');
       }
-      
+
       const application = applicationResult.rows[0];
-      
+
       // Calculate final subsidy amount
       let finalAmount = application.subsidy_amount;
       if (application.subsidy_type === 'percentage') {
         finalAmount = application.income_declaration * (application.subsidy_percentage / 100);
       }
-      
+
       // Create disbursement record
       const disbursementResult = await client.query(
         `INSERT INTO subsidy_disbursements 
@@ -629,22 +629,22 @@ class GovernmentSubsidyService {
           application.aadhaar_verification_status === 'verified',
           application.bank_verification_status === 'verified',
           application.land_verification_status === 'verified',
-          application.income_declaration
-        ]
+          application.income_declaration,
+        ],
       );
-      
+
       // Update application status
       await client.query(
         `UPDATE government_subsidy_applications 
          SET status = 'disbursed', approval_date = $1
          WHERE id = $2`,
-        [new Date(), applicationId]
+        [new Date(), applicationId],
       );
-      
+
       await client.query('COMMIT');
-      
+
       logger.info(`Subsidy disbursed for application: ${applicationId}`);
-      
+
       return {
         success: true,
         disbursement: {
@@ -652,10 +652,10 @@ class GovernmentSubsidyService {
           application_id: applicationId,
           amount: finalAmount,
           payment_method: disbursementData.payment_method || 'dbt',
-          disbursement_date: disbursementData.disbursement_date || new Date()
-        }
+          disbursement_date: disbursementData.disbursement_date || new Date(),
+        },
       };
-      
+
     } catch (error) {
       await client.query('ROLLBACK');
       logger.error(`Error disbursing subsidy: ${error.message}`);
@@ -672,21 +672,21 @@ class GovernmentSubsidyService {
    */
   async trackSubsidyImpact(programId) {
     try {
-      let client = await this.pool.connect();
-      
+      const client = await this.pool.connect();
+
       try {
         // Get program details
-        let programResult = await client.query(
-          `SELECT * FROM government_subsidy_programs WHERE id = $1`,
-          [programId]
+        const programResult = await client.query(
+          'SELECT * FROM government_subsidy_programs WHERE id = $1',
+          [programId],
         );
-        
+
         if (programResult.rows.length === 0) {
           throw new Error('Program not found');
         }
-        
-        let program = programResult.rows[0];
-        
+
+        const program = programResult.rows[0];
+
         // Get utilization metrics
         const utilizationResult = await client.query(
           `SELECT 
@@ -696,9 +696,9 @@ class GovernmentSubsidyService {
               SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_applications
            FROM government_subsidy_applications 
            WHERE program_id = $1`,
-          [programId]
+          [programId],
         );
-        
+
         // Get financial metrics
         const financialResult = await client.query(
           `SELECT 
@@ -707,54 +707,54 @@ class GovernmentSubsidyService {
               COUNT(*) as disbursement_count
            FROM subsidy_disbursements 
            WHERE program_id = $1 AND status = 'disbursed'`,
-          [programId]
+          [programId],
         );
-        
+
         // Calculate utilization rate
         const totalApplications = utilizationResult.rows[0].total_applications || 0;
-        const utilizationRate = totalApplications > 0 
-          ? ((utilizationResult.rows[0].disbursed_applications / totalApplications) * 100).toFixed(1)
-          : 0;
-        
+        const utilizationRate = totalApplications > 0 ?
+          ((utilizationResult.rows[0].disbursed_applications / totalApplications) * 100).toFixed(1) :
+          0;
+
         // Detect potential leakage
         const leakDetection = await this.detectLeakage(client, programId);
-        
+
         // Calculate impact metrics
         const impactMetrics = await this.calculateImpactMetrics(client, programId);
-        
+
         client.release();
-        
+
         return {
           program: {
             id: program.id,
             program_name: program.program_name,
             budget_allocation: program.budget_allocation,
-            utilization_target: program.utilization_target
+            utilization_target: program.utilization_target,
           },
           utilization: {
             total_applications: totalApplications,
             approved_applications: utilizationResult.rows[0].approved_applications,
             disbursed_applications: utilizationResult.rows[0].disbursed_applications,
             rejected_applications: utilizationResult.rows[0].rejected_applications,
-            utilization_rate: parseFloat(utilizationRate) + '%',
-            target_met: parseFloat(utilizationRate) >= program.utilization_target
+            utilization_rate: `${parseFloat(utilizationRate) }%`,
+            target_met: parseFloat(utilizationRate) >= program.utilization_target,
           },
           financial: {
             total_disbursed: financialResult.rows[0].total_disbursed || 0,
             average_disbursement: financialResult.rows[0].average_disbursement || 0,
             disbursement_count: financialResult.rows[0].disbursement_count || 0,
-            budget_utilization: program.budget_allocation > 0 
-              ? ((financialResult.rows[0].total_disbursed / program.budget_allocation) * 100).toFixed(1) + '%'
-              : '0%'
+            budget_utilization: program.budget_allocation > 0 ?
+              `${((financialResult.rows[0].total_disbursed / program.budget_allocation) * 100).toFixed(1) }%` :
+              '0%',
           },
           leak_detection: leakDetection,
-          impact: impactMetrics
+          impact: impactMetrics,
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error tracking subsidy impact: ${error.message}`);
       throw error;
@@ -770,15 +770,15 @@ class GovernmentSubsidyService {
   async detectLeakage(client, programId) {
     try {
       // Check for duplicate applications
-      let duplicateResult = await client.query(
+      const duplicateResult = await client.query(
         `SELECT farmer_id, COUNT(*) as application_count
          FROM government_subsidy_applications 
          WHERE program_id = $1 AND status IN ('approved', 'disbursed')
          GROUP BY farmer_id
          HAVING COUNT(*) > 1`,
-        [programId]
+        [programId],
       );
-      
+
       // Check for unusual disbursement patterns
       const unusualPatternResult = await client.query(
         `SELECT farmer_id, SUM(subsidy_amount) as total_received, COUNT(*) as disbursement_count
@@ -786,9 +786,9 @@ class GovernmentSubsidyService {
          WHERE program_id = $1 AND status = 'disbursed'
          GROUP BY farmer_id
          HAVING SUM(subsidy_amount) > 100000 OR COUNT(*) > 3`,
-        [programId]
+        [programId],
       );
-      
+
       // Check for verification failures
       const verificationFailureResult = await client.query(
         `SELECT COUNT(*) as failed_verifications
@@ -797,29 +797,29 @@ class GovernmentSubsidyService {
          AND (land_verification_status = 'failed' 
               OR aadhaar_verification_status = 'failed' 
               OR bank_verification_status = 'failed')`,
-        [programId]
+        [programId],
       );
-      
+
       const leakRisk = {
         duplicate_applications: duplicateResult.rows.length,
         unusual_patterns: unusualPatternResult.rows.length,
         verification_failures: verificationFailureResult.rows[0].failed_verifications,
-        overall_risk: 'low'
+        overall_risk: 'low',
       };
-      
+
       // Calculate overall risk
-      const riskScore = (duplicateResult.rows.length * 3) + 
-                       (unusualPatternResult.rows.length * 2) + 
+      const riskScore = (duplicateResult.rows.length * 3) +
+                       (unusualPatternResult.rows.length * 2) +
                        verificationFailureResult.rows[0].failed_verifications;
-      
+
       if (riskScore > 10) {
         leakRisk.overall_risk = 'high';
       } else if (riskScore > 5) {
         leakRisk.overall_risk = 'medium';
       }
-      
+
       return leakRisk;
-      
+
     } catch (error) {
       logger.error(`Error detecting leakage: ${error.message}`);
       return { overall_risk: 'unknown', error: error.message };
@@ -842,28 +842,28 @@ class GovernmentSubsidyService {
          WHERE program_id = $1 
          AND pre_subsidy_income IS NOT NULL 
          AND post_subsidy_income IS NOT NULL`,
-        [programId]
+        [programId],
       );
-      
+
       // Calculate productivity improvement
       const productivityResult = await client.query(
         `SELECT AVG(productivity_change) as avg_productivity_change
          FROM subsidy_disbursements 
          WHERE program_id = $1 
          AND productivity_change IS NOT NULL`,
-        [programId]
+        [programId],
       );
-      
+
       return {
         income_impact: {
           average_increase: incomeResult.rows[0].avg_income_increase || 0,
-          percentage_improved: incomeResult.rows[0].income_increase_percentage || 0
+          percentage_improved: incomeResult.rows[0].income_increase_percentage || 0,
         },
         productivity_impact: {
-          average_change: productivityResult.rows[0].avg_productivity_change || 0
-        }
+          average_change: productivityResult.rows[0].avg_productivity_change || 0,
+        },
       };
-      
+
     } catch (error) {
       logger.error(`Error calculating impact metrics: ${error.message}`);
       return { income_impact: {}, productivity_impact: {} };
@@ -878,26 +878,26 @@ class GovernmentSubsidyService {
    */
   async getGovernmentDashboard(ministry, fiscalYear) {
     try {
-      let client = await this.pool.connect();
-      
+      const client = await this.pool.connect();
+
       try {
         // Build query conditions
         const conditions = [];
         const params = [];
         let paramIndex = 1;
-        
+
         if (ministry) {
           conditions.push(`ministry = $${paramIndex++}`);
           params.push(ministry);
         }
-        
+
         if (fiscalYear) {
           conditions.push(`fiscal_year = $${paramIndex++}`);
           params.push(fiscalYear);
         }
-        
+
         const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-        
+
         // Get program summary
         const programSummaryResult = await client.query(
           `SELECT 
@@ -906,9 +906,9 @@ class GovernmentSubsidyService {
               AVG(utilization_target) as avg_utilization_target
            FROM government_subsidy_programs
            ${whereClause}`,
-          params
+          params,
         );
-        
+
         // Get active programs
         const activeProgramsResult = await client.query(
           `SELECT id, program_name, ministry, budget_allocation, fiscal_year,
@@ -917,9 +917,9 @@ class GovernmentSubsidyService {
            ${whereClause}
            ORDER BY budget_allocation DESC
            LIMIT 10`,
-          params
+          params,
         );
-        
+
         // Get overall disbursement statistics
         const disbursementStatsResult = await client.query(
           `SELECT 
@@ -929,9 +929,9 @@ class GovernmentSubsidyService {
            FROM subsidy_disbursements sd
            JOIN government_subsidy_programs sp ON sd.program_id = sp.id
            ${whereClause}`,
-          params
+          params,
         );
-        
+
         // Get application statistics
         const applicationStatsResult = await client.query(
           `SELECT 
@@ -942,23 +942,23 @@ class GovernmentSubsidyService {
            FROM government_subsidy_applications sa
            JOIN government_subsidy_programs sp ON sa.program_id = sp.id
            ${whereClause}`,
-          params
+          params,
         );
-        
+
         client.release();
-        
+
         return {
           summary: programSummaryResult.rows[0],
           active_programs: activeProgramsResult.rows,
           disbursement_statistics: disbursementStatsResult.rows[0],
           application_statistics: applicationStatsResult.rows[0],
-          filters: { ministry, fiscal_year: fiscalYear }
+          filters: { ministry, fiscal_year: fiscalYear },
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error getting government dashboard: ${error.message}`);
       throw error;
@@ -972,8 +972,8 @@ class GovernmentSubsidyService {
    */
   async getFarmerSubsidyDashboard(farmerId) {
     try {
-      let client = await this.pool.connect();
-      
+      const client = await this.pool.connect();
+
       try {
         // Get eligible programs
         const eligibleProgramsResult = await client.query(
@@ -986,9 +986,9 @@ class GovernmentSubsidyService {
            WHERE sp.status = 'active'
            AND sp.application_period_end >= NOW()
            ORDER BY sp.application_period_end ASC
-           LIMIT 10`
+           LIMIT 10`,
         );
-        
+
         // Get farmer's applications
         const applicationsResult = await client.query(
           `SELECT sa.*, sp.program_name, sp.ministry, sp.fiscal_year
@@ -997,9 +997,9 @@ class GovernmentSubsidyService {
            WHERE sa.farmer_id = $1
            ORDER BY sa.application_date DESC
            LIMIT 10`,
-          [farmerId]
+          [farmerId],
         );
-        
+
         // Get farmer's disbursements
         const disbursementsResult = await client.query(
           `SELECT sd.*, sp.program_name, sp.ministry
@@ -1008,11 +1008,11 @@ class GovernmentSubsidyService {
            WHERE sd.farmer_id = $1
            ORDER BY sd.disbursement_date DESC
            LIMIT 10`,
-          [farmerId]
+          [farmerId],
         );
-        
+
         client.release();
-        
+
         return {
           eligible_programs: eligibleProgramsResult.rows,
           my_applications: applicationsResult.rows,
@@ -1021,14 +1021,14 @@ class GovernmentSubsidyService {
             total_applications: applicationsResult.rows.length,
             approved_applications: applicationsResult.rows.filter(a => a.status === 'approved').length,
             disbursed_applications: applicationsResult.rows.filter(a => a.status === 'disbursed').length,
-            total_received: disbursementsResult.rows.reduce((sum, d) => sum + (d.subsidy_amount || 0), 0)
-          }
+            total_received: disbursementsResult.rows.reduce((sum, d) => sum + (d.subsidy_amount || 0), 0),
+          },
         };
-        
+
       } finally {
         client.release();
       }
-      
+
     } catch (error) {
       logger.error(`Error getting farmer subsidy dashboard: ${error.message}`);
       throw error;

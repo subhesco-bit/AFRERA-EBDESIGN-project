@@ -17,7 +17,7 @@ class WebSocketService {
    */
   attach(io) {
   // Validate inputs
-  if (!io) throw new Error('Missing required parameter');
+    if (!io) throw new Error('Missing required parameter');
 
     this.io = io;
     this.setupEventHandlers();
@@ -33,11 +33,11 @@ class WebSocketService {
         cors: {
           origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
           methods: ['GET', 'POST'],
-          credentials: true
+          credentials: true,
         },
         transports: ['websocket', 'polling'],
         pingTimeout: 60000,
-        pingInterval: 25000
+        pingInterval: 25000,
       });
 
       this.setupEventHandlers();
@@ -58,14 +58,14 @@ class WebSocketService {
       this.connectedClients.set(socket.id, {
         connectedAt: new Date(),
         userId: socket.handshake.query.userId || null,
-        rooms: []
+        rooms: [],
       });
 
       // Send welcome message
       socket.emit('connected', {
         message: 'Connected to real-time updates',
         socketId: socket.id,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Handle room subscriptions
@@ -118,7 +118,7 @@ class WebSocketService {
     if (this.io) {
       this.io.emit(event, {
         data,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
@@ -130,7 +130,7 @@ class WebSocketService {
     if (this.io) {
       this.io.to(room).emit(event, {
         data,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
@@ -142,7 +142,7 @@ class WebSocketService {
     if (this.io) {
       this.io.to(socketId).emit(event, {
         data,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
@@ -167,20 +167,20 @@ class WebSocketService {
    */
   sendNotification(notification) {
     const { userId, type, message, data } = notification;
-    
+
     if (userId) {
       this.sendToRoom(`user-${userId}`, 'notification', {
         type,
         message,
         data,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } else {
       this.broadcast('notification', {
         type,
         message,
         data,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   }
@@ -210,7 +210,7 @@ class WebSocketService {
    * Get rooms for a specific client
    */
   getClientRooms(socketId) {
-    let clientData = this.connectedClients.get(socketId);
+    const clientData = this.connectedClients.get(socketId);
     return clientData ? clientData.rooms : [];
   }
 
@@ -224,7 +224,7 @@ class WebSocketService {
         socketId,
         userId: data.userId,
         connectedAt: data.connectedAt,
-        rooms: data.rooms
+        rooms: data.rooms,
       });
     });
     return clients;

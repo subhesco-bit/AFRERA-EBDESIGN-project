@@ -45,7 +45,7 @@ class SellerVerificationService {
         verified_date: null,
         rejection_reason: null,
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       }).returning('*');
 
       logger.info(`Verification request created: ${verificationId} for seller ${sellerId}`);
@@ -54,7 +54,7 @@ class SellerVerificationService {
         id: verificationId,
         status: 'pending',
         submitted_at: new Date(),
-        expected_review_days: 3
+        expected_review_days: 3,
       };
     } catch (error) {
       logger.error(`Verification creation failed: ${error.message}`);
@@ -67,7 +67,7 @@ class SellerVerificationService {
    */
   async getVerificationStatus(sellerId) {
     try {
-      let verification = await db('seller_verifications')
+      const verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .orderBy('submission_date', 'desc')
         .first();
@@ -75,7 +75,7 @@ class SellerVerificationService {
       if (!verification) {
         return {
           status: 'not_submitted',
-          verified: false
+          verified: false,
         };
       }
 
@@ -87,7 +87,7 @@ class SellerVerificationService {
         verified_at: verification.verified_date,
         rejection_reason: verification.rejection_reason,
         business_name: verification.business_name,
-        documents: JSON.parse(verification.documents || '[]')
+        documents: JSON.parse(verification.documents || '[]'),
       };
     } catch (error) {
       logger.error(`Get verification status failed: ${error.message}`);
@@ -101,7 +101,7 @@ class SellerVerificationService {
    */
   async verifySellerAccount(sellerId, adminNotes = '') {
     try {
-      let verification = await db('seller_verifications')
+      const verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .orderBy('submission_date', 'desc')
         .first();
@@ -115,7 +115,7 @@ class SellerVerificationService {
           status: 'verified',
           verified_date: new Date(),
           admin_notes: adminNotes,
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       // Update seller profile
@@ -124,7 +124,7 @@ class SellerVerificationService {
         .update({
           verified: true,
           verified_date: new Date(),
-          verification_id: verification.id
+          verification_id: verification.id,
         });
 
       // Add verified badge to user
@@ -133,7 +133,7 @@ class SellerVerificationService {
         certification_type: 'verified_seller',
         issued_date: new Date(),
         valid_until: null,
-        issuer: 'AFRERA'
+        issuer: 'AFRERA',
       });
 
       logger.info(`Seller ${sellerId} verified successfully`);
@@ -141,7 +141,7 @@ class SellerVerificationService {
       return {
         status: 'verified',
         verified_date: new Date(),
-        badge: 'verified_seller'
+        badge: 'verified_seller',
       };
     } catch (error) {
       logger.error(`Seller verification failed: ${error.message}`);
@@ -154,7 +154,7 @@ class SellerVerificationService {
    */
   async rejectVerification(sellerId, reason) {
     try {
-      let verification = await db('seller_verifications')
+      const verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .orderBy('submission_date', 'desc')
         .first();
@@ -166,14 +166,14 @@ class SellerVerificationService {
         .update({
           status: 'rejected',
           rejection_reason: reason,
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       logger.info(`Seller ${sellerId} verification rejected: ${reason}`);
 
       return {
         status: 'rejected',
-        reason
+        reason,
       };
     } catch (error) {
       logger.error(`Rejection failed: ${error.message}`);
@@ -196,7 +196,7 @@ class SellerVerificationService {
         type: cert.certification_type,
         issued_date: cert.issued_date,
         issuer: cert.issuer,
-        badge_icon: this.getBadgeIcon(cert.certification_type)
+        badge_icon: this.getBadgeIcon(cert.certification_type),
       }));
     } catch (error) {
       logger.error(`Get certifications failed: ${error.message}`);
@@ -210,7 +210,7 @@ class SellerVerificationService {
    */
   async calculateTrustScore(sellerId) {
     try {
-      let verification = await db('seller_verifications')
+      const verification = await db('seller_verifications')
         .where('seller_id', sellerId)
         .where('status', 'verified')
         .first();
@@ -241,11 +241,11 @@ class SellerVerificationService {
         seller_id: sellerId,
         trust_score: Math.round(finalScore),
         factors: {
-          verified: !!verification,
+          verified: Boolean(verification),
           certifications: certifications.count,
           total_orders: orders.count,
-          average_rating: reviews.avg_rating || 0
-        }
+          average_rating: reviews.avg_rating || 0,
+        },
       };
     } catch (error) {
       logger.error(`Calculate trust score failed: ${error.message}`);
@@ -262,7 +262,7 @@ class SellerVerificationService {
       organic: '🌿',
       fair_trade: '🤝',
       gi_certified: '🏆',
-      top_seller: '⭐'
+      top_seller: '⭐',
     };
     return icons[type] || '🎖️';
   }

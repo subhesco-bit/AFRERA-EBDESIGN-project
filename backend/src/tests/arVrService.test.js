@@ -13,7 +13,7 @@ describe('AR/VR Experience Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -21,7 +21,7 @@ describe('AR/VR Experience Service', () => {
       .send({
         email: 'arvr-test@example.com',
         password: 'Test123!@#',
-        role: 'admin'
+        role: 'admin',
       });
     // TEMP DIAGNOSTIC 2026-08-30: registerResponse.body.token has been coming
     // back undefined in CI, causing every subsequent request to 401. Logging
@@ -50,7 +50,7 @@ describe('AR/VR Experience Service', () => {
           target_entity_type: 'product',
           thumbnail_url: '/assets/models/thumbnail.jpg',
           experience_data: { model_url: '/assets/models/test-model.glb' },
-          platform_requirements: { mobile: true, webgl: true }
+          platform_requirements: { mobile: true, webgl: true },
         })
         .expect(201);
 
@@ -64,7 +64,7 @@ describe('AR/VR Experience Service', () => {
       const response = await request(app)
         .post('/api/v1/ar-vr/experiences')
         .send({
-          experience_name: 'Test Experience'
+          experience_name: 'Test Experience',
         })
         .expect(401);
     });
@@ -111,7 +111,7 @@ describe('AR/VR Experience Service', () => {
           file_url: '/assets/models/test-model.glb',
           file_size_bytes: 5242880,
           thumbnail_url: '/assets/models/thumbnail.jpg',
-          metadata: { vertices: 10000, faces: 20000 }
+          metadata: { vertices: 10000, faces: 20000 },
         })
         .expect(201);
 
@@ -143,7 +143,7 @@ describe('AR/VR Experience Service', () => {
           position_x: 0.5,
           position_y: 0.5,
           position_z: 0,
-          interaction_data: { title: 'Product Details', content: 'View detailed information' }
+          interaction_data: { title: 'Product Details', content: 'View detailed information' },
         })
         .expect(201);
 
@@ -171,7 +171,7 @@ describe('AR/VR Experience Service', () => {
           experience_id: testExperienceId,
           session_type: 'ar',
           device_type: 'mobile',
-          session_data: { device_model: 'iPhone 14' }
+          session_data: { device_model: 'iPhone 14' },
         })
         .expect(201);
 
@@ -186,7 +186,7 @@ describe('AR/VR Experience Service', () => {
         .patch('/api/v1/ar-vr/sessions/test-session-id/end')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          interaction_count: 5
+          interaction_count: 5,
         })
         .expect(200);
 
@@ -205,9 +205,9 @@ describe('AR/VR Experience Service', () => {
             unique_users: 35,
             avg_duration: 180,
             total_interactions: 250,
-            most_viewed_experiences: { 'exp1': 20, 'exp2': 15 },
-            device_distribution: { mobile: 30, headset: 15, desktop: 5 }
-          }
+            most_viewed_experiences: { exp1: 20, exp2: 15 },
+            device_distribution: { mobile: 30, headset: 15, desktop: 5 },
+          },
         })
         .expect(200);
 

@@ -18,8 +18,8 @@ router.get('/targets/:entityId/:entityType', controller.getPerformanceTargets);
 router.post('/alerts', controller.createPerformanceAlert);
 router.get('/alerts/:entityId/:entityType', controller.getPerformanceAlerts);
 
-module.exports = { 
-  controller: require('./controller'), 
+module.exports = {
+  controller: require('./controller'),
   service: require('./service'),
-  router: router
+  router,
 };

@@ -2,7 +2,7 @@
  * AI Confidence Engine
  * Component ID: EBD-CMP-00000004
  * Purpose: AI confidence scoring and threshold management
- * 
+ *
  * This module provides confidence scoring for AI decisions across
  * multiple dimensions: model confidence, source confidence, retrieval
  * confidence, rule confidence, data quality, consistency, and historical accuracy.
@@ -41,7 +41,7 @@ function calculateOverallConfidence(scores) {
   if (!scores || Object.keys(scores).length === 0) {
     return { overall: 0, dimensions: {}, decision: 'reject' };
   }
-  
+
   const weights = {
     [CONFIDENCE_DIMENSIONS.MODEL_CONFIDENCE]: 0.25,
     [CONFIDENCE_DIMENSIONS.SOURCE_CONFIDENCE]: 0.20,
@@ -51,18 +51,18 @@ function calculateOverallConfidence(scores) {
     [CONFIDENCE_DIMENSIONS.CONSISTENCY]: 0.10,
     [CONFIDENCE_DIMENSIONS.HISTORICAL_ACCURACY]: 0.05,
   };
-  
+
   let weightedSum = 0;
   let totalWeight = 0;
-  
+
   for (const [dimension, score] of Object.entries(scores)) {
     const weight = weights[dimension] || 0.1;
     weightedSum += score * weight;
     totalWeight += weight;
   }
-  
+
   const overall = totalWeight > 0 ? weightedSum / totalWeight : 0;
-  
+
   return {
     overall: Math.round(overall * 100) / 100,
     dimensions: scores,
@@ -90,42 +90,42 @@ function getDecision(confidence, thresholds = DEFAULT_THRESHOLDS) {
  */
 function evaluateConfidence(criteria) {
   const scores = {};
-  
+
   // Model confidence
   if (criteria.modelScore !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.MODEL_CONFIDENCE] = criteria.modelScore;
   }
-  
+
   // Source confidence
   if (criteria.sourceReliability !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.SOURCE_CONFIDENCE] = criteria.sourceReliability;
   }
-  
+
   // Retrieval confidence
   if (criteria.retrievalScore !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.RETRIEVAL_CONFIDENCE] = criteria.retrievalScore;
   }
-  
+
   // Rule confidence
   if (criteria.ruleMatchStrength !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.RULE_CONFIDENCE] = criteria.ruleMatchStrength;
   }
-  
+
   // Data quality
   if (criteria.dataFreshness !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.DATA_QUALITY] = criteria.dataFreshness;
   }
-  
+
   // Consistency
   if (criteria.consistencyScore !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.CONSISTENCY] = criteria.consistencyScore;
   }
-  
+
   // Historical accuracy
   if (criteria.historicalAccuracy !== undefined) {
     scores[CONFIDENCE_DIMENSIONS.HISTORICAL_ACCURACY] = criteria.historicalAccuracy;
   }
-  
+
   return calculateOverallConfidence(scores);
 }
 
@@ -181,7 +181,7 @@ function updateHistoricalAccuracy(engineId, predicted, actual) {
   // This would typically interact with a database
   // For now, we'll log the update
   logger.info(`Historical accuracy update for ${engineId}: predicted=${predicted}, actual=${actual}`);
-  
+
   // In production, this would update a running average
   // stored in the database or in-memory cache
 }

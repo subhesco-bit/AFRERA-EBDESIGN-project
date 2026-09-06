@@ -29,7 +29,7 @@ async function createFarmerGroup(groupData) {
       established_date,
       objectives,
       bylaws,
-      bank_account_details
+      bank_account_details,
     } = groupData;
 
     const group = {
@@ -53,7 +53,7 @@ async function createFarmerGroup(groupData) {
       bylaws: bylaws || {},
       bank_account_details: bank_account_details || {},
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered group health analysis
@@ -63,8 +63,8 @@ async function createFarmerGroup(groupData) {
         group_data: groupData,
         regional_groups: await getRegionalGroups(state, district),
         industry_benchmarks: await getGroupBenchmarks(group_type),
-        success_factors: await getSuccessFactors(group_type)
-      }
+        success_factors: await getSuccessFactors(group_type),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -84,8 +84,8 @@ async function createFarmerGroup(groupData) {
         group.contact_phone, group.contact_email, group.established_date,
         group.total_members, JSON.stringify(group.objectives), JSON.stringify(group.bylaws),
         JSON.stringify(group.bank_account_details), group.ai_group_health_score,
-        group.status, group.created_at
-      ]
+        group.status, group.created_at,
+      ],
     );
 
     logger.info(`Farmer group created: ${group.group_id}`);
@@ -114,10 +114,10 @@ async function addGroupMember(groupId, farmerId, membershipData) {
       share_percentage,
       voting_rights: voting_rights !== undefined ? voting_rights : true,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO group_memberships 
        (membership_id, group_id, farmer_id, membership_type, role, join_date, 
         contribution_amount, share_percentage, voting_rights, status, created_at)
@@ -127,14 +127,14 @@ async function addGroupMember(groupId, farmerId, membershipData) {
         membership.membership_id, membership.group_id, membership.farmer_id,
         membership.membership_type, membership.role, membership.join_date,
         membership.contribution_amount, membership.share_percentage,
-        membership.voting_rights, membership.status, membership.created_at
-      ]
+        membership.voting_rights, membership.status, membership.created_at,
+      ],
     );
 
     // Update group member count
     await pool.query(
       'UPDATE farmer_groups SET total_members = total_members + 1 WHERE group_id = $1',
-      [groupId]
+      [groupId],
     );
 
     logger.info(`Group member added: ${membership.membership_id}`);
@@ -164,10 +164,10 @@ async function recordGroupMeeting(groupId, meetingData) {
       minutes,
       decisions: decisions || [],
       action_items: action_items || [],
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO group_meetings 
        (meeting_id, group_id, meeting_type, meeting_date, meeting_time, location, 
         agenda, attendees, minutes, decisions, action_items, created_at)
@@ -177,8 +177,8 @@ async function recordGroupMeeting(groupId, meetingData) {
         meeting.meeting_id, meeting.group_id, meeting.meeting_type, meeting.meeting_date,
         meeting.meeting_time, meeting.location, JSON.stringify(meeting.agenda),
         JSON.stringify(meeting.attendees), meeting.minutes, JSON.stringify(meeting.decisions),
-        JSON.stringify(meeting.action_items), meeting.created_at
-      ]
+        JSON.stringify(meeting.action_items), meeting.created_at,
+      ],
     );
 
     logger.info(`Group meeting recorded: ${meeting.meeting_id}`);
@@ -206,10 +206,10 @@ async function recordGroupTransaction(groupId, transactionData) {
       transaction_date,
       reference_number,
       created_by,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO group_finances 
        (finance_id, group_id, transaction_type, amount, description, category, 
         transaction_date, reference_number, created_by, created_at)
@@ -219,8 +219,8 @@ async function recordGroupTransaction(groupId, transactionData) {
         transaction.finance_id, transaction.group_id, transaction.transaction_type,
         transaction.amount, transaction.description, transaction.category,
         transaction.transaction_date, transaction.reference_number,
-        transaction.created_by, transaction.created_at
-      ]
+        transaction.created_by, transaction.created_at,
+      ],
     );
 
     logger.info(`Group transaction recorded: ${transaction.finance_id}`);
@@ -236,7 +236,7 @@ async function recordGroupTransaction(groupId, transactionData) {
  */
 async function getGroupAnalytics(groupId) {
   try {
-    let group = await pool.query('SELECT * FROM farmer_groups WHERE group_id = $1', [groupId]);
+    const group = await pool.query('SELECT * FROM farmer_groups WHERE group_id = $1', [groupId]);
     if (group.rows.length === 0) {
       throw new Error('Group not found');
     }
@@ -254,11 +254,11 @@ async function getGroupAnalytics(groupId) {
       financial_summary: {
         total_income: finances.rows.filter(f => f.transaction_type === 'income').reduce((sum, f) => sum + f.amount, 0),
         total_expenses: finances.rows.filter(f => f.transaction_type === 'expense').reduce((sum, f) => sum + f.amount, 0),
-        balance: 0
+        balance: 0,
       },
       meeting_count: meetings.rows.length,
       recent_meetings: meetings.rows.slice(0, 5),
-      ai_insights: await generateGroupInsights(groupId, members.rows, finances.rows)
+      ai_insights: await generateGroupInsights(groupId, members.rows, finances.rows),
     };
 
     analytics.financial_summary.balance = analytics.financial_summary.total_income - analytics.financial_summary.total_expenses;
@@ -276,9 +276,9 @@ function generateId() {
 
 async function getRegionalGroups(state, district) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM farmer_groups WHERE state = $1 AND district = $2',
-      [state, district]
+      [state, district],
     );
     return result.rows;
   } catch (error) {
@@ -290,7 +290,7 @@ async function getGroupBenchmarks(groupType) {
   return {
     average_members: 25,
     average_financial_health: 0.75,
-    success_rate: 0.8
+    success_rate: 0.8,
   };
 }
 
@@ -299,21 +299,21 @@ async function getSuccessFactors(groupType) {
     leadership_quality: 'critical',
     member_participation: 'important',
     financial_transparency: 'critical',
-    market_access: 'important'
+    market_access: 'important',
   };
 }
 
 async function generateGroupInsights(groupId, members, finances) {
-  let aiRequest = {
+  const aiRequest = {
     task: 'group_analytics_insights',
     parameters: {
       group_id: groupId,
       member_data: members,
-      financial_data: finances
-    }
+      financial_data: finances,
+    },
   };
 
-  let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+  const aiResponse = await aiAPI.generateRecommendation(aiRequest);
   return aiResponse;
 }
 
@@ -322,5 +322,5 @@ module.exports = {
   addGroupMember,
   recordGroupMeeting,
   recordGroupTransaction,
-  getGroupAnalytics
+  getGroupAnalytics,
 };

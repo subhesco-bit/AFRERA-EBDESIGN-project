@@ -5,12 +5,12 @@ const alertLogger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.json()
+    winston.format.json(),
   ),
   transports: [
     new winston.transports.File({ filename: 'logs/alerts.log' }),
-    new winston.transports.Console()
-  ]
+    new winston.transports.Console(),
+  ],
 });
 
 // Alert severity levels
@@ -18,7 +18,7 @@ const SEVERITY = {
   INFO: 'info',
   WARNING: 'warning',
   ERROR: 'error',
-  CRITICAL: 'critical'
+  CRITICAL: 'critical',
 };
 
 // Alert types
@@ -28,7 +28,7 @@ const ALERT_TYPES = {
   SECURITY: 'security',
   BUSINESS: 'business',
   DATABASE: 'database',
-  API: 'api'
+  API: 'api',
 };
 
 // Alert thresholds
@@ -37,33 +37,33 @@ const THRESHOLDS = {
   responseTime: {
     warning: 1000, // 1 second
     error: 3000, // 3 seconds
-    critical: 5000 // 5 seconds
+    critical: 5000, // 5 seconds
   },
   errorRate: {
     warning: 0.01, // 1%
     error: 0.05, // 5%
-    critical: 0.1 // 10%
+    critical: 0.1, // 10%
   },
   cpuUsage: {
     warning: 70,
     error: 85,
-    critical: 95
+    critical: 95,
   },
   memoryUsage: {
     warning: 70,
     error: 85,
-    critical: 95
+    critical: 95,
   },
   diskUsage: {
     warning: 80,
     error: 90,
-    critical: 95
+    critical: 95,
   },
   databaseConnections: {
     warning: 70,
     error: 85,
-    critical: 95
-  }
+    critical: 95,
+  },
 };
 
 // Alert class
@@ -97,7 +97,7 @@ class Alert {
       metadata: this.metadata,
       timestamp: this.timestamp,
       resolved: this.resolved,
-      resolvedAt: this.resolvedAt
+      resolvedAt: this.resolvedAt,
     };
   }
 }
@@ -127,7 +127,7 @@ class AlertManager {
 
     // Log alert
     alertLogger.log(severity, message, {
-      ...alert.toJSON()
+      ...alert.toJSON(),
     });
 
     // Notify handlers
@@ -138,7 +138,7 @@ class AlertManager {
 
   // Resolve alert
   resolveAlert(alertId) {
-    let alert = this.alerts.get(alertId);
+    const alert = this.alerts.get(alertId);
     if (alert) {
       alert.resolve();
       alertLogger.info('Alert resolved', alert.toJSON());
@@ -167,7 +167,7 @@ class AlertManager {
             rule.type,
             rule.severity,
             rule.message,
-            rule.metadata
+            rule.metadata,
           );
         }
       } catch (error) {
@@ -184,14 +184,14 @@ class AlertManager {
   // Get alerts by severity
   getAlertsBySeverity(severity) {
     return Array.from(this.alerts.values()).filter(
-      alert => alert.severity === severity && !alert.resolved
+      alert => alert.severity === severity && !alert.resolved,
     );
   }
 
   // Get alerts by type
   getAlertsByType(type) {
     return Array.from(this.alerts.values()).filter(
-      alert => alert.type === type && !alert.resolved
+      alert => alert.type === type && !alert.resolved,
     );
   }
 }
@@ -232,7 +232,7 @@ const performanceAlertRules = [
     check: async (metrics) => {
       return metrics.responseTime > THRESHOLDS.responseTime.warning;
     },
-    metadata: { threshold: THRESHOLDS.responseTime.warning }
+    metadata: { threshold: THRESHOLDS.responseTime.warning },
   },
   {
     type: ALERT_TYPES.PERFORMANCE,
@@ -241,7 +241,7 @@ const performanceAlertRules = [
     check: async (metrics) => {
       return metrics.responseTime > THRESHOLDS.responseTime.error;
     },
-    metadata: { threshold: THRESHOLDS.responseTime.error }
+    metadata: { threshold: THRESHOLDS.responseTime.error },
   },
   {
     type: ALERT_TYPES.PERFORMANCE,
@@ -250,8 +250,8 @@ const performanceAlertRules = [
     check: async (metrics) => {
       return metrics.responseTime > THRESHOLDS.responseTime.critical;
     },
-    metadata: { threshold: THRESHOLDS.responseTime.critical }
-  }
+    metadata: { threshold: THRESHOLDS.responseTime.critical },
+  },
 ];
 
 // Error rate alert rules
@@ -263,7 +263,7 @@ const errorRateAlertRules = [
     check: async (metrics) => {
       return metrics.errorRate > THRESHOLDS.errorRate.warning;
     },
-    metadata: { threshold: THRESHOLDS.errorRate.warning }
+    metadata: { threshold: THRESHOLDS.errorRate.warning },
   },
   {
     type: ALERT_TYPES.API,
@@ -272,7 +272,7 @@ const errorRateAlertRules = [
     check: async (metrics) => {
       return metrics.errorRate > THRESHOLDS.errorRate.error;
     },
-    metadata: { threshold: THRESHOLDS.errorRate.error }
+    metadata: { threshold: THRESHOLDS.errorRate.error },
   },
   {
     type: ALERT_TYPES.API,
@@ -281,8 +281,8 @@ const errorRateAlertRules = [
     check: async (metrics) => {
       return metrics.errorRate > THRESHOLDS.errorRate.critical;
     },
-    metadata: { threshold: THRESHOLDS.errorRate.critical }
-  }
+    metadata: { threshold: THRESHOLDS.errorRate.critical },
+  },
 ];
 
 // System resource alert rules
@@ -294,7 +294,7 @@ const systemResourceAlertRules = [
     check: async (metrics) => {
       return metrics.cpuUsage > THRESHOLDS.cpuUsage.warning;
     },
-    metadata: { threshold: THRESHOLDS.cpuUsage.warning }
+    metadata: { threshold: THRESHOLDS.cpuUsage.warning },
   },
   {
     type: ALERT_TYPES.SYSTEM,
@@ -303,7 +303,7 @@ const systemResourceAlertRules = [
     check: async (metrics) => {
       return metrics.cpuUsage > THRESHOLDS.cpuUsage.error;
     },
-    metadata: { threshold: THRESHOLDS.cpuUsage.error }
+    metadata: { threshold: THRESHOLDS.cpuUsage.error },
   },
   {
     type: ALERT_TYPES.SYSTEM,
@@ -312,7 +312,7 @@ const systemResourceAlertRules = [
     check: async (metrics) => {
       return metrics.memoryUsage > THRESHOLDS.memoryUsage.warning;
     },
-    metadata: { threshold: THRESHOLDS.memoryUsage.warning }
+    metadata: { threshold: THRESHOLDS.memoryUsage.warning },
   },
   {
     type: ALERT_TYPES.SYSTEM,
@@ -321,7 +321,7 @@ const systemResourceAlertRules = [
     check: async (metrics) => {
       return metrics.memoryUsage > THRESHOLDS.memoryUsage.error;
     },
-    metadata: { threshold: THRESHOLDS.memoryUsage.error }
+    metadata: { threshold: THRESHOLDS.memoryUsage.error },
   },
   {
     type: ALERT_TYPES.SYSTEM,
@@ -330,7 +330,7 @@ const systemResourceAlertRules = [
     check: async (metrics) => {
       return metrics.diskUsage > THRESHOLDS.diskUsage.warning;
     },
-    metadata: { threshold: THRESHOLDS.diskUsage.warning }
+    metadata: { threshold: THRESHOLDS.diskUsage.warning },
   },
   {
     type: ALERT_TYPES.SYSTEM,
@@ -339,8 +339,8 @@ const systemResourceAlertRules = [
     check: async (metrics) => {
       return metrics.diskUsage > THRESHOLDS.diskUsage.error;
     },
-    metadata: { threshold: THRESHOLDS.diskUsage.error }
-  }
+    metadata: { threshold: THRESHOLDS.diskUsage.error },
+  },
 ];
 
 // Database alert rules
@@ -352,7 +352,7 @@ const databaseAlertRules = [
     check: async (metrics) => {
       return metrics.dbConnections > THRESHOLDS.databaseConnections.warning;
     },
-    metadata: { threshold: THRESHOLDS.databaseConnections.warning }
+    metadata: { threshold: THRESHOLDS.databaseConnections.warning },
   },
   {
     type: ALERT_TYPES.DATABASE,
@@ -361,8 +361,8 @@ const databaseAlertRules = [
     check: async (metrics) => {
       return metrics.dbConnections > THRESHOLDS.databaseConnections.error;
     },
-    metadata: { threshold: THRESHOLDS.databaseConnections.error }
-  }
+    metadata: { threshold: THRESHOLDS.databaseConnections.error },
+  },
 ];
 
 // Add all rules
@@ -390,7 +390,7 @@ const getAlertSummary = () => {
       critical: alertManager.getAlertsBySeverity(SEVERITY.CRITICAL).length,
       error: alertManager.getAlertsBySeverity(SEVERITY.ERROR).length,
       warning: alertManager.getAlertsBySeverity(SEVERITY.WARNING).length,
-      info: alertManager.getAlertsBySeverity(SEVERITY.INFO).length
+      info: alertManager.getAlertsBySeverity(SEVERITY.INFO).length,
     },
     byType: {
       system: alertManager.getAlertsByType(ALERT_TYPES.SYSTEM).length,
@@ -398,8 +398,8 @@ const getAlertSummary = () => {
       security: alertManager.getAlertsByType(ALERT_TYPES.SECURITY).length,
       business: alertManager.getAlertsByType(ALERT_TYPES.BUSINESS).length,
       database: alertManager.getAlertsByType(ALERT_TYPES.DATABASE).length,
-      api: alertManager.getAlertsByType(ALERT_TYPES.API).length
-    }
+      api: alertManager.getAlertsByType(ALERT_TYPES.API).length,
+    },
   };
 };
 
@@ -412,5 +412,5 @@ module.exports = {
   THRESHOLDS,
   createAlert,
   checkMetrics,
-  getAlertSummary
+  getAlertSummary,
 };

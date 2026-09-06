@@ -24,7 +24,7 @@ async function reportBreakdown(breakdownData) {
       symptoms,
       severity,
       reported_by,
-      operator_notes
+      operator_notes,
     } = breakdownData;
 
     const breakdown = {
@@ -42,7 +42,7 @@ async function reportBreakdown(breakdownData) {
       reported_by,
       operator_notes,
       status: 'reported',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered breakdown diagnosis
@@ -53,8 +53,8 @@ async function reportBreakdown(breakdownData) {
         equipment_history: await getEquipmentHistory(equipment_id),
         symptom_analysis: await analyzeSymptoms(symptoms, equipment_type),
         common_failures: await getCommonFailures(equipment_type),
-        repair_estimates: await getRepairEstimates(equipment_type, severity)
-      }
+        repair_estimates: await getRepairEstimates(equipment_type, severity),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -83,8 +83,8 @@ async function reportBreakdown(breakdownData) {
         breakdown.operator_notes,
         breakdown.status,
         JSON.stringify(breakdown.ai_diagnosis),
-        breakdown.created_at
-      ]
+        breakdown.created_at,
+      ],
     );
 
     logger.info(`Breakdown reported: ${breakdown.breakdown_id}`);
@@ -106,7 +106,7 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
       priority,
       required_parts,
       estimated_cost,
-      repair_notes
+      repair_notes,
     } = repairData;
 
     const repair = {
@@ -119,32 +119,32 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
       estimated_cost,
       repair_notes,
       status: 'scheduled',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered repair optimization
-    let aiRequest = {
+    const aiRequest = {
       task: 'repair_optimization',
       parameters: {
         repair_data: repairData,
         breakdown_details: await getBreakdownDetails(breakdownId),
         technician_availability: await getTechnicianAvailability(technician_id),
         parts_availability: await checkPartsAvailability(required_parts),
-        repair_time_estimate: await estimateRepairTime(breakdownId, required_parts)
-      }
+        repair_time_estimate: await estimateRepairTime(breakdownId, required_parts),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     repair.ai_optimization = aiResponse;
 
     await pool.query(
       `UPDATE equipment_breakdowns 
        SET status = 'repair_scheduled', updated_at = CURRENT_TIMESTAMP
        WHERE breakdown_id = $1`,
-      [breakdownId]
+      [breakdownId],
     );
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO emergency_repairs 
        (repair_id, breakdown_id, technician_id, estimated_arrival, priority, 
         required_parts, estimated_cost, repair_notes, status, ai_optimization, created_at)
@@ -161,8 +161,8 @@ async function scheduleEmergencyRepair(breakdownId, repairData) {
         repair.repair_notes,
         repair.status,
         JSON.stringify(repair.ai_optimization),
-        repair.created_at
-      ]
+        repair.created_at,
+      ],
     );
 
     logger.info(`Emergency repair scheduled: ${repair.repair_id}`);
@@ -187,7 +187,7 @@ async function trackDowntime(equipmentId, period) {
       breakdown_count: await getBreakdownCount(equipmentId, period),
       repair_time: await getRepairTime(equipmentId, period),
       cost_impact: await calculateCostImpact(equipmentId, period),
-      recommendations: await generateDowntimeRecommendations(equipmentId, period)
+      recommendations: await generateDowntimeRecommendations(equipmentId, period),
     };
 
     return downtime;
@@ -212,7 +212,7 @@ async function generateBreakdownReport(farmerId, reportType) {
       downtime_summary: await getDowntimeSummary(farmerId),
       repair_costs: await getRepairCosts(farmerId),
       mttr_mtbf: await calculateMTTRMTBF(farmerId),
-      recommendations: await generatePreventiveRecommendations(farmerId)
+      recommendations: await generatePreventiveRecommendations(farmerId),
     };
 
     return report;
@@ -228,9 +228,9 @@ function generateId() {
 
 async function getEquipmentHistory(equipmentId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM equipment_breakdowns WHERE equipment_id = $1 ORDER BY breakdown_date DESC LIMIT 5',
-      [equipmentId]
+      [equipmentId],
     );
     return result.rows;
   } catch (error) {
@@ -249,20 +249,20 @@ const SYMPTOM_RULES = [
   { keywords: ['won\'t start', 'not starting', 'no start', 'battery', 'electrical'], cause: 'electrical_failure', components: ['battery', 'starter', 'wiring'] },
   { keywords: ['hydraulic', 'lift', 'pressure'], cause: 'hydraulic_system_failure', components: ['hydraulic_pump', 'hoses'] },
   { keywords: ['brake'], cause: 'brake_system_failure', components: ['brakes'] },
-  { keywords: ['tire', 'tyre', 'wheel'], cause: 'tire_or_wheel_damage', components: ['tires', 'wheels'] }
+  { keywords: ['tire', 'tyre', 'wheel'], cause: 'tire_or_wheel_damage', components: ['tires', 'wheels'] },
 ];
 
 async function analyzeSymptoms(symptoms, equipmentType) {
-  const symptomText = Array.isArray(symptoms)
-    ? symptoms.join(' ').toLowerCase()
-    : String(symptoms || '').toLowerCase();
+  const symptomText = Array.isArray(symptoms) ?
+    symptoms.join(' ').toLowerCase() :
+    String(symptoms || '').toLowerCase();
 
   if (!symptomText.trim()) {
     return {
       likely_cause: 'unknown',
       source: 'static',
       affected_components: [],
-      note: 'No symptoms provided to analyze'
+      note: 'No symptoms provided to analyze',
     };
   }
 
@@ -273,7 +273,7 @@ async function analyzeSymptoms(symptoms, equipmentType) {
       likely_cause: 'undetermined',
       source: 'static',
       affected_components: [],
-      note: `Symptoms did not match a known pattern for equipment type ${equipmentType || 'unknown'}; manual inspection recommended`
+      note: `Symptoms did not match a known pattern for equipment type ${equipmentType || 'unknown'}; manual inspection recommended`,
     };
   }
 
@@ -282,7 +282,7 @@ async function analyzeSymptoms(symptoms, equipmentType) {
     likely_cause: matched[0].cause,
     source: 'rule_based',
     matched_patterns: matched.length,
-    affected_components
+    affected_components,
   };
 }
 
@@ -290,7 +290,7 @@ async function getCommonFailures(equipmentType) {
   return [
     { failure: 'engine_overheating', frequency: 'high' },
     { failure: 'hydraulic_leak', frequency: 'medium' },
-    { failure: 'electrical_issue', frequency: 'low' }
+    { failure: 'electrical_issue', frequency: 'low' },
   ];
 }
 
@@ -299,15 +299,15 @@ async function getRepairEstimates(equipmentType, severity) {
   return {
     estimated_cost: baseCost[severity] || 8000,
     estimated_time: severity === 'high' ? 48 : 24,
-    parts_required: ['engine_parts', 'filters']
+    parts_required: ['engine_parts', 'filters'],
   };
 }
 
 async function getBreakdownDetails(breakdownId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1',
-      [breakdownId]
+      [breakdownId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -319,7 +319,7 @@ async function getTechnicianAvailability(technicianId) {
   return {
     available: true,
     next_available: '2 hours',
-    skills: ['mechanical', 'electrical']
+    skills: ['mechanical', 'electrical'],
   };
 }
 
@@ -327,7 +327,7 @@ async function checkPartsAvailability(requiredParts) {
   return {
     all_available: true,
     unavailable_parts: [],
-    delivery_time: '24 hours'
+    delivery_time: '24 hours',
   };
 }
 
@@ -339,14 +339,14 @@ async function estimateRepairTime(breakdownId, requiredParts) {
   const partsList = Array.isArray(requiredParts) ? requiredParts : (requiredParts ? [requiredParts] : []);
   const BASE_HOURS = 4;
   const HOURS_PER_PART = 1.5;
-  const estimated_hours = partsList.length === 0
-    ? BASE_HOURS
-    : BASE_HOURS + partsList.length * HOURS_PER_PART;
+  const estimated_hours = partsList.length === 0 ?
+    BASE_HOURS :
+    BASE_HOURS + partsList.length * HOURS_PER_PART;
 
   return {
     estimated_hours,
     source: partsList.length === 0 ? 'static' : 'rule_based',
-    parts_count: partsList.length
+    parts_count: partsList.length,
   };
 }
 
@@ -354,7 +354,7 @@ async function getTotalDowntime(equipmentId, period) {
   return {
     total_hours: 48,
     average_per_breakdown: 12,
-    impact_level: 'medium'
+    impact_level: 'medium',
   };
 }
 
@@ -363,7 +363,7 @@ async function getBreakdownCount(equipmentId, period) {
     total: 4,
     critical: 1,
     major: 2,
-    minor: 1
+    minor: 1,
   };
 }
 
@@ -371,7 +371,7 @@ async function getRepairTime(equipmentId, period) {
   return {
     total_repair_hours: 32,
     average_repair_time: 8,
-    efficiency_rating: 'good'
+    efficiency_rating: 'good',
   };
 }
 
@@ -380,7 +380,7 @@ async function calculateCostImpact(equipmentId, period) {
     total_cost: 40000,
     repair_cost: 32000,
     lost_productivity: 8000,
-    impact_per_hour: 833
+    impact_per_hour: 833,
   };
 }
 
@@ -388,15 +388,15 @@ async function generateDowntimeRecommendations(equipmentId, period) {
   return [
     'Implement preventive maintenance schedule',
     'Train operators on early failure detection',
-    'Keep critical spare parts in stock'
+    'Keep critical spare parts in stock',
   ];
 }
 
 async function getTotalBreakdowns(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT COUNT(*) as count FROM equipment_breakdowns WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -406,9 +406,9 @@ async function getTotalBreakdowns(farmerId) {
 
 async function getBreakdownByType(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT equipment_type, COUNT(*) as count FROM equipment_breakdowns WHERE farmer_id = $1 GROUP BY equipment_type',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -420,7 +420,7 @@ async function getDowntimeSummary(farmerId) {
   return {
     total_downtime_hours: 192,
     average_downtime: 24,
-    downtime_percentage: 5
+    downtime_percentage: 5,
   };
 }
 
@@ -428,7 +428,7 @@ async function getRepairCosts(farmerId) {
   return {
     total_repair_cost: 160000,
     average_repair_cost: 20000,
-    cost_trend: 'increasing'
+    cost_trend: 'increasing',
   };
 }
 
@@ -436,7 +436,7 @@ async function calculateMTTRMTBF(farmerId) {
   return {
     mttr: 24, // Mean Time To Repair
     mtbf: 480, // Mean Time Between Failures
-    reliability_score: 95
+    reliability_score: 95,
   };
 }
 
@@ -444,7 +444,7 @@ async function generatePreventiveRecommendations(farmerId) {
   return [
     'Increase preventive maintenance frequency',
     'Implement condition monitoring',
-    'Review operator training programs'
+    'Review operator training programs',
   ];
 }
 
@@ -466,13 +466,13 @@ async function listBreakdowns({ page = 1, limit = 20, farmer_id = null, status =
   const listParams = [...params, limit, offset];
   const res = await pool.query(
     `SELECT * FROM equipment_breakdowns ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams
+    listParams,
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
 }
 
 async function getBreakdown(id) {
-  let res = await pool.query('SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1', [id]);
+  const res = await pool.query('SELECT * FROM equipment_breakdowns WHERE breakdown_id = $1', [id]);
   return res.rows[0] || null;
 }
 
@@ -482,5 +482,5 @@ module.exports = {
   reportBreakdown,
   scheduleEmergencyRepair,
   trackDowntime,
-  generateBreakdownReport
+  generateBreakdownReport,
 };

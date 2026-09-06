@@ -38,7 +38,7 @@ async function createWaterBudget(budgetData) {
       industrial_allocation,
       environmental_allocation,
       irrigation_efficiency_target,
-      water_source_type
+      water_source_type,
     } = budgetData;
 
     const budget = {
@@ -53,12 +53,12 @@ async function createWaterBudget(budgetData) {
         agricultural: agricultural_allocation,
         domestic: domestic_allocation,
         industrial: industrial_allocation,
-        environmental: environmental_allocation
+        environmental: environmental_allocation,
       },
       irrigation_efficiency_target,
       water_source_type,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered water budget optimization
@@ -70,8 +70,8 @@ async function createWaterBudget(budgetData) {
         weather_forecast: await getWeatherForecast(state, district),
         crop_patterns: await getCropPatterns(location_id),
         groundwater_levels: await getGroundwaterLevels(location_id),
-        efficiency_improvements: await getEfficiencyRecommendations(location_id)
-      }
+        efficiency_improvements: await getEfficiencyRecommendations(location_id),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -102,8 +102,8 @@ async function createWaterBudget(budgetData) {
         budget.water_source_type,
         budget.status,
         JSON.stringify(budget.ai_recommendations),
-        budget.created_at
-      ]
+        budget.created_at,
+      ],
     );
 
     logger.info(`Water budget created: ${budget.budget_id}`);
@@ -122,13 +122,13 @@ async function trackWaterUsage(budgetId, period) {
     const usage = {
       tracking_id: generateId(),
       budget_id: budgetId,
-      period: period,
+      period,
       timestamp: new Date().toISOString(),
       actual_usage: await getActualWaterUsage(budgetId, period),
       budget_limits: await getBudgetLimits(budgetId),
       variance: await calculateVariance(budgetId, period),
       efficiency_metrics: await calculateEfficiencyMetrics(budgetId, period),
-      recommendations: await generateUsageRecommendations(budgetId, period)
+      recommendations: await generateUsageRecommendations(budgetId, period),
     };
 
     return usage;
@@ -143,20 +143,20 @@ async function trackWaterUsage(budgetId, period) {
  */
 async function optimizeWaterAllocation(budgetId, constraints) {
   try {
-    let aiRequest = {
+    const aiRequest = {
       task: 'water_allocation_optimization',
       parameters: {
         budget_id: budgetId,
-        constraints: constraints,
+        constraints,
         current_allocation: await getCurrentAllocation(budgetId),
         demand_forecast: await getWaterDemandForecast(budgetId),
         supply_constraints: await getSupplyConstraints(budgetId),
         priority_matrix: await getPriorityMatrix(budgetId),
-        environmental_requirements: await getEnvironmentalRequirements(budgetId)
-      }
+        environmental_requirements: await getEnvironmentalRequirements(budgetId),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const optimization = {
       optimization_id: generateId(),
@@ -167,7 +167,7 @@ async function optimizeWaterAllocation(budgetId, constraints) {
       expected_savings: aiResponse.expected_savings,
       efficiency_improvement: aiResponse.efficiency_improvement,
       implementation_plan: aiResponse.implementation_plan,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     return optimization;
@@ -192,7 +192,7 @@ async function generateBudgetReport(budgetId, reportType) {
       efficiency_metrics: await getEfficiencyMetrics(budgetId),
       recommendations: await getBudgetRecommendations(budgetId),
       forecast: await getWaterForecast(budgetId),
-      risk_assessment: await assessWaterRisks(budgetId)
+      risk_assessment: await assessWaterRisks(budgetId),
     };
 
     return report;
@@ -209,9 +209,9 @@ function generateId() {
 
 async function getHistoricalWaterUsage(locationId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM water_usage_history WHERE location_id = $1 ORDER BY date DESC LIMIT 365',
-      [locationId]
+      [locationId],
     );
     return result.rows;
   } catch (error) {
@@ -224,15 +224,15 @@ async function getWeatherForecast(state, district) {
   return {
     temperature: { min: 20, max: 35 },
     rainfall: { expected: 100, probability: 0.7 },
-    humidity: { min: 60, max: 85 }
+    humidity: { min: 60, max: 85 },
   };
 }
 
 async function getCropPatterns(locationId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT crop_type, area, water_requirement FROM crop_patterns WHERE location_id = $1',
-      [locationId]
+      [locationId],
     );
     return result.rows;
   } catch (error) {
@@ -242,9 +242,9 @@ async function getCropPatterns(locationId) {
 
 async function getGroundwaterLevels(locationId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT level, date FROM groundwater_levels WHERE location_id = $1 ORDER BY date DESC LIMIT 12',
-      [locationId]
+      [locationId],
     );
     return result.rows;
   } catch (error) {
@@ -257,15 +257,15 @@ async function getEfficiencyRecommendations(locationId) {
     'Implement drip irrigation for water-intensive crops',
     'Use soil moisture sensors for precise irrigation',
     'Schedule irrigation during cooler hours to reduce evaporation',
-    'Consider rainwater harvesting systems'
+    'Consider rainwater harvesting systems',
   ];
 }
 
 async function getActualWaterUsage(budgetId, period) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT SUM(usage_amount) as total FROM water_usage_records WHERE budget_id = $1 AND period = $2',
-      [budgetId, period]
+      [budgetId, period],
     );
     return result.rows[0]?.total || 0;
   } catch (error) {
@@ -275,9 +275,9 @@ async function getActualWaterUsage(budgetId, period) {
 
 async function getBudgetLimits(budgetId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM water_budgets WHERE budget_id = $1',
-      [budgetId]
+      [budgetId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -287,14 +287,14 @@ async function getBudgetLimits(budgetId) {
 
 async function calculateVariance(budgetId, period) {
   const actual = await getActualWaterUsage(budgetId, period);
-  let budget = await getBudgetLimits(budgetId);
+  const budget = await getBudgetLimits(budgetId);
   const variance = actual - (budget.total_allocation || 0);
   const variance_percentage = budget.total_allocation > 0 ? (variance / budget.total_allocation) * 100 : 0;
-  
+
   return {
     absolute: variance,
     percentage: variance_percentage,
-    status: variance > 0 ? 'over_budget' : variance < 0 ? 'under_budget' : 'on_target'
+    status: variance > 0 ? 'over_budget' : variance < 0 ? 'under_budget' : 'on_target',
   };
 }
 
@@ -303,32 +303,32 @@ async function calculateEfficiencyMetrics(budgetId, period) {
     irrigation_efficiency: 75,
     water_productivity: 2.5,
     distribution_efficiency: 85,
-    overall_efficiency: 78
+    overall_efficiency: 78,
   };
 }
 
 async function generateUsageRecommendations(budgetId, period) {
-  let variance = await calculateVariance(budgetId, period);
-  
+  const variance = await calculateVariance(budgetId, period);
+
   if (variance.status === 'over_budget') {
     return [
       'Reduce irrigation frequency during non-critical growth stages',
       'Implement deficit irrigation strategies for drought-tolerant crops',
-      'Consider crop varieties with lower water requirements'
+      'Consider crop varieties with lower water requirements',
     ];
   } else if (variance.status === 'under_budget') {
     return [
       'Consider expanding cultivated area within water limits',
       'Optimize crop rotation for better water utilization',
-      'Implement precision irrigation to maximize yield per unit water'
+      'Implement precision irrigation to maximize yield per unit water',
     ];
   }
-  
+
   return ['Maintain current irrigation practices'];
 }
 
 async function getCurrentAllocation(budgetId) {
-  let budget = await getBudgetLimits(budgetId);
+  const budget = await getBudgetLimits(budgetId);
   return budget.allocations || {};
 }
 
@@ -338,7 +338,7 @@ async function getWaterDemandForecast(budgetId) {
     domestic_demand: 200,
     industrial_demand: 150,
     environmental_demand: 100,
-    total_demand: 1450
+    total_demand: 1450,
   };
 }
 
@@ -347,7 +347,7 @@ async function getSupplyConstraints(budgetId) {
     ground_water_capacity: 500,
     surface_water_capacity: 800,
     recycled_water_capacity: 100,
-    total_capacity: 1400
+    total_capacity: 1400,
   };
 }
 
@@ -356,7 +356,7 @@ async function getPriorityMatrix(budgetId) {
     domestic: { priority: 1, weight: 0.4 },
     agricultural: { priority: 2, weight: 0.3 },
     environmental: { priority: 3, weight: 0.2 },
-    industrial: { priority: 4, weight: 0.1 }
+    industrial: { priority: 4, weight: 0.1 },
   };
 }
 
@@ -364,7 +364,7 @@ async function getEnvironmentalRequirements(budgetId) {
   return {
     minimum_environmental_flow: 50,
     groundwater_recharge_requirement: 30,
-    quality_standards: 'drinking_water'
+    quality_standards: 'drinking_water',
   };
 }
 
@@ -377,7 +377,7 @@ async function getUsageAnalysis(budgetId) {
     trend: 'increasing',
     seasonality: 'peak_monsoon',
     major_consumers: ['agriculture', 'domestic'],
-    efficiency_trend: 'improving'
+    efficiency_trend: 'improving',
   };
 }
 
@@ -389,7 +389,7 @@ async function getBudgetRecommendations(budgetId) {
   return [
     'Increase irrigation efficiency to 80%',
     'Implement water recycling for industrial use',
-    'Expand rainwater harvesting infrastructure'
+    'Expand rainwater harvesting infrastructure',
   ];
 }
 
@@ -397,7 +397,7 @@ async function getWaterForecast(budgetId) {
   return {
     demand_forecast: 'increasing',
     supply_forecast: 'stable',
-    risk_level: 'moderate'
+    risk_level: 'moderate',
   };
 }
 
@@ -406,7 +406,7 @@ async function assessWaterRisks(budgetId) {
     scarcity_risk: 'moderate',
     quality_risk: 'low',
     infrastructure_risk: 'medium',
-    climate_change_impact: 'high'
+    climate_change_impact: 'high',
   };
 }
 
@@ -414,5 +414,5 @@ module.exports = {
   createWaterBudget,
   trackWaterUsage,
   optimizeWaterAllocation,
-  generateBudgetReport
+  generateBudgetReport,
 };

@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce ERP Controller
- * 
+ *
  * Handles all ERP integration endpoints:
  * - Financial ERP (GL posting, GST invoicing)
  * - Supply Chain ERP (inventory sync, purchase orders)
@@ -22,13 +22,13 @@ const { logger } = require('../utils/logger');
 async function postToGeneralLedger(req, res) {
   try {
     const result = await ecommerceERPService.postToGeneralLedger(req.body);
-    
+
     res.json(result);
   } catch (error) {
     logger.error('Error in postToGeneralLedger controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to post to general ledger'
+      error: error.message || 'Failed to post to general ledger',
     });
   }
 }
@@ -40,15 +40,15 @@ async function postToGeneralLedger(req, res) {
 async function generateGSTInvoice(req, res) {
   try {
     const { orderId } = req.params;
-    
-    let result = await ecommerceERPService.generateGSTInvoice(orderId);
-    
+
+    const result = await ecommerceERPService.generateGSTInvoice(orderId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in generateGSTInvoice controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to generate GST invoice'
+      error: error.message || 'Failed to generate GST invoice',
     });
   }
 }
@@ -64,15 +64,15 @@ async function generateGSTInvoice(req, res) {
 async function syncInventoryWithERP(req, res) {
   try {
     const { productId } = req.params;
-    
-    let result = await ecommerceERPService.syncInventoryWithERP(productId);
-    
+
+    const result = await ecommerceERPService.syncInventoryWithERP(productId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in syncInventoryWithERP controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to sync inventory with ERP'
+      error: error.message || 'Failed to sync inventory with ERP',
     });
   }
 }
@@ -84,15 +84,15 @@ async function syncInventoryWithERP(req, res) {
 async function createPurchaseOrder(req, res) {
   try {
     const { listingId, quantity } = req.body;
-    
-    let result = await ecommerceERPService.createPurchaseOrder(listingId, quantity);
-    
+
+    const result = await ecommerceERPService.createPurchaseOrder(listingId, quantity);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in createPurchaseOrder controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create purchase order'
+      error: error.message || 'Failed to create purchase order',
     });
   }
 }
@@ -108,15 +108,15 @@ async function createPurchaseOrder(req, res) {
 async function syncCustomerWithCRM(req, res) {
   try {
     const { userId } = req.params;
-    
-    let result = await ecommerceERPService.syncCustomerWithCRM(userId);
-    
+
+    const result = await ecommerceERPService.syncCustomerWithCRM(userId);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in syncCustomerWithCRM controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to sync customer with CRM'
+      error: error.message || 'Failed to sync customer with CRM',
     });
   }
 }
@@ -132,15 +132,15 @@ async function syncCustomerWithCRM(req, res) {
 async function createProductionOrder(req, res) {
   try {
     const { productId, demandQuantity } = req.body;
-    
-    let result = await ecommerceERPService.createProductionOrder(productId, demandQuantity);
-    
+
+    const result = await ecommerceERPService.createProductionOrder(productId, demandQuantity);
+
     res.json(result);
   } catch (error) {
     logger.error('Error in createProductionOrder controller', { error: error.message });
     res.status(500).json({
       success: false,
-      error: error.message || 'Failed to create production order'
+      error: error.message || 'Failed to create production order',
     });
   }
 }
@@ -153,14 +153,14 @@ module.exports = {
   // Financial ERP
   postToGeneralLedger,
   generateGSTInvoice,
-  
+
   // Supply Chain ERP
   syncInventoryWithERP,
   createPurchaseOrder,
-  
+
   // Customer ERP (CRM)
   syncCustomerWithCRM,
-  
+
   // Production ERP
-  createProductionOrder
+  createProductionOrder,
 };

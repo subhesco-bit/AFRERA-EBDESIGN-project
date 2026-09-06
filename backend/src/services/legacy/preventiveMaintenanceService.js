@@ -36,10 +36,8 @@ module.exports = { preventiveMaintenance };
 
 // Merged from backend/src/modules/M101
 {
-  const m101 = require("../../modules/M101/service");
+  const m101 = require('../../modules/M101/service');
   const { ...rest } = m101;
   Object.assign(module.exports, rest);
 }
-
-
 

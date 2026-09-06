@@ -45,5 +45,5 @@ module.exports = {
   registerPoultryFlock,
   updateFlockHealth,
   trackFlockPerformance,
-  generatePoultryReport
+  generatePoultryReport,
 };

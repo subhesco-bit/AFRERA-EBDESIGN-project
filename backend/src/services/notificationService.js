@@ -28,17 +28,17 @@ class NotificationService extends EventEmitter {
    */
   async sendNotification(notificationData) {
   // Validate inputs
-  if (!notificationData) throw new Error('Missing required parameter');
+    if (!notificationData) throw new Error('Missing required parameter');
 
-    const { 
-      userId, 
-      type, 
-      title, 
-      message, 
+    const {
+      userId,
+      type,
+      title,
+      message,
       data = {},
       channels = ['in_app'],
       priority = 'normal',
-      scheduledFor = null 
+      scheduledFor = null,
     } = notificationData;
 
     try {
@@ -57,11 +57,11 @@ class NotificationService extends EventEmitter {
         JSON.stringify(data),
         JSON.stringify(channels),
         priority,
-        scheduledFor
+        scheduledFor,
       ]);
 
       const notification = result.rows[0];
-      
+
       // Send through channels if not scheduled
       if (!scheduledFor || new Date(scheduledFor) <= new Date()) {
         await this.deliverNotification(notification);
@@ -86,11 +86,11 @@ class NotificationService extends EventEmitter {
 
       for (const channel of channels) {
         try {
-          let result = await this.deliverToChannel(channel, {
+          const result = await this.deliverToChannel(channel, {
             userId: user_id,
             title,
             message,
-            data
+            data,
           });
           deliveryResults.push({ channel, success: true, result });
         } catch (error) {
@@ -100,9 +100,9 @@ class NotificationService extends EventEmitter {
 
       // Update notification status
       const allSuccessful = deliveryResults.every(r => r.success);
-      await this.updateNotificationStatus(notification_id, 
+      await this.updateNotificationStatus(notification_id,
         allSuccessful ? 'delivered' : 'partial',
-        { deliveryResults }
+        { deliveryResults },
       );
 
       this.emit('notificationDelivered', notification, deliveryResults);
@@ -178,7 +178,7 @@ class NotificationService extends EventEmitter {
       io.to(`user_${notificationData.userId}`).emit('notification', {
         title: notificationData.title,
         message: notificationData.message,
-        data: notificationData.data
+        data: notificationData.data,
       });
       return { delivered: true, method: 'websocket' };
     }
@@ -201,7 +201,7 @@ class NotificationService extends EventEmitter {
 
       if (unreadOnly) {
         paramCount++;
-        query += ` AND read = false`;
+        query += ' AND read = false';
       }
 
       if (type) {
@@ -213,7 +213,7 @@ class NotificationService extends EventEmitter {
       query += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      let result = await this.db.query(query, params);
+      const result = await this.db.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Get user notifications failed', error);
@@ -226,14 +226,14 @@ class NotificationService extends EventEmitter {
    */
   async markAsRead(notificationId, userId) {
     try {
-      let query = `
+      const query = `
         UPDATE notifications 
         SET read = true, read_at = NOW()
         WHERE notification_id = $1 AND user_id = $2
         RETURNING *
       `;
-      let result = await this.db.query(query, [notificationId, userId]);
-      
+      const result = await this.db.query(query, [notificationId, userId]);
+
       if (result.rows.length === 0) {
         throw new Error('Notification not found');
       }
@@ -251,14 +251,14 @@ class NotificationService extends EventEmitter {
    */
   async markAllAsRead(userId) {
     try {
-      let query = `
+      const query = `
         UPDATE notifications 
         SET read = true, read_at = NOW()
         WHERE user_id = $1 AND read = false
         RETURNING *
       `;
-      let result = await this.db.query(query, [userId]);
-      
+      const result = await this.db.query(query, [userId]);
+
       logger.info(`Marked ${result.rows.length} notifications as read for user ${userId}`);
       return result.rows;
     } catch (error) {
@@ -272,13 +272,13 @@ class NotificationService extends EventEmitter {
    */
   async deleteNotification(notificationId, userId) {
     try {
-      let query = `
+      const query = `
         DELETE FROM notifications 
         WHERE notification_id = $1 AND user_id = $2
         RETURNING *
       `;
-      let result = await this.db.query(query, [notificationId, userId]);
-      
+      const result = await this.db.query(query, [notificationId, userId]);
+
       if (result.rows.length === 0) {
         throw new Error('Notification not found');
       }
@@ -296,7 +296,7 @@ class NotificationService extends EventEmitter {
    */
   async updateNotificationStatus(notificationId, status, metadata = {}) {
     try {
-      let query = `
+      const query = `
         UPDATE notifications 
         SET status = $1, 
             metadata = COALESCE($2, metadata),
@@ -306,7 +306,7 @@ class NotificationService extends EventEmitter {
       await this.db.query(query, [
         status,
         Object.keys(metadata).length > 0 ? JSON.stringify(metadata) : null,
-        notificationId
+        notificationId,
       ]);
     } catch (error) {
       logger.error('Update notification status failed', error);
@@ -318,12 +318,12 @@ class NotificationService extends EventEmitter {
    */
   async getUserPreferences(userId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM notification_preferences 
         WHERE user_id = $1
       `;
-      let result = await this.db.query(query, [userId]);
-      
+      const result = await this.db.query(query, [userId]);
+
       if (result.rows.length === 0) {
         // Return default preferences
         return this.getDefaultPreferences();
@@ -341,7 +341,7 @@ class NotificationService extends EventEmitter {
    */
   async updateUserPreferences(userId, preferences) {
     try {
-      let query = `
+      const query = `
         INSERT INTO notification_preferences (
           user_id, email_enabled, sms_enabled, push_enabled, 
           in_app_enabled, categories, updated_at
@@ -355,13 +355,13 @@ class NotificationService extends EventEmitter {
           updated_at = NOW()
         RETURNING *
       `;
-      let result = await this.db.query(query, [
+      const result = await this.db.query(query, [
         userId,
         preferences.email_enabled ?? true,
         preferences.sms_enabled ?? false,
         preferences.push_enabled ?? true,
         preferences.in_app_enabled ?? true,
-        JSON.stringify(preferences.categories || {})
+        JSON.stringify(preferences.categories || {}),
       ]);
 
       logger.info(`Notification preferences updated for user ${userId}`);
@@ -385,8 +385,8 @@ class NotificationService extends EventEmitter {
         system: true,
         alerts: true,
         updates: true,
-        marketing: false
-      }
+        marketing: false,
+      },
     };
   }
 
@@ -398,9 +398,9 @@ class NotificationService extends EventEmitter {
 
     for (const userId of userIds) {
       try {
-        let result = await this.sendNotification({
+        const result = await this.sendNotification({
           ...notificationData,
-          userId
+          userId,
         });
         results.push({ userId, success: true, notificationId: result.notification_id });
       } catch (error) {
@@ -428,7 +428,7 @@ class NotificationService extends EventEmitter {
           SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed
         FROM notifications
       `;
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (userId) {
@@ -451,7 +451,7 @@ class NotificationService extends EventEmitter {
         params.push(endDate);
       }
 
-      let result = await this.db.query(query, params);
+      const result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get notification statistics failed', error);

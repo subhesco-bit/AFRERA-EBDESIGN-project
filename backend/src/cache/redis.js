@@ -35,7 +35,7 @@ async function initializeRedis() {
 
     // Test connection
     await redisClient.ping();
-    
+
     return redisClient;
   } catch (error) {
     logger.error('Failed to initialize Redis', { error: error.message, stack: error.stack });
@@ -73,13 +73,13 @@ async function set(key, value, ttl = 3600) {
  */
 async function get(key) {
   try {
-    let client = getClient();
+    const client = getClient();
     const value = await client.get(key);
-    
+
     if (value === null) {
       return null;
     }
-    
+
     return JSON.parse(value);
   } catch (error) {
     logger.error('Error getting cache', { error: error.message, stack: error.stack });
@@ -92,7 +92,7 @@ async function get(key) {
  */
 async function del(key) {
   try {
-    let client = getClient();
+    const client = getClient();
     await client.del(key);
     logger.debug(`Deleted cache key: ${key}`);
   } catch (error) {
@@ -106,14 +106,14 @@ async function del(key) {
  */
 async function delPattern(pattern) {
   try {
-    let client = getClient();
+    const client = getClient();
     const keys = await client.keys(pattern);
-    
+
     if (keys.length > 0) {
       await client.del(...keys);
       logger.debug(`Deleted ${keys.length} keys matching pattern: ${pattern}`);
     }
-    
+
     return keys.length;
   } catch (error) {
     logger.error('Error deleting cache pattern', { error: error.message, stack: error.stack });
@@ -126,7 +126,7 @@ async function delPattern(pattern) {
  */
 async function exists(key) {
   try {
-    let client = getClient();
+    const client = getClient();
     return await client.exists(key) === 1;
   } catch (error) {
     logger.error('Error checking cache existence', { error: error.message, stack: error.stack });
@@ -139,7 +139,7 @@ async function exists(key) {
  */
 async function expire(key, ttl) {
   try {
-    let client = getClient();
+    const client = getClient();
     await client.expire(key, ttl);
   } catch (error) {
     logger.error('Error setting TTL', { error: error.message, stack: error.stack });
@@ -152,7 +152,7 @@ async function expire(key, ttl) {
  */
 async function ttl(key) {
   try {
-    let client = getClient();
+    const client = getClient();
     return await client.ttl(key);
   } catch (error) {
     logger.error('Error getting TTL', { error: error.message, stack: error.stack });
@@ -165,7 +165,7 @@ async function ttl(key) {
  */
 async function incr(key) {
   try {
-    let client = getClient();
+    const client = getClient();
     return await client.incr(key);
   } catch (error) {
     logger.error('Error incrementing counter', { error: error.message, stack: error.stack });
@@ -178,7 +178,7 @@ async function incr(key) {
  */
 async function decr(key) {
   try {
-    let client = getClient();
+    const client = getClient();
     return await client.decr(key);
   } catch (error) {
     logger.error('Error decrementing counter', { error: error.message, stack: error.stack });
@@ -194,9 +194,9 @@ function cache(ttl = 3600, keyGenerator = null) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args) {
-      const cacheKey = keyGenerator 
-        ? keyGenerator(...args) 
-        : `${target.constructor.name}:${propertyKey}:${JSON.stringify(args)}`;
+      const cacheKey = keyGenerator ?
+        keyGenerator(...args) :
+        `${target.constructor.name}:${propertyKey}:${JSON.stringify(args)}`;
 
       // Try to get from cache
       const cachedValue = await get(cacheKey);
@@ -265,5 +265,5 @@ module.exports = {
   cache,
   invalidateEntity,
   isHealthy,
-  close
+  close,
 };

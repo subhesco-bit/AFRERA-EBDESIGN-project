@@ -19,7 +19,7 @@ async function createConfiguration(configData) {
       environment,
       description,
       encrypted,
-      validation_rules
+      validation_rules,
     } = configData;
 
     const config = {
@@ -32,7 +32,7 @@ async function createConfiguration(configData) {
       encrypted: encrypted || false,
       validation_rules,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered configuration validation
@@ -42,8 +42,8 @@ async function createConfiguration(configData) {
         config_data: configData,
         security_risks: await assessSecurityRisks(configData),
         best_practices: await getConfigurationBestPractices(config_type),
-        dependency_impact: await assessDependencyImpact(config_key)
-      }
+        dependency_impact: await assessDependencyImpact(config_key),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -67,8 +67,8 @@ async function createConfiguration(configData) {
         JSON.stringify(config.validation_rules),
         config.status,
         JSON.stringify(config.ai_validation),
-        config.created_at
-      ]
+        config.created_at,
+      ],
     );
 
     logger.info(`Configuration created: ${config.config_id}`);
@@ -84,17 +84,17 @@ async function createConfiguration(configData) {
  */
 async function getConfiguration(configKey, environment) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM platform_configurations WHERE config_key = $1 AND environment = $2 AND status = $3',
-      [configKey, environment, 'active']
+      [configKey, environment, 'active'],
     );
-    
+
     if (result.rows.length === 0) {
       throw new Error('Configuration not found');
     }
 
-    let config = result.rows[0];
-    
+    const config = result.rows[0];
+
     // Decrypt if encrypted
     if (config.encrypted) {
       config.config_value = await decryptValue(config.config_value);
@@ -116,23 +116,23 @@ async function updateConfiguration(configId, updates) {
       config_value,
       description,
       validation_rules,
-      status
+      status,
     } = updates;
 
     // AI-powered update validation
-    let aiRequest = {
+    const aiRequest = {
       task: 'configuration_update_validation',
       parameters: {
         config_id: configId,
-        updates: updates,
+        updates,
         current_config: await getConfigurationById(configId),
-        impact_analysis: await assessUpdateImpact(configId, updates)
-      }
+        impact_analysis: await assessUpdateImpact(configId, updates),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE platform_configurations 
        SET config_value = COALESCE($1, config_value),
            description = COALESCE($2, description),
@@ -146,8 +146,8 @@ async function updateConfiguration(configId, updates) {
         description,
         validation_rules ? JSON.stringify(validation_rules) : null,
         status,
-        configId
-      ]
+        configId,
+      ],
     );
 
     logger.info(`Configuration updated: ${configId}`);
@@ -164,10 +164,10 @@ async function updateConfiguration(configId, updates) {
 async function bulkUpdateConfigurations(updates) {
   try {
     const results = [];
-    
+
     for (const update of updates) {
       try {
-        let result = await updateConfiguration(update.config_id, update);
+        const result = await updateConfiguration(update.config_id, update);
         results.push({ success: true, config_id: update.config_id, data: result });
       } catch (error) {
         results.push({ success: false, config_id: update.config_id, error: error.message });
@@ -178,7 +178,7 @@ async function bulkUpdateConfigurations(updates) {
       total: updates.length,
       successful: results.filter(r => r.success).length,
       failed: results.filter(r => !r.success).length,
-      results
+      results,
     };
   } catch (error) {
     logger.error('Error bulk updating configurations', { error: error.message, stack: error.stack });
@@ -195,13 +195,13 @@ async function getConfigurationHistory(configId) {
       `SELECT * FROM configuration_history 
        WHERE config_id = $1 
        ORDER BY changed_at DESC`,
-      [configId]
+      [configId],
     );
 
     return {
       config_id: configId,
       total_changes: history.rows.length,
-      changes: history.rows
+      changes: history.rows,
     };
   } catch (error) {
     logger.error('Error getting configuration history', { error: error.message, stack: error.stack });
@@ -216,15 +216,15 @@ function generateId() {
 
 async function assessSecurityRisks(configData) {
   const risks = [];
-  
+
   if (configData.encrypted === false && configData.config_type === 'sensitive') {
     risks.push({ type: 'unencrypted_sensitive_data', severity: 'high' });
   }
-  
+
   if (configData.config_key.includes('password') || configData.config_key.includes('secret')) {
     risks.push({ type: 'credential_storage', severity: 'medium' });
   }
-  
+
   return risks;
 }
 
@@ -232,7 +232,7 @@ async function getConfigurationBestPractices(configType) {
   const practices = {
     database: ['use_connection_pooling', 'enable_ssl', 'implement_retry_logic'],
     api: ['implement_rate_limiting', 'enable_caching', 'use_circuit_breaker'],
-    security: ['enable_encryption', 'implement_audit_logging', 'use_least_privilege']
+    security: ['enable_encryption', 'implement_audit_logging', 'use_least_privilege'],
   };
   return practices[configType] || [];
 }
@@ -241,7 +241,7 @@ async function assessDependencyImpact(configKey) {
   return {
     dependent_services: ['api_gateway', 'auth_service'],
     impact_level: 'medium',
-    restart_required: false
+    restart_required: false,
   };
 }
 
@@ -252,9 +252,9 @@ async function decryptValue(encryptedValue) {
 
 async function getConfigurationById(configId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM platform_configurations WHERE config_id = $1',
-      [configId]
+      [configId],
     );
     return result.rows[0] || {};
   } catch (error) {
@@ -267,7 +267,7 @@ async function assessUpdateImpact(configId, updates) {
     user_impact: 'low',
     service_impact: 'medium',
     downtime_required: false,
-    rollback_needed: true
+    rollback_needed: true,
   };
 }
 
@@ -276,5 +276,5 @@ module.exports = {
   getConfiguration,
   updateConfiguration,
   bulkUpdateConfigurations,
-  getConfigurationHistory
+  getConfigurationHistory,
 };

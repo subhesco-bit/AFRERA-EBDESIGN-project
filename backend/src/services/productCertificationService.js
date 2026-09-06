@@ -16,7 +16,7 @@ class ProductCertificationService {
    */
   async addCertification(productId, certData) {
   // Validate inputs
-  if (!productId) throw new Error('Missing required parameter');
+    if (!productId) throw new Error('Missing required parameter');
 
     try {
       if (!productId || !certData.certification_type) {
@@ -36,14 +36,14 @@ class ProductCertificationService {
         valid_until: certData.valid_until,
         verification_status: 'pending',
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       }).returning('*');
 
       logger.info(`Certification added: ${productId} - ${certData.certification_type}`);
 
       return {
         certification_id: certification[0].id,
-        status: 'pending'
+        status: 'pending',
       };
     } catch (error) {
       logger.error(`Add certification failed: ${error.message}`);
@@ -67,7 +67,7 @@ class ProductCertificationService {
       if (!registry) {
         return {
           valid: false,
-          message: 'Certificate not found in registry'
+          message: 'Certificate not found in registry',
         };
       }
 
@@ -75,7 +75,7 @@ class ProductCertificationService {
         .where('certificate_number', certCode)
         .update({
           verification_status: 'verified',
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       logger.info(`Certification verified: ${certCode}`);
@@ -85,7 +85,7 @@ class ProductCertificationService {
         certification_type: registry.certification_type,
         issuer: registry.issuer,
         issued_date: registry.issued_date,
-        valid_until: registry.valid_until
+        valid_until: registry.valid_until,
       };
     } catch (error) {
       logger.error(`Verify certification failed: ${error.message}`);
@@ -108,7 +108,7 @@ class ProductCertificationService {
         certificate_number: cert.certificate_number,
         issued_date: cert.issued_date,
         valid_until: cert.valid_until,
-        badge_icon: this.getCertificationBadge(cert.certification_type)
+        badge_icon: this.getCertificationBadge(cert.certification_type),
       }));
     } catch (error) {
       logger.error(`Get product certifications failed: ${error.message}`);
@@ -130,13 +130,13 @@ class ProductCertificationService {
         .update({
           verification_status: 'revoked',
           revocation_reason: reason,
-          updated_at: new Date()
+          updated_at: new Date(),
         });
 
       logger.info(`Certification revoked: ${certificationId}`);
 
       return {
-        status: 'revoked'
+        status: 'revoked',
       };
     } catch (error) {
       logger.error(`Revoke certification failed: ${error.message}`);
@@ -152,7 +152,7 @@ class ProductCertificationService {
       gi_certified: '🏆',
       organic: '🌿',
       fair_trade: '🤝',
-      sustainable: '🌍'
+      sustainable: '🌍',
     };
     return badges[type] || '🎖️';
   }

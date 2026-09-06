@@ -38,7 +38,7 @@ const defenseFitnessPrepController = {
   getReadiness: async (req, res) => {
     try {
       const { category } = req.params;
-      let gender = req.query.gender || 'any';
+      const gender = req.query.gender || 'any';
       const comparison = await defenseFitnessPrepService.getReadinessComparison(req.user.id, category, gender);
       res.json({ success: true, data: comparison });
     } catch (error) {

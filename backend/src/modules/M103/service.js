@@ -28,7 +28,7 @@ async function registerEquipment(equipmentData) {
       state,
       district,
       condition,
-      status
+      status,
     } = equipmentData;
 
     const equipment = {
@@ -49,7 +49,7 @@ async function registerEquipment(equipmentData) {
       district,
       condition: condition || 'good',
       status: status || 'available',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered equipment optimization
@@ -60,8 +60,8 @@ async function registerEquipment(equipmentData) {
         category_requirements: await getCategoryRequirements(equipment_category),
         regional_demand: await getRegionalDemand(state, district, equipment_category),
         depreciation_analysis: await analyzeDepreciation(year, purchase_cost),
-        utilization_potential: await assessUtilizationPotential(equipment_category, state)
-      }
+        utilization_potential: await assessUtilizationPotential(equipment_category, state),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -93,8 +93,8 @@ async function registerEquipment(equipmentData) {
         equipment.condition,
         equipment.status,
         JSON.stringify(equipment.ai_recommendations),
-        equipment.created_at
-      ]
+        equipment.created_at,
+      ],
     );
 
     logger.info(`Equipment registered: ${equipment.equipment_registry_id}`);
@@ -118,30 +118,30 @@ async function updateEquipmentStatus(registryId, statusData) {
       condition,
       location,
       notes,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // AI-powered status analysis
-    let aiRequest = {
+    const aiRequest = {
       task: 'equipment_status_analysis',
       parameters: {
         registry_id: registryId,
         status_data: statusData,
         status_history: await getStatusHistory(registryId),
         utilization_patterns: await getUtilizationPatterns(registryId),
-        maintenance_requirements: await getMaintenanceRequirements(registryId)
-      }
+        maintenance_requirements: await getMaintenanceRequirements(registryId),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
     update.ai_analysis = aiResponse;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE equipment_inventory 
        SET status = $1, condition = $2, location = $3, updated_at = CURRENT_TIMESTAMP
        WHERE equipment_registry_id = $4
        RETURNING *`,
-      [status, condition, location, registryId]
+      [status, condition, location, registryId],
     );
 
     await pool.query(
@@ -156,8 +156,8 @@ async function updateEquipmentStatus(registryId, statusData) {
         location,
         notes,
         JSON.stringify(update.ai_analysis),
-        update.updated_at
-      ]
+        update.updated_at,
+      ],
     );
 
     logger.info(`Equipment status updated: ${registryId}`);
@@ -181,8 +181,8 @@ async function trackEquipmentUtilization(registryId, period) {
       usage_hours: await getUsageHours(registryId, period),
       utilization_rate: await calculateUtilizationRate(registryId, period),
       operational_efficiency: await getOperationalEfficiency(registryId, period),
-    cost_per_hour: await calculateCostPerHour(registryId, period),
-    recommendations: await generateUtilizationRecommendations(registryId, period)
+      cost_per_hour: await calculateCostPerHour(registryId, period),
+      recommendations: await generateUtilizationRecommendations(registryId, period),
     };
 
     return utilization;
@@ -207,7 +207,7 @@ async function generateInventoryReport(farmerId, reportType) {
       condition_summary: await getConditionSummary(farmerId),
       utilization_summary: await getUtilizationSummary(farmerId),
       depreciation_value: await calculateDepreciationValue(farmerId),
-      recommendations: await generateInventoryRecommendations(farmerId)
+      recommendations: await generateInventoryRecommendations(farmerId),
     };
 
     return report;
@@ -225,7 +225,7 @@ async function getCategoryRequirements(category) {
   const requirements = {
     irrigation: { power: 'electric', pressure: '2-5 bar', flow_rate: '10-50 L/min' },
     harvesting: { capacity: '500-2000 kg/hr', power: '50-100 HP' },
-    processing: { capacity: '100-1000 kg/hr', automation: 'semi-auto' }
+    processing: { capacity: '100-1000 kg/hr', automation: 'semi-auto' },
   };
   return requirements[category] || {};
 }
@@ -234,7 +234,7 @@ async function getRegionalDemand(state, district, category) {
   return {
     demand_level: 'high',
     seasonal_demand: ['kharif', 'rabi'],
-    rental_potential: 'good'
+    rental_potential: 'good',
   };
 }
 
@@ -246,7 +246,7 @@ async function analyzeDepreciation(year, purchaseCost) {
     age,
     depreciation_rate: depreciationRate,
     current_value: currentValue,
-    accumulated_depreciation: purchaseCost - currentValue
+    accumulated_depreciation: purchaseCost - currentValue,
   };
 }
 
@@ -254,15 +254,15 @@ async function assessUtilizationPotential(category, state) {
   return {
     potential: 'high',
     rental_opportunities: 5,
-    sharing_potential: 'good'
+    sharing_potential: 'good',
   };
 }
 
 async function getStatusHistory(registryId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM equipment_status_history WHERE registry_id = $1 ORDER BY updated_at DESC LIMIT 10',
-      [registryId]
+      [registryId],
     );
     return result.rows;
   } catch (error) {
@@ -274,7 +274,7 @@ async function getUtilizationPatterns(registryId) {
   return {
     average_daily_hours: 6,
     peak_season_hours: 10,
-    off_season_hours: 2
+    off_season_hours: 2,
   };
 }
 
@@ -282,7 +282,7 @@ async function getMaintenanceRequirements(registryId) {
   return [
     { task: 'routine_inspection', frequency: 'weekly' },
     { task: 'lubrication', frequency: 'monthly' },
-    { task: 'overhaul', frequency: 'annually' }
+    { task: 'overhaul', frequency: 'annually' },
   ];
 }
 
@@ -290,7 +290,7 @@ async function getUsageHours(registryId, period) {
   return {
     total_hours: 180,
     average_daily: 6,
-    peak_hours: 10
+    peak_hours: 10,
   };
 }
 
@@ -298,7 +298,7 @@ async function calculateUtilizationRate(registryId, period) {
   return {
     utilization_rate: 75,
     target_rate: 80,
-    gap: 5
+    gap: 5,
   };
 }
 
@@ -306,7 +306,7 @@ async function getOperationalEfficiency(registryId, period) {
   return {
     efficiency_score: 85,
     downtime: 15,
-    uptime: 85
+    uptime: 85,
   };
 }
 
@@ -315,7 +315,7 @@ async function calculateCostPerHour(registryId, period) {
     cost_per_hour: 150,
     fuel_cost: 50,
     maintenance_cost: 30,
-    depreciation_cost: 70
+    depreciation_cost: 70,
   };
 }
 
@@ -323,15 +323,15 @@ async function generateUtilizationRecommendations(registryId, period) {
   return [
     'Increase utilization during off-season through rental',
     'Schedule maintenance during low-demand periods',
-    'Consider equipment sharing with neighboring farmers'
+    'Consider equipment sharing with neighboring farmers',
   ];
 }
 
 async function getEquipmentCount(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT COUNT(*) as count FROM equipment_inventory WHERE farmer_id = $1',
-      [farmerId]
+      [farmerId],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -341,9 +341,9 @@ async function getEquipmentCount(farmerId) {
 
 async function getCategoryBreakdown(farmerId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT equipment_category, COUNT(*) as count FROM equipment_inventory WHERE farmer_id = $1 GROUP BY equipment_category',
-      [farmerId]
+      [farmerId],
     );
     return result.rows;
   } catch (error) {
@@ -356,7 +356,7 @@ async function getConditionSummary(farmerId) {
     excellent: 30,
     good: 50,
     fair: 15,
-    poor: 5
+    poor: 5,
   };
 }
 
@@ -365,7 +365,7 @@ async function getUtilizationSummary(farmerId) {
     average_utilization: 70,
     highly_utilized: 40,
     underutilized: 30,
-    idle: 30
+    idle: 30,
   };
 }
 
@@ -373,7 +373,7 @@ async function calculateDepreciationValue(farmerId) {
   return {
     total_purchase_value: 500000,
     total_current_value: 350000,
-    total_depreciation: 150000
+    total_depreciation: 150000,
   };
 }
 
@@ -381,7 +381,7 @@ async function generateInventoryRecommendations(farmerId) {
   return [
     'Consider selling underutilized equipment',
     'Explore equipment rental opportunities',
-    'Implement preventive maintenance schedule'
+    'Implement preventive maintenance schedule',
   ];
 }
 
@@ -402,13 +402,13 @@ async function listEquipment({ page = 1, limit = 20, farmer_id = null, status = 
   const listParams = [...params, limit, offset];
   const res = await pool.query(
     `SELECT * FROM equipment_inventory ${where} ORDER BY created_at DESC LIMIT $${listParams.length - 1} OFFSET $${listParams.length}`,
-    listParams
+    listParams,
   );
   return { items: res.rows, pagination: { page: Number(page), limit: Number(limit), total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
 }
 
 async function getEquipment(id) {
-  let res = await pool.query('SELECT * FROM equipment_inventory WHERE equipment_registry_id = $1', [id]);
+  const res = await pool.query('SELECT * FROM equipment_inventory WHERE equipment_registry_id = $1', [id]);
   return res.rows[0] || null;
 }
 
@@ -418,5 +418,5 @@ module.exports = {
   registerEquipment,
   updateEquipmentStatus,
   trackEquipmentUtilization,
-  generateInventoryReport
+  generateInventoryReport,
 };

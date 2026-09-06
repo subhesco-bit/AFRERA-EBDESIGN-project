@@ -160,7 +160,10 @@ CREATE TABLE IF NOT EXISTS cold_storage_bays (
     CHECK (max_temp_c IS NULL OR min_temp_c IS NULL OR max_temp_c >= min_temp_c)
 );
 
-CREATE TABLE IF NOT EXISTS cold_storage_bookings (
+-- Keep the recovered bay model separate from the canonical facility booking
+-- model in 3104_cold_storage_schema.sql. Both used to claim the same table
+-- name with incompatible columns, and migration ordering made 994 win.
+CREATE TABLE IF NOT EXISTS cold_storage_bay_bookings (
     id SERIAL PRIMARY KEY,
     booking_code VARCHAR(40) UNIQUE NOT NULL,
     bay_id INTEGER NOT NULL REFERENCES cold_storage_bays(id) ON DELETE RESTRICT,
@@ -191,7 +194,7 @@ BEGIN
     SELECT capacity_kg INTO v_capacity FROM cold_storage_bays WHERE id = NEW.bay_id;
 
     SELECT COALESCE(SUM(quantity_kg), 0) INTO v_booked
-      FROM cold_storage_bookings
+    FROM cold_storage_bay_bookings
      WHERE bay_id = NEW.bay_id
        AND id <> COALESCE(NEW.id, -1)
        AND status IN ('reserved','confirmed','in_use')
@@ -208,9 +211,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_bay_capacity ON cold_storage_bookings;
-DROP TRIGGER IF EXISTS trg_bay_capacity ON cold_storage_bookings;
-CREATE TRIGGER trg_bay_capacity BEFORE INSERT OR UPDATE ON cold_storage_bookings
+DROP TRIGGER IF EXISTS trg_bay_capacity ON cold_storage_bay_bookings;
+CREATE TRIGGER trg_bay_capacity BEFORE INSERT OR UPDATE ON cold_storage_bay_bookings
     FOR EACH ROW EXECUTE FUNCTION assert_bay_capacity();
 
 -- ---------------------------------------------------------------------------

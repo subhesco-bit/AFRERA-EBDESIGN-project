@@ -10,7 +10,7 @@ async function record(event) {
       (module_id, operation, event_type, actor_user_id, entity_id, correlation_id, payload, error_code)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
     [event.moduleId, event.operation, event.eventType, event.actorUserId || null,
-      event.entityId || null, event.correlationId, JSON.stringify(payload), event.errorCode || null]
+      event.entityId || null, event.correlationId, JSON.stringify(payload), event.errorCode || null],
   );
   return result.rows[0];
 }

@@ -84,7 +84,7 @@ async function run({ state, dryRun = false, maxPages = 30 } = {}) {
   let total = null;
 
   for (let page = 0; page < maxPages; page += 1) {
-    let body = await fetchPage({ offset, state });
+    const body = await fetchPage({ offset, state });
     total = body.total;
     const records = body.records || [];
     all.push(...records);
@@ -116,11 +116,11 @@ async function run({ state, dryRun = false, maxPages = 30 } = {}) {
     neRecords: neRecords.length,
     neStatesReporting: [...new Set(neRecords.map((r) => r.state))],
     // The finding, stated on every run.
-    neCoverageNote: neRecords.length === 0
-      ? 'ZERO North East records in this publication. A farmer in the NE has no published '
-      + 'price to check, so every feature that assumes "look up the mandi rate" returns '
-      + 'nothing for them. Treat that as missing data, never as a flat market.'
-      : `${neRecords.length} NE record(s) from ${[...new Set(neRecords.map((r) => r.state))].join(', ')}.`,
+    neCoverageNote: neRecords.length === 0 ?
+      'ZERO North East records in this publication. A farmer in the NE has no published ' +
+      'price to check, so every feature that assumes "look up the mandi rate" returns ' +
+      'nothing for them. Treat that as missing data, never as a flat market.' :
+      `${neRecords.length} NE record(s) from ${[...new Set(neRecords.map((r) => r.state))].join(', ')}.`,
   };
 
   if (dryRun) return { ...summary, dryRun: true, sample: normalised.slice(0, 3) };

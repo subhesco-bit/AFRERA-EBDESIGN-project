@@ -60,5 +60,3 @@ module.exports = {
   equipmentScheduling, inputConsumption, farmProductivity, farmOperationsDashboard,
 };
 
-
-

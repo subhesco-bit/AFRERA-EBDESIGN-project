@@ -1,6 +1,6 @@
 /**
  * Knowledge Service
- * 
+ *
  * Enterprise-grade knowledge management service providing comprehensive features
  * including knowledge articles, wikis, document repositories, taxonomies,
  * version control, search, AI-powered recommendations, and analytics.
@@ -10,34 +10,34 @@ class KnowledgeService {
   constructor() {
     // Knowledge articles
     this.articles = new Map();
-    
+
     // Wiki pages
     this.wikiPages = new Map();
-    
+
     // Document repository
     this.documents = new Map();
-    
+
     // Taxonomy/categories
     this.taxonomies = new Map();
-    
+
     // Knowledge tags
     this.tags = new Map();
-    
+
     // Version history
     this.versionHistory = new Map();
-    
+
     // Search index
     this.searchIndex = new Map();
-    
+
     // AI recommendations
     this.aiRecommendations = new Map();
-    
+
     // Access control
     this.accessControl = new Map();
-    
+
     // Feedback/ratings
     this.feedback = new Map();
-    
+
     // Initialize default data
     this.initializeDefaultData();
   }
@@ -56,7 +56,7 @@ class KnowledgeService {
       order: 1,
       articleCount: 25,
       color: '#10B981',
-      createdAt: '2024-01-01T00:00:00Z'
+      createdAt: '2024-01-01T00:00:00Z',
     });
 
     this.taxonomies.set('tax-002', {
@@ -68,7 +68,7 @@ class KnowledgeService {
       order: 1,
       articleCount: 15,
       color: '#3B82F6',
-      createdAt: '2024-01-01T00:00:00Z'
+      createdAt: '2024-01-01T00:00:00Z',
     });
 
     // Sample articles
@@ -90,7 +90,7 @@ class KnowledgeService {
       featured: true,
       publishedAt: '2024-02-15T00:00:00Z',
       updatedAt: '2024-03-01T00:00:00Z',
-      createdAt: '2024-01-15T00:00:00Z'
+      createdAt: '2024-01-15T00:00:00Z',
     });
 
     // Sample wiki pages
@@ -107,7 +107,7 @@ class KnowledgeService {
       editCount: 12,
       lastEditedBy: 'user-002',
       lastEditedAt: '2024-06-15T00:00:00Z',
-      createdAt: '2024-01-01T00:00:00Z'
+      createdAt: '2024-01-01T00:00:00Z',
     });
   }
 
@@ -116,7 +116,7 @@ class KnowledgeService {
    */
   createArticle(articleData) {
     const articleId = articleData.id || `article-${Date.now()}`;
-    
+
     const article = {
       id: articleId,
       title: articleData.title,
@@ -136,14 +136,14 @@ class KnowledgeService {
       publishedAt: articleData.status === 'published' ? new Date().toISOString() : null,
       updatedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
-      metadata: articleData.metadata || {}
+      metadata: articleData.metadata || {},
     };
 
     this.articles.set(articleId, article);
-    
+
     // Index for search
     this.indexForSearch(articleId, article);
-    
+
     // Update taxonomy count
     if (articleData.taxonomyId) {
       const taxonomy = this.taxonomies.get(articleData.taxonomyId);
@@ -152,10 +152,10 @@ class KnowledgeService {
         this.taxonomies.set(articleData.taxonomyId, taxonomy);
       }
     }
-    
+
     // Save initial version
     this.saveVersion(articleId, article, 'created');
-    
+
     return article;
   }
 
@@ -205,7 +205,7 @@ class KnowledgeService {
    * Get a specific article
    */
   getArticle(articleId) {
-    let article = this.articles.get(articleId);
+    const article = this.articles.get(articleId);
     if (article) {
       article.viewCount = (article.viewCount || 0) + 1;
       this.articles.set(articleId, article);
@@ -217,7 +217,7 @@ class KnowledgeService {
    * Update article
    */
   updateArticle(articleId, updates) {
-    let article = this.articles.get(articleId);
+    const article = this.articles.get(articleId);
     if (!article) {
       throw new Error(`Article ${articleId} not found`);
     }
@@ -227,7 +227,7 @@ class KnowledgeService {
       ...article,
       ...updates,
       version: article.version + 1,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     if (updates.status === 'published' && !article.publishedAt) {
@@ -240,13 +240,13 @@ class KnowledgeService {
     }
 
     this.articles.set(articleId, updatedArticle);
-    
+
     // Reindex for search
     this.indexForSearch(articleId, updatedArticle);
-    
+
     // Save version
     this.saveVersion(articleId, updatedArticle, 'updated', oldArticle);
-    
+
     return updatedArticle;
   }
 
@@ -254,23 +254,23 @@ class KnowledgeService {
    * Delete article
    */
   deleteArticle(articleId) {
-    let article = this.articles.get(articleId);
+    const article = this.articles.get(articleId);
     if (!article) {
       throw new Error(`Article ${articleId} not found`);
     }
 
     this.articles.delete(articleId);
     this.searchIndex.delete(articleId);
-    
+
     // Update taxonomy count
     if (article.taxonomyId) {
-      let taxonomy = this.taxonomies.get(article.taxonomyId);
+      const taxonomy = this.taxonomies.get(article.taxonomyId);
       if (taxonomy) {
         taxonomy.articleCount = Math.max(0, (taxonomy.articleCount || 0) - 1);
         this.taxonomies.set(article.taxonomyId, taxonomy);
       }
     }
-    
+
     return { success: true, message: `Article ${articleId} deleted` };
   }
 
@@ -280,12 +280,12 @@ class KnowledgeService {
   createWikiPage(wikiData) {
     const wikiId = wikiData.id || `wiki-${Date.now()}`;
     const slug = wikiData.slug || this.generateSlug(wikiData.title);
-    
+
     const wikiPage = {
       id: wikiId,
       title: wikiData.title,
       content: wikiData.content,
-      slug: slug,
+      slug,
       parentId: wikiData.parentId || null,
       authorId: wikiData.authorId,
       status: wikiData.status || 'draft',
@@ -294,14 +294,14 @@ class KnowledgeService {
       editCount: 0,
       lastEditedBy: wikiData.authorId,
       lastEditedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.wikiPages.set(wikiId, wikiPage);
-    
+
     // Save initial version
     this.saveVersion(wikiId, wikiPage, 'created');
-    
+
     return wikiPage;
   }
 
@@ -348,7 +348,7 @@ class KnowledgeService {
       ...updates,
       version: page.version + 1,
       editCount: (page.editCount || 0) + 1,
-      lastEditedAt: new Date().toISOString()
+      lastEditedAt: new Date().toISOString(),
     };
 
     if (updates.title) {
@@ -356,10 +356,10 @@ class KnowledgeService {
     }
 
     this.wikiPages.set(wikiId, updatedPage);
-    
+
     // Save version
     this.saveVersion(wikiId, updatedPage, 'edited', oldPage);
-    
+
     return updatedPage;
   }
 
@@ -368,8 +368,8 @@ class KnowledgeService {
    */
   createTaxonomy(taxonomyData) {
     const taxonomyId = taxonomyData.id || `tax-${Date.now()}`;
-    
-    let taxonomy = {
+
+    const taxonomy = {
       id: taxonomyId,
       name: taxonomyData.name,
       description: taxonomyData.description,
@@ -379,7 +379,7 @@ class KnowledgeService {
       articleCount: 0,
       color: taxonomyData.color || '#6B7280',
       icon: taxonomyData.icon || null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.taxonomies.set(taxonomyId, taxonomy);
@@ -410,7 +410,7 @@ class KnowledgeService {
     const buildTree = (parentId) => {
       const children = this.getTaxonomies({ parentId }).map(taxonomy => ({
         ...taxonomy,
-        children: buildTree(taxonomy.id)
+        children: buildTree(taxonomy.id),
       }));
       return children;
     };
@@ -425,7 +425,7 @@ class KnowledgeService {
     const results = {
       articles: [],
       wikiPages: [],
-      documents: []
+      documents: [],
     };
 
     const queryLower = query.toLowerCase();
@@ -434,15 +434,15 @@ class KnowledgeService {
     if (!filters.type || filters.type === 'articles') {
       results.articles = Array.from(this.articles.values())
         .filter(a => a.status === 'published')
-        .filter(a => 
+        .filter(a =>
           a.title.toLowerCase().includes(queryLower) ||
           a.content.toLowerCase().includes(queryLower) ||
           a.summary.toLowerCase().includes(queryLower) ||
-          a.tags.some(t => t.toLowerCase().includes(queryLower))
+          a.tags.some(t => t.toLowerCase().includes(queryLower)),
         )
         .map(a => ({
           ...a,
-          relevance: this.calculateRelevance(query, a)
+          relevance: this.calculateRelevance(query, a),
         }))
         .sort((a, b) => b.relevance - a.relevance)
         .slice(0, 20);
@@ -452,13 +452,13 @@ class KnowledgeService {
     if (!filters.type || filters.type === 'wiki') {
       results.wikiPages = Array.from(this.wikiPages.values())
         .filter(p => p.status === 'published')
-        .filter(p => 
+        .filter(p =>
           p.title.toLowerCase().includes(queryLower) ||
-          p.content.toLowerCase().includes(queryLower)
+          p.content.toLowerCase().includes(queryLower),
         )
         .map(p => ({
           ...p,
-          relevance: this.calculateRelevance(query, p)
+          relevance: this.calculateRelevance(query, p),
         }))
         .sort((a, b) => b.relevance - a.relevance)
         .slice(0, 10);
@@ -471,7 +471,7 @@ class KnowledgeService {
    * Calculate relevance score
    */
   calculateRelevance(query, item) {
-    let queryLower = query.toLowerCase();
+    const queryLower = query.toLowerCase();
     let score = 0;
 
     if (item.title.toLowerCase().includes(queryLower)) score += 10;
@@ -487,12 +487,12 @@ class KnowledgeService {
    */
   indexForSearch(id, item) {
     const index = {
-      id: id,
+      id,
       title: item.title,
       content: item.content,
       summary: item.summary,
       tags: item.tags,
-      type: item.taxonomyId ? 'article' : 'wiki'
+      type: item.taxonomyId ? 'article' : 'wiki',
     };
     this.searchIndex.set(id, index);
   }
@@ -511,7 +511,7 @@ class KnowledgeService {
    */
   calculateReadTime(content) {
     if (!content) return 0;
-    let words = content.split(' ').length;
+    const words = content.split(' ').length;
     return Math.ceil(words / 200); // Average reading speed: 200 words per minute
   }
 
@@ -530,16 +530,16 @@ class KnowledgeService {
    */
   saveVersion(itemId, item, action, previousItem = null) {
     const versionId = `version-${itemId}-${item.version}`;
-    
+
     const version = {
       id: versionId,
-      itemId: itemId,
+      itemId,
       version: item.version,
-      action: action,
+      action,
       data: { ...item },
       previousData: previousItem ? { ...previousItem } : null,
       changedBy: item.authorId || item.lastEditedBy,
-      changedAt: new Date().toISOString()
+      changedAt: new Date().toISOString(),
     };
 
     if (!this.versionHistory.has(itemId)) {
@@ -564,7 +564,7 @@ class KnowledgeService {
       throw new Error(`No version history found for ${itemId}`);
     }
 
-    let version = history.find(v => v.version === versionNumber);
+    const version = history.find(v => v.version === versionNumber);
     if (!version) {
       throw new Error(`Version ${versionNumber} not found`);
     }
@@ -584,7 +584,7 @@ class KnowledgeService {
    */
   setAccessControl(controlData) {
     const controlId = controlData.id || `acl-${Date.now()}`;
-    
+
     const control = {
       id: controlId,
       resourceId: controlData.resourceId,
@@ -594,7 +594,7 @@ class KnowledgeService {
       permission: controlData.permission || 'read',
       grantedBy: controlData.grantedBy,
       expiresAt: controlData.expiresAt || null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.accessControl.set(controlId, control);
@@ -607,7 +607,7 @@ class KnowledgeService {
   checkAccess(resourceId, userId, requiredPermission = 'read') {
     const controls = Array.from(this.accessControl.values())
       .filter(c => c.resourceId === resourceId);
-    
+
     // Check direct user permissions
     const userControl = controls.find(c => c.userId === userId);
     if (userControl && this.hasPermission(userControl.permission, requiredPermission)) {
@@ -617,7 +617,7 @@ class KnowledgeService {
     // Check role-based permissions (simplified)
     const roleControls = controls.filter(c => c.roleId);
     // In a real implementation, you would check user's roles here
-    
+
     return false;
   }
 
@@ -634,7 +634,7 @@ class KnowledgeService {
    */
   submitFeedback(feedbackData) {
     const feedbackId = feedbackData.id || `feedback-${Date.now()}`;
-    
+
     const feedback = {
       id: feedbackId,
       resourceId: feedbackData.resourceId,
@@ -643,14 +643,14 @@ class KnowledgeService {
       rating: feedbackData.rating,
       comment: feedbackData.comment || '',
       helpful: feedbackData.helpful || false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.feedback.set(feedbackId, feedback);
-    
+
     // Update item stats
     if (feedbackData.resourceType === 'article') {
-      let article = this.articles.get(feedbackData.resourceId);
+      const article = this.articles.get(feedbackData.resourceId);
       if (article) {
         if (feedbackData.helpful) {
           article.helpfulCount = (article.helpfulCount || 0) + 1;
@@ -661,7 +661,7 @@ class KnowledgeService {
         this.articles.set(feedbackData.resourceId, article);
       }
     }
-    
+
     return feedback;
   }
 
@@ -678,13 +678,13 @@ class KnowledgeService {
    */
   async generateAIRecommendations(userId, context) {
     const recommendations = {
-      userId: userId,
-      context: context,
+      userId,
+      context,
       recommendations: [],
       confidence: null,
       implemented: false,
       reason: 'No real recommendation model is connected — relevance scores below are not yet computed.',
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
 
     if (context.type === 'related_articles') {
@@ -693,32 +693,32 @@ class KnowledgeService {
         articleId: article.id,
         title: article.title,
         relevance: null,
-        reason: 'Based on your reading history and interests'
+        reason: 'Based on your reading history and interests',
       }));
     } else if (context.type === 'trending_topics') {
-      let articles = this.getArticles({ status: 'published' });
+      const articles = this.getArticles({ status: 'published' });
       const trending = articles
         .sort((a, b) => b.viewCount - a.viewCount)
         .slice(0, 5);
-      
+
       recommendations.recommendations = trending.map(article => ({
         articleId: article.id,
         title: article.title,
         views: article.viewCount,
-        reason: 'Most viewed articles this week'
+        reason: 'Most viewed articles this week',
       }));
     } else if (context.type === 'knowledge_gaps') {
       recommendations.recommendations = [
         {
           topic: 'Advanced Soil Analysis',
           reason: 'No comprehensive articles found on this topic',
-          priority: 'high'
+          priority: 'high',
         },
         {
           topic: 'Sustainable Pest Management',
           reason: 'Limited coverage in current knowledge base',
-          priority: 'medium'
-        }
+          priority: 'medium',
+        },
       ];
     }
 
@@ -730,10 +730,10 @@ class KnowledgeService {
    * Get knowledge analytics
    */
   getAnalytics() {
-    let articles = Array.from(this.articles.values());
+    const articles = Array.from(this.articles.values());
     const wikiPages = Array.from(this.wikiPages.values());
     const taxonomies = Array.from(this.taxonomies.values());
-    let feedback = Array.from(this.feedback.values());
+    const feedback = Array.from(this.feedback.values());
 
     return {
       content: {
@@ -742,14 +742,14 @@ class KnowledgeService {
         totalWikiPages: wikiPages.length,
         totalTaxonomies: taxonomies.length,
         totalViews: articles.reduce((sum, a) => sum + (a.viewCount || 0), 0) +
-                     wikiPages.reduce((sum, w) => sum + (w.viewCount || 0), 0)
+                     wikiPages.reduce((sum, w) => sum + (w.viewCount || 0), 0),
       },
       engagement: {
         totalLikes: articles.reduce((sum, a) => sum + (a.likeCount || 0), 0),
         totalHelpful: articles.reduce((sum, a) => sum + (a.helpfulCount || 0), 0),
         totalFeedback: feedback.length,
-        averageRating: feedback.length > 0 ? 
-          feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length : 0
+        averageRating: feedback.length > 0 ?
+          feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / feedback.length : 0,
       },
       activity: {
         totalVersions: Array.from(this.versionHistory.values())
@@ -759,13 +759,13 @@ class KnowledgeService {
           const monthAgo = new Date();
           monthAgo.setMonth(monthAgo.getMonth() - 1);
           return created > monthAgo;
-        }).length
+        }).length,
       },
       distribution: {
         byTaxonomy: this.groupByTaxonomy(articles),
         byLanguage: this.groupByLanguage(articles),
-        byStatus: this.groupByStatus(articles)
-      }
+        byStatus: this.groupByStatus(articles),
+      },
     };
   }
 
@@ -776,7 +776,7 @@ class KnowledgeService {
     const grouped = {};
     articles.forEach(article => {
       const taxId = article.taxonomyId || 'uncategorized';
-      let taxonomy = this.taxonomies.get(taxId);
+      const taxonomy = this.taxonomies.get(taxId);
       const name = taxonomy ? taxonomy.name : 'Uncategorized';
       grouped[name] = (grouped[name] || 0) + 1;
     });
@@ -787,7 +787,7 @@ class KnowledgeService {
    * Group articles by language
    */
   groupByLanguage(articles) {
-    let grouped = {};
+    const grouped = {};
     articles.forEach(article => {
       const lang = article.language || 'unknown';
       grouped[lang] = (grouped[lang] || 0) + 1;
@@ -799,7 +799,7 @@ class KnowledgeService {
    * Group articles by status
    */
   groupByStatus(articles) {
-    let grouped = {};
+    const grouped = {};
     articles.forEach(article => {
       const status = article.status || 'unknown';
       grouped[status] = (grouped[status] || 0) + 1;
@@ -823,7 +823,7 @@ class KnowledgeService {
       searchIndex: this.searchIndex.size,
       accessControl: this.accessControl.size,
       feedback: this.feedback.size,
-      aiRecommendations: this.aiRecommendations.size
+      aiRecommendations: this.aiRecommendations.size,
     };
   }
 }
@@ -832,6 +832,4 @@ class KnowledgeService {
 const knowledgeService = new KnowledgeService();
 
 module.exports = knowledgeService;
-
-
 

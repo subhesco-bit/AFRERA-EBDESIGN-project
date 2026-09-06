@@ -20,7 +20,7 @@ router.get('/context', async (req, res) => {
 
 router.put('/context', async (req, res) => {
   try {
-    let context = await aiCollaborationService.updateSharedContext(req.body || {});
+    const context = await aiCollaborationService.updateSharedContext(req.body || {});
     res.json({ success: true, data: context });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -44,7 +44,7 @@ router.get('/work-history/:aiSource', async (req, res) => {
   try {
     const history = await aiCollaborationService.getWorkHistory(
       req.params.aiSource,
-      parseInt(req.query.limit, 10) || 20
+      parseInt(req.query.limit, 10) || 20,
     );
     res.json({ success: true, data: { ai_source: req.params.aiSource, work_history: history, count: history.length } });
   } catch (error) {
@@ -80,7 +80,7 @@ router.post('/handoff/:handoffId/accept', async (req, res) => {
     if (!acceptingAI) {
       return res.status(400).json({ success: false, error: 'accepting_ai is required' });
     }
-    let handoff = await aiCollaborationService.acceptHandoff(req.params.handoffId, acceptingAI);
+    const handoff = await aiCollaborationService.acceptHandoff(req.params.handoffId, acceptingAI);
     res.json({ success: true, data: handoff });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

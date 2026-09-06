@@ -13,9 +13,9 @@ describe.skip('analyticsService', () => {
       forms: [
         { id: '1', status: 'active', workflow: { stages: [{}, {}] } },
         { id: '2', status: 'draft', workflow: {} },
-        { id: '3', status: 'review', workflow: { stages: [{}] } }
+        { id: '3', status: 'review', workflow: { stages: [{}] } },
       ],
-      submissions: [{ id: 'a' }, { id: 'b' }]
+      submissions: [{ id: 'a' }, { id: 'b' }],
     };
 
     const result = buildPipelineInsights(payload);

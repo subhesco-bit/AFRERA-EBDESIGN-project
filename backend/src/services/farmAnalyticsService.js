@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 class FarmAnalyticsService {
   async generateFarmReport(farmId) {
   // Validate inputs
-  if (!farmId) throw new Error('Missing required parameter');
+    if (!farmId) throw new Error('Missing required parameter');
 
     try {
       const yields = await db('yields').where('farm_id', farmId);
@@ -21,7 +21,7 @@ class FarmAnalyticsService {
 
   async getDashboard(farmId) {
     try {
-      let report = await db('farm_analytics_reports').where('farm_id', farmId).orderBy('created_at', 'desc').first();
+      const report = await db('farm_analytics_reports').where('farm_id', farmId).orderBy('created_at', 'desc').first();
       return { farm_id: farmId, dashboard: report ? JSON.parse(report.report_data) : {} };
     } catch (error) { logger.error(`Get dashboard failed: ${error.message}`); throw error; }
   }

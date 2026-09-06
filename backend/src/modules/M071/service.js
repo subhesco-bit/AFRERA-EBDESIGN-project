@@ -8,49 +8,49 @@ const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 async function registerDairyHerd(herdData) {
   const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { herdName, breed, cattleCount, location, farmId, averageMilkProduction, breedingStatus } = herdData;
-  
+
   const res = await pg.query(
     `INSERT INTO dairy_herds (herd_name, breed, cattle_count, location, farm_id, average_milk_production, breeding_status, status, created_at, updated_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, 'active', NOW(), NOW())
      RETURNING *`,
-    [herdName, breed, cattleCount, JSON.stringify(location), farmId, averageMilkProduction, breedingStatus]
+    [herdName, breed, cattleCount, JSON.stringify(location), farmId, averageMilkProduction, breedingStatus],
   );
-  
+
   // Emit signal for herd registration
   signalBus.emitSignal(SIGNAL.ORGANIZATION_CREATED, {
     entityType: 'dairy_herd',
     herdId: res.rows[0].id,
     herdName,
     breed,
-    cattleCount
+    cattleCount,
   }, {
     severity: SEVERITY.INFO,
     source: 'dairy_management_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
 async function getDairyHerd(herdId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
-  let res = await pg.query('SELECT * FROM dairy_herds WHERE id = $1', [herdId]);
+
+  const res = await pg.query('SELECT * FROM dairy_herds WHERE id = $1', [herdId]);
   return res.rows[0] || null;
 }
 
 async function listDairyHerds({ page = 1, limit = 20, farmId, breed, status } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const offset = (page - 1) * limit;
   let query = 'SELECT * FROM dairy_herds WHERE 1=1';
   const params = [];
   let paramIndex = 1;
-  
+
   if (farmId) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
@@ -63,24 +63,24 @@ async function listDairyHerds({ page = 1, limit = 20, farmId, breed, status } = 
     query += ` AND status = $${paramIndex++}`;
     params.push(status);
   }
-  
+
   query += ` ORDER BY created_at DESC LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
   params.push(limit, offset);
-  
-  let res = await pg.query(query, params);
-  const totalRes = await pg.query(query.replace(`SELECT * FROM dairy_herds`, 'SELECT COUNT(*) FROM dairy_herds').split('LIMIT')[0], params.slice(0, -2));
+
+  const res = await pg.query(query, params);
+  const totalRes = await pg.query(query.replace('SELECT * FROM dairy_herds', 'SELECT COUNT(*) FROM dairy_herds').split('LIMIT')[0], params.slice(0, -2));
   const total = parseInt(totalRes.rows[0].count || '0');
-  
-  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total/limit) } };
+
+  return { items: res.rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
 async function updateDairyHerd(herdId, updates) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { herdName, breed, cattleCount, location, averageMilkProduction, breedingStatus, status } = updates;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `UPDATE dairy_herds 
      SET herd_name = COALESCE($1, herd_name),
          breed = COALESCE($2, breed),
@@ -92,33 +92,33 @@ async function updateDairyHerd(herdId, updates) {
          updated_at = NOW()
      WHERE id = $8
      RETURNING *`,
-    [herdName, breed, cattleCount, location ? JSON.stringify(location) : null, averageMilkProduction, breedingStatus, status, herdId]
+    [herdName, breed, cattleCount, location ? JSON.stringify(location) : null, averageMilkProduction, breedingStatus, status, herdId],
   );
-  
+
   // Emit signal for herd update
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'dairy_herd',
     herdId,
-    action: 'updated'
+    action: 'updated',
   }, {
     severity: SEVERITY.INFO,
     source: 'dairy_management_service',
-    entityId: herdId
+    entityId: herdId,
   });
-  
+
   return res.rows[0] || null;
 }
 
 // AI-powered milk production analysis
 async function analyzeMilkProduction(herdId) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const herd = await getDairyHerd(herdId);
   if (!herd) {
     return { success: false, error: 'Herd not found' };
   }
-  
+
   // Analyze milk production characteristics
   const analysis = {
     herdId,
@@ -128,9 +128,9 @@ async function analyzeMilkProduction(herdId) {
     projectedMonthlyYield: calculateProjectedYield(herd),
     feedOptimization: generateFeedOptimization(herd),
     breedingRecommendations: generateBreedingRecommendations(herd),
-    healthAlerts: generateHealthAlerts(herd)
+    healthAlerts: generateHealthAlerts(herd),
   };
-  
+
   return { success: true, data: analysis };
 }
 
@@ -144,19 +144,19 @@ function categorizeProduction(avgProduction) {
 
 function calculateEfficiencyScore(herd) {
   let score = 0;
-  
+
   // Cattle count contribution
   if (herd.cattle_count && herd.cattle_count > 50) score += 20;
-  
+
   // Production contribution
   if (herd.average_milk_production && herd.average_milk_production > 15) score += 30;
-  
+
   // Breed contribution
   if (herd.breed && herd.breed.includes('Holstein')) score += 25;
-  
+
   // Breeding status contribution
   if (herd.breeding_status === 'active') score += 15;
-  
+
   return Math.min(score, 100);
 }
 
@@ -166,104 +166,104 @@ function calculateProjectedYield(herd) {
     daily: dailyProduction,
     weekly: dailyProduction * 7,
     monthly: dailyProduction * 30,
-    annual: dailyProduction * 365
+    annual: dailyProduction * 365,
   };
 }
 
 function generateFeedOptimization(herd) {
   const recommendations = [];
-  
+
   if (herd.average_milk_production < 15) {
     recommendations.push({
       type: 'feed',
       message: 'Increase protein content in feed to boost milk production',
-      priority: 'high'
+      priority: 'high',
     });
   }
-  
+
   if (herd.breeding_status === 'active') {
     recommendations.push({
       type: 'feed',
       message: 'Add mineral supplements for breeding cattle',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
-  
+
   return recommendations;
 }
 
 function generateBreedingRecommendations(herd) {
-  let recommendations = [];
-  
+  const recommendations = [];
+
   if (herd.breeding_status !== 'active') {
     recommendations.push({
       type: 'breeding',
       message: 'Consider starting breeding program to maintain herd size',
-      priority: 'high'
+      priority: 'high',
     });
   }
-  
+
   if (herd.cattle_count && herd.cattle_count < 30) {
     recommendations.push({
       type: 'breeding',
       message: 'Herd size is small - consider expanding breeding program',
-      priority: 'medium'
+      priority: 'medium',
     });
   }
-  
+
   return recommendations;
 }
 
 function generateHealthAlerts(herd) {
   const alerts = [];
-  
+
   if (herd.average_milk_production && herd.average_milk_production < 10) {
     alerts.push({
       type: 'health',
       message: 'Low milk production may indicate health issues',
-      priority: 'high'
+      priority: 'high',
     });
   }
-  
+
   return alerts;
 }
 
 // Milk quality tracking
 async function recordMilkQuality(qualityData) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   const { herdId, sampleDate, fatContent, proteinContent, snf, ph, bacterialCount, grade } = qualityData;
-  
-  let res = await pg.query(
+
+  const res = await pg.query(
     `INSERT INTO milk_quality (herd_id, sample_date, fat_content, protein_content, snf, ph, bacterial_count, grade, created_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
      RETURNING *`,
-    [herdId, sampleDate, fatContent, proteinContent, snf, ph, bacterialCount, grade]
+    [herdId, sampleDate, fatContent, proteinContent, snf, ph, bacterialCount, grade],
   );
-  
+
   // Emit signal for quality recording
   signalBus.emitSignal(SIGNAL.ORGANIZATION_UPDATED, {
     entityType: 'milk_quality',
     herdId,
-    grade
+    grade,
   }, {
     severity: grade === 'poor' ? SEVERITY.WARNING : SEVERITY.INFO,
     source: 'dairy_management_service',
-    entityId: res.rows[0].id
+    entityId: res.rows[0].id,
   });
-  
+
   return res.rows[0];
 }
 
 async function getMilkQualityHistory(herdId, { startDate, endDate, limit = 20 } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = 'SELECT * FROM milk_quality WHERE herd_id = $1';
-  let params = [herdId];
+  const params = [herdId];
   let paramIndex = 2;
-  
+
   if (startDate) {
     query += ` AND sample_date >= $${paramIndex++}`;
     params.push(startDate);
@@ -272,19 +272,19 @@ async function getMilkQualityHistory(herdId, { startDate, endDate, limit = 20 } 
     query += ` AND sample_date <= $${paramIndex++}`;
     params.push(endDate);
   }
-  
+
   query += ` ORDER BY sample_date DESC LIMIT $${paramIndex++}`;
   params.push(limit);
-  
-  let res = await pg.query(query, params);
+
+  const res = await pg.query(query, params);
   return res.rows;
 }
 
 // Dairy analytics
 async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
-  let pg = getPostgreSQL();
+  const pg = getPostgreSQL();
   if (!pg) throw new Error('Database not initialized');
-  
+
   let query = `
     SELECT 
       breed,
@@ -294,9 +294,9 @@ async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
     FROM dairy_herds
     WHERE 1=1
   `;
-  let params = [];
+  const params = [];
   let paramIndex = 1;
-  
+
   if (startDate) {
     query += ` AND created_at >= $${paramIndex++}`;
     params.push(startDate);
@@ -309,40 +309,40 @@ async function getDairyAnalytics({ startDate, endDate, farmId } = {}) {
     query += ` AND farm_id = $${paramIndex++}`;
     params.push(farmId);
   }
-  
-  query += ` GROUP BY breed ORDER BY total_cattle DESC`;
-  
-  let res = await pg.query(query, params);
-  
+
+  query += ' GROUP BY breed ORDER BY total_cattle DESC';
+
+  const res = await pg.query(query, params);
+
   return {
     byBreed: res.rows,
     totalHerds: res.rows.reduce((sum, row) => sum + parseInt(row.herd_count), 0),
     totalCattle: res.rows.reduce((sum, row) => sum + parseInt(row.total_cattle), 0),
-    recommendations: generateDairyAnalyticsRecommendations(res.rows)
+    recommendations: generateDairyAnalyticsRecommendations(res.rows),
   };
 }
 
 function generateDairyAnalyticsRecommendations(breedData) {
-  let recommendations = [];
-  
+  const recommendations = [];
+
   const topBreed = breedData[0];
   if (topBreed) {
     recommendations.push({
       type: 'resource_allocation',
       message: `Highest concentration of ${topBreed.breed} cattle. Consider allocating specialized resources.`,
-      priority: 'high'
+      priority: 'high',
     });
   }
-  
+
   const lowProductionBreeds = breedData.filter(row => parseFloat(row.avg_production) < 15);
   if (lowProductionBreeds.length > 0) {
     recommendations.push({
       type: 'feed_optimization',
       message: `Breeds ${lowProductionBreeds.map(b => b.breed).join(', ')} have low production. Review feed programs.`,
-      priority: 'medium'
+      priority: 'medium',
     });
   }
-  
+
   return recommendations;
 }
 
@@ -352,14 +352,14 @@ module.exports = {
   getDairyHerd,
   listDairyHerds,
   updateDairyHerd,
-  
+
   // AI-powered analysis
   analyzeMilkProduction,
-  
+
   // Milk quality
   recordMilkQuality,
   getMilkQualityHistory,
-  
+
   // Analytics
   getDairyAnalytics,
 };

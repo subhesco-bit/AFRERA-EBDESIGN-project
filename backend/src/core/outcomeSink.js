@@ -50,7 +50,7 @@ async function persistOutcome(entry) {
         entry.rationale ?? 'no rationale recorded',
         JSON.stringify(o),
         entry.at ?? new Date().toISOString(),
-      ]
+      ],
     );
     return rows[0]?.id ?? null;
   } catch (err) {
@@ -88,7 +88,7 @@ async function recordPrediction({
         subjectId == null ? null : String(subjectId),
         predictedValue ?? null, predictedLabel ?? null,
         statedConfidence ?? null, inputQuality ?? null,
-        horizonDays ?? null, resolvesOn ?? null]
+        horizonDays ?? null, resolvesOn ?? null],
     );
     return rows[0]?.id ?? null;
   } catch (err) {
@@ -114,8 +114,8 @@ async function judgeOutcome({ outcomeId, status, value, notes, reviewedBy }) {
   // a raw constraint violation.
   if (['harmed', 'wrong_call'].includes(status) && (!notes || !notes.trim())) {
     throw new Error(
-      'Recording a negative outcome requires notes. Knowing the system got it '
-      + 'wrong without knowing how tells you to distrust the agent but not what to fix.'
+      'Recording a negative outcome requires notes. Knowing the system got it ' +
+      'wrong without knowing how tells you to distrust the agent but not what to fix.',
     );
   }
 
@@ -124,7 +124,7 @@ async function judgeOutcome({ outcomeId, status, value, notes, reviewedBy }) {
         SET outcome_status = $2, outcome_value = $3, outcome_notes = $4,
             outcome_recorded_by = $5, outcome_recorded_at = CURRENT_TIMESTAMP
       WHERE id = $1 RETURNING *`,
-    [outcomeId, status, value ?? null, notes ?? null, reviewedBy]
+    [outcomeId, status, value ?? null, notes ?? null, reviewedBy],
   );
   if (rows.length === 0) throw new Error(`Outcome ${outcomeId} not found`);
   return rows[0];
@@ -136,7 +136,7 @@ async function resolvePrediction({ predictionId, actualValue, actualLabel }) {
     `UPDATE ai_prediction_log
         SET actual_value = $2, actual_label = $3, resolved_at = CURRENT_TIMESTAMP
       WHERE id = $1 RETURNING *`,
-    [predictionId, actualValue ?? null, actualLabel ?? null]
+    [predictionId, actualValue ?? null, actualLabel ?? null],
   );
   if (rows.length === 0) throw new Error(`Prediction ${predictionId} not found`);
   return rows[0];
@@ -145,7 +145,7 @@ async function resolvePrediction({ predictionId, actualValue, actualLabel }) {
 /** Everything the system did that nobody has judged yet. */
 async function listPendingJudgement(limit = 50) {
   const { rows } = await pool.query(
-    'SELECT * FROM v_ai_outcomes_pending LIMIT $1', [limit]
+    'SELECT * FROM v_ai_outcomes_pending LIMIT $1', [limit],
   );
   return rows;
 }
@@ -158,9 +158,9 @@ async function getAccuracy() {
     // An actor with no judged outcomes has UNKNOWN accuracy, not good accuracy.
     // Reporting null as 100% is how a system convinces itself it is working.
     helpfulness_pct: r.helpfulness_pct === null ? null : Number(r.helpfulness_pct),
-    note: r.helpfulness_pct === null
-      ? 'No judged outcomes yet — accuracy is unknown, not good.'
-      : null,
+    note: r.helpfulness_pct === null ?
+      'No judged outcomes yet — accuracy is unknown, not good.' :
+      null,
   }));
 }
 
@@ -169,10 +169,10 @@ async function getCalibration() {
   const { rows } = await pool.query('SELECT * FROM v_ai_calibration ORDER BY calibration_gap DESC NULLS LAST');
   return rows.map((r) => ({
     ...r,
-    verdict: r.calibration_gap === null ? 'insufficient data'
-      : Number(r.calibration_gap) > 15 ? 'overconfident'
-        : Number(r.calibration_gap) < -15 ? 'underconfident'
-          : 'well calibrated',
+    verdict: r.calibration_gap === null ? 'insufficient data' :
+      Number(r.calibration_gap) > 15 ? 'overconfident' :
+        Number(r.calibration_gap) < -15 ? 'underconfident' :
+          'well calibrated',
   }));
 }
 

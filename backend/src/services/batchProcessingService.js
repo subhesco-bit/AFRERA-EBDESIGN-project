@@ -32,13 +32,13 @@ class BatchProcessingService extends EventEmitter {
    * Create a batch job
    */
   async createJob(jobData) {
-    const { 
-      name, 
-      type, 
-      config, 
+    const {
+      name,
+      type,
+      config,
       priority = 'normal',
       scheduledFor = null,
-      userId = null 
+      userId = null,
     } = jobData;
 
     try {
@@ -55,12 +55,12 @@ class BatchProcessingService extends EventEmitter {
         JSON.stringify(config),
         priority,
         scheduledFor,
-        userId
+        userId,
       ]);
 
       const job = result.rows[0];
       logger.info(`Batch job created: ${job.job_id}`);
-      
+
       // Add to queue if not scheduled for future
       if (!scheduledFor || new Date(scheduledFor) <= new Date()) {
         this.jobQueue.push(job);
@@ -78,11 +78,11 @@ class BatchProcessingService extends EventEmitter {
    */
   async getJob(jobId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM batch_jobs WHERE job_id = $1
       `;
-      let result = await this.db.query(query, [jobId]);
-      
+      const result = await this.db.query(query, [jobId]);
+
       if (result.rows.length === 0) {
         throw new Error('Job not found');
       }
@@ -123,7 +123,7 @@ class BatchProcessingService extends EventEmitter {
       query += ` ORDER BY created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
       params.push(limit, offset);
 
-      let result = await this.db.query(query, params);
+      const result = await this.db.query(query, params);
       return result.rows;
     } catch (error) {
       logger.error('Get user jobs failed', error);
@@ -136,8 +136,8 @@ class BatchProcessingService extends EventEmitter {
    */
   async cancelJob(jobId) {
     try {
-      let job = await this.getJob(jobId);
-      
+      const job = await this.getJob(jobId);
+
       if (job.status !== 'pending' && job.status !== 'queued') {
         throw new Error('Cannot cancel job in current status');
       }
@@ -145,13 +145,13 @@ class BatchProcessingService extends EventEmitter {
       // Remove from queue if present
       this.jobQueue = this.jobQueue.filter(j => j.job_id !== jobId);
 
-      let query = `
+      const query = `
         UPDATE batch_jobs 
         SET status = 'cancelled', updated_at = NOW()
         WHERE job_id = $1
         RETURNING *
       `;
-      let result = await this.db.query(query, [jobId]);
+      const result = await this.db.query(query, [jobId]);
 
       logger.info(`Job ${jobId} cancelled`);
       return result.rows[0];
@@ -187,7 +187,7 @@ class BatchProcessingService extends EventEmitter {
       return new Date(a.created_at) - new Date(b.created_at);
     });
 
-    let job = this.jobQueue.shift();
+    const job = this.jobQueue.shift();
     if (!job) {
       return;
     }
@@ -197,7 +197,7 @@ class BatchProcessingService extends EventEmitter {
     await this.updateJobStatus(job.job_id, 'processing');
 
     try {
-      let result = await this.executeJob(job);
+      const result = await this.executeJob(job);
       await this.updateJobStatus(job.job_id, 'completed', { result });
       this.emit('jobCompleted', job);
     } catch (error) {
@@ -242,7 +242,7 @@ class BatchProcessingService extends EventEmitter {
    * Execute data export job
    */
   async executeDataExportJob(config) {
-    let etlService = require('./etlService');
+    const etlService = require('./etlService');
     return await etlService.runPipeline(config);
   }
 
@@ -259,7 +259,7 @@ class BatchProcessingService extends EventEmitter {
    * Execute data sync job
    */
   async executeDataSyncJob(config) {
-    let etlService = require('./etlService');
+    const etlService = require('./etlService');
     return await etlService.runPipeline(config);
   }
 
@@ -268,10 +268,10 @@ class BatchProcessingService extends EventEmitter {
    */
   async executeBulkUpdateJob(config) {
     const { table, updates, conditions } = config;
-    
+
     let query = `UPDATE ${table} SET `;
     const setClauses = [];
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     for (const [field, value] of Object.entries(updates)) {
@@ -293,7 +293,7 @@ class BatchProcessingService extends EventEmitter {
       query += whereClauses.join(' AND ');
     }
 
-    let result = await this.db.query(query, params);
+    const result = await this.db.query(query, params);
     return { updated: result.rowCount };
   }
 
@@ -302,7 +302,7 @@ class BatchProcessingService extends EventEmitter {
    */
   async updateJobStatus(jobId, status, metadata = {}) {
     try {
-      let query = `
+      const query = `
         UPDATE batch_jobs 
         SET status = $1, 
             metadata = COALESCE($2, metadata),
@@ -312,7 +312,7 @@ class BatchProcessingService extends EventEmitter {
       await this.db.query(query, [
         status,
         Object.keys(metadata).length > 0 ? JSON.stringify(metadata) : null,
-        jobId
+        jobId,
       ]);
     } catch (error) {
       logger.error('Update job status failed', error);
@@ -335,7 +335,7 @@ class BatchProcessingService extends EventEmitter {
           SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
         FROM batch_jobs
       `;
-      let params = [];
+      const params = [];
       let paramCount = 0;
 
       if (userId) {
@@ -358,7 +358,7 @@ class BatchProcessingService extends EventEmitter {
         params.push(endDate);
       }
 
-      let result = await this.db.query(query, params);
+      const result = await this.db.query(query, params);
       return result.rows[0];
     } catch (error) {
       logger.error('Get job statistics failed', error);
@@ -371,15 +371,15 @@ class BatchProcessingService extends EventEmitter {
    */
   async retryJob(jobId) {
     try {
-      let job = await this.getJob(jobId);
-      
+      const job = await this.getJob(jobId);
+
       if (job.status !== 'failed') {
         throw new Error('Can only retry failed jobs');
       }
 
       // Reset job to pending
       await this.updateJobStatus(jobId, 'pending');
-      
+
       // Add to queue
       this.jobQueue.push(job);
 

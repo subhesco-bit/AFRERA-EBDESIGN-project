@@ -25,26 +25,26 @@ async function submitSoilSample(sampleData) {
       irrigation_type,
       collection_date,
       collector_name,
-      lab_preference
+      lab_preference,
     } = sampleData;
 
     const sample = {
       sample_id: generateId(),
-      farmer_id: farmer_id,
-      farm_id: farm_id,
-      location: location,
-      state: state,
-      district: district,
-      sample_depth: sample_depth,
-      sample_type: sample_type,
-      crop_planned: crop_planned,
-      irrigation_type: irrigation_type,
-      collection_date: collection_date,
-      collector_name: collector_name,
-      lab_preference: lab_preference,
+      farmer_id,
+      farm_id,
+      location,
+      state,
+      district,
+      sample_depth,
+      sample_type,
+      crop_planned,
+      irrigation_type,
+      collection_date,
+      collector_name,
+      lab_preference,
       status: 'submitted',
       submitted_at: new Date().toISOString(),
-      tracking_number: generateTrackingNumber()
+      tracking_number: generateTrackingNumber(),
     };
 
     // Assign to lab
@@ -65,8 +65,8 @@ async function submitSoilSample(sampleData) {
  */
 async function processSoilTestResults(sampleId, labResults) {
   try {
-    let sample = await getSoilSample(sampleId);
-    
+    const sample = await getSoilSample(sampleId);
+
     // AI-powered soil analysis
     const aiRequest = {
       task: 'soil_analysis',
@@ -78,8 +78,8 @@ async function processSoilTestResults(sampleId, labResults) {
         irrigation_type: sample.irrigation_type,
         location: sample.location,
         soil_standards: await getSoilStandards(sample.state),
-        regional_recommendations: await getRegionalRecommendations(sample.state, sample.district)
-      }
+        regional_recommendations: await getRegionalRecommendations(sample.state, sample.district),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -96,89 +96,89 @@ async function processSoilTestResults(sampleId, labResults) {
         organic_matter_status: aiResponse.organic_matter_status,
         deficiencies: aiResponse.deficiencies,
         toxicities: aiResponse.toxicities,
-        recommendations: aiResponse.recommendations
+        recommendations: aiResponse.recommendations,
       },
       nutrient_levels: {
         nitrogen: {
           measured: labResults.nitrogen,
           status: aiResponse.nitrogen_status,
           optimal_range: aiResponse.nitrogen_optimal,
-          recommendation: aiResponse.nitrogen_recommendation
+          recommendation: aiResponse.nitrogen_recommendation,
         },
         phosphorus: {
           measured: labResults.phosphorus,
           status: aiResponse.phosphorus_status,
           optimal_range: aiResponse.phosphorus_optimal,
-          recommendation: aiResponse.phosphorus_recommendation
+          recommendation: aiResponse.phosphorus_recommendation,
         },
         potassium: {
           measured: labResults.potassium,
           status: aiResponse.potassium_status,
           optimal_range: aiResponse.potassium_optimal,
-          recommendation: aiResponse.potassium_recommendation
+          recommendation: aiResponse.potassium_recommendation,
         },
         calcium: {
           measured: labResults.calcium,
           status: aiResponse.calcium_status,
           optimal_range: aiResponse.calcium_optimal,
-          recommendation: aiResponse.calcium_recommendation
+          recommendation: aiResponse.calcium_recommendation,
         },
         magnesium: {
           measured: labResults.magnesium,
           status: aiResponse.magnesium_status,
           optimal_range: aiResponse.magnesium_optimal,
-          recommendation: aiResponse.magnesium_recommendation
+          recommendation: aiResponse.magnesium_recommendation,
         },
         sulfur: {
           measured: labResults.sulfur,
           status: aiResponse.sulfur_status,
           optimal_range: aiResponse.sulfur_optimal,
-          recommendation: aiResponse.sulfur_recommendation
+          recommendation: aiResponse.sulfur_recommendation,
         },
         iron: {
           measured: labResults.iron,
           status: aiResponse.iron_status,
           optimal_range: aiResponse.iron_optimal,
-          recommendation: aiResponse.iron_recommendation
+          recommendation: aiResponse.iron_recommendation,
         },
         zinc: {
           measured: labResults.zinc,
           status: aiResponse.zinc_status,
           optimal_range: aiResponse.zinc_optimal,
-          recommendation: aiResponse.zinc_recommendation
+          recommendation: aiResponse.zinc_recommendation,
         },
         boron: {
           measured: labResults.boron,
           status: aiResponse.boron_status,
           optimal_range: aiResponse.boron_optimal,
-          recommendation: aiResponse.boron_recommendation
+          recommendation: aiResponse.boron_recommendation,
         },
         manganese: {
           measured: labResults.manganese,
           status: aiResponse.manganese_status,
           optimal_range: aiResponse.manganese_optimal,
-          recommendation: aiResponse.manganese_recommendation
+          recommendation: aiResponse.manganese_recommendation,
         },
         copper: {
           measured: labResults.copper,
           status: aiResponse.copper_status,
           optimal_range: aiResponse.copper_optimal,
-          recommendation: aiResponse.copper_recommendation
-        }
+          recommendation: aiResponse.copper_recommendation,
+        },
       },
       ph_analysis: {
         measured: labResults.ph,
         status: aiResponse.ph_status,
         optimal_range: aiResponse.ph_optimal,
         amendment_needed: aiResponse.ph_amendment_needed,
-        amendment_recommendation: aiResponse.ph_amendment
+        amendment_recommendation: aiResponse.ph_amendment,
       },
       organic_matter: {
         measured: labResults.organic_matter,
         status: aiResponse.organic_matter_status,
         optimal_range: aiResponse.organic_matter_optimal,
         improvement_needed: aiResponse.organic_improvement_needed,
-        improvement_recommendation: aiResponse.organic_improvement
+        improvement_recommendation: aiResponse.organic_improvement,
       },
       soil_texture: {
         sand: labResults.sand_percentage,
@@ -186,9 +186,9 @@ async function processSoilTestResults(sampleId, labResults) {
         clay: labResults.clay_percentage,
         texture_class: aiResponse.texture_class,
         water_holding_capacity: aiResponse.water_holding_capacity,
-        drainage: aiResponse.drainage
+        drainage: aiResponse.drainage,
       },
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     // Update sample status
@@ -209,8 +209,8 @@ async function processSoilTestResults(sampleId, labResults) {
  */
 async function generateFertilizerRecommendation(sampleId, additionalParams) {
   try {
-    let sample = await getSoilSample(sampleId);
-    let analysis = sample.analysis;
+    const sample = await getSoilSample(sampleId);
+    const analysis = sample.analysis;
 
     const {
       crop_type,
@@ -219,40 +219,40 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
       expected_yield,
       farming_method, // organic, conventional, integrated
       budget_constraint,
-      availability_preference
+      availability_preference,
     } = additionalParams;
 
     // AI-powered fertilizer recommendation
-    let aiRequest = {
+    const aiRequest = {
       task: 'fertilizer_recommendation',
       parameters: {
         sample_id: sampleId,
         soil_analysis: analysis,
-        crop_type: crop_type,
-        variety: variety,
-        planting_date: planting_date,
-        expected_yield: expected_yield,
-        farming_method: farming_method,
-        budget_constraint: budget_constraint,
-        availability_preference: availability_preference,
+        crop_type,
+        variety,
+        planting_date,
+        expected_yield,
+        farming_method,
+        budget_constraint,
+        availability_preference,
         crop_nutrient_requirements: await getCropNutrientRequirements(crop_type),
         regional_fertilizer_availability: await getFertilizerAvailability(sample.state),
         government_subsidies: await getFertilizerSubsidies(sample.state),
-        organic_alternatives: await getOrganicAlternatives(crop_type)
-      }
+        organic_alternatives: await getOrganicAlternatives(crop_type),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendation = {
       recommendation_id: generateId(),
       sample_id: sampleId,
       timestamp: new Date().toISOString(),
       crop_details: {
-        crop_type: crop_type,
-        variety: variety,
-        expected_yield: expected_yield,
-        farming_method: farming_method
+        crop_type,
+        variety,
+        expected_yield,
+        farming_method,
       },
       fertilizer_plan: aiResponse.fertilizer_plan.map(stage => ({
         stage: stage.stage,
@@ -268,10 +268,10 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
           application_method: fert.application_method,
           subsidy_eligible: fert.subsidy_eligible,
           subsidy_amount: fert.subsidy_amount,
-          net_cost: fert.net_cost
+          net_cost: fert.net_cost,
         })),
         stage_cost: stage.stage_cost,
-        stage_subsidy: stage.stage_subsidy
+        stage_subsidy: stage.stage_subsidy,
       })),
       total_cost: aiResponse.total_cost,
       total_subsidy: aiResponse.total_subsidy,
@@ -282,7 +282,7 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
       expected_yield_impact: aiResponse.yield_impact,
       cost_benefit_analysis: aiResponse.cost_benefit,
       alternatives: aiResponse.alternatives,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     logger.info(`Fertilizer recommendation generated: ${recommendation.recommendation_id}`);
@@ -298,7 +298,7 @@ async function generateFertilizerRecommendation(sampleId, additionalParams) {
  */
 async function trackSoilSample(sampleId) {
   try {
-    let sample = await getSoilSample(sampleId);
+    const sample = await getSoilSample(sampleId);
 
     const status = {
       sample_id: sampleId,
@@ -309,33 +309,33 @@ async function trackSoilSample(sampleId) {
         {
           stage: 'submitted',
           date: sample.submitted_at,
-          completed: true
+          completed: true,
         },
         {
           stage: 'lab_received',
           date: sample.lab_received_at,
-          completed: !!sample.lab_received_at
+          completed: Boolean(sample.lab_received_at),
         },
         {
           stage: 'testing',
           date: sample.testing_started_at,
-          completed: !!sample.testing_started_at
+          completed: Boolean(sample.testing_started_at),
         },
         {
           stage: 'analyzed',
           date: sample.analyzed_at,
-          completed: !!sample.analyzed_at
+          completed: Boolean(sample.analyzed_at),
         },
         {
           stage: 'report_ready',
           date: sample.report_ready_at,
-          completed: !!sample.report_ready_at
-        }
+          completed: Boolean(sample.report_ready_at),
+        },
       ],
       assigned_lab: sample.assigned_lab,
       estimated_completion: sample.estimated_completion_date,
       current_stage: getCurrentStage(sample),
-      next_milestone: getNextMilestone(sample)
+      next_milestone: getNextMilestone(sample),
     };
 
     return status;
@@ -358,7 +358,7 @@ async function getSoilHealthCard(farmerId, farmId) {
       soil_samples: await getFarmerSoilSamples(farmerId, farmId),
       overall_health_score: 0,
       recommendations: [],
-      historical_trends: await getSoilHealthTrends(farmerId, farmId)
+      historical_trends: await getSoilHealthTrends(farmerId, farmId),
     };
 
     // Calculate overall health score from recent samples
@@ -382,7 +382,7 @@ async function getSoilHealthCard(farmerId, farmId) {
  */
 async function getIntegratedNutrientManagementPlan(sampleId, cropDetails) {
   try {
-    let sample = await getSoilSample(sampleId);
+    const sample = await getSoilSample(sampleId);
     const fertilizerRec = await generateFertilizerRecommendation(sampleId, cropDetails);
 
     const inpPlan = {
@@ -396,16 +396,16 @@ async function getIntegratedNutrientManagementPlan(sampleId, cropDetails) {
         biofertilizers: await getBiofertilizers(cropDetails.crop_type),
         green_manuring: await getGreenManuringOptions(cropDetails.crop_type),
         crop_rotation: await getCropRotationRecommendations(sample.state, cropDetails.crop_type),
-        water_management: await getWaterManagementRecommendations(sample.irrigation_type)
+        water_management: await getWaterManagementRecommendations(sample.irrigation_type),
       },
       sustainability_metrics: {
         carbon_footprint: await calculateCarbonFootprint(fertilizerRec),
         soil_health_impact: await assessSoilHealthImpact(fertilizerRec),
         water_efficiency: await assessWaterEfficiency(cropDetails.irrigation_type),
-        biodiversity_impact: await assessBiodiversityImpact(fertilizerRec)
+        biodiversity_impact: await assessBiodiversityImpact(fertilizerRec),
       },
       monitoring_schedule: await getMonitoringSchedule(cropDetails.crop_type),
-      confidence: fertilizerRec.confidence
+      confidence: fertilizerRec.confidence,
     };
 
     return inpPlan;
@@ -431,7 +431,7 @@ async function assignToLab(sample) {
     lab_name: 'North East Soil Testing Laboratory',
     location: 'Guwahati',
     nabl_accredited: true,
-    contact: '+91-9876543210'
+    contact: '+91-9876543210',
   };
 }
 
@@ -524,7 +524,7 @@ async function getOrganicInputPlan(crop, acres, soilCond) {
   const SOIL_ADJUST = {
     'Looks tired / low yield': { mult: 1.15, note: 'Slightly higher organic matter dressing' },
     'Normal / average': { mult: 1.0, note: 'Standard base dressing' },
-    'Recently fallow / rested': { mult: 0.85, note: 'Lower dressing — residual fertility likely still present' }
+    'Recently fallow / rested': { mult: 0.85, note: 'Lower dressing — residual fertility likely still present' },
   };
 
   const acreage = Number(acres) || 0;
@@ -534,7 +534,7 @@ async function getOrganicInputPlan(crop, acres, soilCond) {
   try {
     const pg = getPostgreSQL();
     const { rows } = await pg.query(
-      'SELECT input_name, quantity, unit, agronomic_role, basis FROM organic_input_rates ORDER BY input_name'
+      'SELECT input_name, quantity, unit, agronomic_role, basis FROM organic_input_rates ORDER BY input_name',
     );
 
     const plan = rows.map((r) => ({
@@ -542,7 +542,7 @@ async function getOrganicInputPlan(crop, acres, soilCond) {
       qty: Math.round(Number(r.quantity) * acreage * mult * 100) / 100,
       unit: r.unit,
       role: r.agronomic_role,
-      basis: r.basis
+      basis: r.basis,
     }));
 
     return {
@@ -551,7 +551,7 @@ async function getOrganicInputPlan(crop, acres, soilCond) {
       soilCond: soilCond || 'Normal / average',
       soilAdjustmentNote: soilAdjustment.note,
       multiplier: mult,
-      plan
+      plan,
     };
   } catch (error) {
     logger.error('Error building organic input plan', { error: error.message, stack: error.stack });
@@ -608,7 +608,7 @@ async function getMonitoringSchedule(cropType) {
 function setupRoutes(app) {
   app.post('/api/v1/soil-testing/samples', authMiddleware, async (req, res) => {
     try {
-      let sample = await submitSoilSample(req.body);
+      const sample = await submitSoilSample(req.body);
       res.json({ success: true, data: sample });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -617,7 +617,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/soil-testing/samples/:id/results', authMiddleware, async (req, res) => {
     try {
-      let analysis = await processSoilTestResults(req.params.id, req.body);
+      const analysis = await processSoilTestResults(req.params.id, req.body);
       res.json({ success: true, data: analysis });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -626,7 +626,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/soil-testing/samples/:id/fertilizer-recommendation', authMiddleware, async (req, res) => {
     try {
-      let recommendation = await generateFertilizerRecommendation(req.params.id, req.body);
+      const recommendation = await generateFertilizerRecommendation(req.params.id, req.body);
       res.json({ success: true, data: recommendation });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -635,7 +635,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/soil-testing/samples/:id/track', async (req, res) => {
     try {
-      let status = await trackSoilSample(req.params.id);
+      const status = await trackSoilSample(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -644,7 +644,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/soil-testing/health-card', async (req, res) => {
     try {
-      let healthCard = await getSoilHealthCard(req.query.farmer_id, req.query.farm_id);
+      const healthCard = await getSoilHealthCard(req.query.farmer_id, req.query.farm_id);
       res.json({ success: true, data: healthCard });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -653,7 +653,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/soil-testing/inm-plan/:sampleId', async (req, res) => {
     try {
-      let inpPlan = await getIntegratedNutrientManagementPlan(req.params.sampleId, req.query);
+      const inpPlan = await getIntegratedNutrientManagementPlan(req.params.sampleId, req.query);
       res.json({ success: true, data: inpPlan });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -664,7 +664,7 @@ function setupRoutes(app) {
   app.get('/api/v1/soil-testing/organic-input-plan', async (req, res) => {
     try {
       const { crop, acres, soil_condition: soilCondition } = req.query;
-      let plan = await getOrganicInputPlan(crop, acres, soilCondition);
+      const plan = await getOrganicInputPlan(crop, acres, soilCondition);
       res.json({ success: true, data: plan });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -680,12 +680,10 @@ module.exports = {
   getSoilHealthCard,
   getIntegratedNutrientManagementPlan,
   getOrganicInputPlan,
-  setupRoutes
+  setupRoutes,
 };
 
 // Merged unique operations from backend/src/modules/M032 (see git history there for
 // full context) - complementary functionality this service did not have.
-Object.assign(module.exports, require("../../modules/M032/service"));
-
-
+Object.assign(module.exports, require('../../modules/M032/service'));
 

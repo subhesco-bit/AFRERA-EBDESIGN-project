@@ -39,7 +39,7 @@ function crudRouter(service, validateCreate) {
   });
   router.put('/:id', rateLimiters.write, authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), validateId, validateBody(), bodyValidator(validateUpdate), async (req, res) => {
     try {
-      let item = await service.update(req.params.id, req.body);
+      const item = await service.update(req.params.id, req.body);
       if (!item) return res.status(404).json({ success: false, error: 'Not found' });
       emitMutation(req, 'update', item);
       res.json({ success: true, data: item });
@@ -71,7 +71,7 @@ function emitMutation(req, operation, item) {
   const id = String(item?.id || req.params.id || 'unknown');
   logger.info('soilManagementRoutes:mutation', { operation, entityId: id, requestId: requestId(req, 'soil') });
   signalBus.emitSignal(SIGNAL.SOIL_RECORD_CHANGED, { operation, resourceId: id }, {
-    severity: SEVERITY.INFO, source: 'soil_management_routes', entityId: id, correlationId: requestId(req, 'soil')
+    severity: SEVERITY.INFO, source: 'soil_management_routes', entityId: id, correlationId: requestId(req, 'soil'),
   });
 }
 

@@ -9,7 +9,7 @@ jest.mock('../modules/M029/service', () => ({
   deleteHealthRecord: jest.fn(),
   getFarmerHealthSummary: jest.fn(),
   getWelfarePrograms: jest.fn(),
-  enrollWelfareProgram: jest.fn()
+  enrollWelfareProgram: jest.fn(),
 }));
 
 jest.mock('../database/pool', () => ({ query: jest.fn() }));
@@ -38,7 +38,7 @@ const validRecord = {
   healthType: 'GENERAL',
   severity: 'LOW',
   date: '2026-08-20',
-  metadata: {}
+  metadata: {},
 };
 
 describe('M029 farmer health routes', () => {

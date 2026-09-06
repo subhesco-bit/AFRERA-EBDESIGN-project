@@ -27,19 +27,19 @@ async function createReview(reviewData) {
       comment,
       images,
       status: 'pending',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     const aiRequest = {
       task: 'sentiment_analysis',
-      parameters: { review_data: reviewData, product_context: await getProductContext(product_id) }
+      parameters: { review_data: reviewData, product_context: await getProductContext(product_id) },
     };
     review.ai_analysis = await aiAPI.generateRecommendation(aiRequest);
 
     const result = await pool.query(
       `INSERT INTO reviews (review_id, product_id, user_id, rating, title, comment, images, status, ai_analysis, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
-      [review.review_id, review.product_id, review.user_id, review.rating, review.title, review.comment, JSON.stringify(review.images), review.status, JSON.stringify(review.ai_analysis), review.created_at]
+      [review.review_id, review.product_id, review.user_id, review.rating, review.title, review.comment, JSON.stringify(review.images), review.status, JSON.stringify(review.ai_analysis), review.created_at],
     );
 
     logger.info(`Review created: ${review.review_id}`);
@@ -63,9 +63,9 @@ async function getReview(reviewId) {
 async function getProductReviews(productId, { page = 1, limit = 20 } = {}) {
   try {
     const offset = (page - 1) * limit;
-    let res = await pool.query(
+    const res = await pool.query(
       'SELECT * FROM reviews WHERE product_id = $1 AND status = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
-      [productId, 'approved', limit, offset]
+      [productId, 'approved', limit, offset],
     );
     return { items: res.rows, pagination: { page, limit, total: res.rows.length, totalPages: Math.ceil(res.rows.length / limit) } };
   } catch (error) {
@@ -76,7 +76,7 @@ async function getProductReviews(productId, { page = 1, limit = 20 } = {}) {
 
 async function updateReviewStatus(reviewId, status) {
   try {
-    let res = await pool.query('UPDATE reviews SET status = $1, updated_at = NOW() WHERE review_id = $2 RETURNING *', [status, reviewId]);
+    const res = await pool.query('UPDATE reviews SET status = $1, updated_at = NOW() WHERE review_id = $2 RETURNING *', [status, reviewId]);
     return res.rows[0] || null;
   } catch (error) {
     logger.error('Error updating review status', { error: error.message });
@@ -97,11 +97,11 @@ function generateId() {
  */
 async function getProductContext(productId) {
   try {
-    let res = await pool.query(
+    const res = await pool.query(
       `SELECT c.name AS category, COALESCE(p.average_rating, 0) AS average_rating
        FROM products p LEFT JOIN categories c ON c.id = p.category_id
        WHERE p.id = $1`,
-      [productId]
+      [productId],
     );
     if (res.rows.length === 0) return { category: null, average_rating: null };
     return res.rows[0];

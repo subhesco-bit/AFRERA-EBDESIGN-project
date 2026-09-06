@@ -1,5 +1,8 @@
 // Auto-generated services index
 
+const userService = require('./userService');
+const errorHandlerService = require('./errorHandlerService');
+const monitoringService = require('./monitoringService');
 const yieldManagementService = require('./yieldManagementService');
 const websocketService = require('./websocketService');
 const weatherAdvisoryService = require('./weatherAdvisoryService');
@@ -127,7 +130,6 @@ const productMediaAIService = require('./productMediaAIService');
 const procurementSubscriptionService = require('./procurementSubscriptionService');
 const preventiveMaintenanceService = require('./preventiveMaintenanceService');
 const preSeasonOrderService = require('./preSeasonOrderService');
-let predictiveAnalyticsService = require('./predictiveAnalyticsService');
 const poultryService = require('./poultryService');
 const platformTelemetryService = require('./platformTelemetryService');
 const platformConfigurationService = require('./platformConfigurationService');
@@ -156,7 +158,6 @@ const machineryAccessService = require('./machineryAccessService');
 const logisticsService = require('./logisticsService');
 const logisticsEnhancementService = require('./logisticsEnhancementService');
 const livestockManagementService = require('./livestockManagementService');
-let libraryKnowledgeService = require('./libraryKnowledgeService');
 const landRecordsService = require('./landRecordsService');
 const landManagementService = require('./landManagementService');
 const laboratoryERPService = require('./laboratoryERPService');
@@ -164,7 +165,6 @@ const knowledgeService = require('./knowledgeService');
 const knowledgeGraphService = require('./knowledgeGraphService');
 const irrigationManagementService = require('./irrigationManagementService');
 const iotSensorService = require('./iotSensorService');
-let iotIntegrationService = require('./iotIntegrationService');
 const insuranceService = require('./insuranceService');
 const insurancePremiumService = require('./insurancePremiumService');
 const insurancePolicyIssuanceService = require('./insurancePolicyIssuanceService');
@@ -179,14 +179,12 @@ const hrService = require('./hrService');
 const householdEconomyService = require('./householdEconomyService');
 const horticultureManagementService = require('./horticultureManagementService');
 const gstService = require('./gstService');
-let greenhouseService = require('./greenhouseService');
 const governmentSchemeService = require('./governmentSchemeService');
 const governanceService = require('./governanceService');
 const goatService = require('./goatService');
 const glutWarningService = require('./glutWarningService');
 const giIntelligenceService = require('./giIntelligenceService');
 const geofencingService = require('./geofencingService');
-let freightPoolingService = require('./freightPoolingService');
 const formService = require('./formService');
 const forestryService = require('./forestryService');
 const foodSafetyService = require('./foodSafetyService');
@@ -215,7 +213,6 @@ const ecommerceBusinessSalesService = require('./ecommerceBusinessSalesService')
 const ecommerceAIService = require('./ecommerceAIService');
 const dynamicPricingService = require('./dynamicPricingService');
 const dprGenerationService = require('./dprGenerationService');
-let digitalTwinService = require('./digitalTwinService');
 const digitalProductPassportService = require('./digitalProductPassportService');
 const demandService = require('./demandService');
 const defenseFitnessPrepService = require('./defenseFitnessPrepService');
@@ -243,11 +240,9 @@ const climateMonitoringService = require('./climateMonitoringService');
 const civilDisruptionService = require('./civilDisruptionService');
 const catalogIntelligenceService = require('./catalogIntelligenceService');
 const buyingClubService = require('./buyingClubService');
-let bulkOrderService = require('./bulkOrderService');
 const blockchainTraceabilityService = require('./blockchainTraceabilityService');
 const biodiversityService = require('./biodiversityService');
 const backupService = require('./backupService');
-let auditService = require('./auditService');
 const assetAccountingService = require('./assetAccountingService');
 const arVrService = require('./arVrService');
 const apicultureService = require('./apicultureService');
@@ -273,7 +268,6 @@ const platformCoreService = require('./platformCoreService');
 const mfaService = require('./mfaService');
 const gdprService = require('./gdprService');
 const authService = require('./authService');
-let unifiedConfigService = require('./unifiedConfigService');
 const productAIService = require('./productAIService');
 const orderAIService = require('./orderAIService');
 const logisticsAIService = require('./logisticsAIService');
@@ -285,10 +279,7 @@ const aiRecoveryService = require('./aiRecoveryService');
 const aiProviderService = require('./aiProviderService');
 const aiOptimizationService = require('./aiOptimizationService');
 const aiDecisionService = require('./aiDecisionService');
-let aiCopilotService = require('./aiCopilotService');
 const aiCoordinationService = require('./aiCoordinationService');
-let aiCollaborationService = require('./aiCollaborationService');
-let aiAgentService = require('./aiAgentService');
 
 // Export all services
 module.exports = {
@@ -419,7 +410,6 @@ module.exports = {
   procurementSubscriptionService,
   preventiveMaintenanceService,
   preSeasonOrderService,
-  predictiveAnalyticsService,
   poultryService,
   platformTelemetryService,
   platformConfigurationService,
@@ -448,7 +438,6 @@ module.exports = {
   logisticsService,
   logisticsEnhancementService,
   livestockManagementService,
-  libraryKnowledgeService,
   landRecordsService,
   landManagementService,
   laboratoryERPService,
@@ -456,7 +445,6 @@ module.exports = {
   knowledgeGraphService,
   irrigationManagementService,
   iotSensorService,
-  iotIntegrationService,
   insuranceService,
   insurancePremiumService,
   insurancePolicyIssuanceService,
@@ -471,14 +459,12 @@ module.exports = {
   householdEconomyService,
   horticultureManagementService,
   gstService,
-  greenhouseService,
   governmentSchemeService,
   governanceService,
   goatService,
   glutWarningService,
   giIntelligenceService,
   geofencingService,
-  freightPoolingService,
   formService,
   forestryService,
   foodSafetyService,
@@ -507,7 +493,6 @@ module.exports = {
   ecommerceAIService,
   dynamicPricingService,
   dprGenerationService,
-  digitalTwinService,
   digitalProductPassportService,
   demandService,
   defenseFitnessPrepService,
@@ -535,11 +520,9 @@ module.exports = {
   civilDisruptionService,
   catalogIntelligenceService,
   buyingClubService,
-  bulkOrderService,
   blockchainTraceabilityService,
   biodiversityService,
   backupService,
-  auditService,
   assetAccountingService,
   arVrService,
   apicultureService,
@@ -565,7 +548,9 @@ module.exports = {
   mfaService,
   gdprService,
   authService,
-  unifiedConfigService,
+  userService,
+  errorHandlerService,
+  monitoringService,
   productAIService,
   orderAIService,
   logisticsAIService,
@@ -577,8 +562,5 @@ module.exports = {
   aiProviderService,
   aiOptimizationService,
   aiDecisionService,
-  aiCopilotService,
   aiCoordinationService,
-  aiCollaborationService,
-  aiAgentService,
 };

@@ -14,7 +14,7 @@ const apiLimiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
   message: {
     success: false,
-    error: 'Too many requests from this IP, please try again after 15 minutes'
+    error: 'Too many requests from this IP, please try again after 15 minutes',
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -22,13 +22,13 @@ const apiLimiter = rateLimit({
     logger.warn('Rate limit exceeded', {
       ip: req.ip,
       path: req.path,
-      method: req.method
+      method: req.method,
     });
     res.status(429).json({
       success: false,
-      error: 'Too many requests from this IP, please try again after 15 minutes'
+      error: 'Too many requests from this IP, please try again after 15 minutes',
     });
-  }
+  },
 });
 
 // Strict rate limiter for sensitive operations (10 requests per hour)
@@ -37,19 +37,19 @@ const strictLimiter = rateLimit({
   max: 10,
   message: {
     success: false,
-    error: 'Too many sensitive operations, please try again later'
+    error: 'Too many sensitive operations, please try again later',
   },
   handler: (req, res) => {
     logger.warn('Strict rate limit exceeded', {
       ip: req.ip,
       path: req.path,
-      method: req.method
+      method: req.method,
     });
     res.status(429).json({
       success: false,
-      error: 'Too many sensitive operations, please try again later'
+      error: 'Too many sensitive operations, please try again later',
     });
-  }
+  },
 });
 
 // Authentication rate limiter (5 requests per 15 minutes)
@@ -58,19 +58,19 @@ const authLimiter = rateLimit({
   max: 5,
   message: {
     success: false,
-    error: 'Too many authentication attempts, please try again later'
+    error: 'Too many authentication attempts, please try again later',
   },
   handler: (req, res) => {
     logger.warn('Auth rate limit exceeded', {
       ip: req.ip,
       path: req.path,
-      method: req.method
+      method: req.method,
     });
     res.status(429).json({
       success: false,
-      error: 'Too many authentication attempts, please try again later'
+      error: 'Too many authentication attempts, please try again later',
     });
-  }
+  },
 });
 
 // API key rate limiter (1000 requests per hour)
@@ -82,19 +82,19 @@ const apiKeyLimiter = rateLimit({
   },
   message: {
     success: false,
-    error: 'API key rate limit exceeded'
+    error: 'API key rate limit exceeded',
   },
   handler: (req, res) => {
     logger.warn('API key rate limit exceeded', {
       apiKey: req.headers['x-api-key'] ? '***REDACTED***' : 'none',
       path: req.path,
-      method: req.method
+      method: req.method,
     });
     res.status(429).json({
       success: false,
-      error: 'API key rate limit exceeded'
+      error: 'API key rate limit exceeded',
     });
-  }
+  },
 });
 
 // Upload rate limiter (5 uploads per hour)
@@ -103,19 +103,19 @@ const uploadLimiter = rateLimit({
   max: 5,
   message: {
     success: false,
-    error: 'Too many file uploads, please try again later'
+    error: 'Too many file uploads, please try again later',
   },
   handler: (req, res) => {
     logger.warn('Upload rate limit exceeded', {
       ip: req.ip,
       path: req.path,
-      method: req.method
+      method: req.method,
     });
     res.status(429).json({
       success: false,
-      error: 'Too many file uploads, please try again later'
+      error: 'Too many file uploads, please try again later',
     });
-  }
+  },
 });
 
 // Custom rate limiter with dynamic configuration
@@ -125,19 +125,19 @@ const createCustomLimiter = (windowMs, max, message) => {
     max,
     message: {
       success: false,
-      error: message || 'Rate limit exceeded'
+      error: message || 'Rate limit exceeded',
     },
     handler: (req, res) => {
       logger.warn('Custom rate limit exceeded', {
         ip: req.ip,
         path: req.path,
-        method: req.method
+        method: req.method,
       });
       res.status(429).json({
         success: false,
-        error: message || 'Rate limit exceeded'
+        error: message || 'Rate limit exceeded',
       });
-    }
+    },
   });
 };
 
@@ -166,5 +166,5 @@ module.exports = {
   uploadLimiter,
   createCustomLimiter,
   conditionalLimiter,
-  isTrustedIP
+  isTrustedIP,
 };

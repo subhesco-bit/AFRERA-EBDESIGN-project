@@ -24,16 +24,16 @@ class IoTSensorService {
 
     try {
       logger.info('Initializing IoT Sensor Service');
-      
+
       // Load active sensors
       await this.loadActiveSensors();
-      
+
       // Load alert thresholds
       await this.loadAlertThresholds();
-      
+
       // Start real-time monitoring
       this.startRealtimeMonitoring();
-      
+
       this.isInitialized = true;
       logger.info('IoT Sensor Service initialized successfully');
     } catch (error) {
@@ -58,12 +58,12 @@ class IoTSensorService {
           ...sensor,
           configuration: JSON.parse(sensor.configuration || '{}'),
           dataPoints: [],
-          alerts: []
+          alerts: [],
         });
       });
 
       logger.info('Active sensors loaded', {
-        count: this.activeSensors.size
+        count: this.activeSensors.size,
       });
     } catch (error) {
       logger.warn('Failed to load active sensors', { error: error.message });
@@ -72,7 +72,7 @@ class IoTSensorService {
 
   async loadAlertThresholds() {
     try {
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         SELECT sensor_type, parameter, min_value, max_value, severity, action
         FROM sensor_alert_thresholds
         WHERE is_active = true
@@ -84,7 +84,7 @@ class IoTSensorService {
       });
 
       logger.info('Alert thresholds loaded', {
-        count: this.alertThresholds.size
+        count: this.alertThresholds.size,
       });
     } catch (error) {
       logger.warn('Failed to load alert thresholds', { error: error.message });
@@ -112,7 +112,7 @@ class IoTSensorService {
 
   async registerSensor(farmId, sensorData) {
     try {
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         INSERT INTO sensors (sensor_id, sensor_type, farm_id, location, 
                            configuration, status, registered_at, last_seen)
         VALUES ($1, $2, $3, $4, $5, 'active', NOW(), NOW())
@@ -122,27 +122,27 @@ class IoTSensorService {
         sensorData.sensorType,
         farmId,
         sensorData.location,
-        JSON.stringify(sensorData.configuration || {})
+        JSON.stringify(sensorData.configuration || {}),
       ]);
 
       const sensor = result.rows[0];
-      
+
       this.activeSensors.set(sensor.id, {
         ...sensor,
         configuration: sensorData.configuration || {},
         dataPoints: [],
-        alerts: []
+        alerts: [],
       });
 
       logger.info('Sensor registered', { sensorId: sensor.sensor_id });
-      
+
       return {
         success: true,
         sensor: {
           id: sensor.id,
           sensorId: sensor.sensor_id,
-          sensorType: sensor.sensor_type
-        }
+          sensorType: sensor.sensor_type,
+        },
       };
     } catch (error) {
       logger.error('Failed to register sensor', { error: error.message });
@@ -152,7 +152,7 @@ class IoTSensorService {
 
   async ingestSensorData(sensorId, readings) {
     try {
-      let sensor = Array.from(this.activeSensors.values())
+      const sensor = Array.from(this.activeSensors.values())
         .find(s => s.sensor_id === sensorId);
 
       if (!sensor) {
@@ -174,7 +174,7 @@ class IoTSensorService {
           reading.unit,
           reading.timestamp || new Date(),
           reading.location || sensor.location,
-          JSON.stringify(reading.metadata || {})
+          JSON.stringify(reading.metadata || {}),
         ]);
 
         // Update sensor last reading
@@ -187,7 +187,7 @@ class IoTSensorService {
         // Add to sensor data buffer
         sensor.dataPoints.push({
           ...reading,
-          timestamp: reading.timestamp || new Date()
+          timestamp: reading.timestamp || new Date(),
         });
 
         // Keep only last 100 data points in memory
@@ -206,12 +206,12 @@ class IoTSensorService {
 
       logger.info('Sensor data ingested', {
         sensorId,
-        readingsCount: readings.length
+        readingsCount: readings.length,
       });
 
       return {
         success: true,
-        processed: processedReadings.length
+        processed: processedReadings.length,
       };
     } catch (error) {
       logger.error('Failed to ingest sensor data', { error: error.message });
@@ -247,7 +247,7 @@ class IoTSensorService {
 
   async createAlert(sensor, reading, threshold, message) {
     try {
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         INSERT INTO sensor_alerts (sensor_id, parameter, value, threshold, 
                                   severity, message, action, created_at, resolved)
         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), false)
@@ -259,26 +259,26 @@ class IoTSensorService {
         JSON.stringify(threshold),
         threshold.severity,
         message,
-        threshold.action
+        threshold.action,
       ]);
 
       const alert = result.rows[0];
-      
+
       sensor.alerts.push({
         id: alert.id,
         parameter: reading.parameter,
         value: reading.value,
         severity: threshold.severity,
-        message: message,
+        message,
         action: threshold.action,
         timestamp: new Date(),
-        resolved: false
+        resolved: false,
       });
 
       logger.warn('Sensor alert created', {
         sensorId: sensor.sensor_id,
         severity: threshold.severity,
-        message
+        message,
       });
 
       // Send notification if high severity
@@ -293,7 +293,7 @@ class IoTSensorService {
   async sendAlertNotification(sensor, alert) {
     try {
       // Get farm owner contact info
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         SELECT u.email, u.phone
         FROM farms f
         JOIN users u ON f.owner_id = u.id
@@ -302,18 +302,18 @@ class IoTSensorService {
 
       if (result.rows.length > 0) {
         const user = result.rows[0];
-        
+
         // Send email notification
         logger.info('Alert notification sent', {
           email: user.email,
-          alertId: alert.id
+          alertId: alert.id,
         });
 
         // Send WhatsApp notification if available
         if (user.phone) {
           logger.info('WhatsApp alert sent', {
             phone: user.phone,
-            alertId: alert.id
+            alertId: alert.id,
           });
         }
       }
@@ -327,10 +327,10 @@ class IoTSensorService {
       try {
         // Calculate aggregates
         const aggregates = this.calculateAggregates(sensor.dataPoints);
-        
+
         // Store aggregates
         await this.storeAggregates(sensor.id, aggregates);
-        
+
         // Update sensor state
         sensor.aggregates = aggregates;
       } catch (error) {
@@ -349,7 +349,7 @@ class IoTSensorService {
     const avg = sum / values.length;
     const min = Math.min(...values);
     const max = Math.max(...values);
-    
+
     // Calculate standard deviation
     const variance = values.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) / values.length;
     const stdDev = Math.sqrt(variance);
@@ -360,8 +360,8 @@ class IoTSensorService {
       minimum: min,
       maximum: max,
       standardDeviation: stdDev,
-      sum: sum,
-      timestamp: new Date()
+      sum,
+      timestamp: new Date(),
     };
   }
 
@@ -389,7 +389,7 @@ class IoTSensorService {
         aggregates.minimum,
         aggregates.maximum,
         aggregates.standardDeviation,
-        aggregates.sum
+        aggregates.sum,
       ]);
     } catch (error) {
       logger.error('Failed to store aggregates', { sensorId, error: error.message });
@@ -415,7 +415,7 @@ class IoTSensorService {
       logger.warn('High variability detected', {
         sensorId: sensor.sensor_id,
         stdDev: aggregates.standardDeviation,
-        avg: aggregates.average
+        avg: aggregates.average,
       });
     }
   }
@@ -423,13 +423,13 @@ class IoTSensorService {
   async cleanOldData() {
     try {
       // Remove sensor readings older than 30 days
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         DELETE FROM sensor_readings
         WHERE timestamp < NOW() - INTERVAL '30 days'
       `);
 
       logger.info('Old sensor data cleaned', {
-        deletedRows: result.rowCount
+        deletedRows: result.rowCount,
       });
     } catch (error) {
       logger.error('Failed to clean old data', { error: error.message });
@@ -465,7 +465,7 @@ class IoTSensorService {
   async getSensorData(sensorId, options = {}) {
     try {
       const { startTime, endTime, limit = 100 } = options;
-      
+
       let query = `
         SELECT parameter, value, unit, timestamp, location, metadata
         FROM sensor_readings
@@ -489,13 +489,13 @@ class IoTSensorService {
       query += ` ORDER BY timestamp DESC LIMIT $${paramCount + 1}`;
       params.push(limit);
 
-      let result = await getPostgreSQL().query(query, params);
+      const result = await getPostgreSQL().query(query, params);
 
       return {
         success: true,
         sensorId,
         readings: result.rows,
-        count: result.rows.length
+        count: result.rows.length,
       };
     } catch (error) {
       logger.error('Failed to get sensor data', { sensorId, error: error.message });
@@ -506,7 +506,7 @@ class IoTSensorService {
   async getSensorAggregates(sensorId, options = {}) {
     try {
       const { startTime, endTime, interval = 'hour' } = options;
-      
+
       let query = `
         SELECT date_trunc($1, timestamp) as interval_start,
                COUNT(*) as count,
@@ -517,7 +517,7 @@ class IoTSensorService {
         FROM sensor_readings
         WHERE sensor_id = (SELECT id FROM sensors WHERE sensor_id = $2)
       `;
-      let params = [interval, sensorId];
+      const params = [interval, sensorId];
       let paramCount = 2;
 
       if (startTime) {
@@ -532,15 +532,15 @@ class IoTSensorService {
         params.push(endTime);
       }
 
-      query += ` GROUP BY interval_start ORDER BY interval_start DESC`;
+      query += ' GROUP BY interval_start ORDER BY interval_start DESC';
 
-      let result = await getPostgreSQL().query(query, params);
+      const result = await getPostgreSQL().query(query, params);
 
       return {
         success: true,
         sensorId,
         interval,
-        aggregates: result.rows
+        aggregates: result.rows,
       };
     } catch (error) {
       logger.error('Failed to get sensor aggregates', { sensorId, error: error.message });
@@ -550,7 +550,7 @@ class IoTSensorService {
 
   async getFarmSensors(farmId) {
     try {
-      let result = await getPostgreSQL().query(`
+      const result = await getPostgreSQL().query(`
         SELECT s.id, s.sensor_id, s.sensor_type, s.location, s.status,
                s.last_reading, s.last_seen, s.configuration
         FROM sensors s
@@ -562,13 +562,13 @@ class IoTSensorService {
         ...sensor,
         configuration: JSON.parse(sensor.configuration || '{}'),
         dataPoints: this.activeSensors.get(sensor.id)?.dataPoints || [],
-        aggregates: this.activeSensors.get(sensor.id)?.aggregates || null
+        aggregates: this.activeSensors.get(sensor.id)?.aggregates || null,
       }));
 
       return {
         success: true,
         farmId,
-        sensors
+        sensors,
       };
     } catch (error) {
       logger.error('Failed to get farm sensors', { farmId, error: error.message });
@@ -588,7 +588,7 @@ class IoTSensorService {
 
       return {
         success: true,
-        alertId
+        alertId,
       };
     } catch (error) {
       logger.error('Failed to resolve alert', { alertId, error: error.message });
@@ -602,7 +602,7 @@ class IoTSensorService {
     app.post('/api/v1/iot/sensors/register', async (req, res) => {
       try {
         const { farmId, sensorData } = req.body;
-        let result = await this.registerSensor(farmId, sensorData);
+        const result = await this.registerSensor(farmId, sensorData);
         res.json(result);
       } catch (error) {
         logger.error('Failed to register sensor', { error: error.message });
@@ -615,7 +615,7 @@ class IoTSensorService {
       try {
         const { sensorId } = req.params;
         const { readings } = req.body;
-        let result = await this.ingestSensorData(sensorId, readings);
+        const result = await this.ingestSensorData(sensorId, readings);
         res.json(result);
       } catch (error) {
         logger.error('Failed to ingest sensor data', { error: error.message });
@@ -630,9 +630,9 @@ class IoTSensorService {
         const options = {
           startTime: req.query.startTime,
           endTime: req.query.endTime,
-          limit: parseInt(req.query.limit) || 100
+          limit: parseInt(req.query.limit) || 100,
         };
-        let result = await this.getSensorData(sensorId, options);
+        const result = await this.getSensorData(sensorId, options);
         res.json(result);
       } catch (error) {
         logger.error('Failed to get sensor data', { error: error.message });
@@ -644,12 +644,12 @@ class IoTSensorService {
     app.get('/api/v1/iot/sensors/:sensorId/aggregates', async (req, res) => {
       try {
         const { sensorId } = req.params;
-        let options = {
+        const options = {
           startTime: req.query.startTime,
           endTime: req.query.endTime,
-          interval: req.query.interval || 'hour'
+          interval: req.query.interval || 'hour',
         };
-        let result = await this.getSensorAggregates(sensorId, options);
+        const result = await this.getSensorAggregates(sensorId, options);
         res.json(result);
       } catch (error) {
         logger.error('Failed to get sensor aggregates', { error: error.message });
@@ -661,7 +661,7 @@ class IoTSensorService {
     app.get('/api/v1/iot/farms/:farmId/sensors', async (req, res) => {
       try {
         const { farmId } = req.params;
-        let result = await this.getFarmSensors(farmId);
+        const result = await this.getFarmSensors(farmId);
         res.json(result);
       } catch (error) {
         logger.error('Failed to get farm sensors', { error: error.message });
@@ -673,7 +673,7 @@ class IoTSensorService {
     app.put('/api/v1/iot/alerts/:alertId/resolve', async (req, res) => {
       try {
         const { alertId } = req.params;
-        let result = await this.resolveAlert(alertId);
+        const result = await this.resolveAlert(alertId);
         res.json(result);
       } catch (error) {
         logger.error('Failed to resolve alert', { error: error.message });
@@ -694,21 +694,21 @@ class IoTSensorService {
           JOIN sensors s ON sa.sensor_id = s.id
           WHERE s.sensor_id = $1
         `;
-        let params = [sensorId];
+        const params = [sensorId];
 
         if (resolved !== undefined) {
-          query += ` AND sa.resolved = $2`;
+          query += ' AND sa.resolved = $2';
           params.push(resolved === 'true');
         }
 
-        query += ` ORDER BY sa.created_at DESC`;
+        query += ' ORDER BY sa.created_at DESC';
 
-        let result = await getPostgreSQL().query(query, params);
+        const result = await getPostgreSQL().query(query, params);
 
         res.json({
           success: true,
           sensorId,
-          alerts: result.rows
+          alerts: result.rows,
         });
       } catch (error) {
         logger.error('Failed to get sensor alerts', { error: error.message });
@@ -719,6 +719,4 @@ class IoTSensorService {
 }
 
 module.exports = new IoTSensorService();
-
-
 

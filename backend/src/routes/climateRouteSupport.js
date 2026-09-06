@@ -47,7 +47,7 @@ function date(value, name, { futureDays = 30 } = {}) {
 
 function dateTime(value, name) {
   if (value === undefined || value === null || value === '') return;
-  let parsed = new Date(value);
+  const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime()) || parsed.getUTCFullYear() < 1900 || parsed > new Date(Date.now() + 30 * 86400000)) throw invalid(`${name} is outside the allowed date range`);
 }
 
@@ -81,5 +81,5 @@ module.exports = {
   enumValue,
   numberValue,
   bodyValidator,
-  queryValidator
+  queryValidator,
 };

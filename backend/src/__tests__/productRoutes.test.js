@@ -26,7 +26,7 @@ describe('Product Routes', () => {
       expect(response.body.data.products).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ category: 'grains' }),
-        ])
+        ]),
       );
     });
 
@@ -37,7 +37,7 @@ describe('Product Routes', () => {
       expect(response.body.data.products).toEqual(
         expect.arrayContaining([
           expect.objectContaining({ name: expect.stringMatching(/rice/i) }),
-        ])
+        ]),
       );
     });
   });

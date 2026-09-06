@@ -22,7 +22,7 @@ function splitTopLevel(value) {
     const character = value[index];
     if (quote) {
       if (character === quote && value[index - 1] !== '\\') quote = null;
-    } else if (character === "'" || character === '"') {
+    } else if (character === '\'' || character === '"') {
       quote = character;
     } else if (character === '(') {
       depth += 1;
@@ -68,14 +68,14 @@ function parseTables(filename, sql) {
         if (inlineReference) foreignKeys.push({
           column: columnName,
           targetTable: normalizeIdentifier(inlineReference[1].split('.').pop()),
-          targetColumn: normalizeIdentifier(inlineReference[2])
+          targetColumn: normalizeIdentifier(inlineReference[2]),
         });
       }
       const constraintReference = definition.match(/FOREIGN\s+KEY\s*\(\s*([\w"`]+)\s*\)\s*REFERENCES\s+([\w."`]+)\s*\(\s*([\w"`]+)\s*\)/i);
       if (constraintReference) foreignKeys.push({
         column: normalizeIdentifier(constraintReference[1]),
         targetTable: normalizeIdentifier(constraintReference[2].split('.').pop()),
-        targetColumn: normalizeIdentifier(constraintReference[3])
+        targetColumn: normalizeIdentifier(constraintReference[3]),
       });
     }
     tables.push({ filename, tableName, columns, foreignKeys });
@@ -107,7 +107,7 @@ function findDuplicateOwnership(tables) {
 }
 
 function findForeignKeyMismatches(tables) {
-  let definitions = new Map();
+  const definitions = new Map();
   for (const table of tables) {
     if (!definitions.has(table.tableName)) definitions.set(table.tableName, new Map());
     for (const [column, type] of table.columns) {
@@ -131,7 +131,7 @@ function findForeignKeyMismatches(tables) {
           column: foreignKey.column,
           localType,
           target: `${foreignKey.targetTable}.${foreignKey.targetColumn}`,
-          targetTypes
+          targetTypes,
         });
       }
     }
@@ -140,7 +140,7 @@ function findForeignKeyMismatches(tables) {
 }
 
 function findAmbiguousForeignKeyTypes(tables) {
-  let definitions = new Map();
+  const definitions = new Map();
   for (const table of tables) {
     if (!definitions.has(table.tableName)) definitions.set(table.tableName, new Map());
     for (const [column, type] of table.columns) {
@@ -151,8 +151,8 @@ function findAmbiguousForeignKeyTypes(tables) {
   const ambiguous = [];
   for (const table of tables) {
     for (const foreignKey of table.foreignKeys) {
-      let localType = table.columns.get(foreignKey.column);
-      let targetTypes = [...(definitions.get(foreignKey.targetTable)?.get(foreignKey.targetColumn) || [])];
+      const localType = table.columns.get(foreignKey.column);
+      const targetTypes = [...(definitions.get(foreignKey.targetTable)?.get(foreignKey.targetColumn) || [])];
       if (targetTypes.length > 1 && targetTypes.includes(localType)) {
         ambiguous.push({
           filename: table.filename,
@@ -160,7 +160,7 @@ function findAmbiguousForeignKeyTypes(tables) {
           column: foreignKey.column,
           localType,
           target: `${foreignKey.targetTable}.${foreignKey.targetColumn}`,
-          targetTypes
+          targetTypes,
         });
       }
     }
@@ -170,7 +170,7 @@ function findAmbiguousForeignKeyTypes(tables) {
 
 function inspectSchemaMigrationDefinitions() {
   const files = ['migrate.js', path.join('migrations', 'enhanced_migrate.js')];
-  let definitions = files.map(relativePath => {
+  const definitions = files.map(relativePath => {
     const filename = path.join(databaseDir, relativePath);
     const content = fs.readFileSync(filename, 'utf8');
     const start = content.search(/CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+schema_migrations\s*\(/i);
@@ -191,13 +191,13 @@ function inspectSchemaMigrationDefinitions() {
   return {
     canonical: 'schema_migrations.js',
     legacy: definitions.filter(definition => definition.columns.length > 0),
-    blocking: []
+    blocking: [],
   };
 }
 
 function run() {
-  let files = fs.readdirSync(migrationsDir).filter(file => file.endsWith('.sql')).sort();
-  let tables = files.flatMap(file => parseTables(file, fs.readFileSync(path.join(migrationsDir, file), 'utf8')));
+  const files = fs.readdirSync(migrationsDir).filter(file => file.endsWith('.sql')).sort();
+  const tables = files.flatMap(file => parseTables(file, fs.readFileSync(path.join(migrationsDir, file), 'utf8')));
   const report = {
     migrationCount: files.length,
     tableDefinitions: tables.length,
@@ -205,7 +205,7 @@ function run() {
     duplicateTableOwnership: findDuplicateOwnership(tables),
     foreignKeyMismatches: findForeignKeyMismatches(tables),
     ambiguousForeignKeyTypes: findAmbiguousForeignKeyTypes(tables),
-    schemaMigrations: inspectSchemaMigrationDefinitions()
+    schemaMigrations: inspectSchemaMigrationDefinitions(),
   };
   report.blockers = report.foreignKeyMismatches.length + report.schemaMigrations.blocking.length;
   report.findings = report.duplicatePrefixes.length + report.duplicateTableOwnership.length +

@@ -44,7 +44,7 @@ class MushroomService {
 
       query += ' ORDER BY created_at DESC';
       const result = await this.pool.query(query, params);
-      
+
       return result.rows;
     } catch (error) {
       console.error('Error getting mushroom cultivation:', error);
@@ -58,12 +58,12 @@ class MushroomService {
   async getMushroomById(mushroomId) {
     try {
       const query = 'SELECT * FROM mushroom_cultivation WHERE id = $1';
-      let result = await this.pool.query(query, [mushroomId]);
-      
+      const result = await this.pool.query(query, [mushroomId]);
+
       if (result.rows.length === 0) {
         throw new Error('Mushroom cultivation not found');
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error('Error getting mushroom cultivation by ID:', error);
@@ -84,17 +84,17 @@ class MushroomService {
         cultivation_area_sqft,
         substrate_type,
         spawn_quantity_kg,
-        expected_yield_kg
+        expected_yield_kg,
       } = mushroomData;
 
-      let query = `
+      const query = `
         INSERT INTO mushroom_cultivation (farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
 
-      let result = await this.pool.query(query, [
-        farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg
+      const result = await this.pool.query(query, [
+        farmer_id, name, location, variety, cultivation_area_sqft, substrate_type, spawn_quantity_kg, expected_yield_kg,
       ]);
 
       return result.rows[0];
@@ -109,13 +109,13 @@ class MushroomService {
    */
   async getSpawnManagement(mushroomId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM spawn_management
         WHERE mushroom_id = $1
         ORDER BY spawn_date DESC
       `;
 
-      let result = await this.pool.query(query, [mushroomId]);
+      const result = await this.pool.query(query, [mushroomId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting spawn management:', error);
@@ -128,13 +128,13 @@ class MushroomService {
    */
   async getSubstrateManagement(mushroomId) {
     try {
-      let query = `
+      const query = `
         SELECT * FROM substrate_management
         WHERE mushroom_id = $1
         ORDER BY preparation_date DESC
       `;
 
-      let result = await this.pool.query(query, [mushroomId]);
+      const result = await this.pool.query(query, [mushroomId]);
       return result.rows;
     } catch (error) {
       console.error('Error getting substrate management:', error);
@@ -144,6 +144,4 @@ class MushroomService {
 }
 
 module.exports = new MushroomService();
-
-
 

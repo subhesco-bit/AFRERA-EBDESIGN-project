@@ -57,7 +57,7 @@ function validatePagination(req, res, next) {
 
 function validateEnrollment(req, res, next) {
   const { farmerId, programId } = req.body || {};
-  let errors = [];
+  const errors = [];
   if (req.user.role === 'admin' && !isValidUuid(farmerId)) errors.push('farmerId must be a valid UUID');
   if (farmerId !== undefined && !isValidUuid(farmerId)) errors.push('farmerId must be a valid UUID');
   if (!isValidPositiveInteger(Number(programId)) || !/^\d+$/.test(String(programId))) errors.push('programId must be a positive integer');
@@ -88,10 +88,10 @@ router.get('/health-records', validatePagination, async (req, res) => {
   try {
     const { farmerId } = req.query;
     if (farmerId !== undefined && !isValidUuid(farmerId)) return res.status(400).json({ error: 'farmerId must be a valid UUID' });
-    let result = await farmerHealthService.listHealthRecords({ 
+    const result = await farmerHealthService.listHealthRecords({
       page: req.pagination.page,
       limit: req.pagination.limit,
-      farmerId: farmerId || null
+      farmerId: farmerId || null,
     });
     res.json(result);
   } catch (error) {
@@ -114,7 +114,7 @@ router.get('/health-records/:id', validateRecordId, async (req, res) => {
 router.post('/health-records', authMiddleware, requireRole('farmer', 'admin'), validateHealthRecord, resolveWriteFarmer, async (req, res) => {
   try {
     if (req.user.role === 'farmer') req.body.farmerId = req.farmerId;
-    let record = await farmerHealthService.createHealthRecord(req.body);
+    const record = await farmerHealthService.createHealthRecord(req.body);
     res.status(201).json(record);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -123,7 +123,7 @@ router.post('/health-records', authMiddleware, requireRole('farmer', 'admin'), v
 
 router.put('/health-records/:id', authMiddleware, requireRole('farmer', 'admin'), validateRecordId, validateHealthRecord, resolveWriteFarmer, requireRecordOwnership, async (req, res) => {
   try {
-    let record = await farmerHealthService.updateHealthRecord(req.recordId, req.body);
+    const record = await farmerHealthService.updateHealthRecord(req.recordId, req.body);
     if (!record) {
       return res.status(404).json({ error: 'Health record not found' });
     }
@@ -159,10 +159,10 @@ router.get('/farmers/:farmerId/health-summary', validateFarmerId, async (req, re
 router.get('/welfare-programs', validatePagination, async (req, res) => {
   try {
     const { eligibility } = req.query;
-    let result = await farmerHealthService.getWelfarePrograms({ 
+    const result = await farmerHealthService.getWelfarePrograms({
       page: req.pagination.page,
       limit: req.pagination.limit,
-      eligibility 
+      eligibility,
     });
     res.json(result);
   } catch (error) {
@@ -176,7 +176,7 @@ router.post('/welfare-enrollments', authMiddleware, requireRole('farmer', 'admin
     const authorizedFarmerId = req.user.role === 'farmer' ? req.farmerId : farmerId;
     const enrollment = await farmerHealthService.enrollWelfareProgram(
       authorizedFarmerId,
-      programId
+      programId,
     );
     res.status(201).json(enrollment);
   } catch (error) {

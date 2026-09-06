@@ -37,17 +37,17 @@ class RealtimeMonitoringService {
   setupAlertRules() {
     this.alertRules.set('threshold', {
       check: this.checkThresholdAlert,
-      severity: 'warning'
+      severity: 'warning',
     });
-    
+
     this.alertRules.set('anomaly', {
       check: this.checkAnomalyAlert,
-      severity: 'critical'
+      severity: 'critical',
     });
-    
+
     this.alertRules.set('pattern', {
       check: this.checkPatternAlert,
-      severity: 'info'
+      severity: 'info',
     });
   }
 
@@ -57,17 +57,17 @@ class RealtimeMonitoringService {
   setupAutomationWorkflows() {
     this.automationWorkflows.set('auto_scaling', {
       trigger: this.checkScalingTrigger,
-      action: this.executeScalingAction
+      action: this.executeScalingAction,
     });
-    
+
     this.automationWorkflows.set('auto_recovery', {
       trigger: this.checkRecoveryTrigger,
-      action: this.executeRecoveryAction
+      action: this.executeRecoveryAction,
     });
-    
+
     this.automationWorkflows.set('auto_optimization', {
       trigger: this.checkOptimizationTrigger,
-      action: this.executeOptimizationAction
+      action: this.executeOptimizationAction,
     });
   }
 
@@ -78,19 +78,19 @@ class RealtimeMonitoringService {
     this.eventStreams.set('system_events', {
       buffer: [],
       maxSize: 1000,
-      retention: 3600000 // 1 hour
+      retention: 3600000, // 1 hour
     });
-    
+
     this.eventStreams.set('user_events', {
       buffer: [],
       maxSize: 5000,
-      retention: 86400000 // 24 hours
+      retention: 86400000, // 24 hours
     });
-    
+
     this.eventStreams.set('business_events', {
       buffer: [],
       maxSize: 10000,
-      retention: 604800000 // 7 days
+      retention: 604800000, // 7 days
     });
   }
 
@@ -100,22 +100,22 @@ class RealtimeMonitoringService {
   async startMonitoring(resourceId, config) {
     try {
       const monitorId = this.generateMonitorId(resourceId);
-      
+
       const monitor = {
         id: monitorId,
         resource_id: resourceId,
-        config: config,
+        config,
         status: 'active',
         started_at: new Date().toISOString(),
         metrics: [],
-        alerts: []
+        alerts: [],
       };
-      
+
       this.activeMonitors.set(monitorId, monitor);
-      
+
       // Start monitoring loop
       this.startMonitoringLoop(monitorId, config);
-      
+
       logger.info(`Started monitoring for resource ${resourceId}`);
       return monitor;
     } catch (error) {
@@ -129,11 +129,11 @@ class RealtimeMonitoringService {
    */
   async stopMonitoring(monitorId) {
     try {
-      let monitor = this.activeMonitors.get(monitorId);
+      const monitor = this.activeMonitors.get(monitorId);
       if (!monitor) {
         throw new Error(`Monitor ${monitorId} not found`);
       }
-      
+
       monitor.status = 'stopped';
       monitor.stopped_at = new Date().toISOString();
 
@@ -158,34 +158,34 @@ class RealtimeMonitoringService {
    */
   startMonitoringLoop(monitorId, config) {
     const interval = config.interval || 60000; // Default 1 minute
-    
+
     const loop = setInterval(async () => {
       try {
-        let monitor = this.activeMonitors.get(monitorId);
+        const monitor = this.activeMonitors.get(monitorId);
         if (!monitor || monitor.status !== 'active') {
           clearInterval(loop);
           return;
         }
-        
+
         const metrics = await this.collectMetrics(monitor.resource_id, config);
         monitor.metrics.push({
           timestamp: new Date().toISOString(),
-          data: metrics
+          data: metrics,
         });
-        
+
         // Check for alerts
         const alerts = await this.checkAlerts(monitorId, metrics, config);
         if (alerts.length > 0) {
           monitor.alerts.push(...alerts);
           await this.sendAlerts(alerts);
         }
-        
+
         // Check for automation triggers
         await this.checkAutomationTriggers(monitorId, metrics, config);
-        
+
         // Cleanup old metrics
         this.cleanupOldMetrics(monitor);
-        
+
       } catch (error) {
         logger.error(`Error in monitoring loop for ${monitorId}:`, error);
       }
@@ -197,12 +197,12 @@ class RealtimeMonitoringService {
    */
   async collectMetrics(resourceId, config) {
     try {
-      let metrics = {};
-      
+      const metrics = {};
+
       for (const metric of config.metrics || []) {
         metrics[metric.name] = await this.collectMetric(resourceId, metric);
       }
-      
+
       return metrics;
     } catch (error) {
       logger.error(`Error collecting metrics for ${resourceId}:`, error);
@@ -232,8 +232,8 @@ class RealtimeMonitoringService {
    * Check for alerts based on metrics
    */
   async checkAlerts(monitorId, metrics, config) {
-    let alerts = [];
-    
+    const alerts = [];
+
     for (const alertConfig of config.alerts || []) {
       const rule = this.alertRules.get(alertConfig.type);
       if (rule) {
@@ -246,12 +246,12 @@ class RealtimeMonitoringService {
             severity: rule.severity,
             message: result.message,
             triggered_at: new Date().toISOString(),
-            data: result.data
+            data: result.data,
           });
         }
       }
     }
-    
+
     return alerts;
   }
 
@@ -261,23 +261,23 @@ class RealtimeMonitoringService {
   async checkThresholdAlert(metrics, config) {
     const value = metrics[config.metric];
     const threshold = config.threshold;
-    
+
     if (config.operator === 'greater_than' && value > threshold) {
       return {
         triggered: true,
         message: `${config.metric} exceeded threshold: ${value} > ${threshold}`,
-        data: { value, threshold }
+        data: { value, threshold },
       };
     }
-    
+
     if (config.operator === 'less_than' && value < threshold) {
       return {
         triggered: true,
         message: `${config.metric} below threshold: ${value} < ${threshold}`,
-        data: { value, threshold }
+        data: { value, threshold },
       };
     }
-    
+
     return { triggered: false };
   }
 
@@ -285,20 +285,20 @@ class RealtimeMonitoringService {
    * Check anomaly alert
    */
   async checkAnomalyAlert(metrics, config) {
-    let value = metrics[config.metric];
+    const value = metrics[config.metric];
     const mean = config.mean || 50;
     const stdDev = config.stdDev || 10;
-    
+
     const zScore = Math.abs((value - mean) / stdDev);
-    
+
     if (zScore > 3) {
       return {
         triggered: true,
         message: `Anomaly detected in ${config.metric}: z-score ${zScore.toFixed(2)}`,
-        data: { value, zScore }
+        data: { value, zScore },
       };
     }
-    
+
     return { triggered: false };
   }
 
@@ -316,10 +316,10 @@ class RealtimeMonitoringService {
   async sendAlerts(alerts) {
     for (const alert of alerts) {
       logger.warn(`Alert triggered: ${alert.message}`);
-      
+
       // Send to notification channels
       await this.sendToNotificationChannels(alert);
-      
+
       // Store in database
       await this.storeAlert(alert);
     }
@@ -344,7 +344,7 @@ class RealtimeMonitoringService {
         (alert_id, monitor_id, type, severity, message, triggered_at, data)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
       `;
-      
+
       await pg.query(query, [
         alert.id,
         alert.monitor_id,
@@ -352,7 +352,7 @@ class RealtimeMonitoringService {
         alert.severity,
         alert.message,
         alert.triggered_at,
-        JSON.stringify(alert.data)
+        JSON.stringify(alert.data),
       ]);
     } catch (error) {
       logger.error('Error storing alert:', error);
@@ -378,7 +378,7 @@ class RealtimeMonitoringService {
    * Check scaling trigger
    */
   async checkScalingTrigger(metrics, config) {
-    let value = metrics[config.metric];
+    const value = metrics[config.metric];
     return value > config.threshold;
   }
 
@@ -394,7 +394,7 @@ class RealtimeMonitoringService {
    * Check recovery trigger
    */
   async checkRecoveryTrigger(metrics, config) {
-    let value = metrics[config.metric];
+    const value = metrics[config.metric];
     return value < config.threshold;
   }
 
@@ -430,14 +430,14 @@ class RealtimeMonitoringService {
     if (!stream) {
       throw new Error(`Stream ${streamType} not found`);
     }
-    
+
     // Set up event streaming
     stream.callback = callback;
-    
+
     return {
       stream_type: streamType,
       status: 'active',
-      buffer_size: stream.buffer.length
+      buffer_size: stream.buffer.length,
     };
   }
 
@@ -445,27 +445,27 @@ class RealtimeMonitoringService {
    * Add event to stream
    */
   async addEvent(streamType, event) {
-    let stream = this.eventStreams.get(streamType);
+    const stream = this.eventStreams.get(streamType);
     if (!stream) {
       throw new Error(`Stream ${streamType} not found`);
     }
-    
+
     const enrichedEvent = {
       ...event,
       event_id: this.generateEventId(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     stream.buffer.push(enrichedEvent);
-    
+
     // Cleanup old events
     this.cleanupOldEvents(stream);
-    
+
     // Trigger callback if registered
     if (stream.callback) {
       stream.callback(enrichedEvent);
     }
-    
+
     return enrichedEvent;
   }
 
@@ -473,11 +473,11 @@ class RealtimeMonitoringService {
    * Get monitoring status
    */
   async getMonitoringStatus(monitorId) {
-    let monitor = this.activeMonitors.get(monitorId);
+    const monitor = this.activeMonitors.get(monitorId);
     if (!monitor) {
       throw new Error(`Monitor ${monitorId} not found`);
     }
-    
+
     return {
       monitor_id: monitor.id,
       resource_id: monitor.resource_id,
@@ -486,7 +486,7 @@ class RealtimeMonitoringService {
       metrics_count: monitor.metrics.length,
       alerts_count: monitor.alerts.length,
       latest_metrics: monitor.metrics.slice(-10),
-      recent_alerts: monitor.alerts.slice(-10)
+      recent_alerts: monitor.alerts.slice(-10),
     };
   }
 
@@ -498,7 +498,7 @@ class RealtimeMonitoringService {
       monitor_id: monitor.id,
       resource_id: monitor.resource_id,
       status: monitor.status,
-      started_at: monitor.started_at
+      started_at: monitor.started_at,
     }));
   }
 
@@ -521,7 +521,7 @@ class RealtimeMonitoringService {
       const eventTime = new Date(event.timestamp).getTime();
       return now - eventTime < stream.retention;
     });
-    
+
     if (stream.buffer.length > stream.maxSize) {
       stream.buffer = stream.buffer.slice(-stream.maxSize);
     }
@@ -554,21 +554,20 @@ class RealtimeMonitoringService {
         automation_workflows: Object.keys(this.automationWorkflows),
         event_streams: Object.keys(this.eventStreams),
         stream_buffer_sizes: Object.fromEntries(
-          Array.from(this.eventStreams.entries()).map(([key, value]) => [key, value.buffer.length])
+          Array.from(this.eventStreams.entries()).map(([key, value]) => [key, value.buffer.length]),
         ),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       logger.error('Real-time Monitoring Service health check failed:', error);
       return {
         status: 'unhealthy',
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
 }
 
 module.exports = new RealtimeMonitoringService();
-
 

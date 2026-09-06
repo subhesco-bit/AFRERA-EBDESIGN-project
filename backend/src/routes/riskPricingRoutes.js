@@ -37,9 +37,7 @@ function fail(res, error) {
 }
 
 /** Crop parameters, with their provenance visible. */
-router.get
-    // Log request
-    logger.debug('router.get request');('/crops/:cropKey', async (req, res) => {
+router.get('/crops/:cropKey', async (req, res) => {
   try {
     res.json({ success: true, data: await risk.cropParams(req.params.cropKey) });
   } catch (error) { fail(res, error); }
@@ -49,21 +47,19 @@ router.get
  * Indicative forward curve. Public.
  * GET /forward?crop=lakadong_turmeric&months=6&spot=180&state=..&district=..
  */
-router.get
-    // Log request
-    logger.debug('router.get request');('/forward', async (req, res) => {
+router.get('/forward', async (req, res) => {
   try {
     const { crop, months, spot, state, district, rainfall, temp, heatDays } = req.query;
     if (!crop || !months || !spot) {
       throw new Error('crop, months and spot are required');
     }
-    const weather = rainfall
-      ? {
+    const weather = rainfall ?
+      {
         rainfallMm: Number(rainfall),
         meanTempC: Number(temp),
         heatDaysAboveThresh: Number(heatDays || 0),
-      }
-      : null;
+      } :
+      null;
     const data = await risk.computeAdvanceRate({
       cropKey: crop,
       monthsAhead: Number(months),
@@ -75,9 +71,7 @@ router.get
 });
 
 /** Is the model entitled to speak about this district+crop at all? */
-router.get
-    // Log request
-    logger.debug('router.get request');('/calibration/:state/:district/:cropKey', async (req, res) => {
+router.get('/calibration/:state/:district/:cropKey', async (req, res) => {
   try {
     const { state, district, cropKey } = req.params;
     const c = await risk.districtConfidence(state, district, cropKey);
@@ -86,9 +80,9 @@ router.get
       data: {
         ...c,
         mayAdvise: c.confidence >= 0.5,
-        standing: c.confidence >= 0.8 ? 'calibrated'
-          : c.confidence >= 0.5 ? 'usable with caveats'
-            : 'must decline — advising here would be guessing with someone else\'s harvest',
+        standing: c.confidence >= 0.8 ? 'calibrated' :
+          c.confidence >= 0.5 ? 'usable with caveats' :
+            'must decline — advising here would be guessing with someone else\'s harvest',
       },
     });
   } catch (error) { fail(res, error); }
@@ -102,9 +96,7 @@ router.get
  * That is a 200, not an error — the model declining is a real answer, and
  * returning 4xx would make callers treat a correct refusal as a fault.
  */
-router.post
-    // Log request
-    logger.debug('router.post request');('/advise', authMiddleware, async (req, res) => {
+router.post('/advise', authMiddleware, async (req, res) => {
   try {
     const b = req.body || {};
     for (const k of ['cropKey', 'qtyKg', 'floorPerKg', 'participationShare', 'spotPerKg', 'monthsAhead']) {
@@ -113,15 +105,13 @@ router.post
     if (b.participationShare < 0 || b.participationShare > 1) {
       throw new Error('participationShare must be between 0 and 1');
     }
-    let data = await risk.adviseCommitment({ ...b, farmerId: b.farmerId || req.user?.id });
+    const data = await risk.adviseCommitment({ ...b, farmerId: b.farmerId || req.user?.id });
     res.json({ success: true, data });
   } catch (error) { fail(res, error); }
 });
 
 /** Publish an advance rate. Authenticated and attributed. */
-router.post
-    // Log request
-    logger.debug('router.post request');('/publish', authMiddleware, async (req, res) => {
+router.post('/publish', authMiddleware, async (req, res) => {
   try {
     const rate = await risk.computeAdvanceRate(req.body || {});
     // An uncalibrated rate is indicative only and must not be published as a
@@ -130,8 +120,8 @@ router.post
     if (!rate.calibrated) {
       return res.status(409).json({
         success: false,
-        error: 'This district is not calibrated for this crop, so the rate cannot be '
-             + 'published as binding.',
+        error: 'This district is not calibrated for this crop, so the rate cannot be ' +
+             'published as binding.',
         confidence: rate.confidence,
         indicativeRate: rate,
       });
@@ -142,11 +132,9 @@ router.post
 });
 
 /** Record and decompose an observed farmgate-to-delivered spread. */
-router.post
-    // Log request
-    logger.debug('router.post request');('/basis', authMiddleware, async (req, res) => {
+router.post('/basis', authMiddleware, async (req, res) => {
   try {
-    let b = req.body || {};
+    const b = req.body || {};
     for (const k of ['cropKey', 'farmgatePerKg', 'ncrDeliveredPerKg', 'freightPerKg', 'expectedLossPct']) {
       if (b[k] === undefined) throw new Error(`${k} is required`);
     }
@@ -154,48 +142,37 @@ router.post
   } catch (error) { fail(res, error); }
 });
 
-
 // ---------------------------------------------------------------------------
 // Yield management (059). Added to the existing pricing routes — one module
 // owns pricing, so two endpoints cannot quote two prices for the same lot.
 // ---------------------------------------------------------------------------
 const dynamicPricing = require('../services/legacy/dynamicPricingService');
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/lots/:lotCode/price', async (req, res) => {
+router.get('/lots/:lotCode/price', async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.priceForLot(req.params.lotCode) });
   } catch (e) { fail(res, e); }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/lots/:lotCode/open-bucket', authMiddleware, async (req, res) => {
+router.post('/lots/:lotCode/open-bucket', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.openNextBucket(req.params.lotCode) });
   } catch (e) { fail(res, e); }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/booking-curve/:cropKey', async (req, res) => {
+router.get('/booking-curve/:cropKey', async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.bookingCurve(req.params.cropKey) });
   } catch (e) { fail(res, e); }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/booking-curve', authMiddleware, async (req, res) => {
+router.post('/booking-curve', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.recordBookingPoint(req.body) });
   } catch (e) { fail(res, e); }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/lots/attention', authMiddleware, async (req, res) => {
+router.get('/lots/attention', authMiddleware, async (req, res) => {
   try {
     res.json({ success: true, data: await dynamicPricing.lotsNeedingAttention(req.query) });
   } catch (e) { fail(res, e); }

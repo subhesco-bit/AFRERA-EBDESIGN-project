@@ -1,22 +1,22 @@
 /**
  * AI Recovery Service - Claude AI Integration
- * 
+ *
  * Claude AI Capability: Autonomous error recovery with Claude coordinator integration
  * Integration Points: Claude AI Coordinator, Library Knowledge Service, AI Collaboration Service
  * Context Sources: Library modules, error patterns, recovery strategies, health metrics
  * Collaboration Mode: Recovery tracking, decision logging, learning feedback
- * 
+ *
  * Original Devin Implementation: AI self-healing with error detection, automatic recovery, root cause analysis
  * Conversion Date: 2026-08-31
  * Conversion Agent: Claude
- * 
+ *
  * AI Enhancement:
  * - Context-aware error recovery using library knowledge
  * - AI-powered root cause analysis
  * - Historical error pattern analysis
  * - Multi-factor recovery optimization
  * - Real-time recovery confidence scoring
- * 
+ *
  * Backward Compatibility:
  * - All error patterns preserved
  * - Original recovery logic maintained
@@ -52,45 +52,45 @@ class ClaudeAIEnhancedRecoveryService {
         work_type: 'error_recovery',
         service: this.serviceName,
         params: { error: error.message, context, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
       const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'detectAndRecover',
         error: error.message,
-        context: context
+        context,
       });
 
       const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'detection',
         query: this.buildErrorRecoveryQuery(error, context, options),
-        context: { 
+        context: {
           error: error.message,
           errorType: error.name,
-          context, 
+          context,
           options,
           libraryContext,
-          errorPatterns: this.getErrorPatterns()
+          errorPatterns: this.getErrorPatterns(),
         },
-        agentPreference: 'governance-agent'
+        agentPreference: 'governance-agent',
       });
 
       const originalResult = await this.originalService.detectAndRecover(error, context);
-      
+
       const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_root_cause_analysis: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_recovery_recommendations: this.extractRecoveryRecommendations(aiEnhancement.content)
+        ai_recovery_recommendations: this.extractRecoveryRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'error_recovery',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -99,9 +99,9 @@ class ClaudeAIEnhancedRecoveryService {
         work_type: 'error_recovery',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.detectAndRecover(error, context);
     }
@@ -120,45 +120,45 @@ class ClaudeAIEnhancedRecoveryService {
         work_type: 'root_cause_analysis',
         service: this.serviceName,
         params: { error: error.message, context, options },
-        status: 'in_progress'
+        status: 'in_progress',
       });
 
-      let libraryContext = await libraryKnowledgeService.buildAIContext({
+      const libraryContext = await libraryKnowledgeService.buildAIContext({
         service: this.serviceName,
         operation: 'analyzeRootCause',
         error: error.message,
-        context: context
+        context,
       });
 
-      let aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
+      const aiEnhancement = await claudeAICoordinator.coordinateAIRequest({
         requestType: 'analysis',
         query: this.buildRootCauseQuery(error, context, options),
-        context: { 
+        context: {
           error: error.message,
           errorType: error.name,
           stack: error.stack,
-          context, 
+          context,
           options,
-          libraryContext
+          libraryContext,
         },
-        agentPreference: 'governance-agent'
+        agentPreference: 'governance-agent',
       });
 
-      let originalResult = await this.originalService.analyzeRootCause(error, context);
-      
-      let enhancedResult = {
+      const originalResult = await this.originalService.analyzeRootCause(error, context);
+
+      const enhancedResult = {
         ...originalResult,
         ai_enhanced: true,
         ai_root_cause: aiEnhancement.content || null,
         ai_confidence: aiEnhancement.confidence || 0.8,
-        ai_prevention_recommendations: this.extractPreventionRecommendations(aiEnhancement.content)
+        ai_prevention_recommendations: this.extractPreventionRecommendations(aiEnhancement.content),
       };
 
       await aiCollaborationService.logWork('claude', {
         work_type: 'root_cause_analysis',
         service: this.serviceName,
         status: 'completed',
-        result: enhancedResult
+        result: enhancedResult,
       });
 
       return enhancedResult;
@@ -167,9 +167,9 @@ class ClaudeAIEnhancedRecoveryService {
         work_type: 'root_cause_analysis',
         service: this.serviceName,
         status: 'error',
-        error: error.message
+        error: error.message,
       });
-      
+
       logger.warn('AI enhancement failed, falling back to original service:', error.message);
       return await this.originalService.analyzeRootCause(error, context);
     }
@@ -185,7 +185,7 @@ class ClaudeAIEnhancedRecoveryService {
       'api_timeout',
       'api_rate_limit',
       'auth_failure',
-      'service_unavailable'
+      'service_unavailable',
     ];
   }
 
@@ -208,16 +208,16 @@ class ClaudeAIEnhancedRecoveryService {
    */
   extractRecoveryRecommendations(aiContent) {
     if (!aiContent) return [];
-    
+
     const recommendations = [];
     const lines = aiContent.split('\n');
-    
+
     lines.forEach(line => {
       if (line.includes('recover') || line.includes('fix') || line.includes('resolve') || line.includes('restore')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -226,16 +226,16 @@ class ClaudeAIEnhancedRecoveryService {
    */
   extractPreventionRecommendations(aiContent) {
     if (!aiContent) return [];
-    
-    let recommendations = [];
-    let lines = aiContent.split('\n');
-    
+
+    const recommendations = [];
+    const lines = aiContent.split('\n');
+
     lines.forEach(line => {
       if (line.includes('prevent') || line.includes('avoid') || line.includes('mitigate') || line.includes('reduce')) {
         recommendations.push(line.trim());
       }
     });
-    
+
     return recommendations;
   }
 
@@ -269,7 +269,7 @@ class ClaudeAIEnhancedRecoveryService {
       library_knowledge: libraryKnowledgeService ? 'available' : 'unavailable',
       collaboration_tracking: aiCollaborationService ? 'available' : 'unavailable',
       error_patterns: this.getErrorPatterns(),
-      ai_enhanced_methods: ['detectAndRecoverAI', 'analyzeRootCauseAI']
+      ai_enhanced_methods: ['detectAndRecoverAI', 'analyzeRootCauseAI'],
     };
   }
 }

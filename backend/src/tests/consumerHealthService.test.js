@@ -12,7 +12,7 @@ describe('Consumer Health Service', () => {
 
   beforeAll(async () => {
     pool = new Pool({
-      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
+      connectionString: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
     });
 
     const registerResponse = await request(app)
@@ -20,7 +20,7 @@ describe('Consumer Health Service', () => {
       .send({
         email: 'health-test@example.com',
         password: 'Test123!@#',
-        role: 'consumer'
+        role: 'consumer',
       });
 
     authToken = registerResponse.body.token;
@@ -47,7 +47,7 @@ describe('Consumer Health Service', () => {
           allergies: ['peanuts'],
           dietary_restrictions: [],
           medications: {},
-          health_goals: ['weight_loss']
+          health_goals: ['weight_loss'],
         })
         .expect(201);
 
@@ -59,7 +59,7 @@ describe('Consumer Health Service', () => {
       const response = await request(app)
         .post('/api/v1/consumer-health/health-profiles')
         .send({
-          profile_name: 'Test Profile'
+          profile_name: 'Test Profile',
         })
         .expect(401);
     });
@@ -88,7 +88,7 @@ describe('Consumer Health Service', () => {
           micronutrient_targets: {},
           meal_frequency: 3,
           meal_timing: {},
-          hydration_target_ml: 2000
+          hydration_target_ml: 2000,
         })
         .expect(201);
 
@@ -107,7 +107,7 @@ describe('Consumer Health Service', () => {
           metric_value: 70,
           unit: 'kg',
           notes: 'Morning weight',
-          source: 'manual'
+          source: 'manual',
         })
         .expect(201);
 
@@ -138,7 +138,7 @@ describe('Consumer Health Service', () => {
           current_value: 70,
           unit: 'kg',
           start_date: '2024-01-01',
-          target_date: '2024-06-01'
+          target_date: '2024-06-01',
         })
         .expect(201);
 
@@ -168,7 +168,7 @@ describe('Consumer Health Service', () => {
           recommendation_text: 'Increase protein intake',
           priority: 'high',
           category: 'nutrition',
-          reasoning: 'Based on health goals'
+          reasoning: 'Based on health goals',
         })
         .expect(201);
 
@@ -196,7 +196,7 @@ describe('Consumer Health Service', () => {
           alert_type: 'allergy',
           severity: 'high',
           alert_message: 'Peanut allergy detected',
-          trigger_data: { allergen: 'peanuts' }
+          trigger_data: { allergen: 'peanuts' },
         })
         .expect(201);
 
@@ -227,7 +227,7 @@ describe('Consumer Health Service', () => {
           quantity_g: 200,
           calories_consumed: 300,
           nutritional_intake: { protein: 15, carbs: 40, fats: 8 },
-          notes: 'Healthy meal'
+          notes: 'Healthy meal',
         })
         .expect(201);
 

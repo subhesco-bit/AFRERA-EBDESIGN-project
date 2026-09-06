@@ -35,7 +35,7 @@ router.post('/product-id', authLimiter, authMiddleware, async (req, res) => {
       origin_country,
       manufacturer_id,
       production_date,
-      batch_number
+      batch_number,
     } = req.body;
 
     // Generate GS1-compliant product ID
@@ -45,7 +45,7 @@ router.post('/product-id', authLimiter, authMiddleware, async (req, res) => {
       origin_country,
       manufacturer_id,
       production_date,
-      batch_number
+      batch_number,
     });
 
     const result = await pool.query(
@@ -56,8 +56,8 @@ router.post('/product-id', authLimiter, authMiddleware, async (req, res) => {
        RETURNING *`,
       [
         productId, product_type, product_category, origin_country,
-        manufacturer_id, production_date, batch_number, req.user.id
-      ]
+        manufacturer_id, production_date, batch_number, req.user.id,
+      ],
     );
 
     logger.info(`Product ID generated: ${productId}`);
@@ -78,7 +78,7 @@ async function generateProductId(params) {
   const category = params.product_category.substring(0, 2).toUpperCase();
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = crypto.randomBytes(2).toString('hex').substring(0, 4).toUpperCase();
-  
+
   return `${prefix}-${productType}-${category}-${timestamp}-${random}`;
 }
 
@@ -87,9 +87,9 @@ async function generateProductId(params) {
  */
 router.get('/product-id/:id', authMiddleware, async (req, res) => {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM product_ids WHERE product_id = $1',
-      [req.params.id]
+      [req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -122,10 +122,10 @@ router.post('/batches', authLimiter, authMiddleware, async (req, res) => {
       production_line,
       production_parameters,
       quality_checks,
-      assigned_by
+      assigned_by,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO batch_tracking 
        (batch_number, product_id, production_date, expiry_date, quantity_produced, 
         quantity_unit, production_line, production_parameters, quality_checks, 
@@ -135,8 +135,8 @@ router.post('/batches', authLimiter, authMiddleware, async (req, res) => {
       [
         batch_number, req.params.product_id || product_id, production_date, expiry_date,
         quantity_produced, quantity_unit, production_line,
-        JSON.stringify(production_parameters), JSON.stringify(quality_checks), assigned_by
-      ]
+        JSON.stringify(production_parameters), JSON.stringify(quality_checks), assigned_by,
+      ],
     );
 
     logger.info(`Batch record created: ${result.rows[0].id}`);
@@ -153,7 +153,7 @@ router.post('/batches', authLimiter, authMiddleware, async (req, res) => {
 router.get('/batches', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_number, status } = req.query;
-    
+
     let query = 'SELECT * FROM batch_tracking WHERE 1=1';
     const params = [];
     let paramCount = 0;
@@ -176,7 +176,7 @@ router.get('/batches', authMiddleware, async (req, res) => {
       params.push(status);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get batch records error', { error: error.message, stack: error.stack });
@@ -208,10 +208,10 @@ router.post('/farm-info', authLimiter, authMiddleware, async (req, res) => {
       pesticides_used,
       harvest_date,
       harvesting_method,
-      post_harvest_handling
+      post_harvest_handling,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO farm_information 
        (product_id, batch_id, farm_id, farm_name, location, coordinates, soil_type, 
         climate_zone, cultivation_practices, irrigation_method, fertilizers_used, 
@@ -224,8 +224,8 @@ router.post('/farm-info', authLimiter, authMiddleware, async (req, res) => {
         JSON.stringify(coordinates), soil_type, climate_zone,
         JSON.stringify(cultivation_practices), irrigation_method,
         JSON.stringify(fertilizers_used), JSON.stringify(pesticides_used),
-        harvest_date, harvesting_method, JSON.stringify(post_harvest_handling)
-      ]
+        harvest_date, harvesting_method, JSON.stringify(post_harvest_handling),
+      ],
     );
 
     logger.info(`Farm information created: ${result.rows[0].id}`);
@@ -242,9 +242,9 @@ router.post('/farm-info', authLimiter, authMiddleware, async (req, res) => {
 router.get('/farm-info', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, farm_id } = req.query;
-    
+
     let query = 'SELECT * FROM farm_information WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -265,7 +265,7 @@ router.get('/farm-info', authMiddleware, async (req, res) => {
       params.push(farm_id);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get farm information error', { error: error.message, stack: error.stack });
@@ -293,10 +293,10 @@ router.post('/farmer-info', authLimiter, authMiddleware, async (req, res) => {
       training_received,
       membership_in_cooperatives,
       payment_details,
-      contract_terms
+      contract_terms,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO farmer_information 
        (product_id, batch_id, farmer_id, farmer_name, contact_information, 
         farming_experience, certifications, training_received, membership_in_cooperatives, 
@@ -308,8 +308,8 @@ router.post('/farmer-info', authLimiter, authMiddleware, async (req, res) => {
         JSON.stringify(contact_information), farming_experience,
         JSON.stringify(certifications), JSON.stringify(training_received),
         JSON.stringify(membership_in_cooperatives), JSON.stringify(payment_details),
-        JSON.stringify(contract_terms)
-      ]
+        JSON.stringify(contract_terms),
+      ],
     );
 
     logger.info(`Farmer information created: ${result.rows[0].id}`);
@@ -326,9 +326,9 @@ router.post('/farmer-info', authLimiter, authMiddleware, async (req, res) => {
 router.get('/farmer-info', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, farmer_id } = req.query;
-    
+
     let query = 'SELECT * FROM farmer_information WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -349,7 +349,7 @@ router.get('/farmer-info', authMiddleware, async (req, res) => {
       params.push(farmer_id);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get farmer information error', { error: error.message, stack: error.stack });
@@ -378,10 +378,10 @@ router.post('/certification-info', authLimiter, authMiddleware, async (req, res)
       standards_complied,
       audit_reports,
       non_conformities,
-      corrective_actions
+      corrective_actions,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO certification_information 
        (product_id, batch_id, certification_type, certification_body, certificate_number, 
         issue_date, expiry_date, scope, standards_complied, audit_reports, 
@@ -392,8 +392,8 @@ router.post('/certification-info', authLimiter, authMiddleware, async (req, res)
         product_id, batch_id, certification_type, certification_body,
         certificate_number, issue_date, expiry_date, scope,
         JSON.stringify(standards_complied), JSON.stringify(audit_reports),
-        JSON.stringify(non_conformities), JSON.stringify(corrective_actions)
-      ]
+        JSON.stringify(non_conformities), JSON.stringify(corrective_actions),
+      ],
     );
 
     logger.info(`Certification information created: ${result.rows[0].id}`);
@@ -410,9 +410,9 @@ router.post('/certification-info', authLimiter, authMiddleware, async (req, res)
 router.get('/certification-info', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, certification_type } = req.query;
-    
+
     let query = 'SELECT * FROM certification_information WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -433,7 +433,7 @@ router.get('/certification-info', authMiddleware, async (req, res) => {
       params.push(certification_type);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get certification information error', { error: error.message, stack: error.stack });
@@ -462,10 +462,10 @@ router.post('/processing-history', authLimiter, authMiddleware, async (req, res)
       additives_used,
       packaging_material,
       processing_time,
-      operators
+      operators,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO processing_history 
        (product_id, batch_id, processing_facility_id, processing_date, processing_type, 
         equipment_used, processing_parameters, quality_checks, additives_used, 
@@ -476,8 +476,8 @@ router.post('/processing-history', authLimiter, authMiddleware, async (req, res)
         product_id, batch_id, processing_facility_id, processing_date, processing_type,
         JSON.stringify(equipment_used), JSON.stringify(processing_parameters),
         JSON.stringify(quality_checks), JSON.stringify(additives_used),
-        packaging_material, processing_time, JSON.stringify(operators)
-      ]
+        packaging_material, processing_time, JSON.stringify(operators),
+      ],
     );
 
     logger.info(`Processing history created: ${result.rows[0].id}`);
@@ -494,9 +494,9 @@ router.post('/processing-history', authLimiter, authMiddleware, async (req, res)
 router.get('/processing-history', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, processing_facility_id } = req.query;
-    
+
     let query = 'SELECT * FROM processing_history WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -517,7 +517,7 @@ router.get('/processing-history', authMiddleware, async (req, res) => {
       params.push(processing_facility_id);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get processing history error', { error: error.message, stack: error.stack });
@@ -547,10 +547,10 @@ router.post('/logistics-history', authLimiter, authMiddleware, async (req, res) 
       handling_instructions,
       transit_time,
       delays,
-      incidents
+      incidents,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO logistics_history 
        (product_id, batch_id, shipment_id, transport_mode, carrier_id, pickup_date, 
         delivery_date, route, temperature_conditions, handling_instructions, 
@@ -561,8 +561,8 @@ router.post('/logistics-history', authLimiter, authMiddleware, async (req, res) 
         product_id, batch_id, shipment_id, transport_mode, carrier_id,
         pickup_date, delivery_date, JSON.stringify(route),
         JSON.stringify(temperature_conditions), handling_instructions,
-        transit_time, JSON.stringify(delays), JSON.stringify(incidents)
-      ]
+        transit_time, JSON.stringify(delays), JSON.stringify(incidents),
+      ],
     );
 
     logger.info(`Logistics history created: ${result.rows[0].id}`);
@@ -579,9 +579,9 @@ router.post('/logistics-history', authLimiter, authMiddleware, async (req, res) 
 router.get('/logistics-history', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, shipment_id } = req.query;
-    
+
     let query = 'SELECT * FROM logistics_history WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -602,7 +602,7 @@ router.get('/logistics-history', authMiddleware, async (req, res) => {
       params.push(shipment_id);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get logistics history error', { error: error.message, stack: error.stack });
@@ -631,10 +631,10 @@ router.post('/sustainability-data', authLimiter, authMiddleware, async (req, res
       social_impact,
       economic_impact,
       sustainability_score,
-      certification_status
+      certification_status,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO sustainability_data 
        (product_id, batch_id, water_usage, energy_consumption, waste_generated, 
         waste_recycled, soil_health_metrics, biodiversity_impact, social_impact, 
@@ -646,8 +646,8 @@ router.post('/sustainability-data', authLimiter, authMiddleware, async (req, res
         JSON.stringify(waste_generated), JSON.stringify(waste_recycled),
         JSON.stringify(soil_health_metrics), JSON.stringify(biodiversity_impact),
         JSON.stringify(social_impact), JSON.stringify(economic_impact),
-        sustainability_score, certification_status
-      ]
+        sustainability_score, certification_status,
+      ],
     );
 
     logger.info(`Sustainability data created: ${result.rows[0].id}`);
@@ -664,9 +664,9 @@ router.post('/sustainability-data', authLimiter, authMiddleware, async (req, res
 router.get('/sustainability-data', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id } = req.query;
-    
+
     let query = 'SELECT * FROM sustainability_data WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -681,7 +681,7 @@ router.get('/sustainability-data', authMiddleware, async (req, res) => {
       params.push(batch_id);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get sustainability data error', { error: error.message, stack: error.stack });
@@ -708,10 +708,10 @@ router.post('/carbon-data', authLimiter, authMiddleware, async (req, res) => {
       carbon_credits,
       verification_method,
       verification_date,
-      carbon_rating
+      carbon_rating,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO carbon_data 
        (product_id, batch_id, carbon_footprint, carbon_offset, emission_sources, 
         reduction_initiatives, carbon_credits, verification_method, verification_date, 
@@ -721,8 +721,8 @@ router.post('/carbon-data', authLimiter, authMiddleware, async (req, res) => {
       [
         product_id, batch_id, carbon_footprint, carbon_offset,
         JSON.stringify(emission_sources), JSON.stringify(reduction_initiatives),
-        JSON.stringify(carbon_credits), verification_method, verification_date, carbon_rating
-      ]
+        JSON.stringify(carbon_credits), verification_method, verification_date, carbon_rating,
+      ],
     );
 
     logger.info(`Carbon data created: ${result.rows[0].id}`);
@@ -739,9 +739,9 @@ router.post('/carbon-data', authLimiter, authMiddleware, async (req, res) => {
 router.get('/carbon-data', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id } = req.query;
-    
+
     let query = 'SELECT * FROM carbon_data WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -756,7 +756,7 @@ router.get('/carbon-data', authMiddleware, async (req, res) => {
       params.push(batch_id);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get carbon data error', { error: error.message, stack: error.stack });
@@ -784,10 +784,10 @@ router.post('/quality-reports', authLimiter, authMiddleware, async (req, res) =>
       pass_fail,
       tested_by,
       laboratory_id,
-      certification_reference
+      certification_reference,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO quality_reports 
        (product_id, batch_id, report_type, test_date, test_parameters, test_results, 
         quality_score, pass_fail, tested_by, laboratory_id, certification_reference, 
@@ -797,8 +797,8 @@ router.post('/quality-reports', authLimiter, authMiddleware, async (req, res) =>
       [
         product_id, batch_id, report_type, test_date,
         JSON.stringify(test_parameters), JSON.stringify(test_results),
-        quality_score, pass_fail, tested_by, laboratory_id, certification_reference
-      ]
+        quality_score, pass_fail, tested_by, laboratory_id, certification_reference,
+      ],
     );
 
     logger.info(`Quality report created: ${result.rows[0].id}`);
@@ -815,9 +815,9 @@ router.post('/quality-reports', authLimiter, authMiddleware, async (req, res) =>
 router.get('/quality-reports', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, report_type } = req.query;
-    
+
     let query = 'SELECT * FROM quality_reports WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -838,7 +838,7 @@ router.get('/quality-reports', authMiddleware, async (req, res) => {
       params.push(report_type);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get quality reports error', { error: error.message, stack: error.stack });
@@ -866,10 +866,10 @@ router.post('/recall-status', authLimiter, authMiddleware, async (req, res) => {
       consumer_notification,
       remediation_actions,
       resolution_status,
-      resolved_date
+      resolved_date,
     } = req.body;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO recall_status 
        (product_id, batch_id, recall_id, recall_status, recall_date, recall_reason, 
         affected_markets, consumer_notification, remediation_actions, resolution_status, 
@@ -879,8 +879,8 @@ router.post('/recall-status', authLimiter, authMiddleware, async (req, res) => {
       [
         product_id, batch_id, recall_id, recall_status, recall_date, recall_reason,
         JSON.stringify(affected_markets), consumer_notification,
-        JSON.stringify(remediation_actions), resolution_status, resolved_date
-      ]
+        JSON.stringify(remediation_actions), resolution_status, resolved_date,
+      ],
     );
 
     logger.info(`Recall status created: ${result.rows[0].id}`);
@@ -897,9 +897,9 @@ router.post('/recall-status', authLimiter, authMiddleware, async (req, res) => {
 router.get('/recall-status', authMiddleware, async (req, res) => {
   try {
     const { product_id, batch_id, recall_status } = req.query;
-    
+
     let query = 'SELECT * FROM recall_status WHERE 1=1';
-    let params = [];
+    const params = [];
     let paramCount = 0;
 
     if (product_id) {
@@ -920,7 +920,7 @@ router.get('/recall-status', authMiddleware, async (req, res) => {
       params.push(recall_status);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
     logger.error('Get recall status error', { error: error.message, stack: error.stack });
@@ -944,7 +944,7 @@ router.post('/qr-code', authMiddleware, async (req, res) => {
       product_id,
       batch_id,
       timestamp: new Date().toISOString(),
-      verification_url: `${process.env.BASE_URL || 'https://afrera.com'}/verify/${product_id}/${batch_id}`
+      verification_url: `${process.env.BASE_URL || 'https://afrera.com'}/verify/${product_id}/${batch_id}`,
     });
 
     const qrCodeDataURL = await QRCode.toDataURL(qrData, {
@@ -952,24 +952,24 @@ router.post('/qr-code', authMiddleware, async (req, res) => {
       margin: 2,
       color: {
         dark: '#000000',
-        light: '#FFFFFF'
-      }
+        light: '#FFFFFF',
+      },
     });
 
     // Store QR code record
-    let result = await pool.query(
+    const result = await pool.query(
       `INSERT INTO qr_codes 
        (product_id, batch_id, qr_data, qr_code_image, generated_by, created_at)
        VALUES ($1, $2, $3, $4, $5, NOW())
        RETURNING *`,
-      [product_id, batch_id, qrData, qrCodeDataURL, req.user.id]
+      [product_id, batch_id, qrData, qrCodeDataURL, req.user.id],
     );
 
     logger.info(`QR code generated for product ${product_id}`);
     res.status(201).json({
       qr_code_id: result.rows[0].id,
       qr_code_image: qrCodeDataURL,
-      qr_data: qrData
+      qr_data: qrData,
     });
   } catch (error) {
     logger.error('Generate QR code error', { error: error.message, stack: error.stack });
@@ -982,9 +982,9 @@ router.post('/qr-code', authMiddleware, async (req, res) => {
  */
 router.get('/qr-code/:id', authMiddleware, async (req, res) => {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM qr_codes WHERE id = $1',
-      [req.params.id]
+      [req.params.id],
     );
 
     if (result.rows.length === 0) {
@@ -1006,9 +1006,9 @@ router.get('/passport/:product_id/:batch_id', authMiddleware, async (req, res) =
     const { product_id, batch_id } = req.params;
 
     // Get all passport data
-    const [productInfo, batchInfo, farmInfo, farmerInfo, certInfo, 
-          processingInfo, logisticsInfo, sustainabilityInfo, carbonInfo, 
-          qualityInfo, recallInfo, qrInfo] = await Promise.all([
+    const [productInfo, batchInfo, farmInfo, farmerInfo, certInfo,
+      processingInfo, logisticsInfo, sustainabilityInfo, carbonInfo,
+      qualityInfo, recallInfo, qrInfo] = await Promise.all([
       pool.query('SELECT * FROM product_ids WHERE product_id = $1', [product_id]),
       pool.query('SELECT * FROM batch_tracking WHERE product_id = $1 AND batch_number = $2', [product_id, batch_id]),
       pool.query('SELECT * FROM farm_information WHERE product_id = $1 AND batch_id = $2', [product_id, batch_id]),
@@ -1020,7 +1020,7 @@ router.get('/passport/:product_id/:batch_id', authMiddleware, async (req, res) =
       pool.query('SELECT * FROM carbon_data WHERE product_id = $1 AND batch_id = $2', [product_id, batch_id]),
       pool.query('SELECT * FROM quality_reports WHERE product_id = $1 AND batch_id = $2', [product_id, batch_id]),
       pool.query('SELECT * FROM recall_status WHERE product_id = $1 AND batch_id = $2', [product_id, batch_id]),
-      pool.query('SELECT * FROM qr_codes WHERE product_id = $1 AND batch_id = $2 ORDER BY created_at DESC LIMIT 1', [product_id, batch_id])
+      pool.query('SELECT * FROM qr_codes WHERE product_id = $1 AND batch_id = $2 ORDER BY created_at DESC LIMIT 1', [product_id, batch_id]),
     ]);
 
     const passport = {
@@ -1038,7 +1038,7 @@ router.get('/passport/:product_id/:batch_id', authMiddleware, async (req, res) =
       quality_reports: qualityInfo.rows,
       recall_status: recallInfo.rows[0] || null,
       qr_code: qrInfo.rows[0] || null,
-      generated_at: new Date().toISOString()
+      generated_at: new Date().toISOString(),
     };
 
     res.json(passport);
@@ -1055,9 +1055,6 @@ function isHealthy() {
 
 module.exports = {
   router,
-  isHealthy
+  isHealthy,
 };
-
-
-
 

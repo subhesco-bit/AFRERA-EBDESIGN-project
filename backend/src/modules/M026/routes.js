@@ -6,9 +6,9 @@ const { authMiddleware, requireRole } = require('../../middleware/auth');
 // Public get/list endpoints, protected writes by default
 router.get('/', controller.list);
 router.get('/:id', controller.get);
-router.post('/', authMiddleware, requireRole('farmer','admin'), controller.create);
-router.put('/:id', authMiddleware, requireRole('farmer','admin'), controller.update);
-router.delete('/:id', authMiddleware, requireRole('farmer','admin'), controller.remove);
+router.post('/', authMiddleware, requireRole('farmer', 'admin'), controller.create);
+router.put('/:id', authMiddleware, requireRole('farmer', 'admin'), controller.update);
+router.delete('/:id', authMiddleware, requireRole('farmer', 'admin'), controller.remove);
 
 module.exports = router;
 

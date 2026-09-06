@@ -16,9 +16,7 @@ const router = express.Router();
 const roleManagementService = require('../services/legacy/roleManagementService');
 const { authMiddleware, requirePermission } = require('../middleware/auth');
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/', authMiddleware, requirePermission('create_roles'), async (req, res) => {
+router.post('/', authMiddleware, requirePermission('create_roles'), async (req, res) => {
   try {
     const role = await roleManagementService.createRole(req.body);
     res.status(201).json(role);
@@ -27,9 +25,7 @@ router.post
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/', authMiddleware, requirePermission('read_roles'), async (req, res) => {
+router.get('/', authMiddleware, requirePermission('read_roles'), async (req, res) => {
   try {
     const roles = await roleManagementService.getRoles(req.query);
     res.json(roles);
@@ -38,11 +34,9 @@ router.get
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/:id', authMiddleware, requirePermission('read_roles'), async (req, res) => {
+router.get('/:id', authMiddleware, requirePermission('read_roles'), async (req, res) => {
   try {
-    let role = await roleManagementService.getRoleById(req.params.id);
+    const role = await roleManagementService.getRoleById(req.params.id);
     res.json(role);
   } catch (error) {
     if (error.message === 'Role not found') {
@@ -53,11 +47,9 @@ router.get
   }
 });
 
-router.put
-    // Log request
-    logger.debug('router.put request');('/:id', authMiddleware, requirePermission('update_roles'), async (req, res) => {
+router.put('/:id', authMiddleware, requirePermission('update_roles'), async (req, res) => {
   try {
-    let role = await roleManagementService.updateRole(req.params.id, req.body);
+    const role = await roleManagementService.updateRole(req.params.id, req.body);
     res.json(role);
   } catch (error) {
     if (error.message === 'Role not found') {
@@ -68,11 +60,9 @@ router.put
   }
 });
 
-router.delete
-    // Log request
-    logger.debug('router.delete request');('/:id', authMiddleware, requirePermission('delete_roles'), async (req, res) => {
+router.delete('/:id', authMiddleware, requirePermission('delete_roles'), async (req, res) => {
   try {
-    let role = await roleManagementService.deleteRole(req.params.id);
+    const role = await roleManagementService.deleteRole(req.params.id);
     res.json(role);
   } catch (error) {
     if (error.message === 'Role not found' || error.message === 'Cannot delete system role') {
@@ -83,9 +73,7 @@ router.delete
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/:id/permissions/:permissionId', authMiddleware, requirePermission('assign_permissions'), async (req, res) => {
+router.post('/:id/permissions/:permissionId', authMiddleware, requirePermission('assign_permissions'), async (req, res) => {
   try {
     const assignment = await roleManagementService.assignPermission(req.params.id, req.params.permissionId);
     res.json(assignment);
@@ -94,20 +82,16 @@ router.post
   }
 });
 
-router.delete
-    // Log request
-    logger.debug('router.delete request');('/:id/permissions/:permissionId', authMiddleware, requirePermission('remove_permissions'), async (req, res) => {
+router.delete('/:id/permissions/:permissionId', authMiddleware, requirePermission('remove_permissions'), async (req, res) => {
   try {
-    let assignment = await roleManagementService.removePermission(req.params.id, req.params.permissionId);
+    const assignment = await roleManagementService.removePermission(req.params.id, req.params.permissionId);
     res.json(assignment);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post
-    // Log request
-    logger.debug('router.post request');('/optimize', authMiddleware, requirePermission('system_optimize'), async (req, res) => {
+router.post('/optimize', authMiddleware, requirePermission('system_optimize'), async (req, res) => {
   try {
     const optimization = await roleManagementService.optimizeRoleAssignments();
     res.json(optimization);
@@ -116,9 +100,7 @@ router.post
   }
 });
 
-router.get
-    // Log request
-    logger.debug('router.get request');('/permissions/analysis', authMiddleware, requirePermission('read_analytics'), async (req, res) => {
+router.get('/permissions/analysis', authMiddleware, requirePermission('read_analytics'), async (req, res) => {
   try {
     const analysis = await roleManagementService.analyzePermissionUsage();
     res.json(analysis);

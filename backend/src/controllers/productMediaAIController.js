@@ -48,7 +48,7 @@ const productMediaAIController = {
   generateProductVideo: async (req, res) => {
     try {
       const { productId } = req.params;
-      let result = await productMediaAIService.requestProductVideoGeneration(productId);
+      const result = await productMediaAIService.requestProductVideoGeneration(productId);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error requesting product video generation', { error: error.message });

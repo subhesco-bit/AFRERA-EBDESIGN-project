@@ -25,18 +25,18 @@ class ProductionService {
 
       this.logger.info(`${this.name}.${methodName} completed`, {
         duration,
-        hasResult: !!result
+        hasResult: Boolean(result),
       });
 
       return result;
     } catch (error) {
       this.errorCount++;
-      let duration = Date.now() - startTime;
+      const duration = Date.now() - startTime;
 
       this.logger.error(`${this.name}.${methodName} failed`, {
         error: error.message,
         duration,
-        stack: error.stack
+        stack: error.stack,
       });
 
       throw error;
@@ -52,7 +52,7 @@ class ProductionService {
 
       const results = [];
       for (const operation of operations) {
-        let result = await client.query(...operation);
+        const result = await client.query(...operation);
         results.push(result);
       }
 
@@ -76,7 +76,7 @@ class ProductionService {
     }
 
     // Execute query
-    let result = await this.db.query(query, params);
+    const result = await this.db.query(query, params);
 
     // Cache result
     await this.cache.set(cacheKey, result.rows, ttl);
@@ -90,7 +90,7 @@ class ProductionService {
       throw new ValidationError('Records must be a non-empty array');
     }
 
-    let results = [];
+    const results = [];
 
     for (let i = 0; i < records.length; i += batchSize) {
       const batch = records.slice(i, i + batchSize);
@@ -104,7 +104,7 @@ class ProductionService {
 
       const query = `INSERT INTO ${table} (${columns.join(',')}) VALUES ${placeholders} RETURNING *`;
 
-      let result = await this.db.query(query, values);
+      const result = await this.db.query(query, values);
       results.push(...result.rows);
     }
 
@@ -120,11 +120,11 @@ class ProductionService {
       .join(' AND ');
 
     const whereClause = where ? `WHERE ${where}` : '';
-    let values = Object.values(filter);
+    const values = Object.values(filter);
 
     const [countResult, dataResult] = await Promise.all([
       this.db.query(`SELECT COUNT(*) FROM ${table} ${whereClause}`, values),
-      this.db.query(`SELECT * FROM ${table} ${whereClause} LIMIT $${values.length + 1} OFFSET $${values.length + 2}`, [...values, limit, offset])
+      this.db.query(`SELECT * FROM ${table} ${whereClause} LIMIT $${values.length + 1} OFFSET $${values.length + 2}`, [...values, limit, offset]),
     ]);
 
     return {
@@ -133,19 +133,19 @@ class ProductionService {
         page,
         limit,
         total: parseInt(countResult.rows[0].count),
-        pages: Math.ceil(parseInt(countResult.rows[0].count) / limit)
-      }
+        pages: Math.ceil(parseInt(countResult.rows[0].count) / limit),
+      },
     };
   }
 
   // Circuit breaker pattern for external calls
   async callExternalService(serviceName, fn, fallback = null) {
     try {
-      let result = await Promise.race([
+      const result = await Promise.race([
         fn(),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 5000)
-        )
+          setTimeout(() => reject(new Error('Timeout')), 5000),
+        ),
       ]);
       return result;
     } catch (error) {
@@ -188,7 +188,7 @@ class ProductionService {
       status: this.errorCount / (this.requestCount + 1) < 0.01 ? 'healthy' : 'degraded',
       requestCount: this.requestCount,
       errorCount: this.errorCount,
-      errorRate: ((this.errorCount / (this.requestCount + 1)) * 100).toFixed(2) + '%'
+      errorRate: `${((this.errorCount / (this.requestCount + 1)) * 100).toFixed(2) }%`,
     };
   }
 }

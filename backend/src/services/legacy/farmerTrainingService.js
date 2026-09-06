@@ -31,29 +31,29 @@ async function createTrainingProgram(programData) {
       capacity,
       fee,
       subsidy_eligible,
-      certification_offered
+      certification_offered,
     } = programData;
 
     const program = {
       program_id: generateId(),
-      program_name: program_name,
-      program_type: program_type, // organic_farming, sustainable_agriculture, post_harvest, digital_literacy
-      category: category,
-      target_audience: target_audience,
-      location: location,
-      state: state,
-      district: district,
-      duration: duration,
-      curriculum: curriculum,
-      instructor_id: instructor_id,
-      start_date: start_date,
-      end_date: end_date,
-      capacity: capacity,
-      fee: fee,
-      subsidy_eligible: subsidy_eligible,
-      certification_offered: certification_offered,
+      program_name,
+      program_type, // organic_farming, sustainable_agriculture, post_harvest, digital_literacy
+      category,
+      target_audience,
+      location,
+      state,
+      district,
+      duration,
+      curriculum,
+      instructor_id,
+      start_date,
+      end_date,
+      capacity,
+      fee,
+      subsidy_eligible,
+      certification_offered,
       status: 'scheduled',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered curriculum optimization using real AI
@@ -97,25 +97,25 @@ async function registerForTraining(registrationData) {
       program_id,
       registration_date,
       payment_status,
-      subsidy_applied
+      subsidy_applied,
     } = registrationData;
 
     const registration = {
       registration_id: generateId(),
-      farmer_id: farmer_id,
-      program_id: program_id,
-      registration_date: registration_date,
-      payment_status: payment_status,
-      subsidy_applied: subsidy_applied,
+      farmer_id,
+      program_id,
+      registration_date,
+      payment_status,
+      subsidy_applied,
       status: 'registered',
-      enrolled_at: new Date().toISOString()
+      enrolled_at: new Date().toISOString(),
     };
 
     // Check eligibility and recommend using real AI
     const farmerProfile = await getFarmerProfile(farmer_id);
-    let program = await getTrainingProgram(program_id);
+    const program = await getTrainingProgram(program_id);
 
-    let aiPrompt = `As an expert agricultural career counselor, assess the following farmer's eligibility for a training program and provide recommendations:
+    const aiPrompt = `As an expert agricultural career counselor, assess the following farmer's eligibility for a training program and provide recommendations:
 
 Farmer Profile: ${JSON.stringify(farmerProfile)}
 Program: ${JSON.stringify(program)}
@@ -127,7 +127,7 @@ Please provide:
 4. Learning readiness assessment
 5. Personalized recommendations`;
 
-    let aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
+    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
     registration.ai_assessment = aiResponse.content;
     registration.ai_provider = aiResponse.provider;
     registration.ai_model = aiResponse.model;
@@ -154,7 +154,7 @@ async function trackTrainingProgress(registrationId) {
       attendance: await getAttendanceRecord(registrationId),
       skills_acquired: await getSkillsAcquired(registrationId),
       certification_eligibility: await checkCertificationEligibility(registrationId),
-      next_steps: await getNextTrainingSteps(registrationId)
+      next_steps: await getNextTrainingSteps(registrationId),
     };
 
     return progress;
@@ -169,10 +169,10 @@ async function trackTrainingProgress(registrationId) {
  */
 async function assessFOLUCompliance(farmerId, assessmentPeriod) {
   try {
-    let farmerProfile = await getFarmerProfile(farmerId);
-    
+    const farmerProfile = await getFarmerProfile(farmerId);
+
     // AI-powered FOLU compliance assessment using real AI
-    let aiPrompt = `As an expert in FOLU (Food Systems, Land Use, and Restoration) compliance, assess the following farmer's compliance with FOLU framework:
+    const aiPrompt = `As an expert in FOLU (Food Systems, Land Use, and Restoration) compliance, assess the following farmer's compliance with FOLU framework:
 
 Farmer Profile: ${JSON.stringify(farmerProfile)}
 Assessment Period: ${assessmentPeriod}
@@ -187,7 +187,7 @@ Please provide:
 7. Recommendations for improvement
 8. Confidence level in assessment`;
 
-    let aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
+    const aiResponse = await aiBackbone.callAI(aiPrompt, { maxTokens: 2048 });
 
     const assessment = {
       assessment_id: generateId(),
@@ -198,14 +198,14 @@ Please provide:
       ai_provider: aiResponse.provider,
       ai_model: aiResponse.model,
       confidence: 'high',
-      recommendations_generated: true
+      recommendations_generated: true,
     };
 
     // Emit signal bus event
     await signalBus.emit('training.folu.assessed', {
       farmer_id: farmerId,
       assessment_id: assessment.assessment_id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     logger.info(`FOLU compliance assessed for farmer ${farmerId}`);
@@ -224,23 +224,23 @@ async function trackCarbonFootprint(farmerId, period) {
     const tracking = {
       tracking_id: generateId(),
       farmer_id: farmerId,
-      period: period,
+      period,
       timestamp: new Date().toISOString(),
       carbon_footprint: {
         total_emissions: await calculateTotalEmissions(farmerId, period),
         emissions_by_source: await getEmissionsBySource(farmerId, period),
         sequestration: await calculateSequestration(farmerId, period),
         net_footprint: await calculateNetFootprint(farmerId, period),
-        footprint_per_hectare: await calculatePerHectareFootprint(farmerId, period)
+        footprint_per_hectare: await calculatePerHectareFootprint(farmerId, period),
       },
       benchmarks: {
         regional_average: await getRegionalAverageFootprint(farmerId),
         industry_best_practice: await getIndustryBestPractice(),
-        improvement_trend: await getImprovementTrend(farmerId)
+        improvement_trend: await getImprovementTrend(farmerId),
       },
       reduction_opportunities: await identifyReductionOpportunities(farmerId),
       carbon_credits_potential: await calculateCarbonCreditsPotential(farmerId),
-      recommendations: await getCarbonReductionRecommendations(farmerId)
+      recommendations: await getCarbonReductionRecommendations(farmerId),
     };
 
     return tracking;
@@ -255,9 +255,9 @@ async function trackCarbonFootprint(farmerId, period) {
  */
 async function getNortheastOrganicTracking(location, category) {
   try {
-    let tracking = {
-      location: location,
-      category: category,
+    const tracking = {
+      location,
+      category,
       timestamp: new Date().toISOString(),
       organic_farmers: await getOrganicFarmerCount(location, category),
       organic_area: await getOrganicArea(location, category),
@@ -268,7 +268,7 @@ async function getNortheastOrganicTracking(location, category) {
       price_premium: await getOrganicPricePremium(category),
       challenges: await getOrganicChallenges(location),
       opportunities: await getOrganicOpportunities(location),
-      government_support: await getGovernmentOrganicSupport(location)
+      government_support: await getGovernmentOrganicSupport(location),
     };
 
     return tracking;
@@ -283,8 +283,8 @@ async function getNortheastOrganicTracking(location, category) {
  */
 async function issueTrainingCertificate(registrationId) {
   try {
-    let registration = await getTrainingRegistration(registrationId);
-    let progress = await trackTrainingProgress(registrationId);
+    const registration = await getTrainingRegistration(registrationId);
+    const progress = await trackTrainingProgress(registrationId);
 
     if (progress.certification_eligibility.eligible) {
       const certificate = {
@@ -298,7 +298,7 @@ async function issueTrainingCertificate(registrationId) {
         skills_verified: progress.skills_acquired,
         assessment_score: progress.assessments.overall_score,
         blockchain_verified: true,
-        qr_code: generateQRCode(registrationId)
+        qr_code: generateQRCode(registrationId),
       };
 
       logger.info(`Training certificate issued: ${certificate.certificate_id}`);
@@ -317,8 +317,8 @@ async function issueTrainingCertificate(registrationId) {
  */
 async function getTrainingRecommendations(farmerId) {
   try {
-    let farmerProfile = await getFarmerProfile(farmerId);
-    
+    const farmerProfile = await getFarmerProfile(farmerId);
+
     const aiRequest = {
       task: 'training_recommendation',
       parameters: {
@@ -327,11 +327,11 @@ async function getTrainingRecommendations(farmerId) {
         career_goals: await getCareerGoals(farmerId),
         market_demand: await getMarketDemandForSkills(),
         available_programs: await getAvailableTrainingPrograms(farmerProfile.state),
-        government_priorities: await getGovernmentTrainingPriorities(farmerProfile.state)
-      }
+        government_priorities: await getGovernmentTrainingPriorities(farmerProfile.state),
+      },
     };
 
-    let aiResponse = await aiAPI.generateRecommendation(aiRequest);
+    const aiResponse = await aiAPI.generateRecommendation(aiRequest);
 
     const recommendations = {
       farmer_id: farmerId,
@@ -342,7 +342,7 @@ async function getTrainingRecommendations(farmerId) {
       time_commitment: aiResponse.time_commitment,
       cost_estimate: aiResponse.cost_estimate,
       subsidy_opportunities: aiResponse.subsidy_opportunities,
-      confidence: aiResponse.confidence
+      confidence: aiResponse.confidence,
     };
 
     return recommendations;
@@ -361,13 +361,13 @@ async function generateComplianceReport(farmerId, reportType, period) {
       report_id: generateId(),
       farmer_id: farmerId,
       report_type: reportType, // folu, organic, carbon, sustainability
-      period: period,
+      period,
       generated_at: new Date().toISOString(),
       data_sources: await getDataSources(farmerId, reportType),
       metrics: await getReportMetrics(farmerId, reportType, period),
       compliance_status: await getComplianceStatus(farmerId, reportType),
       recommendations: await getReportRecommendations(farmerId, reportType),
-      next_audit_date: calculateNextAuditDate(reportType)
+      next_audit_date: calculateNextAuditDate(reportType),
     };
 
     return report;
@@ -652,7 +652,7 @@ async function getReportRecommendations(farmerId, reportType) {
 function setupRoutes(app) {
   app.post('/api/v1/training/programs', authMiddleware, async (req, res) => {
     try {
-      let program = await createTrainingProgram(req.body);
+      const program = await createTrainingProgram(req.body);
       res.json({ success: true, data: program });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -661,7 +661,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/register', authMiddleware, async (req, res) => {
     try {
-      let registration = await registerForTraining(req.body);
+      const registration = await registerForTraining(req.body);
       res.json({ success: true, data: registration });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -670,7 +670,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/progress/:registrationId', async (req, res) => {
     try {
-      let progress = await trackTrainingProgress(req.params.registrationId);
+      const progress = await trackTrainingProgress(req.params.registrationId);
       res.json({ success: true, data: progress });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -679,7 +679,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/folu-assessment', authMiddleware, async (req, res) => {
     try {
-      let assessment = await assessFOLUCompliance(req.body.farmer_id, req.body.assessment_period);
+      const assessment = await assessFOLUCompliance(req.body.farmer_id, req.body.assessment_period);
       res.json({ success: true, data: assessment });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -688,7 +688,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/carbon-footprint/:farmerId', async (req, res) => {
     try {
-      let tracking = await trackCarbonFootprint(req.params.farmerId, req.query.period);
+      const tracking = await trackCarbonFootprint(req.params.farmerId, req.query.period);
       res.json({ success: true, data: tracking });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -697,7 +697,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/northeast-organic', async (req, res) => {
     try {
-      let tracking = await getNortheastOrganicTracking(req.query.location, req.query.category);
+      const tracking = await getNortheastOrganicTracking(req.query.location, req.query.category);
       res.json({ success: true, data: tracking });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -706,7 +706,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/certificates/:registrationId', authMiddleware, async (req, res) => {
     try {
-      let certificate = await issueTrainingCertificate(req.params.registrationId);
+      const certificate = await issueTrainingCertificate(req.params.registrationId);
       res.json({ success: true, data: certificate });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -715,7 +715,7 @@ function setupRoutes(app) {
 
   app.get('/api/v1/training/recommendations/:farmerId', async (req, res) => {
     try {
-      let recommendations = await getTrainingRecommendations(req.params.farmerId);
+      const recommendations = await getTrainingRecommendations(req.params.farmerId);
       res.json({ success: true, data: recommendations });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -724,7 +724,7 @@ function setupRoutes(app) {
 
   app.post('/api/v1/training/compliance-report', authMiddleware, async (req, res) => {
     try {
-      let report = await generateComplianceReport(req.body.farmer_id, req.body.report_type, req.body.period);
+      const report = await generateComplianceReport(req.body.farmer_id, req.body.report_type, req.body.period);
       res.json({ success: true, data: report });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -742,54 +742,52 @@ module.exports = {
   issueTrainingCertificate,
   getTrainingRecommendations,
   generateComplianceReport,
-  setupRoutes
+  setupRoutes,
 };
 
 // Merged unique operations from backend/src/modules/M023 (see git history there for
 // full context) - complementary functionality this service did not have.
-Object.assign(module.exports, require("../../modules/M023/service"));
+Object.assign(module.exports, require('../../modules/M023/service'));
 
 // Merged from backend/src/modules/M021
 {
-  const m021 = require("../../modules/M021/service");
+  const m021 = require('../../modules/M021/service');
   const { ...rest } = m021;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M022
 {
-  const m022 = require("../../modules/M022/service");
+  const m022 = require('../../modules/M022/service');
   const { ...rest } = m022;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M024
 {
-  const m024 = require("../../modules/M024/service");
+  const m024 = require('../../modules/M024/service');
   const { ...rest } = m024;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M025
 {
-  const m025 = require("../../modules/M025/service");
+  const m025 = require('../../modules/M025/service');
   const { ...rest } = m025;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M029
 {
-  const m029 = require("../../modules/M029/service");
+  const m029 = require('../../modules/M029/service');
   const { ...rest } = m029;
   Object.assign(module.exports, rest);
 }
 
 // Merged from backend/src/modules/M030 - 2 name(s) collided and were aliased
 {
-  const m030 = require("../../modules/M030/service");
+  const m030 = require('../../modules/M030/service');
   const { healthCheck: healthCheckFromBE030, execute: executeFromBE030, ...rest } = m030;
   Object.assign(module.exports, rest, { healthCheckFromBE030, executeFromBE030 });
 }
-
-
 

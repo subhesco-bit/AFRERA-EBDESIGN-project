@@ -1,6 +1,6 @@
 /**
  * AFRERA E-Commerce Marketing Routes
- * 
+ *
  * Marketing and advertising endpoints:
  * - Campaign Management
  * - Sponsored Products

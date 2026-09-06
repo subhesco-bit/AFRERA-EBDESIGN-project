@@ -44,7 +44,7 @@ router.get('/fleet/maintenance-due', authMiddleware, async (req, res) => {
 router.get('/fleet/:vehicleId', authMiddleware, async (req, res) => {
   try {
     const { vehicleId } = req.params;
-    let vehicle = await logisticsEnhancementService.getVehicle(vehicleId);
+    const vehicle = await logisticsEnhancementService.getVehicle(vehicleId);
     res.json({ success: true, data: vehicle });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -54,7 +54,7 @@ router.get('/fleet/:vehicleId', authMiddleware, async (req, res) => {
 router.put('/fleet/:vehicleId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { vehicleId } = req.params;
-    let vehicle = await logisticsEnhancementService.updateVehicle(vehicleId, req.body);
+    const vehicle = await logisticsEnhancementService.updateVehicle(vehicleId, req.body);
     res.json({ success: true, data: vehicle });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -85,7 +85,7 @@ router.post('/shipments/:shipmentId/tracking', authLimiter, authMiddleware, asyn
 router.get('/shipments/:shipmentId/tracking', authMiddleware, async (req, res) => {
   try {
     const { shipmentId } = req.params;
-    let tracking = await logisticsEnhancementService.getTracking(shipmentId);
+    const tracking = await logisticsEnhancementService.getTracking(shipmentId);
     res.json({ success: true, data: tracking });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -175,7 +175,7 @@ router.get('/warehouses', authMiddleware, async (req, res) => {
 router.get('/warehouses/:warehouseId', authMiddleware, async (req, res) => {
   try {
     const { warehouseId } = req.params;
-    let warehouse = await logisticsEnhancementService.getWarehouse(warehouseId);
+    const warehouse = await logisticsEnhancementService.getWarehouse(warehouseId);
     res.json({ success: true, data: warehouse });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -195,7 +195,7 @@ router.post('/warehouses/:warehouseId/inventory', authLimiter, authMiddleware, a
 router.get('/warehouses/:warehouseId/inventory', authMiddleware, async (req, res) => {
   try {
     const { warehouseId } = req.params;
-    let inventory = await logisticsEnhancementService.getWarehouseInventory(warehouseId);
+    const inventory = await logisticsEnhancementService.getWarehouseInventory(warehouseId);
     res.json({ success: true, data: inventory });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

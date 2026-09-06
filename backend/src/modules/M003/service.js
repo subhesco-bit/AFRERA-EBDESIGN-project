@@ -22,7 +22,7 @@ async function createTenant(tenantData) {
       api_quota,
       billing_info,
       admin_contact,
-      configuration
+      configuration,
     } = tenantData;
 
     const tenant = {
@@ -40,7 +40,7 @@ async function createTenant(tenantData) {
       admin_contact,
       configuration,
       status: 'active',
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     };
 
     // AI-powered tenant provisioning
@@ -50,8 +50,8 @@ async function createTenant(tenantData) {
         tenant_data: tenantData,
         resource_allocation: await calculateResourceAllocation(plan_tier),
         security_setup: await setupTenantSecurity(tenant_code),
-        performance_optimization: await optimizeTenantPerformance(plan_tier)
-      }
+        performance_optimization: await optimizeTenantPerformance(plan_tier),
+      },
     };
 
     const aiResponse = await aiAPI.generateRecommendation(aiRequest);
@@ -81,8 +81,8 @@ async function createTenant(tenantData) {
         JSON.stringify(tenant.configuration),
         tenant.status,
         JSON.stringify(tenant.ai_provisioning),
-        tenant.created_at
-      ]
+        tenant.created_at,
+      ],
     );
 
     logger.info(`Tenant created: ${tenant.tenant_id}`);
@@ -98,18 +98,18 @@ async function createTenant(tenantData) {
  */
 async function getTenant(tenantId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT * FROM tenants WHERE tenant_id = $1',
-      [tenantId]
+      [tenantId],
     );
-    
+
     if (result.rows.length === 0) {
       throw new Error('Tenant not found');
     }
 
-    let tenant = result.rows[0];
+    const tenant = result.rows[0];
     tenant.usage_metrics = await getTenantUsageMetrics(tenantId);
-    
+
     return tenant;
   } catch (error) {
     logger.error('Error getting tenant', { error: error.message, stack: error.stack });
@@ -131,10 +131,10 @@ async function updateTenant(tenantId, updates) {
       billing_info,
       admin_contact,
       configuration,
-      status
+      status,
     } = updates;
 
-    let result = await pool.query(
+    const result = await pool.query(
       `UPDATE tenants 
        SET tenant_name = COALESCE($1, tenant_name),
            plan_tier = COALESCE($2, plan_tier),
@@ -158,8 +158,8 @@ async function updateTenant(tenantId, updates) {
         admin_contact ? JSON.stringify(admin_contact) : null,
         configuration ? JSON.stringify(configuration) : null,
         status,
-        tenantId
-      ]
+        tenantId,
+      ],
     );
 
     logger.info(`Tenant updated: ${tenantId}`);
@@ -180,7 +180,7 @@ async function getTenantUsageMetrics(tenantId) {
       api_calls: await getAPICalls(tenantId),
       active_users: await getActiveUsers(tenantId),
       bandwidth_used: await getBandwidthUsage(tenantId),
-      resource_utilization: await getResourceUtilization(tenantId)
+      resource_utilization: await getResourceUtilization(tenantId),
     };
 
     return metrics;
@@ -199,7 +199,7 @@ async function listTenants(filters) {
       status,
       plan_tier,
       limit,
-      offset
+      offset,
     } = filters;
 
     let query = 'SELECT * FROM tenants WHERE 1=1';
@@ -231,11 +231,11 @@ async function listTenants(filters) {
       params.push(offset);
     }
 
-    let result = await pool.query(query, params);
+    const result = await pool.query(query, params);
 
     return {
       total: result.rows.length,
-      tenants: result.rows
+      tenants: result.rows,
     };
   } catch (error) {
     logger.error('Error listing tenants', { error: error.message, stack: error.stack });
@@ -252,7 +252,7 @@ async function calculateResourceAllocation(planTier) {
   const allocations = {
     free: { cpu: 1, memory: 2, storage: 10 },
     pro: { cpu: 2, memory: 4, storage: 50 },
-    enterprise: { cpu: 8, memory: 16, storage: 500 }
+    enterprise: { cpu: 8, memory: 16, storage: 500 },
   };
   return allocations[planTier] || allocations.free;
 }
@@ -262,7 +262,7 @@ async function setupTenantSecurity(tenantCode) {
     encryption_enabled: true,
     audit_logging: true,
     access_controls: ['ip_whitelist', 'rate_limiting'],
-    compliance_level: 'standard'
+    compliance_level: 'standard',
   };
 }
 
@@ -270,15 +270,15 @@ async function optimizeTenantPerformance(planTier) {
   return {
     caching_enabled: planTier !== 'free',
     cdn_enabled: planTier === 'enterprise',
-    load_balancing: planTier === 'enterprise'
+    load_balancing: planTier === 'enterprise',
   };
 }
 
 async function getStorageUsage(tenantId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT storage_used FROM tenants WHERE tenant_id = $1',
-      [tenantId]
+      [tenantId],
     );
     return result.rows[0]?.storage_used || 0;
   } catch (error) {
@@ -288,9 +288,9 @@ async function getStorageUsage(tenantId) {
 
 async function getAPICalls(tenantId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT api_used FROM tenants WHERE tenant_id = $1',
-      [tenantId]
+      [tenantId],
     );
     return result.rows[0]?.api_used || 0;
   } catch (error) {
@@ -300,9 +300,9 @@ async function getAPICalls(tenantId) {
 
 async function getActiveUsers(tenantId) {
   try {
-    let result = await pool.query(
+    const result = await pool.query(
       'SELECT COUNT(*) as count FROM users WHERE tenant_id = $1 AND status = $2',
-      [tenantId, 'active']
+      [tenantId, 'active'],
     );
     return result.rows[0]?.count || 0;
   } catch (error) {
@@ -328,5 +328,5 @@ module.exports = {
   getTenant,
   updateTenant,
   getTenantUsageMetrics,
-  listTenants
+  listTenants,
 };
