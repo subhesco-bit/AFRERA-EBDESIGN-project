@@ -154,20 +154,20 @@ const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'))
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'))
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'))
 
-// Report pages
-// TODO: Create missing report pages
-// const ReportsDashboardPage = lazy(() => import('../pages/ReportsDashboardPage'))
-// const SalesReportPage = lazy(() => import('../pages/SalesReportPage'))
-// const InventoryReportPage = lazy(() => import('../pages/InventoryReportPage'))
-// const FarmerReportPage = lazy(() => import('../pages/FarmerReportPage'))
-// const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
-// const OperationsReportPage = lazy(() => import('../pages/OperationsReportPage'))
-// const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
-// const BulkPurchasePage = lazy(() => import('../pages/BulkPurchasePage'))
-// const ContractListingPage = lazy(() => import('../pages/ContractListingPage'))
-// const GroupBuyingPage = lazy(() => import('../pages/GroupBuyingPage'))
-const CreditScorePage = lazy(() => import('../pages/CreditScorePage'))
-const EMICalculatorPage = lazy(() => import('../pages/EMICalculatorPage'))
+// Report pages - mapping to existing analytics/dashboard pages
+const ReportsDashboardPage = lazy(() => import('../pages/AnalyticsPage'))
+// const SalesReportPage - TODO: Create
+// const InventoryReportPage - TODO: Create
+const FarmerReportPage = lazy(() => import('../pages/FarmerProfilePage'))
+const FinancialReportPage = lazy(() => import('../pages/FinancialServicesDashboard'))
+const OperationsReportPage = lazy(() => import('../pages/OperationalDashboard'))
+// const AuditReportPage - TODO: Create
+// Map existing pages
+const BulkPurchasePage = lazy(() => import('../pages/BulkOrderPage'))
+const ContractListingPage = lazy(() => import('../pages/ContractFarmingPage'))
+// const GroupBuyingPage - TODO: Create
+// const CreditScorePage = lazy(() => import('../pages/CreditScorePage')) - TODO: Create
+// const EMICalculatorPage - TODO: Create
 
 // Additional management pages
 const FarmerProfilePage = lazy(() => import('../pages/FarmerProfilePage'))
@@ -435,15 +435,15 @@ export const protectedRoutes = [
     keywords: 'analytics, insights, data',
     transition: 'fade'
   },
-  // TODO: Create missing report pages
-  // {
-  //   path: '/reports',
-  //   component: ReportsDashboardPage,
-  //   title: 'Reports Dashboard - AFRERA',
-  //   description: 'Generate and manage comprehensive reports',
-  //   keywords: 'reports, dashboard, analytics',
-  //   transition: 'fade'
-  // },
+  // Reports Dashboard - mapped to Analytics
+  {
+    path: '/reports',
+    component: ReportsDashboardPage,
+    title: 'Reports Dashboard - AFRERA',
+    description: 'Generate and manage comprehensive reports',
+    keywords: 'reports, dashboard, analytics',
+    transition: 'fade'
+  },
   // {
   //   path: '/reports/sales',
   //   component: SalesReportPage,
@@ -484,6 +484,30 @@ export const protectedRoutes = [
   //   keywords: 'operations, report, logistics',
   //   transition: 'fade'
   // },
+  {
+    path: '/reports/farmer',
+    component: FarmerReportPage,
+    title: 'Farmer Report - AFRERA',
+    description: 'Farmer performance and demographics',
+    keywords: 'farmer, report, performance',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/financial',
+    component: FinancialReportPage,
+    title: 'Financial Report - AFRERA',
+    description: 'Financial performance analysis',
+    keywords: 'financial, report, profit',
+    transition: 'fade'
+  },
+  {
+    path: '/reports/operations',
+    component: OperationsReportPage,
+    title: 'Operations Report - AFRERA',
+    description: 'Logistics and warehouse performance',
+    keywords: 'operations, report, logistics',
+    transition: 'fade'
+  },
   // {
   //   path: '/reports/audit',
   //   component: AuditReportPage,
@@ -492,22 +516,22 @@ export const protectedRoutes = [
   //   keywords: 'audit, report, compliance',
   //   transition: 'fade'
   // },
-  // {
-  //   path: '/marketplace/bulk-purchase',
-  //   component: BulkPurchasePage,
-  //   title: 'Bulk Purchase - AFRERA',
-  //   description: 'Order agricultural products in bulk',
-  //   keywords: 'bulk, purchase, wholesale',
-  //   transition: 'fade'
-  // },
-  // {
-  //   path: 'marketplace/contract-listing',
-  //   component: ContractListingPage,
-  //   title: 'Contract Listings - AFRERA',
-  //   description: 'Browse farming contracts',
-  //   keywords: 'contract, farming, agreement',
-  //   transition: 'fade'
-  // },
+  {
+    path: '/marketplace/bulk-purchase',
+    component: BulkPurchasePage,
+    title: 'Bulk Purchase - AFRERA',
+    description: 'Order agricultural products in bulk',
+    keywords: 'bulk, purchase, wholesale',
+    transition: 'fade'
+  },
+  {
+    path: '/marketplace/contract-listing',
+    component: ContractListingPage,
+    title: 'Contract Listings - AFRERA',
+    description: 'Browse farming contracts',
+    keywords: 'contract, farming, agreement',
+    transition: 'fade'
+  },
   // {
   //   path: '/marketplace/group-buying',
   //   component: GroupBuyingPage,
@@ -516,22 +540,22 @@ export const protectedRoutes = [
   //   keywords: 'group, buying, discount',
   //   transition: 'fade'
   // },
-  {
-    path: '/financial/credit-score',
-    component: CreditScorePage,
-    title: 'Credit Score - AFRERA',
-    description: 'Your creditworthiness assessment',
-    keywords: 'credit, score, assessment',
-    transition: 'fade'
-  },
-  {
-    path: '/financial/emi-calculator',
-    component: EMICalculatorPage,
-    title: 'EMI Calculator - AFRERA',
-    description: 'Calculate loan repayments',
-    keywords: 'emi, calculator, loan',
-    transition: 'fade'
-  },
+  // {
+  //   path: '/financial/credit-score',
+  //   component: CreditScorePage,
+  //   title: 'Credit Score - AFRERA',
+  //   description: 'Your creditworthiness assessment',
+  //   keywords: 'credit, score, assessment',
+  //   transition: 'fade'
+  // },
+  // {
+  //   path: '/financial/emi-calculator',
+  //   component: EMICalculatorPage,
+  //   title: 'EMI Calculator - AFRERA',
+  //   description: 'Calculate loan repayments',
+  //   keywords: 'emi, calculator, loan',
+  //   transition: 'fade'
+  // },
   {
     path: '/modules',
     component: ModuleHubPage,
