@@ -14,6 +14,7 @@
  */
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import PropTypes from 'prop-types';
 
 // ARIA attribute generators
 export const aria = {
@@ -138,6 +139,12 @@ export const FocusTrap = ({ children, isActive, onEscape }) => {
   return <div ref={trapRef} tabIndex={-1}>{children}</div>;
 };
 
+FocusTrap.propTypes = {
+  children: PropTypes.node,
+  isActive: PropTypes.bool,
+  onEscape: PropTypes.func,
+};
+
 // Live region for announcements
 export const LiveRegion = ({ message, level = 'polite', atomic = false }) => {
   return (
@@ -152,6 +159,12 @@ export const LiveRegion = ({ message, level = 'polite', atomic = false }) => {
   );
 };
 
+LiveRegion.propTypes = {
+  message: PropTypes.string,
+  level: PropTypes.string,
+  atomic: PropTypes.bool,
+};
+
 // Screen reader only content
 export const ScreenReaderOnly = ({ children, as = 'span' }) => {
   const Tag = as;
@@ -162,9 +175,14 @@ export const ScreenReaderOnly = ({ children, as = 'span' }) => {
   );
 };
 
+ScreenReaderOnly.propTypes = {
+  children: PropTypes.node,
+  as: PropTypes.string,
+};
+
 // Visually hidden but accessible
 export const VisuallyHidden = ({ children, as = 'span' }) => {
-  let Tag = as;
+  const Tag = as;
   return (
     <Tag className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0">
       {children}
@@ -172,11 +190,16 @@ export const VisuallyHidden = ({ children, as = 'span' }) => {
   );
 };
 
+VisuallyHidden.propTypes = {
+  children: PropTypes.node,
+  as: PropTypes.string,
+};
+
 // Keyboard navigation hook
 export const useKeyboardNavigation = (items, onSelect, onClose) => {
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  let handleKeyDown = useCallback((e) => {
+  const handleKeyDown = useCallback((e) => {
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
@@ -274,10 +297,10 @@ export const useHighContrastMode = () => {
   const [prefersHighContrast, setPrefersHighContrast] = useState(false);
 
   useEffect(() => {
-    let mediaQuery = window.matchMedia('(prefers-contrast: high)');
+    const mediaQuery = window.matchMedia('(prefers-contrast: high)');
     setPrefersHighContrast(mediaQuery.matches);
 
-    let handler = (e) => setPrefersHighContrast(e.matches);
+    const handler = (e) => setPrefersHighContrast(e.matches);
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);
@@ -319,6 +342,16 @@ export const AccessibleButton = ({
       {children}
     </button>
   );
+};
+
+AccessibleButton.propTypes = {
+  children: PropTypes.node,
+  icon: PropTypes.node,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  ariaLabel: PropTypes.string,
+  ariaDescribedBy: PropTypes.string,
+  className: PropTypes.string,
 };
 
 // Accessible form field wrapper
@@ -368,6 +401,15 @@ export const AccessibleField = ({
   );
 };
 
+AccessibleField.propTypes = {
+  label: PropTypes.string,
+  error: PropTypes.string,
+  helper: PropTypes.string,
+  required: PropTypes.bool,
+  children: PropTypes.node,
+  id: PropTypes.string,
+};
+
 // Accessible modal component
 export const AccessibleModal = ({
   isOpen,
@@ -391,7 +433,7 @@ export const AccessibleModal = ({
     };
   }, [isOpen]);
 
-  let handleKeyDown = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       onClose();
     }
@@ -445,11 +487,19 @@ export const AccessibleModal = ({
   );
 };
 
+AccessibleModal.propTypes = {
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func,
+  title: PropTypes.string,
+  children: PropTypes.node,
+  size: PropTypes.string,
+};
+
 // Accessible tabs component
 export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
   const tabsRef = useRef([]);
 
-  let handleKeyDown = (e, index) => {
+  const handleKeyDown = (e, index) => {
     let targetIndex;
 
     switch (e.key) {
@@ -520,6 +570,12 @@ export const AccessibleTabs = ({ tabs, activeTab, onChange }) => {
       ))}
     </div>
   );
+};
+
+AccessibleTabs.propTypes = {
+  tabs: PropTypes.array,
+  activeTab: PropTypes.string,
+  onChange: PropTypes.func,
 };
 
 // Accessibility announcement hook

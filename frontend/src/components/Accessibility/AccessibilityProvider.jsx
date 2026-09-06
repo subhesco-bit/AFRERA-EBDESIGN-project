@@ -21,6 +21,7 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 const STORAGE_KEY = 'afrera.a11y';
 
@@ -124,6 +125,10 @@ export function AccessibilityProvider({ children }) {
     </AccessibilityContext.Provider>
   );
 }
+
+AccessibilityProvider.propTypes = {
+  children: PropTypes.node,
+};
 
 export function useAccessibility() {
   const ctx = useContext(AccessibilityContext);
