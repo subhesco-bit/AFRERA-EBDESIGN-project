@@ -144,21 +144,14 @@ CREATE TABLE IF NOT EXISTS master_configurations (
 CREATE INDEX idx_master_config_group ON master_configurations(config_group);
 CREATE INDEX idx_master_config_key ON master_configurations(config_key);
 
--- Roles Table (Enhanced)
-CREATE TABLE IF NOT EXISTS roles (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL UNIQUE,
-  description TEXT,
-  permissions JSONB DEFAULT '[]',
-  is_system_role BOOLEAN DEFAULT false,
-  level INTEGER DEFAULT 0,
-  metadata JSONB DEFAULT '{}',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Roles Table (Enhanced) - Add missing columns from base schema
+ALTER TABLE IF EXISTS roles
+  ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
 
-CREATE INDEX idx_roles_system ON roles(is_system_role);
-CREATE INDEX idx_roles_level ON roles(level);
+CREATE INDEX IF NOT EXISTS idx_roles_system ON roles(is_system_role);
+CREATE INDEX IF NOT EXISTS idx_roles_level ON roles(level);
 
 -- Permissions Table
 CREATE TABLE IF NOT EXISTS permissions (
