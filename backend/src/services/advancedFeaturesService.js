@@ -410,16 +410,18 @@ class AdvancedFeaturesService {
   async executeVoiceIntent(intent, userId) {
     try {
       switch (intent.action) {
-        case 'check_balance':
+        case 'check_balance': {
           // Get wallet balance
           const walletQuery = 'SELECT balance FROM farmer_wallets WHERE farmer_id = $1';
           const walletResult = await this.pool.query(walletQuery, [userId]);
           return { balance: walletResult.rows[0]?.balance || 0 };
-        case 'show_orders':
+        }
+        case 'show_orders': {
           // Get recent orders
           const ordersQuery = 'SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC LIMIT 5';
           const ordersResult = await this.pool.query(ordersQuery, [userId]);
           return { orders: ordersResult.rows };
+        }
         default:
           return { message: 'Command not recognized' };
       }
