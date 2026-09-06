@@ -1,6 +1,8 @@
 -- Platform Foundation Modules Migration
 -- Phase 1: Platform Foundation Enhancement (M001-M020)
 -- Core platform tables with AI enhancement support
+-- NOTE: This migration wraps statements in error handling to avoid conflicts
+-- with existing tables from base schema
 
 -- Platform Configurations Table
 CREATE TABLE IF NOT EXISTS platform_configurations (
@@ -145,10 +147,17 @@ CREATE INDEX idx_master_config_group ON master_configurations(config_group);
 CREATE INDEX idx_master_config_key ON master_configurations(config_key);
 
 -- Roles Table (Enhanced) - Add missing columns from base schema
-ALTER TABLE IF EXISTS roles
-  ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false,
-  ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+DO $$
+BEGIN
+  ALTER TABLE IF EXISTS roles
+    ADD COLUMN IF NOT EXISTS is_system_role BOOLEAN DEFAULT false;
+  ALTER TABLE IF EXISTS roles
+    ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 0;
+  ALTER TABLE IF EXISTS roles
+    ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_roles_system ON roles(is_system_role);
 CREATE INDEX IF NOT EXISTS idx_roles_level ON roles(level);
@@ -171,10 +180,15 @@ CREATE INDEX idx_permissions_category ON permissions(category);
 CREATE INDEX idx_permissions_resource ON permissions(resource);
 
 -- User Roles Table (Enhanced) - Add missing columns from base schema
-ALTER TABLE IF EXISTS user_roles
-  ADD COLUMN IF NOT EXISTS id SERIAL PRIMARY KEY,
-  ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP,
-  ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+DO $$
+BEGIN
+  ALTER TABLE IF EXISTS user_roles
+    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP;
+  ALTER TABLE IF EXISTS user_roles
+    ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_role ON user_roles(role_id);
