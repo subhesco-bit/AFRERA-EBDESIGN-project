@@ -170,21 +170,15 @@ CREATE TABLE IF NOT EXISTS permissions (
 CREATE INDEX idx_permissions_category ON permissions(category);
 CREATE INDEX idx_permissions_resource ON permissions(resource);
 
--- User Roles Table
-CREATE TABLE IF NOT EXISTS user_roles (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  role_id INTEGER NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-  assigned_by INTEGER REFERENCES users(id),
-  assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  expires_at TIMESTAMP,
-  is_active BOOLEAN DEFAULT true,
-  UNIQUE(user_id, role_id)
-);
+-- User Roles Table (Enhanced) - Add missing columns from base schema
+ALTER TABLE IF EXISTS user_roles
+  ADD COLUMN IF NOT EXISTS id SERIAL PRIMARY KEY,
+  ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 
-CREATE INDEX idx_user_roles_user ON user_roles(user_id);
-CREATE INDEX idx_user_roles_role ON user_roles(role_id);
-CREATE INDEX idx_user_roles_active ON user_roles(is_active);
+CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role ON user_roles(role_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_active ON user_roles(is_active);
 
 -- Role Permissions Table
 CREATE TABLE IF NOT EXISTS role_permissions (
