@@ -1,23 +1,6 @@
-/**
- * Product Media AI Routes — AI product-image generation and nutrient-
- * comparison video generation. See services/productMediaaiBackboneService.js header.
- */
-
-const express = require('express');
-const productMediaAIController = require('../controllers/productMediaAIController');
-const { authMiddleware } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
-
-const router = express.Router();
-
-router.use(authMiddleware);
-router.use(rateLimiter);
-
-router.get('/status', productMediaAIController.getProviderStatus);
-router.post('/products/:productId/image', productMediaAIController.generateProductImage);
-router.post('/products/:productId/cartoon', productMediaAIController.generateProductCartoon);
-router.post('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
-router.post('/products/:productId/video', productMediaAIController.generateProductVideo);
-
-module.exports = router;
-
+// DISABLED FOR MVP - AI image generation
+module.exports = {
+  // All methods return "not_configured" in MVP
+  execute: async () => ({ configured: false, reason: 'AI image generation' }),
+  initialize: async () => ({ configured: false, reason: 'AI image generation' })
+};
