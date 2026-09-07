@@ -7,47 +7,38 @@
 
 'use strict';
 
-const express = require('express');
-const { authMiddleware, requireRole } = require('../middleware/auth');
-const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { soilHealth, nutrientManagement, fertilityManagement } = require('../services/legacy/soilManagementService');
+const { SIGNAL } = require('../core/signalBus');
+// Bounds pagination/IDs, sanitizes input, redacts internal errors, and
+// emits a correlated SOIL_RECORD_CHANGED signal on mutations - see
+// resourceRouteFactory.js. The bare hand-rolled router this replaced had
+// none of that (see routes/__tests__/waterSoilManagementRoutes.test.js,
+// which already existed to catch exactly this gap).
+const { createHardenedCrudRouter } = require('./resourceRouteFactory');
 
-function crudRouter(service) {
-  const router = express.Router();
-  router.get('/', async (req, res) => {
-    try { res.json({ success: true, data: (await service.list(req.query)).items }); }
-    catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  router.get('/:id', async (req, res) => {
-    try {
-      const item = await service.get(req.params.id);
-      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true, data: item });
-    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  router.post('/', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try { res.status(201).json({ success: true, data: await service.create(req.body) }); }
-    catch (e) { res.status(400).json({ success: false, error: e.message }); }
-  });
-  router.put('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try {
-      const item = await service.update(req.params.id, req.body);
-      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true, data: item });
-    } catch (e) { res.status(400).json({ success: false, error: e.message }); }
-  });
-  router.delete('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try {
-      const ok = await service.remove(req.params.id);
-      if (!ok) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true });
-    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  return router;
+function inRange(value, min, max) {
+  const n = Number(value);
+  return Number.isFinite(n) && n >= min && n <= max;
 }
 
+const soilHealthValidate = (body) => {
+  if (body.ph_level !== undefined && body.ph_level !== '' && !inRange(body.ph_level, 0, 14)) {
+    return 'ph_level must be between 0 and 14';
+  }
+  if (body.organic_matter_percent !== undefined && body.organic_matter_percent !== '' && !inRange(body.organic_matter_percent, 0, 100)) {
+    return 'organic_matter_percent must be between 0 and 100';
+  }
+  return null;
+};
+
 module.exports = {
-  soilHealthRoutes: crudRouter(soilHealth),
-  nutrientManagementRoutes: crudRouter(nutrientManagement),
-  fertilityManagementRoutes: crudRouter(fertilityManagement),
+  soilHealthRoutes: createHardenedCrudRouter(soilHealth, {
+    signal: SIGNAL.SOIL_RECORD_CHANGED, source: 'soil_health_routes', validate: soilHealthValidate,
+  }),
+  nutrientManagementRoutes: createHardenedCrudRouter(nutrientManagement, {
+    signal: SIGNAL.SOIL_RECORD_CHANGED, source: 'nutrient_management_routes',
+  }),
+  fertilityManagementRoutes: createHardenedCrudRouter(fertilityManagement, {
+    signal: SIGNAL.SOIL_RECORD_CHANGED, source: 'fertility_management_routes',
+  }),
 };

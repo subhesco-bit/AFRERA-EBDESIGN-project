@@ -34,7 +34,7 @@ jest.mock('../../services/legacy/soilManagementService', () => ({
 const { waterBudgetingRoutes } = require('../waterManagementRoutes');
 const { soilHealthRoutes } = require('../soilManagementRoutes');
 const app = express();
-app.use(expresson());
+app.use(express.json());
 app.use('/water', waterBudgetingRoutes);
 app.use('/soil', soilHealthRoutes);
 

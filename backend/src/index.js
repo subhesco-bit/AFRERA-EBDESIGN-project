@@ -182,12 +182,10 @@ const analyticsMonitoringService = require('./services/legacy/analyticsMonitorin
 const aiAgenticCompanionService = require('./services/legacy/aiAgenticCompanionService');
 // Digital Twin Service
 const digitalTwinService = require('./services/legacy/digitalTwinService');
-// AI Gateway Service - Real AI Backbone System
-const aiBackboneService = require('./services/legacy/aiBackboneService');
+// AI Gateway Service - Real AI Backbone System (see aiBackboneService require
+// above; it also backs the "AI Brain" mount point at /api/v1/ai-brain below)
 // AI Agent Service - Agentic AI Capabilities
 const aiAgentService = require('./services/aiAgentService');
-// AI Brain Service - Cognitive Processing Layer
-const aiBackboneService = require('./services/legacy/aiBackboneService');
 // AI Self-Healing Service - Autonomous Error Recovery Layer
 const aiSelfHealingService = require('./services/legacy/aiSelfHealingService');
 // AI Operation Intelligence Service - Real-Time Optimization Layer
@@ -751,6 +749,13 @@ app.use('/api/v1/defense-fitness-prep', defenseFitnessPrepRoutes);
 // Crop Value-Compound Research - AI-assisted, human-reviewed published reference data
 const cropValueResearchRoutes = require('./routes/cropValueResearchRoutes');
 app.use('/api/v1/crop-value-research', cropValueResearchRoutes);
+// Crop AI Advisory (recommendations/guidance/market outlook) - was defined but
+// never mounted (routes/index.js that exported it is never required); the
+// underlying service also used to return hardcoded canned data while
+// claiming to be AI-driven - now routes through claudeAICoordinator
+// (see cropRecommendationService.js), with a labeled fallback on AI failure.
+const cropRecommendationsRoutes = require('./routes/cropRecommendations');
+app.use('/api/v1/crop-ai', cropRecommendationsRoutes);
 // Platform Telemetry - real system/business metrics for admin dashboard
 const platformTelemetryRoutes = require('./routes/platformTelemetryRoutes');
 app.use('/api/v1/platform-telemetry', platformTelemetryRoutes);

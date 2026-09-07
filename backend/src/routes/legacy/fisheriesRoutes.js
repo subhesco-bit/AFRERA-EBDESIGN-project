@@ -9,6 +9,17 @@ const fisheriesService = require('../../services/legacy/fisheriesService');
 // (2026-08-29) Was importing from '../../middleware/authMiddleware', which
 // does not exist - fixed to the real middleware module. See apicultureRoutes.js.
 const { authMiddleware: authenticate } = require('../../middleware/auth');
+const { SIGNAL } = require('../../core/signalBus');
+// Bounds pagination/IDs, sanitizes bodies, redacts internal errors, emits a
+// correlated FISHERIES_RECORD_CHANGED signal on mutations - see
+// livestockRouteSupport.js (shared with dairyRoutes.js).
+const { protectLivestockRouter } = require('../livestockRouteSupport');
+
+// requestGuard (installed below) already bounds page/limit (1-100) as
+// router-wide middleware, ahead of this route's own `authenticate` check -
+// that ordering is what lets an out-of-range limit return 400 even on an
+// unauthenticated request, matching the other CRUD routers in this domain.
+protectLivestockRouter(router, { signal: SIGNAL.FISHERIES_RECORD_CHANGED });
 
 // GET /api/v1/fisheries - Get all fisheries
 router.get('/', authenticate, async (req, res) => {

@@ -72,10 +72,15 @@ const SIGNAL = Object.freeze({
 
   // Agronomy
   SOIL_RESULT_READY: 'agronomy.soil.result_ready',
+  SOIL_RECORD_CHANGED: 'agronomy.soil.record_changed',
+  WATER_RECORD_CHANGED: 'agronomy.water.record_changed',
   CROP_DISEASE_DETECTED: 'agronomy.disease.detected',
   WEATHER_ALERT: 'agronomy.weather.alert',
+  CROP_RECORD_CHANGED: 'agronomy.crop.record_changed',
 
   // Livestock
+  LIVESTOCK_RECORD_CHANGED: 'livestock.record.changed',
+  FISHERIES_RECORD_CHANGED: 'fisheries.record.changed',
   ANIMAL_HEALTH_CHECK: 'livestock.animal.health_check',
   ANIMAL_TREATMENT: 'livestock.animal.treatment',
   DISEASE_OUTBREAK: 'livestock.disease.outbreak',

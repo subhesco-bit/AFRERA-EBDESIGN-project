@@ -35,6 +35,16 @@ const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 
 const router = express.Router();
 
+// Route params here are DB integer IDs; a non-numeric id (e.g. "invalid")
+// used to fall through to the service layer and surface as a raw 500 -
+// reject it as a 400 before it gets that far.
+router.param('id', (req, res, next, value) => {
+  if (!/^\d+$/.test(String(value))) {
+    return res.status(400).json({ success: false, error: 'id must be a positive integer' });
+  }
+  return next();
+});
+
 router.use(authMiddleware);
 router.use(rateLimiter);
 

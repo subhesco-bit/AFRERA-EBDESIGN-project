@@ -7,51 +7,42 @@
 
 'use strict';
 
-const express = require('express');
-const { authMiddleware, requireRole } = require('../middleware/auth');
-const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const {
   waterBudgeting, waterQuality, rainwaterHarvesting, watershedManagement, waterAnalytics,
 } = require('../services/legacy/waterManagementService');
+const { SIGNAL } = require('../core/signalBus');
+// Bounds pagination/IDs, sanitizes input, redacts internal errors, and
+// emits a correlated WATER_RECORD_CHANGED signal on mutations - see
+// resourceRouteFactory.js (shared with soilManagementRoutes.js). The bare
+// hand-rolled router this replaced had none of that (see
+// routes/__tests__/waterSoilManagementRoutes.test.js, which already existed
+// to catch exactly this gap).
+const { createHardenedCrudRouter } = require('./resourceRouteFactory');
 
-function crudRouter(service) {
-  const router = express.Router();
-  router.get('/', async (req, res) => {
-    try { res.json({ success: true, data: (await service.list(req.query)).items }); }
-    catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  router.get('/:id', async (req, res) => {
-    try {
-      const item = await service.get(req.params.id);
-      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true, data: item });
-    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  router.post('/', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try { res.status(201).json({ success: true, data: await service.create(req.body) }); }
-    catch (e) { res.status(400).json({ success: false, error: e.message }); }
-  });
-  router.put('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try {
-      const item = await service.update(req.params.id, req.body);
-      if (!item) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true, data: item });
-    } catch (e) { res.status(400).json({ success: false, error: e.message }); }
-  });
-  router.delete('/:id', authMiddleware, requireRole(...FARM_OPERATIONS_ROLES), async (req, res) => {
-    try {
-      const ok = await service.remove(req.params.id);
-      if (!ok) return res.status(404).json({ success: false, error: 'Not found' });
-      res.json({ success: true });
-    } catch (e) { res.status(500).json({ success: false, error: e.message }); }
-  });
-  return router;
-}
+const waterBudgetingValidate = (body) => {
+  if (body.demand_liters !== undefined && body.demand_liters !== '' && Number(body.demand_liters) < 0) {
+    return 'demand_liters must not be negative';
+  }
+  if (body.supply_liters !== undefined && body.supply_liters !== '' && Number(body.supply_liters) < 0) {
+    return 'supply_liters must not be negative';
+  }
+  return null;
+};
 
 module.exports = {
-  waterBudgetingRoutes: crudRouter(waterBudgeting),
-  waterQualityRoutes: crudRouter(waterQuality),
-  rainwaterHarvestingRoutes: crudRouter(rainwaterHarvesting),
-  watershedManagementRoutes: crudRouter(watershedManagement),
-  waterAnalyticsRoutes: crudRouter(waterAnalytics),
+  waterBudgetingRoutes: createHardenedCrudRouter(waterBudgeting, {
+    signal: SIGNAL.WATER_RECORD_CHANGED, source: 'water_budgeting_routes', validate: waterBudgetingValidate,
+  }),
+  waterQualityRoutes: createHardenedCrudRouter(waterQuality, {
+    signal: SIGNAL.WATER_RECORD_CHANGED, source: 'water_quality_routes',
+  }),
+  rainwaterHarvestingRoutes: createHardenedCrudRouter(rainwaterHarvesting, {
+    signal: SIGNAL.WATER_RECORD_CHANGED, source: 'rainwater_harvesting_routes',
+  }),
+  watershedManagementRoutes: createHardenedCrudRouter(watershedManagement, {
+    signal: SIGNAL.WATER_RECORD_CHANGED, source: 'watershed_management_routes',
+  }),
+  waterAnalyticsRoutes: createHardenedCrudRouter(waterAnalytics, {
+    signal: SIGNAL.WATER_RECORD_CHANGED, source: 'water_analytics_routes',
+  }),
 };

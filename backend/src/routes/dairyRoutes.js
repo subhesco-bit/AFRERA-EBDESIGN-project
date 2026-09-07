@@ -12,6 +12,14 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 const { FARM_OPERATIONS_ROLES } = require('../middleware/roleGroups');
 const { signalBus, SIGNAL, SEVERITY } = require('../core/signalBus');
 const { logger } = require('../utils/logger');
+// Sanitizes bodies, bounds pagination/IDs, redacts internal errors, and
+// emits a correlated LIVESTOCK_RECORD_CHANGED signal on mutations - this
+// helper already existed (built for this exact purpose) but was never wired
+// into the mounted dairy/fisheries routes; only animalHealthRoutes.js had
+// partial hand-rolled equivalents.
+const { protectLivestockRouter } = require('./livestockRouteSupport');
+
+protectLivestockRouter(router, { signal: SIGNAL.LIVESTOCK_RECORD_CHANGED });
 
 router.get('/animals', async (req, res) => {
   try {
