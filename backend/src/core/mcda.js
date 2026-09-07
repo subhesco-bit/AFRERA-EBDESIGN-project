@@ -9,7 +9,7 @@
  * frontend/. This module restores the framework as tested, reusable code.
  *
  * WHY IT MATTERS MORE THAN THE "AI" IT SITS BESIDE
- * The advancedAIService previously returned Math.random() behind confident
+ * The advancedaiBackboneService previously returned Math.random() behind confident
  * labels like "94% accuracy". This framework does the opposite: it is explicit
  * about how much of a recommendation rests on real data versus assumption, and
  * about which single input the answer is most fragile to.
@@ -205,3 +205,4 @@ async function gatedMcda(actorId, criteria) {
 }
 
 module.exports = { mcda, rankOptions, gatedMcda, DATA_QUALITY_WEIGHT };
+

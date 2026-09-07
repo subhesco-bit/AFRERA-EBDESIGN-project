@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware/auth');
 const { createEscrowTransaction } = require('./escrowService');
@@ -790,3 +790,4 @@ module.exports = {
   getContractDashboard,
   setupRoutes
 };
+

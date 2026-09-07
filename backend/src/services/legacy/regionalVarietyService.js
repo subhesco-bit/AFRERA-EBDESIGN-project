@@ -12,7 +12,7 @@
 
 const { logger } = require('../../utils/logger');
 const pool = require('../../database/pool');
-const productMediaAIService = require('./productMediaAIService');
+const productMediaaiBackboneService = require('./productMediaaiBackboneService');
 const cropValueResearchService = require('./cropValueResearchService');
 
 class RegionalVarietyService {
@@ -46,7 +46,7 @@ class RegionalVarietyService {
 
   /**
    * Requests AI reference imagery for a variety using the same honest
-   * provider adapter as productMediaAIService.js — IMAGE_PROVIDER_ENV. No
+   * provider adapter as productMediaaiBackboneService.js — IMAGE_PROVIDER_ENV. No
    * provider is configured in this environment, so this records the
    * request status honestly (not_configured) rather than fabricating an
    * image URL.
@@ -57,7 +57,7 @@ class RegionalVarietyService {
       (variety.scientific_name ? ` (${variety.scientific_name})` : '') +
       `, a regional variety from ${variety.primary_states}, Northeast India. Natural lighting, clean background, realistic.`;
 
-    const result = await productMediaAIService.callImageProvider('openai_images', prompt);
+    const result = await productMediaaiBackboneService.callImageProvider('openai_images', prompt);
     const status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
     await pool.query(
       `UPDATE regional_variety_directory
@@ -114,3 +114,4 @@ class RegionalVarietyService {
 }
 
 module.exports = new RegionalVarietyService();
+

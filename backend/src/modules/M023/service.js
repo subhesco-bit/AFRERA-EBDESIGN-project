@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Farmer Training Service (M023)
  * Comprehensive farmer training program management with AI-powered course recommendations
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -864,3 +864,4 @@ module.exports = {
   getRecommendedPrograms,
   getTrainingAnalytics
 };
+

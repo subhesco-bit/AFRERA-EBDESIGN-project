@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Master Configuration (M010)
+-- Define tables and indexes here

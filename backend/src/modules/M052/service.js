@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Product Catalog Service (M052)
  * Product catalog management with AI-powered recommendations and categorization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -448,3 +448,4 @@ module.exports = {
   searchProducts,
   getProductRecommendations
 };
+

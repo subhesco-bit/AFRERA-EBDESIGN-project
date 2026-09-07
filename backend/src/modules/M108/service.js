@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Fuel Management Service (M108)
  * Fuel inventory tracking, consumption monitoring, and cost optimization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -413,3 +413,4 @@ module.exports = {
   trackFuelEfficiency,
   generateFuelReport
 };
+

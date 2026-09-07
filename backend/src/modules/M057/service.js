@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Shipping Management Service (M057)
  * Shipping and delivery management with AI-powered route optimization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createShipment(shipmentData) {
@@ -76,3 +76,4 @@ async function getWeatherData() {
 }
 
 module.exports = { createShipment, trackShipment, updateShipmentStatus };
+

@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Land Registry Service (M031)
  * Comprehensive land parcel management with AI-powered land valuation
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createLandParcel(parcelData) {
@@ -326,3 +326,4 @@ module.exports = {
   getLandByFarmer,
   getLandAnalytics
 };
+

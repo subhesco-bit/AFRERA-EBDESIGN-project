@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cattle Registry Service (M122)
  * Comprehensive livestock management and cattle registry system
  *
@@ -20,7 +20,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -542,3 +542,4 @@ module.exports = {
   generateRegistryReport,
   getBreedingRecommendations
 };
+

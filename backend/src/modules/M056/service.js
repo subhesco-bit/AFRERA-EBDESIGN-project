@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createPayment(paymentData) {
@@ -135,3 +135,4 @@ async function getOrderData(orderId) {
 }
 
 module.exports = { createPayment, getPayment, updatePaymentStatus, updatePayment, deletePayment, refundPayment };
+

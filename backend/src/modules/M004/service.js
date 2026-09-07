@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Organization Management Service (M004)
  * Organization structure, hierarchy, and management
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -216,3 +216,4 @@ module.exports = {
   updateOrganization,
   listOrganizations
 };
+

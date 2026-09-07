@@ -1,4 +1,4 @@
-﻿/**
+/**
  * DATA-SOURCE DISCLOSURE (2026-08-29)
  * Same pattern as M122: registration/update/count/distribution functions are
  * real (read/write real tables); breed/vaccination/health-standard lookups
@@ -17,7 +17,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -442,3 +442,4 @@ module.exports = {
   trackFlockPerformance,
   generatePoultryReport
 };
+

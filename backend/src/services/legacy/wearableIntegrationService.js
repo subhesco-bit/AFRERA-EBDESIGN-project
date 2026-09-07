@@ -4,7 +4,7 @@
  * See migration 9999_zzzzzzzzzzz_wearable_integration_schema.sql for the
  * architecture note this file follows: Fitbit has a real public OAuth2 REST
  * API, so it is a genuine server-side adapter (same honest not_configured
- * discipline as aiBackboneService/productMediaAIService — no live call
+ * discipline as aiBackboneService/productMediaaiBackboneService — no live call
  * placed unless FITBIT_CLIENT_ID/FITBIT_CLIENT_SECRET are actually set).
  * Apple HealthKit and Samsung Health have no equivalent third-party cloud
  * API; those two are handled as device_push — the mobile client (AFRERA's
@@ -244,3 +244,4 @@ module.exports = {
   getRecentActivitySummary,
   disconnectProvider,
 };
+

@@ -3,7 +3,7 @@
  *
  * Real, dependency-free statistical implementations used to replace the
  * Math.random() placeholder "models" that previously backed the AI services
- * (advancedAIService.js et al).
+ * (advancedaiBackboneService.js et al).
  *
  * Design notes:
  * - Every function is pure and synchronous so it can be unit tested directly.
@@ -333,3 +333,4 @@ module.exports = {
   normalize,
   weightedScore
 };
+

@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for SHG Management (M046)
+-- Define tables and indexes here

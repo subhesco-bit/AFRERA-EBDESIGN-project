@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Real-time Monitoring Service (M086)
  * Business Intelligence & Analytics - Real-time data monitoring and alerting
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -553,3 +553,4 @@ module.exports = {
   logMonitoringEvent,
   getAlertHistory
 };
+

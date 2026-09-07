@@ -5,7 +5,7 @@
 
 const { logger } = require('../../utils/logger');
 const aiBackbone = require('./aiBackboneService');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus } = require('../../core/signalBus');
 const { authMiddleware } = require('../../middleware/auth');
@@ -790,3 +790,4 @@ Object.assign(module.exports, require("../../modules/M023/service"));
   const { healthCheck: healthCheckFromBE030, execute: executeFromBE030, ...rest } = m030;
   Object.assign(module.exports, rest, { healthCheckFromBE030, executeFromBE030 });
 }
+

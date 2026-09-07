@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Farmer Profile Service (M022)
  * Comprehensive farmer profile management with AI-powered enrichment and completeness analysis
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -712,3 +712,4 @@ module.exports = {
   analyzeProfileCompleteness,
   getFullProfile
 };
+

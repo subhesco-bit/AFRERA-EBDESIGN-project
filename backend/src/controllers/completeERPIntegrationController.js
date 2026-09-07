@@ -5,7 +5,7 @@
  * Integrates all agricultural operations with financial ERP, supply chain ERP, production ERP, and customer ERP
  */
 
-const completeERPIntegrationService = require('../services/legacy/completeERPIntegrationService');
+const erpService = require('../services/legacy/erpService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
@@ -20,7 +20,7 @@ exports.syncFarmerCropPlanningWithERP = async (req, res) => {
     const { farmerId } = req.params;
     const cropPlanData = req.body;
     
-    const result = await completeERPIntegrationService.syncFarmerCropPlanningWithERP(farmerId, cropPlanData);
+    const result = await erpService.syncFarmerCropPlanningWithERP(farmerId, cropPlanData);
     
     res.status(200).json({
       success: true,
@@ -44,7 +44,7 @@ exports.syncFarmerHarvestWithERP = async (req, res) => {
     const { farmerId } = req.params;
     const harvestData = req.body;
     
-    const result = await completeERPIntegrationService.syncFarmerHarvestWithERP(farmerId, harvestData);
+    const result = await erpService.syncFarmerHarvestWithERP(farmerId, harvestData);
     
     res.status(200).json({
       success: true,
@@ -68,7 +68,7 @@ exports.syncFarmerFieldWithERP = async (req, res) => {
     const { farmerId } = req.params;
     const fieldData = req.body;
     
-    const result = await completeERPIntegrationService.syncFarmerFieldWithERP(farmerId, fieldData);
+    const result = await erpService.syncFarmerFieldWithERP(farmerId, fieldData);
     
     res.status(200).json({
       success: true,
@@ -96,7 +96,7 @@ exports.syncCropLifecycleWithERP = async (req, res) => {
     const { cropId } = req.params;
     const lifecycleData = req.body;
     
-    const result = await completeERPIntegrationService.syncCropLifecycleWithERP(cropId, lifecycleData);
+    const result = await erpService.syncCropLifecycleWithERP(cropId, lifecycleData);
     
     res.status(200).json({
       success: true,
@@ -120,7 +120,7 @@ exports.syncCropYieldWithERP = async (req, res) => {
     const { cropId } = req.params;
     const yieldData = req.body;
     
-    const result = await completeERPIntegrationService.syncCropYieldWithERP(cropId, yieldData);
+    const result = await erpService.syncCropYieldWithERP(cropId, yieldData);
     
     res.status(200).json({
       success: true,
@@ -148,7 +148,7 @@ exports.syncLivestockWithERP = async (req, res) => {
     const { livestockId } = req.params;
     const livestockData = req.body;
     
-    const result = await completeERPIntegrationService.syncLivestockWithERP(livestockId, livestockData);
+    const result = await erpService.syncLivestockWithERP(livestockId, livestockData);
     
     res.status(200).json({
       success: true,
@@ -172,7 +172,7 @@ exports.syncLivestockProductionWithERP = async (req, res) => {
     const { livestockId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncLivestockProductionWithERP(livestockId, productionData);
+    const result = await erpService.syncLivestockProductionWithERP(livestockId, productionData);
     
     res.status(200).json({
       success: true,
@@ -196,7 +196,7 @@ exports.syncLivestockHealthWithERP = async (req, res) => {
     const { livestockId } = req.params;
     const healthData = req.body;
     
-    const result = await completeERPIntegrationService.syncLivestockHealthWithERP(livestockId, healthData);
+    const result = await erpService.syncLivestockHealthWithERP(livestockId, healthData);
     
     res.status(200).json({
       success: true,
@@ -224,7 +224,7 @@ exports.syncDairyProductionWithERP = async (req, res) => {
     const { dairyId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncDairyProductionWithERP(dairyId, productionData);
+    const result = await erpService.syncDairyProductionWithERP(dairyId, productionData);
     
     res.status(200).json({
       success: true,
@@ -248,7 +248,7 @@ exports.syncPoultryProductionWithERP = async (req, res) => {
     const { poultryId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncPoultryProductionWithERP(poultryId, productionData);
+    const result = await erpService.syncPoultryProductionWithERP(poultryId, productionData);
     
     res.status(200).json({
       success: true,
@@ -272,7 +272,7 @@ exports.syncGoatProductionWithERP = async (req, res) => {
     const { goatId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncGoatProductionWithERP(goatId, productionData);
+    const result = await erpService.syncGoatProductionWithERP(goatId, productionData);
     
     res.status(200).json({
       success: true,
@@ -296,7 +296,7 @@ exports.syncSheepProductionWithERP = async (req, res) => {
     const { sheepId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncSheepProductionWithERP(sheepId, productionData);
+    const result = await erpService.syncSheepProductionWithERP(sheepId, productionData);
     
     res.status(200).json({
       success: true,
@@ -320,7 +320,7 @@ exports.syncPigProductionWithERP = async (req, res) => {
     const { pigId } = req.params;
     const productionData = req.body;
     
-    const result = await completeERPIntegrationService.syncPigProductionWithERP(pigId, productionData);
+    const result = await erpService.syncPigProductionWithERP(pigId, productionData);
     
     res.status(200).json({
       success: true,
@@ -388,7 +388,7 @@ exports.forceSyncAllERPIntegrations = async (req, res) => {
     // Sync farmer if provided
     if (farmerId) {
       try {
-        results.farmer_sync = await completeERPIntegrationService.syncFarmerCropPlanningWithERP(farmerId, {});
+        results.farmer_sync = await erpService.syncFarmerCropPlanningWithERP(farmerId, {});
       } catch (error) {
         results.farmer_sync = { success: false, error: error.message };
       }
@@ -397,7 +397,7 @@ exports.forceSyncAllERPIntegrations = async (req, res) => {
     // Sync crop if provided
     if (cropId) {
       try {
-        results.crop_sync = await completeERPIntegrationService.syncCropLifecycleWithERP(cropId, {});
+        results.crop_sync = await erpService.syncCropLifecycleWithERP(cropId, {});
       } catch (error) {
         results.crop_sync = { success: false, error: error.message };
       }
@@ -406,7 +406,7 @@ exports.forceSyncAllERPIntegrations = async (req, res) => {
     // Sync livestock if provided
     if (livestockId) {
       try {
-        results.livestock_sync = await completeERPIntegrationService.syncLivestockWithERP(livestockId, {});
+        results.livestock_sync = await erpService.syncLivestockWithERP(livestockId, {});
       } catch (error) {
         results.livestock_sync = { success: false, error: error.message };
       }
@@ -425,3 +425,4 @@ exports.forceSyncAllERPIntegrations = async (req, res) => {
     });
   }
 };
+

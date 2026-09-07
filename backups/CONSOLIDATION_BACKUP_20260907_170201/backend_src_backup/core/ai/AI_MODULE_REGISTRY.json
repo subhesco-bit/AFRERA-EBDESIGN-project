@@ -1,0 +1,15 @@
+{
+  "moduleId": "EBD-MOD-00000001",
+  "name": "AI Intelligence Fabric",
+  "description": "Core AI orchestration layer: provider routing, engine registry, confidence scoring, cost control, guardrails, and audit logging for every AI-backed feature in the platform.",
+  "version": "1.0.0",
+  "components": [
+    { "file": "aiOrchestratorCore.js", "role": "Routes a task to the right AI engine/provider and returns its result." },
+    { "file": "aiProviderAdapters.js", "role": "Adapters for each configured AI provider." },
+    { "file": "aiEngineRegistry.js", "role": "Registry of AI engines available to route tasks to." },
+    { "file": "aiConfidenceEngine.js", "role": "Scores confidence on AI outputs." },
+    { "file": "aiCostController.js", "role": "Tracks and caps AI spend." },
+    { "file": "aiGuardrails.js", "role": "Safety/policy checks on AI requests and responses." },
+    { "file": "aiAuditLogger.js", "role": "Audit trail for AI requests, responses, and decisions." }
+  ]
+}

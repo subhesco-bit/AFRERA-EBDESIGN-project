@@ -13,7 +13,7 @@
  * .calculateValuePerNutrient only reads verified rows — see that file).
  *
  * Same honest not_configured adapter pattern as aiBackboneService.js /
- * productMediaAIService.js: no live search call is placed unless a real
+ * productMediaaiBackboneService.js: no live search call is placed unless a real
  * provider key is set, and this never blocks product creation.
  */
 
@@ -168,3 +168,4 @@ module.exports = {
   getPendingSuggestions,
   reviewSuggestion,
 };
+

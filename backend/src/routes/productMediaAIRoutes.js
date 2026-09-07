@@ -1,6 +1,6 @@
 /**
  * Product Media AI Routes — AI product-image generation and nutrient-
- * comparison video generation. See services/productMediaAIService.js header.
+ * comparison video generation. See services/productMediaaiBackboneService.js header.
  */
 
 const express = require('express');
@@ -20,3 +20,4 @@ router.post('/products/:productId/video-script', productMediaAIController.buildN
 router.post('/products/:productId/video', productMediaAIController.generateProductVideo);
 
 module.exports = router;
+

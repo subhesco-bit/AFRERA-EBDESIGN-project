@@ -1,6 +1,7 @@
-class FinancialAIService {
-  async initialize() { console.log('[FinancialAIService] Initialized'); }
+class FinancialaiBackboneService {
+  async initialize() { console.log('[FinancialaiBackboneService] Initialized'); }
   async analyzeFinancial(data) { return { analysis: 'Financial AI...' }; }
   async init() { return this.initialize(); }
 }
-module.exports = new FinancialAIService();
+module.exports = new FinancialaiBackboneService();
+

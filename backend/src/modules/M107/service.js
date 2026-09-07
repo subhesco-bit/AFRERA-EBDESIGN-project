@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Breakdown Maintenance Service (M107)
  * Equipment breakdown management, emergency repairs, and downtime tracking
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -484,3 +484,4 @@ module.exports = {
   trackDowntime,
   generateBreakdownReport
 };
+

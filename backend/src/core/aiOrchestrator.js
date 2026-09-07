@@ -46,7 +46,7 @@
  * value, a human disposes" gate) — kept separate, wired to the already-real
  * core/erpAgents.js proposal generation, and made to say plainly that it does not persist
  * to ai_proposals (nothing in src/ does yet) or execute anything. simulation_engine's
- * previous delegate, services/advancedAIService.js advancedOptimizePrice(), was found
+ * previous delegate, services/advancedaiBackboneService.js advancedOptimizePrice(), was found
  * broken this session (wrong-shape args produced silent NaN economics behind a fabricated
  * confidence score) and has since been fixed and re-wired — see the capability's own
  * citation below for the fix details and its one remaining honest limitation.)
@@ -364,13 +364,13 @@ const ENGINES = {
   forecasting_engine: {
     label: 'Forecasting Engine',
     status: 'real',
-    citation: 'services/advancedAIService.js advancedPredictDemand() — Holt linear '
+    citation: 'services/advancedaiBackboneService.js advancedPredictDemand() — Holt linear '
       + 'forecast, seasonal indices, MAPE, confidence intervals, all from '
       + 'utils/statistics.js (unit-tested classical statistics, not Math.random()). '
       + 'services/predictiveAnalyticsService.js and services/demandService.js are '
       + 'real but store/read stored forecasts only — neither computes one.',
     invoke: async (payload = {}) => {
-      const { advancedPredictDemand } = require('../services/legacy/advancedAIService');
+      const { advancedPredictDemand } = require('../services/legacy/advancedaiBackboneService');
       const { productId, timeHorizon = 30, includeExplanations = true } = payload;
       if (!productId) throw new Error('forecasting_engine requires payload.productId');
       return advancedPredictDemand(productId, timeHorizon, includeExplanations);
@@ -396,7 +396,7 @@ const ENGINES = {
     citation: '(2026-08-10 re-audit, fix applied same day) core/businessCell.js simulate() '
       + 'default remains an honest stub; core/mcda.js scores already-known options rather '
       + 'than projecting a scenario forward, so that job stays with optimization_engine. '
-      + 'services/advancedAIService.js advancedOptimizePrice(productId, currentPrice, context) '
+      + 'services/advancedaiBackboneService.js advancedOptimizePrice(productId, currentPrice, context) '
       + 'was found broken this session (wrong-shape args into simulatePriceOutcomes() produced '
       + 'silent NaN economics behind a fabricated "confidence: 0.91") and has since been fixed: '
       + 'the argument mismatch, the risk/strategy call-order bug, and the hardcoded confidence '
@@ -412,7 +412,7 @@ const ENGINES = {
       if (!productId || currentPrice == null) {
         throw new Error('simulation_engine requires payload.productId and payload.currentPrice');
       }
-      const { advancedOptimizePrice } = require('../services/legacy/advancedAIService');
+      const { advancedOptimizePrice } = require('../services/legacy/advancedaiBackboneService');
       return advancedOptimizePrice(productId, currentPrice, context || {});
     },
   },
@@ -426,7 +426,7 @@ const ENGINES = {
       + '(migrations/000_base_schema.sql) and user_profiles.profile_image_url. Bounded: '
       + 'analyzeImageQuality() is a simple pixel-statistics heuristic (sharp\'s own '
       + '"experimental" sharpness/entropy stats), NOT a deep-learning classifier — '
-      + 'services/advancedAIService.js loadComputerVisionModel() (crop-disease '
+      + 'services/advancedaiBackboneService.js loadComputerVisionModel() (crop-disease '
       + 'classification) remains an honest {available:false} stub; this does not change '
       + 'that.',
     invoke: async (payload = {}) => {
@@ -470,7 +470,7 @@ const ENGINES = {
       + 'AZURE_SPEECH_KEY. Returns {ok:false, status:"not_configured"} honestly when no key '
       + 'is present, and {ok:false, status:"call_intentionally_not_implemented"} when a key '
       + 'is present but no live SDK call is wired — never a fabricated transcript. '
-      + 'services/voiceAIService.js and services/advancedVoiceAI.js manage session/transcript '
+      + 'services/voiceaiBackboneService.js and services/advancedVoiceAI.js manage session/transcript '
       + 'rows and do keyword intent-matching on an ALREADY-PROVIDED transcript string; '
       + 'unchanged by this entry. services/advancedVoiceAI.js transcribeAudio() remains a '
       + 'hardcoded stub returning a fixed English sentence regardless of input (commented "In '
@@ -655,7 +655,7 @@ const ENGINES = {
     citation: 'Zero LLM SDKs in backend/package.json (no @anthropic-ai/sdk, openai, '
       + '@google/generative-ai, or a DeepSeek client); zero LLM API key env vars '
       + 'referenced anywhere in backend/src. services/aiCopilotService.js, '
-      + 'conversationalAIService.js, advancedAIService.js and enterpriseAIService.js '
+      + 'conversationalaiBackboneService.js, advancedaiBackboneService.js and enterpriseaiBackboneService.js '
       + 'generate responses via switch/case domain templates, not an LLM call. '
       + "migrations/058 seeds ai_model_registry with 6 slots, all provider='UNASSIGNED', "
       + 'enabled=false — the absence is already visible in the schema, this file makes '
@@ -868,3 +868,4 @@ module.exports = {
   listSpeechProviders,
   callSpeechProvider,
 };
+

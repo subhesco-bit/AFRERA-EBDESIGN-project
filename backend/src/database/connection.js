@@ -13,7 +13,7 @@ const { logger } = require('../utils/logger');
  *
  * `require('mongodb')` pulls in ~130 files and costs about twelve seconds on
  * this machine. Twenty-two services import this module for `getPostgreSQL`
- * alone; MongoDB is touched by exactly one (`aiService`, for fraud patterns).
+ * alone; MongoDB is touched by exactly one (`aiBackboneService`, for fraud patterns).
  * So every one of them — and every process that loads any of them — paid the
  * full driver cost to use PostgreSQL.
  *
@@ -220,3 +220,4 @@ module.exports = {
   isHealthy,
   close
 };
+

@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Spare Parts Management Service (M109)
  * Spare parts inventory, procurement, and consumption tracking
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -447,3 +447,4 @@ module.exports = {
   trackInventoryStatus,
   generateInventoryReport
 };
+

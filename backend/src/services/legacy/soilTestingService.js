@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 const { getPostgreSQL } = require('../../database/connection');
 
@@ -686,3 +686,4 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M032 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M032/service"));
+

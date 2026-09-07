@@ -11,7 +11,7 @@
  * - Market Basket Analysis
  */
 
-const ecommerceAIService = require('../services/legacy/ecommerceAIService');
+const ecommerceaiBackboneService = require('../services/legacy/ecommerceaiBackboneService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
@@ -24,7 +24,7 @@ const { logger } = require('../utils/logger');
  */
 async function segmentCustomersRFM(req, res) {
   try {
-    const result = await ecommerceAIService.segmentCustomersRFM();
+    const result = await ecommerceaiBackboneService.segmentCustomersRFM();
     
     res.json(result);
   } catch (error) {
@@ -42,7 +42,7 @@ async function segmentCustomersRFM(req, res) {
  */
 async function segmentCustomersBehavioral(req, res) {
   try {
-    const result = await ecommerceAIService.segmentCustomersBehavioral();
+    const result = await ecommerceaiBackboneService.segmentCustomersBehavioral();
     
     res.json(result);
   } catch (error) {
@@ -67,7 +67,7 @@ async function forecastProductDemand(req, res) {
     const { productId } = req.params;
     const { horizonDays } = req.body;
     
-    const result = await ecommerceAIService.forecastProductDemand(productId, horizonDays || 30);
+    const result = await ecommerceaiBackboneService.forecastProductDemand(productId, horizonDays || 30);
     
     res.json(result);
   } catch (error) {
@@ -91,7 +91,7 @@ async function optimizeInventory(req, res) {
   try {
     const { productId } = req.params;
     
-    const result = await ecommerceAIService.optimizeInventory(productId);
+    const result = await ecommerceaiBackboneService.optimizeInventory(productId);
     
     res.json(result);
   } catch (error) {
@@ -116,7 +116,7 @@ async function getPersonalizedRecommendations(req, res) {
     const { userId } = req.params;
     const { limit } = req.query;
     
-    const result = await ecommerceAIService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
+    const result = await ecommerceaiBackboneService.getPersonalizedRecommendations(userId, parseInt(limit) || 10);
     
     res.json(result);
   } catch (error) {
@@ -140,7 +140,7 @@ async function predictSales(req, res) {
   try {
     const { categoryId, periodDays } = req.body;
     
-    const result = await ecommerceAIService.predictSales(categoryId, periodDays || 30);
+    const result = await ecommerceaiBackboneService.predictSales(categoryId, periodDays || 30);
     
     res.json(result);
   } catch (error) {
@@ -164,7 +164,7 @@ async function calculateCustomerLifetimeValue(req, res) {
   try {
     const { userId } = req.params;
     
-    const result = await ecommerceAIService.calculateCustomerLifetimeValue(userId);
+    const result = await ecommerceaiBackboneService.calculateCustomerLifetimeValue(userId);
     
     res.json(result);
   } catch (error) {
@@ -188,7 +188,7 @@ async function analyzeMarketBasket(req, res) {
   try {
     const { categoryId } = req.query;
     
-    const result = await ecommerceAIService.analyzeMarketBasket(categoryId);
+    const result = await ecommerceaiBackboneService.analyzeMarketBasket(categoryId);
     
     res.json(result);
   } catch (error) {
@@ -227,3 +227,4 @@ module.exports = {
   // Market Basket Analysis
   analyzeMarketBasket
 };
+

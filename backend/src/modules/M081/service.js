@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Data Visualization Dashboard Service (M081)
  * Business Intelligence & Analytics - Dashboard management and visualization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -668,3 +668,4 @@ module.exports = {
   logUsage,
   getDashboardAnalytics
 };
+

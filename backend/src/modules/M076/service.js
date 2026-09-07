@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Water Budgeting Service (M076)
  * Comprehensive water resource management, budgeting, and allocation
  *
@@ -18,7 +18,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -416,3 +416,4 @@ module.exports = {
   optimizeWaterAllocation,
   generateBudgetReport
 };
+

@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Performance Analytics Service (M083)
  * Business Intelligence & Analytics - Performance measurement and analysis
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -724,3 +724,4 @@ module.exports = {
   createPerformanceAlert,
   getPerformanceAlerts
 };
+

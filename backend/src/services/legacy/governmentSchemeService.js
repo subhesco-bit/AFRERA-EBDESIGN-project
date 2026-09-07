@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware/auth');
 // Shared pool (2026-08-04 convention, see database/pool.js): the AI-matching
@@ -945,3 +945,4 @@ module.exports = {
   checkSchemeEligibility,
   setupRoutes
 };
+

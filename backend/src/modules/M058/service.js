@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Returns Management Service (M058)
  * Product returns and refunds with AI-powered analytics
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createReturn(returnData) {
@@ -72,3 +72,4 @@ async function assessProductQuality(productId) {
 }
 
 module.exports = { createReturn, getReturn, updateReturnStatus };
+

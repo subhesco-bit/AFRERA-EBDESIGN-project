@@ -32,7 +32,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 const pool = require('../../database/pool');
 
@@ -877,3 +877,4 @@ module.exports = {
   getEquipmentUtilizationAnalytics,
   setupRoutes
 };
+

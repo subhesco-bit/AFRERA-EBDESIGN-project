@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 
 /**
@@ -540,3 +540,4 @@ module.exports = {
   const { ...rest } = m144;
   Object.assign(module.exports, rest);
 }
+

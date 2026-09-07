@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Session Management (M020)
+-- Define tables and indexes here

@@ -11,7 +11,7 @@
 
 const express = require('express');
 const router = express.Router();
-const aiBrainService = require('../services/legacy/aiBrainService');
+const aiBackboneService = require('../services/legacy/aiBackboneService');
 
 /**
  * Execute full cognitive cycle
@@ -28,7 +28,7 @@ router.post('/cycle', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.executeCognitiveCycle(
+    const result = await aiBackboneService.executeCognitiveCycle(
       input,
       context || {},
       goals || [],
@@ -60,7 +60,7 @@ router.post('/perception', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.perceptionProcess(input, context || {});
+    const result = await aiBackboneService.perceptionProcess(input, context || {});
     
     res.json(result);
   } catch (error) {
@@ -87,7 +87,7 @@ router.post('/attention', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.attentionProcess(perception, goals || []);
+    const result = await aiBackboneService.attentionProcess(perception, goals || []);
     
     res.json(result);
   } catch (error) {
@@ -114,7 +114,7 @@ router.post('/reasoning', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.reasoningProcess(attention, knowledge || {});
+    const result = await aiBackboneService.reasoningProcess(attention, knowledge || {});
     
     res.json(result);
   } catch (error) {
@@ -141,7 +141,7 @@ router.post('/learning', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.learningProcess(experience, outcome);
+    const result = await aiBackboneService.learningProcess(experience, outcome);
     
     res.json(result);
   } catch (error) {
@@ -168,7 +168,7 @@ router.post('/decision', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.decisionProcess(
+    const result = await aiBackboneService.decisionProcess(
       reasoning,
       context || {},
       constraints || {}
@@ -199,7 +199,7 @@ router.post('/planning', async (req, res) => {
       });
     }
     
-    const result = await aiBrainService.planningProcess(
+    const result = await aiBackboneService.planningProcess(
       decision,
       current_state || {},
       target_state || {}
@@ -230,7 +230,7 @@ router.post('/knowledge', (req, res) => {
       });
     }
     
-    aiBrainService.addKnowledge(domain, knowledge);
+    aiBackboneService.addKnowledge(domain, knowledge);
     
     res.json({
       success: true,
@@ -253,7 +253,7 @@ router.post('/knowledge', (req, res) => {
 router.get('/knowledge/:domain', (req, res) => {
   try {
     const { domain } = req.params;
-    const knowledge = aiBrainService.getKnowledge(domain);
+    const knowledge = aiBackboneService.getKnowledge(domain);
     
     if (!knowledge) {
       return res.status(404).json({
@@ -282,7 +282,7 @@ router.get('/knowledge/:domain', (req, res) => {
  */
 router.get('/knowledge', (req, res) => {
   try {
-    const knowledge = Array.from(aiBrainService.knowledgeGraph.entries()).map(([domain, data]) => ({
+    const knowledge = Array.from(aiBackboneService.knowledgeGraph.entries()).map(([domain, data]) => ({
       domain,
       timestamp: data.timestamp,
       confidence: data.confidence
@@ -307,7 +307,7 @@ router.get('/knowledge', (req, res) => {
  */
 router.get('/state', (req, res) => {
   try {
-    const state = aiBrainService.getCognitiveState();
+    const state = aiBackboneService.getCognitiveState();
     
     res.json({
       success: true,
@@ -330,7 +330,7 @@ router.put('/context', (req, res) => {
   try {
     const context = req.body;
     
-    aiBrainService.updateContext(context);
+    aiBackboneService.updateContext(context);
     
     res.json({
       success: true,
@@ -351,7 +351,7 @@ router.put('/context', (req, res) => {
  */
 router.delete('/working-memory', (req, res) => {
   try {
-    const result = aiBrainService.clearWorkingMemory();
+    const result = aiBackboneService.clearWorkingMemory();
     
     res.json(result);
   } catch (error) {
@@ -371,11 +371,12 @@ router.get('/health', (req, res) => {
   res.json({
     success: true,
     status: 'healthy',
-    knowledge_domains: aiBrainService.knowledgeGraph.size,
-    working_memory_size: aiBrainService.workingMemory.size,
-    long_term_memory_size: aiBrainService.longTermMemory.size,
+    knowledge_domains: aiBackboneService.knowledgeGraph.size,
+    working_memory_size: aiBackboneService.workingMemory.size,
+    long_term_memory_size: aiBackboneService.longTermMemory.size,
     timestamp: new Date().toISOString()
   });
 });
 
 module.exports = router;
+

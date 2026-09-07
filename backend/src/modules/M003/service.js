@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Tenant Management Service (M003)
  * Multi-tenant architecture, tenant isolation, and resource management
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -330,3 +330,4 @@ module.exports = {
   getTenantUsageMetrics,
   listTenants
 };
+

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * DATA-SOURCE DISCLOSURE (2026-08-29)
  * Same pattern as M122/M123: createHealthRecord/scheduleVaccination and
  * their direct DB reads are real; disease-pattern/treatment-recommendation
@@ -18,7 +18,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -403,3 +403,4 @@ module.exports = {
   monitorHerdHealth,
   generateHealthReport
 };
+

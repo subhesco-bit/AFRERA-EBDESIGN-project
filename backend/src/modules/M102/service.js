@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Implement Management Service (M102)
  * Agricultural implement inventory, maintenance, and usage tracking
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -444,3 +444,4 @@ module.exports = {
   trackImplementUsage,
   generateImplementReport
 };
+

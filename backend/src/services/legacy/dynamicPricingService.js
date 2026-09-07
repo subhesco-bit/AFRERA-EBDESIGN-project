@@ -4,7 +4,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { authMiddleware } = require('../../middleware/auth');
 const { mcda } = require('../../core/mcda');
 
@@ -813,7 +813,7 @@ async function allocScore(lotCode, dest) {
 //   different prices for the same lot.
 //
 //   catalogIntelligenceService.js's SEASONALITY is availability (what can be
-//   sold this month); omnichannelAIService.js is channel plumbing (web/
+//   sold this month); omnichannelaiBackboneService.js is channel plumbing (web/
 //   WhatsApp/SMS delivery), not pricing at all. Neither overlaps with a
 //   festival-demand price adjustment, which is why this is a genuine gap
 //   rather than a duplicate of either file.
@@ -1089,3 +1089,4 @@ module.exports = {
 // Merged unique operations from backend/src/modules/M055 (see git history there for
 // full context) - complementary functionality this service did not have.
 Object.assign(module.exports, require("../../modules/M055/service"));
+

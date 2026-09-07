@@ -21,18 +21,18 @@ const orderService = require('./services/legacy/orderService');
 const financialService = require('./services/legacy/financialService');
 const logisticsService = require('./services/legacy/logisticsService');
 const insuranceService = require('./services/legacy/insuranceService');
-const aiService = require('./services/legacy/aiService');
+const aiBackboneService = require('./services/legacy/aiBackboneService');
 const erpService = require('./services/legacy/erpService');
 const multilingualService = require('./services/legacy/multilingualService');
 const organicTraceabilityService = require('./services/legacy/organicTraceabilityService');
 const nutritionIntelligenceService = require('./services/legacy/nutritionIntelligenceService');
-const conversationalAIService = require('./services/legacy/conversationalAIService');
+const conversationalaiBackboneService = require('./services/legacy/conversationalaiBackboneService');
 const laboratoryERPService = require('./services/legacy/laboratoryERPService');
 const giIntelligenceService = require('./services/legacy/giIntelligenceService');
 const foodIntelligenceService = require('./services/legacy/foodIntelligenceService');
 const valueCommerceService = require('./services/legacy/valueCommerceService');
 const consumerHealthService = require('./services/legacy/consumerHealthService');
-const voiceAIService = require('./services/legacy/voiceAIService');
+const voiceaiBackboneService = require('./services/legacy/voiceaiBackboneService');
 const blockchainTraceabilityService = require('./services/legacy/blockchainTraceabilityService');
 const knowledgeGraphService = require('./services/legacy/knowledgeGraphService');
 // Enterprise Memory ("Hippocampus" — AFRERA_CLAUDE_BUILD_DIRECTIVE.md §2.3):
@@ -55,7 +55,7 @@ const custodyEventRoutes = require('./services/legacy/custodyEventRoutes');
 // Health check routes for monitoring
 const healthRoutes = require('./routes/healthRoutes');
 const offlinePaymentService = require('./services/legacy/offlinePaymentService');
-const advancedAIService = require('./services/legacy/advancedAIService');
+const advancedaiBackboneService = require('./services/legacy/advancedaiBackboneService');
 const offlineSyncService = require('./services/legacy/offlineSyncService');
 const formService = require('./services/legacy/formService');
 const analyticsService = require('./services/legacy/analyticsService');
@@ -67,7 +67,7 @@ const adminModule = require('./modules/M006');
 const indigenousKnowledgeService = require('./services/legacy/indigenousKnowledgeService');
 const biodiversityService = require('./services/legacy/biodiversityService');
 const aiCopilotService = require('./services/legacy/aiCopilotService');
-const omnichannelAIService = require('./services/legacy/omnichannelAIService');
+const omnichannelaiBackboneService = require('./services/legacy/omnichannelaiBackboneService');
 const foodSafetyService = require('./services/legacy/foodSafetyService');
 const shelfLifeService = require('./services/legacy/shelfLifeService');
 const institutionalProcurementService = require('./services/legacy/institutionalProcurementService');
@@ -183,11 +183,11 @@ const aiAgenticCompanionService = require('./services/legacy/aiAgenticCompanionS
 // Digital Twin Service
 const digitalTwinService = require('./services/legacy/digitalTwinService');
 // AI Gateway Service - Real AI Backbone System
-const aiGatewayService = require('./services/legacy/aiGatewayService');
+const aiBackboneService = require('./services/legacy/aiBackboneService');
 // AI Agent Service - Agentic AI Capabilities
 const aiAgentService = require('./services/aiAgentService');
 // AI Brain Service - Cognitive Processing Layer
-const aiBrainService = require('./services/legacy/aiBrainService');
+const aiBackboneService = require('./services/legacy/aiBackboneService');
 // AI Self-Healing Service - Autonomous Error Recovery Layer
 const aiSelfHealingService = require('./services/legacy/aiSelfHealingService');
 // AI Operation Intelligence Service - Real-Time Optimization Layer
@@ -630,18 +630,18 @@ app.use('/api/v1/orders', criticalRouteMonitoring, orderService.router);
 app.use('/api/v1/financial', criticalRouteMonitoring, financialService.router);
 app.use('/api/v1/logistics', criticalRouteMonitoring, logisticsService.router);
 app.use('/api/v1/insurance', criticalRouteMonitoring, insuranceService.router);
-mountRoute('/api/v1/ai', aiService);
+mountRoute('/api/v1/ai', aiBackboneService);
 mountRoute('/api/v1/erp', erpService);
 mountRoute('/api/v1/multilingual', multilingualService);
 mountRoute('/api/v1/organic-traceability', organicTraceabilityService);
 mountRoute('/api/v1/nutrition-intelligence', nutritionIntelligenceService);
-mountRoute('/api/v1/conversational-ai', conversationalAIService);
+mountRoute('/api/v1/conversational-ai', conversationalaiBackboneService);
 mountRoute('/api/v1/laboratory-erp', laboratoryERPService);
 mountRoute('/api/v1/gi-intelligence', giIntelligenceService);
 mountRoute('/api/v1/food-intelligence', foodIntelligenceService);
 mountRoute('/api/v1/value-commerce', valueCommerceService);
 mountRoute('/api/v1/consumer-health', consumerHealthService);
-mountRoute('/api/v1/voice-ai', voiceAIService);
+mountRoute('/api/v1/voice-ai', voiceaiBackboneService);
 mountRoute('/api/v1/blockchain-traceability', blockchainTraceabilityService);
 mountRoute('/api/v1/knowledge-graph', knowledgeGraphService);
 mountRoute('/api/v1/enterprise-memory', enterpriseMemoryService);
@@ -652,12 +652,12 @@ mountRoute('/api/v1/sms-auth', smsAuthService);
 mountRoute('/api/v1/whatsapp', whatsappService);
 mountRoute('/api/v1/advanced-voice', advancedVoiceAI);
 mountRoute('/api/v1/offline-payment', offlinePaymentService);
-mountRoute('/api/v1/advanced-ai', advancedAIService);
+mountRoute('/api/v1/advanced-ai', advancedaiBackboneService);
 mountRoute('/api/v1/offline-sync', offlineSyncService);
 mountRoute('/api/v1/indigenous-knowledge', indigenousKnowledgeService);
 mountRoute('/api/v1/biodiversity', biodiversityService);
 mountRoute('/api/v1/ai-copilot', aiCopilotService);
-mountRoute('/api/v1/omnichannel-ai', omnichannelAIService);
+mountRoute('/api/v1/omnichannel-ai', omnichannelaiBackboneService);
 mountRoute('/api/v1/food-safety', foodSafetyService);
 mountRoute('/api/v1/shelf-life', shelfLifeService);
 mountRoute('/api/v1/institutional-procurement', institutionalProcurementService);
@@ -989,9 +989,9 @@ app.get('/api/v1/ai/audit', (req, res) => {
 // AI Agent - Agentic AI Capabilities
 app.use('/api/v1/ai-agent', aiAgentRoutes);
 // AI Brain - Cognitive Processing Layer (using service router for health checks)
-mountRoute('/api/v1/ai-brain', aiBrainService);
+mountRoute('/api/v1/ai-brain', aiBackboneService);
 // AI Gateway - AI Backbone System (using service router for health checks)
-mountRoute('/api/v1/ai-gateway', aiGatewayService);
+mountRoute('/api/v1/ai-gateway', aiBackboneService);
 // AI Self-Healing - Autonomous Error Recovery Layer (using service router for health checks)
 mountRoute('/api/v1/ai-self-healing', aiSelfHealingService);
 // AI Operation Intelligence - Real-Time Optimization Layer (using service router for health checks)
@@ -1513,4 +1513,5 @@ if (require.main === module) {
 }
 
 module.exports = { app, io };
+
 

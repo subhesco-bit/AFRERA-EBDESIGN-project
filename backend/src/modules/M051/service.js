@@ -1,10 +1,10 @@
-﻿/**
+/**
  * FPO Registration Service (M051)
  * Farmer Producer Organization registration and management with AI-powered recommendations
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -458,3 +458,4 @@ module.exports = {
   recordFPOTransaction,
   generateFPOPerformanceReport
 };
+

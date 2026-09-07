@@ -1,9 +1,9 @@
 /**
- * Product Media AI Controller — thin HTTP layer over productMediaAIService.
+ * Product Media AI Controller — thin HTTP layer over productMediaaiBackboneService.
  * See that file's header for the honest not_configured provider discipline.
  */
 
-const productMediaAIService = require('../services/legacy/productMediaAIService');
+const productMediaaiBackboneService = require('../services/legacy/productMediaaiBackboneService');
 const { logger } = require('../utils/logger');
 
 const productMediaAIController = {
@@ -12,8 +12,8 @@ const productMediaAIController = {
       res.json({
         success: true,
         data: {
-          imageProviders: productMediaAIService.listImageProviders(),
-          videoProviders: productMediaAIService.listVideoProviders(),
+          imageProviders: productMediaaiBackboneService.listImageProviders(),
+          videoProviders: productMediaaiBackboneService.listVideoProviders(),
         },
       });
     } catch (error) {
@@ -26,7 +26,7 @@ const productMediaAIController = {
     try {
       const { productId } = req.params;
       const { prompt } = req.body;
-      const result = await productMediaAIService.requestProductImageGeneration(productId, prompt);
+      const result = await productMediaaiBackboneService.requestProductImageGeneration(productId, prompt);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error requesting product image generation', { error: error.message });
@@ -36,7 +36,7 @@ const productMediaAIController = {
 
   generateProductCartoon: async (req, res) => {
     try {
-      const result = await productMediaAIService.requestProductCartoonGeneration(req.params.productId, req.body?.prompt);
+      const result = await productMediaaiBackboneService.requestProductCartoonGeneration(req.params.productId, req.body?.prompt);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error requesting product cartoon generation', { error: error.message });
@@ -47,7 +47,7 @@ const productMediaAIController = {
   buildNutrientVideoScript: async (req, res) => {
     try {
       const { productId } = req.params;
-      const script = await productMediaAIService.buildNutrientComparisonScript(productId);
+      const script = await productMediaaiBackboneService.buildNutrientComparisonScript(productId);
       res.json({ success: true, data: script });
     } catch (error) {
       logger.error('Error building nutrient comparison script', { error: error.message });
@@ -58,7 +58,7 @@ const productMediaAIController = {
   generateProductVideo: async (req, res) => {
     try {
       const { productId } = req.params;
-      const result = await productMediaAIService.requestProductVideoGeneration(productId);
+      const result = await productMediaaiBackboneService.requestProductVideoGeneration(productId);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('Error requesting product video generation', { error: error.message });
@@ -68,3 +68,4 @@ const productMediaAIController = {
 };
 
 module.exports = productMediaAIController;
+

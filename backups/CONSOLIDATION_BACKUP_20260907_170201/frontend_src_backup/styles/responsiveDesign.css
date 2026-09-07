@@ -1,0 +1,650 @@
+/**
+ * Responsive Design System - Mobile-First Approach
+ * Production-level responsive design with breakpoints and utilities
+ * 
+ * Breakpoints:
+ * - xs: 0px (mobile portrait)
+ * - sm: 640px (mobile landscape)
+ * - md: 768px (tablet portrait)
+ * - lg: 1024px (tablet landscape/desktop)
+ * - xl: 1280px (desktop)
+ * - 2xl: 1536px (large desktop)
+ */
+
+/* Base Styles - Mobile First */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  color: #1f2937;
+  background-color: #f9fafb;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container System */
+.container {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@container (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@container (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@container (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@container (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@container (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* Grid System */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@container (min-width: 640px) {
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 768px) {
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1024px) {
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 1280px) {
+  .xl\:grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* Flexbox Utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+@container (min-width: 768px) {
+  .md\:flex-row {
+    flex-direction: row;
+  }
+  
+  .md\:flex-col {
+    flex-direction: column;
+  }
+}
+
+/* Spacing Utilities */
+.p-4 {
+  padding: 1rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.m-4 {
+  margin: 1rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+@container (min-width: 768px) {
+  .md\:p-8 {
+    padding: 2rem;
+  }
+  
+  .md\:px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@container (min-width: 1024px) {
+  .lg\:p-12 {
+    padding: 3rem;
+  }
+}
+
+/* Typography */
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+@container (min-width: 768px) {
+  .md\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  
+  .md\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+@container (min-width: 1024px) {
+  .lg\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  .lg\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+@container (min-width: 768px) {
+  .md\:text-left {
+    text-align: left;
+  }
+  
+  .md\:text-center {
+    text-align: center;
+  }
+}
+
+/* Visibility Utilities */
+.hidden {
+  display: none;
+}
+
+@container (max-width: 639px) {
+  .xs\:hidden {
+    display: none;
+  }
+}
+
+@container (min-width: 640px) and (max-width: 767px) {
+  .sm\:hidden {
+    display: none;
+  }
+}
+
+@container (min-width: 768px) and (max-width: 1023px) {
+  .md\:hidden {
+    display: none;
+  }
+}
+
+@container (min-width: 1024px) {
+  .lg\:block {
+    display: block;
+  }
+}
+
+@container (max-width: 1023px) {
+  .lg\:hidden {
+    display: none;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Touch-friendly targets */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Simplified navigation */
+  .desktop-nav {
+    display: none;
+  }
+  
+  .mobile-nav {
+    display: block;
+  }
+  
+  /* Stacked layouts */
+  .stack-on-mobile {
+    flex-direction: column;
+  }
+  
+  /* Reduced padding */
+  .reduce-padding-mobile {
+    padding: 0.5rem;
+  }
+  
+  /* Full-width inputs */
+  .full-width-mobile {
+    width: 100%;
+  }
+  
+  /* Hide non-essential elements */
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 640px) and (max-width: 1024px) {
+  /* Optimized touch targets */
+  button,
+  a {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  
+  /* Two-column layouts */
+  .two-column-tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Moderate padding */
+  .tablet-padding {
+    padding: 1rem;
+  }
+}
+
+/* Desktop optimizations */
+@media (min-width: 1024px) {
+  /* Hover effects */
+  .hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Multi-column layouts */
+  .multi-column-desktop {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Larger spacing */
+  .desktop-spacing {
+    gap: 2rem;
+  }
+  
+  /* Desktop navigation */
+  .mobile-nav {
+    display: none;
+  }
+  
+  .desktop-nav {
+    display: flex;
+  }
+}
+
+/* Landscape optimizations */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Compact layouts for landscape */
+  .compact-landscape {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Scrollable content */
+  .scrollable-landscape {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Crisper borders */
+  .crisp-border {
+    border-width: 0.5px;
+  }
+  
+  /* Optimized images */
+  .retina-image {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1f2937;
+    --bg-secondary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --border-color: #4b5563;
+  }
+  
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .scroll-smooth {
+    scroll-behavior: auto;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none;
+  }
+  
+  .print-only {
+    display: block;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: #000;
+    background: #fff;
+  }
+  
+  a {
+    text-decoration: underline;
+    color: #000;
+  }
+  
+  /* Avoid page breaks */
+  .avoid-page-break {
+    page-break-inside: avoid;
+  }
+  
+  /* Page break before */
+  .page-break-before {
+    page-break-before: always;
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Mobile-safe areas for modern phones */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-area-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.responsive-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Responsive tables */
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-table table {
+  width: 100%;
+  min-width: 600px;
+}
+
+/* Responsive cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@container (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container (min-width: 1280px) {
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Utility classes for common responsive patterns */
+.mobile-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@container (min-width: 768px) {
+  .mobile-stack {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+.responsive-padding {
+  padding: 1rem;
+}
+
+@container (min-width: 768px) {
+  .responsive-padding {
+    padding: 2rem;
+  }
+}
+
+@container (min-width: 1024px) {
+  .responsive-padding {
+    padding: 3rem;
+  }
+}
+
+.text-responsive {
+  font-size: 1rem;
+}
+
+@container (min-width: 768px) {
+  .text-responsive {
+    font-size: 1.125rem;
+  }
+}
+
+@container (min-width: 1024px) {
+  .text-responsive {
+    font-size: 1.25rem;
+  }
+}

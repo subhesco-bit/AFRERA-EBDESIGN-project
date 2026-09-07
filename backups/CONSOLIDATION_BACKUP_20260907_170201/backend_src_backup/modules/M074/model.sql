@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Fertility Management (M074)
+-- Define tables and indexes here

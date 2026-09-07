@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Review Management Service (M060)
  * Product reviews and ratings with AI-powered sentiment analysis
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createReview(reviewData) {
@@ -104,3 +104,4 @@ async function getProductContext(productId) {
 }
 
 module.exports = { createReview, getReview, getProductReviews, updateReviewStatus };
+

@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Village Registry Service (M041)
  * Comprehensive village and community management with AI-powered development index
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createVillage(villageData) {
@@ -264,3 +264,4 @@ module.exports = {
   addVillageResource,
   getVillageAnalytics
 };
+

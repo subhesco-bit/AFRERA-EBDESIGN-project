@@ -2,9 +2,9 @@
  * Agricultural Intelligence Routes.
  * Exposes services/agriculturalIntelligenceService.js — found fully built
  * (8 real methods) but with zero HTTP route exposure anywhere in the repo.
- * Routes through aiGatewayService.predict()/analyze() underneath, which
+ * Routes through aiBackboneService.predict()/analyze() underneath, which
  * honestly returns implemented:false where no real model is connected
- * (see aiGatewayService.js) rather than fabricated values.
+ * (see aiBackboneService.js) rather than fabricated values.
  */
 
 const express = require('express');
@@ -96,3 +96,4 @@ router.get('/health', async (req, res) => {
 });
 
 module.exports = router;
+

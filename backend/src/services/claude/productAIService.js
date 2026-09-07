@@ -1,6 +1,7 @@
-class ProductAIService {
-  async initialize() { console.log('[ProductAIService] Initialized'); }
+class ProductaiBackboneService {
+  async initialize() { console.log('[ProductaiBackboneService] Initialized'); }
   async analyzeProduct(product) { return { analysis: 'Product AI...' }; }
   async init() { return this.initialize(); }
 }
-module.exports = new ProductAIService();
+module.exports = new ProductaiBackboneService();
+

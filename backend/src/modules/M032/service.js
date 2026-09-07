@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Soil Analysis Service (M032)
  * Comprehensive soil testing and analysis with AI-powered recommendations
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createSoilSample(sampleData) {
@@ -256,3 +256,4 @@ module.exports = {
   generateSoilHealthReport,
   getSoilRecommendations
 };
+

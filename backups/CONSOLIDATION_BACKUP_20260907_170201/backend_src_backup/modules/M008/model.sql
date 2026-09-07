@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Localization Management (M008)
+-- Define tables and indexes here

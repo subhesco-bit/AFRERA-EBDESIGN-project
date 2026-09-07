@@ -12,7 +12,7 @@
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
-const aiGatewayService = require('./aiGatewayService');
+const aiBackboneService = require('./aiBackboneService');
 const aiAgentService = require('../aiAgentService');
 const stats = require('../../utils/statistics');
 
@@ -528,7 +528,7 @@ class HRService {
    */
   async recommendRole(skills, experience) {
     // Use AI to match skills to role requirements
-    const roleMatch = await aiGatewayService.recommend('role_matching', {
+    const roleMatch = await aiBackboneService.recommend('role_matching', {
       skills: skills,
       experience: experience
     });
@@ -546,7 +546,7 @@ class HRService {
    */
   async recommendSalary(skills, experience, location) {
     // Use AI to analyze market rates and recommend salary level
-    const salaryAnalysis = await aiGatewayService.analyze('salary_market', {
+    const salaryAnalysis = await aiBackboneService.analyze('salary_market', {
       skills: skills,
       experience: experience,
       location: location
@@ -835,7 +835,7 @@ class HRService {
    */
   async generateCareerPathRecommendation(employee) {
     // Use AI to analyze career trajectory
-    const careerAnalysis = await aiGatewayService.analyze('career_path', {
+    const careerAnalysis = await aiBackboneService.analyze('career_path', {
       current_role: employee.role,
       skills: employee.current_skills,
       performance: employee.avg_performance,
@@ -910,3 +910,4 @@ class HRService {
 }
 
 module.exports = new HRService();
+

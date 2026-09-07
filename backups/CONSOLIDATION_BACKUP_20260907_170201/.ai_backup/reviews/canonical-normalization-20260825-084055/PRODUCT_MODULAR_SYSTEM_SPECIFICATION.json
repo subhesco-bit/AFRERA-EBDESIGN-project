@@ -1,0 +1,27 @@
+﻿{
+    "Product":  [
+                    "id",
+                    "name",
+                    "category",
+                    "subcategory",
+                    "variant",
+                    "sku",
+                    "version",
+                    "documents",
+                    "specifications",
+                    "attributes",
+                    "unit",
+                    "package",
+                    "price",
+                    "status",
+                    "supplier",
+                    "source",
+                    "provenance",
+                    "tags",
+                    "relationships",
+                    "compatibility",
+                    "media",
+                    "knowledge",
+                    "certification"
+                ]
+}

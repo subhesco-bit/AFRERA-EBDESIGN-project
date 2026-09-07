@@ -1,0 +1,3 @@
+﻿-- SQL model for Harvest Planning (M069)
+-- Table (crop_m069_items) lives in
+-- backend/src/database/migrations/3000_M069_generated.sql

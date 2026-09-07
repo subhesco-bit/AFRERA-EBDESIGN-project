@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Equipment Inventory Service (M042)
  * Farm equipment inventory management with AI-powered maintenance prediction
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createEquipment(equipmentData) {
@@ -270,3 +270,4 @@ module.exports = {
   getEquipmentByOwner,
   getMaintenancePredictions
 };
+

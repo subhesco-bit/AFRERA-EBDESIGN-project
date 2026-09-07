@@ -10,13 +10,13 @@
  */
 
 const DatabaseService = require('../../database/connection');
-const aiGatewayService = require('./aiGatewayService');
+const aiBackboneService = require('./aiBackboneService');
 const analyticsService = require('./analyticsService');
 const { logger } = require('../../utils/logger');
 
 class PlatformConfigurationService {
   constructor() {
-    this.aiGateway = aiGatewayService;
+    this.aiGateway = aiBackboneService;
     this.analytics = analyticsService;
     this.db = DatabaseService;
     this.configurations = new Map();
@@ -534,3 +534,4 @@ module.exports = new PlatformConfigurationService();
   const { ...rest } = m005;
   Object.assign(module.exports, rest);
 }
+

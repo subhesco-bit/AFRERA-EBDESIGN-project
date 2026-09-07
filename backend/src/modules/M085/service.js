@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Comparative Analytics Service (M085)
  * Business Intelligence & Analytics - Entity comparison and benchmarking
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -454,3 +454,4 @@ module.exports = {
   getComparisonAlerts,
   createSnapshot
 };
+

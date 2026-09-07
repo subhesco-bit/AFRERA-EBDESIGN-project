@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Environment Management Service (M005)
  * Environment configuration, staging, and deployment management
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -216,3 +216,4 @@ module.exports = {
   updateEnvironment,
   listEnvironments
 };
+

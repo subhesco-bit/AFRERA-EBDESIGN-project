@@ -5,7 +5,7 @@
  * Integrates all agricultural operations with predictive analytics, disease detection, yield prediction, and optimization
  */
 
-const completeAIIntegrationService = require('../services/legacy/completeAIIntegrationService');
+const aiBackboneService = require('../services/legacy/aiBackboneService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
@@ -20,7 +20,7 @@ exports.recommendCropPlanning = async (req, res) => {
     const { farmerId } = req.params;
     const farmData = req.body;
     
-    const result = await completeAIIntegrationService.recommendCropPlanning(farmerId, farmData);
+    const result = await aiBackboneService.recommendCropPlanning(farmerId, farmData);
     
     res.status(200).json({
       success: true,
@@ -44,7 +44,7 @@ exports.predictHarvestTiming = async (req, res) => {
     const { farmerId } = req.params;
     const cropData = req.body;
     
-    const result = await completeAIIntegrationService.predictHarvestTiming(farmerId, cropData);
+    const result = await aiBackboneService.predictHarvestTiming(farmerId, cropData);
     
     res.status(200).json({
       success: true,
@@ -68,7 +68,7 @@ exports.optimizeFarmerResources = async (req, res) => {
     const { farmerId } = req.params;
     const resourceData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeFarmerResources(farmerId, resourceData);
+    const result = await aiBackboneService.optimizeFarmerResources(farmerId, resourceData);
     
     res.status(200).json({
       success: true,
@@ -96,7 +96,7 @@ exports.detectCropDisease = async (req, res) => {
     const { cropId } = req.params;
     const diseaseData = req.body;
     
-    const result = await completeAIIntegrationService.detectCropDisease(cropId, diseaseData);
+    const result = await aiBackboneService.detectCropDisease(cropId, diseaseData);
     
     res.status(200).json({
       success: true,
@@ -120,7 +120,7 @@ exports.predictCropYield = async (req, res) => {
     const { cropId } = req.params;
     const yieldData = req.body;
     
-    const result = await completeAIIntegrationService.predictCropYield(cropId, yieldData);
+    const result = await aiBackboneService.predictCropYield(cropId, yieldData);
     
     res.status(200).json({
       success: true,
@@ -148,7 +148,7 @@ exports.monitorLivestockHealth = async (req, res) => {
     const { livestockId } = req.params;
     const healthData = req.body;
     
-    const result = await completeAIIntegrationService.monitorLivestockHealth(livestockId, healthData);
+    const result = await aiBackboneService.monitorLivestockHealth(livestockId, healthData);
     
     res.status(200).json({
       success: true,
@@ -172,7 +172,7 @@ exports.recommendLivestockBreeding = async (req, res) => {
     const { livestockId } = req.params;
     const breedingData = req.body;
     
-    const result = await completeAIIntegrationService.recommendLivestockBreeding(livestockId, breedingData);
+    const result = await aiBackboneService.recommendLivestockBreeding(livestockId, breedingData);
     
     res.status(200).json({
       success: true,
@@ -200,7 +200,7 @@ exports.optimizeDairyProduction = async (req, res) => {
     const { dairyId } = req.params;
     const productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeDairyProduction(dairyId, productionData);
+    const result = await aiBackboneService.optimizeDairyProduction(dairyId, productionData);
     
     res.status(200).json({
       success: true,
@@ -224,7 +224,7 @@ exports.monitorPoultryHealth = async (req, res) => {
     const { poultryId } = req.params;
     const healthData = req.body;
     
-    const result = await completeAIIntegrationService.monitorPoultryHealth(poultryId, healthData);
+    const result = await aiBackboneService.monitorPoultryHealth(poultryId, healthData);
     
     res.status(200).json({
       success: true,
@@ -248,7 +248,7 @@ exports.optimizeGoatProduction = async (req, res) => {
     const { goatId } = req.params;
     const productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeGoatProduction(goatId, productionData);
+    const result = await aiBackboneService.optimizeGoatProduction(goatId, productionData);
     
     res.status(200).json({
       success: true,
@@ -272,7 +272,7 @@ exports.optimizeSheepProduction = async (req, res) => {
     const { sheepId } = req.params;
     const productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizeSheepProduction(sheepId, productionData);
+    const result = await aiBackboneService.optimizeSheepProduction(sheepId, productionData);
     
     res.status(200).json({
       success: true,
@@ -296,7 +296,7 @@ exports.optimizePigProduction = async (req, res) => {
     const { pigId } = req.params;
     const productionData = req.body;
     
-    const result = await completeAIIntegrationService.optimizePigProduction(pigId, productionData);
+    const result = await aiBackboneService.optimizePigProduction(pigId, productionData);
     
     res.status(200).json({
       success: true,
@@ -365,7 +365,7 @@ exports.forceSyncAllAIIntegrations = async (req, res) => {
     // Sync farmer AI if provided
     if (farmerId) {
       try {
-        results.farmer_ai_sync = await completeAIIntegrationService.recommendCropPlanning(farmerId, {});
+        results.farmer_ai_sync = await aiBackboneService.recommendCropPlanning(farmerId, {});
       } catch (error) {
         results.farmer_ai_sync = { success: false, error: error.message };
       }
@@ -374,7 +374,7 @@ exports.forceSyncAllAIIntegrations = async (req, res) => {
     // Sync crop AI if provided
     if (cropId) {
       try {
-        results.crop_ai_sync = await completeAIIntegrationService.predictCropYield(cropId, {});
+        results.crop_ai_sync = await aiBackboneService.predictCropYield(cropId, {});
       } catch (error) {
         results.crop_ai_sync = { success: false, error: error.message };
       }
@@ -383,7 +383,7 @@ exports.forceSyncAllAIIntegrations = async (req, res) => {
     // Sync livestock AI if provided
     if (livestockId) {
       try {
-        results.livestock_ai_sync = await completeAIIntegrationService.monitorLivestockHealth(livestockId, {});
+        results.livestock_ai_sync = await aiBackboneService.monitorLivestockHealth(livestockId, {});
       } catch (error) {
         results.livestock_ai_sync = { success: false, error: error.message };
       }
@@ -409,7 +409,7 @@ exports.forceSyncAllAIIntegrations = async (req, res) => {
 exports.getAIModelInfo = async (req, res) => {
   try {
     // These are deterministic rule-based scoring functions (see
-    // completeAIIntegrationService.js), not trained/evaluated ML models —
+    // aiBackboneService.js), not trained/evaluated ML models —
     // there is no held-out test set behind them, so "accuracy" is not a
     // claim that can honestly be made. This describes what each function
     // actually weighs, not a fabricated performance number.
@@ -448,3 +448,4 @@ exports.getAIModelInfo = async (req, res) => {
     });
   }
 };
+

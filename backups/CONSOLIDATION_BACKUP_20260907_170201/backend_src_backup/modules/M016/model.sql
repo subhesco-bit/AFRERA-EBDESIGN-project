@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Single Sign-On (M016)
+-- Define tables and indexes here

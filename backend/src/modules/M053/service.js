@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Order Management Service (M053)
  * Order processing, fulfillment, and tracking with AI-powered optimization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -408,3 +408,4 @@ module.exports = {
   processPayment,
   trackOrder
 };
+

@@ -6,7 +6,7 @@
 
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
-const aiGateway = require('./aiGatewayService');
+const aiGateway = require('./aiBackboneService');
 const analytics = require('./analyticsService');
 
 class AgriculturalIntelligenceService {

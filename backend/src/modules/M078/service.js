@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Rainwater Harvesting Service (M078)
  * Rainwater collection, storage management, and distribution systems
  *
@@ -20,7 +20,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -403,3 +403,4 @@ module.exports = {
   calculateWaterBudget,
   manageStorageCapacity
 };
+

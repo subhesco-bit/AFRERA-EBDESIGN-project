@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Water Quality Monitoring Service (M077)
  * Real-time water quality tracking, compliance monitoring, and alerts
  *
@@ -21,7 +21,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -432,3 +432,4 @@ module.exports = {
   monitorWaterQuality,
   generateTreatmentRecommendations
 };
+

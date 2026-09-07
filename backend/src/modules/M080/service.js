@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Water Analytics Service (M080)
  * Advanced water data analytics, dashboards, and predictive insights
  *
@@ -19,7 +19,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -540,3 +540,4 @@ module.exports = {
   generatePredictiveAnalysis,
   compareWaterPerformance
 };
+

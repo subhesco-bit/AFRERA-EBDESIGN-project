@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Discount Management Service (M059)
  * Discount and promotion management with AI-powered optimization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createDiscount(discountData) {
@@ -87,3 +87,4 @@ async function getHistoricalSalesData() {
 }
 
 module.exports = { createDiscount, getDiscount, updateDiscount, deleteDiscount };
+

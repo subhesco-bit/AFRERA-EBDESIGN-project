@@ -1,7 +1,7 @@
 /**
  * Enterprise AI Routes
  *
- * 2026-08-10 audit: this router used to call `services/enterpriseAIService.js`
+ * 2026-08-10 audit: this router used to call `services/enterpriseaiBackboneService.js`
  * exclusively. That file was 100% fabricated — every method (including every
  * "helper" it called) returned a hardcoded constant or a canned literal
  * (`calculateCreditScore()` was commented "Simulated AI credit scoring",
@@ -293,3 +293,4 @@ router.post('/query', async (req, res, next) => {
 });
 
 module.exports = router;
+

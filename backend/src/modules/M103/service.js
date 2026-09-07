@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Equipment Inventory Service (M103)
  * Comprehensive equipment inventory management, tracking, and optimization
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -420,3 +420,4 @@ module.exports = {
   trackEquipmentUtilization,
   generateInventoryReport
 };
+

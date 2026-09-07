@@ -1,0 +1,3 @@
+﻿-- SQL model for System Administration (M006)
+-- Tables (admin_settings, audit_logs) live in
+-- backend/src/database/migrations/1002_system_administration.sql

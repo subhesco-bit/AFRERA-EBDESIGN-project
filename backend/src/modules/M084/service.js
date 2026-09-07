@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Trend Analysis Service (M084)
  * Business Intelligence & Analytics - Trend detection and analysis
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -603,3 +603,4 @@ module.exports = {
   createTrendAlert,
   getTrendAlerts
 };
+

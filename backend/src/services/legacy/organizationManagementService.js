@@ -10,13 +10,13 @@
  */
 
 const DatabaseService = require('../../database/connection');
-const aiGatewayService = require('./aiGatewayService');
+const aiBackboneService = require('./aiBackboneService');
 const analyticsService = require('./analyticsService');
 const { logger } = require('../../utils/logger');
 
 class OrganizationManagementService {
   constructor() {
-    this.aiGateway = aiGatewayService;
+    this.aiGateway = aiBackboneService;
     this.analytics = analyticsService;
     this.db = DatabaseService;
     this.orgMetrics = new Map();

@@ -3,7 +3,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('./aiService');
+const { aiAPI } = require('./aiBackboneService');
 const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware/auth');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
@@ -604,3 +604,4 @@ module.exports = {
   calculateClaimPayout,
   setupRoutes
 };
+

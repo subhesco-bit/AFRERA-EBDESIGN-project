@@ -1,6 +1,7 @@
-class OrderAIService {
-  async initialize() { console.log('[OrderAIService] Initialized'); }
+class OrderaiBackboneService {
+  async initialize() { console.log('[OrderaiBackboneService] Initialized'); }
   async processOrder(order) { return { processed: true }; }
   async init() { return this.initialize(); }
 }
-module.exports = new OrderAIService();
+module.exports = new OrderaiBackboneService();
+

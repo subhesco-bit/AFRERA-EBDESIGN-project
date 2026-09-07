@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Farmer Groups Service (M024)
  * Farmer producer groups and cooperatives management with AI-powered group health analysis
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -324,3 +324,4 @@ module.exports = {
   recordGroupTransaction,
   getGroupAnalytics
 };
+

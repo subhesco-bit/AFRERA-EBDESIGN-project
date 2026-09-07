@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Watershed Management Service (M079)
  * Comprehensive watershed planning, ecosystem management, and conservation
  *
@@ -19,7 +19,7 @@
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -492,3 +492,4 @@ module.exports = {
   implementConservationMeasures,
   generateWatershedReport
 };
+

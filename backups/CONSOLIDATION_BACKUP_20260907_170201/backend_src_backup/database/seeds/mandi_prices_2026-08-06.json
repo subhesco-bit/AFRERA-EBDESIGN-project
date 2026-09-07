@@ -1,0 +1,47 @@
+{
+  "_source": "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070",
+  "_publisher": "Ministry of Agriculture & Farmers Welfare, Government of India",
+  "_dataset": "Current Daily Price of Various Commodities from Various Markets (Mandi)",
+  "_fetched_at": "2026-08-06T02:00:43Z",
+  "_licence": "Government Open Data Licence - India. Public API, documented; not scraped.",
+  "_collection_method": "public_api",
+  "_unit": "INR per quintal (100 kg). NOT per kg — a reader who assumes per-kg is out by 100x.",
+  "_records_available_that_day": 54,
+  "_records_captured_here": 20,
+  "_north_east_records": 0,
+  "_finding": [
+    "ZERO of the 54 records published nationally that day came from a North East state.",
+    "",
+    "This is the most important fact in this file. A farmer in Meghalaya or Nagaland has",
+    "no published price to check. When a trader offers Rs 25/kg there is no public number",
+    "to argue against, and every platform feature that assumes 'look up the mandi rate'",
+    "returns nothing for exactly the users the platform exists to serve.",
+    "",
+    "The failure mode is silent: an empty result renders as a flat or absent market rather",
+    "than as missing data. demandService.getMandiSignal() and marketDataService.priceTrend()",
+    "both return an explicit note for this reason rather than an empty array."
+  ],
+
+  "records": [
+    { "state": "Andhra Pradesh", "district": "Alluri Sitharama Raju", "market": "Chintapally APMC", "commodity": "Groundnut", "variety": "Local", "grade": "FAQ", "date": "2026-08-06", "minPrice": 6500, "maxPrice": 7500, "modalPrice": 7000 },
+    { "state": "Andhra Pradesh", "district": "Palnadu", "market": "Rompicherla APMC", "commodity": "Maize", "variety": "Hybrid/Local", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2300, "maxPrice": 2400, "modalPrice": 2350 },
+    { "state": "Uttar Pradesh", "district": "Hathras", "market": "Shadabad APMC", "commodity": "Pumpkin", "variety": "Pumpkin", "grade": "Small", "date": "2026-08-06", "minPrice": 600, "maxPrice": 700, "modalPrice": 650 },
+    { "state": "Andhra Pradesh", "district": "Prakasam", "market": "Darsi APMC", "commodity": "Paddy(Common)", "variety": "B P T", "grade": "Local", "date": "2026-08-06", "minPrice": 2350, "maxPrice": 2400, "modalPrice": 2400 },
+    { "state": "Andhra Pradesh", "district": "Kakinada", "market": "Peddapuram APMC", "commodity": "Paddy(Common)", "variety": "1001", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2369, "maxPrice": 2380, "modalPrice": 2369 },
+    { "state": "Andhra Pradesh", "district": "Polavaram", "market": "Rampachodvaram APMC", "commodity": "Paddy(Common)", "variety": "1001", "grade": "Grade Range-2", "date": "2026-08-06", "minPrice": 2369, "maxPrice": 2489, "modalPrice": 2379 },
+    { "state": "Andhra Pradesh", "district": "Bapatla", "market": "Chirala APMC", "commodity": "Paddy(Common)", "variety": "B P T", "grade": "Local", "date": "2026-08-06", "minPrice": 2400, "maxPrice": 2500, "modalPrice": 2450 },
+    { "state": "West Bengal", "district": "Paschim Bardhaman", "market": "Asansol APMC", "commodity": "Masur Dal", "variety": "Masur Dal", "grade": "FAQ", "date": "2026-08-06", "minPrice": 9685, "maxPrice": 9850, "modalPrice": 9750 },
+    { "state": "Andhra Pradesh", "district": "Prakasam", "market": "Maddipadu APMC", "commodity": "Bajra(Pearl Millet/Cumbu)", "variety": "Bold", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2550, "maxPrice": 2550, "modalPrice": 2550 },
+    { "state": "Andhra Pradesh", "district": "Prakasam", "market": "Maddipadu APMC", "commodity": "Bengal Gram(Gram)(Whole)", "variety": "Gulabi", "grade": "FAQ", "date": "2026-08-06", "minPrice": 6000, "maxPrice": 6000, "modalPrice": 6000 },
+    { "state": "West Bengal", "district": "Paschim Bardhaman", "market": "Asansol APMC", "commodity": "Rice", "variety": "Fine", "grade": "FAQ", "date": "2026-08-06", "minPrice": 4675, "maxPrice": 4850, "modalPrice": 4750 },
+    { "state": "Keralam", "district": "Ernakulam", "market": "Kunnukara VFPCK Market", "commodity": "Banana", "variety": "Nendra Bale", "grade": "Grade A", "date": "2026-08-06", "minPrice": 5700, "maxPrice": 5900, "modalPrice": 5800 },
+    { "state": "Bihar", "district": "Sheikhpura", "market": "Barbigha APMC", "commodity": "Brinjal", "variety": "Arkasheela Mattigulla", "grade": "FAQ", "date": "2026-08-06", "minPrice": 3140, "maxPrice": 3300, "modalPrice": 3220 },
+    { "state": "Bihar", "district": "Sheikhpura", "market": "Barbigha APMC", "commodity": "Wheat", "variety": "147 Average", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2500, "maxPrice": 2645, "modalPrice": 2560 },
+    { "state": "Andhra Pradesh", "district": "Kakinada", "market": "Pithapuram APMC", "commodity": "Paddy(Common)", "variety": "B P T", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2369, "maxPrice": 2389, "modalPrice": 2379 },
+    { "state": "Andhra Pradesh", "district": "Kakinada", "market": "Sampara (Kakinada Rural) APMC", "commodity": "Paddy(Common)", "variety": "Paddy Medium", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2369, "maxPrice": 2389, "modalPrice": 2379 },
+    { "state": "Andhra Pradesh", "district": "Kakinada", "market": "Karapa APMC", "commodity": "Paddy(Common)", "variety": "1001", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2362, "maxPrice": 2369, "modalPrice": 2366 },
+    { "state": "West Bengal", "district": "Paschim Bardhaman", "market": "Asansol APMC", "commodity": "Peas(Dry)", "variety": "Other", "grade": "FAQ", "date": "2026-08-06", "minPrice": 6750, "maxPrice": 7000, "modalPrice": 6865 },
+    { "state": "Andhra Pradesh", "district": "Kakinada", "market": "Prattipadu APMC", "commodity": "Paddy(Common)", "variety": "1001", "grade": "FAQ", "date": "2026-08-06", "minPrice": 2369, "maxPrice": 2389, "modalPrice": 2379 },
+    { "state": "West Bengal", "district": "Paschim Bardhaman", "market": "Asansol APMC", "commodity": "Red gram split/Arhar dal/Tur dal", "variety": "Arhar Dal(Tur)", "grade": "FAQ", "date": "2026-08-06", "minPrice": 12450, "maxPrice": 12625, "modalPrice": 12550 }
+  ]
+}

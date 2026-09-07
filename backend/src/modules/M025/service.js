@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Farmer Subsidies Service (M025)
  * Government subsidy management with AI-powered eligibility prediction
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 async function createSubsidyScheme(schemeData) {
@@ -234,3 +234,4 @@ module.exports = {
   applyForSubsidy,
   getRecommendedSubsidies
 };
+

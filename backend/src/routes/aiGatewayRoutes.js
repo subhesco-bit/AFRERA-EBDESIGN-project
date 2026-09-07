@@ -3,7 +3,7 @@
  *
  * This file was written against a multi-provider LLM router shape
  * (routeRequest/providers/getAvailableModels/setProviderEnabled), but the real
- * aiGatewayService.js implements a different thing entirely - a predict/optimize/
+ * aiBackboneService.js implements a different thing entirely - a predict/optimize/
  * analyze/recommend ML service (see its module.exports). No file anywhere in
  * backend/src/services implements routeRequest, providers, getAvailableModels or
  * setProviderEnabled, and no frontend page calls /api/v1/ai-gateway/* - this is
@@ -29,3 +29,4 @@ router.put('/providers/:provider/disable', notImplemented('AI provider enable/di
 router.post('/stream', notImplemented('Multi-provider AI gateway streaming'));
 
 module.exports = router;
+

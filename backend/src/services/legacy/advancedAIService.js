@@ -174,7 +174,7 @@ async function advancedPredictDemand(productId, timeHorizon = 30, includeExplana
         forecast: predictions.values ?? [],
         insufficientData: predictions.insufficientData ?? false
       },
-      { severity: SEVERITY.INFO, source: 'advancedAIService', entityId: productId }
+      { severity: SEVERITY.INFO, source: 'advancedaiBackboneService', entityId: productId }
     );
 
 
@@ -569,7 +569,7 @@ async function advancedDetectFraud(transactionData, userId) {
       { probability: fraudProbability, transaction_id: transactionData.transaction_id },
       {
         severity: fraudProbability >= 0.8 ? SEVERITY.CRITICAL : SEVERITY.WARNING,
-        source: 'advancedAIService',
+        source: 'advancedaiBackboneService',
         entityId: userId
       }
     );
@@ -1512,7 +1512,7 @@ router.post('/assess-credit-risk', authMiddleware, async (req, res) => {
     const { farmer_id } = req.body;
     const financialService = require('./financialService');
     const result = await financialService.farmerCreditRiskScore(farmer_id);
-    res.json({ ...result, delegatedFrom: 'advancedAIService.advancedAssessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
+    res.json({ ...result, delegatedFrom: 'advancedaiBackboneService.advancedAssessCreditRisk (deprecated)', canonicalSource: 'financialService.farmerCreditRiskScore' });
   } catch (error) {
     logger.error('Advanced credit risk assessment API error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'Failed to assess credit risk' });

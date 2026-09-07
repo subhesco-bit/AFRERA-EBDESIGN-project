@@ -1,10 +1,10 @@
-﻿/**
+/**
  * Platform Configuration Service (M002)
  * Dynamic configuration management, feature flags, and settings
  */
 
 const { logger } = require('../../utils/logger');
-const { aiAPI } = require('../../services/legacy/aiService');
+const { aiAPI } = require('../../services/legacy/aiBackboneService');
 const pool = require('../../database/pool');
 
 /**
@@ -278,3 +278,4 @@ module.exports = {
   bulkUpdateConfigurations,
   getConfigurationHistory
 };
+
