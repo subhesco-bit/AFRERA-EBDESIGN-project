@@ -20,6 +20,7 @@ import { lazy } from 'react'
  */
 const HomePage = lazy(() => import('../pages/HomePage'))
 const MarketplacePage = lazy(() => import('../pages/MarketplacePage'))
+const PremiumMarketplacePage = lazy(() => import('../pages/PremiumMarketplacePage'))
 const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'))
 const CartPage = lazy(() => import('../pages/CartPage'))
 const CheckoutPage = lazy(() => import('../pages/CheckoutPage'))
@@ -44,6 +45,11 @@ const DiscoverPage = lazy(() => import('../pages/DiscoverPage'))
 const PreOrderPage = lazy(() => import('../pages/PreOrderPage'))
 const LogisticsPage = lazy(() => import('../pages/LogisticsPage'))
 const InsurancePage = lazy(() => import('../pages/InsurancePage'))
+const InsuranceManagementPage = lazy(() => import('../pages/InsuranceManagementPage'))
+const EscrowPage = lazy(() => import('../pages/EscrowPage'))
+const FinancialReportPage = lazy(() => import('../pages/FinancialReportPage'))
+const FinancialServicesDashboard = lazy(() => import('../pages/FinancialServicesDashboard'))
+const RiskManagementPage = lazy(() => import('../pages/RiskManagementPage'))
 const DashboardPage = lazy(() => import('../pages/DashboardPage'))
 const WalletPage = lazy(() => import('../pages/WalletPage'))
 const BankPassportPage = lazy(() => import('../pages/BankPassportPage'))
@@ -56,6 +62,9 @@ const ForwardPricingPage = lazy(() => import('../pages/ForwardPricingPage'))
 const ClimateWeatherPage = lazy(() => import('../pages/ClimateWeatherPage'))
 const LedgerPage = lazy(() => import('../pages/LedgerPage'))
 const CompliancePage = lazy(() => import('../pages/CompliancePage'))
+const ComplianceDashboardPage = lazy(() => import('../pages/ComplianceDashboardPage'))
+const TraceabilityPage = lazy(() => import('../pages/TraceabilityPage'))
+const AuditReportPage = lazy(() => import('../pages/AuditReportPage'))
 const RfqPage = lazy(() => import('../pages/RfqPage'))
 const CorridorEconomicsPage = lazy(() => import('../pages/CorridorEconomicsPage'))
 const LandUseCarbonPage = lazy(() => import('../pages/LandUseCarbonPage'))
@@ -219,6 +228,14 @@ export const publicRoutes = [
     keywords: 'marketplace, buy, sell, agricultural products, farming',
     transition: 'slide',
     preload: true
+  },
+  {
+    path: '/marketplace/premium',
+    component: PremiumMarketplacePage,
+    title: 'Premium Marketplace - GI-Tagged & Organic Produce',
+    description: 'Certified, GI-tagged and organic premium agricultural products sorted by quality score',
+    keywords: 'premium, GI tagged, organic, certified, marketplace',
+    transition: 'slide'
   },
   {
     path: '/products/:id',
@@ -551,6 +568,46 @@ export const farmerRoutes = [
     transition: 'fade'
   },
   {
+    path: '/insurance/manage',
+    component: InsuranceManagementPage,
+    title: 'Insurance Management - AFRERA',
+    description: 'Manage insurance policies and claims',
+    keywords: 'insurance, policy, claims, management',
+    transition: 'fade'
+  },
+  {
+    path: '/escrow',
+    component: EscrowPage,
+    title: 'Escrow - AFRERA',
+    description: 'Secure escrow transactions for buyer-farmer trades',
+    keywords: 'escrow, secure payment, transactions',
+    transition: 'fade'
+  },
+  {
+    path: '/financial-report',
+    component: FinancialReportPage,
+    title: 'Financial Report - AFRERA',
+    description: 'View financial reports and statements',
+    keywords: 'financial, report, statements',
+    transition: 'fade'
+  },
+  {
+    path: '/financial-services',
+    component: FinancialServicesDashboard,
+    title: 'Financial Services - AFRERA',
+    description: 'Loans, advances, credit and financial services dashboard',
+    keywords: 'financial services, loans, credit, advances',
+    transition: 'fade'
+  },
+  {
+    path: '/risk-management',
+    component: RiskManagementPage,
+    title: 'Risk Management - AFRERA',
+    description: 'Crop and pricing risk management tools',
+    keywords: 'risk, pricing, management',
+    transition: 'fade'
+  },
+  {
     path: '/ledger',
     component: LedgerPage,
     title: 'Ledger - AFRERA',
@@ -564,6 +621,30 @@ export const farmerRoutes = [
     title: 'Compliance - AFRERA',
     description: 'Compliance and regulatory information',
     keywords: 'compliance, regulatory, farming',
+    transition: 'fade'
+  },
+  {
+    path: '/compliance-dashboard',
+    component: ComplianceDashboardPage,
+    title: 'Compliance Dashboard - AFRERA',
+    description: 'Audit logs and compliance rules from the compliance service',
+    keywords: 'compliance, audit, governance, regulatory',
+    transition: 'fade'
+  },
+  {
+    path: '/traceability',
+    component: TraceabilityPage,
+    title: 'Product Traceability - AFRERA',
+    description: 'Look up recorded journey events and chain-of-custody verification',
+    keywords: 'traceability, blockchain, organic, chain of custody',
+    transition: 'fade'
+  },
+  {
+    path: '/admin/audit-report',
+    component: AuditReportPage,
+    title: 'Audit Report - AFRERA',
+    description: 'System compliance and security audit results',
+    keywords: 'audit, compliance, security, report',
     transition: 'fade'
   },
   {

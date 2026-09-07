@@ -7,6 +7,28 @@ const { aiAPI } = require('./aiBackboneService');
 const { socketServer } = require('../../websocket');
 const { authMiddleware } = require('../../middleware/auth');
 const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
+const { getPostgreSQL } = require('../../database/connection');
+
+/**
+ * Ownership check for claim status/payout routes.
+ *
+ * 2026-09-07: /claims/:id/status and /claims/:id/payout were previously
+ * mounted with no auth middleware at all - any unauthenticated caller could
+ * read any farmer's claim status or payout amount by guessing/incrementing
+ * the id. Fixed alongside the same-class escrow auth gap in
+ * escrowService.js. Privileged roles (admin/adjuster/superadmin) always
+ * pass; otherwise the claim must belong to the requesting user. If the
+ * claim record has no farmer_id on it (older/partial data), we fail open
+ * rather than locking farmers out of their own claims - this mirrors the
+ * conservative default used elsewhere in this file until claims data is
+ * fully backed by a real farmer_id-populated store.
+ */
+function isClaimOwner(req, claim) {
+  const isPrivileged = req.user && ['admin', 'adjuster', 'superadmin'].includes(req.user.role);
+  if (isPrivileged) return true;
+  if (!claim || claim.farmer_id === undefined || claim.farmer_id === null) return true;
+  return String(claim.farmer_id) === String(req.user?.id);
+}
 
 /**
  * Submit insurance claim with AI validation
@@ -403,9 +425,25 @@ async function checkFraudIndicators(claimData) {
   return [];
 }
 
+/**
+ * Fetch a real claim record from the `claims` table (000_base_schema.sql).
+ *
+ * 2026-09-07: previously a hardcoded stub returning {}, which meant every
+ * caller downstream (getClaimStatus, calculateClaimPayout, isClaimOwner)
+ * was silently operating on an empty object - status/payout endpoints
+ * effectively returned nonsense for any real claim id. `farmer_id` is
+ * mapped from the table's `user_id` column so isClaimOwner's ownership
+ * check (which reads claim.farmer_id) works against real data.
+ */
 async function getClaimDetails(claimId) {
-  // Fetch from database
-  return {};
+  const pg = getPostgreSQL();
+  if (!pg) throw new Error('Database not initialized');
+
+  const { rows } = await pg.query('SELECT * FROM claims WHERE id = $1', [claimId]);
+  if (!rows.length) throw new Error(`Claim not found: ${claimId}`);
+
+  const claim = rows[0];
+  return { ...claim, farmer_id: claim.user_id };
 }
 
 async function analyzeEvidence(documents) {
@@ -567,8 +605,12 @@ function setupRoutes(app) {
     }
   });
 
-  app.get('/api/v1/insurance/claims/:id/status', async (req, res) => {
+  app.get('/api/v1/insurance/claims/:id/status', authMiddleware, async (req, res) => {
     try {
+      const claim = await getClaimDetails(req.params.id);
+      if (!isClaimOwner(req, claim)) {
+        return res.status(403).json({ success: false, error: 'You may only view your own claim' });
+      }
       const status = await getClaimStatus(req.params.id);
       res.json({ success: true, data: status });
     } catch (error) {
@@ -585,8 +627,12 @@ function setupRoutes(app) {
     }
   });
 
-  app.get('/api/v1/insurance/claims/:id/payout', async (req, res) => {
+  app.get('/api/v1/insurance/claims/:id/payout', authMiddleware, async (req, res) => {
     try {
+      const claim = await getClaimDetails(req.params.id);
+      if (!isClaimOwner(req, claim)) {
+        return res.status(403).json({ success: false, error: 'You may only view your own claim' });
+      }
       const payout = await calculateClaimPayout(req.params.id);
       res.json({ success: true, data: payout });
     } catch (error) {
@@ -600,8 +646,10 @@ module.exports = {
   processInsuranceClaim,
   followUpClaimSettlement,
   getClaimStatus,
+  getClaimDetails,
   detectClaimFraud,
   calculateClaimPayout,
+  isClaimOwner,
   setupRoutes
 };
 

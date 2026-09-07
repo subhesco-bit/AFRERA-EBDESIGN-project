@@ -183,7 +183,11 @@ router.post('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, 
   }
 });
 
-router.get('/claims/:claimId/fraud-analysis', authMiddleware, async (req, res) => {
+// 2026-09-07: was authMiddleware-only, letting any authenticated user read
+// another claimant's fraud analysis. The sibling POST route (which runs the
+// analysis) already requires adminMiddleware; reading the result is
+// equally sensitive and is now gated the same way for consistency.
+router.get('/claims/:claimId/fraud-analysis', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { claimId } = req.params;
     const analysis = await insuranceFraudDetectionService.getFraudAnalysis(claimId);

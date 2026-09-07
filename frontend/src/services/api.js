@@ -4377,9 +4377,14 @@ export const strategicAPI = {
  * generic backend-module bridge; verify against the module's service.js
  * before relying on this in production. */
 export const escrowAPI = {
-  list: (params) => api.get('/backend-modules/M697100_ESCROW/list', { params }),
-  release: (escrowId, data) => api.post(`/backend-modules/M697100_ESCROW/release/${escrowId}`, data),
-  refund: (escrowId, data) => api.post(`/backend-modules/M697100_ESCROW/refund/${escrowId}`, data),
+  list: (params) => api.get('/escrow', { params }),
+  create: (data) => api.post('/escrow', data),
+  get: (escrowId) => api.get(`/escrow/${escrowId}`),
+  getStatus: (escrowId) => api.get(`/escrow/${escrowId}/status`),
+  getByOrder: (orderId) => api.get(`/escrow/order/${orderId}`),
+  getUserEscrows: (userId, role) => api.get(`/escrow/user/${userId}`, { params: { role } }),
+  release: (escrowId, data) => api.post(`/escrow/${escrowId}/release`, data),
+  refund: (escrowId, data) => api.post(`/escrow/${escrowId}/refund`, data),
 }
 
 /** Farmer Value / Season Ledger (M844100_FARMERVALUE). No dedicated mounted

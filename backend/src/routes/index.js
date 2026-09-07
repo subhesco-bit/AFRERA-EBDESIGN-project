@@ -69,7 +69,6 @@ module.exports.enterpriseAIRoutes = require('./enterpriseAIRoutes');
 module.exports.enterpriseIntegrationRoutes = require('./enterpriseIntegrationRoutes');
 module.exports.enterpriseRouteSupport = require('./enterpriseRouteSupport');
 module.exports.equipmentExchangeRoutes = require('./equipmentExchangeRoutes');
-module.exports.escrowRoutes = require('./escrowRoutes');
 module.exports.experienceRoutes = require('./experienceRoutes');
 module.exports.farmAnalytics = require('./farmAnalytics');
 module.exports.farmCosting = require('./farmCosting');
