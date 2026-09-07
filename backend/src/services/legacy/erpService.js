@@ -4,10 +4,13 @@
  * Handles data synchronization, business process automation, and financial Reconciliation
  */
 
+const express = require('express');
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { authMiddleware } = require('../../middleware/auth');
 const { AppError } = require('../../middleware/errorHandler');
+
+const router = express.Router();
 
 // ERP configuration
 const ERP_CONFIG = {
@@ -858,9 +861,6 @@ async function logSyncOperation(entityType, entityId, erpType, status, details) 
 /**
  * Express router for ERP service
  */
-const express = require('express');
-const router = express.Router();
-
 router.get('/status', async (req, res) => {
   try {
     const status = await getSyncStatus();
@@ -920,11 +920,259 @@ router.post('/sync/asset', authMiddleware, async (req, res) => {
   }
 });
 
+/**
+ * Get ERP dashboard data
+ */
+async function getDashboardData() {
+  try {
+    const pg = getPostgreSQL();
+    
+    // Get financial summary
+    const financialQuery = `
+      SELECT 
+        COALESCE(SUM(amount), 0) as total_revenue,
+        COALESCE(SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END), 0) as total_expenses,
+        COALESCE(SUM(amount), 0) as net_profit,
+        COUNT(*) as transaction_count
+      FROM journal_entries
+      WHERE entry_date >= NOW() - INTERVAL '30 days'
+    `;
+    
+    const financialResult = await pg.query(financialQuery);
+    const financial = financialResult.rows[0];
+    
+    // Get sync status
+    const syncStatus = await getSyncStatus();
+    
+    // Get budget utilization
+    const budgetQuery = `
+      SELECT 
+        COALESCE(SUM(amount), 0) as total_budget,
+        COALESCE(SUM(CASE WHEN status = 'active' THEN amount ELSE 0 END), 0) as active_budget,
+        COALESCE(SUM(CASE WHEN status = 'active' THEN utilized_amount ELSE 0 END), 0) as utilized_amount
+      FROM budgets
+      WHERE fiscal_year = EXTRACT(YEAR FROM CURRENT_DATE)
+    `;
+    
+    const budgetResult = await pg.query(budgetQuery);
+    const budget = budgetResult.rows[0];
+    
+    const budgetUtilization = budget.total_budget > 0 
+      ? ((budget.utilized_amount / budget.total_budget) * 100).toFixed(1)
+      : 0;
+    
+    return {
+      financials: {
+        revenue: parseFloat(financial.total_revenue) || 0,
+        expenses: parseFloat(financial.total_expenses) || 0,
+        profit: parseFloat(financial.net_profit) || 0,
+        transactions: parseInt(financial.transaction_count) || 0
+      },
+      sync_status: syncStatus,
+      budget_utilization: parseFloat(budgetUtilization),
+      last_updated: new Date().toISOString()
+    };
+  } catch (error) {
+    logger.error('Error getting ERP dashboard data', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * Get GL entries
+ */
+async function getGLEntries(limit = 50) {
+  try {
+    const pg = getPostgreSQL();
+    
+    const query = `
+      SELECT 
+        je.*,
+        c.name as category_name,
+        a.account_name
+      FROM journal_entries je
+      LEFT JOIN categories c ON je.category_id = c.id
+      LEFT JOIN accounts a ON je.account_id = a.id
+      ORDER BY je.entry_date DESC
+      LIMIT $1
+    `;
+    
+    const result = await pg.query(query, [limit]);
+    return result.rows;
+  } catch (error) {
+    logger.error('Error getting GL entries', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * Get reconciliation data
+ */
+async function getReconciliation(limit = 50) {
+  try {
+    const pg = getPostgreSQL();
+    
+    // Get pending reconciliations
+    const pendingQuery = `
+      SELECT COUNT(*) as pending
+      FROM financial_reconciliations
+      WHERE status = 'pending'
+    `;
+    
+    const conflictsQuery = `
+      SELECT COUNT(*) as conflicts
+      FROM financial_reconciliations
+      WHERE status = 'conflict'
+    `;
+    
+    const resolvedQuery = `
+      SELECT COUNT(*) as resolved
+      FROM financial_reconciliations
+      WHERE status = 'resolved'
+      AND resolved_at >= NOW() - INTERVAL '1 day'
+    `;
+    
+    const [pendingResult, conflictsResult, resolvedResult] = await Promise.all([
+      pg.query(pendingQuery),
+      pg.query(conflictsQuery),
+      pg.query(resolvedQuery)
+    ]);
+    
+    // Get recent reconciliation items
+    const itemsQuery = `
+      SELECT 
+        fr.*,
+        je.entry_date,
+        je.amount as system_amount,
+        erp_data->>'amount' as erp_amount
+      FROM financial_reconciliations fr
+      LEFT JOIN journal_entries je ON fr.journal_entry_id = je.id
+      ORDER BY fr.created_at DESC
+      LIMIT $1
+    `;
+    
+    const itemsResult = await pg.query(itemsQuery, [limit]);
+    
+    return {
+      pending: parseInt(pendingResult.rows[0].pending) || 0,
+      conflicts: parseInt(conflictsResult.rows[0].conflicts) || 0,
+      resolved: parseInt(resolvedResult.rows[0].resolved) || 0,
+      items: itemsResult.rows
+    };
+  } catch (error) {
+    logger.error('Error getting reconciliation data', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * Get financial reports
+ */
+async function getFinancialReports(limit = 20) {
+  try {
+    const pg = getPostgreSQL();
+    
+    const query = `
+      SELECT 
+        fr.*,
+        u.name as generated_by
+      FROM financial_reports fr
+      LEFT JOIN users u ON fr.generated_by_id = u.id
+      ORDER BY fr.generated_at DESC
+      LIMIT $1
+    `;
+    
+    const result = await pg.query(query, [limit]);
+    return result.rows;
+  } catch (error) {
+    logger.error('Error getting financial reports', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
 router.post('/sync/bulk', authMiddleware, async (req, res) => {
   try {
     const { entity_type, erp_type } = req.body;
     const result = await triggerBulkSync(entity_type, erp_type);
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ERP health check endpoint
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'erp-service',
+    configuration: {
+      sap: {
+        enabled: ERP_CONFIG.sap.enabled,
+        configured: !!ERP_CONFIG.sap.username && !!ERP_CONFIG.sap.password
+      },
+      oracle: {
+        enabled: ERP_CONFIG.oracle.enabled,
+        configured: !!ERP_CONFIG.oracle.username && !!ERP_CONFIG.oracle.password
+      },
+      custom: {
+        enabled: ERP_CONFIG.custom.enabled,
+        configured: !!ERP_CONFIG.custom.apiUrl && !!ERP_CONFIG.custom.apiKey
+      }
+    },
+    sync_status: SYNC_STATUS,
+    active_syncs: SYNC_STATUS.activeSyncs.size,
+    sync_queue_length: SYNC_STATUS.syncQueue.length
+  });
+});
+
+// Dashboard data endpoint
+router.get('/dashboard', authMiddleware, async (req, res) => {
+  try {
+    const dashboard = await getDashboardData();
+    res.json(dashboard);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Sync status endpoint
+router.get('/sync-status', authMiddleware, async (req, res) => {
+  try {
+    const status = await getSyncStatus();
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GL entries endpoint
+router.get('/gl-entries', authMiddleware, async (req, res) => {
+  try {
+    const { limit = 50 } = req.query;
+    const entries = await getGLEntries(parseInt(limit));
+    res.json(entries);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Reconciliation endpoint
+router.get('/reconciliation', authMiddleware, async (req, res) => {
+  try {
+    const { limit = 50 } = req.query;
+    const reconciliation = await getReconciliation(parseInt(limit));
+    res.json(reconciliation);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Financial reports endpoint
+router.get('/financial-reports', authMiddleware, async (req, res) => {
+  try {
+    const { limit = 20 } = req.query;
+    const reports = await getFinancialReports(parseInt(limit));
+    res.json(reports);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -939,5 +1187,9 @@ module.exports = {
   syncFinancialTransaction,
   syncAssetToERP,
   getSyncStatus,
-  triggerBulkSync
+  triggerBulkSync,
+  getDashboardData,
+  getGLEntries,
+  getReconciliation,
+  getFinancialReports
 };

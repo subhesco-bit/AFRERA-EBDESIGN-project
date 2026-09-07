@@ -18,6 +18,9 @@ import { Button } from '../components/ui/button'
 export default function DietRecipesPage() {
   const [dietaryProfileId, setDietaryProfileId] = useState('')
   const [targetCalories, setTargetCalories] = useState('')
+  const [codeSystem, setCodeSystem] = useState('')
+  const [medicalCode, setMedicalCode] = useState('')
+  const [codeDisplay, setCodeDisplay] = useState('')
   const [result, setResult] = useState(null)
 
   const { data: profiles, isLoading: profilesLoading, error: profilesError } = useQuery({
@@ -26,7 +29,12 @@ export default function DietRecipesPage() {
   })
 
   const recipeMutation = useMutation({
-    mutationFn: () => nutritionAPI.generateRecipe(dietaryProfileId, targetCalories || undefined),
+    mutationFn: () => nutritionAPI.generateRecipe(
+      dietaryProfileId,
+      targetCalories || undefined,
+      undefined,
+      codeSystem && medicalCode ? { codeSystem, code: medicalCode, display: codeDisplay || undefined } : undefined
+    ),
     onMutate: () => setResult(null),
     onSuccess: (res) => setResult(res.data),
     onError: (err) => setResult({ status: 'error', message: err.response?.data?.error || err.message }),
@@ -73,6 +81,33 @@ export default function DietRecipesPage() {
                   placeholder="e.g. 1800"
                 />
 
+                <label htmlFor="medical-code-system" className="text-sm font-medium">Medical code</label>
+                <select
+                  id="medical-code-system"
+                  value={codeSystem}
+                  onChange={(e) => setCodeSystem(e.target.value)}
+                  className="rounded-md border border-input bg-background px-2 py-1.5 text-sm"
+                >
+                  <option value="">None</option>
+                  <option value="ICD-10-CM">ICD-10-CM</option>
+                  <option value="SNOMED-CT">SNOMED-CT</option>
+                  <option value="LOINC">LOINC</option>
+                </select>
+                <input
+                  aria-label="Medical code"
+                  value={medicalCode}
+                  onChange={(e) => setMedicalCode(e.target.value)}
+                  className="w-32 rounded-md border border-input bg-background px-2 py-1.5 text-sm"
+                  placeholder="Code"
+                />
+                <input
+                  aria-label="Medical code description"
+                  value={codeDisplay}
+                  onChange={(e) => setCodeDisplay(e.target.value)}
+                  className="w-44 rounded-md border border-input bg-background px-2 py-1.5 text-sm"
+                  placeholder="Verified description"
+                />
+
                 <Button
                   size="sm"
                   disabled={!dietaryProfileId || recipeMutation.isPending}
@@ -97,6 +132,12 @@ export default function DietRecipesPage() {
                   {result.calorie_target_kcal_per_day ? ` · target ~${result.calorie_target_kcal_per_day} kcal/day` : ''}
                 </div>
                 <p className="whitespace-pre-wrap">{result.recipe_text}</p>
+                {result.medical_coding && (
+                  <p className="text-xs text-muted-foreground">
+                    Medical context: {result.medical_coding.system} {result.medical_coding.code}
+                    {result.medical_coding.display ? ` · ${result.medical_coding.display}` : ''}
+                  </p>
+                )}
                 <div className="text-xs text-muted-foreground">
                   Ingredients considered: {result.ingredients_considered?.join(', ')}
                 </div>

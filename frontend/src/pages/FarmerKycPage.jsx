@@ -105,7 +105,7 @@ function FarmerKycPage() {
       {isLoading && <div className="animate-pulse h-40 bg-gray-200 rounded-lg" />}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
-          Error loading applications: {error.message}. Backend endpoint /farmer-kyc/applications has not been built yet — this page is wired and ready once it is.
+          Error loading applications: {error.message}.
         </div>
       )}
       {!isLoading && !error && (

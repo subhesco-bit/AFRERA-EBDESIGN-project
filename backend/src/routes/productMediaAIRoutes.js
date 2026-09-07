@@ -15,6 +15,7 @@ router.use(rateLimiter);
 
 router.get('/status', productMediaAIController.getProviderStatus);
 router.post('/products/:productId/image', productMediaAIController.generateProductImage);
+router.post('/products/:productId/cartoon', productMediaAIController.generateProductCartoon);
 router.post('/products/:productId/video-script', productMediaAIController.buildNutrientVideoScript);
 router.post('/products/:productId/video', productMediaAIController.generateProductVideo);
 

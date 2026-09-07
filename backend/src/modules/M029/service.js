@@ -4,6 +4,28 @@ const { getPostgreSQL } = require('../../database/connection');
 
 const tableName = 'farmer_health_records';
 
+const MEDICAL_CODE_SYSTEMS = new Set(['ICD-10-CM', 'SNOMED-CT', 'LOINC']);
+
+function normalizeMedicalCoding(payload = {}) {
+  const coding = payload.medicalCoding || payload.medical_coding || {};
+  const codeSystem = coding.codeSystem || coding.code_system || payload.codeSystem || payload.code_system;
+  const code = coding.code || payload.code;
+  const display = coding.display || payload.codeDisplay || payload.code_display;
+
+  if (!codeSystem && !code && !display) return null;
+  if (!codeSystem || !code) {
+    throw new Error('Medical coding requires both codeSystem and code');
+  }
+  if (!MEDICAL_CODE_SYSTEMS.has(codeSystem)) {
+    throw new Error('Unsupported medical codeSystem; use ICD-10-CM, SNOMED-CT, or LOINC');
+  }
+  if (!/^[A-Za-z0-9][A-Za-z0-9.:-]{1,31}$/.test(String(code))) {
+    throw new Error('Medical code must be 2-32 characters using letters, numbers, dot, colon, or hyphen');
+  }
+
+  return { system: codeSystem, code: String(code), display: display ? String(display).trim() : null };
+}
+
 async function listHealthRecords({ page = 1, limit = 20, farmerId = null } = {}) {
   const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   const offset = (page - 1) * limit;
@@ -40,11 +62,12 @@ async function getHealthRecord(id) {
 async function createHealthRecord(payload) {
   const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   const { farmerId, healthType, description, severity, date, metadata } = payload;
+  const medicalCoding = normalizeMedicalCoding(payload);
   
   const res = await pg.query(
     `INSERT INTO ${tableName} (farmer_id, health_type, description, severity, date, metadata, created_at) 
      VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
-    [farmerId, healthType, description, severity, date, JSON.stringify(metadata || {})]
+    [farmerId, healthType, description, severity, date, JSON.stringify({ ...(metadata || {}), medicalCoding })]
   );
   return res.rows[0];
 }
@@ -52,12 +75,13 @@ async function createHealthRecord(payload) {
 async function updateHealthRecord(id, payload) {
   const pg = getPostgreSQL(); if(!pg) throw new Error('Database not initialized');
   const { healthType, description, severity, date, metadata } = payload;
+  const medicalCoding = normalizeMedicalCoding(payload);
   
   const res = await pg.query(
     `UPDATE ${tableName} 
      SET health_type = $1, description = $2, severity = $3, date = $4, metadata = $5, updated_at = NOW() 
      WHERE id = $6 RETURNING *`,
-    [healthType, description, severity, date, JSON.stringify(metadata || {}), id]
+    [healthType, description, severity, date, JSON.stringify({ ...(metadata || {}), medicalCoding }), id]
   );
   return res.rows[0] || null;
 }

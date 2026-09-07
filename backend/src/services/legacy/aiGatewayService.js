@@ -425,4 +425,73 @@ class AiGatewayService {
   }
 }
 
-module.exports = new AiGatewayService();
+// Create Express router for AI Gateway endpoints
+const express = require('express');
+const router = express.Router();
+const { authMiddleware } = require('../../middleware/auth');
+
+// AI Gateway health check
+router.get('/health', (req, res) => {
+  const aiGateway = new AiGatewayService();
+  res.json({
+    status: 'healthy',
+    service: 'ai-gateway',
+    models: Array.from(aiGateway.aiModels.entries()),
+    cache_size: aiGateway.modelCache.size,
+    performance_metrics: Array.from(aiGateway.performanceMetrics.entries())
+  });
+});
+
+// Model prediction endpoint
+router.post('/predict', authMiddleware, async (req, res) => {
+  try {
+    const aiGateway = new AiGatewayService();
+    const { model_type, data } = req.body;
+    const result = await aiGateway.predict(model_type, data);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Model optimization endpoint
+router.post('/optimize', authMiddleware, async (req, res) => {
+  try {
+    const aiGateway = new AiGatewayService();
+    const { model_type, data, constraints } = req.body;
+    const result = await aiGateway.optimize(model_type, data, constraints);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Model analysis endpoint
+router.post('/analyze', authMiddleware, async (req, res) => {
+  try {
+    const aiGateway = new AiGatewayService();
+    const { model_type, data } = req.body;
+    const result = await aiGateway.analyze(model_type, data);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Model recommendation endpoint
+router.post('/recommend', authMiddleware, async (req, res) => {
+  try {
+    const aiGateway = new AiGatewayService();
+    const { model_type, data, context } = req.body;
+    const result = await aiGateway.recommend(model_type, data, context);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = {
+  router,
+  AiGatewayService,
+  ...new AiGatewayService()
+};

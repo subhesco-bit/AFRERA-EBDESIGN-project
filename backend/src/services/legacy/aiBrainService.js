@@ -499,7 +499,74 @@ class AIBrainService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance with router for proper mounting
 const aiBrainService = new AIBrainService();
 
-module.exports = aiBrainService;
+// Create Express router for AI Brain endpoints
+const express = require('express');
+const router = express.Router();
+const { authMiddleware } = require('../../middleware/auth');
+
+// AI Brain health check
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'ai-brain',
+    models_available: {
+      openai: !!aiBrainService.openai,
+      gemini: !!aiBrainService.gemini,
+      anthropic: !!aiBrainService.anthropic
+    },
+    knowledge_graph_size: aiBrainService.knowledgeGraph.size,
+    working_memory_size: aiBrainService.workingMemory.size,
+    long_term_memory_size: aiBrainService.longTermMemory.size
+  });
+});
+
+// Cognitive process endpoint
+router.post('/process', authMiddleware, async (req, res) => {
+  try {
+    const { input, context } = req.body;
+    const result = await aiBrainService.processCognitiveCycle(input, context);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Knowledge graph operations
+router.get('/knowledge-graph', authMiddleware, (req, res) => {
+  try {
+    const graph = aiBrainService.getKnowledgeGraph();
+    res.json({ knowledge_graph: graph });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Memory operations
+router.post('/memory/working', authMiddleware, (req, res) => {
+  try {
+    const { key, value } = req.body;
+    const result = aiBrainService.addToWorkingMemory(key, value);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/memory/long-term', authMiddleware, (req, res) => {
+  try {
+    const { key, value } = req.body;
+    const result = aiBrainService.addToLongTermMemory(key, value);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = {
+  router,
+  aiBrainService,
+  ...aiBrainService
+};

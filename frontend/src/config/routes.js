@@ -135,6 +135,19 @@ const B2BMarketplace = lazy(() => import('../pages/B2BMarketplace'))
 const MarketingCenter = lazy(() => import('../pages/MarketingCenter'))
 const NutrientValueMarketplace = lazy(() => import('../pages/NutrientValueMarketplace'))
 
+// AI and Advanced Feature Dashboard Pages
+const DecisionEngineDashboardPage = lazy(() => import('../pages/DecisionEngineDashboardPage'))
+const EnterpriseMemoryDashboardPage = lazy(() => import('../pages/EnterpriseMemoryDashboardPage'))
+const ERPDashboardPage = lazy(() => import('../pages/ERPDashboardPage'))
+const DigitalTwinDashboardPage = lazy(() => import('../pages/DigitalTwinDashboardPage'))
+const ClimateMonitoringDashboardPage = lazy(() => import('../pages/ClimateMonitoringDashboardPage'))
+const ColdStorageDashboardPage = lazy(() => import('../pages/ColdStorageDashboardPage'))
+
+// Medical Coding and Health Condition Dashboard Pages
+const MedicalCodingDashboardPage = lazy(() => import('../pages/MedicalCodingDashboardPage'))
+const AdvancedMedicalCodingPage = lazy(() => import('../pages/AdvancedMedicalCodingPage'))
+const NutrientCalculatorPage = lazy(() => import('../pages/NutrientCalculatorPage'))
+
 // Additional management pages
 const FarmerProfilePage = lazy(() => import('../pages/FarmerProfilePage'))
 const FarmerFamilyPage = lazy(() => import('../pages/FarmerFamilyPage'))
@@ -709,6 +722,89 @@ export const dashboardRoutes = [
     keywords: 'logistics, provider, transport',
     transition: 'fade',
     role: 'logistics'
+  },
+  // AI and Advanced Feature Dashboards
+  {
+    path: '/decision-engine-dashboard',
+    component: DecisionEngineDashboardPage,
+    title: 'Decision Engine Dashboard - AFRERA',
+    description: 'Monitor and control autonomous decision-making',
+    keywords: 'decision engine, AI, autonomous, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/enterprise-memory-dashboard',
+    component: EnterpriseMemoryDashboardPage,
+    title: 'Enterprise Memory Dashboard - AFRERA',
+    description: 'Monitor autonomous learning and knowledge accumulation',
+    keywords: 'enterprise memory, learning, knowledge, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/erp-dashboard',
+    component: ERPDashboardPage,
+    title: 'ERP Dashboard - AFRERA',
+    description: 'Enterprise Resource Planning monitoring and control',
+    keywords: 'ERP, enterprise, planning, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/digital-twin-dashboard',
+    component: DigitalTwinDashboardPage,
+    title: 'Digital Twin Dashboard - AFRERA',
+    description: 'Farm simulation engine and predictive modeling',
+    keywords: 'digital twin, simulation, modeling, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/climate-monitoring-dashboard',
+    component: ClimateMonitoringDashboardPage,
+    title: 'Climate Monitoring Dashboard - AFRERA',
+    description: 'Weather analytics, drought/flood monitoring, disease forecasting',
+    keywords: 'climate, weather, monitoring, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/cold-storage-dashboard',
+    component: ColdStorageDashboardPage,
+    title: 'Cold Storage Dashboard - AFRERA',
+    description: 'Cold chain monitoring, temperature tracking, facility management',
+    keywords: 'cold storage, temperature, monitoring, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  // Medical Coding and Health Condition Dashboard
+  {
+    path: '/medical-coding-dashboard',
+    component: MedicalCodingDashboardPage,
+    title: 'Medical Coding Dashboard - AFRERA',
+    description: 'Medical coding (ICD-10-CM, SNOMED-CT, LOINC) for health conditions with dietary guidance',
+    keywords: 'medical coding, health conditions, diabetes, hypertension, nutrition, dashboard',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/advanced-medical-coding',
+    component: AdvancedMedicalCodingPage,
+    title: 'Advanced Medical Coding - AFRERA',
+    description: 'MS-Level medical coding with dietitian and natural therapist knowledge, 30+ years experience integration, AI coding assistance',
+    keywords: 'advanced medical coding, MS-level dietitian, natural therapist, AI coding, biological coding, health management',
+    transition: 'fade',
+    role: 'admin'
+  },
+  {
+    path: '/nutrient-calculator',
+    component: NutrientCalculatorPage,
+    title: 'Nutrient Calculator - AFRERA',
+    description: 'Calculate nutrient profiles against health condition requirements',
+    keywords: 'nutrient calculator, health conditions, diabetes, hypertension, nutrition',
+    transition: 'fade',
+    role: 'admin'
   }
 ]
 

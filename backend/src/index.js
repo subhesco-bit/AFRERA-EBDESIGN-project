@@ -192,6 +192,10 @@ const aiBrainService = require('./services/legacy/aiBrainService');
 const aiSelfHealingService = require('./services/legacy/aiSelfHealingService');
 // AI Operation Intelligence Service - Real-Time Optimization Layer
 const aiOperationIntelligenceService = require('./services/legacy/aiOperationIntelligenceService');
+// API Contract Validator - Frontend-Backend contract validation
+const { validateAPIContracts, generateContractReport } = require('./utils/apiContractValidator');
+// Advanced Medical Coding Service - MS-Level Knowledge Integration
+const advancedMedicalCodingService = require('./services/advancedMedicalCodingService');
 // MFA Service - Multi-Factor Authentication
 const mfaService = require('./services/dual-use/mfaService');
 const mfaRoutes = require('./routes/dual-use/mfaRoutes');
@@ -435,6 +439,8 @@ const aiBrainRoutes = require('./routes/aiBrainRoutes');
 const aiSelfHealingRoutes = require('./routes/aiSelfHealingRoutes');
 // AI Operation Intelligence Routes - Real-Time Optimization Layer
 const aiOperationIntelligenceRoutes = require('./routes/aiOperationIntelligenceRoutes');
+// M400 AI Backbone - complete enterprise coordination surface, admin protected.
+const m400AiBackboneRoutes = require('./routes/m400AiBackboneRoutes');
 // SAP Module Architecture Routes - Independent Module Architecture
 const sapModuleArchitectureRoutes = require('./routes/sapModuleArchitectureRoutes');
 // Research and Development Routes - R&D Management with AI Integration
@@ -451,6 +457,13 @@ const platformConfigurationRoutes = require('./routes/platformConfigurationRoute
 const tenantManagementRoutes = require('./routes/tenantManagementRoutes');
 const organizationManagementRoutes = require('./routes/organizationManagementRoutes');
 const systemAdministrationRoutes = require('./routes/systemAdministrationRoutes');
+const labourRoutes = require('./routes/labourRoutes');
+const farmerVerificationRoutes = require('./routes/farmerVerificationRoutes');
+const farmerKycRoutes = require('./routes/farmerKycRoutes');
+const contractFarmingRoutes = require('./routes/strategic/contractFarmingRoutes');
+const governmentSubsidyRoutes = require('./routes/strategic/governmentSubsidyRoutes');
+const householdProcurementRoutes = require('./routes/strategic/householdProcurementRoutes');
+const preSeasonPurchaseRoutes = require('./routes/strategic/preSeasonPurchaseRoutes');
 // Poultry/Goat/Sheep/Pig/Animal Health (M123-M127) already required above.
 
 // Cross-module nervous system + decision layer.
@@ -484,7 +497,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
@@ -554,14 +567,59 @@ app.use('/api/v1/', rateLimiters.api);
 app.use(errorLogger);
 
 // API Routes
-const mountRoute = (pathPrefix, serviceModule) => {
-  if (serviceModule && serviceModule.router) {
-    app.use(pathPrefix, serviceModule.router);
-    return true;
-  }
+const mountedRoutes = new Map(); // Track mounted routes for health monitoring
+const failedMounts = new Map(); // Track failed mounts for debugging
 
-  logger.warn(`Skipping route mount for ${pathPrefix} because no router was exported.`);
-  return false;
+const mountRoute = (pathPrefix, serviceModule) => {
+  try {
+    if (!serviceModule) {
+      const error = `Service module is null/undefined for ${pathPrefix}`;
+      logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
+      failedMounts.set(pathPrefix, { error: 'module_undefined', timestamp: new Date() });
+      return false;
+    }
+
+    if (typeof serviceModule !== 'object') {
+      const error = `Service module is not an object for ${pathPrefix}`;
+      logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
+      failedMounts.set(pathPrefix, { error: 'module_not_object', timestamp: new Date() });
+      return false;
+    }
+
+    if (!serviceModule.router) {
+      const error = `No router property exported by service module for ${pathPrefix}`;
+      logger.warn(`Skipping route mount for ${pathPrefix} because no router was exported.`);
+      failedMounts.set(pathPrefix, { error: 'no_router_export', timestamp: new Date() });
+      return false;
+    }
+
+    if (typeof serviceModule.router !== 'object' || typeof serviceModule.router.use !== 'function') {
+      const error = `Router property is not a valid Express router for ${pathPrefix}`;
+      logger.error(`Route mount failed for ${pathPrefix}: ${error}`);
+      failedMounts.set(pathPrefix, { error: 'invalid_router', timestamp: new Date() });
+      return false;
+    }
+
+    // Valid router - mount it
+    app.use(pathPrefix, serviceModule.router);
+    mountedRoutes.set(pathPrefix, { 
+      mounted: true, 
+      timestamp: new Date(),
+      serviceModule: serviceModule.constructor?.name || 'unknown'
+    });
+    logger.info(`Successfully mounted route: ${pathPrefix}`);
+    return true;
+
+  } catch (error) {
+    const errorDetails = `Exception during route mount for ${pathPrefix}: ${error.message}`;
+    logger.error(errorDetails, { error: error.message, stack: error.stack });
+    failedMounts.set(pathPrefix, { 
+      error: 'mount_exception', 
+      message: error.message, 
+      timestamp: new Date() 
+    });
+    return false;
+  }
 };
 
 app.use('/api/v1/auth', criticalRouteMonitoring, authService.router);
@@ -930,12 +988,16 @@ app.get('/api/v1/ai/audit', (req, res) => {
 });
 // AI Agent - Agentic AI Capabilities
 app.use('/api/v1/ai-agent', aiAgentRoutes);
-// AI Brain - Cognitive Processing Layer
-app.use('/api/v1/ai-brain', aiBrainRoutes);
-// AI Self-Healing - Autonomous Error Recovery Layer
-app.use('/api/v1/ai-self-healing', aiSelfHealingRoutes);
-// AI Operation Intelligence - Real-Time Optimization Layer
-app.use('/api/v1/ai-operation-intelligence', aiOperationIntelligenceRoutes);
+// AI Brain - Cognitive Processing Layer (using service router for health checks)
+mountRoute('/api/v1/ai-brain', aiBrainService);
+// AI Gateway - AI Backbone System (using service router for health checks)
+mountRoute('/api/v1/ai-gateway', aiGatewayService);
+// AI Self-Healing - Autonomous Error Recovery Layer (using service router for health checks)
+mountRoute('/api/v1/ai-self-healing', aiSelfHealingService);
+// AI Operation Intelligence - Real-Time Optimization Layer (using service router for health checks)
+mountRoute('/api/v1/ai-operation-intelligence', aiOperationIntelligenceService);
+mountRoute('/api/v1/advanced-medical-coding', advancedMedicalCodingService);
+app.use('/api/v1/m400-ai-backbone', m400AiBackboneRoutes);
 // SAP Module Architecture - Independent Module Architecture
 app.use('/api/v1/sap-module-architecture', sapModuleArchitectureRoutes);
 // Research and Development - R&D Management with AI Integration
@@ -953,12 +1015,150 @@ app.use('/api/v1/platform-configuration', platformConfigurationRoutes);
 app.use('/api/v1/tenant-management', tenantManagementRoutes);
 app.use('/api/v1/organization-management', organizationManagementRoutes);
 app.use('/api/v1/system-administration', systemAdministrationRoutes);
+app.use('/api/v1/labour', labourRoutes);
+app.use('/api/v1/farmer-verification', farmerVerificationRoutes);
+app.use('/api/v1/farmer-kyc', farmerKycRoutes);
+app.use('/api/v1/strategic/contract-farming', contractFarmingRoutes);
+app.use('/api/v1/strategic/government', governmentSubsidyRoutes);
+app.use('/api/v1/strategic/household', householdProcurementRoutes);
+app.use('/api/v1/strategic/pre-season', preSeasonPurchaseRoutes);
 // Escrow service - secure fund holding for transactions
 escrowService.setupRoutes(app);
 // Custody event service - chain tracking and settlement instructions
 custodyEventRoutes.setupRoutes(app);
 // Health check endpoints for monitoring with specialized monitoring
 app.use('/health', healthCheckMonitoring, healthRoutes);
+
+// Enhanced health check with route mounting status
+app.get('/health/routes', (req, res) => {
+  const mountedRoutesList = Array.from(mountedRoutes.entries()).map(([path, info]) => ({
+    path,
+    mounted: info.mounted,
+    timestamp: info.timestamp,
+    service: info.serviceModule
+  }));
+
+  const failedMountsList = Array.from(failedMounts.entries()).map(([path, info]) => ({
+    path,
+    error: info.error,
+    message: info.message,
+    timestamp: info.timestamp
+  }));
+
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    routes: {
+      mounted: mountedRoutesList.length,
+      failed: failedMountsList.length,
+      mounted_routes: mountedRoutesList,
+      failed_mounts: failedMountsList
+    }
+  });
+});
+
+// Comprehensive system health check
+app.get('/health/comprehensive', async (req, res) => {
+  try {
+    const healthChecks = {
+      system: {
+        status: 'healthy',
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        environment: process.env.NODE_ENV || 'development',
+        timestamp: new Date().toISOString()
+      },
+      routes: {
+        mounted: mountedRoutes.size,
+        failed: failedMounts.size,
+        details: {
+          mounted: Array.from(mountedRoutes.keys()),
+          failed: Array.from(failedMounts.entries())
+        }
+      },
+      database: {
+        postgresql: { status: 'unknown', message: 'Database connection not verified' },
+        mongodb: { status: 'unknown', message: 'MongoDB connection not verified' },
+        redis: { status: 'unknown', message: 'Redis connection not verified' }
+      },
+      services: {
+        ai: { status: 'unknown', message: 'AI services not verified' },
+        erp: { status: 'unknown', message: 'ERP services not verified' },
+        ai_brain: { status: mountedRoutes.has('/api/v1/ai-brain') ? 'mounted' : 'not_mounted' },
+        ai_gateway: { status: mountedRoutes.has('/api/v1/ai-gateway') ? 'mounted' : 'not_mounted' },
+        ai_self_healing: { status: mountedRoutes.has('/api/v1/ai-self-healing') ? 'mounted' : 'not_mounted' },
+        ai_operation_intelligence: { status: mountedRoutes.has('/api/v1/ai-operation-intelligence') ? 'mounted' : 'not_mounted' },
+        erp: { status: mountedRoutes.has('/api/v1/erp') ? 'mounted' : 'not_mounted' }
+      }
+    };
+
+    // Try to verify database connections
+    try {
+      const { getPostgreSQL } = require('./database/connection');
+      const pg = await getPostgreSQL();
+      await pg.query('SELECT 1');
+      healthChecks.database.postgresql = { status: 'healthy', message: 'PostgreSQL connection successful' };
+    } catch (error) {
+      healthChecks.database.postgresql = { status: 'unhealthy', message: error.message };
+    }
+
+    // Try MongoDB connection
+    try {
+      const { getMongoDatabase } = require('./database/connection');
+      const mongo = await getMongoDatabase();
+      await mongo.admin().ping();
+      healthChecks.database.mongodb = { status: 'healthy', message: 'MongoDB connection successful' };
+    } catch (error) {
+      healthChecks.database.mongodb = { status: 'unhealthy', message: error.message };
+    }
+
+    // Try Redis connection
+    try {
+      const { getRedisClient } = require('./database/connection');
+      const redis = await getRedisClient();
+      await redis.ping();
+      healthChecks.database.redis = { status: 'healthy', message: 'Redis connection successful' };
+    } catch (error) {
+      healthChecks.database.redis = { status: 'unhealthy', message: error.message };
+    }
+
+    // Determine overall system status
+    const hasFailedMounts = failedMounts.size > 0;
+    const hasDatabaseIssues = Object.values(healthChecks.database).some(db => db.status === 'unhealthy');
+    
+    if (hasFailedMounts || hasDatabaseIssues) {
+      healthChecks.system.status = 'degraded';
+      healthChecks.system.issues = [];
+      if (hasFailedMounts) healthChecks.system.issues.push('route_mount_failures');
+      if (hasDatabaseIssues) healthChecks.system.issues.push('database_connection_issues');
+    }
+
+    res.json(healthChecks);
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Health check failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// API Contract Validation - Validate frontend-backend API contracts
+app.get('/health/api-contracts', (req, res) => {
+  try {
+    const validationResults = validateAPIContracts(app);
+    const report = generateContractReport(validationResults);
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'API contract validation failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
 // iotSensorService.setupRoutes registers full paths directly on `app`
 // (not a sub-router) — see services/iotSensorService.js line ~600.
 iotSensorService.initialize().catch((error) => logger.warn('iotSensorService initialize failed', { error: error.message }));
@@ -1229,7 +1429,7 @@ async function startServer() {
     logger.warn('Continuing without database enhancements...');
   }
 
-  const PORT = process.env.PORT || 3001;
+  const PORT = 3003; // Force port 3003 to avoid conflicts
   
   // Initialize AI Intelligence Fabric (EBD-MOD-00000001)
   try {

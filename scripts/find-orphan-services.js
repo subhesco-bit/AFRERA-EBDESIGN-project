@@ -58,6 +58,7 @@ function findOrphanServices() {
   const orphans = [];
   for (const f of serviceFiles) {
     const full = path.join(servicesDir, f);
+    if (fs.readFileSync(full, 'utf8').trim() === '') continue;
     const base = f.replace(/\.js$/, '');
     const hay = haystackExcluding(allFiles, full);
     const pattern = new RegExp(`require\\(['"\`][^'"\`]*${base}(\\.js)?['"\`]\\)`);

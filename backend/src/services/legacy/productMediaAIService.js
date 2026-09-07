@@ -22,6 +22,7 @@
 
 const { getPostgreSQL } = require('../../database/connection');
 const { logger } = require('../../utils/logger');
+const axios = require('axios');
 const nutritionIntelligenceService = require('./nutritionIntelligenceService');
 
 // ============================================================================
@@ -43,13 +44,32 @@ function listImageProviders() {
   return Object.keys(IMAGE_PROVIDER_ENV).map(imageProviderStatus);
 }
 
-async function callImageProvider(providerKey, _prompt, _opts = {}) {
+async function callImageProvider(providerKey, prompt, opts = {}) {
   const status = imageProviderStatus(providerKey);
   if (!status.known) return { ok: false, status: 'unknown_provider', provider: providerKey };
   if (!status.configured) return { ok: false, status: 'not_configured', provider: providerKey, envVar: status.envVar };
-  // Deliberately no live call — see file header. Activation requires wiring
-  // the real SDK call here once a provider is actually selected and keyed.
-  return { ok: false, status: 'call_intentionally_not_implemented', provider: providerKey };
+  if (providerKey !== 'openai_images') return { ok: false, status: 'unsupported_provider', provider: providerKey };
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) return { ok: false, status: 'invalid_prompt', provider: providerKey };
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/images/generations', {
+      model: opts.model || process.env.OPENAI_IMAGE_MODEL || 'dall-e-3',
+      prompt: prompt.trim(),
+      size: opts.size || '1024x1024',
+      quality: opts.quality || 'standard',
+      n: 1,
+      response_format: 'url',
+    }, {
+      headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+      timeout: Number(process.env.OPENAI_IMAGE_TIMEOUT_MS || 120000),
+    });
+    const image = response.data?.data?.[0];
+    if (!image?.url) return { ok: false, status: 'provider_empty_response', provider: providerKey };
+    return { ok: true, status: 'completed', provider: providerKey, imageUrl: image.url, revisedPrompt: image.revised_prompt || null };
+  } catch (error) {
+    logger.error('Image provider request failed', { provider: providerKey, status: error.response?.status, error: error.response?.data?.error?.message || error.message });
+    return { ok: false, status: 'provider_error', provider: providerKey, error: error.response?.data?.error?.message || error.message };
+  }
 }
 
 // ============================================================================
@@ -105,6 +125,27 @@ async function requestProductImageGeneration(productId, prompt) {
   }
   logger.info('Product image generation requested', { productId, status, provider: 'openai_images' });
   return { productId, ...result, recordedStatus: status };
+}
+
+async function requestProductCartoonGeneration(productId, prompt) {
+  const cartoonPrompt = [
+    'Create a friendly, family-safe cartoon illustration.',
+    'Use clean bold outlines and bright natural colors.',
+    'Do not add text, logos, watermarks, or invented product claims.',
+    prompt,
+  ].filter(Boolean).join(' ');
+  const result = await callImageProvider('openai_images', cartoonPrompt);
+  const status = result.ok ? 'completed' : (result.status === 'not_configured' ? 'not_configured' : 'failed');
+  const pg = getPostgreSQL();
+  await pg.query(
+    `UPDATE products SET image_generation_status = $1, image_generated_at = CASE WHEN $1 = 'completed' THEN NOW() ELSE image_generated_at END WHERE id = $2`,
+    [status, productId]
+  );
+  if (result.ok && result.imageUrl) {
+    await pg.query(`UPDATE products SET images = images || $1::jsonb WHERE id = $2`, [JSON.stringify([result.imageUrl]), productId]);
+  }
+  logger.info('Product cartoon generation requested', { productId, status, provider: 'openai_images' });
+  return { productId, mediaType: 'cartoon', ...result, recordedStatus: status };
 }
 
 /**
@@ -187,6 +228,7 @@ module.exports = {
   listImageProviders,
   callImageProvider,
   requestProductImageGeneration,
+  requestProductCartoonGeneration,
   listVideoProviders,
   callVideoProvider,
   buildNutrientComparisonScript,

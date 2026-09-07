@@ -678,7 +678,75 @@ class AISelfHealingService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance with router for proper mounting
 const aiSelfHealingService = new AISelfHealingService();
 
-module.exports = aiSelfHealingService;
+// Create Express router for AI Self-Healing endpoints
+const express = require('express');
+const router = express.Router();
+const { authMiddleware } = require('../../middleware/auth');
+
+// AI Self-Healing health check
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'ai-self-healing',
+    models_available: {
+      openai: !!aiSelfHealingService.openai,
+      gemini: !!aiSelfHealingService.gemini,
+      anthropic: !!aiSelfHealingService.anthropic
+    },
+    error_patterns_count: aiSelfHealingService.errorPatterns.size,
+    recovery_strategies_count: aiSelfHealingService.recoveryStrategies.size,
+    system_health_count: aiSelfHealingService.systemHealthMetrics.size
+  });
+});
+
+// Error detection endpoint
+router.post('/detect-error', authMiddleware, async (req, res) => {
+  try {
+    const { error, context } = req.body;
+    const result = await aiSelfHealingService.detectError(error, context);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Error recovery endpoint
+router.post('/recover-error', authMiddleware, async (req, res) => {
+  try {
+    const { error_id, recovery_strategy } = req.body;
+    const result = await aiSelfHealingService.recoverError(error_id, recovery_strategy);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Root cause analysis endpoint
+router.post('/analyze-root-cause', authMiddleware, async (req, res) => {
+  try {
+    const { error_id, context } = req.body;
+    const result = await aiSelfHealingService.analyzeRootCause(error_id, context);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// System health monitoring endpoint
+router.get('/system-health', authMiddleware, (req, res) => {
+  try {
+    const health = aiSelfHealingService.getSystemHealth();
+    res.json(health);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = {
+  router,
+  aiSelfHealingService,
+  ...aiSelfHealingService
+};

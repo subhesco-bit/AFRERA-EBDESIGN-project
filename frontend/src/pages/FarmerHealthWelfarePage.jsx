@@ -127,7 +127,7 @@ function FarmerHealthWelfarePage() {
         searchPlaceholder="Search health records..."
         emptyMessage="No health records yet."
         newLabel="Add Health Record"
-        initialForm={{ farmerId: '', healthType: 'Checkup', description: '', severity: 'Low', date: '' }}
+        initialForm={{ farmerId: '', healthType: 'Checkup', description: '', severity: 'Low', date: '', codeSystem: '', code: '', codeDisplay: '' }}
         requiredFields={['farmerId', 'healthType']}
         columns={[
           { key: 'farmer_id', label: 'Farmer ID' },
@@ -141,6 +141,9 @@ function FarmerHealthWelfarePage() {
           { name: 'healthType', label: 'Health type', type: 'select', options: HEALTH_TYPES },
           { name: 'severity', label: 'Severity', type: 'select', options: SEVERITY },
           { name: 'date', label: 'Date', type: 'date' },
+          { name: 'codeSystem', label: 'Medical code system', type: 'select', options: ['', 'ICD-10-CM', 'SNOMED-CT', 'LOINC'] },
+          { name: 'code', label: 'Medical code', placeholder: 'Optional, e.g. Z00.00' },
+          { name: 'codeDisplay', label: 'Code description', placeholder: 'Optional verified description' },
           { name: 'description', label: 'Description', type: 'textarea', span: 2 },
         ]}
         stats={(items) => [

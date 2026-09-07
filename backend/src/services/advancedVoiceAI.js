@@ -13,7 +13,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const { logger } = require('../utils/logger');
 const { authMiddleware } = require('../middleware/auth');
-const smsAuthService = require('./smsAuthService');
+const smsAuthService = require('./legacy/smsAuthService');
 
 const router = express.Router();
 // Shared pool (2026-08-04): this service previously built its own Pool.

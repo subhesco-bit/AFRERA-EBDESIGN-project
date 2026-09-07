@@ -44,53 +44,46 @@ function AIBrainPage() {
       {tab === 'processes' && (
         <>
           <ActionCard
-            title="Full Cognitive Cycle"
-            description="Run input through the complete perception -> attention -> reasoning -> decision -> planning pipeline. Requires OPENAI_API_KEY."
-            hasJsonPayload jsonLabel="Input / Context / Goals / Constraints (JSON)"
-            jsonPlaceholder='{"input": "Advise on irrigation timing", "context": {}, "goals": [], "constraints": {}}'
-            onRun={(_, p) => aiBrainAPI.runCognitiveCycle(p)}
-          />
-          <ActionCard
-            title="Perception"
-            description="Run the perception process on raw input."
+            title="Process Perception"
+            description="Run the perception process on raw input data."
             hasJsonPayload jsonLabel="Input / Context (JSON)"
             jsonPlaceholder='{"input": "Rainfall data for the last week", "context": {}}'
-            onRun={(_, p) => aiBrainAPI.runPerception(p)}
+            onRun={(_, p) => aiBrainAPI.processPerception(p)}
           />
           <ActionCard
-            title="Attention"
+            title="Process Attention"
             description="Focus attention on a perception result given goals."
             hasJsonPayload jsonLabel="Perception / Goals (JSON)"
             jsonPlaceholder='{"perception": {}, "goals": []}'
-            onRun={(_, p) => aiBrainAPI.runAttention(p)}
+            onRun={(_, p) => aiBrainAPI.processAttention(p)}
           />
           <ActionCard
-            title="Reasoning"
+            title="Process Reasoning"
             description="Reason over an attention result and knowledge."
             hasJsonPayload jsonLabel="Attention / Knowledge (JSON)"
             jsonPlaceholder='{"attention": {}, "knowledge": {}}'
-            onRun={(_, p) => aiBrainAPI.runReasoning(p)}
+            onRun={(_, p) => aiBrainAPI.processReasoning(p)}
           />
           <ActionCard
-            title="Learning"
+            title="Process Learning"
             description="Update knowledge based on an experience and its outcome."
             hasJsonPayload jsonLabel="Experience / Outcome (JSON)"
             jsonPlaceholder='{"experience": {}, "outcome": {}}'
-            onRun={(_, p) => aiBrainAPI.runLearning(p)}
+            onRun={(_, p) => aiBrainAPI.processLearning(p)}
           />
           <ActionCard
-            title="Decision"
+            title="Process Decision"
             description="Make a decision from a reasoning result."
             hasJsonPayload jsonLabel="Reasoning / Context / Constraints (JSON)"
             jsonPlaceholder='{"reasoning": {}, "context": {}, "constraints": {}}'
-            onRun={(_, p) => aiBrainAPI.runDecision(p)}
+            onRun={(_, p) => aiBrainAPI.processDecision(p)}
           />
           <ActionCard
-            title="Planning"
+            title="Process Planning"
             description="Plan a path from the current state to a target state given a decision."
             hasJsonPayload jsonLabel="Decision / Current State / Target State (JSON)"
             jsonPlaceholder='{"decision": {}, "current_state": {}, "target_state": {}}'
-            onRun={(_, p) => aiBrainAPI.runPlanning(p)}
+            onRun={(_, p) => aiBrainAPI.processPlanning(p)}
           />
         </>
       )}
@@ -98,23 +91,24 @@ function AIBrainPage() {
       {tab === 'knowledge' && (
         <>
           <ActionCard
-            title="Add Knowledge"
-            description="Add knowledge to a domain in the knowledge graph."
-            fields={[{ name: 'domain', label: 'Domain', placeholder: 'agriculture' }]}
-            hasJsonPayload jsonLabel="Knowledge (JSON)"
-            jsonPlaceholder='{"facts": ["Rice needs standing water in vegetative stage"]}'
-            onRun={(v, p) => aiBrainAPI.addKnowledge({ domain: v.domain, knowledge: p })}
+            title="Get Knowledge Graph"
+            description="Retrieve the complete knowledge graph structure."
+            onRun={() => aiBrainAPI.getKnowledgeGraph()}
           />
           <ActionCard
-            title="Get Knowledge by Domain"
-            description="Fetch knowledge for a single domain."
-            fields={[{ name: 'domain', label: 'Domain', placeholder: 'agriculture' }]}
-            onRun={(v) => aiBrainAPI.getKnowledge(v.domain)}
+            title="Add Knowledge Node"
+            description="Add new knowledge to the knowledge graph."
+            hasJsonPayload jsonLabel="Knowledge Data (JSON)"
+            jsonPlaceholder='{"domain": "agriculture", "facts": ["Rice needs standing water in vegetative stage"]}'
+            onRun={(_, p) => aiBrainAPI.processLearning({ experience: p, outcome: { learned: true } })}
           />
           <ActionCard
-            title="List Knowledge Domains"
-            description="List every domain currently in the knowledge graph."
-            onRun={() => aiBrainAPI.getAllKnowledgeDomains()}
+            title="Query Knowledge"
+            description="Query the knowledge graph for specific information."
+            fields={[{ name: 'query', label: 'Query', placeholder: 'irrigation timing for rice' }]}
+            hasJsonPayload jsonLabel="Query Context (JSON)"
+            jsonPlaceholder='{"context": {}}'
+            onRun={(v, p) => aiBrainAPI.processReasoning({ attention: { query: v.query }, knowledge: p })}
           />
         </>
       )}
@@ -122,26 +116,28 @@ function AIBrainPage() {
       {tab === 'memory' && (
         <>
           <ActionCard
-            title="Get Cognitive State"
-            description="Fetch the current cognitive state, working memory and long-term memory summary."
-            onRun={() => aiBrainAPI.getCognitiveState()}
+            title="Get Memory State"
+            description="Retrieve current memory state including working and long-term memory."
+            onRun={() => aiBrainAPI.getMemoryState()}
           />
           <ActionCard
-            title="Update Context"
-            description="Update the brain's active context."
-            hasJsonPayload jsonLabel="Context (JSON)"
-            jsonPlaceholder='{"location": "Assam", "season": "kharif"}'
-            onRun={(_, p) => aiBrainAPI.updateContext(p)}
+            title="Get Cognitive Load"
+            description="Monitor cognitive load and processing capacity."
+            onRun={() => aiBrainAPI.getCognitiveLoad()}
           />
           <ActionCard
-            title="Clear Working Memory"
-            description="Clear the short-term working memory."
-            onRun={() => aiBrainAPI.clearWorkingMemory()}
+            title="Process Learning"
+            description="Update long-term memory with new learning from experiences."
+            hasJsonPayload jsonLabel="Experience / Outcome (JSON)"
+            jsonPlaceholder='{"experience": {"event": "crop failure"}, "outcome": {"lesson": "improve drainage"}}'
+            onRun={(_, p) => aiBrainAPI.processLearning(p)}
           />
           <ActionCard
-            title="Service Health"
-            description="Check AI Brain service health and memory sizes."
-            onRun={() => aiBrainAPI.getHealth()}
+            title="Process Decision"
+            description="Make autonomous decisions based on current state and knowledge."
+            hasJsonPayload jsonLabel="Decision Context (JSON)"
+            jsonPlaceholder='{"context": {"crop": "rice", "weather": "drought"}, "constraints": {}}'
+            onRun={(_, p) => aiBrainAPI.processDecision(p)}
           />
         </>
       )}

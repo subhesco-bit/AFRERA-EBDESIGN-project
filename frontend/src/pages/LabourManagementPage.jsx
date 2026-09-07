@@ -106,7 +106,7 @@ function LabourManagementPage() {
           {workersLoading && <div className="animate-pulse h-40 bg-gray-200 rounded-lg" />}
           {workersError && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
-              Error loading workers: {workersError.message}. Backend endpoint /labour/workers has not been built yet — this page is wired and ready once it is.
+              Error loading workers: {workersError.message}.
             </div>
           )}
           {!workersLoading && !workersError && (

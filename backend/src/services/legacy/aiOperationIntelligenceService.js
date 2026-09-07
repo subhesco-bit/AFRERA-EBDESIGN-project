@@ -600,7 +600,75 @@ class AIOperationIntelligenceService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance with router for proper mounting
 const aiOperationIntelligenceService = new AIOperationIntelligenceService();
 
-module.exports = aiOperationIntelligenceService;
+// Create Express router for AI Operation Intelligence endpoints
+const express = require('express');
+const router = express.Router();
+const { authMiddleware } = require('../../middleware/auth');
+
+// AI Operation Intelligence health check
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    service: 'ai-operation-intelligence',
+    models_available: {
+      openai: !!aiOperationIntelligenceService.openai,
+      gemini: !!aiOperationIntelligenceService.gemini,
+      anthropic: !!aiOperationIntelligenceService.anthropic
+    },
+    performance_metrics_count: aiOperationIntelligenceService.performanceMetrics.size,
+    optimization_strategies_count: aiOperationIntelligenceService.optimizationStrategies.size,
+    resource_allocation_count: aiOperationIntelligenceService.resourceAllocation.size
+  });
+});
+
+// Performance monitoring endpoint
+router.get('/performance', authMiddleware, (req, res) => {
+  try {
+    const performance = aiOperationIntelligenceService.getPerformanceMetrics();
+    res.json(performance);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Optimization endpoint
+router.post('/optimize', authMiddleware, async (req, res) => {
+  try {
+    const { operation, parameters } = req.body;
+    const result = await aiOperationIntelligenceService.optimizeOperation(operation, parameters);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Resource allocation endpoint
+router.post('/allocate-resources', authMiddleware, async (req, res) => {
+  try {
+    const { operation, resources } = req.body;
+    const result = await aiOperationIntelligenceService.allocateResources(operation, resources);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Anomaly detection endpoint
+router.post('/detect-anomaly', authMiddleware, async (req, res) => {
+  try {
+    const { metrics, context } = req.body;
+    const result = await aiOperationIntelligenceService.detectAnomaly(metrics, context);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = {
+  router,
+  aiOperationIntelligenceService,
+  ...aiOperationIntelligenceService
+};

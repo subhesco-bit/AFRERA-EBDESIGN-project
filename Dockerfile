@@ -1,65 +1,54 @@
-# Multi-stage Dockerfile for AFRERA Platform
-# Production-ready deployment with optimization
+# Multi-stage Dockerfile for production deployment
+# Stage 1: Build frontend
+FROM node:20-alpine AS frontend-builder
 
-# Stage 1: Build
-FROM node:18-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-COPY frontend/package*.json ./frontend/
-COPY backend/package*.json ./backend/
-
-# Install dependencies
-RUN npm ci --only=production
 WORKDIR /app/frontend
-RUN npm ci --only=production
-WORKDIR /app/backend
+
+# Copy frontend package files
+COPY frontend/package*.json ./
 RUN npm ci --only=production
 
-# Copy source code
-COPY . .
+# Copy frontend source
+COPY frontend/ ./
 
 # Build frontend
-WORKDIR /app/frontend
 RUN npm run build
 
-# Stage 2: Production
-FROM node:18-alpine AS production
+# Stage 2: Build backend
+FROM node:20-alpine AS backend-builder
+
+WORKDIR /app/backend
+
+# Copy backend package files
+COPY backend/package*.json ./
+RUN npm ci --only=production
+
+# Copy backend source
+COPY backend/ ./
+
+# Stage 3: Production image
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dependencies for both frontend and backend
+COPY --from=backend-builder /app/backend/package*.json ./backend/
+COPY --from=backend-builder /app/backend/node_modules ./backend/node_modules
+COPY --from=backend-builder /app/backend/src ./backend/src
 
-# Create non-root user
-RUN addgroup -g 1001 -S afrera && \
-    adduser -S afrera -u 1001
+# Copy built frontend
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-# Copy dependencies and built frontend
-COPY --from=builder --chown=afrera:afrera /app/node_modules ./node_modules
-COPY --from=builder --chown=afrera:afrera /app/backend/node_modules ./backend/node_modules
-COPY --from=builder --chown=afrera:afrera /app/backend ./backend
-COPY --from=builder --chown=afrera:afrera /app/frontend/dist ./frontend/dist
-COPY --from=builder --chown=afrera:afrera /app/package*.json ./
-
-# Create necessary directories
-RUN mkdir -p uploads logs && \
-    chown -R afrera:afrera uploads logs
-
-# Switch to non-root user
-USER afrera
+# Set environment
+ENV NODE_ENV=production
+ENV PORT=3001
 
 # Expose port
 EXPOSE 3001
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Use dumb-init to handle signals properly
-ENTRYPOINT ["dumb-init", "--"]
-
-# Start the application
+# Start backend server
 CMD ["node", "backend/src/index.js"]

@@ -2,14 +2,18 @@ import axios from 'axios'
 
 // API_BASE_URL defaults to localhost for development
 // Production should set VITE_API_URL environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003/api/v1'
 
-// Create axios instance
+// Create axios instance with production-grade configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'X-Client-Version': '1.0.0',
+    'X-Client-Platform': 'web',
   },
+  timeout: 30000, // 30 second timeout for production
+  maxRedirects: 5,
 })
 
 // Request interceptor to add auth token
@@ -24,11 +28,21 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// Response interceptor for error handling
+// Response interceptor for error handling with production-grade retry logic
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
+
+    // Log errors for monitoring in production
+    if (import.meta.env.PROD) {
+      console.error('API Error:', {
+        url: originalRequest.url,
+        method: originalRequest.method,
+        status: error.response?.status,
+        message: error.message,
+      })
+    }
 
     // Handle 401 Unauthorized - try to refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -53,6 +67,26 @@ api.interceptors.response.use(
         localStorage.removeItem('refresh_token')
         window.location.href = '/login'
         return Promise.reject(refreshError)
+      }
+    }
+
+    // Handle 429 Rate Limiting with exponential backoff
+    if (error.response?.status === 429 && !originalRequest._retryCount) {
+      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1
+      const retryDelay = Math.min(1000 * Math.pow(2, originalRequest._retryCount), 10000) // Max 10s
+      
+      await new Promise(resolve => setTimeout(resolve, retryDelay))
+      return api(originalRequest)
+    }
+
+    // Handle 5xx errors with retry (max 3 retries)
+    if (error.response?.status >= 500 && !originalRequest._retryCount) {
+      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1
+      if (originalRequest._retryCount <= 3) {
+        const retryDelay = Math.min(1000 * Math.pow(2, originalRequest._retryCount), 5000) // Max 5s
+        
+        await new Promise(resolve => setTimeout(resolve, retryDelay))
+        return api(originalRequest)
       }
     }
 
@@ -186,6 +220,7 @@ export const insuranceAPI = {
 
 // AI API
 export const aiAPI = {
+  chat: (data) => api.post('/ai/unified', data),
   predictDemand: (data) => api.post('/ai/predict/demand', data),
   optimizePrice: (data) => api.post('/ai/optimize/price', data),
   assessCreditRisk: (data) => api.post('/ai/assess/credit-risk', data),
@@ -200,6 +235,7 @@ export const aiAPI = {
 export const productMediaAIAPI = {
   getProviderStatus: () => api.get('/product-media-ai/status'),
   generateImage: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/image`, { prompt }),
+  generateCartoon: (productId, prompt) => api.post(`/product-media-ai/products/${productId}/cartoon`, { prompt }),
   buildVideoScript: (productId) => api.post(`/product-media-ai/products/${productId}/video-script`),
   generateVideo: (productId) => api.post(`/product-media-ai/products/${productId}/video`),
 }
@@ -270,6 +306,18 @@ export const formsAPI = {
   submitForm: (id, payload) => api.post(`/forms/${id}/submit`, payload),
   getSubmissions: (id) => api.get(`/forms/${id}/submissions`),
   getTemplates: () => api.get('/forms/templates'),
+}
+
+// Advanced Medical Coding API
+export const advancedMedicalCodingAPI = {
+  getCodeSystems: () => api.get('/advanced-medical-coding/code-systems'),
+  searchCodes: (condition, codeSystem) => api.get(`/advanced-medical-coding/search-codes/${condition}`, { params: { codeSystem } }),
+  getDietitianKnowledge: (condition) => api.get(`/advanced-medical-coding/dietitian-knowledge/${condition}`),
+  getNaturalTherapistKnowledge: (condition) => api.get(`/advanced-medical-coding/natural-therapist-knowledge/${condition}`),
+  getExperienceProtocols: (category) => api.get(`/advanced-medical-coding/experience-protocols/${category || ''}`),
+  getBiologicalCoding: (system) => api.get(`/advanced-medical-coding/biological-coding/${system}`),
+  aiCodingAssistance: (clinicalDescription, codeSystem) => api.post('/advanced-medical-coding/ai-coding-assistance', { clinicalDescription, codeSystem }),
+  generateHealthManagementPlan: (conditions, preferences) => api.post('/advanced-medical-coding/health-management-plan', { conditions, preferences })
 }
 
 // Analytics API
@@ -654,8 +702,8 @@ export const economicAPI = {
   forecast: (params) => api.get('/demand/forecast', { params }),
   heatmap: (params) => api.get('/demand/heatmap', { params }),
   mandiSignal: (params) => api.get('/demand/mandi-signal', { params }),
-  costBreakup: (params) => api.get('/cost/breakup', { params }),
-  corridorModel: (corridor) => api.get('/cost/corridor-model', { params: { corridor } }),
+    costBreakup: (params) => api.get('/costs/breakup', { params }),
+    corridorModel: (corridor) => api.get('/costs/corridor-model', { params: { corridor } }),
   revenueOverview: (params) => api.get('/revenue/overview', { params }),
   allocateChannels: (body) => api.post('/revenue/allocate', body),
 }
@@ -1452,19 +1500,30 @@ export const nutritionAPI = {
   getNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
   getDietaryProfiles: () => api.get('/nutrition-intelligence/dietary-profiles'),
   getRecommendations: () => api.get('/nutrition-intelligence/recommendations'),
-  generateRecommendations: (dietaryProfileId, targetCalories, limit) =>
-    api.post('/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit }),
+  generateRecommendations: (dietaryProfileId, targetCalories, limit, medicalCoding) =>
+    api.post('/nutrition-intelligence/recommendations', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, limit, medical_coding: medicalCoding }),
   getWellnessPractices: (params) => api.get('/nutrition-intelligence/wellness-practices', { params }),
   // AI-generated recipe grounded in real dietary profile + real matching AFRERA
   // products — see nutritionIntelligenceService.generateDietBasedRecipe. Returns
   // an honest status: 'generated' | 'ai_not_configured' | 'no_ingredients'.
-  generateRecipe: (dietaryProfileId, targetCalories, provider) =>
-    api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
+  generateRecipe: (dietaryProfileId, targetCalories, provider, medicalCoding) =>
+    api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider, medical_coding: medicalCoding }),
   // "Sell by nutrient, not by kg" — real per-100g comparison against category
   // peers, picks whichever recorded compound (protein, curcumin, Scoville,
   // ASTA color, etc.) actually differentiates this product. See
   // nutritionIntelligenceService.calculateValuePerNutrient.
   getValuePerNutrient: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/value-per-nutrient`),
+  // Medical coding and health condition endpoints
+  getMedicalConditionCodes: () => api.get('/nutrition-intelligence/medical-codes'),
+  getDietaryRestrictions: (condition) => api.get(`/nutrition-intelligence/dietary-restrictions/${condition}`),
+  getNutrientRequirements: (condition) => api.get(`/nutrition-intelligence/nutrient-requirements/${condition}`),
+  getConditionCode: (condition, type) => api.get(`/nutrition-intelligence/medical-code/${condition}${type ? `/${type}` : ''}`),
+  generateConditionSpecificRecipe: (condition, dietaryProfileId, targetCalories, provider) => 
+    api.post(`/nutrition-intelligence/recipes/condition/${condition}`, { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
+  getNaturalTherapistGuidance: (condition, symptoms) => 
+    api.post('/nutrition-intelligence/natural-therapist/guidance', { condition, symptoms }),
+  calculateNutrientProfile: (condition, nutritionData) => 
+    api.post(`/nutrition-intelligence/nutrient-calculator/${condition}`, nutritionData),
 }
 
 /** Organic traceability — farm registration, standards, consumer QR lookup. */
@@ -1578,6 +1637,886 @@ export const fertilizerAPI = {
   issueStock: (id, data) => api.post(`/fertilizer/inventory/${id}/issue`, data),
   // Real stock + real consumption (agri_input_issues) -> computed reorder-point alerts.
   getReorderAlerts: () => api.get('/fertilizer/inventory/reorder-alerts'),
+}
+
+// ---------------------------------------------------------------------------
+// Missing API clients for dark backend routes (BACKEND_FRONTEND_INTEGRATION_GAP)
+// These routes exist in backend but have no frontend API clients
+// ---------------------------------------------------------------------------
+
+/** AI Backbone - Unified multi-provider AI integration */
+export const aiBackboneAPI = {
+  getStatus: () => api.get('/ai-backbone/status'),
+  getAIProviderStatus: () => api.get('/ai-backbone/status'),
+  callAI: (data) => api.post('/ai-backbone/call', data),
+  switchProvider: (provider) => api.post('/ai-backbone/switch-provider', { provider }),
+  resetAIStatistics: () => api.post('/ai-backbone/reset-statistics'),
+  supportAgriculturalDecision: (data) => api.post('/ai-backbone/agricultural-decision', data),
+  optimizeLivestock: (data) => api.post('/ai-backbone/livestock-optimization', data),
+}
+
+/** AI Gateway - API gateway for AI services */
+export const aiGatewayAPI = {
+  getStatus: () => api.get('/ai-gateway/status'),
+  getEndpoints: () => api.get('/ai-gateway/endpoints'),
+  createEndpoint: (data) => api.post('/ai-gateway/endpoints', data),
+  updateEndpoint: (id, data) => api.put(`/ai-gateway/endpoints/${id}`, data),
+  deleteEndpoint: (id) => api.delete(`/ai-gateway/endpoints/${id}`),
+  routeRequest: (endpoint, data) => api.post(`/ai-gateway/route/${endpoint}`, data),
+  getMetrics: () => api.get('/ai-gateway/metrics'),
+}
+
+/** AI Brain - Cognitive processing layer */
+export const aiBrainAPI = {
+  getStatus: () => api.get('/ai-brain/status'),
+  processPerception: (data) => api.post('/ai-brain/perception', data),
+  processAttention: (data) => api.post('/ai-brain/attention', data),
+  processReasoning: (data) => api.post('/ai-brain/reasoning', data),
+  processLearning: (data) => api.post('/ai-brain/learning', data),
+  processDecision: (data) => api.post('/ai-brain/decision', data),
+  processPlanning: (data) => api.post('/ai-brain/planning', data),
+  getKnowledgeGraph: () => api.get('/ai-brain/knowledge-graph'),
+  getMemoryState: () => api.get('/ai-brain/memory'),
+}
+
+/** AI Self-Healing - Autonomous error recovery */
+export const aiSelfHealingAPI = {
+  getStatus: () => api.get('/ai-self-healing/status'),
+  detectErrors: () => api.post('/ai-self-healing/detect'),
+  analyzeRootCause: (errorId) => api.get(`/ai-self-healing/errors/${errorId}/root-cause`),
+  initiateRecovery: (errorId) => api.post(`/ai-self-healing/errors/${errorId}/recover`),
+  getRecoveryHistory: () => api.get('/ai-self-healing/history'),
+  getHealthMetrics: () => api.get('/ai-self-healing/health'),
+}
+
+/** AI Operation Intelligence - Real-time optimization */
+export const aiOperationIntelligenceAPI = {
+  getStatus: () => api.get('/ai-operation-intelligence/status'),
+  getPerformanceMetrics: () => api.get('/ai-operation-intelligence/performance'),
+  getOptimizationSuggestions: () => api.get('/ai-operation-intelligence/suggestions'),
+  detectAnomalies: () => api.post('/ai-operation-intelligence/anomalies'),
+  applyOptimization: (suggestionId) => api.post(`/ai-operation-intelligence/optimizations/${suggestionId}/apply`),
+  getRealtimeAlerts: () => api.get('/ai-operation-intelligence/alerts'),
+}
+
+/** Decision Engine - Core business logic and decision making */
+export const decisionEngineAPI = {
+  getStatus: () => api.get('/decision-support/status'),
+  getRules: () => api.get('/decision-support/rules'),
+  createRule: (data) => api.post('/decision-support/rules', data),
+  updateRule: (id, data) => api.put(`/decision-support/rules/${id}`, data),
+  deleteRule: (id) => api.delete(`/decision-support/rules/${id}`),
+  evaluateDecision: (data) => api.post('/decision-support/evaluate', data),
+  getDecisionHistory: (params) => api.get('/decision-support/history', { params }),
+  getActiveDecisions: () => api.get('/decision-support/active'),
+}
+
+/** Nervous System - Enterprise monitoring and control */
+export const nervousSystemAPI = {
+  // Brain Control
+  processEventThroughBrain: (data) => api.post('/nervous/brain/process-event', data),
+  getBrainDecisionHistory: (params) => api.get('/nervous/brain/decision-history', { params }),
+  getBrainFocus: () => api.get('/nervous/brain/focus'),
+  
+  // Heart Beat
+  startHeartBeat: () => api.post('/nervous/heart/start'),
+  stopHeartBeat: () => api.post('/nervous/heart/stop'),
+  getHeartBeatStatus: () => api.get('/nervous/heart/status'),
+  
+  // Neural Pathways
+  createNeuralPathway: (data) => api.post('/nervous/neural/create-pathway', data),
+  getNeuralPathways: () => api.get('/nervous/neural/pathways'),
+  strengthenNeuralPathway: (pathwayId) => api.post(`/nervous/neural/strengthen/${pathwayId}`),
+  
+  // Reflex Arcs
+  createReflexArc: (data) => api.post('/nervous/reflex/create-arc', data),
+  getReflexArcs: () => api.get('/nervous/reflex/arcs'),
+  triggerReflex: (data) => api.post('/nervous/reflex/trigger', data),
+  
+  // Sensors
+  registerSensor: (data) => api.post('/nervous/sensor/register', data),
+  getSensorData: (sensorId) => api.get(`/nervous/sensor/data/${sensorId}`),
+  getSensorsStatus: () => api.get('/nervous/sensor/status'),
+  
+  // Motor Functions
+  executeMotorFunction: (data) => api.post('/nervous/motor/execute', data),
+  getActiveMotorFunctions: () => api.get('/nervous/motor/active'),
+  
+  // Enterprise Route Control
+  registerEnterpriseRoute: (data) => api.post('/nervous/route/register', data),
+  routeRequest: (data) => api.post('/nervous/route/request', data),
+  getOptimalRoute: () => api.get('/nervous/route/optimal'),
+  deactivateEnterpriseRoute: (routeId) => api.post(`/nervous/route/deactivate/${routeId}`),
+  
+  // System Health
+  getNervousSystemHealth: () => api.get('/nervous/health'),
+}
+
+/** Enterprise Memory - Case log and learning system */
+export const enterpriseMemoryAPI = {
+  getCases: (params) => api.get('/enterprise-memory/cases', { params }),
+  getCase: (caseId) => api.get(`/enterprise-memory/cases/${caseId}`),
+  createCase: (data) => api.post('/enterprise-memory/cases', data),
+  updateCase: (caseId, data) => api.put(`/enterprise-memory/cases/${caseId}`, data),
+  searchCases: (query) => api.get('/enterprise-memory/search', { params: { q: query } }),
+  getLearningInsights: () => api.get('/enterprise-memory/insights'),
+  getSimilarCases: (caseId) => api.get(`/enterprise-memory/cases/${caseId}/similar`),
+}
+
+/** Digital Twin - Farm simulation engine */
+export const digitalTwinAPI = {
+  getStatus: () => api.get('/digital-twin/status'),
+  createTwin: (data) => api.post('/digital-twin/twins', data),
+  getTwins: (params) => api.get('/digital-twin/twins', { params }),
+  getTwin: (twinId) => api.get(`/digital-twin/twins/${twinId}`),
+  updateTwin: (twinId, data) => api.put(`/digital-twin/twins/${twinId}`, data),
+  runSimulation: (twinId, scenario) => api.post(`/digital-twin/twins/${twinId}/simulate`, { scenario }),
+  getSimulationResults: (twinId, simulationId) => api.get(`/digital-twin/twins/${twinId}/simulations/${simulationId}`),
+  getPredictiveModels: (twinId) => api.get(`/digital-twin/twins/${twinId}/models`),
+}
+
+/** Climate Monitoring - Weather analytics and alerts */
+export const climateMonitoringAPI = {
+  getStatus: () => api.get('/climate-monitoring/status'),
+  getDroughtData: (params) => api.get('/climate-monitoring/drought', { params }),
+  getFloodData: (params) => api.get('/climate-monitoring/flood', { params }),
+  getDiseaseForecast: (params) => api.get('/climate-monitoring/disease-forecast', { params }),
+  getClimateRisk: (params) => api.get('/climate-monitoring/climate-risk', { params }),
+  getAgroMeteorology: (params) => api.get('/climate-monitoring/agro-meteorology', { params }),
+  getAlerts: () => api.get('/climate-monitoring/alerts'),
+  generateReport: (params) => api.post('/climate-monitoring/reports', params),
+}
+
+/** Cold Storage - Temperature tracking and monitoring */
+export const coldStorageAPI = {
+  getStatus: () => api.get('/cold-storage/status'),
+  getFacilities: (params) => api.get('/cold-storage/facilities', { params }),
+  createFacility: (data) => api.post('/cold-storage/facilities', data),
+  getFacility: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}`),
+  bookFacility: (facilityId, data) => api.post(`/cold-storage/facilities/${facilityId}/book`, data),
+  getTemperatureData: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/temperature`),
+  getTemperatureAlerts: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/alerts`),
+  getUtilization: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/utilization`),
+}
+
+/** Complete ERP Integration - Comprehensive ERP sync */
+export const completeERPAPI = {
+  getStatus: () => api.get('/complete-erp-integration/status'),
+  syncFarmer: (farmerId) => api.post('/complete-erp-integration/sync/farmer', { farmer_id: farmerId }),
+  syncCrop: (cropId) => api.post('/complete-erp-integration/sync/crop', { crop_id: cropId }),
+  syncLivestock: (livestockId) => api.post('/complete-erp-integration/sync/livestock', { livestock_id: livestockId }),
+  syncModule: (moduleId, data) => api.post('/complete-erp-integration/sync/module', { module_id: moduleId, data }),
+  getSyncHistory: (params) => api.get('/complete-erp-integration/history', { params }),
+  resolveConflict: (conflictId, resolution) => api.post(`/complete-erp-integration/conflicts/${conflictId}/resolve`, { resolution }),
+}
+
+/** Complete AI Integration - AI-driven predictions */
+export const completeAIAPI = {
+  getStatus: () => api.get('/complete-ai-integration/status'),
+  predictYield: (data) => api.post('/complete-ai-integration/predict/yield', data),
+  detectDisease: (data) => api.post('/complete-ai-integration/detect/disease', data),
+  optimizeFertilizer: (data) => api.post('/complete-ai-integration/optimize/fertilizer', data),
+  predictMarketPrice: (data) => api.post('/complete-ai-integration/predict/price', data),
+  getRecommendations: (farmerId) => api.get(`/complete-ai-integration/recommendations/${farmerId}`),
+  trainModel: (modelType, data) => api.post(`/complete-ai-integration/models/${modelType}/train`, data),
+  getModelPerformance: (modelType) => api.get(`/complete-ai-integration/models/${modelType}/performance`),
+}
+
+/** Comprehensive ERP - Oracle/SAP standards */
+export const comprehensiveERPAPI = {
+  getStatus: () => api.get('/comprehensive-erp/status'),
+  getModules: () => api.get('/comprehensive-erp/modules'),
+  syncGL: (data) => api.post('/comprehensive-erp/sync/gl', data),
+  syncBudget: (data) => api.post('/comprehensive-erp/sync/budget', data),
+  syncAsset: (data) => api.post('/comprehensive-erp/sync/asset', data),
+  syncProject: (data) => api.post('/comprehensive-erp/sync/project', data),
+  syncHR: (data) => api.post('/comprehensive-erp/sync/hr', data),
+  syncInventory: (data) => api.post('/comprehensive-erp/sync/inventory', data),
+  syncProcurement: (data) => api.post('/comprehensive-erp/sync/procurement', data),
+  syncSales: (data) => api.post('/comprehensive-erp/sync/sales', data),
+  getReconciliationStatus: () => api.get('/comprehensive-erp/reconciliation'),
+}
+
+/** Real-time Monitoring - Resource monitoring */
+export const realtimeMonitoringAPI = {
+  getStatus: () => api.get('/realtime-monitoring/status'),
+  startMonitor: (resourceType, resourceId) => api.post('/realtime-monitoring/start', { resource_type: resourceType, resource_id: resourceId }),
+  stopMonitor: (monitorId) => api.post(`/realtime-monitoring/stop/${monitorId}`),
+  getMonitors: () => api.get('/realtime-monitoring/monitors'),
+  getMonitorData: (monitorId) => api.get(`/realtime-monitoring/monitors/${monitorId}/data`),
+  getAlerts: () => api.get('/realtime-monitoring/alerts'),
+  acknowledgeAlert: (alertId) => api.post(`/realtime-monitoring/alerts/${alertId}/acknowledge`),
+}
+
+/** Agricultural Intelligence - AI predictions */
+export const agriculturalIntelligenceAPI = {
+  getStatus: () => api.get('/agricultural-intelligence/status'),
+  predictCropYield: (data) => api.post('/agricultural-intelligence/predict/crop-yield', data),
+  analyzeSoilHealth: (data) => api.post('/agricultural-intelligence/analyze/soil', data),
+  predictWeatherImpact: (data) => api.post('/agricultural-intelligence/predict/weather-impact', data),
+  detectPestRisk: (data) => api.post('/agricultural-intelligence/detect/pest-risk', data),
+  optimizeIrrigation: (data) => api.post('/agricultural-intelligence/optimize/irrigation', data),
+  getMarketIntelligence: (params) => api.get('/agricultural-intelligence/market', { params }),
+}
+
+/** Knowledge Reference - Wikipedia and FOLU data */
+export const knowledgeReferenceAPI = {
+  searchWikipedia: (query) => api.get('/knowledge-reference/wikipedia/search', { params: { q: query } }),
+  getWikipediaPage: (title) => api.get('/knowledge-reference/wikipedia/page', { params: { title } }),
+  getFOLUBenchmarks: (params) => api.get('/knowledge-reference/folu/benchmarks', { params }),
+  getAgriculturalKnowledge: (topic) => api.get('/knowledge-reference/agricultural', { params: { topic } }),
+}
+
+/** M400 AI Backbone - Enterprise coordination */
+export const m400AIBackboneAPI = {
+  getStatus: () => api.get('/m400-ai-backbone/status'),
+  getCoordinationState: () => api.get('/m400-ai-backbone/coordination'),
+  triggerCoordination: (data) => api.post('/m400-ai-backbone/coordinate', data),
+  getAgentStatus: () => api.get('/m400-ai-backbone/agents'),
+  getWorkflowStatus: () => api.get('/m400-ai-backbone/workflows'),
+  initiateWorkflow: (workflowType, data) => api.post('/m400-ai-backbone/workflows', { workflow_type: workflowType, data }),
+  getSystemMetrics: () => api.get('/m400-ai-backbone/metrics'),
+}
+
+/** Labour Management - Worker and attendance tracking */
+export const labourManagementAPI = {
+  getWorkers: (params) => api.get('/labour/workers', { params }),
+  createWorker: (data) => api.post('/labour/workers', data),
+  updateWorker: (id, data) => api.put(`/labour/workers/${id}`, data),
+  getAttendance: (params) => api.get('/labour/attendance', { params }),
+  recordAttendance: (data) => api.post('/labour/attendance', data),
+  getPayments: (params) => api.get('/labour/payments', { params }),
+  recordPayment: (data) => api.post('/labour/payments', data),
+  getWorkerPerformance: (workerId) => api.get(`/labour/workers/${workerId}/performance`),
+}
+
+/** Farmer Verification - Verification workflow */
+export const farmerVerificationAPI = {
+  getRequests: (params) => api.get('/farmer-verification/requests', { params }),
+  createRequest: (data) => api.post('/farmer-verification/requests', data),
+  getRequest: (requestId) => api.get(`/farmer-verification/requests/${requestId}`),
+  updateRequest: (requestId, data) => api.put(`/farmer-verification/requests/${requestId}`, data),
+  submitDocuments: (requestId, documents) => api.post(`/farmer-verification/requests/${requestId}/documents`, { documents }),
+  makeDecision: (requestId, decision) => api.post(`/farmer-verification/requests/${requestId}/decision`, decision),
+  getVerificationStatus: (farmerId) => api.get(`/farmer-verification/farmers/${farmerId}/status`),
+}
+
+/** Farmer KYC - Know Your Customer verification */
+export const farmerKycAPI = {
+  getApplications: (params) => api.get('/farmer-kyc/applications', { params }),
+  createApplication: (data) => api.post('/farmer-kyc/applications', data),
+  getApplication: (applicationId) => api.get(`/farmer-kyc/applications/${applicationId}`),
+  updateApplication: (applicationId, data) => api.put(`/farmer-kyc/applications/${applicationId}`, data),
+  submitKycDocuments: (applicationId, documents) => api.post(`/farmer-kyc/applications/${applicationId}/documents`, { documents }),
+  approveApplication: (applicationId, approvalData) => api.post(`/farmer-kyc/applications/${applicationId}/approve`, approvalData),
+  rejectApplication: (applicationId, rejectionData) => api.post(`/farmer-kyc/applications/${applicationId}/reject`, rejectionData),
+  getKycStatus: (farmerId) => api.get(`/farmer-kyc/farmers/${farmerId}/status`),
+}
+
+/** Contract Farming - Contract management */
+export const contractFarmingAPI = {
+  getContracts: (params) => api.get('/contract-farming/contracts', { params }),
+  createContract: (data) => api.post('/contract-farming/contracts', data),
+  getContract: (contractId) => api.get(`/contract-farming/contracts/${contractId}`),
+  updateContract: (contractId, data) => api.put(`/contract-farming/contracts/${contractId}`, data),
+  recordMilestone: (contractId, milestoneData) => api.post(`/contract-farming/contracts/${contractId}/milestones`, milestoneData),
+  getContractPerformance: (contractId) => api.get(`/contract-farming/contracts/${contractId}/performance`),
+  terminateContract: (contractId, terminationData) => api.post(`/contract-farming/contracts/${contractId}/terminate`, terminationData),
+}
+
+/** Government Subsidy - Subsidy management */
+export const governmentSubsidyAPI = {
+  getSchemes: (params) => api.get('/government-subsidy/schemes', { params }),
+  applyForSubsidy: (data) => api.post('/government-subsidy/applications', data),
+  getApplications: (params) => api.get('/government-subsidy/applications', { params }),
+  getApplication: (applicationId) => api.get(`/government-subsidy/applications/${applicationId}`),
+  updateApplication: (applicationId, data) => api.put(`/government-subsidy/applications/${applicationId}`, data),
+  trackApplication: (applicationId) => api.get(`/government-subsidy/applications/${applicationId}/track`),
+  getDisbursementStatus: (applicationId) => api.get(`/government-subsidy/applications/${applicationId}/disbursement`),
+}
+
+/** Household Procurement - Group buying */
+export const householdProcurementAPI = {
+  getGroups: (params) => api.get('/household-procurement/groups', { params }),
+  createGroup: (data) => api.post('/household-procurement/groups', data),
+  getGroup: (groupId) => api.get(`/household-procurement/groups/${groupId}`),
+  createProcurement: (groupId, data) => api.post(`/household-procurement/groups/${groupId}/procurements`, data),
+  getProcurements: (groupId) => api.get(`/household-procurement/groups/${groupId}/procurements`),
+  joinGroup: (groupId, memberId) => api.post(`/household-procurement/groups/${groupId}/members`, { member_id: memberId }),
+  getGroupSavings: (groupId) => api.get(`/household-procurement/groups/${groupId}/savings`),
+}
+
+/** Pre-season Purchase - Advance ordering */
+export const preSeasonPurchaseAPI = {
+  getOrders: (params) => api.get('/pre-season-purchase/orders', { params }),
+  createOrder: (data) => api.post('/pre-season-purchase/orders', data),
+  getOrder: (orderId) => api.get(`/pre-season-purchase/orders/${orderId}`),
+  updateOrder: (orderId, data) => api.put(`/pre-season-purchase/orders/${orderId}`, data),
+  createBid: (orderId, data) => api.post(`/pre-season-purchase/orders/${orderId}/bids`, data),
+  getBids: (orderId) => api.get(`/pre-season-purchase/orders/${orderId}/bids`),
+  acceptBid: (orderId, bidId) => api.post(`/pre-season-purchase/orders/${orderId}/bids/${bidId}/accept`),
+  getOrderAnalytics: (params) => api.get('/pre-season-purchase/analytics', { params }),
+}
+
+// ---------------------------------------------------------------------------
+// MEDICAL CODING AND HEALTH CONDITION API CLIENTS
+// ---------------------------------------------------------------------------
+
+/** Medical Coding - ICD-10-CM, SNOMED-CT, LOINC codes */
+export const medicalCodingAPI = {
+  getMedicalConditionCodes: () => api.get('/nutrition-intelligence/medical-codes'),
+  getConditionCode: (condition, type) => api.get(`/nutrition-intelligence/medical-code/${condition}${type ? `/${type}` : ''}`),
+  getDietaryRestrictions: (condition) => api.get(`/nutrition-intelligence/dietary-restrictions/${condition}`),
+  getNutrientRequirements: (condition) => api.get(`/nutrition-intelligence/nutrient-requirements/${condition}`),
+}
+
+/** Nutrition Intelligence - Dietitian and natural therapist tools */
+export const nutritionIntelligenceAPI = {
+  getNutrients: () => api.get('/nutrition-intelligence/nutrients'),
+  getDietaryProfiles: () => api.get('/nutrition-intelligence/dietary-profiles'),
+  createFoodProfile: (data) => api.post('/nutrition-intelligence/food-profiles', data),
+  searchFoodProfiles: (query, foodGroup) => api.get('/nutrition-intelligence/food-profiles/search', { params: { q: query, food_group: foodGroup } }),
+  addProductNutrition: (data) => api.post('/nutrition-intelligence/product-nutrition', data),
+  getProductNutrition: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}`),
+  calculateNutritionScore: (productId, scoringModelId) => api.post('/nutrition-intelligence/calculate-score', { product_id: productId, scoring_model_id: scoringModelId }),
+  getProductNutritionScore: (productId) => api.get(`/nutrition-intelligence/product-nutrition/${productId}/score`),
+  calculateNutritionPricing: (productId, basePrice, pricingRuleId) => api.post('/nutrition-intelligence/calculate-pricing', { product_id: productId, base_price, pricing_rule_id }),
+  generateRecipe: (dietaryProfileId, targetCalories, provider, medicalCoding) => api.post('/nutrition-intelligence/recipes', { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider, medical_coding: medicalCoding }),
+  generateConditionSpecificRecipe: (condition, dietaryProfileId, targetCalories, provider) => api.post(`/nutrition-intelligence/recipes/condition/${condition}`, { dietary_profile_id: dietaryProfileId, target_calories: targetCalories, provider }),
+  getWellnessPractices: (category, tag) => api.get('/nutrition-intelligence/wellness-practices', { params: { category, tag } }),
+  getNaturalTherapistGuidance: (condition, symptoms) => api.post('/nutrition-intelligence/natural-therapist/guidance', { condition, symptoms }),
+  calculateNutrientProfile: (condition, nutritionData) => api.post(`/nutrition-intelligence/nutrient-calculator/${condition}`, nutritionData),
+}
+
+/** Recipe Intelligence - Master chef and recipe management */
+export const recipeIntelligenceAPI = {
+  getRecipes: (params) => api.get('/recipe-intelligence/recipes', { params }),
+  createRecipe: (data) => api.post('/recipe-intelligence/recipes', data),
+  getRecipe: (recipeId) => api.get(`/recipe-intelligence/recipes/${recipeId}`),
+  updateRecipe: (recipeId, data) => api.put(`/recipe-intelligence/recipes/${recipeId}`, data),
+  deleteRecipe: (recipeId) => api.delete(`/recipe-intelligence/recipes/${recipeId}`),
+  searchRecipes: (query, filters) => api.get('/recipe-intelligence/recipes/search', { params: { q: query, ...filters } }),
+  getRecipeByCondition: (condition) => api.get(`/recipe-intelligence/recipes/condition/${condition}`),
+  analyzeRecipeNutrition: (recipeData) => api.post('/recipe-intelligence/recipes/analyze-nutrition', recipeData),
+  getRecipeVariations: (recipeId) => api.get(`/recipe-intelligence/recipes/${recipeId}/variations`),
+  createRecipeVariation: (recipeId, data) => api.post(`/recipe-intelligence/recipes/${recipeId}/variations`, data),
+}
+
+/** Consumer Health - Health condition management */
+export const consumerHealthAPI = {
+  getHealthConditions: () => api.get('/consumer-health/conditions'),
+  createHealthProfile: (data) => api.post('/consumer-health/profiles', data),
+  getHealthProfile: (profileId) => api.get(`/consumer-health/profiles/${profileId}`),
+  updateHealthProfile: (profileId, data) => api.put(`/consumer-health/profiles/${profileId}`, data),
+  getHealthMetrics: (profileId) => api.get(`/consumer-health/profiles/${profileId}/metrics`),
+  trackSymptoms: (data) => api.post('/consumer-health/symptoms', data),
+  getSymptomHistory: (profileId) => api.get(`/consumer-health/profiles/${profileId}/symptoms`),
+  getHealthRecommendations: (profileId) => api.get(`/consumer-health/profiles/${profileId}/recommendations`),
+}
+
+// ---------------------------------------------------------------------------
+// PRODUCTION-GRADE API CLIENTS FOR MISSING BACKEND INTEGRATION
+// ---------------------------------------------------------------------------
+
+/** SHG Management - Self Help Group management (highest confidence gap) */
+export const shgManagementAPI = {
+  getSHGs: (params) => api.get('/shg/groups', { params }),
+  createSHG: (data) => api.post('/shg/groups', data),
+  getSHG: (shgId) => api.get(`/shg/groups/${shgId}`),
+  updateSHG: (shgId, data) => api.put(`/shg/groups/${shgId}`, data),
+  getSHGMembers: (shgId) => api.get(`/shg/groups/${shgId}/members`),
+  addMember: (shgId, data) => api.post(`/shg/groups/${shgId}/members`, data),
+  getSHGFinancials: (shgId) => api.get(`/shg/groups/${shgId}/financials`),
+  getSHGActivities: (shgId) => api.get(`/shg/groups/${shgId}/activities`),
+}
+
+/** Land Registry - Parcel CRUD (highest confidence gap) */
+export const landRegistryAPI = {
+  getParcels: (params) => api.get('/land-registry/parcels', { params }),
+  createParcel: (data) => api.post('/land-registry/parcels', data),
+  getParcel: (parcelId) => api.get(`/land-registry/parcels/${parcelId}`),
+  updateParcel: (parcelId, data) => api.put(`/land-registry/parcels/${parcelId}`, data),
+  getParcelHistory: (parcelId) => api.get(`/land-registry/parcels/${parcelId}/history`),
+  verifyParcel: (parcelId) => api.post(`/land-registry/parcels/${parcelId}/verify`),
+  getOwnershipDocuments: (parcelId) => api.get(`/land-registry/parcels/${parcelId}/documents`),
+}
+
+/** Farm Costing - Cost analysis and tracking (highest confidence gap) */
+export const farmCostingAPI = {
+  getCosts: (params) => api.get('/farm-costing/costs', { params }),
+  createCost: (data) => api.post('/farm-costing/costs', data),
+  getCost: (costId) => api.get(`/farm-costing/costs/${costId}`),
+  updateCost: (costId, data) => api.put(`/farm-costing/costs/${costId}`, data),
+  getCostCategories: () => api.get('/farm-costing/categories'),
+  getCostAnalysis: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/analysis`, { params: { period } }),
+  getBudgetComparison: (farmId) => api.get(`/farm-costing/farms/${farmId}/budget-comparison`),
+  getCostTrends: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/trends`, { params: { period } }),
+}
+
+/** Decision Engine - Core business logic decisions */
+export const decisionEngineAPI = {
+  getStatus: () => api.get('/decision-support/status'),
+  getRules: () => api.get('/decision-support/rules'),
+  createRule: (data) => api.post('/decision-support/rules', data),
+  updateRule: (ruleId, data) => api.put(`/decision-support/rules/${ruleId}`, data),
+  deleteRule: (ruleId) => api.delete(`/decision-support/rules/${ruleId}`),
+  evaluateDecision: (data) => api.post('/decision-support/evaluate', data),
+  getDecisionHistory: (params) => api.get('/decision-support/history', { params }),
+  getActiveDecisions: () => api.get('/decision-support/active'),
+  getDecisionOutcomes: (decisionId) => api.get(`/decision-support/decisions/${decisionId}/outcomes`),
+  triggerDecision: (ruleId, context) => api.post(`/decision-support/rules/${ruleId}/trigger`, { context }),
+}
+
+/** Enterprise Memory - Case log and learning system */
+export const enterpriseMemoryAPI = {
+  getCases: (params) => api.get('/enterprise-memory/cases', { params }),
+  getCase: (caseId) => api.get(`/enterprise-memory/cases/${caseId}`),
+  createCase: (data) => api.post('/enterprise-memory/cases', data),
+  updateCase: (caseId, data) => api.put(`/enterprise-memory/cases/${caseId}`, data),
+  searchCases: (query) => api.get('/enterprise-memory/search', { params: { q: query } }),
+  getLearningInsights: () => api.get('/enterprise-memory/insights'),
+  getSimilarCases: (caseId) => api.get(`/enterprise-memory/cases/${caseId}/similar`),
+  getKnowledgeGraph: () => api.get('/enterprise-memory/knowledge-graph'),
+  getCaseAnalytics: () => api.get('/enterprise-memory/analytics'),
+}
+
+/** ERP Dashboard - Complete ERP monitoring */
+export const erpDashboardAPI = {
+  getDashboard: () => api.get('/erp/dashboard'),
+  getSyncStatus: () => api.get('/erp/sync-status'),
+  getGLEntries: (params) => api.get('/erp/gl-entries', { params }),
+  getReconciliation: (params) => api.get('/erp/reconciliation', { params }),
+  getBudgetStatus: (budgetId) => api.get(`/erp/budgets/${budgetId}/status`),
+  getFinancialReports: (params) => api.get('/erp/reports', { params }),
+  getAssetRegister: (params) => api.get('/erp/assets', { params }),
+  getProjectStatus: (projectId) => api.get(`/erp/projects/${projectId}/status`),
+  triggerSync: (syncType) => api.post('/erp/sync', { sync_type: syncType }),
+  resolveConflict: (conflictId, resolution) => api.post(`/erp/conflicts/${conflictId}/resolve`, { resolution }),
+}
+
+/** Digital Twin - Farm simulation engine */
+export const digitalTwinAPI = {
+  getStatus: () => api.get('/digital-twin/status'),
+  createTwin: (data) => api.post('/digital-twin/twins', data),
+  getTwins: (params) => api.get('/digital-twin/twins', { params }),
+  getTwin: (twinId) => api.get(`/digital-twin/twins/${twinId}`),
+  updateTwin: (twinId, data) => api.put(`/digital-twin/twins/${twinId}`, data),
+  runSimulation: (twinId, scenario) => api.post(`/digital-twin/twins/${twinId}/simulate`, { scenario }),
+  getSimulationResults: (twinId, simulationId) => api.get(`/digital-twin/twins/${twinId}/simulations/${simulationId}`),
+  getPredictiveModels: (twinId) => api.get(`/digital-twin/twins/${twinId}/models`),
+  getTwinAnalytics: (twinId) => api.get(`/digital-twin/twins/${twinId}/analytics`),
+  syncRealData: (twinId) => api.post(`/digital-twin/twins/${twinId}/sync`),
+}
+
+/** Climate Monitoring - Weather analytics and alerts */
+export const climateMonitoringAPI = {
+  getStatus: () => api.get('/climate-monitoring/status'),
+  getDroughtData: (params) => api.get('/climate-monitoring/drought', { params }),
+  getFloodData: (params) => api.get('/climate-monitoring/flood', { params }),
+  getDiseaseForecast: (params) => api.get('/climate-monitoring/disease-forecast', { params }),
+  getClimateRisk: (params) => api.get('/climate-monitoring/climate-risk', { params }),
+  getAgroMeteorology: (params) => api.get('/climate-monitoring/agro-meteorology', { params }),
+  getAlerts: () => api.get('/climate-monitoring/alerts'),
+  generateReport: (params) => api.post('/climate-monitoring/reports', params),
+  getHistoricalData: (params) => api.get('/climate-monitoring/historical', { params }),
+  getForecastAccuracy: () => api.get('/climate-monitoring/forecast-accuracy'),
+}
+
+/** Cold Storage - Temperature tracking and monitoring */
+export const coldStorageAPI = {
+  getStatus: () => api.get('/cold-storage/status'),
+  getFacilities: (params) => api.get('/cold-storage/facilities', { params }),
+  createFacility: (data) => api.post('/cold-storage/facilities', data),
+  getFacility: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}`),
+  bookFacility: (facilityId, data) => api.post(`/cold-storage/facilities/${facilityId}/book`, data),
+  getTemperatureData: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/temperature`),
+  getTemperatureAlerts: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/alerts`),
+  getUtilization: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/utilization`),
+  getCapacityPlanning: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/capacity-planning`),
+  getComplianceStatus: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/compliance`),
+}
+
+/** AI Operations Intelligence - Real-time optimization */
+export const aiOperationIntelligenceAPI = {
+  getStatus: () => api.get('/ai-operation-intelligence/status'),
+  getPerformanceMetrics: () => api.get('/ai-operation-intelligence/performance'),
+  getOptimizationSuggestions: () => api.get('/ai-operation-intelligence/suggestions'),
+  detectAnomalies: () => api.post('/ai-operation-intelligence/anomalies'),
+  applyOptimization: (suggestionId) => api.post(`/ai-operation-intelligence/optimizations/${suggestionId}/apply`),
+  getRealtimeAlerts: () => api.get('/ai-operation-intelligence/alerts'),
+  getSystemHealth: () => api.get('/ai-operation-intelligence/health'),
+  getResourceUsage: () => api.get('/ai-operation-intelligence/resources'),
+  getCapacityForecast: () => api.get('/ai-operation-intelligence/capacity-forecast'),
+}
+
+/** AI Self-Healing - Autonomous error recovery */
+export const aiSelfHealingAPI = {
+  getStatus: () => api.get('/ai-self-healing/status'),
+  detectErrors: () => api.post('/ai-self-healing/detect'),
+  analyzeRootCause: (errorId) => api.get(`/ai-self-healing/errors/${errorId}/root-cause`),
+  initiateRecovery: (errorId) => api.post(`/ai-self-healing/errors/${errorId}/recover`),
+  getRecoveryHistory: () => api.get('/ai-self-healing/history'),
+  getHealthMetrics: () => api.get('/ai-self-healing/health'),
+  getHealingPatterns: () => api.get('/ai-self-healing/patterns'),
+  configureAutoHealing: (config) => api.post('/ai-self-healing/configure', config),
+}
+
+/** AI Brain - Cognitive processing layer */
+export const aiBrainAPI = {
+  getStatus: () => api.get('/ai-brain/status'),
+  processPerception: (data) => api.post('/ai-brain/perception', data),
+  processAttention: (data) => api.post('/ai-brain/attention', data),
+  processReasoning: (data) => api.post('/ai-brain/reasoning', data),
+  processLearning: (data) => api.post('/ai-brain/learning', data),
+  processDecision: (data) => api.post('/ai-brain/decision', data),
+  processPlanning: (data) => api.post('/ai-brain/planning', data),
+  getKnowledgeGraph: () => api.get('/ai-brain/knowledge-graph'),
+  getMemoryState: () => api.get('/ai-brain/memory'),
+  getCognitiveLoad: () => api.get('/ai-brain/cognitive-load'),
+}
+
+/** AI Gateway - API gateway for AI services */
+export const aiGatewayAPI = {
+  getStatus: () => api.get('/ai-gateway/status'),
+  getEndpoints: () => api.get('/ai-gateway/endpoints'),
+  createEndpoint: (data) => api.post('/ai-gateway/endpoints', data),
+  updateEndpoint: (id, data) => api.put(`/ai-gateway/endpoints/${id}`, data),
+  deleteEndpoint: (id) => api.delete(`/ai-gateway/endpoints/${id}`),
+  routeRequest: (endpoint, data) => api.post(`/ai-gateway/route/${endpoint}`, data),
+  getMetrics: () => api.get('/ai-gateway/metrics'),
+  getRoutingRules: () => api.get('/ai-gateway/rules'),
+  updateRoutingRules: (rules) => api.put('/ai-gateway/rules', rules),
+}
+
+/** Food Safety - FSSAI compliance tracking */
+export const foodSafetyAPI = {
+  getStatus: () => api.get('/food-safety/status'),
+  getComplianceRecords: (params) => api.get('/food-safety/compliance', { params }),
+  createComplianceRecord: (data) => api.post('/food-safety/compliance', data),
+  getRecalls: (params) => api.get('/food-safety/recalls', { params }),
+  createRecall: (data) => api.post('/food-safety/recalls', data),
+  getAuditTrail: (productId) => api.get(`/food-safety/products/${productId}/audit-trail`),
+  getCertificates: (params) => api.get('/food-safety/certificates', { params }),
+  generateComplianceReport: (params) => api.post('/food-safety/reports', params),
+}
+
+/** Organic Traceability - Audit trails */
+export const organicTraceabilityAPI = {
+  getStatus: () => api.get('/organic-traceability/status'),
+  getStandards: () => api.get('/organic-traceability/standards'),
+  registerFarm: (data) => api.post('/organic-traceability/farms', data),
+  getConsumerTransparency: (qrCode) => api.get(`/organic-traceability/consumer-transparency/qr/${qrCode}`),
+  getAuditTrail: (farmId) => api.get(`/organic-traceability/farms/${farmId}/audit-trail`),
+  getCertificationStatus: (farmId) => api.get(`/organic-traceability/farms/${farmId}/certification`),
+  getInspectionSchedule: (farmId) => api.get(`/organic-traceability/farms/${farmId}/inspections`),
+}
+
+/** Biodiversity - Species recognition */
+export const biodiversityAPI = {
+  getStatus: () => api.get('/biodiversity/status'),
+  getSpecies: (params) => api.get('/biodiversity/species', { params }),
+  identifySpecies: (imageData) => api.post('/biodiversity/identify', imageData),
+  getSpeciesDatabase: (params) => api.get('/biodiversity/database', { params }),
+  getBiodiversityMetrics: (location) => api.get('/biodiversity/metrics', { params: { location } }),
+  recordObservation: (data) => api.post('/biodiversity/observations', data),
+  getConservationStatus: (speciesId) => api.get(`/biodiversity/species/${speciesId}/conservation`),
+}
+
+/** Enterprise Control - Workflow engine */
+export const enterpriseControlAPI = {
+  getStatus: () => api.get('/control/status'),
+  getWorkflows: (params) => api.get('/control/workflows', { params }),
+  createWorkflow: (data) => api.post('/control/workflows', data),
+  getWorkflow: (workflowId) => api.get(`/control/workflows/${workflowId}`),
+  executeWorkflow: (workflowId, data) => api.post(`/control/workflows/${workflowId}/execute`, data),
+  getWorkflowHistory: (workflowId) => api.get(`/control/workflows/${workflowId}/history`),
+  getPendingApprovals: () => api.get('/control/approvals/pending'),
+  approveWorkflow: (workflowId) => api.post(`/control/workflows/${workflowId}/approve`),
+  rejectWorkflow: (workflowId, reason) => api.post(`/control/workflows/${workflowId}/reject`, { reason }),
+}
+
+/** Experience Layer - DXP engines */
+export const experienceAPI = {
+  resolve: (params) => api.get('/experience/resolve', { params }),
+  tokens: (theme) => api.get('/experience/tokens', { params: { theme } }),
+  saveToken: (body) => api.post('/experience/tokens', body),
+  themes: () => api.get('/experience/themes'),
+  contrast: (fg, bg, large) => api.get('/experience/contrast', { params: { fg, bg, large } }),
+  motion: (reduced) => api.get('/experience/motion', { params: { reduced } }),
+  breakpoint: (width) => api.get('/experience/breakpoint', { params: { width } }),
+  components: (params) => api.get('/experience/components', { params }),
+  registerComponent: (body) => api.post('/experience/components', body),
+  accessibility: () => api.get('/experience/accessibility'),
+  recordConformance: (body) => api.post('/experience/accessibility', body),
+  preferences: () => api.get('/experience/preferences'),
+  savePreferences: (body) => api.put('/experience/preferences', body),
+}
+
+/** Innovation Lab - Experimental features */
+export const innovationLabAPI = {
+  getStatus: () => api.get('/innovation-lab/status'),
+  getExperiments: (params) => api.get('/innovation-lab/experiments', { params }),
+  createExperiment: (data) => api.post('/innovation-lab/experiments', data),
+  getExperiment: (experimentId) => api.get(`/innovation-lab/experiments/${experimentId}`),
+  runExperiment: (experimentId) => api.post(`/innovation-lab/experiments/${experimentId}/run`),
+  getExperimentResults: (experimentId) => api.get(`/innovation-lab/experiments/${experimentId}/results`),
+  getBetaFeatures: () => api.get('/innovation-lab/beta-features'),
+  enrollInBeta: (featureId) => api.post(`/innovation-lab/beta-features/${featureId}/enroll`),
+}
+
+/** AI Agents - Agentic task execution */
+export const aiAgentAPI = {
+  getStatus: () => api.get('/ai-agents/status'),
+  getAgents: () => api.get('/ai-agents'),
+  createAgent: (data) => api.post('/ai-agents', data),
+  getAgent: (agentId) => api.get(`/ai-agents/${agentId}`),
+  executeTask: (agentId, task) => api.post(`/ai-agents/${agentId}/execute`, { task }),
+  getAgentPerformance: (agentId) => api.get(`/ai-agents/${agentId}/performance`),
+  getToolRegistry: () => api.get('/ai-agents/tools'),
+  registerTool: (tool) => api.post('/ai-agents/tools', tool),
+  getAgentLogs: (agentId) => api.get(`/ai-agents/${agentId}/logs`),
+  coordinateAgents: (agentIds, task) => api.post('/ai-agents/coordinate', { agent_ids: agentIds, task }),
+}
+
+/** Glut Warning - Early warning system */
+export const glutWarningAPI = {
+  getStatus: () => api.get('/glut-warning/status'),
+  getWarnings: (params) => api.get('/glut-warning/warnings', { params }),
+  createWarning: (data) => api.post('/glut-warning/warnings', data),
+  getWarning: (warningId) => api.get(`/glut-warning/warnings/${warningId}`),
+  acknowledgeWarning: (warningId) => api.post(`/glut-warning/warnings/${warningId}/acknowledge`),
+  getHistoricalGluts: (params) => api.get('/glut-warning/historical', { params }),
+  getGlutPrediction: (crop, region) => api.get('/glut-warning/prediction', { params: { crop, region } }),
+  getMitigationStrategies: (warningId) => api.get(`/glut-warning/warnings/${warningId}/strategies`),
+}
+
+/** Market Signals - Market intelligence */
+export const marketSignalsAPI = {
+  getStatus: () => api.get('/market-signals/status'),
+  getSignals: (params) => api.get('/market-signals/signals', { params }),
+  getPriceTrends: (crop, region) => api.get('/market-signals/price-trends', { params: { crop, region } }),
+  getDemandForecast: (crop) => api.get('/market-signals/demand-forecast', { params: { crop } }),
+  getCompetitorAnalysis: (crop) => api.get('/market-signals/competitor-analysis', { params: { crop } }),
+  getMarketSentiment: () => api.get('/market-signals/sentiment'),
+  getSupplyChainStatus: () => api.get('/market-signals/supply-chain'),
+}
+
+/** Seller Ranking - Trust scoring */
+export const sellerRankingAPI = {
+  getStatus: () => api.get('/seller-ranking/status'),
+  getSellers: (params) => api.get('/seller-ranking/sellers', { params }),
+  getSeller: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}`),
+  getSellerRanking: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/ranking`),
+  getSellerReviews: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/reviews`),
+  getSellerPerformance: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/performance`),
+  reportSeller: (sellerId, issue) => api.post(`/seller-ranking/sellers/${sellerId}/report`, { issue }),
+  getSellerBadges: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/badges`),
+}
+
+/** Civil Disruption - Risk monitoring */
+export const civilDisruptionAPI = {
+  getStatus: () => api.get('/civil-disruption/status'),
+  getDisruptions: (params) => api.get('/civil-disruption/disruptions', { params }),
+  createDisruption: (data) => api.post('/civil-disruption/disruptions', data),
+  getDisruption: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}`),
+  getImpactAssessment: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/impact`),
+  getMitigationPlans: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/mitigation`),
+  getRiskForecast: (region) => api.get('/civil-disruption/risk-forecast', { params: { region } }),
+  getAlternateRoutes: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/alternate-routes`),
+}
+
+/** Logistics Enhancement - Advanced logistics */
+export const logisticsEnhancementAPI = {
+  getStatus: () => api.get('/logistics-enhancement/status'),
+  getFleet: (params) => api.get('/logistics-enhancement/fleet', { params }),
+  getVehicle: (vehicleId) => api.get(`/logistics-enhancement/fleet/${vehicleId}`),
+  getDriverPerformance: (driverId) => api.get(`/logistics-enhancement/drivers/${driverId}/performance`),
+  getRouteOptimization: (from, to) => api.get('/logistics-enhancement/route-optimization', { params: { from, to } }),
+  getLiveTracking: (shipmentId) => api.get(`/logistics-enhancement/shipments/${shipmentId}/live-tracking`),
+  getTemperatureTracking: (shipmentId) => api.get(`/logistics-enhancement/shipments/${shipmentId}/temperature`),
+  getWarehouseIntegration: (warehouseId) => api.get(`/logistics-enhancement/warehouses/${warehouseId}/integration`),
+  getReturnLoadOpportunities: () => api.get('/logistics-enhancement/return-loads'),
+  getFreightPooling: () => api.get('/logistics-enhancement/freight-pooling'),
+}
+
+/** Enterprise AI - Enterprise AI services */
+export const enterpriseAIAPI = {
+  getStatus: () => api.get('/enterprise-ai/status'),
+  getCreditScore: (entityId) => api.get(`/enterprise-ai/credit-score/${entityId}`),
+  getSchemeEligibility: (entityId) => api.get(`/enterprise-ai/scheme-eligibility/${entityId}`),
+  getModelRegistry: () => api.get('/enterprise-ai/models'),
+  registerModel: (model) => api.post('/enterprise-ai/models', model),
+  getConversationalQuery: (query) => api.post('/enterprise-ai/query', { query }),
+  getEnterpriseInsights: (entityId) => api.get(`/enterprise-ai/insights/${entityId}`),
+  getRiskAssessment: (entityId) => api.get(`/enterprise-ai/risk/${entityId}`),
+}
+
+/** M400 AI Backbone - Enterprise coordination */
+export const m400AIBackboneAPI = {
+  getStatus: () => api.get('/m400-ai-backbone/status'),
+  getCoordinationState: () => api.get('/m400-ai-backbone/coordination'),
+  triggerCoordination: (data) => api.post('/m400-ai-backbone/coordinate', data),
+  getAgentStatus: () => api.get('/m400-ai-backbone/agents'),
+  getWorkflowStatus: () => api.get('/m400-ai-backbone/workflows'),
+  initiateWorkflow: (workflowType, data) => api.post('/m400-ai-backbone/workflows', { workflow_type: workflowType, data }),
+  getSystemMetrics: () => api.get('/m400-ai-backbone/metrics'),
+  getPerformance: () => api.get('/m400-ai-backbone/performance'),
+  configureAgents: (config) => api.post('/m400-ai-backbone/configure', config),
+}
+
+/** SAP Module Architecture - Independent module architecture */
+export const sapModuleArchitectureAPI = {
+  getStatus: () => api.get('/sap-module-architecture/status'),
+  getModules: () => api.get('/sap-module-architecture/modules'),
+  getModule: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}`),
+  registerModule: (module) => api.post('/sap-module-architecture/modules', module),
+  getDependencies: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/dependencies`),
+  getLifecycle: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/lifecycle`),
+  getConfiguration: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/configuration`),
+  getMTADescriptor: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/mta`),
+  deployModule: (moduleId) => api.post(`/sap-module-architecture/modules/${moduleId}/deploy`),
+}
+
+/** Research and Development - R&D management */
+export const researchAndDevelopmentAPI = {
+  getStatus: () => api.get('/research-and-development/status'),
+  getProjects: (params) => api.get('/research-and-development/projects', { params }),
+  createProject: (data) => api.post('/research-and-development/projects', data),
+  getProject: (projectId) => api.get(`/research-and-development/projects/${projectId}`),
+  updateProject: (projectId, data) => api.put(`/research-and-development/projects/${projectId}`, data),
+  getCollaborations: (projectId) => api.get(`/research-and-development/projects/${projectId}/collaborations`),
+  getInnovations: (params) => api.get('/research-and-development/innovations', { params }),
+  getPatents: (params) => api.get('/research-and-development/patents', { params }),
+  getFunding: (projectId) => api.get(`/research-and-development/projects/${projectId}/funding`),
+  getPublications: (params) => api.get('/research-and-development/publications', { params }),
+  getAIResearchAssistance: (topic) => api.post('/research-and-development/ai-assist', { topic }),
+}
+
+/** Information Sharing - Document management */
+export const informationSharingAPI = {
+  getStatus: () => api.get('/information-sharing/status'),
+  getDocuments: (params) => api.get('/information-sharing/documents', { params }),
+  createDocument: (data) => api.post('/information-sharing/documents', data),
+  getDocument: (documentId) => api.get(`/information-sharing/documents/${documentId}`),
+  updateDocument: (documentId, data) => api.put(`/information-sharing/documents/${documentId}`, data),
+  getFolders: (params) => api.get('/information-sharing/folders', { params }),
+  createFolder: (data) => api.post('/information-sharing/folders', data),
+  getPermissions: (resourceId) => api.get(`/information-sharing/resources/${resourceId}/permissions`),
+  setPermissions: (resourceId, permissions) => api.put(`/information-sharing/resources/${resourceId}/permissions`, permissions),
+  getSharingLinks: (documentId) => api.get(`/information-sharing/documents/${documentId}/links`),
+  createSharingLink: (documentId, settings) => api.post(`/information-sharing/documents/${documentId}/links`, settings),
+  getCollaborationSessions: (documentId) => api.get(`/information-sharing/documents/${documentId}/sessions`),
+  startCollaboration: (documentId) => api.post(`/information-sharing/documents/${documentId}/collaboration`),
+  getAIRecommendations: (documentId) => api.get(`/information-sharing/documents/${documentId}/recommendations`),
+}
+
+/** Agricultural Intelligence - AI predictions */
+export const agriculturalIntelligenceAPI = {
+  getStatus: () => api.get('/agricultural-intelligence/status'),
+  predictCropYield: (data) => api.post('/agricultural-intelligence/predict/crop-yield', data),
+  analyzeSoilHealth: (data) => api.post('/agricultural-intelligence/analyze/soil', data),
+  predictWeatherImpact: (data) => api.post('/agricultural-intelligence/predict/weather-impact', data),
+  detectPestRisk: (data) => api.post('/agricultural-intelligence/detect/pest-risk', data),
+  optimizeIrrigation: (data) => api.post('/agricultural-intelligence/optimize/irrigation', data),
+  getMarketIntelligence: (params) => api.get('/agricultural-intelligence/market', { params }),
+  getAIModels: () => api.get('/agricultural-intelligence/models'),
+  getModelPerformance: (modelId) => api.get(`/agricultural-intelligence/models/${modelId}/performance`),
+  trainModel: (modelType, data) => api.post(`/agricultural-intelligence/models/${modelType}/train`, data),
+}
+
+/** Knowledge Reference - Wikipedia and FOLU data */
+export const knowledgeReferenceAPI = {
+  searchWikipedia: (query) => api.get('/knowledge-reference/wikipedia/search', { params: { q: query } }),
+  getWikipediaPage: (title) => api.get('/knowledge-reference/wikipedia/page', { params: { title } }),
+  getFOLUBenchmarks: (params) => api.get('/knowledge-reference/folu/benchmarks', { params }),
+  getAgriculturalKnowledge: (topic) => api.get('/knowledge-reference/agricultural', { params: { topic } }),
+  getKnowledgeGraph: (entity) => api.get('/knowledge-reference/knowledge-graph', { params: { entity } }),
+}
+
+/** Real-time Monitoring - Resource monitoring */
+export const realtimeMonitoringAPI = {
+  getStatus: () => api.get('/realtime-monitoring/status'),
+  startMonitor: (resourceType, resourceId) => api.post('/realtime-monitoring/start', { resource_type: resourceType, resource_id: resourceId }),
+  stopMonitor: (monitorId) => api.post(`/realtime-monitoring/stop/${monitorId}`),
+  getMonitors: () => api.get('/realtime-monitoring/monitors'),
+  getMonitorData: (monitorId) => api.get(`/realtime-monitoring/monitors/${monitorId}/data`),
+  getAlerts: () => api.get('/realtime-monitoring/alerts'),
+  acknowledgeAlert: (alertId) => api.post(`/realtime-monitoring/alerts/${alertId}/acknowledge`),
+  getSystemMetrics: () => api.get('/realtime-monitoring/metrics'),
+  configureThresholds: (thresholds) => api.post('/realtime-monitoring/thresholds', thresholds),
+}
+
+/** Complete ERP Integration - Comprehensive ERP sync */
+export const completeERPAPI = {
+  getStatus: () => api.get('/complete-erp-integration/status'),
+  syncFarmer: (farmerId) => api.post('/complete-erp-integration/sync/farmer', { farmer_id: farmerId }),
+  syncCrop: (cropId) => api.post('/complete-erp-integration/sync/crop', { crop_id: cropId }),
+  syncLivestock: (livestockId) => api.post('/complete-erp-integration/sync/livestock', { livestock_id: livestockId }),
+  syncModule: (moduleId, data) => api.post('/complete-erp-integration/sync/module', { module_id: moduleId, data }),
+  getSyncHistory: (params) => api.get('/complete-erp-integration/history', { params }),
+  resolveConflict: (conflictId, resolution) => api.post(`/complete-erp-integration/conflicts/${conflictId}/resolve`, { resolution }),
+  getSyncHealth: () => api.get('/complete-erp-integration/health'),
+  triggerBulkSync: (data) => api.post('/complete-erp-integration/bulk-sync', data),
+}
+
+/** Complete AI Integration - AI-driven predictions */
+export const completeAIAPI = {
+  getStatus: () => api.get('/complete-ai-integration/status'),
+  predictYield: (data) => api.post('/complete-ai-integration/predict/yield', data),
+  detectDisease: (data) => api.post('/complete-ai-integration/detect/disease', data),
+  optimizeFertilizer: (data) => api.post('/complete-ai-integration/optimize/fertilizer', data),
+  predictMarketPrice: (data) => api.post('/complete-ai-integration/predict/price', data),
+  getRecommendations: (farmerId) => api.get(`/complete-ai-integration/recommendations/${farmerId}`),
+  trainModel: (modelType, data) => api.post(`/complete-ai-integration/models/${modelType}/train`, data),
+  getModelPerformance: (modelType) => api.get(`/complete-ai-integration/models/${modelType}/performance`),
+  getAIModels: () => api.get('/complete-ai-integration/models'),
+  getPredictionAccuracy: () => api.get('/complete-ai-integration/accuracy'),
+}
+
+/** Comprehensive ERP - Oracle/SAP standards */
+export const comprehensiveERPAPI = {
+  getStatus: () => api.get('/comprehensive-erp/status'),
+  getModules: () => api.get('/comprehensive-erp/modules'),
+  syncGL: (data) => api.post('/comprehensive-erp/sync/gl', data),
+  syncBudget: (data) => api.post('/comprehensive-erp/sync/budget', data),
+  syncAsset: (data) => api.post('/comprehensive-erp/sync/asset', data),
+  syncProject: (data) => api.post('/comprehensive-erp/sync/project', data),
+  syncHR: (data) => api.post('/comprehensive-erp/sync/hr', data),
+  syncInventory: (data) => api.post('/comprehensive-erp/sync/inventory', data),
+  syncProcurement: (data) => api.post('/comprehensive-erp/sync/procurement', data),
+  syncSales: (data) => api.post('/comprehensive-erp/sync/sales', data),
+  getReconciliationStatus: () => api.get('/comprehensive-erp/reconciliation'),
+  getFinancialStatements: (params) => api.get('/comprehensive-erp/statements', { params }),
+  getBudgetReports: (params) => api.get('/comprehensive-erp/budgets', { params }),
+  getAssetRegister: (params) => api.get('/comprehensive-erp/assets', { params }),
+  getProjectReports: (params) => api.get('/comprehensive-erp/projects', { params }),
+}
+
+/** Water Records - Water management data */
+export const waterRecordsAPI = {
+  getBudgets: (params) => api.get('/water-budgeting/budgets', { params }),
+  getQualityReadings: (params) => api.get('/water-quality/readings', { params }),
+  getRainwaterStructures: (params) => api.get('/rainwater-harvesting/structures', { params }),
+  getWatersheds: (params) => api.get('/watersheds', { params }),
+  getAnalyticsRecords: (params) => api.get('/water-analytics/records', { params }),
+  createBudget: (data) => api.post('/water-budgeting/budgets', data),
+  recordQualityReading: (data) => api.post('/water-quality/readings', data),
+  createRainwaterStructure: (data) => api.post('/rainwater-harvesting/structures', data),
+  createWatershed: (data) => api.post('/watersheds', data),
+  recordAnalytics: (data) => api.post('/water-analytics/records', data),
+}
+
+/** Logistics Matching - Freight pooling and return loads */
+export const logisticsMatchingAPI = {
+  getFreightPooling: () => api.get('/logistics-matching/freight-pooling'),
+  getReturnLoadBoard: () => api.get('/logistics-matching/return-loads'),
+  getEquipmentExchange: () => api.get('/logistics-matching/equipment-exchange'),
+  submitFreightRequest: (data) => api.post('/logistics-matching/freight-requests', data),
+  acceptFreightRequest: (requestId) => api.post(`/logistics-matching/freight-requests/${requestId}/accept`),
+  submitReturnLoad: (data) => api.post('/logistics-matching/return-loads`, data),
+  acceptReturnLoad: (loadId) => api.post(`/logistics-matching/return-loads/${loadId}/accept`),
+  listEquipment: (params) => api.get('/logistics-matching/equipment', { params }),
+  createEquipmentListing: (data) => api.post('/logistics-matching/equipment', data),
 }
 
 /** M041 — Village Registry (Community domain). No backend route found. */

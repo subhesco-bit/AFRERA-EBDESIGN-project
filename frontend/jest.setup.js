@@ -1,8 +1,8 @@
 // Jest setup file for frontend
-import '@testing-library/jest-dom';
+require('@testing-library/jest-dom');
 
 // Mock API calls
-jest.mock('../src/services/api', () => ({
+jest.mock('./src/services/api', () => ({
   authAPI: {
     login: jest.fn(),
     register: jest.fn(),

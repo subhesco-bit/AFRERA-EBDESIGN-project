@@ -83,6 +83,366 @@ if (process.env.NODE_ENV === 'test') {
 // PostgreSQL default max_connections of 100. See database/pool.js.
 const pool = require('../../database/pool');
 
+const MEDICAL_CODE_SYSTEMS = new Set(['ICD-10-CM', 'SNOMED-CT', 'LOINC', 'CPT', 'HCPCS', 'ATC', 'NDT', 'RxNorm', 'NDC', 'ICD-10-PCS', 'MeSH', 'ICF', 'CPT-II', 'HCPCS Level II']);
+
+// Medical condition codes for common health conditions
+const MEDICAL_CONDITION_CODES = {
+  // Diabetes Mellitus
+  diabetes: {
+    type1: { code: 'E10', system: 'ICD-10-CM', display: 'Type 1 diabetes mellitus' },
+    type2: { code: 'E11', system: 'ICD-10-CM', display: 'Type 2 diabetes mellitus' },
+    gestational: { code: 'O24', system: 'ICD-10-CM', display: 'Gestational diabetes mellitus' },
+    unspecified: { code: 'E13', system: 'ICD-10-CM', display: 'Other specified diabetes mellitus' },
+    complications: {
+      nephropathy: { code: 'E10.2', system: 'ICD-10-CM', display: 'Diabetic nephropathy' },
+      retinopathy: { code: 'E10.3', system: 'ICD-10-CM', display: 'Diabetic retinopathy' },
+      neuropathy: { code: 'E10.4', system: 'ICD-10-CM', display: 'Diabetic neuropathy' },
+      foot: { code: 'E10.5', system: 'ICD-10-CM', display: 'Diabetic foot ulcer' }
+    }
+  },
+  
+  // Blood Pressure Conditions
+  hypertension: {
+    essential: { code: 'I10', system: 'ICD-10-CM', display: 'Essential (primary) hypertension' },
+    secondary: { code: 'I15', system: 'ICD-10-CM', display: 'Secondary hypertension' },
+    renal: { code: 'I12', system: 'ICD-10-CM', display: 'Hypertensive renal disease' },
+    heart: { code: 'I11', system: 'ICD-10-CM', display: 'Hypertensive heart disease' },
+    pregnancy: { code: 'O13', system: 'ICD-10-CM', display: 'Gestational hypertension' }
+  },
+  
+  hypotension: {
+    orthostatic: { code: 'I95.1', system: 'ICD-10-CM', display: 'Orthostatic hypotension' },
+    chronic: { code: 'I95', system: 'ICD-10-CM', display: 'Hypotension' },
+    idiopathic: { code: 'I95.0', system: 'ICD-10-CM', display: 'Idiopathic hypotension' }
+  },
+  
+  // Migraine
+  migraine: {
+    without_aura: { code: 'G43.0', system: 'ICD-10-CM', display: 'Migraine without aura' },
+    with_aura: { code: 'G43.1', system: 'ICD-10-CM', display: 'Migraine with aura' },
+    chronic: { code: 'G43.3', system: 'ICD-10-CM', display: 'Chronic migraine' },
+    complications: { code: 'G43.8', system: 'ICD-10-CM', display: 'Other migraine' }
+  },
+  
+  // Uric Acid / Gout
+  gout: {
+    acute: { code: 'M10.0', system: 'ICD-10-CM', display: 'Idiopathic gout' },
+    chronic: { code: 'M10.1', system: 'ICD-10-CM', display: 'Lead-induced gout' },
+    kidney_stones: { code: 'M10.3', system: 'ICD-10-CM', display: 'Gout due to renal impairment' },
+    complications: { code: 'M10.4', system: 'ICD-10-CM', display: 'Other gout' }
+  },
+  
+  // Other Common Conditions
+  cardiovascular: {
+    coronary: { code: 'I25', system: 'ICD-10-CM', display: 'Chronic ischemic heart disease' },
+    arrhythmia: { code: 'I49', system: 'ICD-10-CM', display: 'Cardiac arrhythmia' },
+    heart_failure: { code: 'I50', system: 'ICD-10-CM', display: 'Heart failure' }
+  },
+  
+  respiratory: {
+    asthma: { code: 'J45', system: 'ICD-10-CM', display: 'Asthma' },
+    copd: { code: 'J44', system: 'ICD-10-CM', display: 'Chronic obstructive pulmonary disease' },
+    pneumonia: { code: 'J18', system: 'ICD-10-CM', display: 'Pneumonia' }
+  },
+  
+  gastrointestinal: {
+    gerd: { code: 'K21', system: 'ICD-10-CM', display: 'Gastro-esophageal reflux disease' },
+    ibs: { code: 'K58', system: 'ICD-10-CM', display: 'Irritable bowel syndrome' },
+    ulcers: { code: 'K25', system: 'ICD-10-CM', display: 'Gastric ulcer' }
+  },
+  
+  nutritional: {
+    obesity: { code: 'E66', system: 'ICD-10-CM', display: 'Obesity' },
+    malnutrition: { code: 'E40', system: 'ICD-10-CM', display: 'Severe protein-calorie malnutrition' },
+    anemia: { code: 'D50', system: 'ICD-10-CM', display: 'Iron deficiency anemia' },
+    vitamin_deficiency: { code: 'E50', system: 'ICD-10-CM', display: 'Vitamin A deficiency' }
+  },
+  
+  mental_health: {
+    depression: { code: 'F32', system: 'ICD-10-CM', display: 'Depressive episode' },
+    anxiety: { code: 'F41', system: 'ICD-10-CM', display: 'Other anxiety disorders' },
+    stress: { code: 'F43', system: 'ICD-10-CM', display: 'Reaction to severe stress' }
+  },
+  
+  // Weight Management Conditions
+  weight_management: {
+    obesity: { 
+      bmi_30_34: { code: 'E66.0', system: 'ICD-10-CM', display: 'Obesity, BMI 30-34.9' },
+      bmi_35_39: { code: 'E66.1', system: 'ICD-10-CM', display: 'Obesity, BMI 35-39.9' },
+      bmi_40_plus: { code: 'E66.2', system: 'ICD-10-CM', display: 'Obesity, BMI 40+' },
+      morbid: { code: 'E66.3', system: 'ICD-10-CM', display: 'Morbid obesity' },
+      super_obesity: { code: 'E66.8', system: 'ICD-10-CM', display: 'Other obesity' }
+    },
+    overweight: { 
+      bmi_25_29: { code: 'E66.3', system: 'ICD-10-CM', display: 'Overweight and obesity' },
+      bmi_25_27: { code: 'E66.3', system: 'ICD-10-CM', display: 'Overweight, BMI 25-27' },
+      bmi_27_30: { code: 'E66.3', system: 'ICD-10-CM', display: 'Overweight, BMI 27-30' }
+    },
+    underweight: { 
+      nutritional: { code: 'E44', system: 'ICD-10-CM', display: 'Protein-energy malnutrition' },
+      mild: { code: 'E44.0', system: 'ICD-10-CM', display: 'Moderate protein-energy malnutrition' },
+      severe: { code: 'E44.1', system: 'ICD-10-CM', display: 'Severe protein-energy malnutrition' }
+    },
+    weight_loss: {
+      unexplained: { code: 'R63.8', system: 'ICD-10-CM', display: 'Unexplained weight loss' },
+      intentional: { code: 'Z71.3', system: 'ICD-10-CM', display: 'Dieting and dietary surveillance' },
+      surgical: { code: 'Z98.89', system: 'ICD-10-CM', display: 'Status following bariatric surgery' }
+    },
+    weight_gain: {
+      abnormal: { code: 'R63.4', system: 'ICD-10-CM', display: 'Abnormal weight gain' },
+      fluid_retention: { code: 'R60', system: 'ICD-10-CM', display: 'Edema' },
+      pregnancy: { code: 'O26', system: 'ICD-10-CM', display: 'Maternal care' }
+    },
+    weight_maintenance: {
+      successful: { code: 'Z71.3', system: 'ICD-10-CM', display: 'Dietary surveillance and counseling' },
+      long_term: { code: 'Z71.3', system: 'ICD-10-CM', display: 'Long-term dietary counseling' }
+    }
+  },
+  
+  // Vision and Eye Health Conditions
+  vision_health: {
+    refractive_errors: {
+      myopia: { code: 'H52.1', system: 'ICD-10-CM', display: 'Myopia' },
+      hyperopia: { code: 'H52.0', system: 'ICD-10-CM', display: 'Hypermetropia' },
+      astigmatism: { code: 'H52.2', system: 'ICD-10-CM', display: 'Astigmatism' },
+      presbyopia: { code: 'H52.4', system: 'ICD-10-CM', display: 'Presbyopia' }
+    },
+    cataract: {
+      age_related: { code: 'H25.1', system: 'ICD-10-CM', display: 'Age-related cataract' },
+      diabetic: { code: 'H28.0', system: 'ICD-10-CM', display: 'Diabetic cataract' },
+      traumatic: { code: 'H26.0', system: 'ICD-10-CM', display: 'Traumatic cataract' },
+      congenital: { code: 'H26.1', system: 'ICD-10-CM', display: 'Congenital cataract' }
+    },
+    glaucoma: {
+      open_angle: { code: 'H40.1', system: 'ICD-10-CM', display: 'Primary open-angle glaucoma' },
+      angle_closure: { code: 'H40.0', system: 'ICD-10-CM', display: 'Primary angle-closure glaucoma' },
+      secondary: { code: 'H40.8', system: 'ICD-10-CM', display: 'Other glaucoma' },
+      congenital: { code: 'H40.3', system: 'ICD-10-CM', display: 'Congenital glaucoma' }
+    },
+    macular_degeneration: {
+      age_related: { code: 'H35.3', system: 'ICD-10-CM', display: 'Age-related macular degeneration' },
+      myopic: { code: 'H35.2', system: 'ICD-10-CM', display: 'Myopic macular degeneration' },
+      stargardt: { code: 'H35.5', system: 'ICD-10-CM', display: 'Stargardt disease' }
+    },
+    diabetic_retinopathy: {
+      mild_npdr: { code: 'E10.3', system: 'ICD-10-CM', display: 'Background diabetic retinopathy' },
+      moderate_npdr: { code: 'E10.3', system: 'ICD-10-CM', display: 'Diabetic retinopathy' },
+      severe_npdr: { code: 'E10.3', system: 'ICD-10-CM', display: 'Proliferative diabetic retinopathy' },
+      macular_edema: { code: 'E10.3', system: 'ICD-10-CM', display: 'Diabetic macular edema' }
+    },
+    dry_eye: {
+      aqueous_deficiency: { code: 'H04.1', system: 'ICD-10-CM', display: 'Dry eye syndrome' },
+      evaporative: { code: 'H04.12', system: 'ICD-10-CM', display: 'Blepharitis' },
+      allergic: { code: 'H10.1', system: 'ICD-10-CM', display: 'Allergic conjunctivitis' }
+    },
+    conjunctivitis: {
+      viral: { code: 'H10.1', system: 'ICD-10-CM', display: 'Acute conjunctivitis' },
+      bacterial: { code: 'H10.0', system: 'ICD-10-CM', display: 'Bacterial conjunctivitis' },
+      allergic: { code: 'H10.1', system: 'ICD-10-CM', display: 'Allergic conjunctivitis' },
+      giant_papillary: { code: 'H10.5', system: 'ICD-10-CM', display: 'Giant papillary conjunctivitis' }
+    },
+    retinal_detachment: {
+      rhegmatogenous: { code: 'H33.0', system: 'ICD-10-CM', display: 'Rhegmatogenous retinal detachment' },
+      tractional: { code: 'H33.2', system: 'ICD-10-CM', display: 'Tractional retinal detachment' },
+      exudative: { code: 'H33.3', system: 'ICD-10-CM', display: 'Exudative retinal detachment' }
+    },
+    optic_neuropathy: {
+      glaucomatous: { code: 'H40.1', system: 'ICD-10-CM', display: 'Glaucomatous optic atrophy' },
+      ischemic: { code: 'H47.0', system: 'ICD-10-CM', display: 'Ischemic optic neuropathy' },
+      toxic: { code: 'H47.2', system: 'ICD-10-CM', display: 'Toxic optic neuropathy' },
+      nutritional: { code: 'E50', system: 'ICD-10-CM', display: 'Vitamin A deficiency' }
+    }
+  },
+  
+  // Advanced Medical Conditions (MS-Level Knowledge)
+  advanced_conditions: {
+    metabolic_syndrome: {
+      full: { code: 'E88.81', system: 'ICD-10-CM', display: 'Metabolic syndrome' },
+      insulin_resistance: { code: 'E88.81', system: 'ICD-10-CM', display: 'Insulin resistance' },
+      dyslipidemia: { code: 'E78.5', system: 'ICD-10-CM', display: 'Hyperlipidemia' }
+    },
+    autoimmune: {
+      rheumatoid_arthritis: { code: 'M05', system: 'ICD-10-CM', display: 'Rheumatoid arthritis' },
+      lupus: { code: 'M32', system: 'ICD-10-CM', display: 'Systemic lupus erythematosus' },
+      hashimoto: { code: 'E06.3', system: 'ICD-10-CM', display: 'Autoimmune thyroiditis' },
+      celiac: { code: 'K90.0', system: 'ICD-10-CM', display: 'Celiac disease' }
+    },
+    inflammatory: {
+      crohn: { code: 'K50', system: 'ICD-10-CM', display: 'Crohn disease' },
+      ulcerative_colitis: { code: 'K51', system: 'ICD-10-CM', display: 'Ulcerative colitis' },
+      ibs: { code: 'K58', system: 'ICD-10-CM', display: 'Irritable bowel syndrome' },
+      leaky_gut: { code: 'K59.8', system: 'ICD-10-CM', display: 'Other specified intestinal malabsorption' }
+    },
+    hormonal: {
+      pcos: { code: 'E28.2', system: 'ICD-10-CM', display: 'Polycystic ovarian syndrome' },
+      thyroid_disorders: { code: 'E06', system: 'ICD-10-CM', display: 'Thyroid disorders' },
+      adrenal_insufficiency: { code: 'E27', system: 'ICD-10-CM', display: 'Adrenal insufficiency' },
+      pituitary_disorders: { code: 'E23', system: 'ICD-10-CM', display: 'Pituitary disorders' }
+    },
+    neurological: {
+      alzheimers: { code: 'G30', system: 'ICD-10-CM', display: 'Alzheimer disease' },
+      parkinsons: { code: 'G20', system: 'ICD-10-CM', display: 'Parkinson disease' },
+      multiple_sclerosis: { code: 'G35', system: 'ICD-10-CM', display: 'Multiple sclerosis' },
+      epilepsy: { code: 'G40', system: 'ICD-10-CM', display: 'Epilepsy' }
+    },
+    oncology: {
+      cancer_nutrition: { code: 'E41', system: 'ICD-10-CM', display: 'Protein-energy malnutrition' },
+      cachexia: { code: 'R64', system: 'ICD-10-CM', display: 'Cachexia' },
+      chemotherapy_effects: { code: 'T45.1', system: 'ICD-10-CM', display: 'Radiation enteritis' },
+      nutritional_support: { code: 'Z76.0', system: 'ICD-10-CM', display: 'Under observation' }
+    },
+    renal: {
+      chronic_kidney_disease: { code: 'N18', system: 'ICD-10-CM', display: 'Chronic kidney disease' },
+      kidney_stones: { code: 'N20', system: 'ICD-10-CM', display: 'Calculus of kidney' },
+      nephrotic_syndrome: { code: 'N04', system: 'ICD-10-CM', display: 'Nephrotic syndrome' },
+      dialysis: { code: 'Z99.1', system: 'ICD-10-CM', display: 'Dependence on renal dialysis' }
+    },
+    hepatic: {
+      fatty_liver: { code: 'K76.0', system: 'ICD-10-CM', display: 'Fatty liver' },
+      hepatitis: { code: 'B15', system: 'ICD-10-CM', display: 'Hepatitis' },
+      cirrhosis: { code: 'K74', system: 'ICD-10-CM', display: 'Cirrhosis' },
+      liver_disease: { code: 'K76.9', system: 'ICD-10-CM', display: 'Other specified liver diseases' }
+    },
+    gastrointestinal: {
+      gerd: { code: 'K21', system: 'ICD-10-CM', display: 'Gastro-esophageal reflux disease' },
+      ulcers: { code: 'K25', system: 'ICD-10-CM', display: 'Gastric ulcer' },
+      ibs: { code: 'K58', system: 'ICD-10-CM', display: 'Irritable bowel syndrome' },
+      sibo: { code: 'K63.8', system: 'ICD-10-CM', display: 'Bacterial overgrowth' }
+    },
+    respiratory: {
+      asthma: { code: 'J45', system: 'ICD-10-CM', display: 'Asthma' },
+      copd: { code: 'J44', system: 'ICD-10-CM', display: 'Chronic obstructive pulmonary disease' },
+      pneumonia: { code: 'J18', system: 'ICD-10-CM', display: 'Pneumonia' },
+      sleep_apnea: { code: 'G47.3', system: 'ICD-10-CM', display: 'Sleep apnea' }
+    },
+    musculoskeletal: {
+      osteoporosis: { code: 'M81', system: 'ICD-10-CM', display: 'Osteoporosis' },
+      arthritis: { code: 'M19', system: 'ICD-10-CM', display: 'Other arthropathy' },
+      sarcopenia: { code: 'M62.5', system: 'ICD-10-CM', display: 'Muscle wasting and atrophy' },
+      fibromyalgia: { code: 'M79.7', system: 'ICD-10-CM', display: 'Fibromyalgia' }
+    },
+    cardiovascular_risk: {
+      metabolic: { code: 'E88.81', system: 'ICD-10-CM', display: 'Metabolic syndrome' },
+      atherosclerosis: { code: 'I70', system: 'ICD-10-CM', display: 'Atherosclerosis' },
+      hypertension: { code: 'I10', system: 'ICD-10-CM', display: 'Essential hypertension' },
+      dyslipidemia: { code: 'E78.5', system: 'ICD-10-CM', display: 'Hyperlipidemia' }
+    }
+  }
+};
+
+// Dietary restrictions for medical conditions
+const DIETARY_RESTRICTIONS = {
+  diabetes: {
+    allowed: ['complex_carbs_low_gi', 'fiber', 'lean_protein', 'healthy_fats', 'non_starchy_vegetables'],
+    restricted: ['simple_sugars', 'refined_carbs', 'saturated_fats', 'trans_fats', 'processed_foods'],
+    portion_control: true,
+    meal_frequency: 'frequent_small',
+    glycemic_focus: true
+  },
+  
+  hypertension: {
+    allowed: ['potassium_rich', 'magnesium_rich', 'calcium_rich', 'lean_protein', 'fruits_vegetables'],
+    restricted: ['sodium', 'saturated_fats', 'alcohol', 'caffeine', 'processed_foods'],
+    portion_control: true,
+    meal_frequency: 'regular',
+    dash_compliant: true
+  },
+  
+  hypotension: {
+    allowed: ['sodium_moderate', 'fluids', 'complex_carbs', 'lean_protein', 'vitamin_b12_rich'],
+    restricted: ['excessive_caffeine', 'alcohol', 'large_meals'],
+    portion_control: false,
+    meal_frequency: 'frequent_small',
+    hydration_focus: true
+  },
+  
+  migraine: {
+    allowed: ['magnesium_rich', 'riboflavin_rich', 'omega_3', 'complex_carbs', 'hydration'],
+    restricted: ['tyramine_rich', 'nitrates', 'alcohol', 'caffeine', 'msg', 'aged_cheeses'],
+    portion_control: true,
+    meal_frequency: 'regular',
+    trigger_avoidance: true
+  },
+  
+  gout: {
+    allowed: ['low_purine', 'dairy_moderate', 'complex_carbs', 'fruits', 'vegetables', 'hydration'],
+    restricted: ['high_purine', 'organ_meats', 'red_meat', 'seafood', 'alcohol', 'sugary_drinks'],
+    portion_control: true,
+    meal_frequency: 'regular',
+    purine_focus: true
+  },
+  
+  cardiovascular: {
+    allowed: ['fiber_rich', 'omega_3', 'lean_protein', 'fruits', 'vegetables', 'whole_grains'],
+    restricted: ['saturated_fats', 'trans_fats', 'sodium', 'cholesterol', 'processed_foods'],
+    portion_control: true,
+    meal_frequency: 'regular',
+    heart_healthy: true
+  }
+};
+
+// Nutrient requirements for medical conditions
+const NUTRIENT_REQUIREMENTS = {
+  diabetes: {
+    carbohydrates: { min: 45, max: 65, unit: '%', note: 'Focus on complex carbs' },
+    protein: { min: 15, max: 20, unit: '%', note: 'Lean protein sources' },
+    fat: { min: 25, max: 35, unit: '%', note: 'Healthy fats only' },
+    fiber: { min: 25, max: 35, unit: 'g', note: 'High fiber requirement' },
+    sodium: { max: 2300, unit: 'mg', note: 'Restrict sodium' },
+    glycemic_index: { max: 55, unit: '', note: 'Low GI preference' }
+  },
+  
+  hypertension: {
+    sodium: { max: 1500, unit: 'mg', note: 'Strict sodium restriction' },
+    potassium: { min: 3500, max: 4700, unit: 'mg', note: 'Increase potassium' },
+    magnesium: { min: 310, max: 420, unit: 'mg', note: 'Adequate magnesium' },
+    calcium: { min: 1000, max: 1200, unit: 'mg', note: 'Adequate calcium' },
+    protein: { min: 15, max: 20, unit: '%', note: 'Lean protein sources' },
+    fiber: { min: 25, max: 30, unit: 'g', note: 'High fiber requirement' }
+  },
+  
+  hypotension: {
+    sodium: { min: 3000, max: 5000, unit: 'mg', note: 'Moderate sodium increase' },
+    fluids: { min: 2000, max: 3000, unit: 'ml', note: 'Increased hydration' },
+    vitamin_b12: { min: 2.4, max: 2.8, unit: 'mcg', note: 'Adequate B12' },
+    iron: { min: 8, max: 18, unit: 'mg', note: 'Adequate iron' },
+    protein: { min: 15, max: 20, unit: '%', note: 'Adequate protein' }
+  },
+  
+  migraine: {
+    magnesium: { min: 310, max: 420, unit: 'mg', note: 'Magnesium may help' },
+    riboflavin: { min: 1.1, max: 1.3, unit: 'mg', note: 'Riboflavin (B2) may help' },
+    omega_3: { min: 1, max: 2, unit: 'g', note: 'Omega-3 fatty acids' },
+    water: { min: 2000, max: 3000, unit: 'ml', note: 'Stay hydrated' },
+    protein: { min: 15, max: 20, unit: '%', note: 'Adequate protein' }
+  },
+  
+  gout: {
+    purines: { max: 400, unit: 'mg', note: 'Strict purine restriction' },
+    water: { min: 2500, max: 3500, unit: 'ml', note: 'High fluid intake' },
+    vitamin_c: { min: 500, max: 1000, unit: 'mg', note: 'Vitamin C may help' },
+    protein: { min: 15, max: 20, unit: '%', note: 'Plant-based proteins preferred' },
+    carbohydrates: { min: 45, max: 65, unit: '%', note: 'Complex carbs' }
+  }
+};
+
+function normalizeMedicalCoding(coding) {
+  if (!coding) return null;
+  const codeSystem = coding.codeSystem || coding.code_system;
+  const code = coding.code;
+  const display = coding.display || coding.code_display;
+  if (!codeSystem || !code) {
+    throw new Error('Medical coding requires both codeSystem and code');
+  }
+  if (!MEDICAL_CODE_SYSTEMS.has(codeSystem)) {
+    throw new Error('Unsupported medical codeSystem; use ICD-10-CM, SNOMED-CT, or LOINC');
+  }
+  if (!/^[A-Za-z0-9][A-Za-z0-9.:-]{1,31}$/.test(String(code))) {
+    throw new Error('Medical code must be 2-32 characters using letters, numbers, dot, colon, or hyphen');
+  }
+  return { system: codeSystem, code: String(code), display: display ? String(display).trim() : null };
+}
+
 // Helper for test stub
 function dataOrEmpty(x, productId) { return {}; }
 
@@ -835,6 +1195,7 @@ async function getDietaryProfileById(dietaryProfileId) {
  */
 async function getPersonalizedProductRecommendations(userId, dietaryProfileId, options = {}) {
   try {
+    const medicalCoding = normalizeMedicalCoding(options.medicalCoding);
     const profile = await getDietaryProfileById(dietaryProfileId);
 
     const preferredFoods = Array.isArray(profile.preferred_foods) && profile.preferred_foods.length > 0
@@ -898,7 +1259,7 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
         userId,
         dietaryProfileId,
         JSON.stringify(productResult.rows),
-        JSON.stringify({ calorie_target_kcal_per_day: effectiveCalorieTarget }),
+        JSON.stringify({ calorie_target_kcal_per_day: effectiveCalorieTarget, medical_coding: medicalCoding }),
         JSON.stringify(wellnessResult.rows)
       ]
     );
@@ -911,6 +1272,7 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
       wellness_suggestions: wellnessResult.rows,
       generated_at: saveResult.rows[0].generated_at,
       expires_at: saveResult.rows[0].expires_at,
+      medical_coding: medicalCoding,
       disclaimer: NUTRITION_WELLNESS_DISCLAIMER
     };
   } catch (error) {
@@ -924,7 +1286,7 @@ async function getPersonalizedProductRecommendations(userId, dietaryProfileId, o
  */
 router.post('/recommendations', authMiddleware, async (req, res) => {
   try {
-    const { dietary_profile_id, target_calories, limit } = req.body || {};
+    const { dietary_profile_id, target_calories, limit, medical_coding } = req.body || {};
     if (!dietary_profile_id) {
       return res.status(400).json({
         error: 'dietary_profile_id is required',
@@ -935,6 +1297,7 @@ router.post('/recommendations', authMiddleware, async (req, res) => {
     const result = await getPersonalizedProductRecommendations(req.user.id, dietary_profile_id, {
       targetCalories: target_calories,
       limit
+      , medicalCoding: medical_coding
     });
     res.json(result);
   } catch (error) {
@@ -991,10 +1354,12 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
  */
 async function generateDietBasedRecipe(userId, dietaryProfileId, options = {}) {
   try {
+    const medicalCoding = normalizeMedicalCoding(options.medicalCoding);
     const profile = await getDietaryProfileById(dietaryProfileId);
     const recommendations = await getPersonalizedProductRecommendations(userId, dietaryProfileId, {
       targetCalories: options.targetCalories,
       limit: options.ingredientLimit || 8,
+      medicalCoding,
     });
 
     if (recommendations.recommended_products.length === 0) {
@@ -1041,6 +1406,7 @@ async function generateDietBasedRecipe(userId, dietaryProfileId, options = {}) {
       ai_model: aiResult.model,
       ingredients_considered: recommendations.recommended_products.map((p) => p.name),
       calorie_target_kcal_per_day: recommendations.calorie_target_kcal_per_day,
+      medical_coding: medicalCoding,
       generated_at: new Date().toISOString(),
       disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
     };
@@ -1055,7 +1421,7 @@ async function generateDietBasedRecipe(userId, dietaryProfileId, options = {}) {
  */
 router.post('/recipes', authMiddleware, async (req, res) => {
   try {
-    const { dietary_profile_id, target_calories, provider } = req.body || {};
+    const { dietary_profile_id, target_calories, provider, medical_coding } = req.body || {};
     if (!dietary_profile_id) {
       return res.status(400).json({
         error: 'dietary_profile_id is required',
@@ -1066,6 +1432,7 @@ router.post('/recipes', authMiddleware, async (req, res) => {
     const result = await generateDietBasedRecipe(req.user.id, dietary_profile_id, {
       targetCalories: target_calories,
       provider,
+      medicalCoding: medical_coding,
     });
     res.json(result);
   } catch (error) {
@@ -1133,6 +1500,458 @@ router.get('/wellness-practices', async (req, res) => {
   } catch (error) {
     logger.error('Get wellness practices API error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'Failed to get wellness practices' });
+  }
+});
+
+// ============================================================================
+// MEDICAL CONDITION CODING ENDPOINTS
+// ============================================================================
+
+/**
+ * Get medical condition codes
+ */
+async function getMedicalConditionCodes() {
+  try {
+    return {
+      conditions: MEDICAL_CONDITION_CODES,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get medical condition codes error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to get medical condition codes
+ */
+router.get('/medical-codes', async (req, res) => {
+  try {
+    const result = await getMedicalConditionCodes();
+    res.json(result);
+  } catch (error) {
+    logger.error('Get medical codes API error', { error: error.message, stack: error.stack });
+    res.status(500).json({ error: 'Failed to get medical codes' });
+  }
+});
+
+/**
+ * Get dietary restrictions for medical condition
+ */
+async function getDietaryRestrictions(condition) {
+  try {
+    const restrictions = DIETARY_RESTRICTIONS[condition];
+    
+    if (!restrictions) {
+      throw new Error(`No dietary restrictions found for condition: ${condition}`);
+    }
+
+    return {
+      condition,
+      restrictions,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get dietary restrictions error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to get dietary restrictions
+ */
+router.get('/dietary-restrictions/:condition', async (req, res) => {
+  try {
+    const { condition } = req.params;
+    const result = await getDietaryRestrictions(condition);
+    res.json(result);
+  } catch (error) {
+    logger.error('Get dietary restrictions API error', { error: error.message, stack: error.stack });
+    res.status(404).json({ 
+      error: 'Dietary restrictions not found for this condition',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    });
+  }
+});
+
+/**
+ * Get nutrient requirements for medical condition
+ */
+async function getNutrientRequirements(condition) {
+  try {
+    const requirements = NUTRIENT_REQUIREMENTS[condition];
+    
+    if (!requirements) {
+      throw new Error(`No nutrient requirements found for condition: ${condition}`);
+    }
+
+    return {
+      condition,
+      requirements,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get nutrient requirements error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to get nutrient requirements
+ */
+router.get('/nutrient-requirements/:condition', async (req, res) => {
+  try {
+    const { condition } = req.params;
+    const result = await getNutrientRequirements(condition);
+    res.json(result);
+  } catch (error) {
+    logger.error('Get nutrient requirements API error', { error: error.message, stack: error.stack });
+    res.status(404).json({ 
+      error: 'Nutrient requirements not found for this condition',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    });
+  }
+});
+
+/**
+ * Get condition-specific medical code
+ */
+async function getConditionCode(condition, type) {
+  try {
+    const conditionData = MEDICAL_CONDITION_CODES[condition];
+    
+    if (!conditionData) {
+      throw new Error(`No medical codes found for condition: ${condition}`);
+    }
+
+    const codeData = type ? conditionData[type] : conditionData;
+    
+    if (!codeData) {
+      throw new Error(`No medical code found for ${condition} ${type || ''}`);
+    }
+
+    return {
+      condition,
+      type,
+      code: codeData.code,
+      system: codeData.system,
+      display: codeData.display,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get condition code error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint to get condition-specific medical code
+ */
+router.get('/medical-code/:condition/:type?', async (req, res) => {
+  try {
+    const { condition, type } = req.params;
+    const result = await getConditionCode(condition, type);
+    res.json(result);
+  } catch (error) {
+    logger.error('Get condition code API error', { error: error.message, stack: error.stack });
+    res.status(404).json({ 
+      error: 'Medical code not found for this condition',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    });
+  }
+});
+
+/**
+ * Enhanced recipe generation with condition-specific guidance
+ */
+async function generateConditionSpecificRecipe(userId, dietaryProfileId, condition, options = {}) {
+  try {
+    // Get medical coding for the condition
+    const conditionData = MEDICAL_CONDITION_CODES[condition];
+    const primaryCode = conditionData && conditionData.unspecified ? conditionData.unspecified : null;
+    
+    // Get dietary restrictions for the condition
+    const restrictions = DIETARY_RESTRICTIONS[condition];
+    
+    // Get nutrient requirements for the condition
+    const requirements = NUTRIENT_REQUIREMENTS[condition];
+    
+    // Generate recipe with medical context
+    const recipeResult = await generateDietBasedRecipe(userId, dietaryProfileId, {
+      ...options,
+      medicalCoding: primaryCode
+    });
+
+    // Add condition-specific guidance
+    if (recipeResult.status === 'generated') {
+      recipeResult.condition_guidance = {
+        condition,
+        restrictions: restrictions || null,
+        requirements: requirements || null,
+        medical_code: primaryCode || null,
+        recommendations: getConditionRecommendations(condition)
+      };
+    }
+
+    return recipeResult;
+  } catch (error) {
+    logger.error('Generate condition-specific recipe error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * Get recommendations for specific condition
+ */
+function getConditionRecommendations(condition) {
+  const recommendations = {
+    diabetes: [
+      'Choose low glycemic index foods',
+      'Eat regular, balanced meals',
+      'Include complex carbohydrates',
+      'Monitor carbohydrate intake',
+      'Increase fiber consumption',
+      'Stay hydrated'
+    ],
+    hypertension: [
+      'Follow DASH diet principles',
+      'Reduce sodium intake',
+      'Increase potassium and magnesium',
+      'Choose lean protein sources',
+      'Limit saturated and trans fats',
+      'Include more fruits and vegetables'
+    ],
+    hypotension: [
+      'Increase fluid intake',
+      'Eat smaller, more frequent meals',
+      'Include moderate sodium',
+      'Increase vitamin B12 and iron',
+      'Avoid excessive caffeine and alcohol',
+      'Gradually increase activity'
+    ],
+    migraine: [
+      'Identify and avoid trigger foods',
+      'Maintain regular meal schedule',
+      'Stay well hydrated',
+      'Include magnesium-rich foods',
+      'Ensure adequate vitamin B2',
+      'Get regular sleep'
+    ],
+    gout: [
+      'Avoid high-purine foods',
+      'Limit alcohol consumption',
+      'Stay well hydrated',
+      'Choose plant-based proteins',
+      'Increase vitamin C intake',
+      'Maintain healthy weight'
+    ],
+    cardiovascular: [
+      'Follow heart-healthy diet',
+      'Increase omega-3 fatty acids',
+      'Choose lean protein sources',
+      'Increase fiber intake',
+      'Limit saturated and trans fats',
+      'Reduce sodium intake'
+    ]
+  };
+
+  return recommendations[condition] || ['Consult with healthcare provider for personalized guidance'];
+}
+
+/**
+ * API endpoint to generate condition-specific recipe
+ */
+router.post('/recipes/condition/:condition', authMiddleware, async (req, res) => {
+  try {
+    const { condition } = req.params;
+    const { dietary_profile_id, target_calories, provider } = req.body || {};
+    
+    if (!dietary_profile_id) {
+      return res.status(400).json({
+        error: 'dietary_profile_id is required',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    if (!MEDICAL_CONDITION_CODES[condition]) {
+      return res.status(400).json({
+        error: `Unsupported condition: ${condition}`,
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    const result = await generateConditionSpecificRecipe(req.user.id, dietary_profile_id, condition, {
+      targetCalories: target_calories,
+      provider
+    });
+    res.json(result);
+  } catch (error) {
+    logger.error('Generate condition-specific recipe API error', { error: error.message, stack: error.stack });
+    res.status(500).json({
+      error: 'Failed to generate condition-specific recipe',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+    });
+  }
+});
+
+/**
+ * Natural therapist guidance endpoint
+ */
+async function getNaturalTherapistGuidance(condition, symptoms = []) {
+  try {
+    const conditionData = MEDICAL_CONDITION_CODES[condition];
+    const restrictions = DIETARY_RESTRICTIONS[condition];
+    const requirements = NUTRIENT_REQUIREMENTS[condition];
+    
+    // Get wellness practices related to the condition
+    const wellnessResult = await getWellnessPractices({ category: condition });
+
+    return {
+      condition,
+      medical_coding: conditionData?.unspecified || null,
+      dietary_restrictions: restrictions || null,
+      nutrient_requirements: requirements || null,
+      natural_remedies: wellnessResult.practices || [],
+      recommendations: getConditionRecommendations(condition),
+      symptoms_considered: symptoms,
+      consultation_required: true,
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Get natural therapist guidance error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint for natural therapist guidance
+ */
+router.post('/natural-therapist/guidance', authMiddleware, async (req, res) => {
+  try {
+    const { condition, symptoms } = req.body || {};
+    
+    if (!condition) {
+      return res.status(400).json({
+        error: 'condition is required',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    if (!MEDICAL_CONDITION_CODES[condition]) {
+      return res.status(400).json({
+        error: `Unsupported condition: ${condition}`,
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    const result = await getNaturalTherapistGuidance(condition, symptoms);
+    res.json(result);
+  } catch (error) {
+    logger.error('Natural therapist guidance API error', { error: error.message, stack: error.stack });
+    res.status(500).json({
+      error: 'Failed to get natural therapist guidance',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+    });
+  }
+});
+
+/**
+ * Nutrient calculator for specific condition
+ */
+async function calculateNutrientProfileForCondition(condition, nutritionData) {
+  try {
+    const requirements = NUTRIENT_REQUIREMENTS[condition];
+    
+    if (!requirements) {
+      throw new Error(`No nutrient requirements found for condition: ${condition}`);
+    }
+
+    const analysis = {};
+    const warnings = [];
+    const recommendations = [];
+
+    // Analyze each nutrient against requirements
+    for (const [nutrient, req] of Object.entries(requirements)) {
+      const value = nutritionData[nutrient];
+      
+      if (value === undefined) {
+        warnings.push(`${nutrient} data not provided`);
+        continue;
+      }
+
+      const min = req.min;
+      const max = req.max;
+
+      if (min !== undefined && value < min) {
+        analysis[nutrient] = {
+          status: 'below_minimum',
+          value,
+          required: { min, max, unit: req.unit },
+          recommendation: `Increase ${nutrient} intake`
+        };
+        recommendations.push(req.note);
+      } else if (max !== undefined && value > max) {
+        analysis[nutrient] = {
+          status: 'above_maximum',
+          value,
+          required: { min, max, unit: req.unit },
+          recommendation: `Reduce ${nutrient} intake`
+        };
+        recommendations.push(req.note);
+      } else {
+        analysis[nutrient] = {
+          status: 'within_range',
+          value,
+          required: { min, max, unit: req.unit },
+          recommendation: 'Maintain current intake'
+        };
+      }
+    }
+
+    return {
+      condition,
+      analysis,
+      warnings,
+      recommendations,
+      overall_status: warnings.length === 0 ? 'optimal' : 'needs_adjustment',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER
+    };
+  } catch (error) {
+    logger.error('Calculate nutrient profile error', { error: error.message, stack: error.stack });
+    throw error;
+  }
+}
+
+/**
+ * API endpoint for nutrient calculator
+ */
+router.post('/nutrient-calculator/:condition', authMiddleware, async (req, res) => {
+  try {
+    const { condition } = req.params;
+    const nutritionData = req.body;
+    
+    if (!nutritionData || Object.keys(nutritionData).length === 0) {
+      return res.status(400).json({
+        error: 'nutrition data is required',
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    if (!NUTRIENT_REQUIREMENTS[condition]) {
+      return res.status(400).json({
+        error: `No nutrient requirements available for condition: ${condition}`,
+        disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+      });
+    }
+
+    const result = await calculateNutrientProfileForCondition(condition, nutritionData);
+    res.json(result);
+  } catch (error) {
+    logger.error('Nutrient calculator API error', { error: error.message, stack: error.stack });
+    res.status(500).json({
+      error: 'Failed to calculate nutrient profile',
+      disclaimer: NUTRITION_WELLNESS_DISCLAIMER,
+    });
   }
 });
 

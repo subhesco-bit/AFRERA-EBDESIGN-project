@@ -32,12 +32,12 @@ function FarmerVerificationPage() {
   const verifyMutation = useMutation({
     mutationFn: (id) => farmerVerificationAPI.verifyRequest(id, {}),
     onSuccess: () => { toast.success('Marked verified'); queryClient.invalidateQueries({ queryKey: ['farmer-verification'] }) },
-    onError: () => toast.error('Failed to update — backend endpoint not available yet'),
+    onError: () => toast.error('Failed to update verification request'),
   })
   const rejectMutation = useMutation({
     mutationFn: (id) => farmerVerificationAPI.rejectRequest(id, {}),
     onSuccess: () => { toast.success('Marked rejected'); queryClient.invalidateQueries({ queryKey: ['farmer-verification'] }) },
-    onError: () => toast.error('Failed to update — backend endpoint not available yet'),
+    onError: () => toast.error('Failed to reject verification request'),
   })
 
   return (
@@ -53,7 +53,6 @@ function FarmerVerificationPage() {
       searchPlaceholder="Search by farmer or verification type..."
       emptyMessage="No verification requests recorded yet."
       newLabel="Submit Request"
-      backendNote="Backend endpoint /farmer-verification/requests has not been built yet — this page is wired and ready to work once it is."
       initialForm={initialForm}
       requiredFields={['farmer_name', 'verification_type']}
       columns={[

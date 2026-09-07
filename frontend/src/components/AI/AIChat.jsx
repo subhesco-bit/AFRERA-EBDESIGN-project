@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { authAPI } from '../../services/api';
+import { aiAPI } from '../../services/api';
 
 /**
  * AI Chat Component
@@ -27,7 +27,7 @@ export default function AIChat() {
     setLoading(true);
 
     try {
-      const response = await authAPI.post('/ai/unified', {
+      const response = await aiAPI.chat({
         requestType: 'conversational',
         query: input,
         agentPreference: selectedAgent

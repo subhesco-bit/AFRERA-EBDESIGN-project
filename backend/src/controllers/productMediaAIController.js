@@ -34,6 +34,16 @@ const productMediaAIController = {
     }
   },
 
+  generateProductCartoon: async (req, res) => {
+    try {
+      const result = await productMediaAIService.requestProductCartoonGeneration(req.params.productId, req.body?.prompt);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('Error requesting product cartoon generation', { error: error.message });
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
   buildNutrientVideoScript: async (req, res) => {
     try {
       const { productId } = req.params;
