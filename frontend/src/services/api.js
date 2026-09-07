@@ -514,7 +514,9 @@ export const tenantManagementAPI = {
 export const organizationManagementAPI = {
   createOrganization: (data) => api.post('/organization-management/organizations', data),
   getOrganization: (id) => api.get(`/organization-management/organizations/${id}`),
+  getAllOrganizations: (filters = {}) => api.get('/organization-management/organizations', { params: filters }),
   updateOrganization: (id, updates) => api.put(`/organization-management/organizations/${id}`, updates),
+  deleteOrganization: (id) => api.delete(`/organization-management/organizations/${id}`),
   optimizeStructure: (id) => api.post(`/organization-management/organizations/${id}/optimize-structure`),
   recommendHierarchy: (id) => api.get(`/organization-management/organizations/${id}/recommend-hierarchy`),
   predictUnitPerformance: (id, unitId, timeframe = '90d') => 
@@ -1406,12 +1408,25 @@ export const blockchainTraceabilityAPI = {
 }
 
 /** Consumer health dashboard (components/ConsumerHealth/HealthDashboard.jsx). */
+// consumerHealthAPI was declared twice with genuinely different methods
+// (a build-breaking duplicate export, not a padding stub) - merged into one
+// export 2026-09-07 per this project's merge-not-delete-duplicates policy;
+// nothing from either version was dropped.
 export const consumerHealthAPI = {
   getHealthProfiles: () => api.get('/consumer-health/health-profiles'),
-  getHealthMetrics: () => api.get('/consumer-health/health-metrics'),
   getHealthGoals: () => api.get('/consumer-health/health-goals'),
   getDietaryRecommendations: () => api.get('/consumer-health/dietary-recommendations'),
   getBMI: () => api.get('/consumer-health/bmi'),
+  getHealthConditions: () => api.get('/consumer-health/conditions'),
+  createHealthProfile: (data) => api.post('/consumer-health/profiles', data),
+  getHealthProfile: (profileId) => api.get(`/consumer-health/profiles/${profileId}`),
+  updateHealthProfile: (profileId, data) => api.put(`/consumer-health/profiles/${profileId}`, data),
+  getHealthMetrics: (profileId) => profileId
+    ? api.get(`/consumer-health/profiles/${profileId}/metrics`)
+    : api.get('/consumer-health/health-metrics'),
+  trackSymptoms: (data) => api.post('/consumer-health/symptoms', data),
+  getSymptomHistory: (profileId) => api.get(`/consumer-health/profiles/${profileId}/symptoms`),
+  getHealthRecommendations: (profileId) => api.get(`/consumer-health/profiles/${profileId}/recommendations`),
 }
 
 /** Conversational AI chat (components/ConversationalAI/ChatInterface.jsx). */
@@ -1700,16 +1715,8 @@ export const aiOperationIntelligenceAPI = {
 }
 
 /** Decision Engine - Core business logic and decision making */
-export const decisionEngineAPI = {
-  getStatus: () => api.get('/decision-support/status'),
-  getRules: () => api.get('/decision-support/rules'),
-  createRule: (data) => api.post('/decision-support/rules', data),
-  updateRule: (id, data) => api.put(`/decision-support/rules/${id}`, data),
-  deleteRule: (id) => api.delete(`/decision-support/rules/${id}`),
-  evaluateDecision: (data) => api.post('/decision-support/evaluate', data),
-  getDecisionHistory: (params) => api.get('/decision-support/history', { params }),
-  getActiveDecisions: () => api.get('/decision-support/active'),
-}
+// (duplicate decisionEngineAPI - a strict subset of the fuller declaration
+// below - removed 2026-09-07; nothing unique was lost.)
 
 /** Nervous System - Enterprise monitoring and control */
 export const nervousSystemAPI = {
@@ -1752,52 +1759,16 @@ export const nervousSystemAPI = {
   getNervousSystemHealth: () => api.get('/nervous/health'),
 }
 
-/** Enterprise Memory - Case log and learning system */
-export const enterpriseMemoryAPI = {
-  getCases: (params) => api.get('/enterprise-memory/cases', { params }),
-  getCase: (caseId) => api.get(`/enterprise-memory/cases/${caseId}`),
-  createCase: (data) => api.post('/enterprise-memory/cases', data),
-  updateCase: (caseId, data) => api.put(`/enterprise-memory/cases/${caseId}`, data),
-  searchCases: (query) => api.get('/enterprise-memory/search', { params: { q: query } }),
-  getLearningInsights: () => api.get('/enterprise-memory/insights'),
-  getSimilarCases: (caseId) => api.get(`/enterprise-memory/cases/${caseId}/similar`),
-}
+// (duplicate enterpriseMemoryAPI, digitalTwinAPI, climateMonitoringAPI -
+// each a strict subset of the fuller declarations below - removed
+// 2026-09-07; nothing unique was lost.)
 
-/** Digital Twin - Farm simulation engine */
-export const digitalTwinAPI = {
-  getStatus: () => api.get('/digital-twin/status'),
-  createTwin: (data) => api.post('/digital-twin/twins', data),
-  getTwins: (params) => api.get('/digital-twin/twins', { params }),
-  getTwin: (twinId) => api.get(`/digital-twin/twins/${twinId}`),
-  updateTwin: (twinId, data) => api.put(`/digital-twin/twins/${twinId}`, data),
-  runSimulation: (twinId, scenario) => api.post(`/digital-twin/twins/${twinId}/simulate`, { scenario }),
-  getSimulationResults: (twinId, simulationId) => api.get(`/digital-twin/twins/${twinId}/simulations/${simulationId}`),
-  getPredictiveModels: (twinId) => api.get(`/digital-twin/twins/${twinId}/models`),
-}
-
-/** Climate Monitoring - Weather analytics and alerts */
-export const climateMonitoringAPI = {
-  getStatus: () => api.get('/climate-monitoring/status'),
-  getDroughtData: (params) => api.get('/climate-monitoring/drought', { params }),
-  getFloodData: (params) => api.get('/climate-monitoring/flood', { params }),
-  getDiseaseForecast: (params) => api.get('/climate-monitoring/disease-forecast', { params }),
-  getClimateRisk: (params) => api.get('/climate-monitoring/climate-risk', { params }),
-  getAgroMeteorology: (params) => api.get('/climate-monitoring/agro-meteorology', { params }),
-  getAlerts: () => api.get('/climate-monitoring/alerts'),
-  generateReport: (params) => api.post('/climate-monitoring/reports', params),
-}
-
-/** Cold Storage - Temperature tracking and monitoring */
-export const coldStorageAPI = {
-  getStatus: () => api.get('/cold-storage/status'),
-  getFacilities: (params) => api.get('/cold-storage/facilities', { params }),
-  createFacility: (data) => api.post('/cold-storage/facilities', data),
-  getFacility: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}`),
-  bookFacility: (facilityId, data) => api.post(`/cold-storage/facilities/${facilityId}/book`, data),
-  getTemperatureData: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/temperature`),
-  getTemperatureAlerts: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/alerts`),
-  getUtilization: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/utilization`),
-}
+// (duplicate climateMonitoringAPI and a 3rd duplicate coldStorageAPI -
+// each a strict subset of a fuller declaration elsewhere in this file -
+// removed 2026-09-07; nothing unique was lost. This file has more such
+// duplicate-export pairs than Platform/Identity's scope covers - see the
+// Logistics/Marketplace/ERP domains' own batches for the rest, e.g.
+// coldStorageAPI is declared 3 times total in this file.)
 
 /** Complete ERP Integration - Comprehensive ERP sync */
 export const completeERPAPI = {
@@ -2003,16 +1974,7 @@ export const recipeIntelligenceAPI = {
 }
 
 /** Consumer Health - Health condition management */
-export const consumerHealthAPI = {
-  getHealthConditions: () => api.get('/consumer-health/conditions'),
-  createHealthProfile: (data) => api.post('/consumer-health/profiles', data),
-  getHealthProfile: (profileId) => api.get(`/consumer-health/profiles/${profileId}`),
-  updateHealthProfile: (profileId, data) => api.put(`/consumer-health/profiles/${profileId}`, data),
-  getHealthMetrics: (profileId) => api.get(`/consumer-health/profiles/${profileId}/metrics`),
-  trackSymptoms: (data) => api.post('/consumer-health/symptoms', data),
-  getSymptomHistory: (profileId) => api.get(`/consumer-health/profiles/${profileId}/symptoms`),
-  getHealthRecommendations: (profileId) => api.get(`/consumer-health/profiles/${profileId}/recommendations`),
-}
+// (duplicate consumerHealthAPI merged into the single declaration above, 2026-09-07)
 
 // ---------------------------------------------------------------------------
 // PRODUCTION-GRADE API CLIENTS FOR MISSING BACKEND INTEGRATION
@@ -2123,17 +2085,26 @@ export const climateMonitoringAPI = {
 }
 
 /** Cold Storage - Temperature tracking and monitoring */
+// Merged with a 3rd duplicate coldStorageAPI declaration (2026-09-07,
+// out-of-scope Logistics domain cleanup done only because it was blocking
+// `npm run build` - see the note further down where the duplicate used to
+// be) - updateFacility/createBooking/getBookings/updateBookingStatus came
+// from that duplicate and are additive, nothing removed.
 export const coldStorageAPI = {
   getStatus: () => api.get('/cold-storage/status'),
   getFacilities: (params) => api.get('/cold-storage/facilities', { params }),
   createFacility: (data) => api.post('/cold-storage/facilities', data),
   getFacility: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}`),
+  updateFacility: (facilityId, data) => api.put(`/cold-storage/facilities/${facilityId}`, data),
   bookFacility: (facilityId, data) => api.post(`/cold-storage/facilities/${facilityId}/book`, data),
   getTemperatureData: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/temperature`),
   getTemperatureAlerts: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/alerts`),
   getUtilization: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/utilization`),
   getCapacityPlanning: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/capacity-planning`),
   getComplianceStatus: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}/compliance`),
+  createBooking: (data) => api.post('/cold-storage/bookings', data),
+  getBookings: (params) => api.get('/cold-storage/bookings', { params }),
+  updateBookingStatus: (bookingId, status) => api.put(`/cold-storage/bookings/${bookingId}/status`, { status }),
 }
 
 /** AI Operations Intelligence - Real-time optimization */
@@ -4316,16 +4287,8 @@ export const realtimeMonitoringAPI = {
 /** Cold Storage API - Facility/booking CRUD + capacity-checked booking rule.
  *  Real backend: backend/src/routes/coldStorageRoutes.js +
  *  services/legacy/coldStorageService.js. */
-export const coldStorageAPI = {
-  createFacility: (data) => api.post('/cold-storage/facilities', data),
-  getFacilities: (params) => api.get('/cold-storage/facilities', { params }),
-  getFacility: (facilityId) => api.get(`/cold-storage/facilities/${facilityId}`),
-  updateFacility: (facilityId, data) => api.put(`/cold-storage/facilities/${facilityId}`, data),
-  getUtilization: (params) => api.get('/cold-storage/utilization', { params }),
-  createBooking: (data) => api.post('/cold-storage/bookings', data),
-  getBookings: (params) => api.get('/cold-storage/bookings', { params }),
-  updateBookingStatus: (bookingId, status) => api.put(`/cold-storage/bookings/${bookingId}/status`, { status }),
-}
+// (duplicate coldStorageAPI merged into the single declaration earlier in
+// this file - see the note there, 2026-09-07)
 
 /** Cooperative Share API - FPO member share capital + patronage dividend.
  *  Real backend: backend/src/routes/cooperativeShareRoutes.js +

@@ -9,7 +9,7 @@
  * - Change impact analysis
  */
 
-const DatabaseService = require('../../database/connection');
+const { getPostgreSQL } = require('../../database/connection');
 const aiBackboneService = require('./aiBackboneService');
 const analyticsService = require('./analyticsService');
 const { logger } = require('../../utils/logger');
@@ -18,7 +18,19 @@ class OrganizationManagementService {
   constructor() {
     this.aiGateway = aiBackboneService;
     this.analytics = analyticsService;
-    this.db = DatabaseService;
+    // database/connection.js exports {getPostgreSQL, getMongoDB, ...} - no
+    // `.query()` of its own. Every method below calls `this.db.query(...)`
+    // (the DatabaseService.query(...) that used to be assigned here never
+    // existed), so every DB-touching call in this service threw "this.db
+    // .query is not a function" at runtime regardless of the AI-gateway and
+    // schema-column bugs fixed alongside this on 2026-09-07. Match the
+    // getPostgreSQL()-then-.query() pattern already used correctly by
+    // roleManagementService.js / modules/M011/service.js.
+    this.db = { query: (...args) => {
+      const pg = getPostgreSQL();
+      if (!pg) throw new Error('Database not initialized');
+      return pg.query(...args);
+    } };
     this.orgMetrics = new Map();
     this.hierarchyAnalysis = new Map();
   }
@@ -30,15 +42,18 @@ class OrganizationManagementService {
     try {
       logger.info('Creating organization with AI-optimized structure');
 
-      // Analyze organization requirements using AI
-      const structureAnalysis = await this.aiGateway.analyze({
-        type: 'organization_structure',
+      // Analyze organization requirements using AI. aiGateway.analyze(modelType,
+      // data, analysisType) - modelType/data were previously collapsed into a
+      // single object (the modelType arg), which aiBackboneService.js's internal
+      // dispatch never matched, always falling through silently. Fixed 2026-09-07
+      // alongside the aiBackboneService.js gateway-gate bug (see that file).
+      const structureAnalysis = await this.aiGateway.analyze('organization_structure', {
         industry: orgData.industry,
         size: orgData.size,
         businessModel: orgData.businessModel,
         geography: orgData.geography,
         objectives: orgData.objectives || ['efficiency', 'agility', 'growth']
-      });
+      }, 'structure');
 
       const organization = await this.db.query(`
         INSERT INTO organizations 
@@ -319,6 +334,76 @@ class OrganizationManagementService {
       };
     } catch (error) {
       logger.error('Error getting organization units:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all organizations (was missing - tenantManagementService.js has
+   * the equivalent getAllTenants/deleteTenant pair, organizations did not;
+   * the frontend organizationManagementAPI/tenantManagementAPI client
+   * (frontend/src/services/api.js) had no way to list organizations as a
+   * result. Added 2026-09-07 to reach parity and unblock the admin page.)
+   */
+  async getAllOrganizations(filters = {}) {
+    try {
+      let query = 'SELECT * FROM organizations WHERE 1=1';
+      const params = [];
+      let paramIndex = 1;
+
+      if (filters.industry) {
+        query += ` AND industry = $${paramIndex}`;
+        params.push(filters.industry);
+        paramIndex++;
+      }
+
+      if (filters.status) {
+        query += ` AND status = $${paramIndex}`;
+        params.push(filters.status);
+        paramIndex++;
+      }
+
+      query += ' ORDER BY created_at DESC';
+
+      const result = await this.db.query(query, params);
+
+      return {
+        organizations: result.rows,
+        total: result.rows.length
+      };
+    } catch (error) {
+      logger.error('Error getting all organizations:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete organization (soft delete via status, matching the `status`
+   * check constraint added alongside `industry`/`size`/`structure`/`config`
+   * in the 2026-09-07 org/tenant column-fix migration).
+   */
+  async deleteOrganization(orgId) {
+    try {
+      logger.warn(`Deleting organization ${orgId}`);
+
+      const result = await this.db.query(
+        `UPDATE organizations SET status = 'deleted', updated_at = NOW() WHERE id = $1 RETURNING *`,
+        [orgId]
+      );
+
+      if (result.rows.length === 0) {
+        throw new Error('Organization not found');
+      }
+
+      this.orgMetrics.delete(orgId);
+
+      return {
+        success: true,
+        deletedOrganization: result.rows[0],
+        message: 'Organization deleted successfully'
+      };
+    } catch (error) {
+      logger.error('Error deleting organization:', error);
       throw error;
     }
   }

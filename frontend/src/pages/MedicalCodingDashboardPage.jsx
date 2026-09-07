@@ -37,7 +37,7 @@ export default function MedicalCodingDashboardPage() {
   // Fetch nutrient requirements for selected condition
   const { data: requirements, isLoading: requirementsLoading } = useQuery({
     queryKey: ['nutrient-requirements', selectedCondition],
-    queryFn: => medicalCodingAPI.getNutrientRequirements(selectedCondition).then(res => res.data),
+    queryFn: () => medicalCodingAPI.getNutrientRequirements(selectedCondition).then(res => res.data),
     enabled: !!selectedCondition,
   })
 

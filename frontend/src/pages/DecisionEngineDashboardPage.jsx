@@ -79,7 +79,7 @@ export default function DecisionEngineDashboardPage() {
     mutationFn: (ruleId) => decisionEngineAPI.deleteRule(ruleId),
     onSuccess: () => {
       toast.success('Rule deleted successfully')
-      queryClient invalidateQueries({ queryKey: ['decision-engine-rules'] })
+      queryClient.invalidateQueries({ queryKey: ['decision-engine-rules'] })
     },
     onError: (err) => toast.error(err.response?.data?.error || 'Failed to delete rule'),
   })

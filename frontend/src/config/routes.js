@@ -192,6 +192,7 @@ const NervousSystemPage = lazy(() => import('../pages/NervousSystemPage'))
 const LogisticsEnhancementPage = lazy(() => import('../pages/LogisticsEnhancementPage'))
 const EnterpriseAIPage = lazy(() => import('../pages/EnterpriseAIPage'))
 const PlatformManagementPage = lazy(() => import('../pages/PlatformManagementPage'))
+const OrganizationTenantManagementPage = lazy(() => import('../pages/OrganizationTenantManagementPage'))
 const RolePermissionPage = lazy(() => import('../pages/RolePermissionPage'))
 const SharedInfraPage = lazy(() => import('../pages/SharedInfraPage'))
 const SystemAdministrationPage = lazy(() => import('../pages/SystemAdministrationPage'))
@@ -1418,6 +1419,14 @@ export const managementRoutes = [
     title: 'Roles & Permissions - AFRERA',
     description: 'Role and permission management',
     keywords: 'roles, permissions, access control',
+    transition: 'fade'
+  },
+  {
+    path: '/organization-tenant-management',
+    component: OrganizationTenantManagementPage,
+    title: 'Organizations & Tenants - AFRERA',
+    description: 'Organization and tenant CRUD for platform administrators',
+    keywords: 'organizations, tenants, multi-tenancy, admin',
     transition: 'fade'
   },
   {

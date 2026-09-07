@@ -9,7 +9,7 @@
  * - Tenant health scoring
  */
 
-const DatabaseService = require('../../database/connection');
+const { getPostgreSQL } = require('../../database/connection');
 const aiBackboneService = require('./aiBackboneService');
 const analyticsService = require('./analyticsService');
 const { logger } = require('../../utils/logger');
@@ -18,7 +18,15 @@ class TenantManagementService {
   constructor() {
     this.aiGateway = aiBackboneService;
     this.analytics = analyticsService;
-    this.db = DatabaseService;
+    // See organizationManagementService.js's constructor comment
+    // (fixed 2026-09-07) - database/connection.js has no `.query()` of its
+    // own, so `this.db = DatabaseService` made every `this.db.query(...)`
+    // call below throw at runtime.
+    this.db = { query: (...args) => {
+      const pg = getPostgreSQL();
+      if (!pg) throw new Error('Database not initialized');
+      return pg.query(...args);
+    } };
     this.tenantMetrics = new Map();
     this.resourcePredictions = new Map();
   }
@@ -30,15 +38,16 @@ class TenantManagementService {
     try {
       logger.info('Creating new tenant with AI resource allocation');
 
-      // Analyze tenant requirements using AI
-      const resourceAnalysis = await this.aiGateway.analyze({
-        type: 'tenant_resource_allocation',
+      // Analyze tenant requirements using AI. See organizationManagementService
+      // .createOrganization's comment (fixed 2026-09-07) - modelType and data
+      // must be separate args, not one collapsed object.
+      const resourceAnalysis = await this.aiGateway.analyze('tenant_resource_allocation', {
         tenantProfile: tenantData.profile,
         expectedUsers: tenantData.expectedUsers,
         expectedLoad: tenantData.expectedLoad,
         industry: tenantData.industry,
         tier: tenantData.tier || 'standard'
-      });
+      }, 'resource_allocation');
 
       const tenant = await this.db.query(`
         INSERT INTO tenants 

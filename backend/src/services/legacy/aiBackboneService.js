@@ -908,6 +908,7 @@ module.exports = {
 // ============================================================================
 
 // From aiBackboneService.js
+/**
  * AI Decision-Making Engine Service
  * Provides intelligent decision-making capabilities for:
  * - Predictive analytics (demand forecasting, price optimization)
@@ -916,7 +917,7 @@ module.exports = {
  * - Natural language processing (document analysis, query understanding)
  */
 
-const { logger } = require('../../utils/logger');
+// logger already declared at module top (dedup fix, 2026-09-07).
 const { getPostgreSQL, getMongoDatabase } = require('../../database/connection');
 const { authMiddleware } = require('../../middleware/auth');
 
@@ -1625,13 +1626,13 @@ module.exports = {
 
 
 // From aiBackboneService.js
+/**
  * AI Gateway Service
  * Central AI/ML integration hub for all platform modules
  * Provides standardized AI capabilities: prediction, optimization, analysis, recommendations
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
+// logger/getPostgreSQL already declared above (dedup fix, 2026-09-07).
 
 class aiBackboneService {
   constructor() {
@@ -1688,10 +1689,19 @@ class aiBackboneService {
   async predict(modelType, parameters, context = {}) {
     try {
       const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
+
+      // `modelType` here is the domain-specific routing key ('crop_yield',
+      // 'weather', ...) consumed by performPrediction()'s internal switch,
+      // not one of the 4 gateway categories registered in this.aiModels
+      // ('prediction'/'optimization'/'analysis'/'recommendation'). Gate on
+      // the fixed category for this method instead - checking
+      // this.aiModels.get(modelType) here rejected every real caller
+      // (agriculturalIntelligenceService, organizationManagementService,
+      // etc.) with "Model type X not found" before ever reaching the
+      // (already-honest, implemented:false) fallbacks below (fixed 2026-09-07).
+      const model = this.aiModels.get('prediction');
       if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
+        throw new Error('AI gateway category \'prediction\' not initialized');
       }
 
       // Check cache first
@@ -1732,10 +1742,12 @@ class aiBackboneService {
   async optimize(modelType, parameters, constraints = {}) {
     try {
       const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
+
+      // See predict() above: gate on the fixed gateway category, not the
+      // domain-specific routing key (fixed 2026-09-07).
+      const model = this.aiModels.get('optimization');
       if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
+        throw new Error('AI gateway category \'optimization\' not initialized');
       }
 
       const result = await this.performOptimization(modelType, parameters, constraints);
@@ -1758,10 +1770,12 @@ class aiBackboneService {
   async analyze(modelType, data, analysisType = 'standard') {
     try {
       const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
+
+      // See predict() above: gate on the fixed gateway category, not the
+      // domain-specific routing key (fixed 2026-09-07).
+      const model = this.aiModels.get('analysis');
       if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
+        throw new Error('AI gateway category \'analysis\' not initialized');
       }
 
       const result = await this.performAnalysis(modelType, data, analysisType);
@@ -1784,10 +1798,12 @@ class aiBackboneService {
   async recommend(modelType, context, options = {}) {
     try {
       const startTime = Date.now();
-      
-      const model = this.aiModels.get(modelType);
+
+      // See predict() above: gate on the fixed gateway category, not the
+      // domain-specific routing key (fixed 2026-09-07).
+      const model = this.aiModels.get('recommendation');
       if (!model) {
-        throw new Error(`Model type ${modelType} not found`);
+        throw new Error('AI gateway category \'recommendation\' not initialized');
       }
 
       const result = await this.performRecommendation(modelType, context, options);
@@ -2052,9 +2068,7 @@ class aiBackboneService {
 }
 
 // Create Express router for AI Gateway endpoints
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+// (express/router/authMiddleware already declared above - dedup fix, 2026-09-07)
 
 // AI Gateway health check
 router.get('/health', (req, res) => {
@@ -2122,6 +2136,7 @@ module.exports = {
   ...new aiBackboneService()
 };
 // From aiBackboneService.js
+/**
  * AI Brain Service - Cognitive Processing Layer
  * 
  * This service provides cognitive processing capabilities including:
@@ -2146,7 +2161,7 @@ function tryRequireClient(envVar, loader) {
   }
 }
 
-class aiBackboneService {
+class aiBrainServiceCore {
   constructor() {
     // Initialize AI model clients
     this.openai = tryRequireClient('OPENAI_API_KEY', () => {
@@ -2623,12 +2638,10 @@ class aiBackboneService {
 }
 
 // Export singleton instance with router for proper mounting
-const aiBackboneService = new aiBackboneService();
+const aiBrainServiceInstance = new aiBrainServiceCore();
 
 // Create Express router for AI Brain endpoints
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+// (express/router/authMiddleware already declared above - dedup fix, 2026-09-07)
 
 // AI Brain health check
 router.get('/health', (req, res) => {
@@ -2636,13 +2649,13 @@ router.get('/health', (req, res) => {
     status: 'healthy',
     service: 'ai-brain',
     models_available: {
-      openai: !!aiBackboneService.openai,
-      gemini: !!aiBackboneService.gemini,
-      anthropic: !!aiBackboneService.anthropic
+      openai: !!aiBrainServiceInstance.openai,
+      gemini: !!aiBrainServiceInstance.gemini,
+      anthropic: !!aiBrainServiceInstance.anthropic
     },
-    knowledge_graph_size: aiBackboneService.knowledgeGraph.size,
-    working_memory_size: aiBackboneService.workingMemory.size,
-    long_term_memory_size: aiBackboneService.longTermMemory.size
+    knowledge_graph_size: aiBrainServiceInstance.knowledgeGraph.size,
+    working_memory_size: aiBrainServiceInstance.workingMemory.size,
+    long_term_memory_size: aiBrainServiceInstance.longTermMemory.size
   });
 });
 
@@ -2650,7 +2663,7 @@ router.get('/health', (req, res) => {
 router.post('/process', authMiddleware, async (req, res) => {
   try {
     const { input, context } = req.body;
-    const result = await aiBackboneService.processCognitiveCycle(input, context);
+    const result = await aiBrainServiceInstance.processCognitiveCycle(input, context);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2660,7 +2673,7 @@ router.post('/process', authMiddleware, async (req, res) => {
 // Knowledge graph operations
 router.get('/knowledge-graph', authMiddleware, (req, res) => {
   try {
-    const graph = aiBackboneService.getKnowledgeGraph();
+    const graph = aiBrainServiceInstance.getKnowledgeGraph();
     res.json({ knowledge_graph: graph });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2671,7 +2684,7 @@ router.get('/knowledge-graph', authMiddleware, (req, res) => {
 router.post('/memory/working', authMiddleware, (req, res) => {
   try {
     const { key, value } = req.body;
-    const result = aiBackboneService.addToWorkingMemory(key, value);
+    const result = aiBrainServiceInstance.addToWorkingMemory(key, value);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2681,7 +2694,7 @@ router.post('/memory/working', authMiddleware, (req, res) => {
 router.post('/memory/long-term', authMiddleware, (req, res) => {
   try {
     const { key, value } = req.body;
-    const result = aiBackboneService.addToLongTermMemory(key, value);
+    const result = aiBrainServiceInstance.addToLongTermMemory(key, value);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2690,11 +2703,12 @@ router.post('/memory/long-term', authMiddleware, (req, res) => {
 
 module.exports = {
   router,
-  aiBackboneService,
-  ...aiBackboneService
+  aiBrainServiceInstance,
+  ...aiBrainServiceInstance
 };
 
 // From aiBackboneService.js
+/**
  * AFRERA Complete AI Integration Service
  * 
  * Comprehensive AI integration with all agricultural modules:
@@ -2712,9 +2726,13 @@ module.exports = {
  * - Personalized recommendations
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
+// logger/getPostgreSQL already declared at module top (this section was
+// mechanically concatenated from a separate file during the "consolidated
+// from 7 services" merge, duplicating requires that collide as top-level
+// `const` redeclarations - fixed 2026-09-07). signalBus/SIGNAL/SEVERITY are
+// used throughout this section and the "Complete AI Integration" section
+// below, so declared once here for both.
+const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 
 // ============================================================================
 // FARMER MODULE AI INTEGRATION
@@ -4050,6 +4068,7 @@ module.exports = {
 };
 
 // From advancedaiBackboneService.js
+/**
  * Advanced AI Decision-Making Engine Service
  * Enhanced from basic to advanced level with:
  * - Machine Learning Model Integration
@@ -4064,11 +4083,9 @@ module.exports = {
  * - Explainable AI (XAI)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL, getMongoDatabase } = require('../../database/connection');
+// logger/getPostgreSQL/getMongoDatabase/authMiddleware/signalBus/SIGNAL/
+// SEVERITY already declared above (dedup fix, 2026-09-07).
 const stats = require('../../utils/statistics');
-const { authMiddleware } = require('../../middleware/auth');
-const { signalBus, SIGNAL, SEVERITY } = require('../../core/signalBus');
 
 // NOTE (2026-08-03): @tensorflow/tfjs-node used to be imported here and was
 // never actually called anywhere in this file - the "models" below returned
@@ -4718,8 +4735,14 @@ async function advancedGenerateRecommendations(userId, context = {}) {
 
 /**
  * Crop Disease Detection using Computer Vision
+ * (renamed from detectCropDisease to detectCropDiseaseFromImage 2026-09-07 -
+ * collided with the differently-shaped detectCropDisease(cropId, diseaseData)
+ * declared earlier in the "Complete AI Integration" section; Node's sloppy
+ * mode silently let the later declaration win, but Jest/Babel's stricter
+ * parser correctly rejects the redeclaration, so this file could not even
+ * be required under Jest until renamed.)
  */
-async function detectCropDisease(imageData, additionalData = {}) {
+async function detectCropDiseaseFromImage(imageData, additionalData = {}) {
   try {
     // Load computer vision model
     const cvModel = await loadComputerVisionModel('crop_disease_detection');
@@ -5037,7 +5060,7 @@ function calculateConfidenceIntervals(predictions, rows) {
   });
 }
 
-function calculateTrend(rows) {
+function calculateAdvancedDemandTrend(rows) {
   const series = column(rows, 'demand');
   const { slope, r2 } = stats.linearRegression(series);
   const avg = stats.mean(series);
@@ -5096,7 +5119,7 @@ async function analyzeFeatureImportance(model, timeSeriesData) {
 }
 
 async function generateDemandExplanations(predictions, externalFactors, rows) {
-  const trend = calculateTrend(rows);
+  const trend = calculateAdvancedDemandTrend(rows);
   const vol = calculateVolatility(rows);
   const season = calculateAdvancedSeasonality(rows);
   const notes = [
@@ -5515,9 +5538,8 @@ function generatePreventionMeasures() {
 
 /**
  * Express Router for API Endpoints
+ * (express/router already declared above - dedup fix, 2026-09-07)
  */
-const express = require('express');
-const router = express.Router();
 
 /**
  * POST /api/v1/advanced-ai/predict-demand
@@ -5607,7 +5629,7 @@ router.post('/recommendations', authMiddleware, async (req, res) => {
 router.post('/detect-crop-disease', authMiddleware, async (req, res) => {
   try {
     const { image_data, additional_data } = req.body;
-    const result = await detectCropDisease(image_data, additional_data);
+    const result = await detectCropDiseaseFromImage(image_data, additional_data);
     res.json(result);
   } catch (error) {
     logger.error('Crop disease detection API error', { error: error.message, stack: error.stack });
@@ -5657,17 +5679,15 @@ module.exports = {
   detectCropDisease
 };
 // From aiCopilotService.js
+/**
  * AI Copilot Framework Service
  * CAP-224 to CAP-230: Finance Copilot, Logistics Copilot, Warehouse Copilot,
  * Insurance Copilot, Nutrition Copilot, Marketplace Copilot, Copilot Framework
+ * (express/router already declared above - dedup fix, 2026-09-07)
  */
 
-const express = require('express');
 const { Pool } = require('pg');
-const { logger } = require('../../utils/logger');
-const { authMiddleware } = require('../../middleware/auth');
-
-const router = express.Router();
+// logger/authMiddleware/router already declared above - dedup fix, 2026-09-07.
 // Shared pool (2026-08-04): this service previously built its own Pool.
 // 42 services doing so meant ~420 potential connections against a
 // PostgreSQL default max_connections of 100. See database/pool.js.
@@ -6318,13 +6338,13 @@ router.get('/analytics', authMiddleware, async (req, res) => {
 });
 
 // Health check
-function isHealthy() {
+function isCopilotHealthy() {
   return true;
 }
 
 module.exports = {
   router,
-  isHealthy,
+  isHealthy: isCopilotHealthy,
   // Exported (additive only, no logic changed) so services/whatsappService.js
   // can reuse the existing generic-copilot template response for default
   // farmer queries instead of duplicating it.
@@ -6332,6 +6352,7 @@ module.exports = {
 };
 
 // From aiOperationIntelligenceService.js
+/**
  * AI Operation Intelligence Service - Real-Time Optimization Layer
  * 
  * This service provides operation intelligence capabilities including:
@@ -6346,7 +6367,7 @@ module.exports = {
 // These three SDKs are not in package.json (no live LLM credentials exist in this
 // environment, by design). Lazy-require only when the matching env var is present,
 // so absence is a clean not_configured client, never a process-killing MODULE_NOT_FOUND.
-function tryRequireClient(envVar, loader) {
+function tryRequireClientForOps(envVar, loader) {
   if (!process.env[envVar]) return null;
   try {
     return loader();
@@ -6359,17 +6380,17 @@ function tryRequireClient(envVar, loader) {
 class AIOperationIntelligenceService {
   constructor() {
     // Initialize AI model clients
-    this.openai = tryRequireClient('OPENAI_API_KEY', () => {
+    this.openai = tryRequireClientForOps('OPENAI_API_KEY', () => {
       const { OpenAI } = require('openai');
       return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     });
 
-    this.gemini = tryRequireClient('GEMINI_API_KEY', () => {
+    this.gemini = tryRequireClientForOps('GEMINI_API_KEY', () => {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
       return new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     });
 
-    this.anthropic = tryRequireClient('ANTHROPIC_API_KEY', () => {
+    this.anthropic = tryRequireClientForOps('ANTHROPIC_API_KEY', () => {
       const { Anthropic } = require('@anthropic-ai/sdk');
       return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     });
@@ -6937,9 +6958,7 @@ class AIOperationIntelligenceService {
 const aiOperationIntelligenceService = new AIOperationIntelligenceService();
 
 // Create Express router for AI Operation Intelligence endpoints
-const express = require('express');
-const router = express.Router();
-const { authMiddleware } = require('../../middleware/auth');
+// (express/router/authMiddleware already declared above - dedup fix, 2026-09-07)
 
 // AI Operation Intelligence health check
 router.get('/health', (req, res) => {
@@ -7006,14 +7025,84 @@ module.exports = {
   ...aiOperationIntelligenceService
 };
 
-// Export consolidated service
+// Export consolidated service.
+//
+// Every section above ends with its own `module.exports = {...}` -
+// reassigning the same binding 9 times, so only the last one in the file
+// ever took effect and every earlier section's real exports (predict/
+// analyze/optimize/recommend on the AI Gateway Service class chief among
+// them - the interface organizationManagementService.js,
+// tenantManagementService.js, roleManagementService.js and
+// agriculturalIntelligenceService.js all call as `aiGateway.analyze(...)`
+// etc.) were silently discarded. The final block here was also itself
+// broken (`x || async (a,b) => {}` is a syntax error - arrow functions
+// need parens on the right of `||`) and only re-exposed 3 near-useless
+// fallback stubs under the false comment "All merged methods available".
+// Root-caused and fixed 2026-09-07 together with the duplicate top-level
+// `const` redeclarations (logger/getPostgreSQL/express/router/etc.) and
+// the missing `/**` on each concatenated section's docblock that made this
+// file fail to even `require()` at all - see the dedup-fix notes scattered
+// through the sections above.
+//
+// aiBackboneService (class, ~line 1637) is the real "AI Gateway Service" -
+// analyze/optimize/predict/recommend live on its prototype, so spreading
+// `...new aiBackboneService()` (as every section here originally tried)
+// only copies the instance's own data fields (aiModels/modelCache/
+// performanceMetrics Maps), never the methods themselves. Bind them
+// explicitly instead.
+const aiGatewayInstance = new aiBackboneService();
+
 module.exports = {
-  // Core methods
-  callAI: callAI || async (config, request) => { throw new Error('callAI not implemented'); },
-  getStatus: getStatus || async () => { return { status: 'operational' }; },
-  switchProvider: switchProvider || async (provider) => { return { provider: provider }; },
-  
-  // All merged methods available
-  // (see implementations above)
+  // Core AI provider interface (section: "AI Backbone Service - Real AI
+  // Integration", top of file).
+  callClaudeAI, callOpenAI, callGeminiAI, callAzureOpenAI, callHuggingFace,
+  callOllamaAI, callAI, getPreferredProvider,
+  analyzeFinancialData, optimizeSupplyChain, optimizeProduction, analyzeHR,
+  analyzeProject, supportAgriculturalDecision, optimizeLivestock,
+  getAIProviderStatus, switchProvider, resetAIStatistics,
+  AI_PROVIDERS, aiRequestTracker,
+
+  // AI Gateway Service - the generic analyze/optimize/predict/recommend
+  // gateway every other legacy service's `aiGateway.analyze(...)` /
+  // `.optimize(...)` call expects. This is the primary reason this file
+  // is required throughout the codebase.
+  aiGateway: aiGatewayInstance,
+  analyze: aiGatewayInstance.analyze.bind(aiGatewayInstance),
+  optimize: aiGatewayInstance.optimize.bind(aiGatewayInstance),
+  predict: aiGatewayInstance.predict.bind(aiGatewayInstance),
+  recommend: aiGatewayInstance.recommend.bind(aiGatewayInstance),
+  healthCheck: aiGatewayInstance.healthCheck
+    ? aiGatewayInstance.healthCheck.bind(aiGatewayInstance)
+    : async () => ({ status: 'unknown' }),
+
+  // ERP-specific AI endpoints (aiAPI section, ~line 1508).
+  aiAPI, predictDemand, optimizePrice, assessCreditRisk, detectFraud,
+  generateRecommendations,
+
+  // AI Brain (cognitive processing) singleton.
+  aiBrain: aiBrainServiceInstance,
+
+  // Farmer/crop/livestock module AI integration functions ("Complete AI
+  // Integration" section).
+  recommendCropPlanning, predictHarvestTiming, optimizeFarmerResources,
+  detectCropDisease, predictCropYield, monitorLivestockHealth,
+  recommendLivestockBreeding, optimizeDairyProduction, monitorPoultryHealth,
+  optimizeGoatProduction,
+
+  // Advanced AI Decision-Making Engine.
+  advancedPredictDemand, advancedOptimizePrice, advancedAssessCreditRisk,
+  advancedDetectFraud, advancedGenerateRecommendations,
+
+  // AI Copilot Framework.
+  generateCopilotResponse,
+
+  // AI Operation Intelligence.
+  aiOperationIntelligenceService,
+
+  // isHealthy (aiAPI section) and the Copilot section's identical liveness
+  // check (renamed isCopilotHealthy to fix an ESLint no-redeclare error,
+  // 2026-09-07) are both real - export both instead of silently colliding.
+  isHealthy,
+  isCopilotHealthy,
 };
 

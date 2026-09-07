@@ -53,6 +53,38 @@ router.get('/organizations/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// Get all organizations (added 2026-09-07 - parity with tenantManagementRoutes'
+// GET /tenants, needed by the new OrganizationTenantManagementPage.jsx)
+router.get('/organizations', authMiddleware, requireRole("admin"), async (req, res) => {
+  try {
+    const organizations = await organizationManagementService.getAllOrganizations(req.query);
+    res.json(organizations);
+  } catch (error) {
+    logger.error('organizationManagementRoutes:getAllOrganizations', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete organization (soft delete)
+router.delete('/organizations/:id', authMiddleware, requireRole("admin"), async (req, res) => {
+  try {
+    const result = await organizationManagementService.deleteOrganization(req.params.id);
+
+    signalBus.emitSignal(SIGNAL.ORGANIZATION_DELETED || SIGNAL.ORGANIZATION_UPDATED, {
+      organizationId: req.params.id
+    }, {
+      severity: SEVERITY.WARNING,
+      source: 'organization_management_routes',
+      entityId: req.params.id
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('organizationManagementRoutes:deleteOrganization', { error: error.message });
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Update organization
 router.put('/organizations/:id', authMiddleware, requireRole("admin"), async (req, res) => {
   try {

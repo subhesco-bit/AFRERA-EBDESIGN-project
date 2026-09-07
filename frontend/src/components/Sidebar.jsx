@@ -160,6 +160,7 @@ const NAV_GROUPS = [
     items: [
       { to: '/system-administration', label: 'System Administration' },
       { to: '/role-permissions', label: 'Role Permissions' },
+      { to: '/organization-tenant-management', label: 'Organizations & Tenants' },
       { to: '/identity-management', label: 'Identity Management' },
       { to: '/platform-foundation', label: 'Platform Foundation' },
       { to: '/platform-management', label: 'Platform Management' },
