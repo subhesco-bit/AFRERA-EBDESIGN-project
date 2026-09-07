@@ -1,0 +1,70 @@
+{
+  "moduleId": "M102_DAIRY_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Dairy",
+  "description": "Migrated from legacy service: dairyService.js",
+  "category": "platform",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\dairyService.js",
+    "migratedAt": "2026-08-24T17:28:24.330Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 682,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.638Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/DairyManagementPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m102_dairy_management",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  },
+  "cables": {
+    "incoming": [],
+    "outgoing": [
+      "CABLE_M102_DAIRY_MANAGEMENT_TO_M001_PLATFORM_CORE_DATA",
+      "CABLE_M102_DAIRY_MANAGEMENT_TO_M400_AI_CORE_AI"
+    ]
+  }
+}

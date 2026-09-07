@@ -1,0 +1,46 @@
+{
+  "moduleId": "M414100_RETURNLOADBOARD",
+  "version": "1.0.0",
+  "name": "Return Load Board",
+  "description": "Migrated from legacy service: returnLoadBoardService.js",
+  "category": "ai",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\returnLoadBoardService.js",
+    "migratedAt": "2026-08-24T17:28:25.464Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 65,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.107Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

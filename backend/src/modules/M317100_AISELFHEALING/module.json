@@ -1,0 +1,44 @@
+{
+  "moduleId": "M317100_AISELFHEALING",
+  "version": "1.0.0",
+  "name": "Ai Self Healing",
+  "description": "Migrated from legacy service: aiSelfHealingService.js",
+  "category": "erp",
+  "status": "COMPLETE",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\aiSelfHealingService.js",
+    "migratedAt": "2026-08-24T17:28:24.084Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": true,
+      "hasErrorHandling": true,
+      "lineCount": 685,
+      "isComplete": true,
+      "category": "COMPLETE"
+    }
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

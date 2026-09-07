@@ -1,0 +1,70 @@
+{
+  "moduleId": "M18100_POULTRY",
+  "version": "1.0.0",
+  "name": "Poultry",
+  "description": "Migrated from legacy service: poultryService.js",
+  "category": "platform",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\poultryService.js",
+    "migratedAt": "2026-08-24T17:28:25.358Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 937,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.767Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/PoultryManagementPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m18100_poultry",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  },
+  "cables": {
+    "incoming": [],
+    "outgoing": [
+      "CABLE_M18100_POULTRY_TO_M001_PLATFORM_CORE_DATA",
+      "CABLE_M18100_POULTRY_TO_M400_AI_CORE_AI"
+    ]
+  }
+}

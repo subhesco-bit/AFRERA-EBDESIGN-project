@@ -1,0 +1,107 @@
+{
+  "moduleId": "M004_ROLE_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Role Management",
+  "description": "Role and permission management system for access control and authorization",
+  "category": "security",
+  "status": "production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": ["M005_PERMISSION_MANAGEMENT"],
+    "services": ["postgresql"],
+    "libraries": {
+      "backend": ["express"],
+      "frontend": ["react", "zustand"]
+    }
+  },
+  "discovery": {
+    "keywords": ["role", "permission", "access", "authorization", "rbac"],
+    "capabilities": [
+      "role-crud",
+      "permission-assignment",
+      "role-hierarchy",
+      "access-control",
+      "rbac-management"
+    ],
+    "aiContext": "Manages roles, permissions, and access control. Essential for security and authorization across the platform.",
+    "useCases": [
+      "Create and manage roles",
+      "Assign permissions to roles",
+      "Manage role hierarchies",
+      "Control access to resources",
+      "Implement RBAC policies"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "className": "RoleManagementService",
+      "apiRoutes": "backend/routes.js",
+      "port": 3004
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/components/RoleDashboard.jsx"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/roles",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js"
+    }
+  },
+  "claudeIntegration": {
+    "supportedAgents": ["admin", "security-admin"],
+    "contextSources": [
+      "database:roles",
+      "database:permissions",
+      "database:role_permissions"
+    ],
+    "autoDiscovery": true,
+    "runtimeLoading": true,
+    "priority": "critical"
+  },
+  "endpoints": {
+    "createRole": {
+      "method": "POST",
+      "path": "/api/v1/roles",
+      "description": "Create new role",
+      "authentication": true
+    },
+    "assignPermission": {
+      "method": "POST",
+      "path": "/api/v1/roles/:roleId/permissions",
+      "description": "Assign permission to role",
+      "authentication": true
+    }
+  },
+  "dataModels": {
+    "input": {
+      "roleCreate": "backend/models/roleCreate.model.js"
+    },
+    "output": {
+      "role": "backend/models/role.model.js"
+    }
+  },
+  "testing": {
+    "unit": "tests/unit",
+    "integration": "tests/integration",
+    "e2e": "tests/e2e",
+    "coverage": ">= 80%"
+  },
+  "documentation": {
+    "readme": "docs/README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api": "docs/API.md",
+    "integration": "docs/CLAUDE_INTEGRATION.md"
+  },
+  "metadata": {
+    "createdAt": "2026-08-24T20:04:00Z",
+    "updatedAt": "2026-08-24T20:04:00Z",
+    "installedAt": null,
+    "lastHealthCheck": null,
+    "versionHistory": []
+  }
+}

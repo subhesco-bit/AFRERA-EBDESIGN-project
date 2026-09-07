@@ -1,0 +1,67 @@
+{
+  "moduleId": "M87100_ANIMALHEALTH",
+  "version": "1.0.0",
+  "name": "Animal Health",
+  "description": "Migrated from legacy service: animalHealthService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\animalHealthService.js",
+    "migratedAt": "2026-08-24T17:28:24.111Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 488,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.963Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/AnimalHealthPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m87100_animalhealth",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  },
+  "cables": {
+    "incoming": [],
+    "outgoing": []
+  }
+}

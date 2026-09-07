@@ -1,0 +1,46 @@
+{
+  "moduleId": "M254100_DIGITALTWIN",
+  "version": "1.0.0",
+  "name": "Digital Twin",
+  "description": "Migrated from legacy service: digitalTwinService.js",
+  "category": "domain",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\digitalTwinService.js",
+    "migratedAt": "2026-08-24T17:28:24.426Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": false,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 834,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.871Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

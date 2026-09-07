@@ -6,7 +6,7 @@
 const { logger } = require('../../utils/logger');
 const { getPostgreSQL } = require('../../database/connection');
 const { authMiddleware } = require('../../middleware/auth');
-const productMediaaiBackboneService = require('./productMediaaiBackboneService');
+const productMediaAIService = require('./productMediaAIService');
 
 /**
  * Get all products with filtering and pagination
@@ -235,7 +235,7 @@ async function createProduct(productData) {
     // (including "not_configured", if no provider key is set) is recorded
     // honestly on the row by requestProductImageGeneration itself.
     if (!productData.images || productData.images.length === 0) {
-      productMediaaiBackboneService
+      productMediaAIService
         .requestProductImageGeneration(product.id, `${product.name}${productData.description ? ' — ' + productData.description : ''}`)
         .catch((error) => logger.warn('Product image generation request failed', { productId: product.id, error: error.message }));
     }
@@ -591,7 +591,7 @@ router.post('/:id/generate-image', authMiddleware, async (req, res) => {
   try {
     const product = await getProductById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    const result = await productMediaaiBackboneService.requestProductImageGeneration(
+    const result = await productMediaAIService.requestProductImageGeneration(
       req.params.id,
       `${product.name}${product.description ? ' — ' + product.description : ''}`
     );
@@ -604,7 +604,7 @@ router.post('/:id/generate-image', authMiddleware, async (req, res) => {
 // Real, computed nutrient-comparison video script (no external AI required)
 router.get('/:id/video-script', async (req, res) => {
   try {
-    const script = await productMediaaiBackboneService.buildNutrientComparisonScript(req.params.id);
+    const script = await productMediaAIService.buildNutrientComparisonScript(req.params.id);
     res.json(script);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -614,7 +614,7 @@ router.get('/:id/video-script', async (req, res) => {
 // Trigger (or retry) AI video rendering from the real script above
 router.post('/:id/generate-video', authMiddleware, async (req, res) => {
   try {
-    const result = await productMediaaiBackboneService.requestProductVideoGeneration(req.params.id);
+    const result = await productMediaAIService.requestProductVideoGeneration(req.params.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

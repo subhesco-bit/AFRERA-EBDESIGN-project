@@ -1,0 +1,70 @@
+{
+  "moduleId": "M105_WEATHER_INTELLIGENCE",
+  "version": "1.0.0",
+  "name": "Weather",
+  "description": "Migrated from legacy service: weatherService.js",
+  "category": "platform",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\weatherService.js",
+    "migratedAt": "2026-08-24T17:28:25.670Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 460,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.653Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/ClimateWeatherPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m105_weather_intelligence",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  },
+  "cables": {
+    "incoming": [],
+    "outgoing": [
+      "CABLE_M105_WEATHER_INTELLIGENCE_TO_M001_PLATFORM_CORE_DATA",
+      "CABLE_M105_WEATHER_INTELLIGENCE_TO_M400_AI_CORE_AI"
+    ]
+  }
+}

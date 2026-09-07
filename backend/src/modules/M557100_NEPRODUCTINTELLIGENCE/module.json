@@ -1,0 +1,44 @@
+{
+  "moduleId": "M557100_NEPRODUCTINTELLIGENCE",
+  "version": "1.0.0",
+  "name": "Ne Product Intelligence",
+  "description": "Migrated from legacy service: neProductIntelligenceService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\neProductIntelligenceService.js",
+    "migratedAt": "2026-08-24T17:28:25.263Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": false,
+      "hasAuth": true,
+      "hasErrorHandling": true,
+      "lineCount": 347,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.226Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "cableId": "CABLE_M001_PLATFORM_CORE_TO_M408_KNOWLEDGE_MANAGEMENT_AI",
+    "source": "M001_PLATFORM_CORE",
+    "target": "M408_KNOWLEDGE_MANAGEMENT",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  },
+  {
+    "cableId": "CABLE_M408_KNOWLEDGE_MANAGEMENT_TO_M400_AI_CORE_AI",
+    "source": "M408_KNOWLEDGE_MANAGEMENT",
+    "target": "M400_AI_CORE",
+    "type": "ai",
+    "status": "pending",
+    "protocol": "uip-v1",
+    "bandwidth": "medium",
+    "latency": "low",
+    "encryption": true,
+    "circuitBreaker": true
+  }
+]

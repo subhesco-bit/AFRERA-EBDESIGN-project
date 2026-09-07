@@ -1,0 +1,62 @@
+{
+  "moduleId": "M404_DECISION_SUPPORT",
+  "version": "1.0.0",
+  "name": "Decision Support",
+  "description": "Migrated from legacy service: decisionSupportService.js",
+  "category": "ai",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\decisionSupportService.js",
+    "migratedAt": "2026-08-24T17:28:24.337Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 416,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.061Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m404_decision_support",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  },
+  "cables": {
+    "incoming": [
+      "CABLE_M001_PLATFORM_CORE_TO_M404_DECISION_SUPPORT_AI"
+    ],
+    "outgoing": [
+      "CABLE_M404_DECISION_SUPPORT_TO_M400_AI_CORE_AI"
+    ]
+  }
+}

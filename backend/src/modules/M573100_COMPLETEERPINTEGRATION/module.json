@@ -1,0 +1,46 @@
+{
+  "moduleId": "M573100_COMPLETEERPINTEGRATION",
+  "version": "1.0.0",
+  "name": "Complete E R P Integration",
+  "description": "Migrated from legacy service: completeERPIntegrationService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\completeERPIntegrationService.js",
+    "migratedAt": "2026-08-24T17:28:24.240Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 934,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.255Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

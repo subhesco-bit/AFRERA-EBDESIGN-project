@@ -1,0 +1,119 @@
+{
+  "moduleId": "MODULE_ID",
+  "version": "1.0.0",
+  "name": "Module Name",
+  "description": "Module description explaining its purpose and functionality",
+  "category": "platform|domain|enterprise|erp|ai",
+  "status": "development|testing|production",
+  "author": "EBDESIGN Team",
+  "license": "MIT",
+  "dependencies": {
+    "modules": [],
+    "services": ["postgresql", "redis", "mongodb"],
+    "libraries": {
+      "backend": ["express", "winston"],
+      "frontend": ["react", "zustand"]
+    }
+  },
+  "discovery": {
+    "keywords": ["keyword1", "keyword2", "keyword3"],
+    "capabilities": [
+      "capability-1",
+      "capability-2",
+      "capability-3"
+    ],
+    "aiContext": "AI context description for library dialogue",
+    "useCases": [
+      "Use case 1",
+      "Use case 2",
+      "Use case 3"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "entryPoint": "backend/service.js",
+      "className": "ModuleNameService",
+      "apiRoutes": "backend/routes.js",
+      "port": 3000,
+      "startup": "backend/startup.js",
+      "shutdown": "backend/shutdown.js"
+    },
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/components/ModuleComponent.jsx"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/module",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js"
+    }
+  },
+  "claudeIntegration": {
+    "supportedAgents": ["agent-type-1", "agent-type-2"],
+    "contextSources": [
+      "database:table_name",
+      "runtime:context_type"
+    ],
+    "autoDiscovery": true,
+    "runtimeLoading": true,
+    "priority": "critical|high|medium|low",
+    "interactionPatterns": {
+      "discovery": "Natural language query pattern",
+      "execution": "Standard execution pattern",
+      "monitoring": "Monitoring pattern",
+      "configuration": "Configuration pattern"
+    }
+  },
+  "endpoints": {
+    "endpointName": {
+      "method": "GET|POST|PUT|DELETE",
+      "path": "/api/v1/module/endpoint",
+      "description": "Endpoint description",
+      "authentication": true|false
+    }
+  },
+  "dataModels": {
+    "input": {
+      "modelName": "backend/models/inputModel.model.js"
+    },
+    "output": {
+      "modelName": "backend/models/outputModel.model.js"
+    }
+  },
+  "aiCapabilities": {
+    "decisionMaking": true,
+    "strategyEngine": false,
+    "learning": false,
+    "prediction": false,
+    "agents": {
+      "primaryAgent": "agent-name",
+      "secondaryAgents": []
+    }
+  },
+  "cables": {
+    "incoming": [],
+    "outgoing": []
+  },
+  "testing": {
+    "unit": "tests/unit",
+    "integration": "tests/integration",
+    "e2e": "tests/e2e",
+    "coverage": ">= 80%"
+  },
+  "documentation": {
+    "readme": "docs/README.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api": "docs/API.md",
+    "integration": "docs/INTEGRATION.md",
+    "ai": "docs/AI_INTEGRATION.md"
+  },
+  "metadata": {
+    "createdAt": "2026-08-24T00:00:00Z",
+    "updatedAt": "2026-08-24T00:00:00Z",
+    "installedAt": null,
+    "lastHealthCheck": null,
+    "versionHistory": []
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "moduleId": "M186100_REGIONALVARIETY",
+  "version": "1.0.0",
+  "name": "Regional Variety",
+  "description": "Migrated from legacy service: regionalVarietyService.js",
+  "category": "platform",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\regionalVarietyService.js",
+    "migratedAt": "2026-08-24T17:28:25.434Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 117,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.790Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "moduleId": "M604100_INPUTSUPPLYMANAGEMENT",
+  "version": "1.0.0",
+  "name": "Input Supply Management",
+  "description": "Migrated from legacy service: inputSupplyManagementService.js",
+  "category": "enterprise",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\inputSupplyManagementService.js",
+    "migratedAt": "2026-08-24T17:28:24.746Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": false,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": false,
+      "lineCount": 62,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.277Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

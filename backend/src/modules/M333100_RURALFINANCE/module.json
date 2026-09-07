@@ -1,0 +1,46 @@
+{
+  "moduleId": "M333100_RURALFINANCE",
+  "version": "1.0.0",
+  "name": "Rural Finance",
+  "description": "Migrated from legacy service: ruralFinanceService.js",
+  "category": "erp",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\ruralFinanceService.js",
+    "migratedAt": "2026-08-24T17:28:25.505Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": true,
+      "hasErrorHandling": true,
+      "lineCount": 235,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.959Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

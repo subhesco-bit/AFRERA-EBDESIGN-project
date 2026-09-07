@@ -1,0 +1,71 @@
+{
+  "moduleId": "M401_AI_GATEWAY",
+  "version": "1.0.0",
+  "name": "Ai Gateway",
+  "description": "Migrated from legacy service: aiGatewayService.js",
+  "category": "ai",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\aiGatewayService.js",
+    "migratedAt": "2026-08-24T17:28:24.067Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": false,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 428,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.053Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/AIDashboard.jsx",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m401_ai_gateway",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "ROUTES_ONLY"
+    }
+  },
+  "cables": {
+    "incoming": [
+      "CABLE_M001_PLATFORM_CORE_TO_M401_AI_GATEWAY_AI"
+    ],
+    "outgoing": [
+      "CABLE_M401_AI_GATEWAY_TO_M400_AI_CORE_AI"
+    ]
+  }
+}

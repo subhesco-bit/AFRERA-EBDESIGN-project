@@ -1,0 +1,53 @@
+{
+  "moduleId": "M865100_PROJECTSYSTEMS",
+  "version": "1.0.0",
+  "name": "Project Systems",
+  "description": "Migrated from legacy service: projectSystemsService.js",
+  "category": "enterprise",
+  "status": "COMPLETE",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\projectSystemsService.js",
+    "migratedAt": "2026-08-24T17:28:25.407Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 526,
+      "isComplete": true,
+      "category": "COMPLETE"
+    }
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": false,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/ProjectSystemsPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    }
+  }
+}

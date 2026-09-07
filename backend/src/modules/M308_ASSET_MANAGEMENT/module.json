@@ -1,0 +1,53 @@
+{
+  "moduleId": "M308_ASSET_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Asset Accounting",
+  "description": "Migrated from legacy service: assetAccountingService.js",
+  "category": "erp",
+  "status": "COMPLETE",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\assetAccountingService.js",
+    "migratedAt": "2026-08-24T17:28:24.131Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": true,
+      "hasErrorHandling": true,
+      "lineCount": 390,
+      "isComplete": true,
+      "category": "COMPLETE"
+    }
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": false,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/AssetAccountingPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    }
+  }
+}

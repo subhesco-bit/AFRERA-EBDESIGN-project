@@ -1,0 +1,42 @@
+{
+  "moduleId": "M723100_AIBRAIN",
+  "version": "1.0.0",
+  "name": "Ai Brain",
+  "description": "Migrated from legacy service: aiBrainService.js",
+  "category": "enterprise",
+  "status": "BACKEND_ONLY",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\aiBrainService.js",
+    "migratedAt": "2026-08-24T17:28:24.053Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": true,
+      "hasDatabase": false,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 506,
+      "isComplete": false,
+      "category": "BACKEND_ONLY"
+    }
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "moduleId": "M144100_MODULECATALOG",
+  "version": "1.0.0",
+  "name": "Module Catalog",
+  "description": "Migrated from legacy service: moduleCatalogService.js",
+  "category": "platform",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\moduleCatalogService.js",
+    "migratedAt": "2026-08-24T17:28:25.240Z",
+    "analysis": {
+      "hasConstructor": false,
+      "hasMethods": true,
+      "hasDatabase": false,
+      "hasAuth": true,
+      "hasErrorHandling": true,
+      "lineCount": 237,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:18.699Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": false,
+    "routes": false,
+    "tests": false
+  }
+}

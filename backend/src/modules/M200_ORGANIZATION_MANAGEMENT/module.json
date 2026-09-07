@@ -1,0 +1,53 @@
+{
+  "moduleId": "M200_ORGANIZATION_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Organization Management",
+  "description": "Migrated from legacy service: organizationManagementService.js",
+  "category": "domain",
+  "status": "COMPLETE",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\organizationManagementService.js",
+    "migratedAt": "2026-08-24T17:28:25.332Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": true,
+      "hasDatabase": true,
+      "hasAuth": false,
+      "hasErrorHandling": true,
+      "lineCount": 543,
+      "isComplete": true,
+      "category": "COMPLETE"
+    }
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [
+      "postgresql"
+    ],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": false,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/PlatformManagementPage.jsx",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  }
+}

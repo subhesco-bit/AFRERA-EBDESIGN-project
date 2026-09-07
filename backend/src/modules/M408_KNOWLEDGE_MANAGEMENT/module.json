@@ -1,0 +1,69 @@
+{
+  "moduleId": "M408_KNOWLEDGE_MANAGEMENT",
+  "version": "1.0.0",
+  "name": "Knowledge",
+  "description": "Migrated from legacy service: knowledgeService.js",
+  "category": "ai",
+  "status": "WIRED",
+  "migration": {
+    "sourceFile": "C:\\Users\\DIYA GOEL\\Downloads\\EBDESIGN\\backend\\src\\services\\legacy\\knowledgeService.js",
+    "migratedAt": "2026-08-24T17:28:25.082Z",
+    "analysis": {
+      "hasConstructor": true,
+      "hasMethods": false,
+      "hasDatabase": false,
+      "hasAuth": true,
+      "hasErrorHandling": false,
+      "lineCount": 835,
+      "isComplete": false,
+      "category": "SKELETON"
+    },
+    "wiredAt": "2026-08-25T10:20:19.094Z",
+    "wiredVerification": "Loads successfully and delegates to the live source service."
+  },
+  "dependencies": {
+    "modules": [],
+    "services": [],
+    "libraries": {
+      "backend": [
+        "express",
+        "winston"
+      ],
+      "frontend": [
+        "react",
+        "zustand"
+      ]
+    }
+  },
+  "completeness": {
+    "backend": true,
+    "frontend": true,
+    "routes": true,
+    "tests": false
+  },
+  "execution": {
+    "frontend": {
+      "entryPoint": "frontend/index.jsx",
+      "routes": "frontend/routes.json",
+      "mainComponent": "frontend/pages/ResearchDashboardPage.jsx",
+      "migrated": true,
+      "completeness": "FRONTEND_ONLY"
+    },
+    "api": {
+      "specification": "api/openapi.json",
+      "baseEndpoint": "/api/v1/m408_knowledge_management",
+      "contracts": "api/contracts.json",
+      "client": "api/client.js",
+      "migrated": true,
+      "completeness": "COMPLETE"
+    }
+  },
+  "cables": {
+    "incoming": [
+      "CABLE_M001_PLATFORM_CORE_TO_M408_KNOWLEDGE_MANAGEMENT_AI"
+    ],
+    "outgoing": [
+      "CABLE_M408_KNOWLEDGE_MANAGEMENT_TO_M400_AI_CORE_AI"
+    ]
+  }
+}
