@@ -1178,21 +1178,7 @@ router.get('/financial-reports', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = {
-  router,
-  initializeERP,
-  syncProductToERP,
-  syncOrderToERP,
-  syncFarmerToERP,
-  syncFinancialTransaction,
-  syncAssetToERP,
-  getSyncStatus,
-  triggerBulkSync,
-  getDashboardData,
-  getGLEntries,
-  getReconciliation,
-  getFinancialReports
-};
+// (module.exports merged below into one combined export at end of file)
 
 // Merged from erpService.js
 /**
@@ -1211,8 +1197,6 @@ module.exports = {
  * - Customer ERP (CRM integration, customer data sync)
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
 const { signalBus } = require('../../core/signalBus');
 
 // ============================================================================
@@ -2106,28 +2090,7 @@ async function calculateHealthEventCost(livestockId, healthData) {
 // EXPORTS
 // ============================================================================
 
-module.exports = {
-  // Farmer Module Integration
-  syncFarmerCropPlanningWithERP,
-  syncFarmerHarvestWithERP,
-  syncFarmerFieldWithERP,
-  
-  // Crop Module Integration
-  syncCropLifecycleWithERP,
-  syncCropYieldWithERP,
-  
-  // Livestock Module Integration
-  syncLivestockWithERP,
-  syncLivestockProductionWithERP,
-  syncLivestockHealthWithERP,
-  
-  // Inbuilt Modules Integration
-  syncDairyProductionWithERP,
-  syncPoultryProductionWithERP,
-  syncGoatProductionWithERP,
-  syncSheepProductionWithERP,
-  syncPigProductionWithERP
-};
+// (module.exports merged below into one combined export at end of file)
 
 
 // Merged from erpService.js
@@ -2141,9 +2104,6 @@ module.exports = {
  * Compliance: IFRS, GAAP, GST, VAT, local regulations
  */
 
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
 const aiBackbone = require('./aiBackboneService');
 
 // ============================================================================
@@ -3844,43 +3804,7 @@ const businessIntelligence = {
 // EXPORT ALL MODULES
 // ============================================================================
 
-module.exports = {
-  // Financial Accounting (FI)
-  generalLedger,
-  
-  // Controlling (CO)
-  controlling,
-  
-  // Materials Management (MM)
-  materialsManagement,
-  
-  // Sales and Distribution (SD)
-  salesDistribution,
-  
-  // Production Planning (PP)
-  productionPlanning,
-  
-  // Quality Management (QM)
-  qualityManagement,
-  
-  // Plant Maintenance (PM)
-  plantMaintenance,
-  
-  // Human Resources (HR)
-  humanResources,
-  
-  // Project System (PS)
-  projectSystem,
-  
-  // Treasury (TR)
-  treasury,
-  
-  // Asset Management (AM)
-  assetManagement,
-  
-  // Business Intelligence (BI)
-  businessIntelligence
-};
+// (module.exports merged below into one combined export at end of file)
 
 
 // Merged from ecommerceERPService.js
@@ -3904,10 +3828,6 @@ module.exports = {
  * - HR integration for seller management
  * - CRM integration for customer relationship management
  */
-
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
 
 // ============================================================================
 // FINANCIAL ERP INTEGRATION
@@ -4502,18 +4422,56 @@ async function createProductionOrder(productId, demandQuantity) {
 // ============================================================================
 
 module.exports = {
-  // Financial ERP
+  // Section 1 (original top-level ERP integration router)
+  router,
+  initializeERP,
+  syncProductToERP,
+  syncOrderToERP,
+  syncFarmerToERP,
+  syncFinancialTransaction,
+  syncAssetToERP,
+  getSyncStatus,
+  triggerBulkSync,
+  getDashboardData,
+  getGLEntries,
+  getReconciliation,
+  getFinancialReports,
+
+  // Section 2 (farmer/crop/livestock/inbuilt-modules ERP sync)
+  syncFarmerCropPlanningWithERP,
+  syncFarmerHarvestWithERP,
+  syncFarmerFieldWithERP,
+  syncCropLifecycleWithERP,
+  syncCropYieldWithERP,
+  syncLivestockWithERP,
+  syncLivestockProductionWithERP,
+  syncLivestockHealthWithERP,
+  syncDairyProductionWithERP,
+  syncPoultryProductionWithERP,
+  syncGoatProductionWithERP,
+  syncSheepProductionWithERP,
+  syncPigProductionWithERP,
+
+  // Section 3 (SAP/Oracle-standard ERP core modules - used by comprehensiveERPController.js)
+  generalLedger,
+  controlling,
+  materialsManagement,
+  salesDistribution,
+  productionPlanning,
+  qualityManagement,
+  plantMaintenance,
+  humanResources,
+  projectSystem,
+  treasury,
+  assetManagement,
+  businessIntelligence,
+
+  // Section 4 (Financial/Supply Chain/Customer/Production ERP)
   postToGeneralLedger,
   generateGSTInvoice,
-  
-  // Supply Chain ERP
   syncInventoryWithERP,
   createPurchaseOrder,
-  
-  // Customer ERP (CRM)
   syncCustomerWithCRM,
-  
-  // Production ERP
   createProductionOrder
 };
 

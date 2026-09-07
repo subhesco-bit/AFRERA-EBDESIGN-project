@@ -370,7 +370,7 @@ const ENGINES = {
       + 'services/predictiveAnalyticsService.js and services/demandService.js are '
       + 'real but store/read stored forecasts only — neither computes one.',
     invoke: async (payload = {}) => {
-      const { advancedPredictDemand } = require('../services/legacy/advancedaiBackboneService');
+      const { advancedPredictDemand } = require('../services/legacy/advancedAIService');
       const { productId, timeHorizon = 30, includeExplanations = true } = payload;
       if (!productId) throw new Error('forecasting_engine requires payload.productId');
       return advancedPredictDemand(productId, timeHorizon, includeExplanations);
@@ -412,7 +412,7 @@ const ENGINES = {
       if (!productId || currentPrice == null) {
         throw new Error('simulation_engine requires payload.productId and payload.currentPrice');
       }
-      const { advancedOptimizePrice } = require('../services/legacy/advancedaiBackboneService');
+      const { advancedOptimizePrice } = require('../services/legacy/advancedAIService');
       return advancedOptimizePrice(productId, currentPrice, context || {});
     },
   },

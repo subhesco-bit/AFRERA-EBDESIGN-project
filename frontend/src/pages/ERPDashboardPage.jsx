@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Settings, Activity, AlertTriangle, CheckCircle, Clock, TrendingUp, DollarSign, BarChart3, Sync, FileText, Building, Package, Users, RefreshCw } from 'lucide-react'
+import { Settings, Activity, AlertTriangle, CheckCircle, Clock, TrendingUp, DollarSign, BarChart3, FileText, Building, Package, Users, RefreshCw } from 'lucide-react'
 import { erpDashboardAPI } from '../services/api'
 import toast from 'react-hot-toast'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card'
@@ -173,7 +173,7 @@ export default function ERPDashboardPage() {
                   className="w-full"
                   disabled={syncMutation.isPending}
                 >
-                  <Sync className="w-4 h-4 mr-2" />
+                  <RefreshCw className="w-4 h-4 mr-2" />
                   {syncMutation.isPending ? 'Syncing...' : 'Trigger Full Sync'}
                 </Button>
                 <Button 
@@ -377,7 +377,7 @@ export default function ERPDashboardPage() {
                       onClick={() => syncMutation.mutate('full')}
                       disabled={syncMutation.isPending}
                     >
-                      <Sync className="w-4 h-4 mr-2" />
+                      <RefreshCw className="w-4 h-4 mr-2" />
                       Trigger Full Sync
                     </Button>
                     <Button 

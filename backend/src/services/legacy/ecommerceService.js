@@ -692,26 +692,7 @@ async function getMarketDemandAnalysis(categoryId) {
 // EXPORTS
 // ============================================================================
 
-module.exports = {
-  // Product Listing Management
-  createProductListing,
-  getMarketplaceListings,
-  
-  // AI-Powered Pricing & Recommendations
-  getAIPriceRecommendation,
-  assessProductQuality,
-  predictMarketDemand,
-  
-  // Seller Analytics
-  getSellerAnalytics,
-  
-  // GI Marketplace
-  getGIListings,
-  
-  // Market Intelligence
-  getMarketPriceTrends,
-  getMarketDemandAnalysis
-};
+// (module.exports merged below into one combined export at end of file)
 
 // Merged from ecommerceService.js
 /**
@@ -733,10 +714,6 @@ module.exports = {
  * - Allergen-aware product filtering
  * - Dietary restriction compatibility
  */
-
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
 
 // Import integrated services
 const nutritionIntelligenceService = require('./nutritionIntelligenceService');
@@ -1538,31 +1515,7 @@ async function emitIntegrationEvent(eventType, data) {
 // EXPORTS
 // ============================================================================
 
-module.exports = {
-  // Nutrition Scoring
-  calculateProductNutritionScore,
-  calculateNutritionPricePremium,
-  
-  // Recipe Integration
-  getRecipeSuggestionsForProduct,
-  calculateRecipeNutrition,
-  getProductsForRecipe,
-  
-  // Health-Based Recommendations
-  getHealthBasedRecommendations,
-  checkProductCompatibility,
-  
-  // Shopping Cart Nutrition
-  calculateCartNutrition,
-  calculateCartRDAPercentage,
-  
-  // Dietitian Integration
-  getDietitianCollections,
-  getDietitianRecommendation,
-  
-  // Signal Bus Events
-  emitIntegrationEvent
-};
+// (module.exports merged below into one combined export at end of file)
 
 
 // Merged from ecommerceMarketingService.js
@@ -1582,10 +1535,6 @@ module.exports = {
  * - Social Media Integration (Facebook, Instagram, WhatsApp)
  * - Influencer Marketing (partnerships, affiliate programs)
  */
-
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
 
 // ============================================================================
 // CAMPAIGN MANAGEMENT
@@ -2320,27 +2269,7 @@ async function getMarketingAnalytics(filters = {}) {
 // EXPORTS
 // ============================================================================
 
-module.exports = {
-  // Campaign Management
-  createCampaign,
-  launchCampaign,
-  updateCampaignMetrics,
-  
-  // Sponsored Products
-  createSponsoredProduct,
-  getSponsoredProducts,
-  
-  // Promotion Management
-  createPromotion,
-  applyPromotion,
-  
-  // Retargeting
-  createCartRetargeting,
-  createProductViewRetargeting,
-  
-  // Analytics
-  getMarketingAnalytics
-};
+// (module.exports merged below into one combined export at end of file)
 
 
 // Merged from ecommerceService.js
@@ -2359,10 +2288,6 @@ module.exports = {
  * - Order Approval Workflows (multi-level approvals)
  * - Negotiation Support (counter-offers, revision tracking)
  */
-
-const { logger } = require('../../utils/logger');
-const { getPostgreSQL } = require('../../database/connection');
-const { signalBus } = require('../../core/signalBus');
 
 // ============================================================================
 // B2B BULK ORDER MANAGEMENT
@@ -2993,20 +2918,83 @@ async function calculateCommission(orderId) {
 // ============================================================================
 
 module.exports = {
+  // Product Listing Management
+  createProductListing,
+  getMarketplaceListings,
+
+  // AI-Powered Pricing & Recommendations
+  getAIPriceRecommendation,
+  assessProductQuality,
+  predictMarketDemand,
+
+  // Seller Analytics
+  getSellerAnalytics,
+
+  // GI Marketplace
+  getGIListings,
+
+  // Market Intelligence
+  getMarketPriceTrends,
+  getMarketDemandAnalysis,
+
+  // Nutrition Scoring
+  calculateProductNutritionScore,
+  calculateNutritionPricePremium,
+
+  // Recipe Integration
+  getRecipeSuggestionsForProduct,
+  calculateRecipeNutrition,
+  getProductsForRecipe,
+
+  // Health-Based Recommendations
+  getHealthBasedRecommendations,
+  checkProductCompatibility,
+
+  // Shopping Cart Nutrition
+  calculateCartNutrition,
+  calculateCartRDAPercentage,
+
+  // Dietitian Integration
+  getDietitianCollections,
+  getDietitianRecommendation,
+
+  // Signal Bus Events
+  emitIntegrationEvent,
+
+  // Campaign Management
+  createCampaign,
+  launchCampaign,
+  updateCampaignMetrics,
+
+  // Sponsored Products
+  createSponsoredProduct,
+  getSponsoredProducts,
+
+  // Promotion Management
+  createPromotion,
+  applyPromotion,
+
+  // Retargeting
+  createCartRetargeting,
+  createProductViewRetargeting,
+
+  // Marketing Analytics
+  getMarketingAnalytics,
+
   // B2B Bulk Orders
   createBulkOrder,
   findPotentialSellers,
   submitQuotation,
   acceptQuotation,
-  
+
   // Contract Farming
   createContractFarming,
   recordContractMilestone,
-  
+
   // Sales Analytics
   getSalesAnalytics,
   getB2BConversionMetrics,
-  
+
   // Commission Management
   calculateCommission
 };

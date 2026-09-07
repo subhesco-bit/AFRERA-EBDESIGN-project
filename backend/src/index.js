@@ -26,13 +26,13 @@ const erpService = require('./services/legacy/erpService');
 const multilingualService = require('./services/legacy/multilingualService');
 const organicTraceabilityService = require('./services/legacy/organicTraceabilityService');
 const nutritionIntelligenceService = require('./services/legacy/nutritionIntelligenceService');
-const conversationalaiBackboneService = require('./services/legacy/conversationalaiBackboneService');
+const conversationalaiBackboneService = require('./services/legacy/conversationalAIService');
 const laboratoryERPService = require('./services/legacy/laboratoryERPService');
 const giIntelligenceService = require('./services/legacy/giIntelligenceService');
 const foodIntelligenceService = require('./services/legacy/foodIntelligenceService');
 const valueCommerceService = require('./services/legacy/valueCommerceService');
 const consumerHealthService = require('./services/legacy/consumerHealthService');
-const voiceaiBackboneService = require('./services/legacy/voiceaiBackboneService');
+const voiceaiBackboneService = require('./services/legacy/voiceAIService');
 const blockchainTraceabilityService = require('./services/legacy/blockchainTraceabilityService');
 const knowledgeGraphService = require('./services/legacy/knowledgeGraphService');
 // Enterprise Memory ("Hippocampus" — AFRERA_CLAUDE_BUILD_DIRECTIVE.md §2.3):
@@ -55,7 +55,7 @@ const custodyEventRoutes = require('./services/legacy/custodyEventRoutes');
 // Health check routes for monitoring
 const healthRoutes = require('./routes/healthRoutes');
 const offlinePaymentService = require('./services/legacy/offlinePaymentService');
-const advancedaiBackboneService = require('./services/legacy/advancedaiBackboneService');
+const advancedaiBackboneService = require('./services/legacy/advancedAIService');
 const offlineSyncService = require('./services/legacy/offlineSyncService');
 const formService = require('./services/legacy/formService');
 const analyticsService = require('./services/legacy/analyticsService');
@@ -67,7 +67,7 @@ const adminModule = require('./modules/M006');
 const indigenousKnowledgeService = require('./services/legacy/indigenousKnowledgeService');
 const biodiversityService = require('./services/legacy/biodiversityService');
 const aiCopilotService = require('./services/legacy/aiCopilotService');
-const omnichannelaiBackboneService = require('./services/legacy/omnichannelaiBackboneService');
+const omnichannelaiBackboneService = require('./services/legacy/omnichannelAIService');
 const foodSafetyService = require('./services/legacy/foodSafetyService');
 const shelfLifeService = require('./services/legacy/shelfLifeService');
 const institutionalProcurementService = require('./services/legacy/institutionalProcurementService');
@@ -701,7 +701,14 @@ const generatedModuleNames = fs.readdirSync(generatedModuleRoot)
   .sort(); // Note: Synchronous I/O at module load is acceptable for one-time initialization
 
 for (const moduleName of generatedModuleNames) {
-  const resolvedModule = require(path.join(generatedModuleRoot, moduleName));
+  let resolvedModule;
+  try {
+    resolvedModule = require(path.join(generatedModuleRoot, moduleName));
+  } catch (error) {
+    logger.error(`Failed to load generated module ${moduleName}: ${error.message}`);
+    failedMounts.set(`/api/v1/modules/${moduleName.toLowerCase()}`, { error: 'module_load_failed', reason: error.message, timestamp: new Date() });
+    continue;
+  }
   if (resolvedModule && resolvedModule.router) {
     mountRoute(`/api/v1/modules/${moduleName.toLowerCase()}`, resolvedModule);
   }

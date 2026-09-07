@@ -1303,21 +1303,7 @@ export const vendorsAPI = {
 }
 
 /** Experience Layer / DXP — the 15 engines (migration 060). */
-export const experienceAPI = {
-  resolve: (params) => api.get('/experience/resolve', { params }),
-  tokens: (theme) => api.get('/experience/tokens', { params: { theme } }),
-  saveToken: (body) => api.post('/experience/tokens', body),
-  themes: () => api.get('/experience/themes'),
-  contrast: (fg, bg, large) => api.get('/experience/contrast', { params: { fg, bg, large } }),
-  motion: (reduced) => api.get('/experience/motion', { params: { reduced } }),
-  breakpoint: (width) => api.get('/experience/breakpoint', { params: { width } }),
-  components: (params) => api.get('/experience/components', { params }),
-  registerComponent: (body) => api.post('/experience/components', body),
-  accessibility: () => api.get('/experience/accessibility'),
-  recordConformance: (body) => api.post('/experience/accessibility', body),
-  preferences: () => api.get('/experience/preferences'),
-  savePreferences: (body) => api.put('/experience/preferences', body),
-}
+// (duplicate experienceAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 // ---------------------------------------------------------------------------
 // Dashboard/system callers recovered 2026-08-07 (FE-01 fix, docs/registry/20_FRONTEND_BOUNDARIES.md).
@@ -1542,11 +1528,7 @@ export const nutritionAPI = {
 }
 
 /** Organic traceability — farm registration, standards, consumer QR lookup. */
-export const organicTraceabilityAPI = {
-  getStandards: () => api.get('/organic-traceability/standards'),
-  registerFarm: (data) => api.post('/organic-traceability/farms', data),
-  getConsumerTransparency: (qrCode) => api.get(`/organic-traceability/consumer-transparency/qr/${qrCode}`),
-}
+// (duplicate organicTraceabilityAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 /** Predictive analytics — demand forecasts and alerts. */
 export const predictiveAnalyticsAPI = {
@@ -1660,104 +1642,26 @@ export const fertilizerAPI = {
 // ---------------------------------------------------------------------------
 
 /** AI Backbone - Unified multi-provider AI integration */
-export const aiBackboneAPI = {
-  getStatus: () => api.get('/ai-backbone/status'),
-  getAIProviderStatus: () => api.get('/ai-backbone/status'),
-  callAI: (data) => api.post('/ai-backbone/call', data),
-  switchProvider: (provider) => api.post('/ai-backbone/switch-provider', { provider }),
-  resetAIStatistics: () => api.post('/ai-backbone/reset-statistics'),
-  supportAgriculturalDecision: (data) => api.post('/ai-backbone/agricultural-decision', data),
-  optimizeLivestock: (data) => api.post('/ai-backbone/livestock-optimization', data),
-}
+// (duplicate aiBackboneAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Gateway - API gateway for AI services */
-export const aiGatewayAPI = {
-  getStatus: () => api.get('/ai-gateway/status'),
-  getEndpoints: () => api.get('/ai-gateway/endpoints'),
-  createEndpoint: (data) => api.post('/ai-gateway/endpoints', data),
-  updateEndpoint: (id, data) => api.put(`/ai-gateway/endpoints/${id}`, data),
-  deleteEndpoint: (id) => api.delete(`/ai-gateway/endpoints/${id}`),
-  routeRequest: (endpoint, data) => api.post(`/ai-gateway/route/${endpoint}`, data),
-  getMetrics: () => api.get('/ai-gateway/metrics'),
-}
+// (duplicate aiGatewayAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Brain - Cognitive processing layer */
-export const aiBrainAPI = {
-  getStatus: () => api.get('/ai-brain/status'),
-  processPerception: (data) => api.post('/ai-brain/perception', data),
-  processAttention: (data) => api.post('/ai-brain/attention', data),
-  processReasoning: (data) => api.post('/ai-brain/reasoning', data),
-  processLearning: (data) => api.post('/ai-brain/learning', data),
-  processDecision: (data) => api.post('/ai-brain/decision', data),
-  processPlanning: (data) => api.post('/ai-brain/planning', data),
-  getKnowledgeGraph: () => api.get('/ai-brain/knowledge-graph'),
-  getMemoryState: () => api.get('/ai-brain/memory'),
-}
+// (duplicate aiBrainAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Self-Healing - Autonomous error recovery */
-export const aiSelfHealingAPI = {
-  getStatus: () => api.get('/ai-self-healing/status'),
-  detectErrors: () => api.post('/ai-self-healing/detect'),
-  analyzeRootCause: (errorId) => api.get(`/ai-self-healing/errors/${errorId}/root-cause`),
-  initiateRecovery: (errorId) => api.post(`/ai-self-healing/errors/${errorId}/recover`),
-  getRecoveryHistory: () => api.get('/ai-self-healing/history'),
-  getHealthMetrics: () => api.get('/ai-self-healing/health'),
-}
+// (duplicate aiSelfHealingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Operation Intelligence - Real-time optimization */
-export const aiOperationIntelligenceAPI = {
-  getStatus: () => api.get('/ai-operation-intelligence/status'),
-  getPerformanceMetrics: () => api.get('/ai-operation-intelligence/performance'),
-  getOptimizationSuggestions: () => api.get('/ai-operation-intelligence/suggestions'),
-  detectAnomalies: () => api.post('/ai-operation-intelligence/anomalies'),
-  applyOptimization: (suggestionId) => api.post(`/ai-operation-intelligence/optimizations/${suggestionId}/apply`),
-  getRealtimeAlerts: () => api.get('/ai-operation-intelligence/alerts'),
-}
+// (duplicate aiOperationIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Decision Engine - Core business logic and decision making */
 // (duplicate decisionEngineAPI - a strict subset of the fuller declaration
 // below - removed 2026-09-07; nothing unique was lost.)
 
 /** Nervous System - Enterprise monitoring and control */
-export const nervousSystemAPI = {
-  // Brain Control
-  processEventThroughBrain: (data) => api.post('/nervous/brain/process-event', data),
-  getBrainDecisionHistory: (params) => api.get('/nervous/brain/decision-history', { params }),
-  getBrainFocus: () => api.get('/nervous/brain/focus'),
-  
-  // Heart Beat
-  startHeartBeat: () => api.post('/nervous/heart/start'),
-  stopHeartBeat: () => api.post('/nervous/heart/stop'),
-  getHeartBeatStatus: () => api.get('/nervous/heart/status'),
-  
-  // Neural Pathways
-  createNeuralPathway: (data) => api.post('/nervous/neural/create-pathway', data),
-  getNeuralPathways: () => api.get('/nervous/neural/pathways'),
-  strengthenNeuralPathway: (pathwayId) => api.post(`/nervous/neural/strengthen/${pathwayId}`),
-  
-  // Reflex Arcs
-  createReflexArc: (data) => api.post('/nervous/reflex/create-arc', data),
-  getReflexArcs: () => api.get('/nervous/reflex/arcs'),
-  triggerReflex: (data) => api.post('/nervous/reflex/trigger', data),
-  
-  // Sensors
-  registerSensor: (data) => api.post('/nervous/sensor/register', data),
-  getSensorData: (sensorId) => api.get(`/nervous/sensor/data/${sensorId}`),
-  getSensorsStatus: () => api.get('/nervous/sensor/status'),
-  
-  // Motor Functions
-  executeMotorFunction: (data) => api.post('/nervous/motor/execute', data),
-  getActiveMotorFunctions: () => api.get('/nervous/motor/active'),
-  
-  // Enterprise Route Control
-  registerEnterpriseRoute: (data) => api.post('/nervous/route/register', data),
-  routeRequest: (data) => api.post('/nervous/route/request', data),
-  getOptimalRoute: () => api.get('/nervous/route/optimal'),
-  deactivateEnterpriseRoute: (routeId) => api.post(`/nervous/route/deactivate/${routeId}`),
-  
-  // System Health
-  getNervousSystemHealth: () => api.get('/nervous/health'),
-}
+// (duplicate nervousSystemAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 // (duplicate enterpriseMemoryAPI, digitalTwinAPI, climateMonitoringAPI -
 // each a strict subset of the fuller declarations below - removed
@@ -1771,83 +1675,25 @@ export const nervousSystemAPI = {
 // coldStorageAPI is declared 3 times total in this file.)
 
 /** Complete ERP Integration - Comprehensive ERP sync */
-export const completeERPAPI = {
-  getStatus: () => api.get('/complete-erp-integration/status'),
-  syncFarmer: (farmerId) => api.post('/complete-erp-integration/sync/farmer', { farmer_id: farmerId }),
-  syncCrop: (cropId) => api.post('/complete-erp-integration/sync/crop', { crop_id: cropId }),
-  syncLivestock: (livestockId) => api.post('/complete-erp-integration/sync/livestock', { livestock_id: livestockId }),
-  syncModule: (moduleId, data) => api.post('/complete-erp-integration/sync/module', { module_id: moduleId, data }),
-  getSyncHistory: (params) => api.get('/complete-erp-integration/history', { params }),
-  resolveConflict: (conflictId, resolution) => api.post(`/complete-erp-integration/conflicts/${conflictId}/resolve`, { resolution }),
-}
+// (duplicate completeERPAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 /** Complete AI Integration - AI-driven predictions */
-export const completeAIAPI = {
-  getStatus: () => api.get('/complete-ai-integration/status'),
-  predictYield: (data) => api.post('/complete-ai-integration/predict/yield', data),
-  detectDisease: (data) => api.post('/complete-ai-integration/detect/disease', data),
-  optimizeFertilizer: (data) => api.post('/complete-ai-integration/optimize/fertilizer', data),
-  predictMarketPrice: (data) => api.post('/complete-ai-integration/predict/price', data),
-  getRecommendations: (farmerId) => api.get(`/complete-ai-integration/recommendations/${farmerId}`),
-  trainModel: (modelType, data) => api.post(`/complete-ai-integration/models/${modelType}/train`, data),
-  getModelPerformance: (modelType) => api.get(`/complete-ai-integration/models/${modelType}/performance`),
-}
+// (duplicate completeAIAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 /** Comprehensive ERP - Oracle/SAP standards */
-export const comprehensiveERPAPI = {
-  getStatus: () => api.get('/comprehensive-erp/status'),
-  getModules: () => api.get('/comprehensive-erp/modules'),
-  syncGL: (data) => api.post('/comprehensive-erp/sync/gl', data),
-  syncBudget: (data) => api.post('/comprehensive-erp/sync/budget', data),
-  syncAsset: (data) => api.post('/comprehensive-erp/sync/asset', data),
-  syncProject: (data) => api.post('/comprehensive-erp/sync/project', data),
-  syncHR: (data) => api.post('/comprehensive-erp/sync/hr', data),
-  syncInventory: (data) => api.post('/comprehensive-erp/sync/inventory', data),
-  syncProcurement: (data) => api.post('/comprehensive-erp/sync/procurement', data),
-  syncSales: (data) => api.post('/comprehensive-erp/sync/sales', data),
-  getReconciliationStatus: () => api.get('/comprehensive-erp/reconciliation'),
-}
+// (duplicate comprehensiveERPAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Real-time Monitoring - Resource monitoring */
-export const realtimeMonitoringAPI = {
-  getStatus: () => api.get('/realtime-monitoring/status'),
-  startMonitor: (resourceType, resourceId) => api.post('/realtime-monitoring/start', { resource_type: resourceType, resource_id: resourceId }),
-  stopMonitor: (monitorId) => api.post(`/realtime-monitoring/stop/${monitorId}`),
-  getMonitors: () => api.get('/realtime-monitoring/monitors'),
-  getMonitorData: (monitorId) => api.get(`/realtime-monitoring/monitors/${monitorId}/data`),
-  getAlerts: () => api.get('/realtime-monitoring/alerts'),
-  acknowledgeAlert: (alertId) => api.post(`/realtime-monitoring/alerts/${alertId}/acknowledge`),
-}
+// (duplicate realtimeMonitoringAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Agricultural Intelligence - AI predictions */
-export const agriculturalIntelligenceAPI = {
-  getStatus: () => api.get('/agricultural-intelligence/status'),
-  predictCropYield: (data) => api.post('/agricultural-intelligence/predict/crop-yield', data),
-  analyzeSoilHealth: (data) => api.post('/agricultural-intelligence/analyze/soil', data),
-  predictWeatherImpact: (data) => api.post('/agricultural-intelligence/predict/weather-impact', data),
-  detectPestRisk: (data) => api.post('/agricultural-intelligence/detect/pest-risk', data),
-  optimizeIrrigation: (data) => api.post('/agricultural-intelligence/optimize/irrigation', data),
-  getMarketIntelligence: (params) => api.get('/agricultural-intelligence/market', { params }),
-}
+// (duplicate agriculturalIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Knowledge Reference - Wikipedia and FOLU data */
-export const knowledgeReferenceAPI = {
-  searchWikipedia: (query) => api.get('/knowledge-reference/wikipedia/search', { params: { q: query } }),
-  getWikipediaPage: (title) => api.get('/knowledge-reference/wikipedia/page', { params: { title } }),
-  getFOLUBenchmarks: (params) => api.get('/knowledge-reference/folu/benchmarks', { params }),
-  getAgriculturalKnowledge: (topic) => api.get('/knowledge-reference/agricultural', { params: { topic } }),
-}
+// (duplicate knowledgeReferenceAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 /** M400 AI Backbone - Enterprise coordination */
-export const m400AIBackboneAPI = {
-  getStatus: () => api.get('/m400-ai-backbone/status'),
-  getCoordinationState: () => api.get('/m400-ai-backbone/coordination'),
-  triggerCoordination: (data) => api.post('/m400-ai-backbone/coordinate', data),
-  getAgentStatus: () => api.get('/m400-ai-backbone/agents'),
-  getWorkflowStatus: () => api.get('/m400-ai-backbone/workflows'),
-  initiateWorkflow: (workflowType, data) => api.post('/m400-ai-backbone/workflows', { workflow_type: workflowType, data }),
-  getSystemMetrics: () => api.get('/m400-ai-backbone/metrics'),
-}
+// (duplicate m400AIBackboneAPI - strict subset of the fuller declaration below - removed 2026-09-07; nothing unique was lost.)
 
 /** Labour Management - Worker and attendance tracking */
 export const labourManagementAPI = {
@@ -1862,15 +1708,7 @@ export const labourManagementAPI = {
 }
 
 /** Farmer Verification - Verification workflow */
-export const farmerVerificationAPI = {
-  getRequests: (params) => api.get('/farmer-verification/requests', { params }),
-  createRequest: (data) => api.post('/farmer-verification/requests', data),
-  getRequest: (requestId) => api.get(`/farmer-verification/requests/${requestId}`),
-  updateRequest: (requestId, data) => api.put(`/farmer-verification/requests/${requestId}`, data),
-  submitDocuments: (requestId, documents) => api.post(`/farmer-verification/requests/${requestId}/documents`, { documents }),
-  makeDecision: (requestId, decision) => api.post(`/farmer-verification/requests/${requestId}/decision`, decision),
-  getVerificationStatus: (farmerId) => api.get(`/farmer-verification/farmers/${farmerId}/status`),
-}
+// (duplicate farmerVerificationAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Farmer KYC - Know Your Customer verification */
 export const farmerKycAPI = {
@@ -2004,16 +1842,7 @@ export const landRegistryAPI = {
 }
 
 /** Farm Costing - Cost analysis and tracking (highest confidence gap) */
-export const farmCostingAPI = {
-  getCosts: (params) => api.get('/farm-costing/costs', { params }),
-  createCost: (data) => api.post('/farm-costing/costs', data),
-  getCost: (costId) => api.get(`/farm-costing/costs/${costId}`),
-  updateCost: (costId, data) => api.put(`/farm-costing/costs/${costId}`, data),
-  getCostCategories: () => api.get('/farm-costing/categories'),
-  getCostAnalysis: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/analysis`, { params: { period } }),
-  getBudgetComparison: (farmId) => api.get(`/farm-costing/farms/${farmId}/budget-comparison`),
-  getCostTrends: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/trends`, { params: { period } }),
-}
+// (duplicate farmCostingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Decision Engine - Core business logic decisions */
 export const decisionEngineAPI = {
@@ -2108,43 +1937,13 @@ export const coldStorageAPI = {
 }
 
 /** AI Operations Intelligence - Real-time optimization */
-export const aiOperationIntelligenceAPI = {
-  getStatus: () => api.get('/ai-operation-intelligence/status'),
-  getPerformanceMetrics: () => api.get('/ai-operation-intelligence/performance'),
-  getOptimizationSuggestions: () => api.get('/ai-operation-intelligence/suggestions'),
-  detectAnomalies: () => api.post('/ai-operation-intelligence/anomalies'),
-  applyOptimization: (suggestionId) => api.post(`/ai-operation-intelligence/optimizations/${suggestionId}/apply`),
-  getRealtimeAlerts: () => api.get('/ai-operation-intelligence/alerts'),
-  getSystemHealth: () => api.get('/ai-operation-intelligence/health'),
-  getResourceUsage: () => api.get('/ai-operation-intelligence/resources'),
-  getCapacityForecast: () => api.get('/ai-operation-intelligence/capacity-forecast'),
-}
+// (duplicate aiOperationIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Self-Healing - Autonomous error recovery */
-export const aiSelfHealingAPI = {
-  getStatus: () => api.get('/ai-self-healing/status'),
-  detectErrors: () => api.post('/ai-self-healing/detect'),
-  analyzeRootCause: (errorId) => api.get(`/ai-self-healing/errors/${errorId}/root-cause`),
-  initiateRecovery: (errorId) => api.post(`/ai-self-healing/errors/${errorId}/recover`),
-  getRecoveryHistory: () => api.get('/ai-self-healing/history'),
-  getHealthMetrics: () => api.get('/ai-self-healing/health'),
-  getHealingPatterns: () => api.get('/ai-self-healing/patterns'),
-  configureAutoHealing: (config) => api.post('/ai-self-healing/configure', config),
-}
+// (duplicate aiSelfHealingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Brain - Cognitive processing layer */
-export const aiBrainAPI = {
-  getStatus: () => api.get('/ai-brain/status'),
-  processPerception: (data) => api.post('/ai-brain/perception', data),
-  processAttention: (data) => api.post('/ai-brain/attention', data),
-  processReasoning: (data) => api.post('/ai-brain/reasoning', data),
-  processLearning: (data) => api.post('/ai-brain/learning', data),
-  processDecision: (data) => api.post('/ai-brain/decision', data),
-  processPlanning: (data) => api.post('/ai-brain/planning', data),
-  getKnowledgeGraph: () => api.get('/ai-brain/knowledge-graph'),
-  getMemoryState: () => api.get('/ai-brain/memory'),
-  getCognitiveLoad: () => api.get('/ai-brain/cognitive-load'),
-}
+// (duplicate aiBrainAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** AI Gateway - API gateway for AI services */
 export const aiGatewayAPI = {
@@ -2194,17 +1993,7 @@ export const biodiversityAPI = {
 }
 
 /** Enterprise Control - Workflow engine */
-export const enterpriseControlAPI = {
-  getStatus: () => api.get('/control/status'),
-  getWorkflows: (params) => api.get('/control/workflows', { params }),
-  createWorkflow: (data) => api.post('/control/workflows', data),
-  getWorkflow: (workflowId) => api.get(`/control/workflows/${workflowId}`),
-  executeWorkflow: (workflowId, data) => api.post(`/control/workflows/${workflowId}/execute`, data),
-  getWorkflowHistory: (workflowId) => api.get(`/control/workflows/${workflowId}/history`),
-  getPendingApprovals: () => api.get('/control/approvals/pending'),
-  approveWorkflow: (workflowId) => api.post(`/control/workflows/${workflowId}/approve`),
-  rejectWorkflow: (workflowId, reason) => api.post(`/control/workflows/${workflowId}/reject`, { reason }),
-}
+// (duplicate enterpriseControlAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Experience Layer - DXP engines */
 export const experienceAPI = {
@@ -2236,30 +2025,10 @@ export const innovationLabAPI = {
 }
 
 /** AI Agents - Agentic task execution */
-export const aiAgentAPI = {
-  getStatus: () => api.get('/ai-agents/status'),
-  getAgents: () => api.get('/ai-agents'),
-  createAgent: (data) => api.post('/ai-agents', data),
-  getAgent: (agentId) => api.get(`/ai-agents/${agentId}`),
-  executeTask: (agentId, task) => api.post(`/ai-agents/${agentId}/execute`, { task }),
-  getAgentPerformance: (agentId) => api.get(`/ai-agents/${agentId}/performance`),
-  getToolRegistry: () => api.get('/ai-agents/tools'),
-  registerTool: (tool) => api.post('/ai-agents/tools', tool),
-  getAgentLogs: (agentId) => api.get(`/ai-agents/${agentId}/logs`),
-  coordinateAgents: (agentIds, task) => api.post('/ai-agents/coordinate', { agent_ids: agentIds, task }),
-}
+// (duplicate aiAgentAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Glut Warning - Early warning system */
-export const glutWarningAPI = {
-  getStatus: () => api.get('/glut-warning/status'),
-  getWarnings: (params) => api.get('/glut-warning/warnings', { params }),
-  createWarning: (data) => api.post('/glut-warning/warnings', data),
-  getWarning: (warningId) => api.get(`/glut-warning/warnings/${warningId}`),
-  acknowledgeWarning: (warningId) => api.post(`/glut-warning/warnings/${warningId}/acknowledge`),
-  getHistoricalGluts: (params) => api.get('/glut-warning/historical', { params }),
-  getGlutPrediction: (crop, region) => api.get('/glut-warning/prediction', { params: { crop, region } }),
-  getMitigationStrategies: (warningId) => api.get(`/glut-warning/warnings/${warningId}/strategies`),
-}
+// (duplicate glutWarningAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Market Signals - Market intelligence */
 export const marketSignalsAPI = {
@@ -2273,54 +2042,16 @@ export const marketSignalsAPI = {
 }
 
 /** Seller Ranking - Trust scoring */
-export const sellerRankingAPI = {
-  getStatus: () => api.get('/seller-ranking/status'),
-  getSellers: (params) => api.get('/seller-ranking/sellers', { params }),
-  getSeller: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}`),
-  getSellerRanking: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/ranking`),
-  getSellerReviews: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/reviews`),
-  getSellerPerformance: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/performance`),
-  reportSeller: (sellerId, issue) => api.post(`/seller-ranking/sellers/${sellerId}/report`, { issue }),
-  getSellerBadges: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/badges`),
-}
+// (duplicate sellerRankingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Civil Disruption - Risk monitoring */
-export const civilDisruptionAPI = {
-  getStatus: () => api.get('/civil-disruption/status'),
-  getDisruptions: (params) => api.get('/civil-disruption/disruptions', { params }),
-  createDisruption: (data) => api.post('/civil-disruption/disruptions', data),
-  getDisruption: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}`),
-  getImpactAssessment: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/impact`),
-  getMitigationPlans: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/mitigation`),
-  getRiskForecast: (region) => api.get('/civil-disruption/risk-forecast', { params: { region } }),
-  getAlternateRoutes: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/alternate-routes`),
-}
+// (duplicate civilDisruptionAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Logistics Enhancement - Advanced logistics */
-export const logisticsEnhancementAPI = {
-  getStatus: () => api.get('/logistics-enhancement/status'),
-  getFleet: (params) => api.get('/logistics-enhancement/fleet', { params }),
-  getVehicle: (vehicleId) => api.get(`/logistics-enhancement/fleet/${vehicleId}`),
-  getDriverPerformance: (driverId) => api.get(`/logistics-enhancement/drivers/${driverId}/performance`),
-  getRouteOptimization: (from, to) => api.get('/logistics-enhancement/route-optimization', { params: { from, to } }),
-  getLiveTracking: (shipmentId) => api.get(`/logistics-enhancement/shipments/${shipmentId}/live-tracking`),
-  getTemperatureTracking: (shipmentId) => api.get(`/logistics-enhancement/shipments/${shipmentId}/temperature`),
-  getWarehouseIntegration: (warehouseId) => api.get(`/logistics-enhancement/warehouses/${warehouseId}/integration`),
-  getReturnLoadOpportunities: () => api.get('/logistics-enhancement/return-loads'),
-  getFreightPooling: () => api.get('/logistics-enhancement/freight-pooling'),
-}
+// (duplicate logisticsEnhancementAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Enterprise AI - Enterprise AI services */
-export const enterpriseAIAPI = {
-  getStatus: () => api.get('/enterprise-ai/status'),
-  getCreditScore: (entityId) => api.get(`/enterprise-ai/credit-score/${entityId}`),
-  getSchemeEligibility: (entityId) => api.get(`/enterprise-ai/scheme-eligibility/${entityId}`),
-  getModelRegistry: () => api.get('/enterprise-ai/models'),
-  registerModel: (model) => api.post('/enterprise-ai/models', model),
-  getConversationalQuery: (query) => api.post('/enterprise-ai/query', { query }),
-  getEnterpriseInsights: (entityId) => api.get(`/enterprise-ai/insights/${entityId}`),
-  getRiskAssessment: (entityId) => api.get(`/enterprise-ai/risk/${entityId}`),
-}
+// (duplicate enterpriseAIAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** M400 AI Backbone - Enterprise coordination */
 export const m400AIBackboneAPI = {
@@ -2336,64 +2067,16 @@ export const m400AIBackboneAPI = {
 }
 
 /** SAP Module Architecture - Independent module architecture */
-export const sapModuleArchitectureAPI = {
-  getStatus: () => api.get('/sap-module-architecture/status'),
-  getModules: () => api.get('/sap-module-architecture/modules'),
-  getModule: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}`),
-  registerModule: (module) => api.post('/sap-module-architecture/modules', module),
-  getDependencies: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/dependencies`),
-  getLifecycle: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/lifecycle`),
-  getConfiguration: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/configuration`),
-  getMTADescriptor: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/mta`),
-  deployModule: (moduleId) => api.post(`/sap-module-architecture/modules/${moduleId}/deploy`),
-}
+// (duplicate sapModuleArchitectureAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Research and Development - R&D management */
-export const researchAndDevelopmentAPI = {
-  getStatus: () => api.get('/research-and-development/status'),
-  getProjects: (params) => api.get('/research-and-development/projects', { params }),
-  createProject: (data) => api.post('/research-and-development/projects', data),
-  getProject: (projectId) => api.get(`/research-and-development/projects/${projectId}`),
-  updateProject: (projectId, data) => api.put(`/research-and-development/projects/${projectId}`, data),
-  getCollaborations: (projectId) => api.get(`/research-and-development/projects/${projectId}/collaborations`),
-  getInnovations: (params) => api.get('/research-and-development/innovations', { params }),
-  getPatents: (params) => api.get('/research-and-development/patents', { params }),
-  getFunding: (projectId) => api.get(`/research-and-development/projects/${projectId}/funding`),
-  getPublications: (params) => api.get('/research-and-development/publications', { params }),
-  getAIResearchAssistance: (topic) => api.post('/research-and-development/ai-assist', { topic }),
-}
+// (duplicate researchAndDevelopmentAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Information Sharing - Document management */
-export const informationSharingAPI = {
-  getStatus: () => api.get('/information-sharing/status'),
-  getDocuments: (params) => api.get('/information-sharing/documents', { params }),
-  createDocument: (data) => api.post('/information-sharing/documents', data),
-  getDocument: (documentId) => api.get(`/information-sharing/documents/${documentId}`),
-  updateDocument: (documentId, data) => api.put(`/information-sharing/documents/${documentId}`, data),
-  getFolders: (params) => api.get('/information-sharing/folders', { params }),
-  createFolder: (data) => api.post('/information-sharing/folders', data),
-  getPermissions: (resourceId) => api.get(`/information-sharing/resources/${resourceId}/permissions`),
-  setPermissions: (resourceId, permissions) => api.put(`/information-sharing/resources/${resourceId}/permissions`, permissions),
-  getSharingLinks: (documentId) => api.get(`/information-sharing/documents/${documentId}/links`),
-  createSharingLink: (documentId, settings) => api.post(`/information-sharing/documents/${documentId}/links`, settings),
-  getCollaborationSessions: (documentId) => api.get(`/information-sharing/documents/${documentId}/sessions`),
-  startCollaboration: (documentId) => api.post(`/information-sharing/documents/${documentId}/collaboration`),
-  getAIRecommendations: (documentId) => api.get(`/information-sharing/documents/${documentId}/recommendations`),
-}
+// (duplicate informationSharingAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Agricultural Intelligence - AI predictions */
-export const agriculturalIntelligenceAPI = {
-  getStatus: () => api.get('/agricultural-intelligence/status'),
-  predictCropYield: (data) => api.post('/agricultural-intelligence/predict/crop-yield', data),
-  analyzeSoilHealth: (data) => api.post('/agricultural-intelligence/analyze/soil', data),
-  predictWeatherImpact: (data) => api.post('/agricultural-intelligence/predict/weather-impact', data),
-  detectPestRisk: (data) => api.post('/agricultural-intelligence/detect/pest-risk', data),
-  optimizeIrrigation: (data) => api.post('/agricultural-intelligence/optimize/irrigation', data),
-  getMarketIntelligence: (params) => api.get('/agricultural-intelligence/market', { params }),
-  getAIModels: () => api.get('/agricultural-intelligence/models'),
-  getModelPerformance: (modelId) => api.get(`/agricultural-intelligence/models/${modelId}/performance`),
-  trainModel: (modelType, data) => api.post(`/agricultural-intelligence/models/${modelType}/train`, data),
-}
+// (duplicate agriculturalIntelligenceAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Knowledge Reference - Wikipedia and FOLU data */
 export const knowledgeReferenceAPI = {
@@ -2405,17 +2088,7 @@ export const knowledgeReferenceAPI = {
 }
 
 /** Real-time Monitoring - Resource monitoring */
-export const realtimeMonitoringAPI = {
-  getStatus: () => api.get('/realtime-monitoring/status'),
-  startMonitor: (resourceType, resourceId) => api.post('/realtime-monitoring/start', { resource_type: resourceType, resource_id: resourceId }),
-  stopMonitor: (monitorId) => api.post(`/realtime-monitoring/stop/${monitorId}`),
-  getMonitors: () => api.get('/realtime-monitoring/monitors'),
-  getMonitorData: (monitorId) => api.get(`/realtime-monitoring/monitors/${monitorId}/data`),
-  getAlerts: () => api.get('/realtime-monitoring/alerts'),
-  acknowledgeAlert: (alertId) => api.post(`/realtime-monitoring/alerts/${alertId}/acknowledge`),
-  getSystemMetrics: () => api.get('/realtime-monitoring/metrics'),
-  configureThresholds: (thresholds) => api.post('/realtime-monitoring/thresholds', thresholds),
-}
+// (duplicate realtimeMonitoringAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Complete ERP Integration - Comprehensive ERP sync */
 export const completeERPAPI = {
@@ -2445,23 +2118,7 @@ export const completeAIAPI = {
 }
 
 /** Comprehensive ERP - Oracle/SAP standards */
-export const comprehensiveERPAPI = {
-  getStatus: () => api.get('/comprehensive-erp/status'),
-  getModules: () => api.get('/comprehensive-erp/modules'),
-  syncGL: (data) => api.post('/comprehensive-erp/sync/gl', data),
-  syncBudget: (data) => api.post('/comprehensive-erp/sync/budget', data),
-  syncAsset: (data) => api.post('/comprehensive-erp/sync/asset', data),
-  syncProject: (data) => api.post('/comprehensive-erp/sync/project', data),
-  syncHR: (data) => api.post('/comprehensive-erp/sync/hr', data),
-  syncInventory: (data) => api.post('/comprehensive-erp/sync/inventory', data),
-  syncProcurement: (data) => api.post('/comprehensive-erp/sync/procurement', data),
-  syncSales: (data) => api.post('/comprehensive-erp/sync/sales', data),
-  getReconciliationStatus: () => api.get('/comprehensive-erp/reconciliation'),
-  getFinancialStatements: (params) => api.get('/comprehensive-erp/statements', { params }),
-  getBudgetReports: (params) => api.get('/comprehensive-erp/budgets', { params }),
-  getAssetRegister: (params) => api.get('/comprehensive-erp/assets', { params }),
-  getProjectReports: (params) => api.get('/comprehensive-erp/projects', { params }),
-}
+// (duplicate comprehensiveERPAPI - merged into the fuller declaration below (union of all keys across both) - removed 2026-09-07; nothing unique was lost.)
 
 /** Water Records - Water management data */
 export const waterRecordsAPI = {
@@ -2484,7 +2141,7 @@ export const logisticsMatchingAPI = {
   getEquipmentExchange: () => api.get('/logistics-matching/equipment-exchange'),
   submitFreightRequest: (data) => api.post('/logistics-matching/freight-requests', data),
   acceptFreightRequest: (requestId) => api.post(`/logistics-matching/freight-requests/${requestId}/accept`),
-  submitReturnLoad: (data) => api.post('/logistics-matching/return-loads`, data),
+  submitReturnLoad: (data) => api.post('/logistics-matching/return-loads', data),
   acceptReturnLoad: (loadId) => api.post(`/logistics-matching/return-loads/${loadId}/accept`),
   listEquipment: (params) => api.get('/logistics-matching/equipment', { params }),
   createEquipmentListing: (data) => api.post('/logistics-matching/equipment', data),
@@ -2529,6 +2186,14 @@ export const orchardAPI = {
 /** M098 — Farm Costing (Operations domain). economicAPI.costBreakup covers
  *  corridor-level cost models; no route handles per-farm cost records. */
 export const farmCostingAPI = {
+  getCosts: (params) => api.get('/farm-costing/costs', { params }),
+  createCost: (data) => api.post('/farm-costing/costs', data),
+  getCost: (costId) => api.get(`/farm-costing/costs/${costId}`),
+  updateCost: (costId, data) => api.put(`/farm-costing/costs/${costId}`, data),
+  getCostCategories: () => api.get('/farm-costing/categories'),
+  getCostAnalysis: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/analysis`, { params: { period } }),
+  getBudgetComparison: (farmId) => api.get(`/farm-costing/farms/${farmId}/budget-comparison`),
+  getCostTrends: (farmId, period) => api.get(`/farm-costing/farms/${farmId}/trends`, { params: { period } }),
   getRecords: (params) => api.get('/farm-costing/records', { params }),
   createRecord: (data) => api.post('/farm-costing/records', data),
   updateRecord: (id, data) => api.put(`/farm-costing/records/${id}`, data),
@@ -2638,7 +2303,12 @@ export const farmerFamilyAPI = {
  *  verification of farmer records (land, cropping, membership claims). */
 export const farmerVerificationAPI = {
   getRequests: (params) => api.get('/farmer-verification/requests', { params }),
+  createRequest: (data) => api.post('/farmer-verification/requests', data),
   getRequest: (id) => api.get(`/farmer-verification/requests/${id}`),
+  updateRequest: (requestId, data) => api.put(`/farmer-verification/requests/${requestId}`, data),
+  submitDocuments: (requestId, documents) => api.post(`/farmer-verification/requests/${requestId}/documents`, { documents }),
+  makeDecision: (requestId, decision) => api.post(`/farmer-verification/requests/${requestId}/decision`, decision),
+  getVerificationStatus: (farmerId) => api.get(`/farmer-verification/farmers/${farmerId}/status`),
   submitRequest: (data) => api.post('/farmer-verification/requests', data),
   verifyRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/verify`, data),
   rejectRequest: (id, data) => api.put(`/farmer-verification/requests/${id}/reject`, data),
@@ -3834,31 +3504,39 @@ export const masterConfigAPI = {
 // ACTION it describes is still taken by a person, not this client.
 // ---------------------------------------------------------------------------
 export const enterpriseControlAPI = {
-  // Workflow engine — approval chains with amount thresholds.
+  getStatus: () => api.get('/control/status'),
+  getWorkflows: (params) => api.get('/control/workflows', { params }),
+  createWorkflow: (data) => api.post('/control/workflows', data),
+  getWorkflow: (workflowId) => api.get(`/control/workflows/${workflowId}`),
+  executeWorkflow: (workflowId, data) => api.post(`/control/workflows/${workflowId}/execute`, data),
+  getWorkflowHistory: (workflowId) => api.get(`/control/workflows/${workflowId}/history`),
+  getPendingApprovals: () => api.get('/control/approvals/pending'),
+  approveWorkflow: (workflowId) => api.post(`/control/workflows/${workflowId}/approve`),
+  rejectWorkflow: (workflowId, reason) => api.post(`/control/workflows/${workflowId}/reject`, { reason }),
   startWorkflow: (body) => api.post('/control/workflow/start', body),
   actOnWorkflow: (instanceCode, body) => api.post(`/control/workflow/${instanceCode}/act`, body),
   pendingApprovals: (params) => api.get('/control/workflow/pending', { params }),
 
-  // CRM — leads and pipeline.
+  // CRM — leads and pipeline.,
   createLead: (body) => api.post('/control/crm/leads', body),
   convertLead: (leadCode, body) => api.post(`/control/crm/leads/${leadCode}/convert`, body),
   pipeline: () => api.get('/control/crm/pipeline'),
 
   // Clients — account health (no list/create route exists on the backend;
-  // clients are created only via convertLead's createClient flag).
+  // clients are created only via convertLead's createClient flag).,
   clientHealth: (id) => api.get(`/control/clients/${id}/health`),
 
   // Legal — admin-gated on the backend (adminMiddleware); calendar/read-only,
-  // no create route exists for legal_matters/legal_obligations.
+  // no create route exists for legal_matters/legal_obligations.,
   legalCalendar: (params) => api.get('/control/legal/calendar', { params }),
 
-  // Risk — admin-gated assessment; heatmap is a read-only aggregate.
+  // Risk — admin-gated assessment; heatmap is a read-only aggregate.,
   assessRisk: (riskCode, body) => api.post(`/control/risk/${riskCode}/assess`, body),
   riskHeatmap: () => api.get('/control/risk/heatmap'),
 
   // Emergency — raising and acknowledging are authenticated but NOT
   // admin-gated on the backend: the person who sees the problem first is
-  // rarely the person with the highest privilege.
+  // rarely the person with the highest privilege.,
   raiseIncident: (body) => api.post('/control/emergency/incidents', body),
   acknowledgeIncident: (incidentCode) => api.post(`/control/emergency/incidents/${incidentCode}/acknowledge`),
   activeIncidents: () => api.get('/control/emergency/active'),
@@ -3988,7 +3666,21 @@ export const pigAIAPI = {
 /** Comprehensive ERP API - Oracle/SAP standards complete ERP system.
  *  Real backend as of 2026-08-12: backend/src/routes/comprehensiveERPRoutes.js */
 export const comprehensiveERPAPI = {
-  // Financial Accounting (FI) / General Ledger (GL)
+  getStatus: () => api.get('/comprehensive-erp/status'),
+  getModules: () => api.get('/comprehensive-erp/modules'),
+  syncGL: (data) => api.post('/comprehensive-erp/sync/gl', data),
+  syncBudget: (data) => api.post('/comprehensive-erp/sync/budget', data),
+  syncAsset: (data) => api.post('/comprehensive-erp/sync/asset', data),
+  syncProject: (data) => api.post('/comprehensive-erp/sync/project', data),
+  syncHR: (data) => api.post('/comprehensive-erp/sync/hr', data),
+  syncInventory: (data) => api.post('/comprehensive-erp/sync/inventory', data),
+  syncProcurement: (data) => api.post('/comprehensive-erp/sync/procurement', data),
+  syncSales: (data) => api.post('/comprehensive-erp/sync/sales', data),
+  getReconciliationStatus: () => api.get('/comprehensive-erp/reconciliation'),
+  getFinancialStatements: (params) => api.get('/comprehensive-erp/statements', { params }),
+  getBudgetReports: (params) => api.get('/comprehensive-erp/budgets', { params }),
+  getAssetRegister: (params) => api.get('/comprehensive-erp/assets', { params }),
+  getProjectReports: (params) => api.get('/comprehensive-erp/projects', { params }),
   createChartOfAccounts: (data) => api.post('/comprehensive-erp/fi/gl/chart-of-accounts', data),
   createGLAccount: (data) => api.post('/comprehensive-erp/fi/gl/accounts', data),
   postJournalEntry: (data) => api.post('/comprehensive-erp/fi/gl/journal-entries', data),
@@ -3997,64 +3689,64 @@ export const comprehensiveERPAPI = {
   getProfitLoss: (params) => api.get('/comprehensive-erp/fi/gl/profit-loss', { params }),
   analyzeFinancialsAI: (params) => api.get('/comprehensive-erp/fi/gl/ai-analysis', { params }),
 
-  // Controlling (CO)
+  // Controlling (CO),
   createCostCenter: (data) => api.post('/comprehensive-erp/co/cost-centers', data),
   createProfitCenter: (data) => api.post('/comprehensive-erp/co/profit-centers', data),
   postCostAllocation: (data) => api.post('/comprehensive-erp/co/cost-allocations', data),
   getCostCenterReport: (params) => api.get('/comprehensive-erp/co/cost-centers/report', { params }),
   getProfitCenterReport: (params) => api.get('/comprehensive-erp/co/profit-centers/report', { params }),
   
-  // Materials Management (MM)
+  // Materials Management (MM),
   createMaterialMaster: (data) => api.post('/comprehensive-erp/mm/material-master', data),
   createPurchaseOrder: (data) => api.post('/comprehensive-erp/mm/purchase-orders', data),
   createGoodsReceipt: (data) => api.post('/comprehensive-erp/mm/goods-receipts', data),
   getInventoryOverview: (params) => api.get('/comprehensive-erp/mm/inventory', { params }),
   optimizeSupplyChainAI: (params) => api.get('/comprehensive-erp/mm/ai-optimization', { params }),
 
-  // Sales and Distribution (SD)
+  // Sales and Distribution (SD),
   createCustomerMaster: (data) => api.post('/comprehensive-erp/sd/customers', data),
   createSalesOrder: (data) => api.post('/comprehensive-erp/sd/sales-orders', data),
   createDelivery: (data) => api.post('/comprehensive-erp/sd/deliveries', data),
   createInvoice: (data) => api.post('/comprehensive-erp/sd/invoices', data),
   
-  // Production Planning (PP)
+  // Production Planning (PP),
   createProductionOrder: (data) => api.post('/comprehensive-erp/pp/production-orders', data),
   releaseProductionOrder: (productionOrder) => api.post(`/comprehensive-erp/pp/production-orders/${productionOrder}/release`),
   confirmProductionOrder: (productionOrder, data) => api.post(`/comprehensive-erp/pp/production-orders/${productionOrder}/confirm`, data),
   optimizeProductionAI: (params) => api.get('/comprehensive-erp/pp/ai-optimization', { params }),
 
-  // Quality Management (QM)
+  // Quality Management (QM),
   createInspectionLot: (data) => api.post('/comprehensive-erp/qm/inspection-lots', data),
   recordInspectionResult: (data) => api.post('/comprehensive-erp/qm/inspection-results', data),
   makeUsageDecision: (inspectionLot, data) => api.post(`/comprehensive-erp/qm/inspection-lots/${inspectionLot}/usage-decision`, data),
   
-  // Plant Maintenance (PM)
+  // Plant Maintenance (PM),
   createEquipmentMaster: (data) => api.post('/comprehensive-erp/pm/equipment', data),
   createMaintenanceOrder: (data) => api.post('/comprehensive-erp/pm/maintenance-orders', data),
   confirmMaintenanceOrder: (maintenanceOrder, data) => api.post(`/comprehensive-erp/pm/maintenance-orders/${maintenanceOrder}/confirm`, data),
   
-  // Human Resources (HR)
+  // Human Resources (HR),
   createEmployeeMaster: (data) => api.post('/comprehensive-erp/hr/employees', data),
   createOrganizationalUnit: (data) => api.post('/comprehensive-erp/hr/org-units', data),
   processPayroll: (data) => api.post('/comprehensive-erp/hr/payroll', data),
   analyzeHRAI: (params) => api.get('/comprehensive-erp/hr/ai-analysis', { params }),
 
-  // Project System (PS)
+  // Project System (PS),
   createProjectDefinition: (data) => api.post('/comprehensive-erp/ps/projects', data),
   createWBS: (data) => api.post('/comprehensive-erp/ps/wbs-elements', data),
   updateProjectStatus: (projectCode, data) => api.post(`/comprehensive-erp/ps/projects/${projectCode}/status`, data),
   analyzeProjectAI: (projectCode) => api.get(`/comprehensive-erp/ps/projects/${projectCode}/ai-analysis`),
 
-  // Treasury (TR)
+  // Treasury (TR),
   createBankAccount: (data) => api.post('/comprehensive-erp/tr/bank-accounts', data),
   recordCashFlow: (data) => api.post('/comprehensive-erp/tr/cash-flows', data),
   getCashPosition: (params) => api.get('/comprehensive-erp/tr/cash-position', { params }),
   
-  // Asset Management (AM)
+  // Asset Management (AM),
   createFixedAsset: (data) => api.post('/comprehensive-erp/am/fixed-assets', data),
   calculateDepreciation: (assetCode, params) => api.post(`/comprehensive-erp/am/fixed-assets/${assetCode}/depreciation`, null, { params }),
   
-  // Business Intelligence (BI)
+  // Business Intelligence (BI),
   getExecutiveDashboard: (params) => api.get('/comprehensive-erp/bi/executive-dashboard', { params }),
   getProfitabilityAnalysis: (params) => api.get('/comprehensive-erp/bi/profitability-analysis', { params }),
 }
@@ -4111,31 +3803,37 @@ export const nervousSystemAPI = {
  *  the route file itself returns 501 NOT_IMPLEMENTED for those (no backing
  *  service methods exist). */
 export const logisticsEnhancementAPI = {
-  // Fleet Management
-  addVehicle: (data) => api.post('/logistics-enhancement/fleet/vehicles', data),
+  getStatus: () => api.get('/logistics-enhancement/status'),
   getFleet: (params) => api.get('/logistics-enhancement/fleet/vehicles', { params }),
   getVehicle: (vehicleId) => api.get(`/logistics-enhancement/fleet/vehicles/${vehicleId}`),
+  getDriverPerformance: (driverId) => api.get(`/logistics-enhancement/drivers/${driverId}/performance`),
+  getRouteOptimization: (from, to) => api.get('/logistics-enhancement/route-optimization', { params: { from, to } }),
+  getLiveTracking: (shipmentId) => api.get(`/logistics-enhancement/tracking/${shipmentId}/live`),
+  getTemperatureTracking: (shipmentId) => api.get(`/logistics-enhancement/shipments/${shipmentId}/temperature`),
+  getWarehouseIntegration: (warehouseId) => api.get(`/logistics-enhancement/warehouses/${warehouseId}/integration`),
+  getReturnLoadOpportunities: () => api.get('/logistics-enhancement/return-loads'),
+  getFreightPooling: () => api.get('/logistics-enhancement/freight-pooling'),
+  addVehicle: (data) => api.post('/logistics-enhancement/fleet/vehicles', data),
   updateVehicle: (vehicleId, data) => api.put(`/logistics-enhancement/fleet/vehicles/${vehicleId}`, data),
   scheduleMaintenance: (vehicleId, data) => api.post(`/logistics-enhancement/fleet/vehicles/${vehicleId}/maintenance`, data),
 
-  // Real-time Tracking
+  // Real-time Tracking,
   updateTracking: (shipmentId, data) => api.post(`/logistics-enhancement/tracking/${shipmentId}`, data),
   getTracking: (shipmentId) => api.get(`/logistics-enhancement/tracking/${shipmentId}`),
-  getLiveTracking: (shipmentId) => api.get(`/logistics-enhancement/tracking/${shipmentId}/live`),
   setGeofence: (shipmentId, data) => api.post(`/logistics-enhancement/tracking/${shipmentId}/geofence`, data),
 
-  // Temperature Monitoring
+  // Temperature Monitoring,
   recordTemperature: (shipmentId, data) => api.post(`/logistics-enhancement/temperature/${shipmentId}`, data),
   getTemperatureData: (shipmentId, params) => api.get(`/logistics-enhancement/temperature/${shipmentId}`, { params }),
   getTemperatureAlerts: (shipmentId) => api.get(`/logistics-enhancement/temperature/${shipmentId}/alerts`),
 
-  // Warehouse Management
+  // Warehouse Management,
   createWarehouse: (data) => api.post('/logistics-enhancement/warehouse/locations', data),
   getWarehouses: (params) => api.get('/logistics-enhancement/warehouse/locations', { params }),
   addInventory: (warehouseId, data) => api.post('/logistics-enhancement/warehouse/inventory', { warehouseId, ...data }),
   getWarehouseInventory: (warehouseId) => api.get('/logistics-enhancement/warehouse/inventory', { params: { warehouseId } }),
 
-  // Driver Location
+  // Driver Location,
   recordDriverLocation: (data) => api.post('/logistics-enhancement/drivers/location', data),
   getActiveDrivers: (params) => api.get('/logistics-enhancement/drivers/active', { params }),
   getShipmentTrail: (id) => api.get(`/logistics-enhancement/shipments/${id}/trail`),
@@ -4149,8 +3847,14 @@ export const logisticsEnhancementAPI = {
  *  Not Implemented for those (documented in its own header as fabricated
  *  logic removed, not replaced). */
 export const enterpriseAIAPI = {
+  getStatus: () => api.get('/enterprise-ai/status'),
   getCreditScore: (data) => api.post('/enterprise-ai/credit-score', data),
   getSchemeEligibility: (data) => api.post('/enterprise-ai/scheme-eligibility', data),
+  getModelRegistry: () => api.get('/enterprise-ai/models'),
+  registerModel: (model) => api.post('/enterprise-ai/models', model),
+  getConversationalQuery: (query) => api.post('/enterprise-ai/query', { query }),
+  getEnterpriseInsights: (entityId) => api.get(`/enterprise-ai/insights/${entityId}`),
+  getRiskAssessment: (entityId) => api.get(`/enterprise-ai/risk/${entityId}`),
   getModelSlots: () => api.get('/enterprise-ai/model-slots'),
   getUnservedIntents: () => api.get('/enterprise-ai/unserved-intents'),
   upsertModelSlot: (data) => api.post('/enterprise-ai/model-slots', data),
@@ -4160,37 +3864,37 @@ export const enterpriseAIAPI = {
 /** AI Backbone API - Real AI integration (Claude, ChatGPT, Gemini, Azure, Hugging Face).
  *  Real backend as of 2026-08-12: backend/src/routes/aiBackboneRoutes.js */
 export const aiBackboneAPI = {
-  // General AI Operations
-  callAI: (data) => api.post('/ai-backbone/call', data),
+  getStatus: () => api.get('/ai-backbone/status'),
   getAIProviderStatus: () => api.get('/ai-backbone/status'),
+  callAI: (data) => api.post('/ai-backbone/call', data),
   switchProvider: (data) => api.post('/ai-backbone/switch-provider', data),
   resetAIStatistics: () => api.post('/ai-backbone/reset-statistics'),
   
-  // Agricultural AI Operations
+  // Agricultural AI Operations,
   supportAgriculturalDecision: (data) => api.post('/ai-backbone/agricultural-decision', data),
   optimizeLivestock: (data) => api.post('/ai-backbone/livestock-optimization', data),
 
-  // Farmer Module AI Integration
+  // Farmer Module AI Integration,
   recommendCropPlanning: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/crop-planning-recommendation`, data),
   predictHarvestTiming: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/harvest-timing-prediction`, data),
   optimizeFarmerResources: (farmerId, data) => api.post(`/complete-ai-integration/farmer/${farmerId}/resource-optimization`, data),
   
-  // Crop Module AI Integration
+  // Crop Module AI Integration,
   detectCropDisease: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/disease-detection`, data),
   predictCropYield: (cropId, data) => api.post(`/complete-ai-integration/crop/${cropId}/yield-prediction`, data),
   
-  // Livestock Module AI Integration
+  // Livestock Module AI Integration,
   monitorLivestockHealth: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/health-monitoring`, data),
   recommendLivestockBreeding: (livestockId, data) => api.post(`/complete-ai-integration/livestock/${livestockId}/breeding-recommendation`, data),
   
-  // Inbuilt Modules AI Integration
+  // Inbuilt Modules AI Integration,
   optimizeDairyProduction: (dairyId, data) => api.post(`/complete-ai-integration/dairy/${dairyId}/production-optimization`, data),
   monitorPoultryHealth: (poultryId, data) => api.post(`/complete-ai-integration/poultry/${poultryId}/health-monitoring`, data),
   optimizeGoatProduction: (goatId, data) => api.post(`/complete-ai-integration/goat/${goatId}/production-optimization`, data),
   optimizeSheepProduction: (sheepId, data) => api.post(`/complete-ai-integration/sheep/${sheepId}/production-optimization`, data),
   optimizePigProduction: (pigId, data) => api.post(`/complete-ai-integration/pig/${pigId}/production-optimization`, data),
   
-  // Bulk AI Integration
+  // Bulk AI Integration,
   getAIIntegrationStatus: (params) => api.get('/complete-ai-integration/status', { params }),
   forceSyncAllAIIntegrations: (data) => api.post('/complete-ai-integration/force-sync', data),
   getAIModelInfo: () => api.get('/complete-ai-integration/model-info'),
@@ -4240,6 +3944,14 @@ export const equipmentExchangeAPI = {
 /** Glut Early-Warning API - oversupply risk detection.
  *  Real backend as of 2026-08-29: backend/src/routes/glutWarningRoutes.js */
 export const glutWarningAPI = {
+  getStatus: () => api.get('/glut-warning/status'),
+  getWarnings: (params) => api.get('/glut-warning/warnings', { params }),
+  createWarning: (data) => api.post('/glut-warning/warnings', data),
+  getWarning: (warningId) => api.get(`/glut-warning/warnings/${warningId}`),
+  acknowledgeWarning: (warningId) => api.post(`/glut-warning/warnings/${warningId}/acknowledge`),
+  getHistoricalGluts: (params) => api.get('/glut-warning/historical', { params }),
+  getGlutPrediction: (crop, region) => api.get('/glut-warning/prediction', { params: { crop, region } }),
+  getMitigationStrategies: (warningId) => api.get(`/glut-warning/warnings/${warningId}/strategies`),
   checkGlutRisk: (categoryId, stateId) => api.get('/glut-warning/check', { params: { categoryId, stateId } }),
   scanAllCategories: (stateId) => api.get('/glut-warning/scan', { params: { stateId } }),
 }
@@ -4247,6 +3959,14 @@ export const glutWarningAPI = {
 /** Seller Ranking API - DB-backed seller trust ranking.
  *  Real backend as of 2026-08-29: backend/src/routes/sellerRankingRoutes.js */
 export const sellerRankingAPI = {
+  getStatus: () => api.get('/seller-ranking/status'),
+  getSellers: (params) => api.get('/seller-ranking/sellers', { params }),
+  getSeller: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}`),
+  getSellerRanking: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/ranking`),
+  getSellerReviews: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/reviews`),
+  getSellerPerformance: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/performance`),
+  reportSeller: (sellerId, issue) => api.post(`/seller-ranking/sellers/${sellerId}/report`, { issue }),
+  getSellerBadges: (sellerId) => api.get(`/seller-ranking/sellers/${sellerId}/badges`),
   getRankedSellers: (params) => api.get('/seller-ranking/sellers', { params }),
   getSellerTrustScore: (userId) => api.get(`/seller-ranking/sellers/${userId}/trust-score`),
 }
@@ -4254,6 +3974,14 @@ export const sellerRankingAPI = {
 /** Civil Disruption / Blockade Response API.
  *  Real backend as of 2026-08-29: backend/src/routes/civilDisruptionRoutes.js */
 export const civilDisruptionAPI = {
+  getStatus: () => api.get('/civil-disruption/status'),
+  getDisruptions: (params) => api.get('/civil-disruption/disruptions', { params }),
+  createDisruption: (data) => api.post('/civil-disruption/disruptions', data),
+  getDisruption: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}`),
+  getImpactAssessment: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/impact`),
+  getMitigationPlans: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/mitigation`),
+  getRiskForecast: (region) => api.get('/civil-disruption/risk-forecast', { params: { region } }),
+  getAlternateRoutes: (disruptionId) => api.get(`/civil-disruption/disruptions/${disruptionId}/alternate-routes`),
   report: (data) => api.post('/civil-disruptions', data),
   listActive: (params) => api.get('/civil-disruptions/active', { params }),
   verify: (id) => api.post(`/civil-disruptions/${id}/verify`),
@@ -4277,6 +4005,15 @@ export const engineeringProjectAPI = {
  *  Real backend: backend/src/routes/realtimeMonitoringRoutes.js +
  *  services/legacy/realtimeMonitoringService.js. Platform-staff only. */
 export const realtimeMonitoringAPI = {
+  getStatus: () => api.get('/realtime-monitoring/status'),
+  startMonitor: (resourceType, resourceId) => api.post('/realtime-monitoring/start', { resource_type: resourceType, resource_id: resourceId }),
+  stopMonitor: (monitorId) => api.post(`/realtime-monitoring/stop/${monitorId}`),
+  getMonitors: () => api.get('/realtime-monitoring/monitors'),
+  getMonitorData: (monitorId) => api.get(`/realtime-monitoring/monitors/${monitorId}/data`),
+  getAlerts: () => api.get('/realtime-monitoring/alerts'),
+  acknowledgeAlert: (alertId) => api.post(`/realtime-monitoring/alerts/${alertId}/acknowledge`),
+  getSystemMetrics: () => api.get('/realtime-monitoring/metrics'),
+  configureThresholds: (thresholds) => api.post('/realtime-monitoring/thresholds', thresholds),
   startMonitoring: (resourceId, config) => api.post('/realtime-monitoring/monitors', { resourceId, config }),
   getAllMonitors: () => api.get('/realtime-monitoring/monitors'),
   getMonitoringStatus: (id) => api.get(`/realtime-monitoring/monitors/${id}`),
@@ -4308,12 +4045,20 @@ export const cooperativeShareAPI = {
  *  backend/src/routes/agriculturalIntelligenceRoutes.js +
  *  services/legacy/agriculturalIntelligenceService.js. */
 export const agriculturalIntelligenceAPI = {
+  getStatus: () => api.get('/agricultural-intelligence/status'),
   predictCropYield: (data) => api.post('/agri-intelligence/crop-yield/predict', data),
+  analyzeSoilHealth: (data) => api.post('/agricultural-intelligence/analyze/soil', data),
+  predictWeatherImpact: (data) => api.post('/agricultural-intelligence/predict/weather-impact', data),
+  detectPestRisk: (data) => api.post('/agricultural-intelligence/detect/pest-risk', data),
+  optimizeIrrigation: (data) => api.post('/agri-intelligence/irrigation/optimize', data),
+  getMarketIntelligence: (params) => api.get('/agricultural-intelligence/market', { params }),
+  getAIModels: () => api.get('/agricultural-intelligence/models'),
+  getModelPerformance: (modelId) => api.get(`/agricultural-intelligence/models/${modelId}/performance`),
+  trainModel: (modelType, data) => api.post(`/agricultural-intelligence/models/${modelType}/train`, data),
   analyzeSoil: (data) => api.post('/agri-intelligence/soil/analyze', data),
   getWeatherIntelligence: (location, timeframe) => api.get('/agri-intelligence/weather-intelligence', { params: { location, timeframe } }),
   predictPestOutbreak: (data) => api.post('/agri-intelligence/pest-outbreak/predict', data),
   recommendCrops: (data) => api.post('/agri-intelligence/crops/recommend', data),
-  optimizeIrrigation: (data) => api.post('/agri-intelligence/irrigation/optimize', data),
   recommendFertilizer: (data) => api.post('/agri-intelligence/fertilizer/recommend', data),
   getAgriculturalAnalytics: (params) => api.get('/agri-intelligence/analytics', { params }),
   healthCheck: () => api.get('/agri-intelligence/health'),
@@ -4357,14 +4102,20 @@ export const decisionSupportAPI = {
  *  environment, so execute/coordinate calls will 500 with a clear
  *  "not configured" message until a key is set. */
 export const aiAgentAPI = {
-  executeTask: (data) => api.post('/ai-agent/execute', data),
-  coordinateAgents: (data) => api.post('/ai-agent/coordinate', data),
+  getStatus: () => api.get('/ai-agents/status'),
+  getAgents: () => api.get('/ai-agents'),
+  createAgent: (data) => api.post('/ai-agents', data),
   getAgent: (agentName) => api.get(`/ai-agent/agent/${agentName}`),
+  executeTask: (data) => api.post('/ai-agent/execute', data),
+  getAgentPerformance: (agentId) => api.get(`/ai-agents/${agentId}/performance`),
+  getToolRegistry: () => api.get('/ai-agents/tools'),
+  registerTool: (data) => api.post('/ai-agent/tool', data),
+  getAgentLogs: (agentId) => api.get(`/ai-agents/${agentId}/logs`),
+  coordinateAgents: (data) => api.post('/ai-agent/coordinate', data),
   getAllAgents: () => api.get('/ai-agent/agents'),
   registerAgent: (data) => api.post('/ai-agent/agent', data),
   updateAgent: (agentName, data) => api.put(`/ai-agent/agent/${agentName}`, data),
   clearAgentMemory: (agentName) => api.delete(`/ai-agent/agent/${agentName}/memory`),
-  registerTool: (data) => api.post('/ai-agent/tool', data),
   getTools: () => api.get('/ai-agent/tools'),
   getHealth: () => api.get('/ai-agent/health'),
 }
@@ -4376,6 +4127,16 @@ export const aiAgentAPI = {
  *  unconfigured in this dev environment, so they'll 500 with a clear
  *  "not configured" message until a key is set. */
 export const aiBrainAPI = {
+  getStatus: () => api.get('/ai-brain/status'),
+  processPerception: (data) => api.post('/ai-brain/perception', data),
+  processAttention: (data) => api.post('/ai-brain/attention', data),
+  processReasoning: (data) => api.post('/ai-brain/reasoning', data),
+  processLearning: (data) => api.post('/ai-brain/learning', data),
+  processDecision: (data) => api.post('/ai-brain/decision', data),
+  processPlanning: (data) => api.post('/ai-brain/planning', data),
+  getKnowledgeGraph: () => api.get('/ai-brain/knowledge-graph'),
+  getMemoryState: () => api.get('/ai-brain/memory'),
+  getCognitiveLoad: () => api.get('/ai-brain/cognitive-load'),
   runCognitiveCycle: (data) => api.post('/ai-brain/cycle', data),
   runPerception: (data) => api.post('/ai-brain/perception', data),
   runAttention: (data) => api.post('/ai-brain/attention', data),
@@ -4399,13 +4160,20 @@ export const aiBrainAPI = {
  *  OPENAI_API_KEY - unconfigured in this dev environment, so they'll 500
  *  with a clear "not configured" message until a key is set. */
 export const aiSelfHealingAPI = {
+  getStatus: () => api.get('/ai-self-healing/status'),
+  detectErrors: () => api.post('/ai-self-healing/detect'),
+  analyzeRootCause: (errorId) => api.get(`/ai-self-healing/errors/${errorId}/root-cause`),
+  initiateRecovery: (errorId) => api.post(`/ai-self-healing/errors/${errorId}/recover`),
+  getRecoveryHistory: () => api.get('/ai-self-healing/history'),
+  getHealthMetrics: () => api.get('/ai-self-healing/health'),
+  getHealingPatterns: () => api.get('/ai-self-healing/patterns'),
+  configureAutoHealing: (config) => api.post('/ai-self-healing/configure', config),
   detectError: (data) => api.post('/ai-self-healing/detect', data),
   rootCauseAnalysis: (data) => api.post('/ai-self-healing/root-cause', data),
   executeRecovery: (data) => api.post('/ai-self-healing/recover', data),
   runHealingCycle: (data) => api.post('/ai-self-healing/heal', data),
   predictFailures: () => api.get('/ai-self-healing/predict'),
   getHealingHistory: (limit) => api.get('/ai-self-healing/history', { params: { limit } }),
-  getHealthMetrics: () => api.get('/ai-self-healing/health'),
   addErrorPattern: (data) => api.post('/ai-self-healing/pattern', data),
   addRecoveryStrategy: (data) => api.post('/ai-self-healing/strategy', data),
   getSystemState: () => api.get('/ai-self-healing/system-state'),
@@ -4421,13 +4189,21 @@ export const aiSelfHealingAPI = {
  *  predict calls need OPENAI_API_KEY - unconfigured in this dev environment,
  *  so they'll 500 with a clear "not configured" message until a key is set. */
 export const aiOperationIntelligenceAPI = {
+  getStatus: () => api.get('/ai-operation-intelligence/status'),
+  getPerformanceMetrics: () => api.get('/ai-operation-intelligence/performance'),
+  getOptimizationSuggestions: () => api.get('/ai-operation-intelligence/suggestions'),
+  detectAnomalies: () => api.get('/ai-operation-intelligence/anomalies'),
+  applyOptimization: (suggestionId) => api.post(`/ai-operation-intelligence/optimizations/${suggestionId}/apply`),
+  getRealtimeAlerts: () => api.get('/ai-operation-intelligence/alerts'),
+  getSystemHealth: () => api.get('/ai-operation-intelligence/health'),
+  getResourceUsage: () => api.get('/ai-operation-intelligence/resources'),
+  getCapacityForecast: () => api.get('/ai-operation-intelligence/capacity-forecast'),
   getMetrics: () => api.get('/ai-operation-intelligence/metrics'),
   analyzePerformance: (data) => api.post('/ai-operation-intelligence/analyze', data),
   recommendOptimizations: (data) => api.post('/ai-operation-intelligence/recommend', data),
   executeOptimizations: (data) => api.post('/ai-operation-intelligence/optimize', data),
   runOptimizationCycle: () => api.post('/ai-operation-intelligence/cycle'),
   predictOptimization: (horizon) => api.get('/ai-operation-intelligence/predict', { params: { horizon } }),
-  detectAnomalies: () => api.get('/ai-operation-intelligence/anomalies'),
   getContinuousImprovement: () => api.get('/ai-operation-intelligence/improvements'),
   getStrategies: () => api.get('/ai-operation-intelligence/strategies'),
   addStrategy: (data) => api.post('/ai-operation-intelligence/strategy', data),
@@ -4441,32 +4217,38 @@ export const aiOperationIntelligenceAPI = {
  *  Real backend: backend/src/routes/sapModuleArchitectureRoutes.js +
  *  services/legacy/sapModuleArchitectureService.js (all methods verified to exist). */
 export const sapModuleArchitectureAPI = {
-  // Module registry
-  getAllModules: () => api.get('/sap-module-architecture/modules'),
+  getStatus: () => api.get('/sap-module-architecture/status'),
+  getModules: () => api.get('/sap-module-architecture/modules'),
   getModule: (id) => api.get(`/sap-module-architecture/modules/${id}`),
-  getModulesByType: (type) => api.get(`/sap-module-architecture/modules/type/${type}`),
   registerModule: (data) => api.post('/sap-module-architecture/modules', data),
+  getDependencies: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/dependencies`),
+  getLifecycle: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/lifecycle`),
+  getConfiguration: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/configuration`),
+  getMTADescriptor: (moduleId) => api.get(`/sap-module-architecture/modules/${moduleId}/mta`),
+  deployModule: (moduleId) => api.post(`/sap-module-architecture/modules/${moduleId}/deploy`),
+  getAllModules: () => api.get('/sap-module-architecture/modules'),
+  getModulesByType: (type) => api.get(`/sap-module-architecture/modules/type/${type}`),
   updateModule: (id, data) => api.put(`/sap-module-architecture/modules/${id}`, data),
   deleteModule: (id) => api.delete(`/sap-module-architecture/modules/${id}`),
 
-  // Dependencies
+  // Dependencies,
   getModuleDependencies: (id) => api.get(`/sap-module-architecture/modules/${id}/dependencies`),
   getDependencyGraph: () => api.get('/sap-module-architecture/dependency-graph'),
   resolveDependencies: (id) => api.get(`/sap-module-architecture/modules/${id}/resolve-dependencies`),
 
-  // Configuration
+  // Configuration,
   getModuleConfiguration: (id) => api.get(`/sap-module-architecture/modules/${id}/configuration`),
   setModuleConfiguration: (id, data) => api.put(`/sap-module-architecture/modules/${id}/configuration`, data),
 
-  // Version management
+  // Version management,
   getModuleVersion: (id) => api.get(`/sap-module-architecture/modules/${id}/version`),
   updateModuleVersion: (id, version) => api.put(`/sap-module-architecture/modules/${id}/version`, { version }),
 
-  // Lifecycle
+  // Lifecycle,
   transitionModuleState: (id, newState) => api.post(`/sap-module-architecture/modules/${id}/transition`, { new_state: newState }),
   getModuleLifecycle: (id) => api.get(`/sap-module-architecture/modules/${id}/lifecycle`),
 
-  // Compatibility / MTA / overview
+  // Compatibility / MTA / overview,
   getModuleCompatibility: (id) => api.get(`/sap-module-architecture/modules/${id}/compatibility`),
   generateMTADescriptor: (id) => api.get(`/sap-module-architecture/modules/${id}/mta-descriptor`),
   getArchitectureOverview: () => api.get('/sap-module-architecture/overview'),
@@ -4478,46 +4260,51 @@ export const sapModuleArchitectureAPI = {
  *  Real backend: backend/src/routes/researchAndDevelopmentRoutes.js +
  *  services/legacy/researchAndDevelopmentService.js (all methods verified to exist). */
 export const researchAndDevelopmentAPI = {
-  // Projects
+  getStatus: () => api.get('/research-and-development/status'),
+  getProjects: (params) => api.get('/research-and-development/projects', { params }),
+  createProject: (data) => api.post('/research-and-development/projects', data),
+  getProject: (projectId) => api.get(`/research-and-development/projects/${projectId}`),
+  updateProject: (projectId, data) => api.put(`/research-and-development/projects/${projectId}`, data),
+  getCollaborations: (params) => api.get('/research-and-development/collaborations', { params }),
+  getInnovations: (params) => api.get('/research-and-development/innovations', { params }),
+  getPatents: (params) => api.get('/research-and-development/patents', { params }),
+  getFunding: (projectId) => api.get(`/research-and-development/projects/${projectId}/funding`),
+  getPublications: (params) => api.get('/research-and-development/publications', { params }),
+  getAIResearchAssistance: (query, context) => api.post('/research-and-development/ai-assistance', { query, context }),
+
+  // Knowledge base,
   getRDProjects: (params) => api.get('/research-and-development/projects', { params }),
   getRDProject: (projectId) => api.get(`/research-and-development/projects/${projectId}`),
   createRDProject: (data) => api.post('/research-and-development/projects', data),
   updateRDProject: (projectId, data) => api.put(`/research-and-development/projects/${projectId}`, data),
   deleteRDProject: (projectId) => api.delete(`/research-and-development/projects/${projectId}`),
 
-  // Milestones
+  // Milestones,
   addMilestone: (projectId, data) => api.post(`/research-and-development/projects/${projectId}/milestones`, data),
   updateMilestone: (projectId, milestoneId, data) => api.put(`/research-and-development/projects/${projectId}/milestones/${milestoneId}`, data),
 
-  // Collaborations
-  getCollaborations: (params) => api.get('/research-and-development/collaborations', { params }),
+  // Collaborations,
   createCollaboration: (data) => api.post('/research-and-development/collaborations', data),
 
-  // Innovations
-  getInnovations: (params) => api.get('/research-and-development/innovations', { params }),
+  // Innovations,
   createInnovation: (data) => api.post('/research-and-development/innovations', data),
 
-  // Patents
-  getPatents: (params) => api.get('/research-and-development/patents', { params }),
+  // Patents,
   createPatent: (data) => api.post('/research-and-development/patents', data),
 
-  // Funding
+  // Funding,
   getFundingOpportunities: (params) => api.get('/research-and-development/funding', { params }),
   createFundingOpportunity: (data) => api.post('/research-and-development/funding', data),
   applyForFunding: (fundingId, data) => api.post(`/research-and-development/funding/${fundingId}/apply`, data),
 
-  // Publications
-  getPublications: (params) => api.get('/research-and-development/publications', { params }),
+  // Publications,
   createPublication: (data) => api.post('/research-and-development/publications', data),
 
-  // AI research assistance
-  getAIResearchAssistance: (query, context) => api.post('/research-and-development/ai-assistance', { query, context }),
-
-  // Knowledge base
+  // AI research assistance,
   searchKnowledgeBase: (q, params) => api.get('/research-and-development/knowledge', { params: { q, ...params } }),
   addKnowledge: (data) => api.post('/research-and-development/knowledge', data),
 
-  // Analytics / health
+  // Analytics / health,
   getRDAnalytics: () => api.get('/research-and-development/analytics'),
   getHealthStatus: () => api.get('/research-and-development/health'),
 }
@@ -4529,38 +4316,42 @@ export const researchAndDevelopmentAPI = {
  *  fixed a route-ordering bug 2026-08-29 where GET /documents/search was
  *  shadowed by GET /documents/:documentId and unreachable). */
 export const informationSharingAPI = {
-  // Documents
+  getStatus: () => api.get('/information-sharing/status'),
   getDocuments: (params) => api.get('/information-sharing/documents', { params }),
-  getDocument: (documentId) => api.get(`/information-sharing/documents/${documentId}`),
   createDocument: (data) => api.post('/information-sharing/documents', data),
+  getDocument: (documentId) => api.get(`/information-sharing/documents/${documentId}`),
   updateDocument: (documentId, data) => api.put(`/information-sharing/documents/${documentId}`, data),
+  getFolders: (params) => api.get('/information-sharing/folders', { params }),
+  createFolder: (data) => api.post('/information-sharing/folders', data),
+
+  // Permissions,
+  getPermissions: (resourceId, resourceType) => api.get(`/information-sharing/permissions/${resourceId}`, { params: { resourceType } }),
+  setPermissions: (resourceId, permissions) => api.put(`/information-sharing/resources/${resourceId}/permissions`, permissions),
+  getSharingLinks: (documentId) => api.get(`/information-sharing/documents/${documentId}/links`),
+  createSharingLink: (data) => api.post('/information-sharing/sharing-links', data),
+  getCollaborationSessions: (params) => api.get('/information-sharing/collaboration-sessions', { params }),
+  startCollaboration: (documentId) => api.post(`/information-sharing/documents/${documentId}/collaboration`),
+  getAIRecommendations: (documentId) => api.get(`/information-sharing/documents/${documentId}/recommendations`),
   deleteDocument: (documentId) => api.delete(`/information-sharing/documents/${documentId}`),
   searchDocuments: (q, params) => api.get('/information-sharing/documents/search', { params: { q, ...params } }),
 
-  // Folders
-  getFolders: (params) => api.get('/information-sharing/folders', { params }),
+  // Folders,
   getFolderTree: (rootId) => api.get('/information-sharing/folders/tree', { params: rootId ? { rootId } : {} }),
-  createFolder: (data) => api.post('/information-sharing/folders', data),
-
-  // Permissions
-  getPermissions: (resourceId, resourceType) => api.get(`/information-sharing/permissions/${resourceId}`, { params: { resourceType } }),
   setPermission: (data) => api.post('/information-sharing/permissions', data),
   checkPermission: (resourceId, userId, permission) => api.get(`/information-sharing/permissions/${resourceId}/check/${userId}`, { params: { permission } }),
 
-  // Sharing links
-  createSharingLink: (data) => api.post('/information-sharing/sharing-links', data),
+  // Sharing links,
   accessSharingLink: (token) => api.get(`/information-sharing/sharing-links/access/${token}`),
 
-  // Collaboration sessions
-  getCollaborationSessions: (params) => api.get('/information-sharing/collaboration-sessions', { params }),
+  // Collaboration sessions,
   createCollaborationSession: (data) => api.post('/information-sharing/collaboration-sessions', data),
   joinCollaborationSession: (sessionId, userId) => api.post(`/information-sharing/collaboration-sessions/${sessionId}/join`, { userId }),
   endCollaborationSession: (sessionId) => api.post(`/information-sharing/collaboration-sessions/${sessionId}/end`),
 
-  // AI recommendations
+  // AI recommendations,
   generateAIRecommendations: (userId, context) => api.post('/information-sharing/ai-recommendations', { userId, context }),
 
-  // Activity logs / analytics / health
+  // Activity logs / analytics / health,
   getActivityLogs: (resourceId) => api.get(`/information-sharing/activity-logs/${resourceId}`),
   getAnalytics: () => api.get('/information-sharing/analytics'),
   getHealthStatus: () => api.get('/information-sharing/health'),
@@ -4582,4 +4373,62 @@ export const strategicAPI = {
   },
 }
 
+/** Escrow (M697100_ESCROW). No dedicated mounted route found - calls the
+ * generic backend-module bridge; verify against the module's service.js
+ * before relying on this in production. */
+export const escrowAPI = {
+  list: (params) => api.get('/backend-modules/M697100_ESCROW/list', { params }),
+  release: (escrowId, data) => api.post(`/backend-modules/M697100_ESCROW/release/${escrowId}`, data),
+  refund: (escrowId, data) => api.post(`/backend-modules/M697100_ESCROW/refund/${escrowId}`, data),
+}
+
+/** Farmer Value / Season Ledger (M844100_FARMERVALUE). No dedicated mounted
+ * route found - calls the generic backend-module bridge; verify against the
+ * module's service.js before relying on this in production. */
+export const farmerValueAPI = {
+  getSeasonLedger: (farmerId, season) => api.get(`/backend-modules/M844100_FARMERVALUE/getSeasonLedger/${farmerId}`, { params: { season } }),
+}
+
+/** Generic dashboard stats. No backend route found. */
+export const dashboardAPI = {
+  getStats: () => api.get('/dashboard/stats'),
+}
+
+/** Generic user profile/address management. No backend route found -
+ * userManagementAPI (auth-backed) may already cover this; verify before use. */
+export const userAPI = {
+  getProfile: () => api.get('/users/profile'),
+  updateProfile: (data) => api.put('/users/profile', data),
+  getAddresses: () => api.get('/users/addresses'),
+  addAddress: (data) => api.post('/users/addresses', data),
+}
+
+/** Payment Gateway (M3100_OFFLINEPAYMENT covers offline only). No dedicated
+ * online payment-gateway route found. */
+export const paymentGatewayAPI = {
+  getSupportedGateways: () => api.get('/payment-gateway/gateways'),
+  processPayment: (data) => api.post('/payment-gateway/process', data),
+  getPaymentStatus: (paymentId) => api.get(`/payment-gateway/status/${paymentId}`),
+  refundPayment: (paymentId, data) => api.post(`/payment-gateway/${paymentId}/refund`, data),
+}
+
+/** Public data source extraction/registry. No backend route found. */
+export const publicDataAPI = {
+  listSources: () => api.get('/public-data/sources'),
+  registerSource: (data) => api.post('/public-data/sources', data),
+  extract: (sourceId, params) => api.post(`/public-data/sources/${sourceId}/extract`, params),
+}
+
+/** Generic transaction history. No dedicated mounted route found. */
+export const transactionAPI = {
+  getUserTransactions: (params) => api.get('/transactions', { params }),
+}
+
+/** Global/advanced search across products/knowledge entries. No dedicated
+ * mounted route found. */
+export const searchAPI = {
+  search: (params) => api.get('/search', { params }),
+}
+
+export { api }
 export default api

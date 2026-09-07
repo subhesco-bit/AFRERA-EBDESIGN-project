@@ -11,7 +11,7 @@
  * - Market Basket Analysis
  */
 
-const ecommerceaiBackboneService = require('../services/legacy/ecommerceaiBackboneService');
+const ecommerceaiBackboneService = require('../services/legacy/ecommerceAIService');
 const { logger } = require('../utils/logger');
 
 // ============================================================================
