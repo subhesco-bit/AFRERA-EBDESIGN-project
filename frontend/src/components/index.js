@@ -1,0 +1,36 @@
+// Auto-generated index file - exports all module contents
+
+export { default as AdvancedPageShell } from './AdvancedPageShell';
+export * from './AdvancedPageShell';
+export { default as AIImageGenerator } from './AIImageGenerator';
+export * from './AIImageGenerator';
+export { default as BottomNav } from './BottomNav';
+export * from './BottomNav';
+export { default as ErrorBoundary } from './ErrorBoundary';
+export * from './ErrorBoundary';
+export { default as Footer } from './Footer';
+export * from './Footer';
+export { default as Header } from './Header';
+export * from './Header';
+export { default as Layout } from './Layout';
+export * from './Layout';
+export { default as MobileOptimizedLayout } from './MobileOptimizedLayout';
+export * from './MobileOptimizedLayout';
+export { default as NotificationBell } from './NotificationBell';
+export * from './NotificationBell';
+export { default as PlaceholderPage } from './PlaceholderPage';
+export * from './PlaceholderPage';
+export { default as ProtectedRoute } from './ProtectedRoute';
+export * from './ProtectedRoute';
+export { default as RouteAnalytics } from './RouteAnalytics';
+export * from './RouteAnalytics';
+export { default as RouteErrorBoundary } from './RouteErrorBoundary';
+export * from './RouteErrorBoundary';
+export { default as RouteGuard } from './RouteGuard';
+export * from './RouteGuard';
+export { default as RouteLoading } from './RouteLoading';
+export * from './RouteLoading';
+export { default as RouteTransition } from './RouteTransition';
+export * from './RouteTransition';
+export { default as Sidebar } from './Sidebar';
+export * from './Sidebar';

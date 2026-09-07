@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Crop Variety Management (M064)
+-- Define tables and indexes here

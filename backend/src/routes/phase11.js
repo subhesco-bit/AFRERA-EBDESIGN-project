@@ -1,0 +1,14 @@
+const router = require('express').Router();
+const p11 = require('../services/phase11');
+const auth = require('../middleware/auth');
+router.post('/sso/:id', auth, async (req, res) => { try { res.json(await p11.sso(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/mfa/:id', auth, async (req, res) => { try { res.json(await p11.mfa(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/ldap/:id', auth, async (req, res) => { try { res.json(await p11.ldap(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/oauth/:id', auth, async (req, res) => { try { res.json(await p11.oauth(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/backup/:id', auth, async (req, res) => { try { res.json(await p11.backup(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/monitoring/:id', auth, async (req, res) => { try { res.json(await p11.monitoring(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/logging/:id', auth, async (req, res) => { try { res.json(await p11.logging(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/cdn/:id', auth, async (req, res) => { try { res.json(await p11.cdn(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/scaling/:id', auth, async (req, res) => { try { res.json(await p11.scaling(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/loadbalancer/:id', auth, async (req, res) => { try { res.json(await p11.loadbalancer(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+module.exports = router;

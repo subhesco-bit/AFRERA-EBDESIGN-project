@@ -1,0 +1,36 @@
+-- ============================================================================
+-- 9998_cold_storage_booking_trigger_fix.sql
+--
+-- BUG (found while building coldStorageRoutes.js real booking logic):
+-- migrations run in filename string-sort order (see database/migrate.js's
+-- `.sort()` over readdirSync). "3104_cold_storage_schema.sql" sorts BEFORE
+-- "994_recovered_capabilities.sql" (string compare: '3' < '9'), so the
+-- UUID/facility_id-shaped cold_storage_bookings table from 3104 is created
+-- FIRST. 994's own `CREATE TABLE IF NOT EXISTS cold_storage_bookings (...)`
+-- (a different, SERIAL/bay_id-shaped table) is therefore a no-op — but its
+-- `CREATE TRIGGER trg_bay_capacity BEFORE INSERT OR UPDATE ON
+-- cold_storage_bookings` is NOT conditional on the table being the one it
+-- expects, and attaches unconditionally to whatever cold_storage_bookings
+-- table actually exists (the 3104 one).
+--
+-- assert_bay_capacity() references NEW.bay_id, NEW.quantity_kg and status
+-- values ('reserved','confirmed','in_use') that do not exist on the 3104
+-- schema (which has facility_id, quantity_units, and status IN ('booked',
+-- 'checked_in','checked_out','cancelled')). PL/pgSQL binds record-field
+-- references lazily, on first invocation — so this passes migration time and
+-- boot time cleanly, and only fails at the moment a real row is inserted,
+-- with `record "new" has no field "bay_id"`. That is exactly what
+-- coldStorageRoutes.js's booking endpoint now does on every call.
+--
+-- FIX: detach the trigger from cold_storage_bookings. The bay/trigger design
+-- in 994 was written for a table shape that never actually materialized (it
+-- lost the migration-order race); the 3104 facility/booking schema is the
+-- one coldStorageRoutes.js is built against, and its capacity rule is
+-- enforced in application code instead (sum of overlapping-window bookings
+-- vs capacity_units — see coldStorageRoutes.js's checkFacilityCapacity()).
+-- cold_storage_bays is left in place (harmless and simply unused) rather
+-- than dropped, since dropping a table is not reversible and nothing here
+-- requires it gone — only the trigger needs neutralizing.
+-- ============================================================================
+
+DROP TRIGGER IF EXISTS trg_bay_capacity ON cold_storage_bookings;

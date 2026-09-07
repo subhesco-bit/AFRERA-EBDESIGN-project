@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Crop Calendar (M062)
+-- Define tables and indexes here

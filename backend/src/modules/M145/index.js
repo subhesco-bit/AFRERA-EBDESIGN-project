@@ -1,0 +1,2 @@
+﻿// M145 - Polyhouse Management
+module.exports = { controller: require('./controller'), service: require('./service') };

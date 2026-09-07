@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Horticulture Analytics (M150)
+-- Define tables and indexes here

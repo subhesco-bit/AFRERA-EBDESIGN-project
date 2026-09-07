@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #faf8f3; }
+    a { color: #1a5f3a; } a:hover { color: #0f3a23; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="padding: 40px; max-width: 1200px; margin: 0 auto;">
+  <h1 style="margin: 0 0 32px 0; color: #1f2937; font-size: 28px; font-weight: 700;">Enhanced Product Card v2.0</h1>
+
+  <!-- Two-column layout: Standard vs GI variant -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px;">
+
+    <!-- STANDARD PRODUCT CARD (DEFAULT STATE) -->
+    <div>
+      <h2 style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Standard Product (Default)</h2>
+
+      <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: all 0.2s ease;">
+        <!-- Image Section -->
+        <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">
+          High-quality Product Image
+        </div>
+
+        <!-- Content Section -->
+        <div style="padding: 16px;">
+          <!-- Seller Identity Row (NEW) -->
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #d4a942 0%, #b8941a 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">F</div>
+            <div style="flex: 1;">
+              <div style="color: #1f2937; font-weight: 600; font-size: 14px;">Farmer Name</div>
+              <div style="color: #6b7280; font-size: 12px;">Assam Valley, India</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 2px;">
+              <span style="color: #d4a942; font-size: 12px;">★</span>
+              <span style="color: #1f2937; font-weight: 600; font-size: 13px;">4.8</span>
+            </div>
+          </div>
+
+          <!-- Product Name & Description -->
+          <h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Organic Basmati Rice</h3>
+          <p style="margin: 0 0 12px 0; color: #6b7280; font-size: 13px; line-height: 1.4;">Premium long-grain basmati with authentic aroma and superior taste</p>
+
+          <!-- Trust Badges Row (NEW) -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+            <div style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #ecfdf5; border-radius: 4px; border: 1px solid #d1fae5;">
+              <span style="font-size: 11px;">🌿</span>
+              <span style="color: #059669; font-size: 11px; font-weight: 500;">Organic</span>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #fef3c7; border-radius: 4px; border: 1px solid #fde68a;">
+              <span style="font-size: 11px;">✓</span>
+              <span style="color: #92400e; font-size: 11px; font-weight: 500;">Verified</span>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f3f4f6; border-radius: 4px; border: 1px solid #e5e7eb;">
+              <span style="font-size: 11px;">🤝</span>
+              <span style="color: #374151; font-size: 11px; font-weight: 500;">Fair-Trade</span>
+            </div>
+          </div>
+
+          <!-- FOLU Section (NEW) -->
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px; background: #f0fdf4; border-radius: 6px; border-left: 3px solid #1a5f3a; margin-bottom: 12px;">
+            <span style="font-size: 14px;">📍</span>
+            <div style="flex: 1;">
+              <div style="color: #1a5f3a; font-size: 12px; font-weight: 600;">Origin Verified</div>
+              <div style="color: #6b7280; font-size: 11px;">Traced to Assam Valley Farm</div>
+            </div>
+          </div>
+
+          <!-- Price & Actions -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+            <div>
+              <div style="color: #6b7280; font-size: 11px; font-weight: 500;">Price per kg</div>
+              <div style="color: #1a5f3a; font-size: 18px; font-weight: 700;">₹450</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button style="padding: 8px 12px; background: white; border: 1px solid #1a5f3a; color: #1a5f3a; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer;">💚 Save</button>
+              <button style="padding: 8px 12px; background: #1a5f3a; color: white; border: none; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer;">Add to Cart</button>
+            </div>
+          </div>
+
+          <!-- Footer Stats (Optional) -->
+          <div style="display: flex; justify-content: space-around; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f3f4f6; text-align: center;">
+            <div style="color: #6b7280; font-size: 11px;">
+              <div style="color: #1f2937; font-weight: 600; font-size: 13px;">1.2k</div>
+              <div>Sold this month</div>
+            </div>
+            <div style="color: #6b7280; font-size: 11px;">
+              <div style="color: #1f2937; font-weight: 600; font-size: 13px;">2-3 days</div>
+              <div>Ships within</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GI PRODUCT CARD (HOVER STATE) -->
+    <div>
+      <h2 style="margin: 0 0 16px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">GI Product (Hover State)</h2>
+
+      <div style="border: 2px solid #d4a942; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 4px 12px rgba(212, 169, 66, 0.15); transition: all 0.2s ease; transform: translateY(-4px);">
+        <!-- GI Badge Overlay (NEW) -->
+        <div style="position: relative; width: 100%; height: 200px; background: linear-gradient(135deg, #d4a942 0%, #b8941a 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 500; overflow: hidden;">
+          <div style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.95); padding: 6px 10px; border-radius: 4px; display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #92400e;">
+            🏆 GI Protected
+          </div>
+          High-quality GI Product Image
+        </div>
+
+        <!-- Content Section -->
+        <div style="padding: 16px;">
+          <!-- Seller Identity Row -->
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6;">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #d4a942 0%, #b8941a 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">A</div>
+            <div style="flex: 1;">
+              <div style="color: #1f2937; font-weight: 600; font-size: 14px;">Assam Tea Cooperative</div>
+              <div style="color: #6b7280; font-size: 12px;">Assam, India • 8 yrs</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 2px;">
+              <span style="color: #d4a942; font-size: 12px;">★★★★★</span>
+            </div>
+          </div>
+
+          <!-- Product Name & Description -->
+          <h3 style="margin: 0 0 6px 0; color: #1f2937; font-size: 16px; font-weight: 600;">Darjeeling First Flush Tea</h3>
+          <p style="margin: 0 0 12px 0; color: #6b7280; font-size: 13px; line-height: 1.4;">Exquisite GI-protected tea with distinctive muscatel flavor from Nepal's foothills</p>
+
+          <!-- Trust Badges Row (Enhanced for GI) -->
+          <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+            <div style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #fef3c7; border-radius: 4px; border: 1px solid #fde68a;">
+              <span style="font-size: 11px;">🏆</span>
+              <span style="color: #92400e; font-size: 11px; font-weight: 500;">GI Certified</span>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #ecfdf5; border-radius: 4px; border: 1px solid #d1fae5;">
+              <span style="font-size: 11px;">🌿</span>
+              <span style="color: #059669; font-size: 11px; font-weight: 500;">Organic</span>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: #fef3c7; border-radius: 4px; border: 1px solid #fde68a;">
+              <span style="font-size: 11px;">✓</span>
+              <span style="color: #92400e; font-size: 11px; font-weight: 500;">Top Seller</span>
+            </div>
+          </div>
+
+          <!-- FOLU Section with Enhanced Traceability -->
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px; background: #fef3c7; border-radius: 6px; border-left: 3px solid #d4a942; margin-bottom: 12px;">
+            <span style="font-size: 14px;">📍</span>
+            <div style="flex: 1;">
+              <div style="color: #92400e; font-size: 12px; font-weight: 600;">Farm-to-Origin Certified</div>
+              <div style="color: #6b7280; font-size: 11px;">Darjeeling Estate, Nepal • View farm ↗</div>
+            </div>
+          </div>
+
+          <!-- Price & Actions (Premium Pricing Indicator) -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+            <div>
+              <div style="color: #6b7280; font-size: 11px; font-weight: 500;">Premium Price</div>
+              <div style="color: #d4a942; font-size: 18px; font-weight: 700;">₹850</div>
+              <div style="color: #059669; font-size: 11px; font-weight: 500;">+15% GI premium</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button style="padding: 8px 12px; background: white; border: 2px solid #d4a942; color: #d4a942; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer;">💛 Save</button>
+              <button style="padding: 8px 12px; background: #d4a942; color: white; border: none; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer;">Add to Cart</button>
+            </div>
+          </div>
+
+          <!-- Footer Stats -->
+          <div style="display: flex; justify-content: space-around; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f3f4f6; text-align: center;">
+            <div style="color: #6b7280; font-size: 11px;">
+              <div style="color: #1f2937; font-weight: 600; font-size: 13px;">5.8k</div>
+              <div>Sold this month</div>
+            </div>
+            <div style="color: #6b7280; font-size: 11px;">
+              <div style="color: #1f2937; font-weight: 600; font-size: 13px;">1-2 days</div>
+              <div>Ships within</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend/Key Features -->
+  <div style="margin-top: 48px; padding: 24px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+    <h3 style="margin: 0 0 16px 0; color: #1f2937; font-size: 14px; font-weight: 600;">Key Enhancements</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ Seller Identity Integration</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>Seller avatar with initials</li>
+          <li>Business name and location</li>
+          <li>Years as seller indicator</li>
+          <li>Star rating display</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ Trust & Certifications</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>Organic certification badge</li>
+          <li>GI (Geographical Indication)</li>
+          <li>Fair-trade certification</li>
+          <li>Verified seller status</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ FOLU Transparency</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>Origin Verified badge</li>
+          <li>Farm location info</li>
+          <li>Traceability link</li>
+          <li>Land-use certification</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color: #1a5f3a; font-weight: 600; margin-bottom: 8px;">✓ Engagement Metrics</div>
+        <ul style="margin: 0; padding-left: 20px; color: #6b7280; font-size: 13px; line-height: 1.6;">
+          <li>Sales volume (this month)</li>
+          <li>Shipping speed</li>
+          <li>Review count implied</li>
+          <li>Wishlist save button</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

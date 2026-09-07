@@ -1,0 +1,19 @@
+-- Phase 7: Advanced P3 Services
+CREATE TABLE blockchain_records (id UUID PRIMARY KEY, product_id UUID, from_address VARCHAR(255), to_address VARCHAR(255), created_at TIMESTAMP);
+CREATE TABLE iot_readings (id UUID PRIMARY KEY, sensor_id UUID, reading_value NUMERIC, created_at TIMESTAMP);
+CREATE TABLE automation_logs (id UUID PRIMARY KEY, workflow_id UUID, params JSONB, status VARCHAR(50), created_at TIMESTAMP);
+CREATE TABLE biometric_logs (id UUID PRIMARY KEY, user_id UUID, biometric_type VARCHAR(50), verified BOOLEAN, created_at TIMESTAMP);
+CREATE TABLE video_analyses (id UUID PRIMARY KEY, video_id UUID, analysis_type VARCHAR(100), result JSONB, created_at TIMESTAMP);
+CREATE TABLE ar_experiences (id UUID PRIMARY KEY, product_id UUID, model_data JSONB, created_at TIMESTAMP);
+CREATE TABLE vr_spaces (id UUID PRIMARY KEY, space_name VARCHAR(255), space_data JSONB, created_at TIMESTAMP);
+CREATE TABLE ml_models (id UUID PRIMARY KEY, model_id UUID, training_data JSONB, accuracy NUMERIC, created_at TIMESTAMP);
+CREATE TABLE nlp_analyses (id UUID PRIMARY KEY, text TEXT, sentiment VARCHAR(50), created_at TIMESTAMP);
+CREATE TABLE charts (id UUID PRIMARY KEY, data_id UUID, chart_type VARCHAR(100), created_at TIMESTAMP);
+CREATE INDEX idx_blockchain_product ON blockchain_records(product_id);
+CREATE INDEX idx_iot_sensor ON iot_readings(sensor_id);
+CREATE INDEX idx_automation_workflow ON automation_logs(workflow_id);
+CREATE INDEX idx_biometric_user ON biometric_logs(user_id);
+CREATE INDEX idx_video_analysis ON video_analyses(video_id);
+CREATE INDEX idx_ar_product ON ar_experiences(product_id);
+CREATE INDEX idx_ml_model ON ml_models(model_id);
+CREATE INDEX idx_chart_data ON charts(data_id);

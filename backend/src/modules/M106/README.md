@@ -1,0 +1,1 @@
+﻿# M106 - M106 Module\n\nAuto-generated module template. Domain: TBD.\n\nFiles: controller.js, service.js, routes.js, migrations/3000_M106_generated.sql\n

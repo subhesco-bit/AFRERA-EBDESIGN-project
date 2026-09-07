@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Nursery Management (M066)
+-- Define tables and indexes here

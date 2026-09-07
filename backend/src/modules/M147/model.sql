@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Aeroponics Management (M147)
+-- Define tables and indexes here

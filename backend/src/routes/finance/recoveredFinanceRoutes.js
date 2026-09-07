@@ -1,0 +1,166 @@
+/**
+ * Routes for finance and compliance logic recovered from v42/v44.
+ * Backed by services/recoveredFinanceService.js and migration 053.
+ *
+ * Writes are authenticated throughout. A ledger entry, a warehouse receipt and
+ * a risk event are all attributions — an unattributed one cannot be questioned
+ * later, which defeats the purpose of recording it.
+ */
+
+'use strict';
+
+const express = require('express');
+const Joi = require('joi');
+
+const router = express.Router();
+const fin = require('../../services/finance/recoveredFinanceService');
+const { authMiddleware } = require('../../middleware/auth');
+const { resolveFarmerId } = require('../../middleware/resolveFarmerId');
+const { validateBody } = require('../../middleware/inputValidation');
+
+function fail(res, error) {
+  const bad = /required|must|Unknown|No GST rule|differ/i.test(error.message);
+  res.status(bad ? 400 : 500).json({ success: false, error: error.message });
+}
+
+// ---- GST (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -
+//
+// fin.gstFor()/buildInvoice() were a second, independent GST-rate authority
+// alongside the canonical, HSN-driven gstService.resolveGSTRate(), which also
+// handles the branded/unbranded staple-tax split these two functions do not.
+// No frontend caller was found for either route. Deprecated rather than
+// deleted — recoveredFinanceService.gstFor()/buildInvoice() themselves are
+// untouched so this is reversible if something unknown depended on them.
+
+function deprecatedFinance(canonicalPath) {
+  return (req, res) => res.status(410).json({
+    success: false,
+    error: 'This endpoint is deprecated: it was a duplicate financial authority found by a cross-module integrity audit, with no confirmed frontend caller.',
+    canonical: canonicalPath,
+    deprecatedOn: '2026-08-15',
+    reference: "AFRERA_CLAUDE_BUILD_DIRECTIVE.md, Part 3C",
+  });
+}
+
+router.get('/gst/classify', deprecatedFinance('/api/v1/gst (gstService.resolveGSTRate)'));
+router.post('/gst/invoice', authMiddleware, deprecatedFinance('/api/v1/gst (gstService.generateGSTInvoice)'));
+
+// ---- Ledger (DEPRECATED 2026-08-15 — see AFRERA_CLAUDE_BUILD_DIRECTIVE.md Part 3C) -
+//
+// fin.appendLedgerEntry()/trialBalance()/verifyLedger() posted to a second,
+// fully disconnected hash-chained ledger (gl_ledger_chain) alongside the
+// canonical journal_entries/journal_lines ledger that GST, AF-AA, AF-CO and
+// AF-PS all actually post to. No frontend caller was found. Deprecated
+// rather than deleted for the same reversibility reason as above.
+
+router.post('/ledger/entry', authMiddleware, deprecatedFinance('/api/v1/ledger (the canonical journal_entries/journal_lines ledger)'));
+router.get('/ledger/trial-balance', authMiddleware, deprecatedFinance('/api/v1/ledger/trial-balance'));
+router.get('/ledger/verify', authMiddleware, deprecatedFinance('/api/v1/ledger/verify'));
+
+// ---- Schemes ---------------------------------------------------------------
+
+router.get('/schemes/match', async (req, res) => {
+  try {
+    const { projectType, state } = req.query;
+    if (!projectType) throw new Error('projectType is required');
+    res.json({ success: true, data: await fin.matchSchemes(projectType, state) });
+  } catch (e) { fail(res, e); }
+});
+
+// ---- eNWR ------------------------------------------------------------------
+
+// M5 (FIXES.md): joi-validated body, matching the shape actually consumed by
+// recoveredFinanceService.issueEnwr().
+const enwrIssueSchema = Joi.object({
+  bookingId: Joi.alternatives(Joi.string(), Joi.number()).allow(null),
+  facilityId: Joi.alternatives(Joi.string(), Joi.number()).allow(null),
+  farmerId: Joi.alternatives(Joi.string(), Joi.number()).allow(null),
+  commodity: Joi.string().allow('', null),
+  quantityQtl: Joi.number().positive().required(),
+  estimatedValueInr: Joi.number().positive().required(),
+  haircutPct: Joi.number().min(0).max(100).allow(null),
+  validUntil: Joi.alternatives(Joi.date(), Joi.string()).allow(null)
+});
+
+router.post('/enwr/issue', authMiddleware, validateBody(enwrIssueSchema), async (req, res) => {
+  try {
+    res.json({ success: true, data: await fin.issueEnwr({ ...req.body, issuedBy: req.user?.id }) });
+  } catch (e) { fail(res, e); }
+});
+
+// "Bank Passport" — added 2026-08-15. issueEnwr() had no way to list what
+// had been issued; a lender-facing evidence view needs this to exist at all.
+router.get('/enwr/my-receipts', authMiddleware, resolveFarmerId, async (req, res) => {
+  try {
+    res.json({ success: true, data: await fin.listMyEnwrReceipts(req.farmerId) });
+  } catch (e) { fail(res, e); }
+});
+
+// ---- Freight ---------------------------------------------------------------
+
+router.get('/freight/rate', async (req, res) => {
+  try {
+    const { km, class: cls, utilisation } = req.query;
+    if (!km || !cls) throw new Error('km and class are required');
+    res.json({
+      success: true,
+      data: await fin.freightRate({
+        laneKm: Number(km),
+        classKey: cls,
+        utilisationPct: utilisation === undefined ? null : Number(utilisation),
+      }),
+    });
+  } catch (e) { fail(res, e); }
+});
+
+// ---- Subsidy + risk --------------------------------------------------------
+
+router.get('/subsidy/equipment', async (req, res) => {
+  try {
+    const { price, tier } = req.query;
+    if (!price) throw new Error('price is required');
+    res.json({ success: true, data: await fin.equipmentSubsidy(Number(price), tier || 'general') });
+  } catch (e) { fail(res, e); }
+});
+
+// M5 (FIXES.md): joi-validated body, matching the shape actually consumed by
+// recoveredFinanceService.recordRiskEvent().
+const riskEventSchema = Joi.object({
+  partyId: Joi.alternatives(Joi.string(), Joi.number()).required(),
+  partyType: Joi.string().allow('', null),
+  eventType: Joi.string().required(),
+  weight: Joi.number().allow(null),
+  reference: Joi.string().allow('', null),
+  detail: Joi.string().allow('', null)
+});
+
+router.post('/risk/event', authMiddleware, validateBody(riskEventSchema), async (req, res) => {
+  try {
+    const b = req.body || {};
+    res.json({ success: true, data: await fin.recordRiskEvent(b) });
+  } catch (e) { fail(res, e); }
+});
+
+// M3 (FIXES.md, IDOR): partyRisk is a financial risk profile keyed by
+// party_id (party_type defaults to 'user' in recordRiskEvent above), not
+// farmer-specific data — there's no 'lender'/'bank' role anywhere else in
+// this codebase to gate on (grepped: only 'admin'/'superadmin' privileged
+// checks exist, e.g. marketplaceEnhancements.js, insuranceEnhancements.js,
+// farmerPortalEnhancements.js), so this mirrors that same
+// req.user.role === 'admin' bypass pattern rather than inventing a role that
+// doesn't exist elsewhere. Non-admins may only view their own risk profile.
+router.get('/risk/:partyId', authMiddleware, async (req, res) => {
+  const isPrivileged = req.user && (req.user.role === 'admin' || req.user.role === 'superadmin');
+  if (!isPrivileged && String(req.params.partyId) !== String(req.user?.id)) {
+    return res.status(403).json({ success: false, error: 'You may only view your own risk profile' });
+  }
+  try { res.json({ success: true, data: await fin.partyRisk(req.params.partyId) }); } catch (e) { fail(res, e); }
+});
+
+router.get('/certificates/expiring', authMiddleware, async (req, res) => {
+  try {
+    res.json({ success: true, data: await fin.certExpiryAlerts(Number(req.query.days) || 120) });
+  } catch (e) { fail(res, e); }
+});
+
+module.exports = router;

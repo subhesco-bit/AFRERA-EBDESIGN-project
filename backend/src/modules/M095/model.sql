@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Machinery Operations (M095)
+-- Define tables and indexes here

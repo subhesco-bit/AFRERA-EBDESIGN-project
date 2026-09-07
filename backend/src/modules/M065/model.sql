@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Seed Planning (M065)
+-- Define tables and indexes here

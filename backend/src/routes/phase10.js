@@ -1,0 +1,14 @@
+const router = require('express').Router();
+const p10 = require('../services/phase10');
+const auth = require('../middleware/auth');
+router.post('/erp/:id', auth, async (req, res) => { try { res.json(await p10.erp(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/crm/:id', auth, async (req, res) => { try { res.json(await p10.crm(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/payment/:id', auth, async (req, res) => { try { res.json(await p10.payment(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/logistics/:id', auth, async (req, res) => { try { res.json(await p10.logistics(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/accounting/:id', auth, async (req, res) => { try { res.json(await p10.accounting(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/email/:id', auth, async (req, res) => { try { res.json(await p10.email(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/sms/:id', auth, async (req, res) => { try { res.json(await p10.sms(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/whatsapp/:id', auth, async (req, res) => { try { res.json(await p10.whatsapp(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/maps/:id', auth, async (req, res) => { try { res.json(await p10.maps(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+router.post('/webhooks/:id', auth, async (req, res) => { try { res.json(await p10.webhooks(req.params.id)); } catch (e) { res.status(500).json({ error: e.message }); } });
+module.exports = router;

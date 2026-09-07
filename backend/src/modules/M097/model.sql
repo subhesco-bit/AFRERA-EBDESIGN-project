@@ -1,0 +1,2 @@
+﻿-- SQL model placeholder for Input Consumption (M097)
+-- Define tables and indexes here

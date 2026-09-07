@@ -1,0 +1,74 @@
+{
+  "totalFiles": 4808,
+  "byType": {
+    "js": 2057,
+    "jsx": 1238,
+    "ts": 1,
+    "tsx": 0,
+    "json": 251,
+    "md": 418,
+    "sql": 497,
+    "yml": 6,
+    "yaml": 7,
+    "css": 160,
+    "html": 168,
+    "env*": 0,
+    "sh": 4,
+    "py": 1
+  },
+  "byPurpose": {
+    "Backend Services": {
+      "count": 300,
+      "purpose": "Business logic implementation"
+    },
+    "API Routes": {
+      "count": 233,
+      "purpose": "REST API endpoints"
+    },
+    "Database Migrations": {
+      "count": 413,
+      "purpose": "Schema and data migrations"
+    },
+    "Frontend Pages": {
+      "count": 386,
+      "purpose": "User interface pages"
+    },
+    "Frontend Components": {
+      "count": 367,
+      "purpose": "Reusable UI components"
+    },
+    "Middleware": {
+      "count": 23,
+      "purpose": "Request/response processing"
+    },
+    "Database Models": {
+      "count": 5,
+      "purpose": "ORM/data models"
+    },
+    "Utilities": {
+      "count": 10,
+      "purpose": "Helper functions and utilities"
+    },
+    "Tests": {
+      "count": 0,
+      "purpose": "Unit and integration tests"
+    },
+    "Documentation": {
+      "count": 0,
+      "purpose": "Project documentation"
+    },
+    "Configuration": {
+      "count": 0,
+      "purpose": "Application configuration"
+    },
+    "Library & Modules": {
+      "count": 109,
+      "purpose": "Module documentation and catalog"
+    }
+  },
+  "fileMap": {},
+  "dependencies": {},
+  "unconnected": [],
+  "connected": [],
+  "stats": {}
+}

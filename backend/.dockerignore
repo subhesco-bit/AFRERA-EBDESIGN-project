@@ -1,0 +1,42 @@
+# Keep the Docker build context small and secret-free. Only package*.json and
+# src/ are ever COPY'd by the Dockerfile - everything below is either
+# reinstalled fresh in-image (node_modules), irrelevant to the build
+# (reports/logs/docs), or must never reach a build context at all (.env*).
+
+# Dependencies (npm ci reinstalls these fresh inside the image)
+node_modules/
+
+# VCS
+.git/
+.gitignore
+
+# Env files / secrets - never send these to the Docker daemon
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Generated reports and test artifacts (large, build-irrelevant)
+eslint-report.json
+jest-target-results.json
+coverage/
+openapi.json
+service_route_mapping.json
+
+# Dead/reference code kept out of the image
+_removed_*/
+
+# Misc dev-only scripts and CI config not needed inside the image
+.github/
+tmp_test_marketplace.js
+check_mounts.js
+generate_service_mapping.js
+
+# Editor/OS cruft
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
