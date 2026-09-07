@@ -1,10 +1,19 @@
 /**
  * ERP Cost Control & Profitability Module API Routes
  * Cost centre management, cost allocation, and profitability analysis
+ *
+ * NOTE: distinct from routes/costControlRoutes.js (mounted at
+ * /api/v1/erp/controlling), which is the DB-backed cost/profit-centre +
+ * budget-vs-GL-actual module. This file wraps services/erp/CostControlModule.js,
+ * a stateless calculator for activity-based cost allocation, variance
+ * analysis and profitability drill-down — it does not persist cost centres
+ * between requests. Mounted at /api/v1/erp/cost-management.
  */
 
 const express = require('express');
 const CostControlModule = require('../services/erp/CostControlModule');
+const { authMiddleware } = require('../middleware/auth');
+const { adminMiddleware } = require('../middleware/admin');
 
 const router = express.Router();
 
@@ -12,7 +21,7 @@ const router = express.Router();
  * POST /api/v1/erp/cost-centres/create
  * Create a new cost centre
  */
-router.post('/cost-centres/create', async (req, res) => {
+router.post('/cost-centres/create', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const {
       code,
@@ -56,7 +65,7 @@ router.post('/cost-centres/create', async (req, res) => {
  * POST /api/v1/erp/costs/allocate
  * Allocate costs to cost centre
  */
-router.post('/costs/allocate', async (req, res) => {
+router.post('/costs/allocate', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const {
       cost_centre_id,
@@ -98,7 +107,7 @@ router.post('/costs/allocate', async (req, res) => {
  * POST /api/v1/erp/costs/record-consumption
  * Record actual cost consumption
  */
-router.post('/costs/record-consumption', async (req, res) => {
+router.post('/costs/record-consumption', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const {
       cost_centre_id,
@@ -142,7 +151,7 @@ router.post('/costs/record-consumption', async (req, res) => {
  * POST /api/v1/erp/costs/allocate-abc
  * Allocate indirect costs using activity-based costing
  */
-router.post('/costs/allocate-abc', async (req, res) => {
+router.post('/costs/allocate-abc', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const {
       indirect_cost_pool_id,
@@ -178,7 +187,7 @@ router.post('/costs/allocate-abc', async (req, res) => {
  * GET /api/v1/erp/profitability/:cost_centre_id/:period
  * Calculate profitability for cost centre
  */
-router.get('/profitability/:cost_centre_id/:period', async (req, res) => {
+router.get('/profitability/:cost_centre_id/:period', authMiddleware, async (req, res) => {
   try {
     const {
       cost_centre_id,
@@ -212,7 +221,7 @@ router.get('/profitability/:cost_centre_id/:period', async (req, res) => {
  * GET /api/v1/erp/variance/:cost_centre_id/:period
  * Analyze cost variance
  */
-router.get('/variance/:cost_centre_id/:period', async (req, res) => {
+router.get('/variance/:cost_centre_id/:period', authMiddleware, async (req, res) => {
   try {
     const {
       cost_centre_id,
@@ -252,7 +261,7 @@ router.get('/variance/:cost_centre_id/:period', async (req, res) => {
  * GET /api/v1/erp/drill-down/:cost_centre_id/:period
  * Drill down into cost centre details
  */
-router.get('/drill-down/:cost_centre_id/:period', async (req, res) => {
+router.get('/drill-down/:cost_centre_id/:period', authMiddleware, async (req, res) => {
   try {
     const { cost_centre_id, period } = req.params;
 

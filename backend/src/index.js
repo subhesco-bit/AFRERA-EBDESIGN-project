@@ -368,6 +368,13 @@ const costControlRoutes = require('./routes/costControlRoutes');
 // in migration 9996_project_systems_schema.sql (see that file's header for
 // why it is numbered after 996 rather than in the 060s sequence).
 const projectSystemsRoutes = require('./routes/projectSystemsRoutes');
+// AF-CO activity-based costing/profitability drill-down calculator — found
+// unmounted (routes/erpRoutes.js) during the ERP-domain batch pass on
+// audit/ui-api-fix. Distinct from costControlRoutes.js (DB-backed cost/profit
+// centres against posted GL); this wraps services/erp/CostControlModule.js,
+// a stateless ABC-costing/variance/drill-down calculator. Mounted separately
+// to avoid colliding with /api/v1/erp/controlling.
+const erpCostManagementRoutes = require('./routes/erpRoutes');
 const coldStorageRoutes = require('./routes/coldStorageRoutes');
 const dprGenerationRoutes = require('./routes/dprGenerationRoutes');
 const decisionSupportRoutes = require('./routes/decisionSupportRoutes');
@@ -945,6 +952,8 @@ app.use('/api/v1/costs', costRoutes);
 app.use('/api/v1/erp/assets', assetAccountingRoutes);
 app.use('/api/v1/erp/controlling', costControlRoutes);
 app.use('/api/v1/erp/projects', projectSystemsRoutes);
+// See require comment above — previously unmounted.
+app.use('/api/v1/erp/cost-management', erpCostManagementRoutes);
 app.use('/api/v1/cold-storage', coldStorageRoutes);
 app.use('/api/v1/dpr', dprGenerationRoutes);
 app.use('/api/v1/decision-support', decisionSupportRoutes);

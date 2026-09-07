@@ -1374,11 +1374,11 @@ export const managementRoutes = [
     transition: 'fade'
   },
   {
-    path: '/erp-dashboard',
+    path: '/ecommerce-erp-dashboard',
     component: ERPDashboard,
-    title: 'ERP Dashboard - AFRERA',
-    description: 'Enterprise Resource Planning',
-    keywords: 'ERP, dashboard, enterprise',
+    title: 'E-commerce ERP Dashboard - AFRERA',
+    description: 'Financial, supply chain, production and CRM ERP sync for e-commerce orders',
+    keywords: 'ERP, ecommerce, dashboard, enterprise, GST, CRM',
     transition: 'fade'
   },
   {
