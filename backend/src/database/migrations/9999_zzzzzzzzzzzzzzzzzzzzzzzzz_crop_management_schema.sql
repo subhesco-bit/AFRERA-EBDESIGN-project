@@ -20,6 +20,19 @@ CREATE TABLE IF NOT EXISTS crop_registrations (
 );
 CREATE INDEX IF NOT EXISTS idx_crop_registrations_status ON crop_registrations(status);
 
+-- 2026-09-08 (DB audit follow-up): `crop_varieties` collides with the
+-- EARLIER `CREATE TABLE IF NOT EXISTS crop_varieties` in
+-- 001_skeleton_complete_schema.sql (id SERIAL, crop_id/code/name/
+-- description/average_yield_kg_per_acre - a completely different shape,
+-- no crop_name column). 001 sorts first and wins, so the CREATE TABLE
+-- below is a silent no-op, and the index that used to follow it
+-- (`idx_crop_varieties_crop` on crop_name) would throw "column crop_name
+-- does not exist" on a real run - halting every migration after this
+-- file, per migrate.js's archive-and-throw failure handling. Discovered
+-- statically while fixing the M044 module-schema gap. Index removed here;
+-- crop_name is added to the real (001) table, with an equivalent index,
+-- by 9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_module_schema_gaps_batch1.sql
+-- (idx_crop_varieties_crop_name), which runs last by filename order.
 CREATE TABLE IF NOT EXISTS crop_varieties (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     crop_name VARCHAR(150) NOT NULL,
@@ -32,7 +45,6 @@ CREATE TABLE IF NOT EXISTS crop_varieties (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
-CREATE INDEX IF NOT EXISTS idx_crop_varieties_crop ON crop_varieties(crop_name);
 
 CREATE TABLE IF NOT EXISTS seed_planning_plans (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

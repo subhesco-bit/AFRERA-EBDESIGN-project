@@ -50,9 +50,25 @@ CREATE TABLE IF NOT EXISTS farmer_onboarding (
 );
 
 -- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_farmers_email ON farmers(email);
+--
+-- 2026-09-08 (DB audit follow-up): `farmers` collides with the EARLIER,
+-- incompatible `CREATE TABLE IF NOT EXISTS farmers` in 000_base_schema.sql
+-- (id UUID, user_id/fpo_id/farmer_id/fdi_score/... - the FDI-scoring
+-- shape). 000 sorts first and wins, so this file's own `CREATE TABLE
+-- farmers` above is a silent no-op and the live table has NEITHER `email`
+-- nor `primary_crop`. The two indexes below on those columns would throw
+-- "column does not exist" on a real run and, per migrate.js's
+-- archive-and-halt failure handling, would stop EVERY migration after
+-- this one from ever executing - discovered statically (no Postgres
+-- running in this environment) while fixing the M021 module-schema gap.
+-- Removed here rather than fixed in place, because the real columns don't
+-- exist yet at this point in migration order; both are re-added (via
+-- ALTER TABLE, plus equivalent indexes idx_farmers_email_m021 /
+-- idx_farmers_primary_crop_m021) later in
+-- 9999_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz_module_schema_gaps_batch1.sql,
+-- which runs last by filename order. `idx_farmers_status` is unaffected -
+-- `status` already exists on the real (000_base_schema.sql) table.
 CREATE INDEX IF NOT EXISTS idx_farmers_status ON farmers(status);
-CREATE INDEX IF NOT EXISTS idx_farmers_primary_crop ON farmers(primary_crop);
 CREATE INDEX IF NOT EXISTS idx_farmer_verifications_farmer_id ON farmer_verifications(farmer_id);
 CREATE INDEX IF NOT EXISTS idx_farmer_verifications_status ON farmer_verifications(status);
 CREATE INDEX IF NOT EXISTS idx_farmer_onboarding_farmer_id ON farmer_onboarding(farmer_id);
